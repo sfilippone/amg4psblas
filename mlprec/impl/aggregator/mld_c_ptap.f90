@@ -125,11 +125,11 @@ subroutine mld_c_ptap(a_csr,desc_a,nlaggr,parms,ac,&
       call psb_c_coo_glob_transpose(coo_restr,desc_a,info,desc_c=desc_ac,desc_rx=desc_ax)
       call coo_restr%set_nrows(desc_ac%get_local_rows())
       call coo_restr%set_ncols(desc_ax%get_local_cols())
-!!$      write(0,*) me,' ',trim(name),' check on glob_transpose 1: ',&
-!!$           & desc_a%get_local_cols(),desc_ax%get_local_cols(),coo_restr%get_nzeros()
-      if (desc_a%get_local_cols()<desc_ax%get_local_cols()) then
-        write(0,*) me,' ',trim(name),' WARNING: GLOB_TRANSPOSE NEW INDICES '
-      end if
+! !$      write(0,*) me,' ',trim(name),' check on glob_transpose 1: ',&
+! !$           & desc_a%get_local_cols(),desc_ax%get_local_cols(),coo_restr%get_nzeros()
+! !$      if (desc_a%get_local_cols()<desc_ax%get_local_cols()) then
+! !$        write(0,*) me,' ',trim(name),' WARNING: GLOB_TRANSPOSE NEW INDICES '
+! !$      end if
     end block
     call csr_restr%cp_from_coo(coo_restr,info)
 
@@ -341,11 +341,11 @@ subroutine mld_c_lc_ptap(a_csr,desc_a,nlaggr,parms,ac,&
       call psb_c_coo_glob_transpose(icoo_restr,desc_a,info,desc_c=desc_ac,desc_rx=desc_ax)
       call icoo_restr%set_nrows(desc_ac%get_local_rows())
       call icoo_restr%set_ncols(desc_ax%get_local_cols())
-      write(0,*) me,' ',trim(name),' check on glob_transpose 1: ',&
-           & desc_a%get_local_cols(),desc_ax%get_local_cols(),icoo_restr%get_nzeros()
-      if (desc_a%get_local_cols()<desc_ax%get_local_cols()) then
-        write(0,*) me,' ',trim(name),' WARNING: GLOB_TRANSPOSE NEW INDICES '
-      end if
+! !$      write(0,*) me,' ',trim(name),' check on glob_transpose 1: ',&
+! !$           & desc_a%get_local_cols(),desc_ax%get_local_cols(),icoo_restr%get_nzeros()
+! !$      if (desc_a%get_local_cols()<desc_ax%get_local_cols()) then
+! !$        write(0,*) me,' ',trim(name),' WARNING: GLOB_TRANSPOSE NEW INDICES '
+! !$      end if
       call coo_restr%cp_from_icoo(icoo_restr,info)
     end block
     call csr_restr%cp_from_lcoo(coo_restr,info)

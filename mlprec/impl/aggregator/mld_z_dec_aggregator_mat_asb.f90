@@ -143,15 +143,15 @@ subroutine  mld_z_dec_aggregator_mat_asb(ag,parms,a,desc_a,&
     call op_prol%mv_to(tmpcoo)
     nzl = tmpcoo%get_nzeros()
     call psb_loc_to_glob(tmpcoo%ja(1:nzl),desc_ac,info,'I')
+    call tmpcoo%set_ncols(i_nr)
     call op_prol%mv_from(tmpcoo)
 
     call op_restr%mv_to(tmpcoo)
     nzl = tmpcoo%get_nzeros()
     call psb_loc_to_glob(tmpcoo%ia(1:nzl),desc_ac,info,'I')
+    call tmpcoo%set_nrows(i_nr)
     call op_restr%mv_from(tmpcoo)
 
-    call op_prol%set_ncols(i_nr)
-    call op_restr%set_nrows(i_nr)
 
     call psb_gather(tmp_ac,ac,desc_ac,info,root=-ione,&
          & dupl=psb_dupl_add_,keeploc=.false.)
