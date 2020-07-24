@@ -573,13 +573,21 @@ PAC_FORTRAN_TEST_ISO_FORTRAN_ENV(
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
 )
 
+PAC_FORTRAN_TEST_VOLATILE(
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for	VOLATILE])]	
+)
+
+PAC_FORTRAN_TEST_FINAL( 
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for FINAL])]	
+)
+
+
 #
 # Optional features
 #
 
-PAC_FORTRAN_TEST_VOLATILE( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_VOLATILE $FDEFINES"],
-)
 
 PAC_FORTRAN_TEST_GENERICS( 
 	[],
@@ -590,10 +598,6 @@ PAC_FORTRAN_TEST_FLUSH(
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FLUSH_STMT $FDEFINES"],
 )
 
-
-PAC_FORTRAN_TEST_FINAL( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FINAL $FDEFINES"],
-)
 
 PAC_FORTRAN_TEST_SAME_TYPE( 
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_SAME_TYPE_AS $FDEFINES"],
