@@ -34,11 +34,11 @@ dnl NOTE : odd configurations like ifc + gcc still await in the mist of the unkn
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([MLD2P4],2.3.1, [https://github.com/sfilippone/mld2p4-2/issues])
+AC_INIT([AMG4PSBLAS],1.0.0, [https://github.com/sfilippone/amg4psblas/issues])
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-mld2p4_cv_version="2.3.1"
+amg4psblas_cv_version="1.0.0"
 
 # A sample source file
 AC_CONFIG_SRCDIR([mlprec/mld_prec_type.f90])
@@ -46,7 +46,7 @@ AC_CONFIG_SRCDIR([mlprec/mld_prec_type.f90])
 AC_CONFIG_MACRO_DIR([config])
 AC_MSG_NOTICE([
 --------------------------------------------------------------------------------
-	Welcome to the $PACKAGE_NAME $mld2p4_cv_version configure Script.
+	Welcome to the $PACKAGE_NAME $amg4psblas_cv_version configure Script.
 
 	This creates Make.inc, but if you read carefully the
 	documentation, you can make your own by hand for your needs.
@@ -100,7 +100,7 @@ AC_PROG_INSTALL
 AC_MSG_CHECKING([where to install])
 case $prefix in  
    \/* )   eval "INSTALL_DIR=$prefix";;
-   * ) eval "INSTALL_DIR=/usr/local/mld2p4";;
+   * ) eval "INSTALL_DIR=/usr/local/amg4psblas";;
 esac
 case $libdir in 
    \/* )   eval "INSTALL_LIBDIR=$libdir";;
@@ -641,15 +641,15 @@ PAC_CHECK_MUMPS
 #    	the problem size fits into 4 bytes, very likely since we
 #    	are mostly using MUMPS at coarse level.
 #
-if test "x$mld2p4_cv_have_mumps" == "xyes" ; then
+if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
    if test "x$pac_cv_psblas_ipk" == "x8" ; then
       AC_MSG_NOTICE([PSBLAS defines PSB_IPK_ as $pac_cv_psblas_ipk. MUMPS interfacing disabled. ])
       MUMPS_FLAGS="";
       MUMPS_LIBS="";
-      mld2p4_cv_have_mumps=no;
+      amg4psblas_cv_have_mumps=no;
    fi
 fi   
-if test "x$mld2p4_cv_have_mumps" == "xyes" ; then
+if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
    if test "x$pac_cv_psblas_lpk" == "x8" ; then
       AC_MSG_NOTICE([PSBLAS defines PSB_LPK_ as $pac_cv_psblas_lpk. MUMPS interfacing will fail when called in global mode on very large matrices. ])
    fi	
@@ -669,7 +669,7 @@ else
 fi
 
 PAC_CHECK_UMFPACK
-if test "x$mld2p4_cv_have_umfpack" == "xyes" ; then 
+if test "x$amg4psblas_cv_have_umfpack" == "xyes" ; then 
    UMF_FLAGS="-DHave_UMF_ $UMF_INCLUDES"
    FDEFINES="$mld_cv_define_prepend-DHAVE_UMF_ $FDEFINES"
 else
@@ -677,7 +677,7 @@ else
 fi
 
 PAC_CHECK_SUPERLU
-if test "x$mld2p4_cv_have_superlu" == "xyes" ; then 
+if test "x$amg4psblas_cv_have_superlu" == "xyes" ; then 
    SLU_FLAGS="-DHave_SLU_ -DSLU_VERSION_$pac_slu_version $SLU_INCLUDES"
    FDEFINES="$mld_cv_define_prepend-DHAVE_SLU_ $FDEFINES"
 else
@@ -686,10 +686,10 @@ fi
 
 PAC_CHECK_SUPERLUDIST()
 
-if test "x$mld2p4_cv_have_superludist" == "xyes" ; then
-   pac_sludist_version="$mld2p4_cv_superludist_major";      
-   if (($mld2p4_cv_superludist_major==6)); then
-      if (($mld2p4_cv_superludist_minor>=3)); then
+if test "x$amg4psblas_cv_have_superludist" == "xyes" ; then
+   pac_sludist_version="$amg4psblas_cv_superludist_major";      
+   if (($amg4psblas_cv_superludist_major==6)); then
+      if (($amg4psblas_cv_superludist_minor>=3)); then
         pac_sludist_version="63";
       fi
    fi	
@@ -797,13 +797,13 @@ AC_OUTPUT()
 
 dnl Please note that brackets around variable identifiers are absolutely needed for compatibility..
 AC_MSG_NOTICE([
-	${PACKAGE_NAME} ${mld2p4_cv_version} has been configured as follows:
+	${PACKAGE_NAME} ${amg4psblas_cv_version} has been configured as follows:
 
 	PSBLAS library        : ${PSBLAS_DIR}
-	MUMPS detected        : ${mld2p4_cv_have_mumps}
-	SuperLU detected      : ${mld2p4_cv_have_superlu}
-	SuperLU_Dist detected : ${mld2p4_cv_have_superludist}
-	UMFPack detected      : ${mld2p4_cv_have_umfpack}
+	MUMPS detected        : ${amg4psblas_cv_have_mumps}
+	SuperLU detected      : ${amg4psblas_cv_have_superlu}
+	SuperLU_Dist detected : ${amg4psblas_cv_have_superludist}
+	UMFPack detected      : ${amg4psblas_cv_have_umfpack}
 
 	If you are satisfied, run 'make' to build ${PACKAGE_NAME} and its documentation; otherwise
 	type  ./configure --help=short for a complete list of configure options specific to ${PACKAGE_NAME}.
