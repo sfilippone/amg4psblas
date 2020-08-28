@@ -231,9 +231,9 @@ module mld_base_prec_type
   integer(psb_ipk_), parameter :: mld_diag_scale_    = mld_slv_delta_+1
   integer(psb_ipk_), parameter :: mld_l1_diag_scale_ = mld_slv_delta_+2
   integer(psb_ipk_), parameter :: mld_gs_            = mld_slv_delta_+3
-  integer(psb_ipk_), parameter :: mld_ilu_n_         = mld_slv_delta_+4
-  integer(psb_ipk_), parameter :: mld_milu_n_        = mld_slv_delta_+5
-  integer(psb_ipk_), parameter :: mld_ilu_t_         = mld_slv_delta_+6
+  ! !$  integer(psb_ipk_), parameter :: mld_ilu_n_         = mld_slv_delta_+4
+  ! !$  integer(psb_ipk_), parameter :: mld_milu_n_        = mld_slv_delta_+5
+  ! !$  integer(psb_ipk_), parameter :: mld_ilu_t_         = mld_slv_delta_+6
   integer(psb_ipk_), parameter :: mld_slu_           = mld_slv_delta_+7
   integer(psb_ipk_), parameter :: mld_umf_           = mld_slv_delta_+8
   integer(psb_ipk_), parameter :: mld_sludist_       = mld_slv_delta_+9
@@ -423,6 +423,7 @@ contains
   !               The integer value corresponding to the string
   !
   function mld_stringval(string) result(val)
+    use psb_prec_const_mod
     implicit none 
   ! Arguments
     character(len=*), intent(in) :: string
@@ -455,11 +456,11 @@ contains
     case('BGS','BWGS')
       val = mld_bwgs_
     case('ILU')
-      val = mld_ilu_n_
+      val = psb_ilu_n_
     case('MILU')
-      val = mld_milu_n_
+      val = psb_milu_n_
     case('ILUT')
-      val = mld_ilu_t_
+      val = psb_ilu_t_
     case('MUMPS')
       val = mld_mumps_
     case('UMF')
@@ -908,12 +909,13 @@ contains
     return
   end function is_legal_ml_fact
   function is_legal_ilu_fact(ip)
+    use psb_prec_const_mod
     implicit none 
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ilu_fact
 
-    is_legal_ilu_fact = ((ip==mld_ilu_n_).or.&
-         & (ip==mld_milu_n_).or.(ip==mld_ilu_t_))
+    is_legal_ilu_fact = ((ip==psb_ilu_n_).or.&
+         & (ip==psb_milu_n_).or.(ip==psb_ilu_t_))
     return
   end function is_legal_ilu_fact
   function is_legal_d_omega(ip)

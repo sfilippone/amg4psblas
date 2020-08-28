@@ -72,9 +72,7 @@ module mld_d_sludist_solver
     procedure, nopass   :: get_fmt => d_sludist_solver_get_fmt
     procedure, nopass   :: get_id  => d_sludist_solver_get_id
     procedure, pass(sv) :: is_global => d_sludist_solver_is_global
-#if defined(HAVE_FINAL) 
     final               :: d_sludist_solver_finalize
-#endif
   end type mld_d_sludist_solver_type
 
 
@@ -83,9 +81,7 @@ module mld_d_sludist_solver
        &  d_sludist_solver_sizeof, d_sludist_solver_apply_vect, &
        &  d_sludist_solver_get_fmt,  d_sludist_solver_get_id, &
        &  d_sludist_solver_is_global, d_sludist_solver_clear_data
-#if defined(HAVE_FINAL) 
   private :: d_sludist_solver_finalize
-#endif
 
 
   interface 
@@ -389,7 +385,6 @@ contains
     val = .true.
   end function d_sludist_solver_is_global
   
-#if defined(HAVE_FINAL)
   subroutine d_sludist_solver_finalize(sv)
 
     Implicit None
@@ -405,7 +400,6 @@ contains
     return
   
   end subroutine d_sludist_solver_finalize
-#endif
 
   subroutine d_sludist_solver_descr(sv,info,iout,coarse)
 

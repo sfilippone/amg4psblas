@@ -7,7 +7,7 @@ HERE=.
 FINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(INCDIR) $(PSBLAS_INCLUDES)
 
 
-DMODOBJS=mld_d_prec_type.o mld_d_ilu_fact_mod.o \
+DMODOBJS=mld_d_prec_type.o \
 	mld_d_inner_mod.o mld_d_ilu_solver.o mld_d_diag_solver.o mld_d_jac_smoother.o mld_d_as_smoother.o \
 	mld_d_umf_solver.o mld_d_slu_solver.o mld_d_sludist_solver.o mld_d_id_solver.o\
 	mld_d_base_solver_mod.o mld_d_base_smoother_mod.o mld_d_onelev_mod.o \
@@ -125,8 +125,8 @@ mld_s_base_solver_mod.o mld_d_base_solver_mod.o mld_c_base_solver_mod.o mld_z_ba
 mld_d_mumps_solver.o mld_d_gs_solver.o mld_d_id_solver.o mld_d_sludist_solver.o mld_d_slu_solver.o \
 mld_d_umf_solver.o mld_d_diag_solver.o mld_d_ilu_solver.o: mld_d_base_solver_mod.o  mld_d_prec_type.o
 
-mld_d_ilu_fact_mod.o: mld_base_prec_type.o  mld_d_base_solver_mod.o
-mld_d_ilu_solver.o mld_d_iluk_fact.o: mld_d_ilu_fact_mod.o
+#mld_d_ilu_fact_mod.o: mld_base_prec_type.o  mld_d_base_solver_mod.o
+#mld_d_ilu_solver.o mld_d_iluk_fact.o: mld_d_ilu_fact_mod.o
 mld_d_as_smoother.o mld_d_jac_smoother.o: mld_d_base_smoother_mod.o
 mld_d_jac_smoother.o: mld_d_diag_solver.o
 mld_dprecinit.o mld_dprecset.o: mld_d_diag_solver.o mld_d_ilu_solver.o \

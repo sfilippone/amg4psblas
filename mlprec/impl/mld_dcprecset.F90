@@ -206,7 +206,7 @@ subroutine mld_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
 #elif defined(HAVE_MUMPS_)
             call p%precv(nlev_)%set('SUB_SOLVE',mld_mumps_,info,pos=pos)
 #else
-            call p%precv(nlev_)%set('SUB_SOLVE',mld_ilu_n_,info,pos=pos)
+            call p%precv(nlev_)%set('SUB_SOLVE',psb_ilu_n_,info,pos=pos)
 #endif
             call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info)
           case(mld_slu_)
@@ -220,10 +220,10 @@ subroutine mld_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
             call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #else 
             call p%precv(nlev_)%set('SMOOTHER_TYPE',mld_bjac_,info,pos=pos)
-            call p%precv(nlev_)%set('SUB_SOLVE',mld_ilu_n_,info,pos=pos)
+            call p%precv(nlev_)%set('SUB_SOLVE',psb_ilu_n_,info,pos=pos)
             call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #endif
-          case(mld_ilu_n_, mld_ilu_t_,mld_milu_n_)
+          case(psb_ilu_n_, psb_ilu_t_,psb_milu_n_)
             call p%precv(nlev_)%set('SMOOTHER_TYPE',mld_bjac_,info,pos=pos)
             call p%precv(nlev_)%set('SUB_SOLVE',val,info,pos=pos)
             call p%precv(nlev_)%set('COARSE_MAT',mld_repl_mat_,info,pos=pos)
@@ -234,7 +234,7 @@ subroutine mld_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
             call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #else 
             call p%precv(nlev_)%set('SMOOTHER_TYPE',mld_bjac_,info,pos=pos)
-            call p%precv(nlev_)%set('SUB_SOLVE',mld_ilu_n_,info,pos=pos)
+            call p%precv(nlev_)%set('SUB_SOLVE',psb_ilu_n_,info,pos=pos)
             call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #endif
          case(mld_umf_)
@@ -252,7 +252,7 @@ subroutine mld_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
             call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #else 
             call p%precv(nlev_)%set('SMOOTHER_TYPE',mld_bjac_,info,pos=pos)
-            call p%precv(nlev_)%set('SUB_SOLVE',mld_ilu_n_,info,pos=pos)
+            call p%precv(nlev_)%set('SUB_SOLVE',psb_ilu_n_,info,pos=pos)
             call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #endif
           
@@ -275,7 +275,7 @@ subroutine mld_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
             call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #else 
             call p%precv(nlev_)%set('SMOOTHER_TYPE',mld_bjac_,info,pos=pos)
-            call p%precv(nlev_)%set('SUB_SOLVE',mld_ilu_n_,info,pos=pos)
+            call p%precv(nlev_)%set('SUB_SOLVE',psb_ilu_n_,info,pos=pos)
             call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #endif
           case(mld_jac_)
@@ -366,7 +366,7 @@ subroutine mld_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
 #elif defined(HAVE_MUMPS_)
           call p%precv(nlev_)%set('SUB_SOLVE',mld_mumps_,info,pos=pos)
 #else
-          call p%precv(nlev_)%set('SUB_SOLVE',mld_ilu_n_,info,pos=pos)
+          call p%precv(nlev_)%set('SUB_SOLVE',psb_ilu_n_,info,pos=pos)
 #endif
           call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info)
         case(mld_slu_)
@@ -380,10 +380,10 @@ subroutine mld_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
           call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #else 
           call p%precv(nlev_)%set('SMOOTHER_TYPE',mld_bjac_,info,pos=pos)
-          call p%precv(nlev_)%set('SUB_SOLVE',mld_ilu_n_,info,pos=pos)
+          call p%precv(nlev_)%set('SUB_SOLVE',psb_ilu_n_,info,pos=pos)
           call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #endif
-        case(mld_ilu_n_, mld_ilu_t_,mld_milu_n_)
+        case(psb_ilu_n_, psb_ilu_t_,psb_milu_n_)
           call p%precv(nlev_)%set('SMOOTHER_TYPE',mld_bjac_,info,pos=pos)
           call p%precv(nlev_)%set('SUB_SOLVE',val,info,pos=pos)
           call p%precv(nlev_)%set('COARSE_MAT',mld_repl_mat_,info,pos=pos)
@@ -394,7 +394,7 @@ subroutine mld_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
           call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #else 
           call p%precv(nlev_)%set('SMOOTHER_TYPE',mld_bjac_,info,pos=pos)
-          call p%precv(nlev_)%set('SUB_SOLVE',mld_ilu_n_,info,pos=pos)
+          call p%precv(nlev_)%set('SUB_SOLVE',psb_ilu_n_,info,pos=pos)
           call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #endif
        case(mld_umf_)
@@ -412,7 +412,7 @@ subroutine mld_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
           call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #else 
           call p%precv(nlev_)%set('SMOOTHER_TYPE',mld_bjac_,info,pos=pos)
-          call p%precv(nlev_)%set('SUB_SOLVE',mld_ilu_n_,info,pos=pos)
+          call p%precv(nlev_)%set('SUB_SOLVE',psb_ilu_n_,info,pos=pos)
           call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #endif
           
@@ -435,7 +435,7 @@ subroutine mld_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
           call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #else 
           call p%precv(nlev_)%set('SMOOTHER_TYPE',mld_bjac_,info,pos=pos)
-          call p%precv(nlev_)%set('SUB_SOLVE',mld_ilu_n_,info,pos=pos)
+          call p%precv(nlev_)%set('SUB_SOLVE',psb_ilu_n_,info,pos=pos)
           call p%precv(nlev_)%set('COARSE_MAT',mld_distr_mat_,info,pos=pos)
 #endif
         case(mld_jac_)

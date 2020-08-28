@@ -99,7 +99,7 @@ subroutine mld_c_ilu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
   select case(sv%fact_type)
 
-  case (mld_ilu_t_)
+  case (psb_ilu_t_)
     !
     ! ILU(k,t)
     !
@@ -113,17 +113,17 @@ subroutine mld_c_ilu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
     case(0:)
       ! Fill-in >= 0
-      call mld_ilut_fact(sv%fill_in,sv%thresh,&
+      call psb_ilut_fact(sv%fill_in,sv%thresh,&
            & a, sv%l,sv%u,sv%d,info,blck=b)
     end select
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
-      ch_err='mld_ilut_fact'
+      ch_err='psb_ilut_fact'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
 
-  case(mld_ilu_n_,mld_milu_n_) 
+  case(psb_ilu_n_,psb_milu_n_) 
     !
     ! ILU(k) and MILU(k)
     !
@@ -137,24 +137,24 @@ subroutine mld_c_ilu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
       ! Fill-in 0
       ! Separate implementation of ILU(0) for better performance.
       ! There seems to be a problem with the separate implementation of MILU(0),
-      ! contained into mld_ilu0_fact. This must be investigated. For the time being,
+      ! contained into psb_ilu0_fact. This must be investigated. For the time being,
       ! resort to the implementation of MILU(k) with k=0.
-      if (sv%fact_type == mld_ilu_n_) then 
-        call mld_ilu0_fact(sv%fact_type,a,sv%l,sv%u,&
+      if (sv%fact_type == psb_ilu_n_) then 
+        call psb_ilu0_fact(sv%fact_type,a,sv%l,sv%u,&
              & sv%d,info,blck=b)
       else
-        call mld_iluk_fact(sv%fill_in,sv%fact_type,&
+        call psb_iluk_fact(sv%fill_in,sv%fact_type,&
              & a,sv%l,sv%u,sv%d,info,blck=b)
       endif
     case(1:)
       ! Fill-in >= 1
       ! The same routine implements both ILU(k) and MILU(k)
-      call mld_iluk_fact(sv%fill_in,sv%fact_type,&
+      call psb_iluk_fact(sv%fill_in,sv%fact_type,&
            & a,sv%l,sv%u,sv%d,info,blck=b)
     end select
     if (info /= psb_success_) then
       info=psb_err_from_subroutine_
-      ch_err='mld_iluk_fact'
+      ch_err='psb_iluk_fact'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if

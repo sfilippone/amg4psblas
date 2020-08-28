@@ -164,7 +164,7 @@ subroutine mld_c_base_onelev_cseti(lv,what,val,info,pos,idx)
     case (mld_bwgs_)
       call lv%set(mld_c_bwgs_solver_mold,info,pos=pos)
       
-    case (mld_ilu_n_,mld_milu_n_,mld_ilu_t_)
+    case (psb_ilu_n_,psb_milu_n_,psb_ilu_t_)
       call lv%set(mld_c_ilu_solver_mold,info,pos=pos)
       if (info == 0) then
         if ((ipos_==mld_smooth_pre_) .or.(ipos_==mld_smooth_both_)) then 

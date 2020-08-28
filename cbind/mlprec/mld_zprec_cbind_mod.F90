@@ -397,7 +397,7 @@ contains
  
  
    call precp%descr()
-   call flush(output_unit)
+   call flush(psb_out_unit)
  
    info = 0
    res = MLDC_ERR_FILTER(info)

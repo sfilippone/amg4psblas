@@ -100,9 +100,7 @@ module mld_s_mumps_solver
     procedure, nopass   :: get_fmt => s_mumps_solver_get_fmt
     procedure, nopass   :: get_id  => s_mumps_solver_get_id
     procedure, pass(sv) :: is_global => s_mumps_solver_is_global
-#if defined(HAVE_FINAL) 
     final               :: s_mumps_solver_finalize
-#endif
   end type mld_s_mumps_solver_type
 
 
@@ -114,9 +112,7 @@ module mld_s_mumps_solver
        &  s_mumps_solver_default, s_mumps_solver_get_fmt, &
        &  s_mumps_solver_clone_settings, &
        &  s_mumps_solver_get_id, s_mumps_solver_is_global
-#if defined(HAVE_FINAL) 
   private :: s_mumps_solver_finalize
-#endif
 
   interface 
     subroutine s_mumps_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
@@ -301,7 +297,6 @@ contains
 #endif
   end subroutine s_mumps_solver_free
 
-#if defined(HAVE_FINAL)
 subroutine s_mumps_solver_finalize(sv)
 
   Implicit None
@@ -317,7 +312,6 @@ subroutine s_mumps_solver_finalize(sv)
   return
 
 end subroutine s_mumps_solver_finalize
-#endif
 
 subroutine s_mumps_solver_descr(sv,info,iout,coarse)
 

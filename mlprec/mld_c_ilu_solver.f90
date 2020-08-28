@@ -58,7 +58,7 @@ module mld_c_ilu_solver
 
   use mld_base_prec_type, only : mld_fact_names
   use mld_c_base_solver_mod
-  use mld_c_ilu_fact_mod
+  use psb_c_ilu_fact_mod
 
   type, extends(mld_c_base_solver_type) :: mld_c_ilu_solver_type
     type(psb_cspmat_type)      :: l, u
@@ -234,7 +234,7 @@ contains
     ! Arguments
     class(mld_c_ilu_solver_type), intent(inout) :: sv
 
-    sv%fact_type = mld_ilu_n_
+    sv%fact_type = psb_ilu_n_
     sv%fill_in   = 0
     sv%thresh    = szero
 
@@ -255,13 +255,13 @@ contains
     info = psb_success_
 
     call mld_check_def(sv%fact_type,&
-         & 'Factorization',mld_ilu_n_,is_legal_ilu_fact)
+         & 'Factorization',psb_ilu_n_,is_legal_ilu_fact)
 
     select case(sv%fact_type)
-    case(mld_ilu_n_,mld_milu_n_)      
+    case(psb_ilu_n_,psb_milu_n_)      
       call mld_check_def(sv%fill_in,&
            & 'Level',izero,is_int_non_negative)
-    case(mld_ilu_t_)                 
+    case(psb_ilu_t_)                 
       call mld_check_def(sv%thresh,&
            & 'Eps',szero,is_legal_s_fact_thrs)
     end select
@@ -432,9 +432,9 @@ contains
     write(iout_,*) '  Incomplete factorization solver: ',&
          &  mld_fact_names(sv%fact_type)
     select case(sv%fact_type)
-    case(mld_ilu_n_,mld_milu_n_)      
+    case(psb_ilu_n_,psb_milu_n_)      
       write(iout_,*) '  Fill level:',sv%fill_in
-    case(mld_ilu_t_)         
+    case(psb_ilu_t_)         
       write(iout_,*) '  Fill level:',sv%fill_in
       write(iout_,*) '  Fill threshold :',sv%thresh
     end select
@@ -489,7 +489,7 @@ contains
     implicit none 
     integer(psb_ipk_)  :: val
     
-    val = mld_ilu_n_
+    val = psb_ilu_n_
   end function c_ilu_solver_get_id
 
   function c_ilu_solver_get_wrksize() result(val)

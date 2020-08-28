@@ -181,8 +181,8 @@ subroutine mld_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
              & ' but it has been changed to distributed.'
       end if
             
-    case(mld_ilu_n_, mld_ilu_t_,mld_milu_n_)
-      if (prec%precv(iszv)%sm%sv%get_id() /= mld_ilu_n_) then
+    case(psb_ilu_n_, psb_ilu_t_,psb_milu_n_)
+      if (prec%precv(iszv)%sm%sv%get_id() /= psb_ilu_n_) then
         write(psb_err_unit,*) &
              & 'MLD2P4: Warning: original coarse solver was requested as ',&
              & mld_fact_names(coarse_solve_id)

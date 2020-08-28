@@ -71,9 +71,7 @@ module mld_z_umf_solver
     procedure, pass(sv) :: sizeof  => z_umf_solver_sizeof
     procedure, nopass   :: get_fmt => z_umf_solver_get_fmt
     procedure, nopass   :: get_id  => z_umf_solver_get_id
-#if defined(HAVE_FINAL) 
     final               :: z_umf_solver_finalize
-#endif
   end type mld_z_umf_solver_type
 
 
@@ -82,9 +80,7 @@ module mld_z_umf_solver
        &  z_umf_solver_sizeof, z_umf_solver_apply_vect, &
        &  z_umf_solver_get_fmt, z_umf_solver_get_id, &
        &  z_umf_solver_clear_data
-#if defined(HAVE_FINAL) 
   private :: z_umf_solver_finalize
-#endif
 
 
 
@@ -377,7 +373,6 @@ contains
     return
   end subroutine z_umf_solver_clear_data
 
-#if defined(HAVE_FINAL)
   subroutine z_umf_solver_finalize(sv)
 
     Implicit None
@@ -393,7 +388,6 @@ contains
     return
   
   end subroutine z_umf_solver_finalize
-#endif
 
   subroutine z_umf_solver_descr(sv,info,iout,coarse)
 

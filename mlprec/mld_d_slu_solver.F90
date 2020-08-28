@@ -72,9 +72,7 @@ module mld_d_slu_solver
     procedure, pass(sv) :: sizeof  => d_slu_solver_sizeof
     procedure, nopass   :: get_fmt => d_slu_solver_get_fmt
     procedure, nopass   :: get_id  => d_slu_solver_get_id
-#if defined(HAVE_FINAL) 
     final               :: d_slu_solver_finalize
-#endif
   end type mld_d_slu_solver_type
 
 
@@ -83,9 +81,7 @@ module mld_d_slu_solver
        &  d_slu_solver_sizeof, d_slu_solver_apply_vect, &
        &  d_slu_solver_get_fmt, d_slu_solver_get_id, &
        &  d_slu_solver_clear_data
-#if defined(HAVE_FINAL) 
   private :: d_slu_solver_finalize
-#endif
 
 
 
@@ -371,7 +367,6 @@ contains
     return
   end subroutine d_slu_solver_clear_data
 
-#if defined(HAVE_FINAL)
   subroutine d_slu_solver_finalize(sv)
 
     Implicit None
@@ -387,7 +382,6 @@ contains
     return
   
   end subroutine d_slu_solver_finalize
-#endif
 
   subroutine d_slu_solver_descr(sv,info,iout,coarse)
 
