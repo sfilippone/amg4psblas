@@ -9,41 +9,41 @@ FINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(PSBLAS_INCLUD
 #CINCLUDES= -I${SUPERLU_INCDIR} -I${HSL_INCDIR}  -I${SPRAL_INCDIR} -I/home/users/pasqua/Ambra/BootCMatch/include -lBCM -L/home/users/pasqua/Ambra/BootCMatch/lib  -lm 
 
 OBJS= \
-mld_s_dec_aggregator_mat_asb.o \
-mld_s_dec_aggregator_mat_bld.o \
-mld_s_dec_aggregator_tprol.o \
-mld_s_symdec_aggregator_tprol.o  \
-mld_s_map_to_tprol.o mld_s_soc1_map_bld.o mld_s_soc2_map_bld.o\
-mld_s_ptap.o \
-mld_saggrmat_minnrg_bld.o\
-mld_saggrmat_nosmth_bld.o mld_saggrmat_smth_bld.o \
-mld_d_dec_aggregator_mat_asb.o \
-mld_d_dec_aggregator_mat_bld.o \
-mld_d_dec_aggregator_tprol.o \
-mld_d_symdec_aggregator_tprol.o  \
-mld_d_map_to_tprol.o mld_d_soc1_map_bld.o mld_d_soc2_map_bld.o \
-mld_d_ptap.o \
-mld_daggrmat_minnrg_bld.o \
-mld_daggrmat_nosmth_bld.o mld_daggrmat_smth_bld.o \
-mld_c_dec_aggregator_mat_asb.o \
-mld_c_dec_aggregator_mat_bld.o \
-mld_c_dec_aggregator_tprol.o \
-mld_c_symdec_aggregator_tprol.o  \
-mld_c_map_to_tprol.o mld_c_soc1_map_bld.o mld_c_soc2_map_bld.o\
-mld_c_ptap.o \
-mld_caggrmat_minnrg_bld.o\
-mld_caggrmat_nosmth_bld.o mld_caggrmat_smth_bld.o \
-mld_z_dec_aggregator_mat_asb.o \
-mld_z_dec_aggregator_mat_bld.o \
-mld_z_dec_aggregator_tprol.o \
-mld_z_symdec_aggregator_tprol.o  \
-mld_z_map_to_tprol.o mld_z_soc1_map_bld.o mld_z_soc2_map_bld.o\
-mld_z_ptap.o \
-mld_zaggrmat_minnrg_bld.o\
-mld_zaggrmat_nosmth_bld.o mld_zaggrmat_smth_bld.o 
+amg_s_dec_aggregator_mat_asb.o \
+amg_s_dec_aggregator_mat_bld.o \
+amg_s_dec_aggregator_tprol.o \
+amg_s_symdec_aggregator_tprol.o  \
+amg_s_map_to_tprol.o amg_s_soc1_map_bld.o amg_s_soc2_map_bld.o\
+amg_s_ptap.o \
+amg_saggrmat_minnrg_bld.o\
+amg_saggrmat_nosmth_bld.o amg_saggrmat_smth_bld.o \
+amg_d_dec_aggregator_mat_asb.o \
+amg_d_dec_aggregator_mat_bld.o \
+amg_d_dec_aggregator_tprol.o \
+amg_d_symdec_aggregator_tprol.o  \
+amg_d_map_to_tprol.o amg_d_soc1_map_bld.o amg_d_soc2_map_bld.o \
+amg_d_ptap.o \
+amg_daggrmat_minnrg_bld.o \
+amg_daggrmat_nosmth_bld.o amg_daggrmat_smth_bld.o \
+amg_c_dec_aggregator_mat_asb.o \
+amg_c_dec_aggregator_mat_bld.o \
+amg_c_dec_aggregator_tprol.o \
+amg_c_symdec_aggregator_tprol.o  \
+amg_c_map_to_tprol.o amg_c_soc1_map_bld.o amg_c_soc2_map_bld.o\
+amg_c_ptap.o \
+amg_caggrmat_minnrg_bld.o\
+amg_caggrmat_nosmth_bld.o amg_caggrmat_smth_bld.o \
+amg_z_dec_aggregator_mat_asb.o \
+amg_z_dec_aggregator_mat_bld.o \
+amg_z_dec_aggregator_tprol.o \
+amg_z_symdec_aggregator_tprol.o  \
+amg_z_map_to_tprol.o amg_z_soc1_map_bld.o amg_z_soc2_map_bld.o\
+amg_z_ptap.o \
+amg_zaggrmat_minnrg_bld.o\
+amg_zaggrmat_nosmth_bld.o amg_zaggrmat_smth_bld.o 
 
 
-LIBNAME=libmld_prec.a
+LIBNAME=libamg_prec.a
 
 lib:  $(OBJS)  	
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)

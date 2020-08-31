@@ -8,61 +8,61 @@ FINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(PSBLAS_INCLUD
 
 
 
-OBJS=mld_c_base_onelev_build.o \
-mld_c_base_onelev_check.o \
-mld_c_base_onelev_cnv.o \
-mld_c_base_onelev_csetc.o \
-mld_c_base_onelev_cseti.o \
-mld_c_base_onelev_csetr.o \
-mld_c_base_onelev_descr.o \
-mld_c_base_onelev_dump.o \
-mld_c_base_onelev_free.o \
-mld_c_base_onelev_mat_asb.o \
-mld_c_base_onelev_setag.o \
-mld_c_base_onelev_setsm.o \
-mld_c_base_onelev_setsv.o \
-mld_d_base_onelev_build.o \
-mld_d_base_onelev_check.o \
-mld_d_base_onelev_cnv.o \
-mld_d_base_onelev_csetc.o \
-mld_d_base_onelev_cseti.o \
-mld_d_base_onelev_csetr.o \
-mld_d_base_onelev_descr.o \
-mld_d_base_onelev_dump.o \
-mld_d_base_onelev_free.o \
-mld_d_base_onelev_mat_asb.o \
-mld_d_base_onelev_setag.o \
-mld_d_base_onelev_setsm.o \
-mld_d_base_onelev_setsv.o \
-mld_s_base_onelev_build.o \
-mld_s_base_onelev_check.o \
-mld_s_base_onelev_cnv.o \
-mld_s_base_onelev_csetc.o \
-mld_s_base_onelev_cseti.o \
-mld_s_base_onelev_csetr.o \
-mld_s_base_onelev_descr.o \
-mld_s_base_onelev_dump.o \
-mld_s_base_onelev_free.o \
-mld_s_base_onelev_mat_asb.o \
-mld_s_base_onelev_setag.o \
-mld_s_base_onelev_setsm.o \
-mld_s_base_onelev_setsv.o \
-mld_z_base_onelev_build.o \
-mld_z_base_onelev_check.o \
-mld_z_base_onelev_cnv.o \
-mld_z_base_onelev_csetc.o \
-mld_z_base_onelev_cseti.o \
-mld_z_base_onelev_csetr.o \
-mld_z_base_onelev_descr.o \
-mld_z_base_onelev_dump.o \
-mld_z_base_onelev_free.o \
-mld_z_base_onelev_mat_asb.o \
-mld_z_base_onelev_setag.o \
-mld_z_base_onelev_setsm.o \
-mld_z_base_onelev_setsv.o 
+OBJS=amg_c_base_onelev_build.o \
+amg_c_base_onelev_check.o \
+amg_c_base_onelev_cnv.o \
+amg_c_base_onelev_csetc.o \
+amg_c_base_onelev_cseti.o \
+amg_c_base_onelev_csetr.o \
+amg_c_base_onelev_descr.o \
+amg_c_base_onelev_dump.o \
+amg_c_base_onelev_free.o \
+amg_c_base_onelev_mat_asb.o \
+amg_c_base_onelev_setag.o \
+amg_c_base_onelev_setsm.o \
+amg_c_base_onelev_setsv.o \
+amg_d_base_onelev_build.o \
+amg_d_base_onelev_check.o \
+amg_d_base_onelev_cnv.o \
+amg_d_base_onelev_csetc.o \
+amg_d_base_onelev_cseti.o \
+amg_d_base_onelev_csetr.o \
+amg_d_base_onelev_descr.o \
+amg_d_base_onelev_dump.o \
+amg_d_base_onelev_free.o \
+amg_d_base_onelev_mat_asb.o \
+amg_d_base_onelev_setag.o \
+amg_d_base_onelev_setsm.o \
+amg_d_base_onelev_setsv.o \
+amg_s_base_onelev_build.o \
+amg_s_base_onelev_check.o \
+amg_s_base_onelev_cnv.o \
+amg_s_base_onelev_csetc.o \
+amg_s_base_onelev_cseti.o \
+amg_s_base_onelev_csetr.o \
+amg_s_base_onelev_descr.o \
+amg_s_base_onelev_dump.o \
+amg_s_base_onelev_free.o \
+amg_s_base_onelev_mat_asb.o \
+amg_s_base_onelev_setag.o \
+amg_s_base_onelev_setsm.o \
+amg_s_base_onelev_setsv.o \
+amg_z_base_onelev_build.o \
+amg_z_base_onelev_check.o \
+amg_z_base_onelev_cnv.o \
+amg_z_base_onelev_csetc.o \
+amg_z_base_onelev_cseti.o \
+amg_z_base_onelev_csetr.o \
+amg_z_base_onelev_descr.o \
+amg_z_base_onelev_dump.o \
+amg_z_base_onelev_free.o \
+amg_z_base_onelev_mat_asb.o \
+amg_z_base_onelev_setag.o \
+amg_z_base_onelev_setsm.o \
+amg_z_base_onelev_setsv.o 
 
 
-LIBNAME=libmld_prec.a
+LIBNAME=libamg_prec.a
 
 lib:  $(OBJS) 
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)

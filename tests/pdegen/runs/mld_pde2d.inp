@@ -11,7 +11,7 @@ CG                          ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS F
 ML-VCYCLE-FBGS-R-UMF        ! Longer descriptive name for preconditioner (up to 20 chars) 
 ML                          ! Preconditioner type: NONE JACOBI GS FBGS BJAC AS ML
 %%%%%%%%%%%  First smoother (for all levels but coarsest) %%%%%%%%%%%%%%%%
-FBGS                        ! Smoother type JACOBI FBGS GS BWGS BJAC AS. For 1-level, repeats previous. 
+BJAC                        ! Smoother type JACOBI FBGS GS BWGS BJAC AS. For 1-level, repeats previous. 
 1                           ! Number of sweeps for smoother
 0                           ! Number of overlap layers for AS preconditioner
 HALO                        ! AS restriction operator: NONE HALO 

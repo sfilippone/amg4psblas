@@ -10,11 +10,11 @@ CINCLUDES=-I. -I$(LIBDIR) -I$(PSBLAS_INCDIR)
 FINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(INCDIR) $(FMFLAG)$(MODDIR) $(PSBLAS_INCLUDES)
 
 
-OBJS=mld_prec_cbind_mod.o mld_dprec_cbind_mod.o  mld_c_dprec.o mld_zprec_cbind_mod.o  mld_c_zprec.o
-CMOD=mld_cbind.h mld_c_dprec.h  mld_c_zprec.h mld_const.h
+OBJS=amg_prec_cbind_mod.o amg_dprec_cbind_mod.o  amg_c_dprec.o amg_zprec_cbind_mod.o  amg_c_zprec.o
+CMOD=amg_cbind.h amg_c_dprec.h  amg_c_zprec.h amg_const.h
 
 
-LIBMOD=mld_prec_cbind_mod$(.mod) mld_dprec_cbind_mod$(.mod) mld_zprec_cbind_mod$(.mod) 
+LIBMOD=amg_prec_cbind_mod$(.mod) amg_dprec_cbind_mod$(.mod) amg_zprec_cbind_mod$(.mod) 
 LOCAL_MODS=$(LIBMOD)
 #LIBNAME=$(CPRECLIBNAME)	
 
@@ -25,8 +25,8 @@ lib:  $(OBJS) $(CMOD)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(DEST)
 	/bin/cp -p $(LIBMOD) $(CMOD) $(DEST)
 
-mld_prec_cbind_mod.o: mld_dprec_cbind_mod.o  mld_zprec_cbind_mod.o 
-#mld_prec_cbind_mod.o: psb_prec_cbind_mod.o
+amg_prec_cbind_mod.o: amg_dprec_cbind_mod.o  amg_zprec_cbind_mod.o 
+#amg_prec_cbind_mod.o: psb_prec_cbind_mod.o
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
 

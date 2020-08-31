@@ -3,7 +3,8 @@ include Make.inc
 
 all:  library 
 
-library: libdir mlp cbnd
+library: libdir mlp
+#cbnd
 
 libdir:
 	(if test ! -d lib ; then mkdir lib; fi)
