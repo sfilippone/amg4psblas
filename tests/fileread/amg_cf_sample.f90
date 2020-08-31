@@ -1,14 +1,14 @@
 !   
 !   
-!                             MLD2P4  version 2.2
-!    MultiLevel Domain Decomposition Parallel Preconditioners Package
+!                             AMG4PSBLAS version 1.0
+!    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.5)
 !    
-!    (C) Copyright 2008-2018 
+!    (C) Copyright 2020 
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
-!        Daniela di Serafino   
+!        Fabio Durastante        
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -18,14 +18,14 @@
 !      2. Redistributions in binary form must reproduce the above copyright
 !         notice, this list of conditions, and the following disclaimer in the
 !         documentation and/or other materials provided with the distribution.
-!      3. The name of the MLD2P4 group or the names of its contributors may
+!      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MLD2P4 GROUP OR ITS CONTRIBUTORS
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
 !    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 !    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 !    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -35,9 +35,9 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-program mld_cf_sample
+program amg_cf_sample
   use psb_base_mod
-  use mld_prec_mod
+  use amg_prec_mod
   use psb_krylov_mod
   use psb_util_mod
   use data_input
@@ -124,7 +124,7 @@ program mld_cf_sample
   type(psb_cspmat_type) :: a, aux_a
 
   ! preconditioner data
-  type(mld_cprec_type)  :: prec
+  type(amg_cprec_type)  :: prec
   ! dense matrices
   complex(psb_spk_), allocatable, target ::  aux_b(:,:), d(:), aux_g(:,:), aux_x(:,:)
   complex(psb_spk_), allocatable , save  :: x_col_glob(:), r_col_glob(:)
@@ -165,7 +165,7 @@ program mld_cf_sample
   endif
 
 
-  name='mld_cf_sample'
+  name='amg_cf_sample'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
   call psb_set_errverbosity(itwo)
@@ -174,7 +174,7 @@ program mld_cf_sample
   !
   if (iam == psb_root_) then 
     write(psb_out_unit,*) ' '
-    write(psb_out_unit,*) 'Welcome to MLD2P4 version: ',mld_version_string_
+    write(psb_out_unit,*) 'Welcome to MLD2P4 version: ',amg_version_string_
     write(psb_out_unit,*) 'This is the ',trim(name),' sample test program'
     write(psb_out_unit,*) ' '
   end if
@@ -457,7 +457,7 @@ program mld_cf_sample
   call prec%hierarchy_build(a,desc_a,info)
   thier = psb_wtime()-t1
   if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='mld_hierarchy_bld')
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_hierarchy_bld')
     goto 9999
   end if
   call psb_barrier(ictxt)
@@ -465,7 +465,7 @@ program mld_cf_sample
   call prec%smoothers_build(a,desc_a,info)
   tprec = psb_wtime()-t1
   if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='mld_smoothers_bld')
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_smoothers_bld')
     goto 9999
   end if
 
@@ -756,4 +756,4 @@ contains
 
   end subroutine get_parms
   
-end program mld_cf_sample
+end program amg_cf_sample

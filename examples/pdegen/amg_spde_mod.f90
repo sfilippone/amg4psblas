@@ -1,14 +1,14 @@
 !   
 !   
-!                             MLD2P4  version 2.2
-!    MultiLevel Domain Decomposition Parallel Preconditioners Package
+!                             AMG4PSBLAS version 1.0
+!    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.5)
 !    
-!    (C) Copyright 2008-2018 
+!    (C) Copyright 2020 
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
-!        Daniela di Serafino   
+!        Fabio Durastante        
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -18,14 +18,14 @@
 !      2. Redistributions in binary form must reproduce the above copyright
 !         notice, this list of conditions, and the following disclaimer in the
 !         documentation and/or other materials provided with the distribution.
-!      3. The name of the MLD2P4 group or the names of its contributors may
+!      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MLD2P4 GROUP OR ITS CONTRIBUTORS
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
 !    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 !    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 !    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -34,7 +34,7 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-module mld_s_pde_mod
+module amg_s_pde_mod
   use psb_base_mod, only : psb_spk_, psb_ipk_, psb_desc_type,&
        &  psb_sspmat_type, psb_s_vect_type, szero,&
        &  psb_s_base_sparse_mat, psb_s_base_vect_type, psb_i_base_vect_type
@@ -47,9 +47,9 @@ module mld_s_pde_mod
     end function s_func_3d
   end interface 
 
-  interface mld_gen_pde3d
-    module procedure  mld_s_gen_pde3d
-  end interface mld_gen_pde3d
+  interface amg_gen_pde3d
+    module procedure  amg_s_gen_pde3d
+  end interface amg_gen_pde3d
 
   
 contains
@@ -67,7 +67,7 @@ contains
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs. 
   !
-  subroutine mld_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
+  subroutine amg_s_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,&
        & a1,a2,a3,b1,b2,b3,c,g,info,f,amold,vmold,imold,partition,nrl,iv)
     use psb_base_mod
     use psb_util_mod
@@ -462,7 +462,7 @@ contains
 9999 call psb_error_handler(ictxt,err_act)
 
     return
-  end subroutine mld_s_gen_pde3d
+  end subroutine amg_s_gen_pde3d
 
   !
   ! functions parametrizing the differential equation 
@@ -520,5 +520,5 @@ contains
       g = exp(y**2-z**2)
     end if
   end function g
-end module mld_s_pde_mod
+end module amg_s_pde_mod
 

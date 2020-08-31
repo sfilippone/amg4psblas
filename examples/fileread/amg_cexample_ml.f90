@@ -1,14 +1,14 @@
 !   
 !   
-!                             MLD2P4  version 2.2
-!    MultiLevel Domain Decomposition Parallel Preconditioners Package
+!                             AMG4PSBLAS version 1.0
+!    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.5)
 !    
-!    (C) Copyright 2008-2018 
+!    (C) Copyright 2020 
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
-!        Daniela di Serafino   
+!        Fabio Durastante        
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -18,14 +18,14 @@
 !      2. Redistributions in binary form must reproduce the above copyright
 !         notice, this list of conditions, and the following disclaimer in the
 !         documentation and/or other materials provided with the distribution.
-!      3. The name of the MLD2P4 group or the names of its contributors may
+!      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MLD2P4 GROUP OR ITS CONTRIBUTORS
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
 !    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 !    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 !    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -35,7 +35,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-! File: mld_cexample_ml.f90
+! File: amg_cexample_ml.f90
 !
 ! This sample program solves a linear system by using CG coupled with
 ! one of the following multi-level preconditioner, as explained in Section 6.1
@@ -57,9 +57,9 @@
 ! The matrix and the rhs are read from files (if an rhs is not available, the
 ! unit rhs is set).
 !
-program mld_cexample_ml
+program amg_cexample_ml
   use psb_base_mod
-  use mld_prec_mod
+  use amg_prec_mod
   use psb_krylov_mod
   use psb_util_mod
   use data_input
@@ -77,7 +77,7 @@ program mld_cexample_ml
   type(psb_desc_type):: desc_A
 
   ! preconditioner
-  type(mld_cprec_type)  :: P
+  type(amg_cprec_type)  :: P
 
   ! right-hand side, solution and residual vectors
   type(psb_c_vect_type)  :: b, x, r
@@ -114,7 +114,7 @@ program mld_cexample_ml
     stop
   endif
 
-  name='mld_cexample_ml'
+  name='amg_cexample_ml'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
   call psb_set_errverbosity(2)
@@ -122,7 +122,7 @@ program mld_cexample_ml
   ! Hello world
   !
   if (iam == psb_root_) then 
-    write(*,*) 'Welcome to MLD2P4 version: ',mld_version_string_
+    write(*,*) 'Welcome to MLD2P4 version: ',amg_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
   end if
 
@@ -254,7 +254,7 @@ program mld_cexample_ml
   call psb_amx(ictxt, tprec)
 
   if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='mld_precbld')
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_precbld')
     goto 9999
   end if
 
@@ -391,4 +391,4 @@ contains
     call psb_bcast(ictxt,tol)
 
   end subroutine get_parms
-end program mld_cexample_ml
+end program amg_cexample_ml

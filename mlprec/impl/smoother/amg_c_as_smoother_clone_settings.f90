@@ -1,14 +1,14 @@
 !  
 !   
-!                             MLD2P4  version 2.2
-!    MultiLevel Domain Decomposition Parallel Preconditioners Package
+!                             AMG4PSBLAS version 1.0
+!    Algebraic Multigrid Package
 !               asd on PSBLAS (Parallel Sparse BLAS version 3.5)
 !    
-!    (C) Copyright 2008-2018 
+!    (C) Copyright 2020 
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
-!        Daniela di Serafino   
+!        Fabio Durastante        
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -18,14 +18,14 @@
 !      2. Redistributions in binary form must reproduce the above copyright
 !         notice, this list of conditions, and the following disclaimer in the
 !         documentation and/or other materials provided with the distribution.
-!      3. The name of the MLD2P4 group or the names of its contributors may
+!      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MLD2P4 GROUP OR ITS CONTRIBUTORS
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
 !    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 !    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 !    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS

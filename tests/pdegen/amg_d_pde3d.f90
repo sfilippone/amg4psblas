@@ -1,14 +1,14 @@
 !   
 !   
-!                             MLD2P4  version 2.2
-!    MultiLevel Domain Decomposition Parallel Preconditioners Package
+!                             AMG4PSBLAS version 1.0
+!    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.5)
 !    
-!    (C) Copyright 2008-2018 
+!    (C) Copyright 2020 
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
-!        Daniela di Serafino   
+!        Fabio Durastante        
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -18,14 +18,14 @@
 !      2. Redistributions in binary form must reproduce the above copyright
 !         notice, this list of conditions, and the following disclaimer in the
 !         documentation and/or other materials provided with the distribution.
-!      3. The name of the MLD2P4 group or the names of its contributors may
+!      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MLD2P4 GROUP OR ITS CONTRIBUTORS
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
 !    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 !    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 !    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -36,9 +36,9 @@
 !   
 !    
 !
-! File: mld_d_pde3d.f90
+! File: amg_d_pde3d.f90
 !
-! Program: mld_d_pde3d
+! Program: amg_d_pde3d
 ! This sample program solves a linear system obtained by discretizing a
 ! PDE with Dirichlet BCs. 
 ! 
@@ -64,7 +64,7 @@
 ! 3. A 3D distribution in which the unit cube is partitioned
 !    into subcubes, each one assigned to a process.
 !
-module mld_d_pde3d_mod
+module amg_d_pde3d_mod
   use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_lpk_, psb_desc_type,&
        &  psb_dspmat_type, psb_d_vect_type, dzero,&
        &  psb_d_base_sparse_mat, psb_d_base_vect_type, &
@@ -78,9 +78,9 @@ module mld_d_pde3d_mod
     end function d_func_3d
   end interface 
 
-  interface mld_gen_pde3d
-    module procedure  mld_d_gen_pde3d
-  end interface mld_gen_pde3d
+  interface amg_gen_pde3d
+    module procedure  amg_d_gen_pde3d
+  end interface amg_gen_pde3d
 
   
 contains
@@ -173,7 +173,7 @@ contains
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs. 
   !
-  subroutine mld_d_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,info,&
+  subroutine amg_d_gen_pde3d(ictxt,idim,a,bv,xv,desc_a,afmt,info,&
        & f,amold,vmold,imold,partition,nrl,iv)
     use psb_base_mod
     use psb_util_mod
@@ -571,17 +571,17 @@ contains
 9999 call psb_error_handler(ictxt,err_act)
 
     return
-  end subroutine mld_d_gen_pde3d
+  end subroutine amg_d_gen_pde3d
 
-end module mld_d_pde3d_mod
+end module amg_d_pde3d_mod
 
-program mld_d_pde3d
+program amg_d_pde3d
   use psb_base_mod
-  use mld_prec_mod
+  use amg_prec_mod
   use psb_krylov_mod
   use psb_util_mod
   use data_input
-  use mld_d_pde3d_mod
+  use amg_d_pde3d_mod
   implicit none
 
   ! input parameters
@@ -595,7 +595,7 @@ program mld_d_pde3d
 
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a
-  type(mld_dprec_type)  :: prec
+  type(amg_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense vectors
@@ -695,13 +695,13 @@ program mld_d_pde3d
     stop
   endif
   if(psb_get_errstatus() /= 0) goto 9999
-  name='mld_d_pde3d'
+  name='amg_d_pde3d'
   call psb_set_errverbosity(itwo)
   !
   ! Hello world
   !
   if (iam == psb_root_) then 
-    write(*,*) 'Welcome to MLD2P4 version: ',mld_version_string_
+    write(*,*) 'Welcome to MLD2P4 version: ',amg_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
   end if
 
@@ -716,12 +716,12 @@ program mld_d_pde3d
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call mld_gen_pde3d(ictxt,idim,a,b,x,desc_a,afmt,info)  
+  call amg_gen_pde3d(ictxt,idim,a,b,x,desc_a,afmt,info)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
-    ch_err='mld_gen_pde3d'
+    ch_err='amg_gen_pde3d'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
@@ -829,7 +829,7 @@ program mld_d_pde3d
   call prec%hierarchy_build(a,desc_a,info)
   thier = psb_wtime()-t1
   if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='mld_hierarchy_bld')
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_hierarchy_bld')
     goto 9999
   end if
   call psb_barrier(ictxt)
@@ -837,7 +837,7 @@ program mld_d_pde3d
   call prec%smoothers_build(a,desc_a,info)
   tprec = psb_wtime()-t1
   if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='mld_smoothers_bld')
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_smoothers_bld')
     goto 9999
   end if
 
@@ -1094,4 +1094,4 @@ contains
 
   end subroutine get_parms
 
-end program mld_d_pde3d
+end program amg_d_pde3d
