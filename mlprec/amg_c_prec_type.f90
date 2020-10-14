@@ -133,8 +133,9 @@ module amg_c_prec_type
     procedure, pass(prec)               :: move_alloc   => c_prec_move_alloc
     procedure, pass(prec)               :: init         => amg_cprecinit
     procedure, pass(prec)               :: build        => amg_cprecbld
-    procedure, pass(prec)               :: hierarchy_build  => amg_c_hierarchy_bld
-    procedure, pass(prec)               :: smoothers_build  => amg_c_smoothers_bld
+    procedure, pass(prec)               :: hierarchy_build   => amg_c_hierarchy_bld
+    procedure, pass(prec)               :: hierarchy_rebuild => amg_c_hierarchy_rebld
+    procedure, pass(prec)               :: smoothers_build   => amg_c_smoothers_bld
     procedure, pass(prec)               :: descr        =>  amg_cfile_prec_descr
   end type amg_cprec_type
 
@@ -310,6 +311,19 @@ module amg_c_prec_type
       !      character, intent(in),optional             :: upd
     end subroutine amg_c_hierarchy_bld
   end interface amg_hierarchy_bld
+
+  interface amg_hierarchy_rebld
+    subroutine amg_c_hierarchy_rebld(a,desc_a,prec,info)
+      import :: psb_cspmat_type, psb_desc_type, psb_spk_, &
+           & amg_cprec_type, psb_ipk_
+      implicit none
+      type(psb_cspmat_type), intent(in), target          :: a
+      type(psb_desc_type), intent(inout), target           :: desc_a
+      class(amg_cprec_type), intent(inout), target        :: prec
+      integer(psb_ipk_), intent(out)                       :: info
+      !      character, intent(in),optional             :: upd
+    end subroutine amg_c_hierarchy_rebld
+  end interface amg_hierarchy_rebld
 
   interface amg_smoothers_bld
     subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)

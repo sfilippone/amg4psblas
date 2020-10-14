@@ -135,36 +135,6 @@ module amg_d_base_aggregator_mod
       integer(psb_ipk_), intent(out)             :: info
       type(psb_desc_type), intent(inout), optional :: desc_ax
     end subroutine amg_d_ptap
-!!$    subroutine amg_d_ld_ptap(a_csr,desc_a,nlaggr,parms,ac,&
-!!$         & coo_prol,desc_cprol,coo_restr,info,desc_ax)
-!!$      import :: psb_d_csr_sparse_mat, psb_ldspmat_type, psb_desc_type, &
-!!$           & psb_ld_coo_sparse_mat, amg_dml_parms, psb_dpk_, psb_ipk_, psb_lpk_
-!!$      implicit none
-!!$      type(psb_d_csr_sparse_mat), intent(inout) :: a_csr
-!!$      type(psb_desc_type), intent(in)            :: desc_a
-!!$      integer(psb_lpk_), intent(inout)           :: nlaggr(:)
-!!$      type(amg_dml_parms), intent(inout)         :: parms 
-!!$      type(psb_ld_coo_sparse_mat), intent(inout) :: coo_prol, coo_restr
-!!$      type(psb_desc_type), intent(inout)         :: desc_cprol
-!!$      type(psb_ldspmat_type), intent(out)        :: ac
-!!$      integer(psb_ipk_), intent(out)             :: info
-!!$      type(psb_desc_type), intent(inout), optional :: desc_ax
-!!$    end subroutine amg_d_ld_ptap
-!!$    subroutine amg_ld_ptap(a_csr,desc_a,nlaggr,parms,ac,&
-!!$         & coo_prol,desc_cprol,coo_restr,info,desc_ax)
-!!$      import :: psb_ld_csr_sparse_mat, psb_ldspmat_type, psb_desc_type, &
-!!$           & psb_ld_coo_sparse_mat, amg_dml_parms, psb_dpk_, psb_ipk_, psb_lpk_
-!!$      implicit none
-!!$      type(psb_ld_csr_sparse_mat), intent(inout) :: a_csr
-!!$      type(psb_desc_type), intent(in)            :: desc_a
-!!$      integer(psb_lpk_), intent(inout)           :: nlaggr(:)
-!!$      type(amg_dml_parms), intent(inout)         :: parms 
-!!$      type(psb_ld_coo_sparse_mat), intent(inout) :: coo_prol, coo_restr
-!!$      type(psb_desc_type), intent(inout)         :: desc_cprol
-!!$      type(psb_ldspmat_type), intent(out)        :: ac
-!!$      integer(psb_ipk_), intent(out)             :: info
-!!$      type(psb_desc_type), intent(inout), optional :: desc_ax
-!!$    end subroutine amg_ld_ptap
   end interface amg_ptap
   
 contains

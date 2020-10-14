@@ -133,9 +133,9 @@ module amg_d_prec_type
     procedure, pass(prec)               :: move_alloc   => d_prec_move_alloc
     procedure, pass(prec)               :: init         => amg_dprecinit
     procedure, pass(prec)               :: build        => amg_dprecbld
-    procedure, pass(prec)               :: hierarchy_build  => amg_d_hierarchy_bld
-    procedure, pass(prec)               :: hierarchy_rebuild  => amg_d_hierarchy_rebld
-    procedure, pass(prec)               :: smoothers_build  => amg_d_smoothers_bld
+    procedure, pass(prec)               :: hierarchy_build   => amg_d_hierarchy_bld
+    procedure, pass(prec)               :: hierarchy_rebuild => amg_d_hierarchy_rebld
+    procedure, pass(prec)               :: smoothers_build   => amg_d_smoothers_bld
     procedure, pass(prec)               :: descr        =>  amg_dfile_prec_descr
   end type amg_dprec_type
 

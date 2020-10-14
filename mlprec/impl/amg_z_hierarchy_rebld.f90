@@ -35,9 +35,9 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-! File: amg_d_hierarchy_bld.f90
+! File: amg_z_hierarchy_bld.f90
 !
-! Subroutine: amg_d_hierarchy_bld
+! Subroutine: amg_z_hierarchy_bld
 ! Version:    real
 !
 !  This routine builds the preconditioner according to the requirements made by
@@ -63,18 +63,18 @@
 !    info    -  integer, output.
 !               Error code.              
 !  
-subroutine amg_d_hierarchy_rebld(a,desc_a,prec,info)
+subroutine amg_z_hierarchy_rebld(a,desc_a,prec,info)
 
   use psb_base_mod
-  use amg_d_inner_mod
-  use amg_d_prec_mod, amg_protect_name => amg_d_hierarchy_rebld
+  use amg_z_inner_mod
+  use amg_z_prec_mod, amg_protect_name => amg_z_hierarchy_rebld
 
   Implicit None
 
   ! Arguments
-  type(psb_dspmat_type),intent(in), target           :: a
+  type(psb_zspmat_type),intent(in), target           :: a
   type(psb_desc_type), intent(inout), target           :: desc_a
-  class(amg_dprec_type),intent(inout),target          :: prec
+  class(amg_zprec_type),intent(inout),target          :: prec
   integer(psb_ipk_), intent(out)                       :: info
 
   ! Local Variables
@@ -83,13 +83,13 @@ subroutine amg_d_hierarchy_rebld(a,desc_a,prec,info)
        & nplevs, mxplevs
   integer(psb_lpk_) :: iaggsize, casize
   real(psb_dpk_)     :: mnaggratio, sizeratio, athresh, aomega
-  class(amg_d_base_smoother_type), allocatable :: coarse_sm, med_sm, &
+  class(amg_z_base_smoother_type), allocatable :: coarse_sm, med_sm, &
        & med_sm2, coarse_sm2
-  class(amg_d_base_aggregator_type), allocatable :: tmp_aggr
+  class(amg_z_base_aggregator_type), allocatable :: tmp_aggr
   type(amg_dml_parms)              :: medparms, coarseparms
   integer(psb_lpk_), allocatable   :: nlaggr(:)
-  type(psb_d_coo_sparse_mat) :: coo_prol, coo_restr
-  type(psb_d_csr_sparse_mat) :: acsr
+  type(psb_z_coo_sparse_mat) :: coo_prol, coo_restr
+  type(psb_z_csr_sparse_mat) :: acsr
   type(psb_desc_type), pointer :: p_desc_a
   integer(psb_ipk_)  :: debug_level, debug_unit
   character(len=20)  :: name, ch_err
@@ -148,4 +148,4 @@ subroutine amg_d_hierarchy_rebld(a,desc_a,prec,info)
 
   return
 
-end subroutine amg_d_hierarchy_rebld
+end subroutine amg_z_hierarchy_rebld

@@ -207,7 +207,7 @@ subroutine amg_c_ptap(a_csr,desc_a,nlaggr,parms,ac,&
     call acsr3%free()
   end if
 
-  call psb_cdasb(desc_ac,info)
+  if (.not.desc_ac%is_asb()) call psb_cdasb(desc_ac,info)
 
   call ac_csr%set_nrows(desc_ac%get_local_rows())
   call ac_csr%set_ncols(desc_ac%get_local_cols())
@@ -424,7 +424,7 @@ subroutine amg_c_lc_ptap(a_csr,desc_a,nlaggr,parms,ac,&
     call acsr3%free()
   end if
 
-  call psb_cdasb(desc_ac,info)
+  if (.not.desc_ac%is_asb()) call psb_cdasb(desc_ac,info)
 
   call ac_csr%set_nrows(desc_ac%get_local_rows())
   call ac_csr%set_ncols(desc_ac%get_local_cols())
@@ -640,8 +640,8 @@ subroutine amg_lc_ptap(a_csr,desc_a,nlaggr,parms,ac,&
     if (do_timings) call psb_toc(idx_spspmm)      
     call acsr3%free()
   end if
-
-  call psb_cdasb(desc_ac,info)
+  
+  if (.not.desc_ac%is_asb()) call psb_cdasb(desc_ac,info)
 
   call ac_csr%set_nrows(desc_ac%get_local_rows())
   call ac_csr%set_ncols(desc_ac%get_local_cols())

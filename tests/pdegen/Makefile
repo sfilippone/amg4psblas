@@ -27,6 +27,10 @@ amg_s_pde2d: amg_s_pde2d.o   data_input.o
 	$(FLINK) $(LINKOPT) amg_s_pde2d.o  data_input.o -o amg_s_pde2d $(AMG_LIBS) $(PSBLAS_LIBS) $(LDLIBS)
 	/bin/mv amg_s_pde2d $(EXEDIR)
 
+amg_d_pde3d_rebld: amg_d_pde3d_rebld.o  data_input.o
+	$(FLINK) $(LINKOPT) amg_d_pde3d_rebld.o  data_input.o -o amg_d_pde3d_rebld $(AMG_LIBS) $(PSBLAS_LIBS) $(LDLIBS)
+	/bin/mv amg_d_pde3d_rebld $(EXEDIR)
+
 amg_d_pde3d.o amg_s_pde3d.o amg_d_pde2d.o amg_s_pde2d.o: data_input.o 
 
 check: all
