@@ -119,8 +119,8 @@ module amg_s_base_aggregator_mod
     end subroutine amg_s_soc_map_bld
   end interface
 
-  interface amg_ptap
-    subroutine amg_s_ptap(a_csr,desc_a,nlaggr,parms,ac,&
+  interface amg_ptap_bld
+    subroutine amg_s_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
          & coo_prol,desc_cprol,coo_restr,info,desc_ax)
       import :: psb_s_csr_sparse_mat, psb_sspmat_type, psb_desc_type, &
            & psb_s_coo_sparse_mat, amg_sml_parms, psb_spk_, psb_ipk_, psb_lpk_
@@ -134,6 +134,23 @@ module amg_s_base_aggregator_mod
       type(psb_sspmat_type), intent(out)        :: ac
       integer(psb_ipk_), intent(out)             :: info
       type(psb_desc_type), intent(inout), optional :: desc_ax
+    end subroutine amg_s_ptap_bld
+  end interface amg_ptap_bld
+
+  interface amg_ptap
+    subroutine amg_s_ptap(a_csr,desc_a,nlaggr,parms,ac,&
+         & coo_prol,desc_cprol,coo_restr,info)
+      import :: psb_s_csr_sparse_mat, psb_sspmat_type, psb_desc_type, &
+           & psb_s_coo_sparse_mat, amg_sml_parms, psb_spk_, psb_ipk_, psb_lpk_
+      implicit none
+      type(psb_s_csr_sparse_mat), intent(inout) :: a_csr
+      type(psb_desc_type), intent(in)            :: desc_a
+      integer(psb_lpk_), intent(inout)           :: nlaggr(:)
+      type(amg_sml_parms), intent(inout)         :: parms 
+      type(psb_s_coo_sparse_mat), intent(inout) :: coo_prol, coo_restr
+      type(psb_desc_type), intent(inout)         :: desc_cprol
+      type(psb_sspmat_type), intent(out)        :: ac
+      integer(psb_ipk_), intent(out)             :: info
     end subroutine amg_s_ptap
   end interface amg_ptap
   
