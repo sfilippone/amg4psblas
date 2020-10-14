@@ -147,9 +147,9 @@ fi
 if eval "$FC -qversion 2>&1 | grep XL 2>/dev/null" ; then
 	# Some configurations of the XLF want "-WF," prepended to -D.. flags.
 	# TODO : discover the exact conditions when the usage of -WF is needed.
-	mld_cv_define_prepend="-WF,"
+	amg_cv_define_prepend="-WF,"
         if eval "$MPIFC -qversion 2>&1 | grep -e\"Version: 10\.\" 2>/dev/null"; then
-        	FDEFINES="$mld_cv_define_prepend-DXLF_10 $FDEFINES"		  
+        	FDEFINES="$amg_cv_define_prepend-DXLF_10 $FDEFINES"		  
         fi
 
  # Note : there could be problems with old xlf compiler versions ( <10.1 )
@@ -655,9 +655,9 @@ if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
    fi	
    MUMPS_FLAGS="-DHave_MUMPS_ $MUMPS_INCLUDES"
    if test "x$pac_mumps_fmods_ok" == "xyes" ; then 
-      FDEFINES="$mld_cv_define_prepend-DHAVE_MUMPS_ $mld_cv_define_prepend-DHAVE_MUMPS_MODULES_ $MUMPS_MODULES $FDEFINES"
+      FDEFINES="$amg_cv_define_prepend-DHAVE_MUMPS_ $amg_cv_define_prepend-DHAVE_MUMPS_MODULES_ $MUMPS_MODULES $FDEFINES"
    elif test "x$pac_mumps_fincs_ok" == "xyes" ; then
-      FDEFINES="$mld_cv_define_prepend-DHAVE_MUMPS_ $mld_cv_define_prepend-DHAVE_MUMPS_INCLUDES_ $MUMPS_FINCLUDES $FDEFINES"
+      FDEFINES="$amg_cv_define_prepend-DHAVE_MUMPS_ $amg_cv_define_prepend-DHAVE_MUMPS_INCLUDES_ $MUMPS_FINCLUDES $FDEFINES"
    else
       # This should not happen
       MUMPS_FLAGS=""
@@ -671,7 +671,7 @@ fi
 PAC_CHECK_UMFPACK
 if test "x$amg4psblas_cv_have_umfpack" == "xyes" ; then 
    UMF_FLAGS="-DHave_UMF_ $UMF_INCLUDES"
-   FDEFINES="$mld_cv_define_prepend-DHAVE_UMF_ $FDEFINES"
+   FDEFINES="$amg_cv_define_prepend-DHAVE_UMF_ $FDEFINES"
 else
    UMF_FLAGS=""
 fi
@@ -679,7 +679,7 @@ fi
 PAC_CHECK_SUPERLU
 if test "x$amg4psblas_cv_have_superlu" == "xyes" ; then 
    SLU_FLAGS="-DHave_SLU_ -DSLU_VERSION_$pac_slu_version $SLU_INCLUDES"
-   FDEFINES="$mld_cv_define_prepend-DHAVE_SLU_ $FDEFINES"
+   FDEFINES="$amg_cv_define_prepend-DHAVE_SLU_ $FDEFINES"
 else
    SLU_FLAGS=""
 fi
@@ -695,7 +695,7 @@ if test "x$amg4psblas_cv_have_superludist" == "xyes" ; then
    fi	
    SLUDIST_FLAGS=""	       
    SLUDIST_FLAGS="-DHave_SLUDist_ -DSLUD_VERSION_$pac_sludist_version $SLUDIST_INCLUDES"
-   FDEFINES="$mld_cv_define_prepend-DHAVE_SLUDIST_ $FDEFINES"
+   FDEFINES="$amg_cv_define_prepend-DHAVE_SLUDIST_ $FDEFINES"
 else
    SLUDIST_FLAGS=""
 fi
