@@ -134,6 +134,7 @@ module amg_d_prec_type
     procedure, pass(prec)               :: init         => amg_dprecinit
     procedure, pass(prec)               :: build        => amg_dprecbld
     procedure, pass(prec)               :: hierarchy_build  => amg_d_hierarchy_bld
+    procedure, pass(prec)               :: hierarchy_rebuild  => amg_d_hierarchy_rebld
     procedure, pass(prec)               :: smoothers_build  => amg_d_smoothers_bld
     procedure, pass(prec)               :: descr        =>  amg_dfile_prec_descr
   end type amg_dprec_type
@@ -310,6 +311,19 @@ module amg_d_prec_type
       !      character, intent(in),optional             :: upd
     end subroutine amg_d_hierarchy_bld
   end interface amg_hierarchy_bld
+
+  interface amg_hierarchy_rebld
+    subroutine amg_d_hierarchy_rebld(a,desc_a,prec,info)
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, &
+           & amg_dprec_type, psb_ipk_
+      implicit none
+      type(psb_dspmat_type), intent(in), target          :: a
+      type(psb_desc_type), intent(inout), target           :: desc_a
+      class(amg_dprec_type), intent(inout), target        :: prec
+      integer(psb_ipk_), intent(out)                       :: info
+      !      character, intent(in),optional             :: upd
+    end subroutine amg_d_hierarchy_rebld
+  end interface amg_hierarchy_rebld
 
   interface amg_smoothers_bld
     subroutine amg_d_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)

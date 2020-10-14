@@ -23,7 +23,7 @@ MPCOBJS=amg_dslud_interface.o amg_zslud_interface.o
 
 
 DINNEROBJS= amg_dmlprec_bld.o amg_dfile_prec_descr.o \
-	amg_d_smoothers_bld.o amg_d_hierarchy_bld.o \
+	amg_d_smoothers_bld.o amg_d_hierarchy_bld.o amg_d_hierarchy_rebld.o \
 	amg_dmlprec_aply.o   \
 	$(DMPFOBJS) amg_d_extprol_bld.o
 

@@ -41,7 +41,7 @@ AC_INIT([AMG4PSBLAS],1.0.0, [https://github.com/sfilippone/amg4psblas/issues])
 amg4psblas_cv_version="1.0.0"
 
 # A sample source file
-AC_CONFIG_SRCDIR([mlprec/mld_prec_type.f90])
+AC_CONFIG_SRCDIR([mlprec/amg_prec_type.f90])
 # Our custom M4 macros are in the 'config' directory
 AC_CONFIG_MACRO_DIR([config])
 AC_MSG_NOTICE([
