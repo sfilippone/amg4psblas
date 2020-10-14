@@ -286,7 +286,7 @@ subroutine amg_daggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   nzl = acsr1%get_nzeros()
   call acsr1%mv_to_coo(coo_prol,info)
   
-  call amg_ptap(acsr,desc_a,nlaggr,parms,ac,&
+  call amg_ptap_bld(acsr,desc_a,nlaggr,parms,ac,&
        & coo_prol,desc_ac,coo_restr,info)
 
   call op_prol%mv_from(coo_prol)

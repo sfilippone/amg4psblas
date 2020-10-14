@@ -160,7 +160,7 @@ subroutine amg_caggrmat_nosmth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   call psb_cdasb(desc_ac,info)
   call psb_cd_reinit(desc_ac,info)
 
-  call amg_ptap(acsr,desc_a,nlaggr,parms,ac,&
+  call amg_ptap_bld(acsr,desc_a,nlaggr,parms,ac,&
        & coo_prol,desc_ac,coo_restr,info)
 
   call coo_restr%set_nrows(desc_ac%get_local_rows())
