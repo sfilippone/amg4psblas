@@ -14,7 +14,7 @@ amg_s_dec_aggregator_mat_bld.o \
 amg_s_dec_aggregator_tprol.o \
 amg_s_symdec_aggregator_tprol.o  \
 amg_s_map_to_tprol.o amg_s_soc1_map_bld.o amg_s_soc2_map_bld.o\
-amg_s_ptap.o amg_s_ptap_bld.o \
+amg_s_rap.o amg_s_ptap_bld.o \
 amg_saggrmat_minnrg_bld.o\
 amg_saggrmat_nosmth_bld.o amg_saggrmat_smth_bld.o \
 amg_d_dec_aggregator_mat_asb.o \
@@ -22,7 +22,7 @@ amg_d_dec_aggregator_mat_bld.o \
 amg_d_dec_aggregator_tprol.o \
 amg_d_symdec_aggregator_tprol.o  \
 amg_d_map_to_tprol.o amg_d_soc1_map_bld.o amg_d_soc2_map_bld.o \
-amg_d_ptap.o amg_d_ptap_bld.o \
+amg_d_rap.o amg_d_ptap_bld.o \
 amg_daggrmat_minnrg_bld.o \
 amg_daggrmat_nosmth_bld.o amg_daggrmat_smth_bld.o \
 amg_c_dec_aggregator_mat_asb.o \
@@ -30,7 +30,7 @@ amg_c_dec_aggregator_mat_bld.o \
 amg_c_dec_aggregator_tprol.o \
 amg_c_symdec_aggregator_tprol.o  \
 amg_c_map_to_tprol.o amg_c_soc1_map_bld.o amg_c_soc2_map_bld.o\
-amg_c_ptap.o amg_c_ptap_bld.o \
+amg_c_rap.o amg_c_ptap_bld.o \
 amg_caggrmat_minnrg_bld.o\
 amg_caggrmat_nosmth_bld.o amg_caggrmat_smth_bld.o \
 amg_z_dec_aggregator_mat_asb.o \
@@ -38,7 +38,7 @@ amg_z_dec_aggregator_mat_bld.o \
 amg_z_dec_aggregator_tprol.o \
 amg_z_symdec_aggregator_tprol.o  \
 amg_z_map_to_tprol.o amg_z_soc1_map_bld.o amg_z_soc2_map_bld.o\
-amg_z_ptap.o amg_z_ptap_bld.o \
+amg_z_rap.o amg_z_ptap_bld.o \
 amg_zaggrmat_minnrg_bld.o\
 amg_zaggrmat_nosmth_bld.o amg_zaggrmat_smth_bld.o 
 

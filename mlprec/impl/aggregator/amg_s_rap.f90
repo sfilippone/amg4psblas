@@ -32,27 +32,31 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-! File: amg_ptap.F90
+! File: amg_rap.F90
 !
 !  This routine computes the triple product :
-!                   AC = P^T  A P    
-!   P^T is stored in Restr
+!                   AC = R  A P    
+!   R is stored in Restr
+!   WARNINGS:
+!   1. So far this has only been tested with R=P^T
+!   2. Patterns and descriptors need to be consistent
+!      between initial build and application of this. 
 !
-subroutine amg_z_ptap(a_csr,desc_a,nlaggr,parms,ac,&
+subroutine amg_s_rap(a_csr,desc_a,nlaggr,parms,ac,&
      & coo_prol,desc_ac,coo_restr,info)
   use psb_base_mod
-  use amg_z_inner_mod
-  use amg_z_base_aggregator_mod, amg_protect_name => amg_z_ptap
+  use amg_s_inner_mod
+  use amg_s_base_aggregator_mod, amg_protect_name => amg_s_rap
   implicit none
 
   ! Arguments
-  type(psb_z_csr_sparse_mat), intent(inout) :: a_csr
+  type(psb_s_csr_sparse_mat), intent(inout) :: a_csr
   type(psb_desc_type), intent(inout)          :: desc_a
   integer(psb_lpk_), intent(inout)           :: nlaggr(:)
-  type(amg_dml_parms), intent(inout)         :: parms 
-  type(psb_z_coo_sparse_mat), intent(inout)  :: coo_prol, coo_restr
+  type(amg_sml_parms), intent(inout)         :: parms 
+  type(psb_s_coo_sparse_mat), intent(inout)  :: coo_prol, coo_restr
   type(psb_desc_type), intent(inout)         :: desc_ac
-  type(psb_zspmat_type), intent(out)        :: ac
+  type(psb_sspmat_type), intent(out)        :: ac
   integer(psb_ipk_), intent(out)             :: info
 
   ! Local variables
@@ -60,15 +64,15 @@ subroutine amg_z_ptap(a_csr,desc_a,nlaggr,parms,ac,&
   integer(psb_ipk_)  :: ictxt,np,me, icomm, ndx, minfo
   character(len=40)  :: name
   integer(psb_ipk_)  :: ierr(5)
-  type(psb_lz_coo_sparse_mat) :: ac_coo, tmpcoo
-  type(psb_z_csr_sparse_mat) :: acsr3, csr_prol, ac_csr, csr_restr
+  type(psb_ls_coo_sparse_mat) :: ac_coo, tmpcoo
+  type(psb_s_csr_sparse_mat) :: acsr3, csr_prol, ac_csr, csr_restr
   integer(psb_ipk_) :: debug_level, debug_unit, naggr
   integer(psb_lpk_) :: nglob, ntaggr, naggrm1, naggrp1
   integer(psb_ipk_) :: nrow, ncol, nrl, nzl, ip, nzt, i, k
   integer(psb_lpk_) ::  nrsave, ncsave, nzsave, nza
   logical, parameter :: debug=.false.
 
-  name='amg_ptap'
+  name='amg_rap'
   if(psb_get_errstatus().ne.0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -151,7 +155,7 @@ subroutine amg_z_ptap(a_csr,desc_a,nlaggr,parms,ac,&
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
-       & 'Done ptap '
+       & 'Done rap '
 
   call psb_erractionrestore(err_act)
   return
@@ -159,4 +163,4 @@ subroutine amg_z_ptap(a_csr,desc_a,nlaggr,parms,ac,&
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine amg_z_ptap
+end subroutine amg_s_rap

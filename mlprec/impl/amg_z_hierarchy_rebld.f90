@@ -128,7 +128,7 @@ subroutine amg_z_hierarchy_rebld(a,desc_a,prec,info)
     p_desc_a => prec%precv(i-1)%base_desc
     call prec%precv(i)%map%mat_V2U%cp_to(coo_prol)
     call prec%precv(i)%map%mat_U2V%cp_to(coo_restr)
-    call amg_ptap(acsr,p_desc_a,prec%precv(i)%map%naggr,&
+    call amg_rap(acsr,p_desc_a,prec%precv(i)%map%naggr,&
          & prec%precv(i)%parms,prec%precv(i)%ac,&
          & coo_prol,prec%precv(i)%desc_ac,coo_restr,info)
 
