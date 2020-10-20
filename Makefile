@@ -21,7 +21,7 @@ install: all
 	mkdir -p $(INSTALL_LIBDIR) &&\
 	   $(INSTALL_DATA) lib/*.a  $(INSTALL_LIBDIR)
 	mkdir -p  $(INSTALL_INCLUDEDIR) &&\
-	   $(INSTALL_DATA) Make.inc  $(INSTALL_INCLUDEDIR)/Make.inc.mld2p4
+	   $(INSTALL_DATA) Make.inc  $(INSTALL_INCLUDEDIR)/Make.inc.amg4psblas
 	mkdir -p $(INSTALL_INCLUDEDIR) && \
 	   $(INSTALL_DATA) include/*.h $(INSTALL_INCLUDEDIR)
 	mkdir -p $(INSTALL_MODULESDIR) && \
