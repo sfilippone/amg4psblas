@@ -81,9 +81,9 @@ module amg_base_prec_type
   ! 
   ! Version numbers
   !
-  character(len=*), parameter   :: amg_version_string_ = "2.3.0"
-  integer(psb_ipk_), parameter  :: amg_version_major_  = 2
-  integer(psb_ipk_), parameter  :: amg_version_minor_  = 3
+  character(len=*), parameter   :: amg_version_string_ = "1.0.0"
+  integer(psb_ipk_), parameter  :: amg_version_major_  = 1
+  integer(psb_ipk_), parameter  :: amg_version_minor_  = 0
   integer(psb_ipk_), parameter  :: amg_patchlevel_     = 0
 
   type amg_ml_parms
