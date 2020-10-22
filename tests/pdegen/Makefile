@@ -1,6 +1,6 @@
 AMGDIR=../..
 AMGINCDIR=$(AMGDIR)/include
-include $(AMGINCDIR)/Make.inc.mld2p4
+include $(AMGINCDIR)/Make.inc.amg4psblas
 AMGMODDIR=$(AMGDIR)/modules
 AMGLIBDIR=$(AMGDIR)/lib
 AMG_LIBS=-L$(AMGLIBDIR) -lpsb_krylov -lamg_prec -lpsb_prec
