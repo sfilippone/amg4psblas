@@ -3,7 +3,7 @@ include Make.inc
 
 all:  library 
 
-library: libdir mlp
+library: libdir amgp
 #cbnd
 
 libdir:
@@ -13,9 +13,9 @@ libdir:
 	($(INSTALL_DATA) Make.inc  include/Make.inc.amg4psblas)
         
 
-mlp:
-	$(MAKE) -C mlprec all
-cbnd: mlp
+amgp:
+	$(MAKE) -C amgprec all
+cbnd: amgp
 	$(MAKE) -C cbind all
 install: all
 	mkdir -p $(INSTALL_LIBDIR) &&\
@@ -41,7 +41,7 @@ cleanlib:
 	(cd modules; /bin/rm -f *.a *$(.mod) *$(.fh))
 
 veryclean: cleanlib
-	(cd mlprec; make veryclean)
+	(cd amgprec; make veryclean)
 	(cd examples/fileread; make clean)
 	(cd examples/pdegen; make clean)
 	(cd tests/fileread; make clean)
@@ -51,4 +51,4 @@ check: all
 	make check -C tests/pdegen
 
 clean:
-	(cd mlprec; make clean)
+	(cd amgprec; make clean)

@@ -9,18 +9,18 @@ LIBNAME=$(CBINDLIBNAME)
 LIBNAME=libmld_cbind.a	
 
 all: lib
-lib: mlprecd
+lib: amgprecd
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
 	/bin/cp -p $(CPUPDFLAG) *.h $(INCDIR)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)	
 
 
-mlprecd:
-	$(MAKE) -C mlprec lib LIBNAME=$(LIBNAME) 
+amgprecd:
+	$(MAKE) -C amgprec lib LIBNAME=$(LIBNAME) 
 
 
 clean: 
-	$(MAKE) -C mlprec clean
+	$(MAKE) -C amgprec clean
 
 
 veryclean: clean
