@@ -1,6 +1,6 @@
 MLDDIR=../..
 MLDINCDIR=$(MLDDIR)/include
-include $(MLDINCDIR)/Make.inc.mld2p4
+include $(MLDINCDIR)/Make.inc.amg4psblas
 MLDMODDIR=$(MLDDIR)/modules
 MLDLIBDIR=$(MLDDIR)/lib
 MLD_LIBS=-L$(MLDLIBDIR) -lpsb_krylov -lmld_prec -lpsb_prec
