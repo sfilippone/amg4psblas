@@ -152,6 +152,15 @@ module amg_z_onelev_mod
   end type amg_zmlprec_wrk_type
   private :: z_wrk_alloc, z_wrk_free, &
        & z_wrk_clone, z_wrk_move_alloc, z_wrk_cnv, z_wrk_sizeof    
+
+  type amg_z_remap_data_type
+    type(psb_zspmat_type)          :: ac_pre_remap
+    type(psb_desc_type)            :: desc_ac_pre_remap
+    integer(psb_ipk_)              :: ipdest
+    integer(psb_ipk_), allocatable :: isrc(:), nrsrc(:) 
+!!$  contains
+!!$    procedure, pass(rmp) :: clone   => z_remap_data_clone
+  end type amg_z_remap_data_type
   
   type amg_z_onelev_type
     class(amg_z_base_smoother_type), allocatable   :: sm, sm2a
@@ -167,6 +176,7 @@ module amg_z_onelev_mod
     type(psb_desc_type), pointer     :: base_desc => null() 
     type(psb_lzspmat_type)           :: tprol
     type(psb_zlinmap_type)           :: map
+    type(amg_z_remap_data_type)      :: remap_data
     real(psb_dpk_)                     :: szratio
   contains
     procedure, pass(lv) :: bld_tprol   => z_base_onelev_bld_tprol
@@ -196,6 +206,13 @@ module amg_z_onelev_mod
     procedure, nopass   :: stringval => amg_stringval
     procedure, pass(lv) :: move_alloc => z_base_onelev_move_alloc
     
+    
+    procedure, pass(lv) :: map_up_a => amg_z_base_onelev_map_up_a
+    procedure, pass(lv) :: map_dw_a => amg_z_base_onelev_map_dw_a
+    procedure, pass(lv) :: map_up_v => amg_z_base_onelev_map_up_v
+    procedure, pass(lv) :: map_dw_v => amg_z_base_onelev_map_dw_v
+    generic, public     :: map_up => map_up_a, map_up_v
+    generic, public     :: map_dw => map_dw_a, map_dw_v
   end type amg_z_onelev_type
 
   type amg_z_onelev_node
@@ -821,4 +838,92 @@ contains
     end if
   end function z_wrk_sizeof
  
+  subroutine amg_z_base_onelev_map_up_a(lv,alpha,u,beta,v,info,work)
+    implicit none
+    class(amg_z_onelev_type), target, intent(inout) :: lv
+    complex(psb_dpk_), intent(in)     :: alpha, beta
+    complex(psb_dpk_), intent(inout)   :: u(:)
+    complex(psb_dpk_), intent(out)     :: v(:)
+    integer(psb_ipk_), intent(out) :: info
+    complex(psb_dpk_), optional       :: work(:)
+
+    if (lv%remap_data%ac_pre_remap%is_asb()) then
+      !
+      ! Remap has happened, deal with it
+      !
+      write(0,*) 'Remap handling not implemented yet '
+    else
+      ! Default transfer
+        call lv%map%map_U2V(alpha,u,beta,v,info,&
+             & work=work)
+    end if
+
+  end subroutine amg_z_base_onelev_map_up_a
+  
+  subroutine amg_z_base_onelev_map_dw_a(lv,alpha,v,beta,u,info,work)
+    implicit none
+    class(amg_z_onelev_type), target, intent(inout) :: lv
+    complex(psb_dpk_), intent(in)     :: alpha, beta
+    complex(psb_dpk_), intent(inout)   :: u(:)
+    complex(psb_dpk_), intent(out)     :: v(:)
+    integer(psb_ipk_), intent(out) :: info
+    complex(psb_dpk_), optional          :: work(:)
+
+    if (lv%remap_data%ac_pre_remap%is_asb()) then
+      !
+      ! Remap has happened, deal with it
+      !
+      write(0,*) 'Remap handling not implemented yet '
+    else
+      ! Default transfer
+        call lv%map%map_V2U(alpha,v,beta,u,info,&
+             & work=work)
+    end if
+
+  end subroutine amg_z_base_onelev_map_dw_a
+
+  subroutine amg_z_base_onelev_map_up_v(lv,alpha,vect_u,beta,vect_v,info,work,vtx,vty)
+    implicit none
+    class(amg_z_onelev_type), target, intent(inout) :: lv
+    complex(psb_dpk_), intent(in)           :: alpha, beta
+    type(psb_z_vect_type), intent(inout) :: vect_u, vect_v
+    integer(psb_ipk_), intent(out)       :: info
+    complex(psb_dpk_), optional          :: work(:)
+    type(psb_z_vect_type), optional, target, intent(inout)  :: vtx,vty
+
+    if (lv%remap_data%ac_pre_remap%is_asb()) then
+      !
+      ! Remap has happened, deal with it
+      !
+      write(0,*) 'Remap handling not implemented yet '
+    else
+      ! Default transfer
+        call lv%map%map_U2V(alpha,vect_u,beta,vect_v,info,&
+             & work=work,vtx=vtx,vty=vty)
+    end if
+
+  end subroutine amg_z_base_onelev_map_up_v
+  
+  subroutine amg_z_base_onelev_map_dw_v(lv,alpha,vect_v,beta,vect_u,info,work,vtx,vty)
+    implicit none
+    class(amg_z_onelev_type), target, intent(inout) :: lv
+    complex(psb_dpk_), intent(in)           :: alpha, beta
+    type(psb_z_vect_type), intent(inout) :: vect_u, vect_v
+    integer(psb_ipk_), intent(out)       :: info
+    complex(psb_dpk_), optional          :: work(:)
+    type(psb_z_vect_type), optional, target, intent(inout)  :: vtx,vty
+
+    if (lv%remap_data%ac_pre_remap%is_asb()) then
+      !
+      ! Remap has happened, deal with it
+      !
+      write(0,*) 'Remap handling not implemented yet '
+    else
+      ! Default transfer
+        call lv%map%map_V2U(alpha,vect_v,beta,vect_u,info,&
+             & work=work,vtx=vtx,vty=vty)
+    end if
+
+  end subroutine amg_z_base_onelev_map_dw_v
+
 end module amg_z_onelev_mod

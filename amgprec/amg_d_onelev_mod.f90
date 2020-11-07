@@ -157,9 +157,9 @@ module amg_d_onelev_mod
     type(psb_dspmat_type)          :: ac_pre_remap
     type(psb_desc_type)            :: desc_ac_pre_remap
     integer(psb_ipk_)              :: ipdest
-    integer(psb_ipk_), allocatable :: isrc(:)
-  contains
-    procedure, pass(rmp) :: clone   => d_remap_data_clone
+    integer(psb_ipk_), allocatable :: isrc(:), nrsrc(:) 
+!!$  contains
+!!$    procedure, pass(rmp) :: clone   => d_remap_data_clone
   end type amg_d_remap_data_type
   
   type amg_d_onelev_type
@@ -177,7 +177,7 @@ module amg_d_onelev_mod
     type(psb_ldspmat_type)           :: tprol
     type(psb_dlinmap_type)           :: map
     type(amg_d_remap_data_type)      :: remap_data
-    real(psb_dpk_)                   :: szratio
+    real(psb_dpk_)                     :: szratio
   contains
     procedure, pass(lv) :: bld_tprol   => d_base_onelev_bld_tprol
     procedure, pass(lv) :: mat_asb     => amg_d_base_onelev_mat_asb
@@ -206,9 +206,13 @@ module amg_d_onelev_mod
     procedure, nopass   :: stringval => amg_stringval
     procedure, pass(lv) :: move_alloc => d_base_onelev_move_alloc
     
-    procedure, pass(lv) :: map_u2v => amg_d_base_onelev_map_u2v
-    procedure, pass(lv) :: map_v2u => amg_d_base_onelev_map_v2u
     
+    procedure, pass(lv) :: map_up_a => amg_d_base_onelev_map_up_a
+    procedure, pass(lv) :: map_dw_a => amg_d_base_onelev_map_dw_a
+    procedure, pass(lv) :: map_up_v => amg_d_base_onelev_map_up_v
+    procedure, pass(lv) :: map_dw_v => amg_d_base_onelev_map_dw_v
+    generic, public     :: map_up => map_up_a, map_up_v
+    generic, public     :: map_dw => map_dw_a, map_dw_v
   end type amg_d_onelev_type
 
   type amg_d_onelev_node
@@ -224,8 +228,7 @@ module amg_d_onelev_mod
 
   interface 
     subroutine amg_d_base_onelev_mat_asb(lv,a,desc_a,ilaggr,nlaggr,t_prol,info)
-      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, &
-           & psb_ldspmat_type, psb_lpk_
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, psb_ldspmat_type, psb_lpk_
       import :: amg_d_onelev_type
       implicit none 
       class(amg_d_onelev_type), intent(inout), target :: lv
@@ -409,32 +412,6 @@ interface
     end subroutine amg_d_base_onelev_dump
   end interface
   
-!!$  interface
-!!$    subroutine amg_d_base_onelev_map_u2v(lv,alpha,vect_u,beta,vect_v,info)
-!!$      import :: psb_d_base_sparse_mat, psb_d_vect_type, &
-!!$           & psb_i_base_vect_type, psb_dpk_, amg_d_onelev_type, &
-!!$           & psb_ipk_, psb_epk_, psb_desc_type
-!!$      implicit none
-!!$      class(amg_d_onelev_type), target, intent(inout) :: lv
-!!$      real(psb_dpk_), intent(in)           :: alpha, beta
-!!$      type(psb_d_vect_type), intent(inout) :: vect_u, vect_v
-!!$      integer(psb_ipk_), intent(out)       :: info
-!!$    end subroutine amg_d_base_onelev_map_u2v
-!!$  end interface
-!!$  
-!!$  interface
-!!$    subroutine amg_d_base_onelev_map_v2u(lv,alpha,vect_v,beta,vect_u,info)
-!!$      import :: psb_d_base_sparse_mat, psb_d_vect_type, &
-!!$           & psb_i_base_vect_type, psb_dpk_, amg_d_onelev_type, &
-!!$           & psb_ipk_, psb_epk_, psb_desc_type
-!!$      implicit none
-!!$      class(amg_d_onelev_type), target, intent(inout) :: lv
-!!$      real(psb_dpk_), intent(in)           :: alpha, beta
-!!$      type(psb_d_vect_type), intent(inout) :: vect_u, vect_v
-!!$      integer(psb_ipk_), intent(out)       :: info
-!!$    end subroutine amg_d_base_onelev_map_v2u
-!!$  end interface
-
 contains
   !
   ! Function returning the size of the amg_prec_type data structure
@@ -594,7 +571,6 @@ contains
     if (info == psb_success_) call lv%tprol%clone(lvout%tprol,info)
     if (info == psb_success_) call lv%desc_ac%clone(lvout%desc_ac,info)
     if (info == psb_success_) call lv%map%clone(lvout%map,info)
-    if (info == psb_success_) call lv%remap_data%clone(lvout%remap_data,info)
     lvout%base_a    => lv%base_a
     lvout%base_desc => lv%base_desc
     
@@ -602,17 +578,6 @@ contains
 
   end subroutine d_base_onelev_clone
 
-    subroutine d_remap_data_clone(rmp,rmpout,info)
-
-    Implicit None
-
-    ! Arguments
-    class(amg_d_remap_data_type), target, intent(inout) :: rmp
-    class(amg_d_remap_data_type), target, intent(inout) :: rmpout
-    integer(psb_ipk_), intent(out)                    :: info
-    
-  end subroutine d_remap_data_clone
-  
   subroutine d_base_onelev_move_alloc(lv, b,info)
     use psb_base_mod
     implicit none
@@ -873,27 +838,51 @@ contains
     end if
   end function d_wrk_sizeof
  
-
-  subroutine amg_d_base_onelev_map_u2v(lv,alpha,vect_u,beta,vect_v,info,work,vtx,vty)
+  subroutine amg_d_base_onelev_map_up_a(lv,alpha,u,beta,v,info,work)
     implicit none
     class(amg_d_onelev_type), target, intent(inout) :: lv
-    real(psb_dpk_), intent(in)           :: alpha, beta
-    type(psb_d_vect_type), intent(inout) :: vect_u, vect_v
-    integer(psb_ipk_), intent(out)       :: info
-    real(psb_dpk_), optional          :: work(:)
-    type(psb_d_vect_type), optional, target, intent(inout)  :: vtx,vty
+    real(psb_dpk_), intent(in)     :: alpha, beta
+    real(psb_dpk_), intent(inout)   :: u(:)
+    real(psb_dpk_), intent(out)     :: v(:)
+    integer(psb_ipk_), intent(out) :: info
+    real(psb_dpk_), optional       :: work(:)
 
     if (lv%remap_data%ac_pre_remap%is_asb()) then
       !
       ! Remap has happened, deal with it
       !
+      write(0,*) 'Remap handling not implemented yet '
     else
       ! Default transfer
+        call lv%map%map_U2V(alpha,u,beta,v,info,&
+             & work=work)
     end if
 
-  end subroutine amg_d_base_onelev_map_u2v
+  end subroutine amg_d_base_onelev_map_up_a
   
-  subroutine amg_d_base_onelev_map_v2u(lv,alpha,vect_v,beta,vect_u,info,work,vtx,vty)
+  subroutine amg_d_base_onelev_map_dw_a(lv,alpha,v,beta,u,info,work)
+    implicit none
+    class(amg_d_onelev_type), target, intent(inout) :: lv
+    real(psb_dpk_), intent(in)     :: alpha, beta
+    real(psb_dpk_), intent(inout)   :: u(:)
+    real(psb_dpk_), intent(out)     :: v(:)
+    integer(psb_ipk_), intent(out) :: info
+    real(psb_dpk_), optional          :: work(:)
+
+    if (lv%remap_data%ac_pre_remap%is_asb()) then
+      !
+      ! Remap has happened, deal with it
+      !
+      write(0,*) 'Remap handling not implemented yet '
+    else
+      ! Default transfer
+        call lv%map%map_V2U(alpha,v,beta,u,info,&
+             & work=work)
+    end if
+
+  end subroutine amg_d_base_onelev_map_dw_a
+
+  subroutine amg_d_base_onelev_map_up_v(lv,alpha,vect_u,beta,vect_v,info,work,vtx,vty)
     implicit none
     class(amg_d_onelev_type), target, intent(inout) :: lv
     real(psb_dpk_), intent(in)           :: alpha, beta
@@ -906,11 +895,35 @@ contains
       !
       ! Remap has happened, deal with it
       !
+      write(0,*) 'Remap handling not implemented yet '
     else
       ! Default transfer
-      
+        call lv%map%map_U2V(alpha,vect_u,beta,vect_v,info,&
+             & work=work,vtx=vtx,vty=vty)
     end if
 
-  end subroutine amg_d_base_onelev_map_v2u
+  end subroutine amg_d_base_onelev_map_up_v
+  
+  subroutine amg_d_base_onelev_map_dw_v(lv,alpha,vect_v,beta,vect_u,info,work,vtx,vty)
+    implicit none
+    class(amg_d_onelev_type), target, intent(inout) :: lv
+    real(psb_dpk_), intent(in)           :: alpha, beta
+    type(psb_d_vect_type), intent(inout) :: vect_u, vect_v
+    integer(psb_ipk_), intent(out)       :: info
+    real(psb_dpk_), optional          :: work(:)
+    type(psb_d_vect_type), optional, target, intent(inout)  :: vtx,vty
+
+    if (lv%remap_data%ac_pre_remap%is_asb()) then
+      !
+      ! Remap has happened, deal with it
+      !
+      write(0,*) 'Remap handling not implemented yet '
+    else
+      ! Default transfer
+        call lv%map%map_V2U(alpha,vect_v,beta,vect_u,info,&
+             & work=work,vtx=vtx,vty=vty)
+    end if
+
+  end subroutine amg_d_base_onelev_map_dw_v
 
 end module amg_d_onelev_mod
