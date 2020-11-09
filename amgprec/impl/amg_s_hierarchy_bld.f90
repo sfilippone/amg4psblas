@@ -333,7 +333,7 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
     if (i==2) then 
       sizeratio = desc_a%get_global_rows()/sizeratio
     else
-      sizeratio = sum(prec%precv(i-1)%map%naggr)/sizeratio
+      sizeratio = sum(prec%precv(i-1)%linmap%naggr)/sizeratio
     end if
     prec%precv(i)%szratio = sizeratio
 
@@ -352,7 +352,7 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
         end if
       end if
 
-      if (all(nlaggr == prec%precv(i-1)%map%naggr)) then 
+      if (all(nlaggr == prec%precv(i-1)%linmap%naggr)) then 
         newsz=i-1
         if (me == 0) then 
           write(debug_unit,*) trim(name),&
@@ -387,8 +387,8 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
         ! We are going back and revisit a previous leve;
         ! recover the aggregation.
         !
-        ilaggr = prec%precv(newsz)%map%iaggr
-        nlaggr = prec%precv(newsz)%map%naggr
+        ilaggr = prec%precv(newsz)%linmap%iaggr
+        nlaggr = prec%precv(newsz)%linmap%naggr
         call prec%precv(newsz)%tprol%clone(op_prol,info)
       end if
       if (do_timings) call psb_tic(idx_matasb)      
@@ -449,8 +449,8 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
     do i=2, iszv 
       prec%precv(i)%base_a       => prec%precv(i)%ac
       prec%precv(i)%base_desc    => prec%precv(i)%desc_ac
-      prec%precv(i)%map%p_desc_U => prec%precv(i-1)%base_desc
-      prec%precv(i)%map%p_desc_V => prec%precv(i)%base_desc
+      prec%precv(i)%linmap%p_desc_U => prec%precv(i-1)%base_desc
+      prec%precv(i)%linmap%p_desc_V => prec%precv(i)%base_desc
     end do
   end if
 

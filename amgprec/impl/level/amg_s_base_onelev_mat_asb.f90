@@ -53,7 +53,7 @@
 !  2. Call amg_Xaggrmat_asb to compute prolongator/restrictor/AC
 !  3. According to the choice of DIST/REPL for AC, build a descriptor DESC_AC,
 !     and adjust the column numbering of AC/OP_PROL/OP_RESTR
-!  4. Pack restrictor and prolongator into p%map
+!  4. Pack restrictor and prolongator into p%linmap
 !  5. Fix base_a and base_desc pointers.
 !
 ! 
@@ -157,7 +157,7 @@ subroutine amg_s_base_onelev_mat_asb(lv,a,desc_a,ilaggr,nlaggr,t_prol,info)
   if (info == psb_success_) call lv%ac%cscnv(info,type='csr',dupl=psb_dupl_add_)
   
   if (info == psb_success_) call lv%aggr%bld_map(desc_a, lv%desc_ac,&
-       & ilaggr,nlaggr,op_restr,op_prol,lv%map,info)
+       & ilaggr,nlaggr,op_restr,op_prol,lv%linmap,info)
   if(info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mat_asb/map_bld')
     goto 9999

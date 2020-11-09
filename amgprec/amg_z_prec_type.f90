@@ -832,8 +832,8 @@ contains
           if (info == psb_success_) then 
             pout%precv(lev)%base_a       => pout%precv(lev)%ac
             pout%precv(lev)%base_desc    => pout%precv(lev)%desc_ac
-            pout%precv(lev)%map%p_desc_U => pout%precv(lev-1)%base_desc
-            pout%precv(lev)%map%p_desc_V => pout%precv(lev)%base_desc
+            pout%precv(lev)%linmap%p_desc_U => pout%precv(lev-1)%base_desc
+            pout%precv(lev)%linmap%p_desc_V => pout%precv(lev)%base_desc
           end if
         end do
       end if
@@ -873,8 +873,8 @@ contains
       do i=2, size(b%precv)
         b%precv(i)%base_a    => b%precv(i)%ac
         b%precv(i)%base_desc => b%precv(i)%desc_ac
-        b%precv(i)%map%p_desc_U => b%precv(i-1)%base_desc
-        b%precv(i)%map%p_desc_V => b%precv(i)%base_desc
+        b%precv(i)%linmap%p_desc_U => b%precv(i-1)%base_desc
+        b%precv(i)%linmap%p_desc_V => b%precv(i)%base_desc
       end do
             
     else

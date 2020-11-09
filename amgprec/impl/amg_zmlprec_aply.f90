@@ -520,7 +520,7 @@ contains
 
       if (level < nlev) then
         ! Apply the restriction
-        call p%precv(level+1)%map_up(zone,vx2l,&
+        call p%precv(level+1)%map_rstr(zone,vx2l,&
              & zzero,p%precv(level+1)%wrk%vx2l,&
              & info,work=work,&
              & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
@@ -540,7 +540,7 @@ contains
         !
         ! Apply the prolongator
         !  
-        call p%precv(level+1)%map_dw(zone,&
+        call p%precv(level+1)%map_prol(zone,&
              & p%precv(level+1)%wrk%vy2l, zone,vy2l,&
              & info,work=work,&
              & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
@@ -653,7 +653,7 @@ contains
                  & a_err='Error during residue')
             goto 9999
           end if
-          call p%precv(level+1)%map_up(zone,vty,&
+          call p%precv(level+1)%map_rstr(zone,vty,&
                & zzero,p%precv(level+1)%wrk%vx2l,&
                & info,work=work,&
                & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
@@ -664,7 +664,7 @@ contains
           end if
         else
           ! Shortcut: just transfer x2l. 
-          call p%precv(level+1)%map_up(zone,vx2l,&
+          call p%precv(level+1)%map_rstr(zone,vx2l,&
                & zzero,p%precv(level+1)%wrk%vx2l,&
                & info,work=work,&
                & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
@@ -680,7 +680,7 @@ contains
         !
         ! Apply the prolongator
         !  
-        call p%precv(level+1)%map_dw(zone,&
+        call p%precv(level+1)%map_prol(zone,&
              & p%precv(level+1)%wrk%vy2l,zone,vy2l,&
              & info,work=work,&
              & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
@@ -698,7 +698,7 @@ contains
                & vy2l,zone,vty,&
                & base_desc,info,work=work,trans=trans)
           if (info == psb_success_) &
-               & call p%precv(level+1)%map_up(zone,vty,&
+               & call p%precv(level+1)%map_rstr(zone,vty,&
                & zzero,p%precv(level+1)%wrk%vx2l,info,work=work,&
                & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
           if (info /= psb_success_) then
@@ -709,7 +709,7 @@ contains
 
           call inner_ml_aply(level+1,p,trans,work,info)
 
-          if (info == psb_success_) call p%precv(level+1)%map_dw(zone, &
+          if (info == psb_success_) call p%precv(level+1)%map_prol(zone, &
                & p%precv(level+1)%wrk%vy2l,zone,vy2l,&
                & info,work=work,&
                & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
@@ -889,7 +889,7 @@ contains
         end if
 
         ! Apply the restriction
-        call  p%precv(level + 1)%map_up(zone,vty,&
+        call  p%precv(level + 1)%map_rstr(zone,vty,&
              & zzero,p%precv(level + 1)%wrk%vx2l,&
              &info,work=work,&
              & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
@@ -925,7 +925,7 @@ contains
         !
         ! Apply the prolongator
         !  
-        call p%precv(level+1)%map_dw(zone,&
+        call p%precv(level+1)%map_prol(zone,&
              & p%precv(level+1)%wrk%vy2l,zone,vy2l,&
              & info,work=work,&
              & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
@@ -1415,7 +1415,7 @@ contains
 
     if (level < nlev) then
       ! Apply the restriction
-      call p%precv(level+1)%map_up(zone,mlwrk(level)%x2l,&
+      call p%precv(level+1)%map_rstr(zone,mlwrk(level)%x2l,&
            & zzero,mlwrk(level+1)%x2l,&
            & info,work=work)
       mlwrk(level+1)%y2l(:) = zzero
@@ -1435,7 +1435,7 @@ contains
       !
       ! Apply the prolongator and add correction.
       !  
-      call p%precv(level+1)%map_dw(zone,&
+      call p%precv(level+1)%map_prol(zone,&
            & mlwrk(level+1)%y2l,zone,mlwrk(level)%y2l,&
            & info,work=work)
       if (info /= psb_success_) then
@@ -1555,7 +1555,7 @@ contains
                & a_err='Error during residue')
           goto 9999
         end if
-        call p%precv(level+1)%map_up(zone,mlwrk(level)%ty,&
+        call p%precv(level+1)%map_rstr(zone,mlwrk(level)%ty,&
              & zzero,mlwrk(level+1)%x2l,info,work=work)
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
@@ -1564,7 +1564,7 @@ contains
         end if
       else
         ! Shortcut: just transfer x2l. 
-        call p%precv(level+1)%map_up(zone,mlwrk(level)%x2l,&
+        call p%precv(level+1)%map_rstr(zone,mlwrk(level)%x2l,&
              & zzero,mlwrk(level+1)%x2l,info,work=work)
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
@@ -1593,7 +1593,7 @@ contains
       !
       ! Apply the prolongator
       !  
-      call p%precv(level+1)%map_dw(zone,mlwrk(level+1)%y2l,&
+      call p%precv(level+1)%map_prol(zone,mlwrk(level+1)%y2l,&
            & zone,mlwrk(level)%y2l,info,work=work)
       if (info /= psb_success_) then
         call psb_errpush(psb_err_internal_error_,name,&

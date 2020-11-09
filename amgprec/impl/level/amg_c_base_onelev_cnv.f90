@@ -62,6 +62,6 @@ subroutine amg_c_base_onelev_cnv(lv,info,amold,vmold,imold)
          & call lv%ac%cscnv(info,mold=amold)
     if (info == psb_success_ .and. lv%desc_ac%is_ok() &
          & .and. present(imold)) call lv%desc_ac%cnv(imold)
-    if (info == psb_success_) call lv%map%cnv(info,mold=amold,imold=imold)
+    if (info == psb_success_) call lv%linmap%cnv(info,mold=amold,imold=imold)
   end if
 end subroutine amg_c_base_onelev_cnv

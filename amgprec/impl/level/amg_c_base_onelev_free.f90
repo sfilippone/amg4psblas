@@ -63,7 +63,7 @@ subroutine amg_c_base_onelev_free(lv,info)
   call lv%ac%free()
   if (lv%desc_ac%is_ok()) &
        & call lv%desc_ac%free(info)
-  call lv%map%free(info)
+  call lv%linmap%free(info)
 
   ! This is a pointer to something else, must not free it here. 
   nullify(lv%base_a) 

@@ -156,10 +156,10 @@ module amg_z_onelev_mod
   type amg_z_remap_data_type
     type(psb_zspmat_type)          :: ac_pre_remap
     type(psb_desc_type)            :: desc_ac_pre_remap
-    integer(psb_ipk_)              :: ipdest
+    integer(psb_ipk_)              :: idest
     integer(psb_ipk_), allocatable :: isrc(:), nrsrc(:) 
-!!$  contains
-!!$    procedure, pass(rmp) :: clone   => z_remap_data_clone
+  contains
+    procedure, pass(rmp) :: clone   => z_remap_data_clone
   end type amg_z_remap_data_type
   
   type amg_z_onelev_type
@@ -175,7 +175,7 @@ module amg_z_onelev_mod
     type(psb_zspmat_type), pointer   :: base_a    => null() 
     type(psb_desc_type), pointer     :: base_desc => null() 
     type(psb_lzspmat_type)           :: tprol
-    type(psb_zlinmap_type)           :: map
+    type(psb_zlinmap_type)           :: linmap
     type(amg_z_remap_data_type)      :: remap_data
     real(psb_dpk_)                     :: szratio
   contains
@@ -207,12 +207,12 @@ module amg_z_onelev_mod
     procedure, pass(lv) :: move_alloc => z_base_onelev_move_alloc
     
     
-    procedure, pass(lv) :: map_up_a => amg_z_base_onelev_map_up_a
-    procedure, pass(lv) :: map_dw_a => amg_z_base_onelev_map_dw_a
-    procedure, pass(lv) :: map_up_v => amg_z_base_onelev_map_up_v
-    procedure, pass(lv) :: map_dw_v => amg_z_base_onelev_map_dw_v
-    generic, public     :: map_up => map_up_a, map_up_v
-    generic, public     :: map_dw => map_dw_a, map_dw_v
+    procedure, pass(lv) :: map_rstr_a => amg_z_base_onelev_map_rstr_a
+    procedure, pass(lv) :: map_prol_a => amg_z_base_onelev_map_prol_a
+    procedure, pass(lv) :: map_rstr_v => amg_z_base_onelev_map_rstr_v
+    procedure, pass(lv) :: map_prol_v => amg_z_base_onelev_map_prol_v
+    generic, public     :: map_rstr => map_rstr_a, map_rstr_v
+    generic, public     :: map_prol => map_prol_a, map_prol_v
   end type amg_z_onelev_type
 
   type amg_z_onelev_node
@@ -440,7 +440,7 @@ contains
     val = val + lv%desc_ac%sizeof()
     val = val + lv%ac%sizeof()
     val = val + lv%tprol%sizeof()
-    val = val + lv%map%sizeof() 
+    val = val + lv%linmap%sizeof() 
     if (allocated(lv%sm))   val = val + lv%sm%sizeof()
     if (allocated(lv%sm2a)) val = val + lv%sm2a%sizeof()
     if (allocated(lv%aggr)) val = val + lv%aggr%sizeof()
@@ -570,7 +570,8 @@ contains
     if (info == psb_success_) call lv%ac%clone(lvout%ac,info)
     if (info == psb_success_) call lv%tprol%clone(lvout%tprol,info)
     if (info == psb_success_) call lv%desc_ac%clone(lvout%desc_ac,info)
-    if (info == psb_success_) call lv%map%clone(lvout%map,info)
+    if (info == psb_success_) call lv%linmap%clone(lvout%linmap,info)
+    if (info == psb_success_) call lv%remap_data%clone(lvout%remap_data,info)
     lvout%base_a    => lv%base_a
     lvout%base_desc => lv%base_desc
     
@@ -601,7 +602,7 @@ contains
     if (info == psb_success_) call psb_move_alloc(lv%ac,b%ac,info) 
     if (info == psb_success_) call psb_move_alloc(lv%tprol,b%tprol,info) 
     if (info == psb_success_) call psb_move_alloc(lv%desc_ac,b%desc_ac,info) 
-    if (info == psb_success_) call psb_move_alloc(lv%map,b%map,info) 
+    if (info == psb_success_) call psb_move_alloc(lv%linmap,b%linmap,info) 
     b%base_a    => lv%base_a
     b%base_desc => lv%base_desc
     
@@ -838,7 +839,7 @@ contains
     end if
   end function z_wrk_sizeof
  
-  subroutine amg_z_base_onelev_map_up_a(lv,alpha,u,beta,v,info,work)
+  subroutine amg_z_base_onelev_map_rstr_a(lv,alpha,u,beta,v,info,work)
     implicit none
     class(amg_z_onelev_type), target, intent(inout) :: lv
     complex(psb_dpk_), intent(in)     :: alpha, beta
@@ -854,13 +855,13 @@ contains
       write(0,*) 'Remap handling not implemented yet '
     else
       ! Default transfer
-        call lv%map%map_U2V(alpha,u,beta,v,info,&
+        call lv%linmap%map_U2V(alpha,u,beta,v,info,&
              & work=work)
     end if
 
-  end subroutine amg_z_base_onelev_map_up_a
+  end subroutine amg_z_base_onelev_map_rstr_a
   
-  subroutine amg_z_base_onelev_map_dw_a(lv,alpha,v,beta,u,info,work)
+  subroutine amg_z_base_onelev_map_prol_a(lv,alpha,v,beta,u,info,work)
     implicit none
     class(amg_z_onelev_type), target, intent(inout) :: lv
     complex(psb_dpk_), intent(in)     :: alpha, beta
@@ -876,13 +877,13 @@ contains
       write(0,*) 'Remap handling not implemented yet '
     else
       ! Default transfer
-        call lv%map%map_V2U(alpha,v,beta,u,info,&
+        call lv%linmap%map_V2U(alpha,v,beta,u,info,&
              & work=work)
     end if
 
-  end subroutine amg_z_base_onelev_map_dw_a
+  end subroutine amg_z_base_onelev_map_prol_a
 
-  subroutine amg_z_base_onelev_map_up_v(lv,alpha,vect_u,beta,vect_v,info,work,vtx,vty)
+  subroutine amg_z_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,work,vtx,vty)
     implicit none
     class(amg_z_onelev_type), target, intent(inout) :: lv
     complex(psb_dpk_), intent(in)           :: alpha, beta
@@ -898,13 +899,13 @@ contains
       write(0,*) 'Remap handling not implemented yet '
     else
       ! Default transfer
-        call lv%map%map_U2V(alpha,vect_u,beta,vect_v,info,&
+        call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&
              & work=work,vtx=vtx,vty=vty)
     end if
 
-  end subroutine amg_z_base_onelev_map_up_v
+  end subroutine amg_z_base_onelev_map_rstr_v
   
-  subroutine amg_z_base_onelev_map_dw_v(lv,alpha,vect_v,beta,vect_u,info,work,vtx,vty)
+  subroutine amg_z_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vtx,vty)
     implicit none
     class(amg_z_onelev_type), target, intent(inout) :: lv
     complex(psb_dpk_), intent(in)           :: alpha, beta
@@ -920,10 +921,30 @@ contains
       write(0,*) 'Remap handling not implemented yet '
     else
       ! Default transfer
-        call lv%map%map_V2U(alpha,vect_v,beta,vect_u,info,&
+        call lv%linmap%map_V2U(alpha,vect_v,beta,vect_u,info,&
              & work=work,vtx=vtx,vty=vty)
     end if
 
-  end subroutine amg_z_base_onelev_map_dw_v
+  end subroutine amg_z_base_onelev_map_prol_v
 
+  subroutine z_remap_data_clone(rmp, remap_out, info)
+    use psb_base_mod
+    implicit none 
+    ! Arguments
+    class(amg_z_remap_data_type), target, intent(inout) :: rmp
+    class(amg_z_remap_data_type), target, intent(inout) :: remap_out
+    integer(psb_ipk_), intent(out)                    :: info 
+    !
+    integer(psb_ipk_) :: i
+
+    info = psb_success_
+
+    call rmp%ac_pre_remap%clone(remap_out%ac_pre_remap,info)
+    if (info == psb_success_) &
+         & call rmp%desc_ac_pre_remap%clone(remap_out%desc_ac_pre_remap,info)
+    remap_out%idest = rmp%idest
+    call psb_safe_ab_cpy(rmp%isrc,remap_out%isrc,info)
+    call psb_safe_ab_cpy(rmp%nrsrc,remap_out%nrsrc,info)    
+  end subroutine z_remap_data_clone
+  
 end module amg_z_onelev_mod

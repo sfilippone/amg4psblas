@@ -89,11 +89,11 @@ subroutine amg_s_base_onelev_descr(lv,il,nl,ilmin,info,iout)
     call lv%parms%descr(iout_,info,coarse=coarse)
 
     if (nl > 1) then 
-      if (allocated(lv%map%naggr)) then
+      if (allocated(lv%linmap%naggr)) then
         write(iout_,*) '  Coarse Matrix: Global size: ', &
-             &  sum((1_psb_lpk_*lv%map%naggr(:))),' Nonzeros: ',lv%ac_nz_tot
+             &  sum((1_psb_lpk_*lv%linmap%naggr(:))),' Nonzeros: ',lv%ac_nz_tot
         write(iout_,*) '          Local matrix sizes: ', &
-             &  lv%map%naggr(:)
+             &  lv%linmap%naggr(:)
         write(iout_,*) '  Aggregation   ratio: ', &
              &  lv%szratio
       end if
