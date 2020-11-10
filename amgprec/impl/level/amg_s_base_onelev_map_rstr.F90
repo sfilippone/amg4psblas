@@ -52,6 +52,21 @@ subroutine amg_s_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,work,vt
     ! Remap has happened, deal with it
     !
     write(0,*) 'Remap handling not implemented yet '
+    block
+      integer(psb_ipk_) :: i,j,ip,nctxt,ictxt, idest
+      integer(psb_ipk_) :: me, np,  rme, rnp
+      
+      ictxt = lv%remap_data%desc_ac_pre_remap%get_ctxt()
+      call psb_info(ictxt,me,np)
+      nctxt = lv%desc_ac%get_ctxt()
+      call psb_info(nctxt,rme,rnp)
+      idest = lv%remap_data%idest
+      associate(isrc => lv%remap_data%isrc, nrsrc => lv%remap_data%nrsrc)
+        write(0,*) 'Should apply maps, then send data from ',me,' to ',idest
+        if (rme >= 0) write(0,*) rme, '  Receiving      data from ',isrc(:)        
+      end associate
+    end block
+ 
   else
     ! Default transfer
     call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&

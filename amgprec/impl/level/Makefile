@@ -21,6 +21,8 @@ amg_c_base_onelev_mat_asb.o \
 amg_c_base_onelev_setag.o \
 amg_c_base_onelev_setsm.o \
 amg_c_base_onelev_setsv.o \
+amg_c_base_onelev_map_rstr.o \
+amg_c_base_onelev_map_prol.o \
 amg_d_base_onelev_build.o \
 amg_d_base_onelev_check.o \
 amg_d_base_onelev_cnv.o \
@@ -34,6 +36,8 @@ amg_d_base_onelev_mat_asb.o \
 amg_d_base_onelev_setag.o \
 amg_d_base_onelev_setsm.o \
 amg_d_base_onelev_setsv.o \
+amg_d_base_onelev_map_rstr.o \
+amg_d_base_onelev_map_prol.o \
 amg_s_base_onelev_build.o \
 amg_s_base_onelev_check.o \
 amg_s_base_onelev_cnv.o \
@@ -47,6 +51,8 @@ amg_s_base_onelev_mat_asb.o \
 amg_s_base_onelev_setag.o \
 amg_s_base_onelev_setsm.o \
 amg_s_base_onelev_setsv.o \
+amg_s_base_onelev_map_rstr.o \
+amg_s_base_onelev_map_prol.o \
 amg_z_base_onelev_build.o \
 amg_z_base_onelev_check.o \
 amg_z_base_onelev_cnv.o \
@@ -59,7 +65,9 @@ amg_z_base_onelev_free.o \
 amg_z_base_onelev_mat_asb.o \
 amg_z_base_onelev_setag.o \
 amg_z_base_onelev_setsm.o \
-amg_z_base_onelev_setsv.o 
+amg_z_base_onelev_setsv.o \
+amg_z_base_onelev_map_rstr.o \
+amg_z_base_onelev_map_prol.o 
 
 
 LIBNAME=libamg_prec.a
