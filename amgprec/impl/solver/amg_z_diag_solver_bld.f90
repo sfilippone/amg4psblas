@@ -55,15 +55,16 @@ subroutine amg_z_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota
   complex(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
   complex(psb_dpk_), allocatable :: tdb(:)
-  integer(psb_ipk_) :: ictxt,np,me,i, err_act, debug_unit, debug_level
-  character(len=20) :: name='z_diag_solver_bld', ch_err
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
+  character(len=20)   :: name='z_diag_solver_bld', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt       = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt       = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
 
@@ -133,15 +134,16 @@ subroutine amg_z_l1_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota
   complex(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
   complex(psb_dpk_), allocatable :: tdb(:)
-  integer(psb_ipk_) :: ictxt,np,me,i, err_act, debug_unit, debug_level
-  character(len=20) :: name='z_l1_diag_solver_bld', ch_err
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
+  character(len=20)   :: name='z_l1_diag_solver_bld', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt       = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt       = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
 

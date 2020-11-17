@@ -56,16 +56,17 @@ subroutine amg_s_as_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   integer(psb_ipk_)    :: n_row,n_col, nrow_d, i
   real(psb_spk_), pointer :: aux(:)
   type(psb_s_vect_type) :: tx, ty, ww
-  integer(psb_ipk_)  :: ictxt,np,me, err_act,isz,int_err(5)
-  character          :: trans_, init_
-  logical            :: do_realloc_wv
-  character(len=20)  :: name='s_as_smoother_apply_v', ch_err
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, err_act,isz,int_err(5)
+  character           :: trans_, init_
+  logical             :: do_realloc_wv
+  character(len=20)   :: name='s_as_smoother_apply_v', ch_err
 
   call psb_erractionsave(err_act)
 
   info  = psb_success_
-  ictxt = desc_data%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt,me,np)
 
   if (present(init)) then
     init_ = psb_toupper(init)

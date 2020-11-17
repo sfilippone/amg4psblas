@@ -8405,22 +8405,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 #
-# For the time being:
-#    1. Disable MUMPS when IPK=8 (would need a check on whether MUMPS
-#    		      	   	  was compiled with 8 bytes)
-#    2. Enable even with LPK=8, internally it will check if
+#    1. Enable even with LPK=8, internally it will check if
 #    	the problem size fits into 4 bytes, very likely since we
 #    	are mostly using MUMPS at coarse level.
 #
-if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
-   if test "x$pac_cv_psblas_ipk" == "x8" ; then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: PSBLAS defines PSB_IPK_ as $pac_cv_psblas_ipk. MUMPS interfacing disabled. " >&5
-$as_echo "$as_me: PSBLAS defines PSB_IPK_ as $pac_cv_psblas_ipk. MUMPS interfacing disabled. " >&6;}
-      MUMPS_FLAGS="";
-      MUMPS_LIBS="";
-      amg4psblas_cv_have_mumps=no;
-   fi
-fi
 if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
    if test "x$pac_cv_psblas_lpk" == "x8" ; then
       { $as_echo "$as_me:${as_lineno-$LINENO}: PSBLAS defines PSB_LPK_ as $pac_cv_psblas_lpk. MUMPS interfacing will fail when called in global mode on very large matrices. " >&5

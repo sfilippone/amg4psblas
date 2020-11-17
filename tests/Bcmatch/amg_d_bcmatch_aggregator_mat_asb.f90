@@ -149,7 +149,7 @@ subroutine  mld_d_bcmatch_aggregator_mat_asb(ag,parms,a,desc_a,ilaggr,nlaggr,ac,
 
   ! Local variables
   character(len=20)          :: name
-  integer(psb_mpk_)          :: ictxt, np, me
+  integer(psb_mpk_)          :: ctxt, np, me
   type(psb_d_coo_sparse_mat) :: acoo, bcoo
   type(psb_d_csr_sparse_mat) :: acsr1
   integer(psb_ipk_)          :: nzl,ntaggr
@@ -162,8 +162,8 @@ subroutine  mld_d_bcmatch_aggregator_mat_asb(ag,parms,a,desc_a,ilaggr,nlaggr,ac,
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   info  = psb_success_
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt,me,np)
 
   !
   ! Build the coarse-level matrix from the fine-level one, starting from 

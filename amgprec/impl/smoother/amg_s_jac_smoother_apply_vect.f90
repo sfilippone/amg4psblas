@@ -59,16 +59,17 @@ subroutine amg_s_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   integer(psb_ipk_)    :: n_row,n_col
   type(psb_s_vect_type)  :: tx, ty, r
   real(psb_spk_), pointer :: aux(:)
-  integer(psb_ipk_)  :: ictxt,np,me,i, err_act
-  character          :: trans_, init_
-  real(psb_dpk_)     :: res, resdenum
-  character(len=20)  :: name='s_jac_smoother_apply_v'
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act
+  character           :: trans_, init_
+  real(psb_dpk_)      :: res, resdenum
+  character(len=20)   :: name='s_jac_smoother_apply_v'
 
   call psb_erractionsave(err_act)
 
   info = psb_success_
-  ictxt = desc_data%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt,me,np)
 
 
   if (present(init)) then

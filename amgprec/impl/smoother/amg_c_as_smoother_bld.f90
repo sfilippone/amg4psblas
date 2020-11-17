@@ -54,15 +54,16 @@ subroutine amg_c_as_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
   type(psb_cspmat_type) :: blck, atmp
   integer(psb_ipk_) :: n_row,n_col, nrow_a, nhalo, novr, data_
   complex(psb_spk_), pointer :: ww(:), aux(:), tx(:),ty(:)
-  integer(psb_ipk_) :: ictxt,np,me,i, err_act, debug_unit, debug_level
-  character(len=20) :: name='c_as_smoother_bld', ch_err
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me,i, err_act, debug_unit, debug_level
+  character(len=20)   :: name='c_as_smoother_bld', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt       = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt       = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
 
@@ -169,7 +170,7 @@ subroutine amg_c_as_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
     goto 9999
   end if
   sm%nd_nnz_tot = sm%nd%get_nzeros()
-  call psb_sum(ictxt,sm%nd_nnz_tot)
+  call psb_sum(ctxt,sm%nd_nnz_tot)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' end'

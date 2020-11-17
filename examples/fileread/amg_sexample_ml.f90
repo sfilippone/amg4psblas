@@ -91,7 +91,8 @@ program amg_sexample_ml
   integer          :: nlev
 
   ! parallel environment parameters
-  integer            :: ictxt, iam, np
+  type(psb_ctxt_type) :: ctxt
+  integer             :: iam, np
 
   ! other variables
   integer              :: choice       
@@ -105,12 +106,12 @@ program amg_sexample_ml
 
   ! initialize the parallel environment
 
-  call psb_init(ictxt)
-  call psb_info(ictxt,iam,np)
+  call psb_init(ctxt)
+  call psb_info(ctxt,iam,np)
 
   if (iam < 0) then 
     ! This should not happen, but just in case
-    call psb_exit(ictxt)
+    call psb_exit(ctxt)
     stop
   endif
 
@@ -128,9 +129,9 @@ program amg_sexample_ml
 
   ! get parameters
 
-  call get_parms(ictxt,mtrx_file,rhs_file,filefmt,choice,itmax,tol)
+  call get_parms(ctxt,mtrx_file,rhs_file,filefmt,choice,itmax,tol)
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()  
 
   ! read and assemble the matrix A and the right-hand side b
@@ -159,11 +160,11 @@ program amg_sexample_ml
     end select
     if (info /= psb_success_) then
       write(0,*) 'Error while reading input matrix '
-      call psb_abort(ictxt)
+      call psb_abort(ctxt)
     end if
 
     m_problem = aux_a%get_nrows()
-    call psb_bcast(ictxt,m_problem)
+    call psb_bcast(ctxt,m_problem)
 
     ! At this point aux_b may still be unallocated
     if (psb_size(aux_b,1) == m_problem) then
@@ -185,17 +186,17 @@ program amg_sexample_ml
       enddo
     endif
   else
-    call psb_bcast(ictxt,m_problem)
+    call psb_bcast(ctxt,m_problem)
   end if
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   if (iam == psb_root_) write(*,'("Partition type: block")')
-  call psb_matdist(aux_A, A, ictxt, desc_A,info,parts=part_block)
+  call psb_matdist(aux_A, A, ctxt, desc_A,info,parts=part_block)
   call psb_scatter(b_glob,b,desc_a,info,root=psb_root_)
 
   t2 = psb_wtime() - t1
 
-  call psb_amx(ictxt, t2)
+  call psb_amx(ctxt, t2)
 
   if (iam == psb_root_) then
     write(*,'(" ")')
@@ -212,7 +213,7 @@ program amg_sexample_ml
     ! GS sweep as pre/post-smoother and UMFPACK as coarsest-level
     ! solver
 
-    call P%init(ictxt,'ML',info)
+    call P%init(ctxt,'ML',info)
     kmethod = 'CG'
 
   case(2)
@@ -243,7 +244,7 @@ program amg_sexample_ml
 
   ! build the preconditioner
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
 
   ! build the preconditioner
@@ -251,7 +252,7 @@ program amg_sexample_ml
   call P%smoothers_build(A,desc_A,info)
 
   tprec = psb_wtime()-t1
-  call psb_amx(ictxt, tprec)
+  call psb_amx(ctxt, tprec)
 
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_precbld')
@@ -265,13 +266,13 @@ program amg_sexample_ml
 
   ! solve Ax=b with preconditioned CG
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
 
   call psb_krylov(kmethod,A,P,b,x,tol,desc_A,info,itmax,iter,err,itrace=1,istop=2)
 
   t2 = psb_wtime() - t1
-  call psb_amx(ictxt,t2)
+  call psb_amx(ctxt,t2)
 
   call psb_geasb(r,desc_A,info,scratch=.true.)
   call psb_geaxpby(sone,b,szero,r,desc_A,info)
@@ -282,9 +283,9 @@ program amg_sexample_ml
   amatsize = a%sizeof()
   descsize = desc_a%sizeof()
   precsize = p%sizeof()
-  call psb_sum(ictxt,amatsize)
-  call psb_sum(ictxt,descsize)
-  call psb_sum(ictxt,precsize)
+  call psb_sum(ctxt,amatsize)
+  call psb_sum(ctxt,descsize)
+  call psb_sum(ctxt,precsize)
 
   call P%descr(info)
 
@@ -334,27 +335,28 @@ program amg_sexample_ml
   call psb_spfree(A, desc_A,info)
   call P%free(info)
   call psb_cdfree(desc_A,info)
-  call psb_exit(ictxt)
+  call psb_exit(ctxt)
   stop
 
 9999 continue
-  call psb_error(ictxt)
+  call psb_error(ctxt)
 
 contains
   !
   ! get parameters from standard input
   !
-  subroutine get_parms(ictxt,mtrx,rhs,filefmt,choice,itmax,tol)
+  subroutine get_parms(ctxt,mtrx,rhs,filefmt,choice,itmax,tol)
 
     implicit none
 
-    integer             :: ictxt, choice, itmax
+    type(psb_ctxt_type) :: ctxt
+    integer             :: choice, itmax
     real(psb_spk_)      :: tol
     character(len=*)    :: mtrx, rhs,filefmt
     integer             :: iam, np, inp_unit
     character(len=1024)   :: filename
 
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
 
     if (iam == psb_root_) then
       if (command_argument_count()>0) then
@@ -363,7 +365,7 @@ contains
         open(inp_unit,file=filename,action='read',iostat=info)
         if (info /= 0) then
           write(psb_err_unit,*) 'Could not open file ',filename,' for input'
-          call psb_abort(ictxt)
+          call psb_abort(ctxt)
           stop
         else
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
@@ -383,12 +385,12 @@ contains
       end if
     end if
 
-    call psb_bcast(ictxt,mtrx)
-    call psb_bcast(ictxt,rhs)
-    call psb_bcast(ictxt,filefmt)
-    call psb_bcast(ictxt,choice)
-    call psb_bcast(ictxt,itmax)
-    call psb_bcast(ictxt,tol)
+    call psb_bcast(ctxt,mtrx)
+    call psb_bcast(ctxt,rhs)
+    call psb_bcast(ctxt,filefmt)
+    call psb_bcast(ctxt,choice)
+    call psb_bcast(ctxt,itmax)
+    call psb_bcast(ctxt,tol)
 
   end subroutine get_parms
 end program amg_sexample_ml

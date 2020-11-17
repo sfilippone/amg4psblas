@@ -52,11 +52,11 @@ subroutine amg_d_ilu_solver_apply(alpha,sv,x,beta,y,desc_data,&
   character, intent(in), optional       :: init
   real(psb_dpk_),intent(inout), optional :: initu(:)
 
-  integer(psb_ipk_)  :: n_row,n_col
+  integer(psb_ipk_)   :: n_row,n_col
   real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
-  integer(psb_ipk_)  :: ictxt,np,me,i, err_act
-  character          :: trans_
-  character(len=20)  :: name='d_ilu_solver_apply'
+  integer(psb_ipk_)   :: i, err_act
+  character           :: trans_
+  character(len=20)   :: name='d_ilu_solver_apply'
 
   call psb_erractionsave(err_act)
 

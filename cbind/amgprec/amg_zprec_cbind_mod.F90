@@ -22,14 +22,14 @@ contains
 #define MLDC_ERR_FILTER(INFO) (INFO)
 #define MLDC_ERR_HANDLE(INFO) if(INFO/=mld_success_)MLDC_ERROR("ERROR!")
 
-  function  mld_c_zprecinit(ictxt,ph,ptype) bind(c) result(res)
+  function  mld_c_zprecinit(cctxt,ph,ptype) bind(c) result(res)
     use psb_base_mod
     use mld_prec_mod
     implicit none
 
     integer(psb_c_ipk_)  :: res
     type(mld_c_zprec)    :: ph
-    integer(psb_c_ipk_), value :: ictxt
+    integer(psb_c_ipk_), value :: cctxt
     character(c_char)     :: ptype(*)
     integer               :: info
     type(mld_zprec_type), pointer :: precp
@@ -48,7 +48,7 @@ contains
 
     call stringc2f(ptype,fptype)
 
-    call precp%init(ictxt,fptype,info)
+    call precp%init(cctxt,fptype,info)
 
     res = MLDC_ERR_FILTER(info)
     MLDC_ERR_HANDLE(res)

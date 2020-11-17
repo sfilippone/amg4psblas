@@ -71,9 +71,10 @@ subroutine amg_sfile_prec_descr(prec,iout,root)
   integer(psb_ipk_), intent(in), optional :: root
 
   ! Local variables
-  integer(psb_ipk_) :: ilev, nlev, ilmin, info, nswps
-  integer(psb_ipk_) :: ictxt, me, np
-  logical           :: is_symgs
+  integer(psb_ipk_)   :: ilev, nlev, ilmin, info, nswps
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: me, np
+  logical             :: is_symgs
   character(len=20), parameter :: name='amg_file_prec_descr'
   integer(psb_ipk_)  :: iout_
   integer(psb_ipk_)  :: root_
@@ -86,11 +87,11 @@ subroutine amg_sfile_prec_descr(prec,iout,root)
   end if
   if (iout_ < 0) iout_ = psb_out_unit
 
-  ictxt = prec%ictxt
+  ctxt = prec%ctxt
 
   if (allocated(prec%precv)) then
 
-    call psb_info(ictxt,me,np)
+    call psb_info(ctxt,me,np)
     if (present(root)) then 
       root_ = root
     else

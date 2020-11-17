@@ -78,8 +78,9 @@ subroutine amg_z_hierarchy_rebld(a,desc_a,prec,info)
   integer(psb_ipk_), intent(out)                       :: info
 
   ! Local Variables
-  integer(psb_ipk_)  :: ictxt, me,np
-  integer(psb_ipk_)  :: err,i,k, err_act, iszv, newsz,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: me, np
+  integer(psb_ipk_)   :: err,i,k, err_act, iszv, newsz,&
        & nplevs, mxplevs
   integer(psb_lpk_) :: iaggsize, casize
   real(psb_dpk_)     :: mnaggratio, sizeratio, athresh, aomega
@@ -105,9 +106,9 @@ subroutine amg_z_hierarchy_rebld(a,desc_a,prec,info)
 
   name = 'amg_hierarchy_rebld'
   info = psb_success_
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
-  prec%ictxt = ictxt
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
+  prec%ctxt = ctxt
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Entering '

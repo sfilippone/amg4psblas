@@ -46,10 +46,11 @@ subroutine amg_d_base_onelev_build(lv,info,amold,vmold,imold,ilv)
   class(psb_i_base_vect_type), intent(in), optional  :: imold
   integer(psb_ipk_), intent(in), optional :: ilv
   ! Local
-  integer(psb_ipk_)  :: err,i,k, err_act
-  integer(psb_ipk_)  :: ictxt, me, np
-  integer(psb_ipk_)  :: debug_level, debug_unit
-  character(len=20)  :: name, ch_err
+  integer(psb_ipk_)   :: err,i,k, err_act
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: me, np
+  integer(psb_ipk_)   :: debug_level, debug_unit
+  character(len=20)   :: name, ch_err
 
   name = 'amg_onelev_build'
   info=psb_success_
@@ -67,8 +68,8 @@ subroutine amg_d_base_onelev_build(lv,info,amold,vmold,imold,ilv)
     goto 9999
   end if
   info = psb_success_
-  ictxt = lv%base_desc%get_ctxt()
-  call psb_info(ictxt,me,np)
+  ctxt = lv%base_desc%get_ctxt()
+  call psb_info(ctxt,me,np)
 
   if (.not.allocated(lv%sm)) then 
     !! Error: should have called amg_dprecinit
@@ -86,7 +87,7 @@ subroutine amg_d_base_onelev_build(lv,info,amold,vmold,imold,ilv)
   lv%ac_nz_tot = lv%ac_nz_loc
   select case(lv%parms%coarse_mat)
   case(amg_distr_mat_) 
-    call psb_sum(ictxt,lv%ac_nz_tot)
+    call psb_sum(ctxt,lv%ac_nz_tot)
   case(amg_repl_mat_)
     ! Do nothing
   case default

@@ -52,16 +52,17 @@ subroutine amg_d_gs_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   class(psb_d_base_vect_type), intent(in), optional   :: vmold
   class(psb_i_base_vect_type), intent(in), optional   :: imold
   ! Local variables
-  integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota
-  integer(psb_ipk_) :: ictxt,np,me,i, err_act, debug_unit, debug_level
-  character(len=20) :: name='d_gs_solver_bld', ch_err
+  integer(psb_ipk_)   :: n_row,n_col, nrow_a, nztota
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
+  character(len=20)   :: name='d_gs_solver_bld', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt       = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt       = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
 

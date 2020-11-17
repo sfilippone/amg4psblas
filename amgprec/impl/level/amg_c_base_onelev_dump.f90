@@ -47,9 +47,10 @@ subroutine amg_c_base_onelev_dump(lv,level,info,prefix,head,ac,rp,&
   character(len=*), intent(in), optional :: prefix, head
   logical, optional, intent(in)    :: ac, rp, smoother, solver, tprol, global_num
   ! Local variables
-  integer(psb_ipk_) :: i, j, il1, iln, lname, lev, ni
-  integer(psb_ipk_) :: icontxt,iam, np
-  character(len=80) :: prefix_, frmt
+  integer(psb_ipk_)   :: i, j, il1, iln, lname, lev, ni
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: iam, np
+  character(len=80)   :: prefix_, frmt
   character(len=1024) :: fname 
   logical :: ac_, rp_, tprol_, global_num_
   integer(psb_lpk_), allocatable :: ivr(:), ivc(:)
@@ -63,10 +64,9 @@ subroutine amg_c_base_onelev_dump(lv,level,info,prefix,head,ac,rp,&
   end if
 
   if (associated(lv%base_desc)) then 
-    icontxt = lv%base_desc%get_context()
-    call psb_info(icontxt,iam,np)
+    ctxt = lv%base_desc%get_context()
+    call psb_info(ctxt,iam,np)
   else 
-    icontxt = -1 
     iam     = -1
     np      = -1
   end if

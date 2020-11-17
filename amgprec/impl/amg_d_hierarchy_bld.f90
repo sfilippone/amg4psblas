@@ -78,8 +78,9 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
   integer(psb_ipk_), intent(out)                       :: info
 
   ! Local Variables
-  integer(psb_ipk_)  :: ictxt, me,np
-  integer(psb_ipk_)  :: err,i,k, err_act, iszv, newsz,&
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: me,np
+  integer(psb_ipk_)   :: err,i,k, err_act, iszv, newsz,&
        & nplevs, mxplevs
   integer(psb_lpk_) :: iaggsize, casize
   real(psb_dpk_)     :: mnaggratio, sizeratio, athresh, aomega
@@ -106,9 +107,9 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
 
   name = 'amg_d_hierarchy_bld'
   info = psb_success_
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
-  prec%ictxt = ictxt
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
+  prec%ctxt = ctxt
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Entering '
@@ -133,10 +134,10 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
   mnaggratio = prec%ag_data%min_cr_ratio
   casize     = prec%ag_data%min_coarse_size
   iszv       = size(prec%precv)
-  call psb_bcast(ictxt,iszv)
-  call psb_bcast(ictxt,casize)
-  call psb_bcast(ictxt,mxplevs)
-  call psb_bcast(ictxt,mnaggratio)
+  call psb_bcast(ctxt,iszv)
+  call psb_bcast(ctxt,casize)
+  call psb_bcast(ctxt,mxplevs)
+  call psb_bcast(ctxt,mnaggratio)
   if (casize /= prec%ag_data%min_coarse_size) then 
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Inconsistent min_coarse_size')
@@ -200,7 +201,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
     casize = int((done*casize)**(done/(done*3)),psb_lpk_)
     casize = max(casize,lone)
     casize = casize*40_psb_lpk_
-    call psb_bcast(ictxt,casize)
+    call psb_bcast(ctxt,casize)
     if (casize > huge(prec%ag_data%min_coarse_size)) then
       !
       ! computed coarse size does not fit in IPK_.
@@ -285,7 +286,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
     ! Check on the iprcparm contents: they should be the same
     ! on all processes.
     !
-    call psb_bcast(ictxt,prec%precv(i)%parms)
+    call psb_bcast(ctxt,prec%precv(i)%parms)
 
     !
     ! Sanity checks on the parameters
@@ -367,7 +368,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
         end if
       end if
     end if
-    call psb_bcast(ictxt,newsz)
+    call psb_bcast(ctxt,newsz)
     
     if (newsz > 0) then
       !

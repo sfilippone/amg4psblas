@@ -94,10 +94,11 @@ subroutine amg_d_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
   ! !$  character, intent(in), optional         :: upd
 
   ! Local Variables
-  integer(psb_ipk_)  :: ictxt, me,np
-  integer(psb_ipk_)  :: err,i,k, err_act, iszv, newsz, casize, nplevs, mxplevs
-  integer(psb_ipk_)  :: nprolv, nrestrv
-  real(psb_dpk_)     :: mnaggratio
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: me,np
+  integer(psb_ipk_)   :: err,i,k, err_act, iszv, newsz, casize, nplevs, mxplevs
+  integer(psb_ipk_)   :: nprolv, nrestrv
+  real(psb_dpk_)      :: mnaggratio
   integer(psb_ipk_)  :: ipv(amg_ifpsz_), val
   class(amg_d_base_smoother_type), allocatable :: coarse_sm, base_sm, med_sm
   type(amg_dml_parms)              :: baseparms, medparms, coarseparms
@@ -120,9 +121,9 @@ subroutine amg_d_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
   name = 'amg_d_extprol_bld'
   info = psb_success_
   int_err(1) = 0
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
-  p%ictxt = ictxt
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
+  p%ctxt = ctxt
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Entering '
@@ -166,12 +167,12 @@ subroutine amg_d_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
   iszv       = size(p%precv)
   nprolv     = size(prolv)
   nrestrv    = size(restrv)
-  call psb_bcast(ictxt,iszv)
-  call psb_bcast(ictxt,casize)
-  call psb_bcast(ictxt,mxplevs)
-  call psb_bcast(ictxt,mnaggratio)
-  call psb_bcast(ictxt,nprolv)
-  call psb_bcast(ictxt,nrestrv)
+  call psb_bcast(ctxt,iszv)
+  call psb_bcast(ctxt,casize)
+  call psb_bcast(ctxt,mxplevs)
+  call psb_bcast(ctxt,mnaggratio)
+  call psb_bcast(ctxt,nprolv)
+  call psb_bcast(ctxt,nrestrv)
   if (casize /= p%ag_data%min_coarse_size) then 
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Inconsistent min_coarse_size')
@@ -313,7 +314,7 @@ subroutine amg_d_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
       if (all(p%precv(i)%map%naggr == p%precv(i-1)%map%naggr)) then 
         newsz=i-1
       end if
-      call psb_bcast(ictxt,newsz)
+      call psb_bcast(ctxt,newsz)
       if (newsz > 0) exit array_build_loop
     end if
   end do array_build_loop
@@ -354,9 +355,10 @@ contains
     integer(psb_ipk_), intent(out)                :: info
 
     ! Local variables
-    character(len=20)                :: name
-    integer(psb_mpk_)               :: ictxt, np, me, ncol
-    integer(psb_ipk_)                :: err_act,ntaggr,nzl 
+    character(len=20)   :: name
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_mpk_)   :: np, me, ncol
+    integer(psb_ipk_)   :: err_act,ntaggr,nzl 
     integer(psb_ipk_), allocatable   :: ilaggr(:), nlaggr(:)
     type(psb_dspmat_type)      :: ac, am2, am3, am4
     type(psb_d_coo_sparse_mat) :: acoo, bcoo
@@ -369,8 +371,8 @@ contains
       info = psb_err_internal_error_; goto 9999
     end if
     info = psb_success_
-    ictxt = desc_a%get_context()
-    call psb_info(ictxt,me,np)
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt,me,np)
 #if defined(LPK8)
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Need fix for LPK8')
@@ -391,7 +393,7 @@ contains
       call psb_errpush(info,name,a_err='Inconsistent restr/prol sizes')
       goto 9999      
     end if
-    call psb_sum(ictxt,nlaggr)
+    call psb_sum(ctxt,nlaggr)
     ntaggr = sum(nlaggr)
     ncol = desc_a%get_local_cols()
     if (debug) write(0,*)me,' Sizes:',op_restr%get_nrows(),op_restr%get_ncols(),&
@@ -432,7 +434,7 @@ contains
       call ac%mv_to(bcoo)
       nzl = bcoo%get_nzeros()
 
-      if (info == psb_success_) call psb_cdall(ictxt,p%desc_ac,info,nl=nlaggr(me+1))
+      if (info == psb_success_) call psb_cdall(ctxt,p%desc_ac,info,nl=nlaggr(me+1))
       if (info == psb_success_) call psb_cdins(nzl,bcoo%ia,bcoo%ja,p%desc_ac,info)
       if (info == psb_success_) call psb_cdasb(p%desc_ac,info)
       if (info == psb_success_) call psb_glob_to_loc(bcoo%ia(1:nzl),p%desc_ac,info,iact='I')
@@ -491,7 +493,7 @@ contains
     case(amg_repl_mat_) 
       !
       !
-      call psb_cdall(ictxt,p%desc_ac,info,mg=ntaggr,repl=.true.)
+      call psb_cdall(ctxt,p%desc_ac,info,mg=ntaggr,repl=.true.)
       if (info == psb_success_) call psb_cdasb(p%desc_ac,info)
       if (info == psb_success_) &
            & call psb_gather(p%ac,ac,p%desc_ac,info,dupl=psb_dupl_add_,keeploc=.false.)

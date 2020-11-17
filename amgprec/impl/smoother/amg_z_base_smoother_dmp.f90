@@ -47,9 +47,10 @@ subroutine amg_z_base_smoother_dmp(sm,desc,level,info,prefix,head,smoother,solve
   character(len=*), intent(in), optional :: prefix, head
   logical, optional, intent(in)    :: smoother, solver, global_num
   integer(psb_ipk_)  :: i, j, il1, iln, lname, lev
-  integer(psb_ipk_)  :: ictxt,iam, np
-  character(len=80)  :: prefix_
-  character(len=120) :: fname ! len should be at least 20 more than
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: iam, np
+  character(len=80)   :: prefix_
+  character(len=120)  :: fname ! len should be at least 20 more than
   logical :: smoother_, global_num_
   !  len of prefix_ 
 
@@ -60,8 +61,8 @@ subroutine amg_z_base_smoother_dmp(sm,desc,level,info,prefix,head,smoother,solve
   else
     prefix_ = "dump_smth_z"
   end if
-  ictxt = desc%get_context()
-  call psb_info(ictxt,iam,np)
+  ctxt = desc%get_context()
+  call psb_info(ctxt,iam,np)
 
   if (present(global_num)) then 
     global_num_ = global_num

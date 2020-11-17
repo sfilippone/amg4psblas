@@ -222,11 +222,12 @@ subroutine amg_cmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
   integer(psb_ipk_), intent(out)        :: info
 
   ! Local variables
-  integer(psb_ipk_)  :: ictxt, np, me
-  integer(psb_ipk_)  :: debug_level, debug_unit
-  integer(psb_ipk_)  :: nlev, nc2l, level, isweep, err_act
-  character(len=20)  :: name
-  character          :: trans_
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: debug_level, debug_unit
+  integer(psb_ipk_)   :: nlev, nc2l, level, isweep, err_act
+  character(len=20)   :: name
+  character           :: trans_
   complex(psb_spk_)     :: beta_
   logical  :: do_alloc_wrk
   type(amg_cmlprec_wrk_type), allocatable, target  :: mlprec_wrk(:)
@@ -237,8 +238,8 @@ subroutine amg_cmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt, me, np)
 
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),&
@@ -365,12 +366,13 @@ contains
     type(psb_c_vect_type), pointer :: current
     integer(psb_ipk_) :: sweeps_post, sweeps_pre
     ! Local variables
-    integer(psb_ipk_)  :: ictxt,np,me
-    integer(psb_ipk_)  :: i, err_act
-    integer(psb_ipk_)  :: debug_level, debug_unit
-    integer(psb_ipk_)  :: nlev, ilev, sweeps
-    logical            :: pre, post
-    character(len=20)  :: name
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)   :: np, me
+    integer(psb_ipk_)   :: i, err_act
+    integer(psb_ipk_)   :: debug_level, debug_unit
+    integer(psb_ipk_)   :: nlev, ilev, sweeps
+    logical             :: pre, post
+    character(len=20)   :: name
 
 
 
@@ -385,8 +387,8 @@ contains
            & a_err='wrong call level to inner_ml')
       goto 9999      
     end if
-    ictxt = p%precv(level)%base_desc%get_context()
-    call psb_info(ictxt, me, np)
+    ctxt = p%precv(level)%base_desc%get_context()
+    call psb_info(ctxt, me, np)
 
     if(debug_level > 1) then
       write(debug_unit,*) me,' Start inner_ml_aply at level ',level, info
@@ -450,12 +452,13 @@ contains
     type(psb_c_vect_type), pointer :: current
     integer(psb_ipk_) :: sweeps_post, sweeps_pre
     ! Local variables
-    integer(psb_ipk_)  :: ictxt,np,me
-    integer(psb_ipk_)  :: i, err_act, k
-    integer(psb_ipk_)  :: debug_level, debug_unit
-    integer(psb_ipk_)  :: nlev, ilev, sweeps
-    logical            :: pre, post
-    character(len=20)  :: name
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)   :: np, me
+    integer(psb_ipk_)   :: i, err_act, k
+    integer(psb_ipk_)   :: debug_level, debug_unit
+    integer(psb_ipk_)   :: nlev, ilev, sweeps
+    logical             :: pre, post
+    character(len=20)   :: name
 
 
 
@@ -470,8 +473,8 @@ contains
            & a_err='wrong call level to inner_add')
       goto 9999      
     end if
-    ictxt = p%precv(level)%base_desc%get_context()
-    call psb_info(ictxt, me, np)
+    ctxt = p%precv(level)%base_desc%get_context()
+    call psb_info(ctxt, me, np)
 
     if(debug_level > 1) then
       write(debug_unit,*) me,' inner_add at level ',level
@@ -578,12 +581,13 @@ contains
     type(psb_c_vect_type), pointer :: current
     integer(psb_ipk_) :: sweeps_post, sweeps_pre
     ! Local variables
-    integer(psb_ipk_)  :: ictxt,np,me
-    integer(psb_ipk_)  :: i, err_act
-    integer(psb_ipk_)  :: debug_level, debug_unit
-    integer(psb_ipk_)  :: nlev, ilev, sweeps
-    logical            :: pre, post
-    character(len=20)  :: name
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)   :: np, me
+    integer(psb_ipk_)   :: i, err_act
+    integer(psb_ipk_)   :: debug_level, debug_unit
+    integer(psb_ipk_)   :: nlev, ilev, sweeps
+    logical             :: pre, post
+    character(len=20)   :: name
 
     name = 'inner_inner_mult'
     info = psb_success_
@@ -596,8 +600,8 @@ contains
            & a_err='wrong call level to inner_mult')
       goto 9999      
     end if
-    ictxt = p%precv(level)%base_desc%get_context()
-    call psb_info(ictxt, me, np)
+    ctxt = p%precv(level)%base_desc%get_context()
+    call psb_info(ctxt, me, np)
 
     if(debug_level > 1) then
       write(debug_unit,*) me,' inner_mult at level ',level
@@ -802,12 +806,13 @@ contains
     type(psb_c_vect_type), pointer :: current
     integer(psb_ipk_) :: sweeps_post, sweeps_pre
     ! Local variables
-    integer(psb_ipk_)  :: ictxt,np,me
-    integer(psb_ipk_)  :: i, err_act
-    integer(psb_ipk_)  :: debug_level, debug_unit
-    integer(psb_ipk_)  :: nlev, ilev, sweeps
-    logical            :: pre, post
-    character(len=20)  :: name
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)   :: np, me
+    integer(psb_ipk_)   :: i, err_act
+    integer(psb_ipk_)   :: debug_level, debug_unit
+    integer(psb_ipk_)   :: nlev, ilev, sweeps
+    logical             :: pre, post
+    character(len=20)   :: name
 
 
 
@@ -822,8 +827,8 @@ contains
            & a_err='wrong call level to inner_add')
       goto 9999      
     end if
-    ictxt = p%precv(level)%base_desc%get_context()
-    call psb_info(ictxt, me, np)
+    ctxt = p%precv(level)%base_desc%get_context()
+    call psb_info(ctxt, me, np)
 
     if(debug_level > 1) then
       write(debug_unit,*) me,name,' start at level ',level
@@ -1166,11 +1171,12 @@ subroutine amg_cmlprec_aply(alpha,p,x,beta,y,desc_data,trans,work,info)
   integer(psb_ipk_), intent(out)              :: info
 
   ! Local variables
-  integer(psb_ipk_)  :: ictxt, np, me
-  integer(psb_ipk_)  :: err_act
-  integer(psb_ipk_)  :: debug_level, debug_unit, nlev,nc2l,nr2l,level
-  character(len=20)  :: name
-  character          :: trans_
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: err_act
+  integer(psb_ipk_)   :: debug_level, debug_unit, nlev,nc2l,nr2l,level
+  character(len=20)   :: name
+  character           :: trans_
   type amg_mlwrk_type
     complex(psb_spk_), allocatable  :: tx(:), ty(:), x2l(:), y2l(:)
   end type amg_mlwrk_type
@@ -1182,8 +1188,8 @@ subroutine amg_cmlprec_aply(alpha,p,x,beta,y,desc_data,trans,work,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt, me, np)
 
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),&
@@ -1285,12 +1291,13 @@ contains
     type(psb_c_vect_type), pointer :: current
     integer(psb_ipk_) :: sweeps_post, sweeps_pre
     ! Local variables
-    integer(psb_ipk_)  :: ictxt,np,me
-    integer(psb_ipk_)  :: i, err_act
-    integer(psb_ipk_)  :: debug_level, debug_unit
-    integer(psb_ipk_)  :: nlev, ilev, sweeps
-    logical            :: pre, post
-    character(len=20)  :: name
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)   :: np, me
+    integer(psb_ipk_)   :: i, err_act
+    integer(psb_ipk_)   :: debug_level, debug_unit
+    integer(psb_ipk_)   :: nlev, ilev, sweeps
+    logical             :: pre, post
+    character(len=20)   :: name
 
 
 
@@ -1305,8 +1312,8 @@ contains
            & a_err='wrong call level to inner_ml')
       goto 9999      
     end if
-    ictxt = p%precv(level)%base_desc%get_context()
-    call psb_info(ictxt, me, np)
+    ctxt = p%precv(level)%base_desc%get_context()
+    call psb_info(ctxt, me, np)
 
     if(debug_level > 1) then
       write(debug_unit,*) me,' inner_ml_aply at level ',level
@@ -1368,12 +1375,13 @@ contains
     type(psb_c_vect_type), pointer :: current
     integer(psb_ipk_) :: sweeps_post, sweeps_pre
     ! Local variables
-    integer(psb_ipk_)  :: ictxt,np,me
-    integer(psb_ipk_)  :: i, err_act
-    integer(psb_ipk_)  :: debug_level, debug_unit
-    integer(psb_ipk_)  :: nlev, ilev, sweeps
-    logical            :: pre, post
-    character(len=20)  :: name
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)   :: np, me
+    integer(psb_ipk_)   :: i, err_act
+    integer(psb_ipk_)   :: debug_level, debug_unit
+    integer(psb_ipk_)   :: nlev, ilev, sweeps
+    logical             :: pre, post
+    character(len=20)   :: name
 
 
 
@@ -1388,8 +1396,8 @@ contains
            & a_err='wrong call level to inner_add')
       goto 9999      
     end if
-    ictxt = p%precv(level)%base_desc%get_context()
-    call psb_info(ictxt, me, np)
+    ctxt = p%precv(level)%base_desc%get_context()
+    call psb_info(ctxt, me, np)
 
     if(debug_level > 1) then
       write(debug_unit,*) me,' inner_add at level ',level
@@ -1472,12 +1480,13 @@ contains
     type(psb_c_vect_type), pointer :: current
     integer(psb_ipk_) :: sweeps_post, sweeps_pre
     ! Local variables
-    integer(psb_ipk_)  :: ictxt,np,me
-    integer(psb_ipk_)  :: i, err_act
-    integer(psb_ipk_)  :: debug_level, debug_unit
-    integer(psb_ipk_)  :: nlev, ilev, sweeps
-    logical            :: pre, post
-    character(len=20)  :: name
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)   :: np, me
+    integer(psb_ipk_)   :: i, err_act
+    integer(psb_ipk_)   :: debug_level, debug_unit
+    integer(psb_ipk_)   :: nlev, ilev, sweeps
+    logical             :: pre, post
+    character(len=20)   :: name
 
 
 
@@ -1492,8 +1501,8 @@ contains
            & a_err='wrong call level to inner_mult')
       goto 9999      
     end if
-    ictxt = p%precv(level)%base_desc%get_context()
-    call psb_info(ictxt, me, np)
+    ctxt = p%precv(level)%base_desc%get_context()
+    call psb_info(ctxt, me, np)
 
     if(debug_level > 1) then
       write(debug_unit,*) me,' inner_mult at level ',level

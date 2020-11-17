@@ -56,9 +56,9 @@ subroutine amg_c_ilu_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   integer(psb_ipk_)   :: n_row,n_col
   type(psb_c_vect_type)  :: tw, tw1
   complex(psb_spk_), pointer :: ww(:), aux(:), tx(:),ty(:)
-  integer(psb_ipk_)   :: ictxt,np,me,i, err_act
-  character          :: trans_
-  character(len=20)  :: name='c_ilu_solver_apply'
+  integer(psb_ipk_)   :: i, err_act
+  character           :: trans_
+  character(len=20)   :: name='c_ilu_solver_apply'
 
   call psb_erractionsave(err_act)
 

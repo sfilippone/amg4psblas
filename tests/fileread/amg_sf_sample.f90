@@ -134,7 +134,8 @@ program amg_sf_sample
   ! communications data structure
   type(psb_desc_type):: desc_a
 
-  integer(psb_ipk_)   :: ictxt, iam, np
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: iam, np
 
   ! solver paramters
   integer(psb_ipk_) :: iter, ircode, nlv
@@ -155,12 +156,12 @@ program amg_sf_sample
   integer(psb_ipk_), allocatable :: ivg(:), ipv(:), perm(:)
   logical   :: have_guess=.false., have_ref=.false.
 
-  call psb_init(ictxt)
-  call psb_info(ictxt,iam,np)
+  call psb_init(ctxt)
+  call psb_info(ctxt,iam,np)
 
   if (iam < 0) then 
     ! This should not happen, but just in case
-    call psb_exit(ictxt)
+    call psb_exit(ctxt)
     stop
   endif
 
@@ -181,10 +182,10 @@ program amg_sf_sample
   !
   ! get parameters
   !
-  call get_parms(ictxt,mtrx_file,rhs_file,guess_file,sol_file,filefmt, &
+  call get_parms(ctxt,mtrx_file,rhs_file,guess_file,sol_file,filefmt, &
        & part,afmt,s_choice,p_choice)
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()  
   ! read the input matrix to be processed and (possibly) the rhs,
   ! the initial guess and the reference solution
@@ -224,13 +225,13 @@ program amg_sf_sample
 
     if (info /= psb_success_) then
       write(psb_err_unit,*) 'Error while reading input matrix '
-      call psb_abort(ictxt)
+      call psb_abort(ctxt)
     end if
 
     m_problem = aux_a%get_nrows()
-    call psb_bcast(ictxt,m_problem)
-    call psb_bcast(ictxt,have_guess)
-    call psb_bcast(ictxt,have_ref)
+    call psb_bcast(ctxt,m_problem)
+    call psb_bcast(ctxt,have_guess)
+    call psb_bcast(ctxt,have_ref)
     
     ! At this point aux_b may still be unallocated
     if (psb_size(aux_b,dim=ione) == m_problem) then
@@ -279,9 +280,9 @@ program amg_sf_sample
     call aux_a%clean_zeros(info)
 
   else
-    call psb_bcast(ictxt,m_problem)
-    call psb_bcast(ictxt,have_guess)
-    call psb_bcast(ictxt,have_ref)
+    call psb_bcast(ctxt,m_problem)
+    call psb_bcast(ctxt,have_guess)
+    call psb_bcast(ctxt,have_ref)
   end if
     
 
@@ -316,21 +317,21 @@ program amg_sf_sample
   !
   select case (psb_toupper(part))
   case('BLOCK')
-    call psb_barrier(ictxt)
+    call psb_barrier(ctxt)
     if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
-    call psb_matdist(aux_a, a,  ictxt, desc_a,info,fmt=afmt,parts=part_block)
+    call psb_matdist(aux_a, a,  ctxt, desc_a,info,fmt=afmt,parts=part_block)
   case('GRAPH')
     if (iam == psb_root_) then 
       write(psb_out_unit,'("Partition type: graph")')
       write(psb_out_unit,'(" ")')
       call build_mtpart(aux_a,np)
     endif
-    call distr_mtpart(psb_root_,ictxt)
+    call distr_mtpart(psb_root_,ctxt)
     call getv_mtpart(ivg)
-    call psb_matdist(aux_a, a, ictxt,desc_a,info,fmt=afmt,vg=ivg)
+    call psb_matdist(aux_a, a, ctxt,desc_a,info,fmt=afmt,vg=ivg)
   case default
     if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
-    call psb_matdist(aux_a, a,  ictxt, desc_a,info,fmt=afmt,parts=part_block)
+    call psb_matdist(aux_a, a,  ctxt, desc_a,info,fmt=afmt,parts=part_block)
   end select
 
   !
@@ -350,7 +351,7 @@ program amg_sf_sample
   end if
 
   t2 = psb_wtime() - t1
-  call psb_amx(ictxt, t2)
+  call psb_amx(ctxt, t2)
 
   if (iam == psb_root_) then
     write(psb_out_unit,'(" ")')
@@ -361,7 +362,7 @@ program amg_sf_sample
   !
   ! initialize the preconditioner
   !
-  call prec%init(ictxt,p_choice%ptype,info)
+  call prec%init(ctxt,p_choice%ptype,info)
   select case(trim(psb_toupper(p_choice%ptype)))
   case ('NONE','NOPREC')
     ! Do nothing, keep defaults
@@ -452,7 +453,7 @@ program amg_sf_sample
   end select
   
   ! build the preconditioner
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
   call prec%hierarchy_build(a,desc_a,info)
   thier = psb_wtime()-t1
@@ -460,7 +461,7 @@ program amg_sf_sample
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_hierarchy_bld')
     goto 9999
   end if
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
   call prec%smoothers_build(a,desc_a,info)
   tprec = psb_wtime()-t1
@@ -469,8 +470,8 @@ program amg_sf_sample
     goto 9999
   end if
 
-  call psb_amx(ictxt, thier)
-  call psb_amx(ictxt, tprec)
+  call psb_amx(ctxt, thier)
+  call psb_amx(ctxt, tprec)
 
   if(iam == psb_root_) then
     write(psb_out_unit,'(" ")')
@@ -482,15 +483,15 @@ program amg_sf_sample
   !
   ! iterative method parameters 
   !
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
   call psb_krylov(s_choice%kmethd,a,prec,b_col,x_col,s_choice%eps,&
        & desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,itrace=s_choice%itrace,&
        & istop=s_choice%istopc,irst=s_choice%irst)
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   tslv = psb_wtime() - t1
 
-  call psb_amx(ictxt,tslv)
+  call psb_amx(ctxt,tslv)
 
   ! compute residual norms
   call psb_geall(r_col,desc_a,info)
@@ -513,9 +514,9 @@ program amg_sf_sample
   amatsize = a%sizeof()
   descsize = desc_a%sizeof()
   precsize = prec%sizeof()
-  call psb_sum(ictxt,amatsize)
-  call psb_sum(ictxt,descsize)
-  call psb_sum(ictxt,precsize)
+  call psb_sum(ctxt,amatsize)
+  call psb_sum(ctxt,descsize)
+  call psb_sum(ctxt,precsize)
   call prec%descr(iout=psb_out_unit)
   if (iam == psb_root_) then 
     write(psb_out_unit,'("Matrix: ",a)')mtrx_file
@@ -584,28 +585,28 @@ program amg_sf_sample
   call prec%free(info)
   call psb_cdfree(desc_a,info)
 
-  call psb_exit(ictxt)
+  call psb_exit(ctxt)
   stop
 
 9999 continue
-  call psb_error(ictxt)
+  call psb_error(ctxt)
 
 contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine get_parms(icontxt,mtrx,rhs,guess,sol,filefmt,part,afmt,solve,prec)
+  subroutine get_parms(ctxt,mtrx,rhs,guess,sol,filefmt,part,afmt,solve,prec)
 
     implicit none
 
-    integer(psb_ipk_)   :: icontxt
+    type(psb_ctxt_type) :: ctxt
     character(len=*)    :: mtrx, rhs, guess, sol, filefmt, afmt, part
     type(solverdata)    :: solve
     type(precdata)      :: prec
     integer(psb_ipk_)   :: iam, nm, np, inp_unit
     character(len=1024)   :: filename
 
-    call psb_info(icontxt,iam,np)
+    call psb_info(ctxt,iam,np)
 
     if (iam == psb_root_) then
       ! read input data
@@ -615,7 +616,7 @@ contains
         open(inp_unit,file=filename,action='read',iostat=info)
         if (info /= 0) then
           write(psb_err_unit,*) 'Could not open file ',filename,' for input'
-          call psb_abort(icontxt)
+          call psb_abort(ctxt)
           stop
         else
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
@@ -691,67 +692,67 @@ contains
       end if     
     end if
 
-    call psb_bcast(icontxt,mtrx)
-    call psb_bcast(icontxt,rhs)
-    call psb_bcast(icontxt,guess)
-    call psb_bcast(icontxt,sol)
-    call psb_bcast(icontxt,filefmt)
-    call psb_bcast(icontxt,afmt)
-    call psb_bcast(icontxt,part)
+    call psb_bcast(ctxt,mtrx)
+    call psb_bcast(ctxt,rhs)
+    call psb_bcast(ctxt,guess)
+    call psb_bcast(ctxt,sol)
+    call psb_bcast(ctxt,filefmt)
+    call psb_bcast(ctxt,afmt)
+    call psb_bcast(ctxt,part)
 
-    call psb_bcast(icontxt,solve%kmethd)
-    call psb_bcast(icontxt,solve%istopc)
-    call psb_bcast(icontxt,solve%itmax)
-    call psb_bcast(icontxt,solve%itrace)
-    call psb_bcast(icontxt,solve%irst)
-    call psb_bcast(icontxt,solve%eps)
+    call psb_bcast(ctxt,solve%kmethd)
+    call psb_bcast(ctxt,solve%istopc)
+    call psb_bcast(ctxt,solve%itmax)
+    call psb_bcast(ctxt,solve%itrace)
+    call psb_bcast(ctxt,solve%irst)
+    call psb_bcast(ctxt,solve%eps)
 
-    call psb_bcast(icontxt,prec%descr)
-    call psb_bcast(icontxt,prec%ptype)
+    call psb_bcast(ctxt,prec%descr)
+    call psb_bcast(ctxt,prec%ptype)
 
     ! broadcast first (pre-)smoother / 1-lev prec data
-    call psb_bcast(icontxt,prec%smther)     
-    call psb_bcast(icontxt,prec%jsweeps)
-    call psb_bcast(icontxt,prec%novr)
-    call psb_bcast(icontxt,prec%restr)
-    call psb_bcast(icontxt,prec%prol)
-    call psb_bcast(icontxt,prec%solve)
-    call psb_bcast(icontxt,prec%fill)
-    call psb_bcast(icontxt,prec%thr)
+    call psb_bcast(ctxt,prec%smther)     
+    call psb_bcast(ctxt,prec%jsweeps)
+    call psb_bcast(ctxt,prec%novr)
+    call psb_bcast(ctxt,prec%restr)
+    call psb_bcast(ctxt,prec%prol)
+    call psb_bcast(ctxt,prec%solve)
+    call psb_bcast(ctxt,prec%fill)
+    call psb_bcast(ctxt,prec%thr)
     ! broadcast second (post-)smoother 
-    call psb_bcast(icontxt,prec%smther2)
-    call psb_bcast(icontxt,prec%jsweeps2)
-    call psb_bcast(icontxt,prec%novr2)
-    call psb_bcast(icontxt,prec%restr2)
-    call psb_bcast(icontxt,prec%prol2)
-    call psb_bcast(icontxt,prec%solve2)
-    call psb_bcast(icontxt,prec%fill2)
-    call psb_bcast(icontxt,prec%thr2)
+    call psb_bcast(ctxt,prec%smther2)
+    call psb_bcast(ctxt,prec%jsweeps2)
+    call psb_bcast(ctxt,prec%novr2)
+    call psb_bcast(ctxt,prec%restr2)
+    call psb_bcast(ctxt,prec%prol2)
+    call psb_bcast(ctxt,prec%solve2)
+    call psb_bcast(ctxt,prec%fill2)
+    call psb_bcast(ctxt,prec%thr2)
     
     ! broadcast AMG parameters
-    call psb_bcast(icontxt,prec%mlcycle)
-    call psb_bcast(icontxt,prec%outer_sweeps)
-    call psb_bcast(icontxt,prec%maxlevs)
+    call psb_bcast(ctxt,prec%mlcycle)
+    call psb_bcast(ctxt,prec%outer_sweeps)
+    call psb_bcast(ctxt,prec%maxlevs)
     
-    call psb_bcast(icontxt,prec%aggr_prol)
-    call psb_bcast(icontxt,prec%par_aggr_alg)
-    call psb_bcast(icontxt,prec%aggr_ord)
-    call psb_bcast(icontxt,prec%aggr_filter)
-    call psb_bcast(icontxt,prec%mncrratio)
-    call psb_bcast(ictxt,prec%thrvsz)
+    call psb_bcast(ctxt,prec%aggr_prol)
+    call psb_bcast(ctxt,prec%par_aggr_alg)
+    call psb_bcast(ctxt,prec%aggr_ord)
+    call psb_bcast(ctxt,prec%aggr_filter)
+    call psb_bcast(ctxt,prec%mncrratio)
+    call psb_bcast(ctxt,prec%thrvsz)
     if (prec%thrvsz > 0) then
       if (iam /= psb_root_) call psb_realloc(prec%thrvsz,prec%athresv,info)
-      call psb_bcast(ictxt,prec%athresv)
+      call psb_bcast(ctxt,prec%athresv)
     end if
-    call psb_bcast(ictxt,prec%athres)
+    call psb_bcast(ctxt,prec%athres)
     
-    call psb_bcast(icontxt,prec%csize)
-    call psb_bcast(icontxt,prec%cmat)
-    call psb_bcast(icontxt,prec%csolve)
-    call psb_bcast(icontxt,prec%csbsolve)
-    call psb_bcast(icontxt,prec%cfill)
-    call psb_bcast(icontxt,prec%cthres)
-    call psb_bcast(icontxt,prec%cjswp)
+    call psb_bcast(ctxt,prec%csize)
+    call psb_bcast(ctxt,prec%cmat)
+    call psb_bcast(ctxt,prec%csolve)
+    call psb_bcast(ctxt,prec%csbsolve)
+    call psb_bcast(ctxt,prec%cfill)
+    call psb_bcast(ctxt,prec%cthres)
+    call psb_bcast(ctxt,prec%cjswp)
 
 
   end subroutine get_parms

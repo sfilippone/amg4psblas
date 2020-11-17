@@ -54,15 +54,16 @@ subroutine amg_s_l1_jac_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
   integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota, nzeros
   real(psb_spk_), allocatable  :: arwsum(:)
   type(psb_sspmat_type)      :: tmpa
-  integer(psb_ipk_) :: ictxt,np,me,i, err_act, debug_unit, debug_level
-  character(len=20) :: name='s_l1_jac_smoother_bld', ch_err
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
+  character(len=20)   :: name='s_l1_jac_smoother_bld', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt       = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt       = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
 
@@ -80,7 +81,7 @@ subroutine amg_s_l1_jac_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
     sm%pa => a
     sm%nd_nnz_tot = nztota
     
-    call psb_sum(ictxt,sm%nd_nnz_tot)
+    call psb_sum(ctxt,sm%nd_nnz_tot)
     call sm%sv%build(a,desc_a,info,amold=amold,vmold=vmold)
 
   class default
@@ -89,7 +90,7 @@ subroutine amg_s_l1_jac_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
       ! is acting globally.
       call sm%nd%free()
       sm%nd_nnz_tot = 0
-      call psb_sum(ictxt,sm%nd_nnz_tot)
+      call psb_sum(ctxt,sm%nd_nnz_tot)
       call sm%sv%build(a,desc_a,info,amold=amold,vmold=vmold)
     else
 
@@ -105,7 +106,7 @@ subroutine amg_s_l1_jac_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
       call combine_dl1(sone,arwsum,tmpa,info)
       
       sm%nd_nnz_tot = sm%nd%get_nzeros()
-      call psb_sum(ictxt,sm%nd_nnz_tot)
+      call psb_sum(ctxt,sm%nd_nnz_tot)
 
       call sm%sv%build(tmpa,desc_a,info,amold=amold,vmold=vmold)
 

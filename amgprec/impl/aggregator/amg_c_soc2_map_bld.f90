@@ -95,7 +95,8 @@ subroutine amg_c_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   real(psb_spk_)  :: cpling, tcl
   logical :: disjoint
   integer(psb_ipk_) :: debug_level, debug_unit,err_act
-  integer(psb_ipk_) :: ictxt,np,me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me
   integer(psb_ipk_) :: nrow, ncol, n_ne
   character(len=20)  :: name, ch_err
 
@@ -108,8 +109,8 @@ subroutine amg_c_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   !
-  ictxt=desc_a%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt=desc_a%get_context()
+  call psb_info(ctxt,me,np)
   nrow   = desc_a%get_local_rows()
   ncol   = desc_a%get_local_cols()
   nrglob = desc_a%get_global_rows()
@@ -335,7 +336,7 @@ subroutine amg_c_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
 
   nlaggr(:) = 0
   nlaggr(me+1) = naggr
-  call psb_sum(ictxt,nlaggr(1:np))
+  call psb_sum(ctxt,nlaggr(1:np))
 
   call psb_erractionrestore(err_act)
   return

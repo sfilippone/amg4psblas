@@ -113,7 +113,7 @@ subroutine mld_daggrmat_unsmth_spmm_asb(a,desc_a,ilaggr,nlaggr,parms,ac,op_prol,
 
   ! Local variables
   integer(psb_ipk_)  :: err_act
-  integer(psb_ipk_)  :: ictxt,np,me, icomm, ndx, minfo
+  integer(psb_ipk_)  :: ctxt,np,me, icomm, ndx, minfo
   character(len=20)  :: name
   integer(psb_ipk_)  :: ierr(5) 
   type(psb_d_coo_sparse_mat) :: ac_coo, tmpcoo
@@ -129,9 +129,9 @@ subroutine mld_daggrmat_unsmth_spmm_asb(a,desc_a,ilaggr,nlaggr,parms,ac,op_prol,
   call psb_erractionsave(err_act)
 
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   nglob = desc_a%get_global_rows()

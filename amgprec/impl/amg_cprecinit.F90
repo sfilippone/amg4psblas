@@ -88,7 +88,7 @@
 !    info    -  integer, output.
 !               Error code.
 !  
-subroutine amg_cprecinit(ictxt,prec,ptype,info)
+subroutine amg_cprecinit(ctxt,prec,ptype,info)
 
   use psb_base_mod
   use amg_c_prec_mod, amg_protect_name => amg_cprecinit
@@ -106,15 +106,15 @@ subroutine amg_cprecinit(ictxt,prec,ptype,info)
   implicit none
 
   ! Arguments
-  integer(psb_ipk_), intent(in)           :: ictxt
+  type(psb_ctxt_type), intent(in)       :: ctxt
   class(amg_cprec_type), intent(inout)  :: prec
-  character(len=*), intent(in)            :: ptype
-  integer(psb_ipk_), intent(out)          :: info
+  character(len=*), intent(in)          :: ptype
+  integer(psb_ipk_), intent(out)        :: info
 
   ! Local variables
-  integer(psb_ipk_)                   :: nlev_, ilev_
-  real(psb_spk_)                      :: thr
-  character(len=*), parameter         :: name='amg_precinit'
+  integer(psb_ipk_)            :: nlev_, ilev_
+  real(psb_spk_)               :: thr
+  character(len=*), parameter  :: name='amg_precinit'
   info = psb_success_
 
   if (allocated(prec%precv)) then 
@@ -123,7 +123,7 @@ subroutine amg_cprecinit(ictxt,prec,ptype,info)
       ! Do we want to do something? 
     endif
   endif
-  prec%ictxt = ictxt
+  prec%ctxt = ctxt
   prec%ag_data%min_coarse_size = -1
 
   select case(psb_toupper(trim(ptype)))

@@ -64,7 +64,9 @@ subroutine z_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   integer(psb_ipk_)  :: n_row,n_col, nrow_a, nza, npr, npc
   integer(psb_lpk_)  :: nglob, nglobrec, nzt
   integer(psb_ipk_)  :: ifrst, ibcheck
-  integer(psb_ipk_)  :: ictxt, ictxt1, icomm, np, iam, me, i, err_act, debug_unit, debug_level
+  type(psb_ctxt_type) :: ctxt, ctxt1
+  integer(psb_mpk_)  :: icomm
+  integer(psb_ipk_)  :: np, iam, me, i, err_act, debug_unit, debug_level
   character(len=20)  :: name='z_mumps_solver_bld', ch_err
 
 #if defined(HAVE_MUMPS_) 
@@ -74,20 +76,20 @@ subroutine z_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt       = desc_a%get_context()
-  call psb_info(ictxt, iam, np)      
+  ctxt       = desc_a%get_context()
+  call psb_info(ctxt, iam, np)      
   if (sv%ipar(1) == amg_local_solver_ ) then
-    call psb_init(ictxt1,np=1,basectxt=ictxt,ids=(/iam/))
-    icomm = psb_get_mpi_comm(ictxt1)
-    allocate(sv%local_ictxt,stat=info)
-    sv%local_ictxt = ictxt1
-    !write(*,*)iam,'mumps_bld: local +++++>',icomm,sv%local_ictxt
-    call psb_info(ictxt1, me, np)
+    call psb_init(ctxt1,np=1,basectxt=ctxt,ids=(/iam/))
+    icomm = psb_get_mpi_comm(ctxt1)
+    allocate(sv%local_ctxt,stat=info)
+    sv%local_ctxt = ctxt1
+    !write(*,*)iam,'mumps_bld: local +++++>',icomm,sv%local_ctxt
+    call psb_info(ctxt1, me, np)
     npr  = np
   else if (sv%ipar(1) == amg_global_solver_ ) then
-    icomm = psb_get_mpi_comm(ictxt)
-    !write(*,*)iam,'mumps_bld: global +++++>',icomm,ictxt
-    call psb_info(ictxt, iam, np)
+    icomm = psb_get_mpi_comm(ctxt)
+    !write(*,*)iam,'mumps_bld: global +++++>',icomm,ctxt
+    call psb_info(ctxt, iam, np)
     me = iam 
     npr  = np
   else
@@ -222,12 +224,12 @@ subroutine z_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   sv%id%nnz     = acoo%get_nzeros()
   sv%id%job    = 4
   if (sv%ipar(1) == amg_global_solver_ ) then
-    call psb_sum(ictxt,sv%id%nnz)
+    call psb_sum(ctxt,sv%id%nnz)
   end if
-  !call psb_barrier(ictxt)
+  !call psb_barrier(ctxt)
   write(*,*)iam, ' calling mumps N,nz,nz_loc',sv%id%n,sv%id%nnz,sv%id%nnz_loc
   call zmumps(sv%id)
-  !call psb_barrier(ictxt)
+  !call psb_barrier(ctxt)
   info = sv%id%infog(1)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_

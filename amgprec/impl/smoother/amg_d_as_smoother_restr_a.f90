@@ -46,15 +46,16 @@ subroutine amg_d_as_smoother_restr_a(sm,x,trans,work,info,data)
   integer(psb_ipk_), intent(out)                 :: info
       integer(psb_ipk_), optional, intent(in)        :: data
   !Local
-  integer(psb_ipk_)  :: ictxt,np,me, err_act,isz,int_err(5), data_
-  character          :: trans_
-  character(len=20)  :: name='d_as_smther_restr_a', ch_err
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, err_act,isz,int_err(5), data_
+  character           :: trans_
+  character(len=20)   :: name='d_as_smther_restr_a', ch_err
 
   call psb_erractionsave(err_act)
 
   info  = psb_success_
-  ictxt = sm%desc_data%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt = sm%desc_data%get_context()
+  call psb_info(ctxt,me,np)
 
   trans_ = psb_toupper(trans)
   select case(trans_)

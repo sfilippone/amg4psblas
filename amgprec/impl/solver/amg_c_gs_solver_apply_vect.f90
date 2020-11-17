@@ -56,13 +56,14 @@ subroutine amg_c_gs_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   integer(psb_ipk_)   :: n_row,n_col, itx, itxst
   complex(psb_spk_), pointer :: ww(:), aux(:), tx(:),ty(:)
   complex(psb_spk_), allocatable :: temp(:)
-  integer(psb_ipk_)   :: ictxt,np,me,i, err_act
-  character          :: trans_, init_
-  character(len=20)  :: name='c_gs_solver_apply'
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act
+  character           :: trans_, init_
+  character(len=20)   :: name='c_gs_solver_apply'
 
   call psb_erractionsave(err_act)
-  ictxt = desc_data%get_ctxt()
-  call psb_info(ictxt,me,np)
+  ctxt = desc_data%get_ctxt()
+  call psb_info(ctxt,me,np)
   info = psb_success_
 
   trans_ = psb_toupper(trans)

@@ -91,16 +91,17 @@ subroutine amg_cprecaply(prec,x,y,desc_data,info,trans,work)
   complex(psb_spk_), pointer :: work_(:)
   complex(psb_spk_), allocatable :: w1(:), w2(:) 
   
-  integer(psb_ipk_)  :: ictxt,np,me
-  integer(psb_ipk_)  :: err_act,iwsz, k, nswps
-  character(len=20)  :: name
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: err_act,iwsz, k, nswps
+  character(len=20)   :: name
 
   name='amg_cprecaply'
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt = desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt, me, np)
 
   if (present(trans)) then 
     trans_=psb_toupper(trans)
@@ -256,8 +257,9 @@ subroutine amg_cprecaply1(prec,x,desc_data,info,trans)
   character(len=1), optional        :: trans
 
   ! Local variables
-  integer(psb_ipk_)      :: ictxt,np,me
-  integer(psb_ipk_)      :: err_act
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: err_act
   complex(psb_spk_), pointer :: ww(:), w1(:)
   character(len=20)   :: name
 
@@ -266,8 +268,8 @@ subroutine amg_cprecaply1(prec,x,desc_data,info,trans)
   call psb_erractionsave(err_act)
   
 
-  ictxt = desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt, me, np)
 
   allocate(ww(size(x)),w1(size(x)),stat=info)
   if (info /= psb_success_) then 
@@ -321,17 +323,18 @@ subroutine amg_cprecaply2_vect(prec,x,y,desc_data,info,trans,work)
   ! Local variables
   character     :: trans_ 
   complex(psb_spk_), pointer :: work_(:)
-  integer(psb_ipk_)  :: ictxt,np,me
-  integer(psb_ipk_)  :: err_act,iwsz, k, nswps
-  logical            :: do_alloc_wrk
-  character(len=20)  :: name
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: err_act,iwsz, k, nswps
+  logical             :: do_alloc_wrk
+  character(len=20)   :: name
 
   name='amg_cprecaply'
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt = desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt, me, np)
 
   if (present(trans)) then 
     trans_=psb_toupper(trans)
@@ -470,17 +473,18 @@ subroutine amg_cprecaply1_vect(prec,x,desc_data,info,trans,work)
   ! Local variables
   character     :: trans_ 
   complex(psb_spk_), pointer :: work_(:)
-  integer(psb_ipk_)  :: ictxt,np,me
-  integer(psb_ipk_)  :: err_act,iwsz, k, nswps
-  logical            :: do_alloc_wrk
-  character(len=20)  :: name
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: err_act,iwsz, k, nswps
+  logical             :: do_alloc_wrk
+  character(len=20)   :: name
 
   name='amg_cprecaply'
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  ictxt = desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt, me, np)
 
   if (present(trans)) then 
     trans_=psb_toupper(trans)

@@ -1050,49 +1050,49 @@ contains
 
   end function pr_to_str
 
-  subroutine amg_ml_bcast(ictxt,dat,root)
+  subroutine amg_ml_bcast(ctxt,dat,root)
 
     implicit none 
-    integer(psb_ipk_), intent(in)      :: ictxt
+    type(psb_ctxt_type), intent(in) :: ctxt
     type(amg_ml_parms), intent(inout)   :: dat
     integer(psb_ipk_), intent(in), optional :: root
 
-    call psb_bcast(ictxt,dat%sweeps_pre,root)
-    call psb_bcast(ictxt,dat%sweeps_post,root)
-    call psb_bcast(ictxt,dat%ml_cycle,root)
-    call psb_bcast(ictxt,dat%aggr_type,root)
-    call psb_bcast(ictxt,dat%par_aggr_alg,root)
-    call psb_bcast(ictxt,dat%aggr_ord,root)
-    call psb_bcast(ictxt,dat%aggr_prol,root)
-    call psb_bcast(ictxt,dat%aggr_omega_alg,root)
-    call psb_bcast(ictxt,dat%aggr_eig,root)
-    call psb_bcast(ictxt,dat%aggr_filter,root)
-    call psb_bcast(ictxt,dat%coarse_mat,root)
-    call psb_bcast(ictxt,dat%coarse_solve,root)
+    call psb_bcast(ctxt,dat%sweeps_pre,root)
+    call psb_bcast(ctxt,dat%sweeps_post,root)
+    call psb_bcast(ctxt,dat%ml_cycle,root)
+    call psb_bcast(ctxt,dat%aggr_type,root)
+    call psb_bcast(ctxt,dat%par_aggr_alg,root)
+    call psb_bcast(ctxt,dat%aggr_ord,root)
+    call psb_bcast(ctxt,dat%aggr_prol,root)
+    call psb_bcast(ctxt,dat%aggr_omega_alg,root)
+    call psb_bcast(ctxt,dat%aggr_eig,root)
+    call psb_bcast(ctxt,dat%aggr_filter,root)
+    call psb_bcast(ctxt,dat%coarse_mat,root)
+    call psb_bcast(ctxt,dat%coarse_solve,root)
 
   end subroutine amg_ml_bcast
 
-  subroutine amg_sml_bcast(ictxt,dat,root)
+  subroutine amg_sml_bcast(ctxt,dat,root)
 
     implicit none 
-    integer(psb_ipk_), intent(in)      :: ictxt
+    type(psb_ctxt_type), intent(in) :: ctxt
     type(amg_sml_parms), intent(inout)   :: dat
     integer(psb_ipk_), intent(in), optional :: root
 
-    call psb_bcast(ictxt,dat%amg_ml_parms,root)
-    call psb_bcast(ictxt,dat%aggr_omega_val,root)
-    call psb_bcast(ictxt,dat%aggr_thresh,root)
+    call psb_bcast(ctxt,dat%amg_ml_parms,root)
+    call psb_bcast(ctxt,dat%aggr_omega_val,root)
+    call psb_bcast(ctxt,dat%aggr_thresh,root)
   end subroutine amg_sml_bcast
 
-  subroutine amg_dml_bcast(ictxt,dat,root)
+  subroutine amg_dml_bcast(ctxt,dat,root)
     implicit none 
-    integer(psb_ipk_), intent(in)      :: ictxt
+    type(psb_ctxt_type), intent(in) :: ctxt
     type(amg_dml_parms), intent(inout)   :: dat
     integer(psb_ipk_), intent(in), optional :: root
 
-    call psb_bcast(ictxt,dat%amg_ml_parms,root)
-    call psb_bcast(ictxt,dat%aggr_omega_val,root)
-    call psb_bcast(ictxt,dat%aggr_thresh,root)
+    call psb_bcast(ctxt,dat%amg_ml_parms,root)
+    call psb_bcast(ctxt,dat%aggr_omega_val,root)
+    call psb_bcast(ctxt,dat%aggr_thresh,root)
   end subroutine amg_dml_bcast
 
   subroutine ml_parms_clone(pm,pmout,info)

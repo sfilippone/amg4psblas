@@ -149,7 +149,7 @@ program mld_d_pde3d
   ! dense vectors
   type(psb_d_vect_type) :: x,b
   ! parallel environment
-  integer(psb_ipk_) :: ictxt, iam, np
+  integer(psb_ipk_) :: ctxt, iam, np
 
   ! solver parameters
   integer(psb_ipk_)        :: iter, itmax,itrace, istopc, irst, nlv
@@ -163,12 +163,12 @@ program mld_d_pde3d
   info=psb_success_
 
 
-  call psb_init(ictxt)
-  call psb_info(ictxt,iam,np)
+  call psb_init(ctxt)
+  call psb_info(ctxt,iam,np)
 
   if (iam < 0) then 
     ! This should not happen, but just in case
-    call psb_exit(ictxt)
+    call psb_exit(ctxt)
     stop
   endif
   if(psb_get_errstatus() /= 0) goto 9999
@@ -185,17 +185,17 @@ program mld_d_pde3d
   !
   !  get parameters
   !
-  call get_parms(ictxt,kmethd,afmt,idim,istopc,itmax,itrace,irst,eps)
+  call get_parms(ctxt,kmethd,afmt,idim,istopc,itmax,itrace,irst,eps)
 
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
   !
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
-  call psb_gen_pde3d(ictxt,idim,a,b,x,desc_a,afmt,&
+  call psb_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
        & a1,a2,a3,b1,b2,b3,c,g,info)  
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -214,7 +214,7 @@ program mld_d_pde3d
   !  
   call prec%init('ML',       info)
   
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
   call prec%hierarchy_build(a,desc_a,info)
   if(info /= psb_success_) then
@@ -227,7 +227,7 @@ program mld_d_pde3d
   nlv = prec%get_nlevs()
   call prec%set(tlusv,   info,ilev=1,ilmax=max(1,nlv-1))
   
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
   call prec%smoothers_build(a,desc_a,info)
   if(info /= psb_success_) then
@@ -238,8 +238,8 @@ program mld_d_pde3d
   end if
   tprec = psb_wtime()-t1
 
-  call psb_amx(ictxt,thier)
-  call psb_amx(ictxt,tprec)
+  call psb_amx(ctxt,thier)
+  call psb_amx(ctxt,tprec)
 
   if (iam == psb_root_) &
        & write(psb_out_unit,'("Preconditioner time : ",es12.5)') tprec+thier
@@ -252,7 +252,7 @@ program mld_d_pde3d
   !
   if(iam == psb_root_) &
        & write(psb_out_unit,'("Calling iterative method ",a)')kmethd
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()  
   call psb_krylov(kmethd,a,prec,b,x,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
@@ -264,16 +264,16 @@ program mld_d_pde3d
     goto 9999
   end if
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   tslv = psb_wtime() - t1
-  call psb_amx(ictxt,tslv)
+  call psb_amx(ctxt,tslv)
 
   amatsize = a%sizeof()
   descsize = desc_a%sizeof()
   precsize = prec%sizeof()
-  call psb_sum(ictxt,amatsize)
-  call psb_sum(ictxt,descsize)
-  call psb_sum(ictxt,precsize)
+  call psb_sum(ctxt,amatsize)
+  call psb_sum(ctxt,descsize)
+  call psb_sum(ctxt,precsize)
   if (iam == psb_root_) then
     write(psb_out_unit,'(" ")')
     write(psb_out_unit,'("Numer of levels of aggr. hierarchy: ",i12)') prec%get_nlevs()
@@ -306,26 +306,26 @@ program mld_d_pde3d
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_exit(ictxt)
+  call psb_exit(ctxt)
   stop
 
 9999 continue
-  call psb_error(ictxt)
+  call psb_error(ctxt)
 
 contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine  get_parms(ictxt,kmethd,afmt,idim,istopc,itmax,itrace,irst,eps)
+  subroutine  get_parms(ctxt,kmethd,afmt,idim,istopc,itmax,itrace,irst,eps)
     
-    integer(psb_ipk_) :: ictxt
+    integer(psb_ipk_) :: ctxt
     character(len=*)  :: kmethd, afmt
     integer(psb_ipk_) :: idim, istopc,itmax,itrace,irst
     integer(psb_ipk_) :: np, iam, info
     real(psb_dpk_)    :: eps
     character(len=20) :: buffer
 
-    call psb_info(ictxt, iam, np)
+    call psb_info(ctxt, iam, np)
 
     if (iam == psb_root_) then
       call read_data(kmethd,psb_inp_unit)
@@ -339,14 +339,14 @@ contains
     end if
 
     ! broadcast parameters to all processors
-    call psb_bcast(ictxt,kmethd)
-    call psb_bcast(ictxt,afmt)
-    call psb_bcast(ictxt,idim)
-    call psb_bcast(ictxt,istopc)
-    call psb_bcast(ictxt,itmax)
-    call psb_bcast(ictxt,itrace)
-    call psb_bcast(ictxt,irst)
-    call psb_bcast(ictxt,eps)
+    call psb_bcast(ctxt,kmethd)
+    call psb_bcast(ctxt,afmt)
+    call psb_bcast(ctxt,idim)
+    call psb_bcast(ctxt,istopc)
+    call psb_bcast(ctxt,itmax)
+    call psb_bcast(ctxt,itrace)
+    call psb_bcast(ctxt,irst)
+    call psb_bcast(ctxt,eps)
 
     if (iam == psb_root_) then 
       write(psb_out_unit,'("Solving matrix       : ell1")')      

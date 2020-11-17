@@ -55,15 +55,16 @@ subroutine amg_s_jac_smoother_apply(alpha,sm,x,beta,y,desc_data,&
   integer(psb_ipk_)    :: n_row,n_col
   real(psb_spk_), allocatable  :: tx(:),ty(:)
   real(psb_spk_), pointer :: aux(:)
-  integer(psb_ipk_)  :: ictxt,np,me,i, err_act
-  character          :: trans_, init_
-  character(len=20)  :: name='s_jac_smoother_apply'
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me,i, err_act
+  character           :: trans_, init_
+  character(len=20)   :: name='s_jac_smoother_apply'
 
   call psb_erractionsave(err_act)
 
   info = psb_success_
-  ictxt = desc_data%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt,me,np)
 
   
   if (present(init)) then

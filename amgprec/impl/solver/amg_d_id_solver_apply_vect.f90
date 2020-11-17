@@ -53,10 +53,11 @@ subroutine amg_d_id_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   character, intent(in), optional                :: init
   type(psb_d_vect_type),intent(inout), optional   :: initu
 
-  integer(psb_ipk_)  :: n_row,n_col
-  integer(psb_ipk_)  :: ictxt,np,me,i, err_act
-  character          :: trans_
-  character(len=20)  :: name='d_id_solver_apply_vect'
+  integer(psb_ipk_)   :: n_row,n_col
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act
+  character           :: trans_
+  character(len=20)   :: name='d_id_solver_apply_vect'
 
   call psb_erractionsave(err_act)
 

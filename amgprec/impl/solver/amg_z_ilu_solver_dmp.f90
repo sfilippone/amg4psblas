@@ -46,18 +46,19 @@ subroutine amg_z_ilu_solver_dmp(sv,desc,level,info,prefix,head,solver,global_num
   integer(psb_ipk_), intent(out)             :: info
   character(len=*), intent(in), optional     :: prefix, head
   logical, optional, intent(in)              :: solver, global_num
-  integer(psb_ipk_)  :: i, j, il1, iln, lname, lev
-  integer(psb_ipk_)  :: ictxt,iam, np
-  character(len=80)  :: prefix_
-  character(len=120) :: fname ! len should be at least 20 more than
+  integer(psb_ipk_)   :: i, j, il1, iln, lname, lev
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: iam, np
+  character(len=80)   :: prefix_
+  character(len=120)  :: fname ! len should be at least 20 more than
   logical :: solver_, global_num_
   integer(psb_lpk_), allocatable :: iv(:)
   !  len of prefix_ 
 
   info = 0
 
-  ictxt = desc%get_context()
-  call psb_info(ictxt,iam,np)
+  ctxt = desc%get_context()
+  call psb_info(ctxt,iam,np)
 
   if (present(solver)) then 
     solver_ = solver

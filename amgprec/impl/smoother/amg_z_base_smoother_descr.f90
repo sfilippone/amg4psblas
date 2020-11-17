@@ -49,10 +49,9 @@ subroutine amg_z_base_smoother_descr(sm,info,iout,coarse)
   logical, intent(in), optional                 :: coarse
 
   ! Local variables
-  integer(psb_ipk_)      :: err_act
-  integer(psb_ipk_)      :: ictxt, me, np
+  integer(psb_ipk_)   :: err_act
   character(len=20), parameter :: name='amg_z_base_smoother_descr'
-  integer(psb_ipk_) :: iout_
+  integer(psb_ipk_)   :: iout_
   logical      :: coarse_
 
 
