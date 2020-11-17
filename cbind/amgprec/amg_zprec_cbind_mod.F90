@@ -1,12 +1,12 @@
-module mld_zprec_cbind_mod
+module amg_zprec_cbind_mod
 
   use iso_c_binding
-  use mld_prec_mod
+  use amg_prec_mod
   use psb_base_cbind_mod
 
-  type, bind(c) :: mld_c_zprec
+  type, bind(c) :: amg_c_zprec
     type(c_ptr) :: item = c_null_ptr
-  end type mld_c_zprec
+  end type amg_c_zprec
 
 contains
 
@@ -17,22 +17,22 @@ contains
 #define MLDC_DEBUG(MSG)
 #define MLDC_ERROR(MSG)
 #endif
-#define mld_success_ 0
+#define amg_success_ 0
 !#define MLDC_ERR_FILTER(INFO) min(0,INFO)
 #define MLDC_ERR_FILTER(INFO) (INFO)
-#define MLDC_ERR_HANDLE(INFO) if(INFO/=mld_success_)MLDC_ERROR("ERROR!")
+#define MLDC_ERR_HANDLE(INFO) if(INFO/=amg_success_)MLDC_ERROR("ERROR!")
 
-  function  mld_c_zprecinit(cctxt,ph,ptype) bind(c) result(res)
+  function  amg_c_zprecinit(cctxt,ph,ptype) bind(c) result(res)
     use psb_base_mod
-    use mld_prec_mod
+    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_)  :: res
-    type(mld_c_zprec)    :: ph
+    type(amg_c_zprec)    :: ph
     integer(psb_c_ipk_), value :: cctxt
     character(c_char)     :: ptype(*)
     integer               :: info
-    type(mld_zprec_type), pointer :: precp
+    type(amg_zprec_type), pointer :: precp
     character(len=80)     :: fptype
 
     res = -1
@@ -48,16 +48,16 @@ contains
 
     call stringc2f(ptype,fptype)
 
-    call precp%init(cctxt,fptype,info)
+    call precp%init(psb_c2f_ctxt(cctxt),fptype,info)
 
     res = MLDC_ERR_FILTER(info)
     MLDC_ERR_HANDLE(res)
     return
-  end function mld_c_zprecinit
+  end function amg_c_zprecinit
 
-  function  mld_c_zprecseti(ph,what,val) bind(c) result(res)
+  function  amg_c_zprecseti(ph,what,val) bind(c) result(res)
     use psb_base_mod
-    use mld_prec_mod
+    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
@@ -66,7 +66,7 @@ contains
     integer(psb_c_ipk_), value :: val
     integer               :: info
     character(len=80)     :: fwhat
-    type(mld_zprec_type), pointer  :: precp
+    type(amg_zprec_type), pointer  :: precp
 
     res = -1
     if (c_associated(ph%item)) then
@@ -77,17 +77,17 @@ contains
 
     call stringc2f(what,fwhat)
 
-    call mld_precset(precp,fwhat,val,info)
+    call amg_precset(precp,fwhat,val,info)
 
     res = MLDC_ERR_FILTER(info)
     MLDC_ERR_HANDLE(res)
     return
-  end function mld_c_zprecseti
+  end function amg_c_zprecseti
 
 
-  function  mld_c_zprecsetr(ph,what,val) bind(c) result(res)
+  function  amg_c_zprecsetr(ph,what,val) bind(c) result(res)
     use psb_base_mod
-    use mld_prec_mod
+    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
@@ -96,7 +96,7 @@ contains
     real(c_double), value :: val
     integer               :: info
     character(len=80)     :: fwhat
-    type(mld_zprec_type), pointer  :: precp
+    type(amg_zprec_type), pointer  :: precp
 
     res = -1
     if (c_associated(ph%item)) then
@@ -107,16 +107,16 @@ contains
 
     call stringc2f(what,fwhat)
 
-    call mld_precset(precp,fwhat,val,info)
+    call amg_precset(precp,fwhat,val,info)
 
     res = MLDC_ERR_FILTER(info)
     MLDC_ERR_HANDLE(res)
     return
-  end function mld_c_zprecsetr
+  end function amg_c_zprecsetr
 
-  function  mld_c_zprecsetc(ph,what,val) bind(c) result(res)
+  function  amg_c_zprecsetc(ph,what,val) bind(c) result(res)
     use psb_base_mod
-    use mld_prec_mod
+    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
@@ -124,7 +124,7 @@ contains
     character(c_char)     :: what(*), val(*)
     integer               :: info
     character(len=80)     :: fwhat,fval
-    type(mld_zprec_type), pointer  :: precp
+    type(amg_zprec_type), pointer  :: precp
 
     res = -1
     if (c_associated(ph%item)) then
@@ -136,22 +136,22 @@ contains
     call stringc2f(what,fwhat)
     call stringc2f(val,fval)
 
-    call mld_precset(precp,fwhat,fval,info)
+    call amg_precset(precp,fwhat,fval,info)
 
     res = MLDC_ERR_FILTER(info)
     MLDC_ERR_HANDLE(res)
     return
-  end function mld_c_zprecsetc
+  end function amg_c_zprecsetc
 
-  function  mld_c_zprecbld(ah,cdh,ph) bind(c) result(res)
+  function  amg_c_zprecbld(ah,cdh,ph) bind(c) result(res)
     use psb_base_mod
-    use mld_prec_mod
+    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
     integer               :: info
-    type(mld_zprec_type), pointer  :: precp
+    type(amg_zprec_type), pointer  :: precp
     type(psb_zspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
@@ -174,23 +174,23 @@ contains
       return
     end if
 
-    call mld_precbld(ap,descp,precp,info)
+    call amg_precbld(ap,descp,precp,info)
 
     res = MLDC_ERR_FILTER(info)
     MLDC_ERR_HANDLE(res)
 
     return
-  end function mld_c_zprecbld
+  end function amg_c_zprecbld
 
-  function  mld_c_zhierarchy_build(ah,cdh,ph) bind(c) result(res)
+  function  amg_c_zhierarchy_build(ah,cdh,ph) bind(c) result(res)
     use psb_base_mod
-    use mld_prec_mod
+    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
     integer               :: info
-    type(mld_zprec_type), pointer  :: precp
+    type(amg_zprec_type), pointer  :: precp
     type(psb_zspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
@@ -219,17 +219,17 @@ contains
     MLDC_ERR_HANDLE(res)
 
     return
-  end function mld_c_zhierarchy_build
+  end function amg_c_zhierarchy_build
 
-  function  mld_c_zsmoothers_build(ah,cdh,ph) bind(c) result(res)
+  function  amg_c_zsmoothers_build(ah,cdh,ph) bind(c) result(res)
     use psb_base_mod
-    use mld_prec_mod
+    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
     integer               :: info
-    type(mld_zprec_type), pointer  :: precp
+    type(amg_zprec_type), pointer  :: precp
     type(psb_zspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
@@ -258,9 +258,9 @@ contains
     MLDC_ERR_HANDLE(res)
 
     return
-  end function mld_c_zsmoothers_build
+  end function amg_c_zsmoothers_build
 
-  function  mld_c_zkrylov(methd,&
+  function  amg_c_zkrylov(methd,&
        & ah,ph,bh,xh,cdh,options) bind(c) result(res)
     use psb_base_mod
     use psb_prec_mod
@@ -273,15 +273,15 @@ contains
     character(c_char)       :: methd(*)
     type(solveroptions)     :: options
 
-    res= mld_c_zkrylov_opt(methd, ah, ph, bh, xh, options%eps,cdh,  &
+    res= amg_c_zkrylov_opt(methd, ah, ph, bh, xh, options%eps,cdh,  &
          & itmax=options%itmax, iter=options%iter,&
          & itrace=options%itrace, istop=options%istop,&
          & irst=options%irst, err=options%err)
 
-  end function mld_c_zkrylov
+  end function amg_c_zkrylov
 
 
-  function  mld_c_zkrylov_opt(methd,&
+  function  amg_c_zkrylov_opt(methd,&
        & ah,ph,bh,xh,eps,cdh,itmax,iter,err,itrace,irst,istop) bind(c) result(res)
     use psb_base_mod
     use psb_prec_mod
@@ -299,7 +299,7 @@ contains
     character(c_char)       :: methd(*)
     type(psb_desc_type), pointer   :: descp
     type(psb_zspmat_type), pointer :: ap
-    type(mld_zprec_type), pointer  :: precp
+    type(amg_zprec_type), pointer  :: precp
     type(psb_z_vect_type), pointer :: xp, bp
 
     integer               :: info,fitmax,fitrace,first,fistop,fiter
@@ -349,17 +349,17 @@ contains
     err  = ferr
     res = min(info,0)
 
-  end function mld_c_zkrylov_opt
+  end function amg_c_zkrylov_opt
 
-  function  mld_c_zprecfree(ph) bind(c) result(res)
+  function  amg_c_zprecfree(ph) bind(c) result(res)
     use psb_base_mod
-    use mld_prec_mod
+    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type) :: ph
     integer               :: info
-    type(mld_zprec_type), pointer :: precp
+    type(amg_zprec_type), pointer :: precp
     character(len=80)     :: fptype
 
     res = -1
@@ -375,17 +375,17 @@ contains
     res = MLDC_ERR_FILTER(info)
     MLDC_ERR_HANDLE(res)
     return
-  end function mld_c_zprecfree
+  end function amg_c_zprecfree
 
-  function mld_c_zdescr(ph) bind(c) result(res)
+  function amg_c_zdescr(ph) bind(c) result(res)
    use psb_base_mod
-   use mld_prec_mod
+   use amg_prec_mod
    implicit none
  
    integer(psb_c_ipk_) :: res
    type(psb_c_object_type) :: ph
    integer               :: info
-   type(mld_zprec_type), pointer :: precp
+   type(amg_zprec_type), pointer :: precp
  
    res = -1
    info = -1
@@ -403,6 +403,6 @@ contains
    res = MLDC_ERR_FILTER(info)
    MLDC_ERR_HANDLE(res)
    return
- end function mld_c_zdescr
+ end function amg_c_zdescr
 
-end module mld_zprec_cbind_mod
+end module amg_zprec_cbind_mod
