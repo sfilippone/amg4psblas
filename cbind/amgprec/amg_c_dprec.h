@@ -19,7 +19,7 @@ extern "C" {
   amg_c_dprec* amg_c_dprec_new();
   psb_i_t amg_c_dprec_delete(amg_c_dprec* p);
  
-  psb_i_t amg_c_dprecinit(psb_i_t ictxt, amg_c_dprec *ph, const char *ptype);
+  psb_i_t amg_c_dprecinit(psb_c_ctxt cctxt, amg_c_dprec *ph, const char *ptype);
   psb_i_t amg_c_dprecseti(amg_c_dprec *ph, const char *what, psb_i_t val);
   psb_i_t amg_c_dprecsetc(amg_c_dprec *ph, const char *what, const char *val);
   psb_i_t amg_c_dprecsetr(amg_c_dprec *ph, const char *what, double val);

@@ -29,7 +29,7 @@ contains
 
     integer(psb_c_ipk_)  :: res
     type(amg_c_zprec)    :: ph
-    integer(psb_c_ipk_), value :: cctxt
+    type(psb_c_object_type), value :: cctxt
     character(c_char)     :: ptype(*)
     integer               :: info
     type(amg_zprec_type), pointer :: precp
