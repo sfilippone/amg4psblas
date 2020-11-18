@@ -136,9 +136,10 @@ contains
 
     integer    :: n_row,n_col
     complex(psb_dpk_), pointer :: ww(:)
-    integer    :: ictxt,np,me,i, err_act
-    character          :: trans_
-    character(len=20)  :: name='z_sludist_solver_apply'
+    type(psb_ctxt_type) :: ctxt
+    integer             :: np,me,i, err_act
+    character           :: trans_
+    character(len=20)   :: name='z_sludist_solver_apply'
 
     call psb_erractionsave(err_act)
 
@@ -271,15 +272,16 @@ contains
     type(psb_z_csr_sparse_mat) :: acsr
     integer :: n_row,n_col, nrow_a, nztota, nglob, nzt, npr, npc
     integer :: ifrst, ibcheck
-    integer :: ictxt,np,me,i, err_act, debug_unit, debug_level
+    type(psb_ctxt_type) :: ctxt
+    integer :: np,me,i, err_act, debug_unit, debug_level
     character(len=20)  :: name='z_sludist_solver_bld', ch_err
     
     info=psb_success_
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    ictxt       = desc_a%get_context()
-    call psb_info(ictxt, me, np)
+    ctxt       = desc_a%get_context()
+    call psb_info(ctxt, me, np)
     npr  = np
     npc  = 1
     if (debug_level >= psb_debug_outer_) &
@@ -413,7 +415,8 @@ contains
 
     ! Local variables
     integer      :: err_act
-    integer      :: ictxt, me, np
+    type(psb_ctxt_type) :: ctxt
+    integer      :: me, np
     character(len=20), parameter :: name='amg_z_sludist_solver_descr'
     integer :: iout_
 

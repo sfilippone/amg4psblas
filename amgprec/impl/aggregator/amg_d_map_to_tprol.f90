@@ -95,9 +95,10 @@ subroutine amg_d_map_to_tprol(desc_a,ilaggr,nlaggr,op_prol,info)
   integer(psb_lpk_) :: icnt,nlp,k,n,ia,isz,nr, naggr,i,j,m,naggrm1, naggrp1, ntaggr
   type(psb_ld_coo_sparse_mat) :: tmpcoo
   integer(psb_ipk_) :: debug_level, debug_unit,err_act
-  integer(psb_ipk_) :: ictxt,np,me
-  integer(psb_lpk_) :: nrow, ncol, n_ne
-  character(len=20)  :: name, ch_err
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me
+  integer(psb_lpk_)   :: nrow, ncol, n_ne
+  character(len=20)   :: name, ch_err
 
   info=psb_success_
   name = 'amg_map_to_tprol'
@@ -108,8 +109,8 @@ subroutine amg_d_map_to_tprol(desc_a,ilaggr,nlaggr,op_prol,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   !
-  ictxt=desc_a%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt=desc_a%get_context()
+  call psb_info(ctxt,me,np)
   nrow  = desc_a%get_local_rows()
   ncol  = desc_a%get_local_cols()
 

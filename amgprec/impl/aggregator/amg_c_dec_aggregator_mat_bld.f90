@@ -151,11 +151,12 @@ subroutine  amg_c_dec_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
   integer(psb_ipk_), intent(out)       :: info
 
   ! Local variables
-  character(len=20)            :: name
-  integer(psb_mpk_)            :: ictxt, np, me
-  integer(psb_lpk_)            :: nzl,ntaggr
-  integer(psb_ipk_)            :: err_act
-  integer(psb_ipk_)            :: debug_level, debug_unit
+  character(len=20)   :: name
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me
+  integer(psb_lpk_)   :: nzl,ntaggr
+  integer(psb_ipk_)   :: err_act
+  integer(psb_ipk_)   :: debug_level, debug_unit
 
   name='amg_c_dec_aggregator_mat_bld'
   call psb_erractionsave(err_act)
@@ -165,8 +166,8 @@ subroutine  amg_c_dec_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   info  = psb_success_
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt,me,np)
 
   !
   ! Build the coarse-level matrix from the fine-level one, starting from 

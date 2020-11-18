@@ -49,7 +49,7 @@ subroutine amg_c_jac_smoother_cnv(sm,info,amold,vmold,imold)
   class(psb_c_base_vect_type), intent(in), optional  :: vmold
   class(psb_i_base_vect_type), intent(in), optional  :: imold
   ! Local variables
-  integer(psb_ipk_) :: ictxt,np,me,i, err_act, debug_unit, debug_level
+  integer(psb_ipk_) :: i, err_act, debug_unit, debug_level
   character(len=20) :: name='d_jac_smoother_cnv', ch_err
 
   info=psb_success_

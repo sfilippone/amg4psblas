@@ -96,12 +96,13 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
   class(psb_i_base_vect_type), intent(in), optional  :: imold
 
   ! Local Variables
-  integer(psb_ipk_)  :: ictxt, me,np
-  integer(psb_ipk_)  :: err,i,k, err_act, iszv, newsz, nplevs, mxplevs
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: me, np
+  integer(psb_ipk_)   :: err,i,k, err_act, iszv, newsz, nplevs, mxplevs
   real(psb_spk_)     :: mnaggratio
-  integer(psb_ipk_)  :: coarse_solve_id
-  integer(psb_ipk_)  :: debug_level, debug_unit
-  character(len=20)  :: name, ch_err
+  integer(psb_ipk_)   :: coarse_solve_id
+  integer(psb_ipk_)   :: debug_level, debug_unit
+  character(len=20)   :: name, ch_err
 
   info=psb_success_
   err=0
@@ -114,8 +115,8 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
 
   name = 'amg_c_smoothers_bld'
   info = psb_success_
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
@@ -132,7 +133,7 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
   ! Check to ensure all procs have the same 
   !   
   iszv       = size(prec%precv)
-  call psb_bcast(ictxt,iszv)
+  call psb_bcast(ctxt,iszv)
   if (iszv /= size(prec%precv)) then 
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Inconsistent size of precv')

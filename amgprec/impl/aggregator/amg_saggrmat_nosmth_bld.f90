@@ -115,9 +115,10 @@ subroutine amg_saggrmat_nosmth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   integer(psb_ipk_), intent(out)             :: info
 
   ! Local variables
-  integer(psb_ipk_)  :: err_act
-  integer(psb_ipk_)  :: ictxt, np, me, icomm,  minfo
-  character(len=20)  :: name
+  integer(psb_ipk_)   :: err_act
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me
+  character(len=20)   :: name
   type(psb_ls_coo_sparse_mat) :: lcoo_prol
   type(psb_s_coo_sparse_mat) :: coo_prol, coo_restr
   type(psb_s_csr_sparse_mat) :: acsr
@@ -134,9 +135,8 @@ subroutine amg_saggrmat_nosmth_bld(a,desc_a,ilaggr,nlaggr,parms,&
     info = psb_err_internal_error_; goto 9999
   end if
 
-  ictxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   nglob = desc_a%get_global_rows()
   nrow  = desc_a%get_local_rows()
   ncol  = desc_a%get_local_cols()
@@ -149,7 +149,7 @@ subroutine amg_saggrmat_nosmth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   call a%cp_to(acsr)
   call t_prol%mv_to(lcoo_prol)
   inaggr = naggr
-  call psb_cdall(ictxt,desc_ac,info,nl=inaggr)
+  call psb_cdall(ctxt,desc_ac,info,nl=inaggr)
   nzlp = lcoo_prol%get_nzeros()
   call desc_ac%indxmap%g2lip_ins(lcoo_prol%ja(1:nzlp),info) 
   call lcoo_prol%set_ncols(desc_ac%get_local_cols())

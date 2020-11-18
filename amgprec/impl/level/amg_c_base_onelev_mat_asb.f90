@@ -102,12 +102,13 @@ subroutine amg_c_base_onelev_mat_asb(lv,a,desc_a,ilaggr,nlaggr,t_prol,info)
   
 
   ! Local variables
-  character(len=24)            :: name
-  integer(psb_ipk_)            :: ictxt, np, me
-  integer(psb_ipk_)            :: err_act
-  type(psb_cspmat_type)        :: ac, op_restr, op_prol
-  integer(psb_ipk_)            :: nzl, inl
-  integer(psb_ipk_)            :: debug_level, debug_unit
+  character(len=24)        :: name
+  type(psb_ctxt_type)      :: ctxt
+  integer(psb_ipk_)        :: np, me
+  integer(psb_ipk_)        :: err_act
+  type(psb_cspmat_type)    :: ac, op_restr, op_prol
+  integer(psb_ipk_)        :: nzl, inl
+  integer(psb_ipk_)        :: debug_level, debug_unit
 
   name='amg_c_onelev_mat_asb'
   call psb_erractionsave(err_act)
@@ -117,8 +118,8 @@ subroutine amg_c_base_onelev_mat_asb(lv,a,desc_a,ilaggr,nlaggr,t_prol,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   info  = psb_success_
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt,me,np)
 
   call amg_check_def(lv%parms%aggr_prol,'Smoother',&
        &   amg_smooth_prol_,is_legal_ml_aggr_prol)

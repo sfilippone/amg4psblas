@@ -75,10 +75,10 @@ subroutine amg_zprecbld(a,desc_a,prec,info,amold,vmold,imold)
 
   ! Local Variables
   type(amg_zprec_type) :: t_prec
-  integer(psb_ipk_)      :: ictxt, me,np
-  integer(psb_ipk_)      :: err,i,k,err_act, iszv, newsz
-  integer(psb_ipk_)      :: ipv(amg_ifpsz_), val
-  integer(psb_ipk_)      :: int_err(5)
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: me, np
+  integer(psb_ipk_)   :: err,i,k,err_act, iszv, newsz
+  integer(psb_ipk_)   :: ipv(amg_ifpsz_), val
   type(amg_dml_parms) :: prm
   integer(psb_ipk_)   :: debug_level, debug_unit
   character(len=20)   :: name, ch_err
@@ -94,10 +94,9 @@ subroutine amg_zprecbld(a,desc_a,prec,info,amold,vmold,imold)
 
   name = 'amg_zprecbld'
   info = psb_success_
-  int_err(1) = 0
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
-  prec%ictxt = ictxt
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
+  prec%ctxt = ctxt
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
@@ -116,7 +115,7 @@ subroutine amg_zprecbld(a,desc_a,prec,info,amold,vmold,imold)
   !   
   newsz = -1
   iszv  = size(prec%precv)
-  call psb_bcast(ictxt,iszv)
+  call psb_bcast(ctxt,iszv)
   if (iszv /= size(prec%precv)) then 
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Inconsistent size of precv')

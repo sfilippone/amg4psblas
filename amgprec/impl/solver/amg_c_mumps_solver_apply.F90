@@ -60,9 +60,9 @@ subroutine c_mumps_solver_apply(alpha,sv,x,beta,y,desc_data,&
   integer(psb_epk_)  :: eng
   complex(psb_spk_), allocatable     :: ww(:)
   complex(psb_spk_), allocatable, target :: gx(:)
-  integer(psb_ipk_)  :: ictxt,np,me,i, err_act
-  character          :: trans_
-  character(len=20)  :: name='c_mumps_solver_apply'
+  integer(psb_ipk_)   :: i, err_act
+  character           :: trans_
+  character(len=20)   :: name='c_mumps_solver_apply'
 
   call psb_erractionsave(err_act)
 

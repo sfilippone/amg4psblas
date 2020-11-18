@@ -52,10 +52,11 @@ subroutine amg_c_id_solver_apply(alpha,sv,x,beta,y,desc_data,&
   character, intent(in), optional       :: init
   complex(psb_spk_),intent(inout), optional :: initu(:)
 
-  integer(psb_ipk_)  :: n_row,n_col
-  integer(psb_ipk_)  :: ictxt,np,me,i, err_act
-  character          :: trans_
-  character(len=20)  :: name='c_id_solver_apply'
+  integer(psb_ipk_)   :: n_row,n_col
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act
+  character           :: trans_
+  character(len=20)   :: name='c_id_solver_apply'
 
   call psb_erractionsave(err_act)
 

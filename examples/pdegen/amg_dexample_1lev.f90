@@ -85,7 +85,8 @@ program amg_dexample_1lev
   integer :: itmax, iter, itrace, istop
 
   ! parallel environment parameters
-  integer            :: ictxt, iam, np
+  type(psb_ctxt_type) :: ctxt
+  integer             :: iam, np
 
   ! other variables
   integer            :: i,info,j
@@ -98,12 +99,12 @@ program amg_dexample_1lev
   character(len=20)  :: name, kmethod
 
   ! initialize the parallel environment
-  call psb_init(ictxt)
-  call psb_info(ictxt,iam,np)
+  call psb_init(ctxt)
+  call psb_info(ctxt,iam,np)
 
   if (iam < 0) then 
     ! This should not happen, but just in case
-    call psb_exit(ictxt)
+    call psb_exit(ctxt)
     stop
   endif
 
@@ -121,15 +122,15 @@ program amg_dexample_1lev
 
   ! get parameters
 
-  call get_parms(ictxt,idim,itmax,tol)
+  call get_parms(ctxt,idim,itmax,tol)
 
   ! allocate and fill in the coefficient matrix, rhs and initial guess
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
-  call amg_gen_pde3d(ictxt,idim,a,b,x,desc_a,afmt,&
+  call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
        & a1,a2,a3,b1,b2,b3,c,g,info)  
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -142,7 +143,7 @@ program amg_dexample_1lev
 
   ! set RAS
 
-  call P%init(ictxt,'AS',info)
+  call P%init(ctxt,'AS',info)
 
   ! set number of overlaps
 
@@ -155,7 +156,7 @@ program amg_dexample_1lev
   call P%build(A,desc_A,info)
 
   tprec = psb_wtime()-t1
-  call psb_amx(ictxt, tprec)
+  call psb_amx(ctxt, tprec)
 
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_precbld')
@@ -171,13 +172,13 @@ program amg_dexample_1lev
   ! solve Ax=b with preconditioned Krylov method: BiCGSTAB
   kmethod = 'BiCGSTAB'
 
-  call psb_barrier(ictxt)
+  call psb_barrier(ctxt)
   t1 = psb_wtime()
 
   call psb_krylov(kmethod,A,P,b,x,tol,desc_A,info,itmax,iter,err,itrace=1,istop=2)
 
   t2 = psb_wtime() - t1
-  call psb_amx(ictxt,t2)
+  call psb_amx(ctxt,t2)
 
   call psb_geall(r,desc_A,info)
   call r%zero()
@@ -191,9 +192,9 @@ program amg_dexample_1lev
   descsize = desc_a%sizeof()
   precsize = p%sizeof()
   system_size = desc_a%get_global_rows()
-  call psb_sum(ictxt,amatsize)
-  call psb_sum(ictxt,descsize)
-  call psb_sum(ictxt,precsize)
+  call psb_sum(ctxt,amatsize)
+  call psb_sum(ctxt,descsize)
+  call psb_sum(ctxt,precsize)
 
   call P%descr(info)
 
@@ -221,26 +222,27 @@ program amg_dexample_1lev
   call psb_spfree(A, desc_A,info)
   call P%free(info)
   call psb_cdfree(desc_A,info)
-  call psb_exit(ictxt)
+  call psb_exit(ctxt)
   stop
 
 9999 continue
-  call psb_error(ictxt)
+  call psb_error(ctxt)
 
 contains
   !
   ! get parameters from standard input
   !
-  subroutine get_parms(ictxt,idim,itmax,tol)
+  subroutine get_parms(ctxt,idim,itmax,tol)
 
     implicit none
 
-    integer             :: idim, ictxt, itmax
+    type(psb_ctxt_type) :: ctxt
+    integer             :: idim, itmax
     real(psb_dpk_)      :: tol
     integer             :: iam, np, inp_unit
     character(len=1024)   :: filename
 
-    call psb_info(ictxt,iam,np)
+    call psb_info(ctxt,iam,np)
     
     if (iam == psb_root_) then
       if (command_argument_count()>0) then
@@ -249,7 +251,7 @@ contains
         open(inp_unit,file=filename,action='read',iostat=info)
         if (info /= 0) then
           write(psb_err_unit,*) 'Could not open file ',filename,' for input'
-          call psb_abort(ictxt)
+          call psb_abort(ctxt)
           stop
         else
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
@@ -267,9 +269,9 @@ contains
       end if
     end if
 
-    call psb_bcast(ictxt,idim)
-    call psb_bcast(ictxt,itmax)
-    call psb_bcast(ictxt,tol)
+    call psb_bcast(ctxt,idim)
+    call psb_bcast(ctxt,itmax)
+    call psb_bcast(ctxt,tol)
 
   end subroutine get_parms
 end program amg_dexample_1lev

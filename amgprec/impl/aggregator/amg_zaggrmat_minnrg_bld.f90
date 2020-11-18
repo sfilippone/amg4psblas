@@ -125,8 +125,9 @@ subroutine amg_zaggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
   ! Local variables
   integer(psb_lpk_) :: nrow, nglob, ncol, ntaggr, nzac, ip, ndx,&
        & naggr, nzl,naggrm1,naggrp1, i, j, k, jd, icolF, nrt
-  integer(psb_ipk_)           :: ictxt,np,me, icomm
-  character(len=20)            :: name
+  type(psb_ctxt_type)       :: ctxt
+  integer(psb_ipk_)         :: np, me, icomm
+  character(len=20)         :: name
   type(psb_lzspmat_type)      :: la, af, ptilde, rtilde, atran, atp, atdatp
   type(psb_lzspmat_type)      :: am3,am4, ap, adap,atmp,rada, ra, atmp2, dap, dadap, da
   type(psb_lzspmat_type)      :: dat, datp, datdatp, atmp3, tmp_prol
@@ -151,11 +152,10 @@ subroutine amg_zaggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
-  ictxt = desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   nglob = desc_a%get_global_rows()
   nrow  = desc_a%get_local_rows()
@@ -246,8 +246,8 @@ subroutine amg_zaggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
 
   call csc_mat_col_prod(csc_dap,csc_dadap,omp,info)
   call csc_mat_col_prod(csc_dadap,csc_dadap,oden,info)
-  call psb_sum(ictxt,omp)
-  call psb_sum(ictxt,oden)
+  call psb_sum(ctxt,omp)
+  call psb_sum(ctxt,oden)
   ! !$  write(0,*) trim(name),' OMP :',omp
   ! !$  write(0,*) trim(name),' ODEN:',oden
 
@@ -404,8 +404,8 @@ subroutine amg_zaggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
 
   call csc_mat_col_prod(csc_datp,csc_datdatp,omp,info)
   call csc_mat_col_prod(csc_datdatp,csc_datdatp,oden,info)
-  call psb_sum(ictxt,omp)
-  call psb_sum(ictxt,oden)
+  call psb_sum(ctxt,omp)
+  call psb_sum(ctxt,oden)
 
 
   ! !$  write(debug_unit,*) trim(name),' OMP_R :',omp

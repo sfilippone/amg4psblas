@@ -94,13 +94,14 @@ subroutine  amg_z_symdec_aggregator_build_tprol(ag,parms,ag_data,&
 
   ! Local variables
   type(psb_zspmat_type) :: atmp, atrans
-  character(len=20)           :: name
-  integer(psb_mpk_)           :: ictxt, np, me
-  integer(psb_ipk_)           :: err_act
-  integer(psb_ipk_)           :: nr
-  integer(psb_lpk_)           :: ntaggr
-  integer(psb_ipk_)           :: debug_level, debug_unit
-  logical                      :: clean_zeros
+  character(len=20)       :: name
+  type(psb_ctxt_type)     :: ctxt
+  integer(psb_ipk_)       :: np, me
+  integer(psb_ipk_)       :: err_act
+  integer(psb_ipk_)       :: nr
+  integer(psb_lpk_)       :: ntaggr
+  integer(psb_ipk_)       :: debug_level, debug_unit
+  logical                 :: clean_zeros
 
   name='amg_z_symdec_aggregator_tprol'
   call psb_erractionsave(err_act)
@@ -110,8 +111,8 @@ subroutine  amg_z_symdec_aggregator_build_tprol(ag,parms,ag_data,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   info  = psb_success_
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt,me,np)
 
   call amg_check_def(parms%ml_cycle,'Multilevel cycle',&
        &   amg_mult_ml_,is_legal_ml_cycle)

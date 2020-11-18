@@ -54,9 +54,10 @@ subroutine amg_c_diag_solver_apply(alpha,sv,x,beta,y,desc_data,&
 
   integer(psb_ipk_)   :: n_row,n_col
   complex(psb_spk_), pointer :: ww(:), aux(:), tx(:),ty(:)
-  integer(psb_ipk_)  :: ictxt,np,me,i, err_act
-  character          :: trans_
-  character(len=20)  :: name='c_diag_solver_apply'
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act
+  character           :: trans_
+  character(len=20)   :: name='c_diag_solver_apply'
 
   call psb_erractionsave(err_act)
 

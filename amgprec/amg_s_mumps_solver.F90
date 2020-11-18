@@ -82,7 +82,7 @@ module amg_s_mumps_solver
     ! IPAR(2) : MUMPS_PRINT_ERR  print verbosity (see MUMPS)
     ! IPAR(3) : MUMPS_SYM        0: non-symmetric   2: symmetric
     integer(psb_ipk_), dimension(3) :: ipar
-    integer(psb_ipk_), allocatable  :: local_ictxt
+      type(psb_ctxt_type), allocatable  :: local_ctxt
     logical                         :: built = .false.
   contains
     procedure, pass(sv) :: build   => s_mumps_solver_bld
@@ -248,9 +248,9 @@ contains
         if (info /= psb_success_) goto 9999
       end if
       deallocate(sv%id, stat=info)
-      if (allocated(sv%local_ictxt)) then
-        call psb_exit(sv%local_ictxt,close=.false.)
-        deallocate(sv%local_ictxt,stat=info)
+      if (allocated(sv%local_ctxt)) then
+        call psb_exit(sv%local_ctxt,close=.false.)
+        deallocate(sv%local_ctxt,stat=info)
       end if
       sv%built=.false.
     end if
@@ -324,8 +324,9 @@ subroutine s_mumps_solver_descr(sv,info,iout,coarse)
   logical, intent(in), optional       :: coarse
 
   ! Local variables
-  integer(psb_ipk_)      :: err_act
-  integer(psb_ipk_)      :: ictxt, me, np
+  integer(psb_ipk_)   :: err_act
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: me, np
   character(len=20), parameter :: name='amg_z_mumps_solver_descr'
   integer(psb_ipk_) :: iout_
 

@@ -634,21 +634,18 @@ AC_LANG([C])
 
 PAC_CHECK_MUMPS
 #
-# For the time being:
-#    1. Disable MUMPS when IPK=8 (would need a check on whether MUMPS
-#    		      	   	  was compiled with 8 bytes)
-#    2. Enable even with LPK=8, internally it will check if
+#    1. Enable even with LPK=8, internally it will check if
 #    	the problem size fits into 4 bytes, very likely since we
 #    	are mostly using MUMPS at coarse level.
 #
-if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
-   if test "x$pac_cv_psblas_ipk" == "x8" ; then
-      AC_MSG_NOTICE([PSBLAS defines PSB_IPK_ as $pac_cv_psblas_ipk. MUMPS interfacing disabled. ])
-      MUMPS_FLAGS="";
-      MUMPS_LIBS="";
-      amg4psblas_cv_have_mumps=no;
-   fi
-fi   
+dnl if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
+dnl    if test "x$pac_cv_psblas_ipk" == "x8" ; then
+dnl       AC_MSG_NOTICE([PSBLAS defines PSB_IPK_ as $pac_cv_psblas_ipk. MUMPS interfacing disabled. ])
+dnl       MUMPS_FLAGS="";
+dnl       MUMPS_LIBS="";
+dnl       amg4psblas_cv_have_mumps=no;
+dnl    fi
+dnl fi   
 if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
    if test "x$pac_cv_psblas_lpk" == "x8" ; then
       AC_MSG_NOTICE([PSBLAS defines PSB_LPK_ as $pac_cv_psblas_lpk. MUMPS interfacing will fail when called in global mode on very large matrices. ])

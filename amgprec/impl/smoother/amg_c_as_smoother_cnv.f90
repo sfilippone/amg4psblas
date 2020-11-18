@@ -52,15 +52,16 @@ subroutine amg_c_as_smoother_cnv(sm,info,amold,vmold,imold)
   type(psb_dspmat_type) :: blck, atmp
   integer(psb_ipk_) :: n_row,n_col, nrow_a, nhalo, novr, data_, nzeros
   real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
-  integer(psb_ipk_) :: ictxt,np,me,i, err_act, debug_unit, debug_level
-  character(len=20) :: name='d_as_smoother_cnv', ch_err
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
+  character(len=20)   :: name='d_as_smoother_cnv', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt       = sm%desc_data%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt       = sm%desc_data%get_context()
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
 

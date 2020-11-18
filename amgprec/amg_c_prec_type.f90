@@ -57,7 +57,8 @@ module amg_c_prec_type
   use amg_c_base_smoother_mod
   use amg_c_base_aggregator_mod
   use amg_c_onelev_mod
-  use psb_base_mod, only : psb_erractionsave, psb_erractionrestore, psb_errstatus_fatal
+  use psb_base_mod, only : psb_erractionsave, psb_erractionrestore, &
+       & psb_errstatus_fatal, psb_ctxt_type
   use psb_prec_mod, only : psb_cprec_type
 
   !
@@ -85,7 +86,6 @@ module amg_c_prec_type
   integer, parameter, private :: wv_size_=4
   
   type, extends(psb_cprec_type)        :: amg_cprec_type
-    ! integer(psb_ipk_)                  :: ictxt ! Now it's in the PSBLAS prec.
     type(amg_saggr_data)                 :: ag_data
     !
     ! Number of outer sweeps. Sometimes  2 V-cycles may be better than 1 W-cycle. 
@@ -272,13 +272,13 @@ module amg_c_prec_type
   end interface
 
   interface amg_precinit
-    subroutine amg_cprecinit(ictxt,prec,ptype,info)
+    subroutine amg_cprecinit(ctxt,prec,ptype,info)
       import :: psb_cspmat_type, psb_desc_type, psb_spk_, &
-           & amg_cprec_type, psb_ipk_
-      integer(psb_ipk_), intent(in)            :: ictxt
-      class(amg_cprec_type), intent(inout)    :: prec
-      character(len=*), intent(in)             :: ptype
-      integer(psb_ipk_), intent(out)           :: info
+           & amg_cprec_type, psb_ipk_, psb_ctxt_type
+      type(psb_ctxt_type), intent(in)        :: ctxt
+      class(amg_cprec_type), intent(inout) :: prec
+      character(len=*), intent(in)           :: ptype
+      integer(psb_ipk_), intent(out)         :: info
     end subroutine amg_cprecinit
   end interface amg_precinit
 
@@ -460,12 +460,12 @@ contains
     class(amg_cprec_type), intent(inout) :: prec
     
     real(psb_spk_) :: num, den, nmin
-    integer(psb_ipk_) :: ictxt 
-    integer(psb_ipk_)  :: il 
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)   :: il 
 
     num = -sone
     den = sone
-    ictxt = prec%ictxt
+    ctxt = prec%ctxt
     if (allocated(prec%precv)) then 
       il  = 1
       num = prec%precv(il)%base_a%get_nzeros()
@@ -477,13 +477,13 @@ contains
       end if
     end if
     nmin = num
-    call psb_min(ictxt,nmin) 
+    call psb_min(ctxt,nmin) 
     if (nmin < szero) then
       num = szero
       den = sone
     else
-      call psb_sum(ictxt,num)
-      call psb_sum(ictxt,den)
+      call psb_sum(ctxt,num)
+      call psb_sum(ctxt,den)
     end if
     prec%ag_data%op_complexity = num/den
   end subroutine amg_c_cmp_compl
@@ -506,14 +506,14 @@ contains
     implicit none 
     class(amg_cprec_type), intent(inout) :: prec
     
-    real(psb_spk_)  :: avgcr
-    integer(psb_ipk_) :: ictxt 
-    integer(psb_ipk_) :: il, nl, iam, np
+    real(psb_spk_)    :: avgcr
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)   :: il, nl, iam, np
 
 
     avgcr = szero
-    ictxt = prec%ictxt
-    call psb_info(ictxt,iam,np)
+    ctxt = prec%ctxt
+    call psb_info(ctxt,iam,np)
     if (allocated(prec%precv)) then
       nl = size(prec%precv)
       do il=2,nl
@@ -521,7 +521,7 @@ contains
       end do
       avgcr = avgcr / (nl-1)      
     end if
-    call psb_sum(ictxt,avgcr) 
+    call psb_sum(ctxt,avgcr) 
     prec%ag_data%avg_cr = avgcr/np
   end subroutine amg_c_cmp_avg_cr
   
@@ -737,14 +737,15 @@ contains
     integer(psb_ipk_), intent(in), optional :: istart, iend, iproc
     character(len=*), intent(in), optional  :: prefix, head
     logical, optional, intent(in)    :: smoother, solver,ac, rp, tprol, global_num
-    integer(psb_ipk_)  :: i, j, il1, iln, lev
-    integer(psb_ipk_)  :: icontxt, iam, np, iproc_
-    character(len=80)  :: prefix_
-    character(len=120) :: fname ! len should be at least 20 more than
+    integer(psb_ipk_)   :: i, j, il1, iln, lev
+    type(psb_ctxt_type) :: icontxt
+    integer(psb_ipk_)   :: iam, np, iproc_
+    character(len=80)   :: prefix_
+    character(len=120)  :: fname ! len should be at least 20 more than
     !  len of prefix_ 
 
     info = 0
-    icontxt = prec%ictxt
+    icontxt = prec%ctxt
     call psb_info(icontxt,iam,np)
     
     iln = size(prec%precv)
@@ -810,13 +811,14 @@ contains
     class(psb_cprec_type), target, intent(inout) :: precout
     integer(psb_ipk_), intent(out)             :: info
     ! Local vars
-    integer(psb_ipk_)  :: i, j, ln, lev
-    integer(psb_ipk_)  :: icontxt,iam, np
+    integer(psb_ipk_)   :: i, j, ln, lev
+    type(psb_ctxt_type) :: icontxt
+    integer(psb_ipk_)   :: iam, np
 
     info = psb_success_
     select type(pout => precout)
     class is (amg_cprec_type)
-      pout%ictxt         = prec%ictxt
+      pout%ctxt         = prec%ctxt
       pout%ag_data       = prec%ag_data
       pout%outer_sweeps  = prec%outer_sweeps
       if (allocated(prec%precv)) then 
@@ -864,7 +866,7 @@ contains
 !!$        return
         endif
       end if
-      b%ictxt         = prec%ictxt
+      b%ctxt         = prec%ctxt
       b%ag_data       = prec%ag_data
       b%outer_sweeps  = prec%outer_sweeps
             

@@ -62,15 +62,15 @@ subroutine mld_d_tlu_solver_bld(a,desc_a,sv,info,b,amold,vmold)
   class(psb_d_base_vect_type), intent(in), optional   :: vmold
   ! Local variables
   integer :: n_row,n_col, nrow_a, nztota
-  integer :: ictxt,np,me,i, err_act, debug_unit, debug_level
+  integer :: ctxt,np,me,i, err_act, debug_unit, debug_level
   character(len=20)  :: name='d_tlu_solver_bld', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  ictxt       = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt       = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
 

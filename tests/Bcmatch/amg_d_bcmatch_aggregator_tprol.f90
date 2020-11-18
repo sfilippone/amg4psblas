@@ -66,7 +66,7 @@ subroutine  mld_d_bcmatch_aggregator_build_tprol(ag,parms,a,desc_a,ilaggr,nlaggr
   type(bcm_CSRMatrix) :: C, P
   integer(c_int) :: match_algorithm, n_sweeps, max_csize, max_nlevels
   character(len=20)           :: name, ch_err
-  integer(psb_mpk_)           :: ictxt, np, me
+  integer(psb_mpk_)           :: ctxt, np, me
   integer(psb_ipk_)           :: err_act, ierr
   integer(psb_ipk_)           :: debug_level, debug_unit
   integer(psb_ipk_)           :: i, j, k, nr, nc, isz, num_pcols
@@ -110,8 +110,8 @@ subroutine  mld_d_bcmatch_aggregator_build_tprol(ag,parms,a,desc_a,ilaggr,nlaggr
   end interface
 
   name='mld_d_bcmatch_aggregator_tprol'
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt,me,np)
   if (psb_get_errstatus().ne.0) return 
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -183,7 +183,7 @@ subroutine  mld_d_bcmatch_aggregator_build_tprol(ag,parms,a,desc_a,ilaggr,nlaggr
 
   nlaggr(:)=0
   nlaggr(me+1) = num_pcols
-  call psb_sum(ictxt,nlaggr(1:np))
+  call psb_sum(ctxt,nlaggr(1:np))
 
 
   call mld_d_bcmatch_map_to_tprol(desc_a,ilaggr,nlaggr,valaggr,op_prol,info)

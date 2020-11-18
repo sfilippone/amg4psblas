@@ -125,7 +125,8 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   integer(psb_lpk_) :: nrow, nglob, ncol, ntaggr, ip, &
        & naggr, nzl,naggrm1,naggrp1, i, j, k, jd, icolF, nrw
   integer(psb_ipk_) :: inaggr, nzlp
-  integer(psb_ipk_) :: ictxt, np, me
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_) :: np, me
   character(len=20) :: name
   type(psb_lc_coo_sparse_mat) :: tmpcoo
   type(psb_c_coo_sparse_mat) :: coo_prol, coo_restr
@@ -149,9 +150,9 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ictxt = desc_a%get_context()
+  ctxt = desc_a%get_context()
 
-  call psb_info(ictxt, me, np)
+  call psb_info(ctxt, me, np)
 
   nglob = desc_a%get_global_rows()
   nrow  = desc_a%get_local_rows()
@@ -232,7 +233,7 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
       allocate(arwsum(nrow))
       call acsr%arwsum(arwsum)      
       anorm = maxval(abs(adiag(1:nrow)*arwsum(1:nrow)))
-      call psb_amx(ictxt,anorm)
+      call psb_amx(ctxt,anorm)
       omega = 4.d0/(3.d0*anorm)
       parms%aggr_omega_val = omega 
 
@@ -258,7 +259,7 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
 
   call t_prol%mv_to(tmpcoo)
   inaggr = naggr
-  call psb_cdall(ictxt,desc_ac,info,nl=inaggr)
+  call psb_cdall(ctxt,desc_ac,info,nl=inaggr)
   nzlp = tmpcoo%get_nzeros()
   call desc_ac%indxmap%g2lip_ins(tmpcoo%ja(1:nzlp),info) 
   call tmpcoo%set_ncols(desc_ac%get_local_cols())

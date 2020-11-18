@@ -137,7 +137,8 @@ contains
 
     integer    :: n_row,n_col
     complex(psb_spk_), pointer :: ww(:)
-    integer    :: ictxt,np,me,i, err_act
+    type(psb_ctxt_type) :: ctxt
+    integer    :: np,me,i, err_act
     character          :: trans_
     character(len=20)  :: name='c_slu_solver_apply'
 
@@ -268,15 +269,16 @@ contains
     type(psb_c_csc_sparse_mat) :: acsc
     type(psb_c_coo_sparse_mat) :: acoo
     integer :: n_row,n_col, nrow_a, nztota
-    integer :: ictxt,np,me,i, err_act, debug_unit, debug_level
+    type(psb_ctxt_type) :: ctxt
+    integer :: np,me,i, err_act, debug_unit, debug_level
     character(len=20)  :: name='c_slu_solver_bld', ch_err
     
     info=psb_success_
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    ictxt       = desc_a%get_context()
-    call psb_info(ictxt, me, np)
+    ctxt       = desc_a%get_context()
+    call psb_info(ctxt, me, np)
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),' start'
     
@@ -395,7 +397,6 @@ contains
 
     ! Local variables
     integer      :: err_act
-    integer      :: ictxt, me, np
     character(len=20), parameter :: name='amg_c_slu_solver_descr'
     integer :: iout_
 

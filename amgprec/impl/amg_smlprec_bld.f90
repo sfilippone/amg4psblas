@@ -94,12 +94,13 @@ subroutine amg_smlprec_bld(a,desc_a,p,info,amold,vmold,imold)
   class(psb_i_base_vect_type), intent(in), optional  :: imold
 
   ! Local Variables
-  integer(psb_ipk_)  :: ictxt, me,np
-  integer(psb_ipk_)  :: err,i,k, err_act, iszv, newsz, casize, nplevs, mxplevs
-  real(psb_spk_)     :: mnaggratio
-  integer(psb_ipk_)  :: ipv(amg_ifpsz_), val
-  integer(psb_ipk_)  :: debug_level, debug_unit
-  character(len=20)  :: name, ch_err
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: me, np
+  integer(psb_ipk_)   :: err,i,k, err_act, iszv, newsz, casize, nplevs, mxplevs
+  real(psb_spk_)       :: mnaggratio
+  integer(psb_ipk_)   :: ipv(amg_ifpsz_), val
+  integer(psb_ipk_)   :: debug_level, debug_unit
+  character(len=20)   :: name, ch_err
 
   info=psb_success_
   err=0
@@ -112,8 +113,8 @@ subroutine amg_smlprec_bld(a,desc_a,p,info,amold,vmold,imold)
 
   name = 'amg_smlprec_bld'
   info = psb_success_
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&

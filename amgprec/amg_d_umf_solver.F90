@@ -137,7 +137,7 @@ contains
 
     integer    :: n_row,n_col
     real(psb_dpk_), pointer :: ww(:)
-    integer    :: ictxt,np,me,i, err_act
+    integer(psb_ipk_)  :: i, err_act
     character          :: trans_
     character(len=20)  :: name='d_umf_solver_apply'
 
@@ -271,15 +271,16 @@ contains
     type(psb_dspmat_type) :: atmp
     type(psb_d_csc_sparse_mat) :: acsc
     integer :: n_row,n_col, nrow_a, nztota
-    integer :: ictxt,np,me,i, err_act, debug_unit, debug_level
+    type(psb_ctxt_type) :: ctxt
+    integer :: np,me,i, err_act, debug_unit, debug_level
     character(len=20)  :: name='d_umf_solver_bld', ch_err
     
     info=psb_success_
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    ictxt       = desc_a%get_context()
-    call psb_info(ictxt, me, np)
+    ctxt       = desc_a%get_context()
+    call psb_info(ctxt, me, np)
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),' start'
 
@@ -401,7 +402,6 @@ contains
 
     ! Local variables
     integer      :: err_act
-    integer      :: ictxt, me, np
     character(len=20), parameter :: name='amg_d_umf_solver_descr'
     integer :: iout_
 

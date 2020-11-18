@@ -97,7 +97,8 @@ subroutine  amg_z_dec_aggregator_mat_asb(ag,parms,a,desc_a,&
   type(psb_desc_type), intent(inout)     :: desc_ac
   integer(psb_ipk_), intent(out)         :: info
   !
-  integer(psb_ipk_)              :: ictxt, np, me
+  type(psb_ctxt_type)            :: ctxt
+  integer(psb_ipk_)              :: np, me
   type(psb_lz_coo_sparse_mat)  :: tmpcoo
   type(psb_lzspmat_type)       :: tmp_ac
   integer(psb_ipk_)              :: i_nr, i_nc, i_nl, nzl
@@ -111,8 +112,8 @@ subroutine  amg_z_dec_aggregator_mat_asb(ag,parms,a,desc_a,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   info  = psb_success_
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt,me,np)
 
   select case(parms%coarse_mat)
 
@@ -158,7 +159,7 @@ subroutine  amg_z_dec_aggregator_mat_asb(ag,parms,a,desc_a,&
     call tmp_ac%mv_to(tmpcoo)
     call ac%mv_from(tmpcoo)
     
-    call psb_cdall(ictxt,desc_ac,info,mg=ntaggr,repl=.true.)
+    call psb_cdall(ctxt,desc_ac,info,mg=ntaggr,repl=.true.)
     if (info == psb_success_) call psb_cdasb(desc_ac,info)
 
     if (info /= psb_success_) goto 9999

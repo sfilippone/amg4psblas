@@ -63,9 +63,9 @@ subroutine amg_z_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
 
   ! Local variables
   integer(psb_ipk_)  :: err_act
-  integer(psb_ipk_)  :: ictxt,np,me, icomm, ndx, minfo
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)  :: np, me, ndx
   character(len=40)  :: name
-  integer(psb_ipk_)  :: ierr(5)
   type(psb_lz_coo_sparse_mat) :: ac_coo, tmpcoo
   type(psb_z_csr_sparse_mat) :: acsr3, csr_prol, ac_csr, csr_restr
   integer(psb_ipk_) :: debug_level, debug_unit, naggr
@@ -81,9 +81,8 @@ subroutine amg_z_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
   call psb_erractionsave(err_act)
 
 
-  ictxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   nglob = desc_a%get_global_rows()
@@ -276,10 +275,10 @@ subroutine amg_z_lz_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
   type(psb_desc_type), intent(inout), optional :: desc_ax
 
   ! Local variables
-  integer(psb_ipk_)  :: err_act
-  integer(psb_ipk_)  :: ictxt,np,me, icomm, ndx, minfo
-  character(len=40)  :: name
-  integer(psb_ipk_)  :: ierr(5)
+  integer(psb_ipk_)   :: err_act
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, ndx
+  character(len=40)   :: name
   type(psb_lz_coo_sparse_mat) :: ac_coo, tmpcoo
   type(psb_z_csr_sparse_mat) :: acsr3, csr_prol, ac_csr, csr_restr
   integer(psb_ipk_) :: debug_level, debug_unit, naggr
@@ -295,9 +294,8 @@ subroutine amg_z_lz_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
   call psb_erractionsave(err_act)
 
 
-  ictxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   nglob = desc_a%get_global_rows()
@@ -494,9 +492,9 @@ subroutine amg_lz_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
 
   ! Local variables
   integer(psb_ipk_)  :: err_act
-  integer(psb_ipk_)  :: ictxt,np,me, icomm, ndx, minfo
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)  :: np, me, ndx
   character(len=40)  :: name
-  integer(psb_ipk_)  :: ierr(5)
   type(psb_lz_coo_sparse_mat) :: ac_coo, tmpcoo
   type(psb_lz_csr_sparse_mat) :: acsr3, csr_prol, ac_csr, csr_restr
   integer(psb_ipk_) :: debug_level, debug_unit, naggr
@@ -512,9 +510,8 @@ subroutine amg_lz_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
   call psb_erractionsave(err_act)
 
 
-  ictxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
-  call psb_info(ictxt, me, np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt, me, np)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   nglob = desc_a%get_global_rows()
