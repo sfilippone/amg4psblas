@@ -117,6 +117,10 @@ subroutine amg_s_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
   info = psb_success_
   ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
+  if (me <0) then
+!!$    write(0,*) 'out of CTXT, should not do anything '
+    goto 9998
+  end if
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
@@ -289,6 +293,7 @@ subroutine amg_s_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
     !
     ! build the base preconditioner at level i
     !
+!!$    write(0,*) me,' Building at level ',i
     call prec%precv(i)%bld(info,amold=amold,vmold=vmold,imold=imold,ilv=i)
     
     if (info /= psb_success_) then 
@@ -304,6 +309,7 @@ subroutine amg_s_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Exiting with',iszv,' levels'
 
+9998 continue
   call psb_erractionrestore(err_act)
   return
 

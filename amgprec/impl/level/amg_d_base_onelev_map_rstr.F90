@@ -36,7 +36,8 @@
 !   
 !  
 
-subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,work,vtx,vty)
+subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
+     &  work,vtx,vty)
   use psb_base_mod
   use amg_d_onelev_mod, amg_protect_name =>  amg_d_base_onelev_map_rstr_v
   implicit none
@@ -47,24 +48,52 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,work,vt
   real(psb_dpk_), optional          :: work(:)
   type(psb_d_vect_type), optional, target, intent(inout)  :: vtx,vty
 
+!!$  write(0,*) 'New map_rstr',lv%remap_data%ac_pre_remap%is_asb()
   if (lv%remap_data%ac_pre_remap%is_asb()) then
     !
     ! Remap has happened, deal with it
     !
-    write(0,*) 'Remap handling not implemented yet '
+!!$    write(0,*) 'Remap handling not implemented yet '
     block
-      integer(psb_ipk_) :: i,j,ip,nctxt,ictxt, idest
+      type(psb_ctxt_type) :: ctxt, nctxt
+      integer(psb_ipk_) :: i,j,ip, idest, nsrc, nrl, kp
       integer(psb_ipk_) :: me, np,  rme, rnp
+      real(psb_dpk_), allocatable :: rsnd(:), rrcv(:)
+      type(psb_d_vect_type) :: tv
       
-      ictxt = lv%remap_data%desc_ac_pre_remap%get_ctxt()
-      call psb_info(ictxt,me,np)
+      ctxt = lv%remap_data%desc_ac_pre_remap%get_ctxt()
+      call psb_info(ctxt,me,np)
       nctxt = lv%desc_ac%get_ctxt()
       call psb_info(nctxt,rme,rnp)
+!!$      write(0,*) 'New context ',rme,rnp
       idest = lv%remap_data%idest
       associate(isrc => lv%remap_data%isrc, nrsrc => lv%remap_data%nrsrc)
-        write(0,*) 'Should apply maps, then send data from ',me,' to ',idest
-        if (rme >= 0) write(0,*) rme, '  Receiving      data from ',isrc(:)        
+!!$        write(0,*) 'Should apply maps, then send data from ',me,' to ',idest
+!!$        if (rme >= 0) write(0,*) rme, '  Receiving      data from ',isrc(:)
+        nsrc = size(isrc)
+        nrl  = lv%remap_data%desc_ac_pre_remap%get_local_rows()
+        call psb_geall(tv,lv%remap_data%desc_ac_pre_remap,info)
+        call psb_geasb(tv,lv%remap_data%desc_ac_pre_remap,info) 
+!!$        write(0,*) me,' Size of TV ',tv%get_nrows()
+        call lv%linmap%map_U2V(alpha,vect_u,beta,tv,info,&
+             & work=work,vtx=vtx,vty=vty)
+        rsnd = tv%get_vect()
+        call psb_snd(ctxt,rsnd(1:nrl),idest)
+        if (rme >=0) then
+          allocate(rrcv(sum(nrsrc)))
+!!$          write(0,*) me,rme,' Size check ',size(rrcv)!,lv%desc_ac%get_local_rows()
+          kp = 0
+          do i = 1,size(isrc)
+            ip = isrc(i)
+            nrl = nrsrc(i)
+!!$            write(0,*) me,' Receiving from ',ip,nrl,kp+1,kp+nrl,size(rrcv)
+            call psb_rcv(ctxt,rrcv(kp+1:kp+nrl),ip)
+            kp = kp + nrl
+          end do
+          call vect_v%set_vect(rrcv)
+        end if
       end associate
+!!$      write(0,*) me, ' Restrictor with remap done '
     end block
  
   else

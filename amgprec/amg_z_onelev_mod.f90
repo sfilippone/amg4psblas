@@ -157,7 +157,7 @@ module amg_z_onelev_mod
     type(psb_zspmat_type)          :: ac_pre_remap
     type(psb_desc_type)            :: desc_ac_pre_remap
     integer(psb_ipk_)              :: idest
-    integer(psb_ipk_), allocatable :: isrc(:), nrsrc(:) 
+    integer(psb_ipk_), allocatable :: isrc(:), nrsrc(:), naggr(:)
   contains
     procedure, pass(rmp) :: clone   => z_remap_data_clone
   end type amg_z_remap_data_type
@@ -704,7 +704,17 @@ contains
     info = psb_success_
     nwv = lv%get_wrksz()
     if (.not.allocated(lv%wrk)) allocate(lv%wrk,stat=info)
-    if (info == 0) call lv%wrk%alloc(nwv,lv%base_desc,info,vmold=vmold)
+    if (info == 0) then
+      if (lv%remap_data%desc_ac_pre_remap%is_asb()) then
+        !
+        !  Need to fix this, we need two different allocations
+        !
+        call lv%wrk%alloc(nwv,lv%base_desc,info,vmold=vmold,&
+             & desc2=lv%remap_data%desc_ac_pre_remap)      
+      else
+        call lv%wrk%alloc(nwv,lv%base_desc,info,vmold=vmold)
+      end if
+    end if
     
   end subroutine z_base_onelev_allocate_wrk
 
@@ -724,7 +734,7 @@ contains
     end if
   end subroutine z_base_onelev_free_wrk
   
-  subroutine z_wrk_alloc(wk,nwv,desc,info,vmold)
+  subroutine z_wrk_alloc(wk,nwv,desc,info,vmold, desc2)
     use psb_base_mod
     
     Implicit None
@@ -735,25 +745,67 @@ contains
     type(psb_desc_type), intent(in)                   :: desc
     integer(psb_ipk_), intent(out)                    :: info 
     class(psb_z_base_vect_type), intent(in), optional  :: vmold
+    type(psb_desc_type), intent(in), optional          :: desc2
     !
     integer(psb_ipk_) :: i
 
     info = psb_success_
     call wk%free(info)
-    call psb_geasb(wk%vx2l,desc,info,&
-         & scratch=.true.,mold=vmold)
-    call psb_geasb(wk%vy2l,desc,info,&
-         & scratch=.true.,mold=vmold)
-    call psb_geasb(wk%vtx,desc,info,&
-         & scratch=.true.,mold=vmold)
-    call psb_geasb(wk%vty,desc,info,&
-         & scratch=.true.,mold=vmold)
-    allocate(wk%wv(nwv),stat=info)
-    do i=1,nwv
-      call psb_geasb(wk%wv(i),desc,info,&
+    if  (present(desc2)) then
+!!$      write(0,*) 'Check on wrk_alloc 2',&
+!!$           & desc2%get_local_rows(), desc%get_local_rows(),&
+!!$           & desc2%get_local_cols(),desc%get_local_cols()
+!!$      flush(0)
+      if (desc2%get_local_cols()>desc%get_local_cols()) then
+        call psb_geasb(wk%vx2l,desc2,info,&
+             & scratch=.true.,mold=vmold)
+        call psb_geasb(wk%vy2l,desc2,info,&
+             & scratch=.true.,mold=vmold)
+        call psb_geasb(wk%vtx,desc2,info,&
+             & scratch=.true.,mold=vmold)
+        call psb_geasb(wk%vty,desc2,info,&
+             & scratch=.true.,mold=vmold)
+        allocate(wk%wv(nwv),stat=info)
+        do i=1,nwv
+          call psb_geasb(wk%wv(i),desc2,info,&
+               & scratch=.true.,mold=vmold)
+        end do
+      else
+!!$        write(0,*) 'Check on wrk_alloc 1.5 ',&
+!!$             & desc%get_local_rows(),&
+!!$             & desc%get_local_cols()
+        call psb_geasb(wk%vx2l,desc,info,&
+             & scratch=.true.,mold=vmold)
+        call psb_geasb(wk%vy2l,desc,info,&
+             & scratch=.true.,mold=vmold)
+        call psb_geasb(wk%vtx,desc,info,&
+             & scratch=.true.,mold=vmold)
+        call psb_geasb(wk%vty,desc,info,&
+             & scratch=.true.,mold=vmold)
+        allocate(wk%wv(nwv),stat=info)
+        do i=1,nwv
+          call psb_geasb(wk%wv(i),desc,info,&
+               & scratch=.true.,mold=vmold)
+        end do
+      end if
+    else
+!!$      write(0,*) 'Check on wrk_alloc 1 ',&
+!!$           & desc%get_local_rows(),&
+!!$           & desc%get_local_cols()
+      call psb_geasb(wk%vx2l,desc,info,&
            & scratch=.true.,mold=vmold)
-    end do
-    
+      call psb_geasb(wk%vy2l,desc,info,&
+           & scratch=.true.,mold=vmold)
+      call psb_geasb(wk%vtx,desc,info,&
+           & scratch=.true.,mold=vmold)
+      call psb_geasb(wk%vty,desc,info,&
+           & scratch=.true.,mold=vmold)
+      allocate(wk%wv(nwv),stat=info)
+      do i=1,nwv
+        call psb_geasb(wk%wv(i),desc,info,&
+             & scratch=.true.,mold=vmold)
+      end do
+    end if
   end subroutine z_wrk_alloc
     
   subroutine z_wrk_free(wk,info)

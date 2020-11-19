@@ -71,72 +71,81 @@ subroutine amg_s_base_onelev_build(lv,info,amold,vmold,imold,ilv)
   ctxt = lv%base_desc%get_ctxt()
   call psb_info(ctxt,me,np)
 
-  if (.not.allocated(lv%sm)) then 
-    !! Error: should have called amg_dprecinit
-    info=3111
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-  if (.not.allocated(lv%sm%sv)) then 
-    !! Error: should have called amg_dprecinit
-    info=3111
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-  lv%ac_nz_loc = lv%ac%get_nzeros()
-  lv%ac_nz_tot = lv%ac_nz_loc
-  select case(lv%parms%coarse_mat)
-  case(amg_distr_mat_) 
-    call psb_sum(ctxt,lv%ac_nz_tot)
-  case(amg_repl_mat_)
-    ! Do nothing
-  case default
-    ! Should never get here
-    info = psb_err_internal_error_
-    call psb_errpush(info,name,a_err='Wrong lv%parms')
-    goto 9999
-  end select
-  
-  
-  if (debug_level >= psb_debug_outer_) &
-       & write(debug_unit,*) me,' ',trim(name),&
-       & 'Calling mlprcbld at level  ',i
-  call amg_check_def(lv%parms%sweeps_pre,&
-       & 'Jacobi sweeps',izero,is_int_non_negative)
-  call amg_check_def(lv%parms%sweeps_post,&
-       & 'Jacobi sweeps',izero,is_int_non_negative)
-
-  call lv%sm%build(lv%base_a,lv%base_desc,info)
-  if (info == 0) then
-    if (allocated(lv%sm2a)) then 
-      call lv%sm2a%build(lv%base_a,lv%base_desc,info)
-      lv%sm2 => lv%sm2a
-    else
-      lv%sm2 => lv%sm
+  !
+  ! At top level(s) I may be using
+  ! a context with less processes
+  !
+  if (me < 0) then
+!!$    write(0,*) 'onelevbld: I am excluded from this one '
+  else
+!!$    write(0,*) me,' Going to build smoothers at this level '
+    if (.not.allocated(lv%sm)) then 
+      !! Error: should have called amg_dprecinit
+      info=3111
+      call psb_errpush(info,name)
+      goto 9999
     end if
-  end if
-  if (info /=0 ) then
-    info = psb_err_internal_error_
-    call psb_errpush(info,name,&
-         & a_err='Smoother bld error')
-    goto 9999
-  end if
-
-  if (lv%sm%sv%is_global()) then
-    if ((lv%parms%sweeps_pre>1).or.(lv%parms%sweeps_post>1)) then
-      lv%parms%sweeps_pre  = 1
-      lv%parms%sweeps_post = 1
-      if (me == 0) then
-        write(debug_unit,*) 
-        if (present(ilv)) then
-          write(debug_unit,*) 'Warning: the solver "',trim(lv%sm%sv%get_fmt()),&
-               & '" at level ',ilv
-          write(debug_unit,*) '         is configured as a global solver '
-        else
-          write(debug_unit,*) 'Warning: the solver "',trim(lv%sm%sv%get_fmt()),&
-               & '" is configured as a global solver '
+    if (.not.allocated(lv%sm%sv)) then 
+      !! Error: should have called amg_dprecinit
+      info=3111
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    lv%ac_nz_loc = lv%ac%get_nzeros()
+    lv%ac_nz_tot = lv%ac_nz_loc
+    select case(lv%parms%coarse_mat)
+    case(amg_distr_mat_) 
+      call psb_sum(ctxt,lv%ac_nz_tot)
+    case(amg_repl_mat_)
+      ! Do nothing
+    case default
+      ! Should never get here
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='Wrong lv%parms')
+      goto 9999
+    end select
+    
+    
+    if (debug_level >= psb_debug_outer_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & 'Calling mlprcbld at level  ',i
+    call amg_check_def(lv%parms%sweeps_pre,&
+         & 'Jacobi sweeps',izero,is_int_non_negative)
+    call amg_check_def(lv%parms%sweeps_post,&
+         & 'Jacobi sweeps',izero,is_int_non_negative)
+    
+    call lv%sm%build(lv%base_a,lv%base_desc,info)
+    if (info == 0) then
+      if (allocated(lv%sm2a)) then 
+        call lv%sm2a%build(lv%base_a,lv%base_desc,info)
+        lv%sm2 => lv%sm2a
+      else
+        lv%sm2 => lv%sm
+      end if
+    end if
+    if (info /=0 ) then
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,&
+           & a_err='Smoother bld error')
+      goto 9999
+    end if
+    
+    if (lv%sm%sv%is_global()) then
+      if ((lv%parms%sweeps_pre>1).or.(lv%parms%sweeps_post>1)) then
+        lv%parms%sweeps_pre  = 1
+        lv%parms%sweeps_post = 1
+        if (me == 0) then
+          write(debug_unit,*) 
+          if (present(ilv)) then
+            write(debug_unit,*) 'Warning: the solver "',trim(lv%sm%sv%get_fmt()),&
+                 & '" at level ',ilv
+            write(debug_unit,*) '         is configured as a global solver '
+          else
+            write(debug_unit,*) 'Warning: the solver "',trim(lv%sm%sv%get_fmt()),&
+                 & '" is configured as a global solver '
+          end if
+          write(debug_unit,*) '        Pre and post sweeps at this level reset to 1'
         end if
-        write(debug_unit,*) '        Pre and post sweeps at this level reset to 1'
       end if
     end if
   end if

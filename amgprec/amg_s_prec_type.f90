@@ -738,15 +738,15 @@ contains
     character(len=*), intent(in), optional  :: prefix, head
     logical, optional, intent(in)    :: smoother, solver,ac, rp, tprol, global_num
     integer(psb_ipk_)   :: i, j, il1, iln, lev
-    type(psb_ctxt_type) :: icontxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: iam, np, iproc_
     character(len=80)   :: prefix_
     character(len=120)  :: fname ! len should be at least 20 more than
     !  len of prefix_ 
 
     info = 0
-    icontxt = prec%ctxt
-    call psb_info(icontxt,iam,np)
+    ctxt = prec%ctxt
+    call psb_info(ctxt,iam,np)
     
     iln = size(prec%precv)
     if (present(istart)) then 
@@ -812,13 +812,13 @@ contains
     integer(psb_ipk_), intent(out)             :: info
     ! Local vars
     integer(psb_ipk_)   :: i, j, ln, lev
-    type(psb_ctxt_type) :: icontxt
+    type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: iam, np
 
     info = psb_success_
     select type(pout => precout)
     class is (amg_sprec_type)
-      pout%ctxt         = prec%ctxt
+      pout%ctxt          = prec%ctxt
       pout%ag_data       = prec%ag_data
       pout%outer_sweeps  = prec%outer_sweeps
       if (allocated(prec%precv)) then 

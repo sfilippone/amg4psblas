@@ -455,6 +455,31 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
     end do
   end if
 
+
+  !write(0,*) 'Should we remap? '
+  if (.true..and.(np>=4)) then
+    write(0,*) 'Going for remapping '
+    if (.true.) then 
+      associate(lv=>prec%precv(iszv), rmp => prec%precv(iszv)%remap_data)
+        call lv%desc_ac%clone(rmp%desc_ac_pre_remap,info)
+        call lv%ac%clone(rmp%ac_pre_remap,info)
+        if (np >= 8) then 
+          call psb_remap(np/4,rmp%desc_ac_pre_remap,rmp%ac_pre_remap,&
+               & rmp%idest,rmp%isrc,rmp%nrsrc,rmp%naggr,lv%desc_ac,lv%ac,info)
+        else
+          call psb_remap(np/2,rmp%desc_ac_pre_remap,rmp%ac_pre_remap,&
+               & rmp%idest,rmp%isrc,rmp%nrsrc,rmp%naggr,lv%desc_ac,lv%ac,info)
+        end if
+        write(0,*) me,' Out of remapping ',rmp%desc_ac_pre_remap%get_fmt(),' ',&
+             & lv%desc_ac%get_fmt(),sum(lv%linmap%naggr),sum(rmp%naggr)
+        lv%linmap%naggr(:)    =  rmp%naggr(:)
+        lv%linmap%p_desc_V => rmp%desc_ac_pre_remap
+        lv%base_a          => lv%ac
+        lv%base_desc       => lv%desc_ac
+      end associate 
+    end if
+  end if
+
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,&
          & a_err='Internal hierarchy build' )
