@@ -1,15 +1,15 @@
-!  
-!   
+!
+!
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.5)
-!    
-!    (C) Copyright 2020 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Fabio Durastante        
-!   
+!
+!    (C) Copyright 2020
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,21 +33,21 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
+!
+!
 ! File: amg_s_prec_type.f90
 !
 ! Module: amg_s_prec_type
 !
-!  This module defines: 
+!  This module defines:
 !  - the amg_s_prec_type data structure containing the preconditioner and related
 !    data structures;
 !
 !  It contains routines for
-!  - Building and applying; 
+!  - Building and applying;
 !  - checking if the preconditioner is correctly defined;
 !  - printing a	description of the preconditioner;
-!  - deallocating the preconditioner data structure.  
+!  - deallocating the preconditioner data structure.
 !
 
 module amg_s_prec_type
@@ -70,25 +70,25 @@ module amg_s_prec_type
   !  It consists of an array of 'one-level' intermediate data structures
   !  of type amg_sonelev_type, each containing the information needed to apply
   !  the smoothing and the coarse-space correction at a generic level. RT is the
-  !  real data type, i.e. S for both S and C, and D for both D and Z. 
+  !  real data type, i.e. S for both S and C, and D for both D and Z.
   !
   !  type amg_sprec_type
-  !    type(amg_sonelev_type), allocatable :: precv(:) 
+  !    type(amg_sonelev_type), allocatable :: precv(:)
   !  end type amg_sprec_type
-  ! 
+  !
   !  Note that the levels are numbered in increasing order starting from
   !  the level 1 as the finest one, and the number of levels is given by
-  !  size(precv(:))  which is the id of the coarsest level. 
+  !  size(precv(:))  which is the id of the coarsest level.
   !  In the multigrid literature many authors number the levels in the opposite
   !  order, with level 0 being the id of the coarsest level.
   !
   !
   integer, parameter, private :: wv_size_=4
-  
+
   type, extends(psb_sprec_type)        :: amg_sprec_type
     type(amg_saggr_data)                 :: ag_data
     !
-    ! Number of outer sweeps. Sometimes  2 V-cycles may be better than 1 W-cycle. 
+    ! Number of outer sweeps. Sometimes  2 V-cycles may be better than 1 W-cycle.
     !
     integer(psb_ipk_)                  :: outer_sweeps = 1
     !
@@ -97,11 +97,11 @@ module amg_s_prec_type
     ! to keep track against what is put later in the multilevel array
     !
     integer(psb_ipk_)                  :: coarse_solver = -1
-    
+
     !
     ! The multilevel hierarchy
     !
-    type(amg_s_onelev_type), allocatable :: precv(:) 
+    type(amg_s_onelev_type), allocatable :: precv(:)
   contains
     procedure, pass(prec)               :: psb_s_apply2_vect => amg_s_apply2_vect
     procedure, pass(prec)               :: psb_s_apply1_vect => amg_s_apply1_vect
@@ -127,7 +127,7 @@ module amg_s_prec_type
     procedure, pass(prec)               :: cseti  => amg_scprecseti
     procedure, pass(prec)               :: csetc  => amg_scprecsetc
     procedure, pass(prec)               :: csetr  => amg_scprecsetr
-    generic, public                     :: set => cseti, csetc, csetr, setsm, setsv, setag 
+    generic, public                     :: set => setsm, setsv, setag 
     procedure, pass(prec)               :: get_smoother => amg_s_get_smootherp
     procedure, pass(prec)               :: get_solver   => amg_s_get_solverp
     procedure, pass(prec)               :: move_alloc   => s_prec_move_alloc
@@ -157,7 +157,7 @@ module amg_s_prec_type
   interface amg_precdescr
     subroutine amg_sfile_prec_descr(prec,iout,root)
       import :: amg_sprec_type, psb_ipk_
-      implicit none 
+      implicit none
       ! Arguments
       class(amg_sprec_type), intent(in)      :: prec
       integer(psb_ipk_), intent(in), optional :: iout
@@ -211,7 +211,7 @@ module amg_s_prec_type
     end subroutine amg_sprecaply1
   end interface
 
-  interface 
+  interface
     subroutine amg_sprecsetsm(prec,val,info,ilev,ilmax,pos)
       import :: psb_sspmat_type, psb_desc_type, psb_spk_, &
            & amg_sprec_type, amg_s_base_smoother_type, psb_ipk_
@@ -243,7 +243,7 @@ module amg_s_prec_type
       import :: psb_sspmat_type, psb_desc_type, psb_spk_, &
            & amg_sprec_type, psb_ipk_
       class(amg_sprec_type), intent(inout)   :: prec
-      character(len=*), intent(in)             :: what 
+      character(len=*), intent(in)             :: what
       integer(psb_ipk_), intent(in)            :: val
       integer(psb_ipk_), intent(out)           :: info
       integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
@@ -253,7 +253,7 @@ module amg_s_prec_type
       import :: psb_sspmat_type, psb_desc_type, psb_spk_, &
            & amg_sprec_type, psb_ipk_
       class(amg_sprec_type), intent(inout)   :: prec
-      character(len=*), intent(in)             :: what 
+      character(len=*), intent(in)             :: what
       real(psb_spk_), intent(in)                :: val
       integer(psb_ipk_), intent(out)           :: info
       integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
@@ -263,7 +263,7 @@ module amg_s_prec_type
       import :: psb_sspmat_type, psb_desc_type, psb_spk_, &
            & amg_sprec_type, psb_ipk_
       class(amg_sprec_type), intent(inout)   :: prec
-      character(len=*), intent(in)             :: what 
+      character(len=*), intent(in)             :: what
       character(len=*), intent(in)             :: string
       integer(psb_ipk_), intent(out)           :: info
       integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
@@ -341,28 +341,28 @@ module amg_s_prec_type
       !      character, intent(in),optional             :: upd
     end subroutine amg_s_smoothers_bld
   end interface amg_smoothers_bld
-  
+
 contains
   !
   ! Function returning a pointer to the smoother
   !
   function amg_s_get_smootherp(prec,ilev) result(val)
-    implicit none 
+    implicit none
     class(amg_sprec_type), target, intent(in) :: prec
     integer(psb_ipk_), optional                 :: ilev
     class(amg_s_base_smoother_type), pointer  :: val
     integer(psb_ipk_)        :: ilev_
-    
+
     val => null()
-    if (present(ilev)) then 
+    if (present(ilev)) then
       ilev_ = ilev
     else
-      ! What is a good default? 
+      ! What is a good default?
       ilev_ = 1
     end if
-    if (allocated(prec%precv)) then 
-      if ((1<=ilev_).and.(ilev_<=size(prec%precv))) then 
-        if (allocated(prec%precv(ilev_)%sm)) then 
+    if (allocated(prec%precv)) then
+      if ((1<=ilev_).and.(ilev_<=size(prec%precv))) then
+        if (allocated(prec%precv(ilev_)%sm)) then
           val => prec%precv(ilev_)%sm
         end if
       end if
@@ -372,23 +372,23 @@ contains
   ! Function returning a pointer to the solver
   !
   function amg_s_get_solverp(prec,ilev) result(val)
-    implicit none 
+    implicit none
     class(amg_sprec_type), target, intent(in) :: prec
     integer(psb_ipk_), optional                 :: ilev
     class(amg_s_base_solver_type), pointer  :: val
     integer(psb_ipk_)        :: ilev_
-    
+
     val => null()
-    if (present(ilev)) then 
+    if (present(ilev)) then
       ilev_ = ilev
     else
-      ! What is a good default? 
+      ! What is a good default?
       ilev_ = 1
     end if
-    if (allocated(prec%precv)) then 
-      if ((1<=ilev_).and.(ilev_<=size(prec%precv))) then 
-        if (allocated(prec%precv(ilev_)%sm)) then 
-          if (allocated(prec%precv(ilev_)%sm%sv)) then 
+    if (allocated(prec%precv)) then
+      if ((1<=ilev_).and.(ilev_<=size(prec%precv))) then
+        if (allocated(prec%precv(ilev_)%sm)) then
+          if (allocated(prec%precv(ilev_)%sm%sv)) then
             val => prec%precv(ilev_)%sm%sv
           end if
         end if
@@ -399,25 +399,25 @@ contains
   ! Function returning the size of the precv(:) array
   !
   function amg_s_get_nlevs(prec) result(val)
-    implicit none 
+    implicit none
     class(amg_sprec_type), intent(in) :: prec
     integer(psb_ipk_) :: val
     val = 0
-    if (allocated(prec%precv)) then 
+    if (allocated(prec%precv)) then
       val = size(prec%precv)
     end if
   end function amg_s_get_nlevs
   !
   ! Function returning the size of the amg_prec_type data structure
-  ! in bytes or in number of nonzeros of the operator(s) involved. 
+  ! in bytes or in number of nonzeros of the operator(s) involved.
   !
   function amg_s_get_nzeros(prec) result(val)
-    implicit none 
+    implicit none
     class(amg_sprec_type), intent(in) :: prec
     integer(psb_epk_) :: val
     integer(psb_ipk_)        :: i
     val = 0
-    if (allocated(prec%precv)) then 
+    if (allocated(prec%precv)) then
       do i=1, size(prec%precv)
         val = val + prec%precv(i)%get_nzeros()
       end do
@@ -425,13 +425,13 @@ contains
   end function amg_s_get_nzeros
 
   function amg_sprec_sizeof(prec) result(val)
-    implicit none 
+    implicit none
     class(amg_sprec_type), intent(in) :: prec
     integer(psb_epk_) :: val
     integer(psb_ipk_)        :: i
     val = 0
     val = val + psb_sizeof_ip
-    if (allocated(prec%precv)) then 
+    if (allocated(prec%precv)) then
       do i=1, size(prec%precv)
         val = val + prec%precv(i)%sizeof()
       end do
@@ -444,40 +444,40 @@ contains
   ! various level to the nonzeroes at the fine level
   ! (original matrix)
   !
-  
+
   function amg_s_get_compl(prec) result(val)
-    implicit none 
+    implicit none
     class(amg_sprec_type), intent(in) :: prec
     real(psb_spk_)  :: val
-    
+
     val = prec%ag_data%op_complexity
 
   end function amg_s_get_compl
-  
-  subroutine amg_s_cmp_compl(prec) 
 
-    implicit none 
+  subroutine amg_s_cmp_compl(prec)
+
+    implicit none
     class(amg_sprec_type), intent(inout) :: prec
-    
+
     real(psb_spk_) :: num, den, nmin
     type(psb_ctxt_type) :: ctxt
-    integer(psb_ipk_)   :: il 
+    integer(psb_ipk_)   :: il
 
     num = -sone
     den = sone
     ctxt = prec%ctxt
-    if (allocated(prec%precv)) then 
+    if (allocated(prec%precv)) then
       il  = 1
       num = prec%precv(il)%base_a%get_nzeros()
       if (num >= szero) then
-        den = num 
+        den = num
         do il=2,size(prec%precv)
           num = num + max(0,prec%precv(il)%base_a%get_nzeros())
         end do
       end if
     end if
     nmin = num
-    call psb_min(ctxt,nmin) 
+    call psb_min(ctxt,nmin)
     if (nmin < szero) then
       num = szero
       den = sone
@@ -487,25 +487,25 @@ contains
     end if
     prec%ag_data%op_complexity = num/den
   end subroutine amg_s_cmp_compl
-  
+
   !
   ! Average coarsening ratio
   !
-  
+
   function amg_s_get_avg_cr(prec) result(val)
-    implicit none 
+    implicit none
     class(amg_sprec_type), intent(in) :: prec
     real(psb_spk_)  :: val
-    
+
     val = prec%ag_data%avg_cr
 
   end function amg_s_get_avg_cr
-  
-  subroutine amg_s_cmp_avg_cr(prec) 
 
-    implicit none 
+  subroutine amg_s_cmp_avg_cr(prec)
+
+    implicit none
     class(amg_sprec_type), intent(inout) :: prec
-    
+
     real(psb_spk_)    :: avgcr
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: il, nl, iam, np
@@ -519,12 +519,12 @@ contains
       do il=2,nl
         avgcr = avgcr + max(szero,prec%precv(il)%szratio)
       end do
-      avgcr = avgcr / (nl-1)      
+      avgcr = avgcr / (nl-1)
     end if
-    call psb_sum(ctxt,avgcr) 
+    call psb_sum(ctxt,avgcr)
     prec%ag_data%avg_cr = avgcr/np
   end subroutine amg_s_cmp_avg_cr
-  
+
   !
   ! Subroutines: amg_Tprec_free
   ! Version: real
@@ -538,74 +538,74 @@ contains
   !             error code.
   !
   subroutine amg_sprecfree(p,info)
-  
+
     implicit none
-    
+
     ! Arguments
     type(amg_sprec_type), intent(inout) :: p
     integer(psb_ipk_), intent(out)        :: info
-    
+
     ! Local variables
     integer(psb_ipk_)   :: me,err_act,i
     character(len=20)   :: name
-    
+
     info=psb_success_
     name = 'amg_sprecfree'
     call psb_erractionsave(err_act)
     if (psb_errstatus_fatal()) then
       info = psb_err_internal_error_; return
     end if
-    
+
     me=-1
-    
+
     call p%free(info)
 
-    
+
     return
-    
+
   end subroutine amg_sprecfree
 
   subroutine amg_s_prec_free(prec,info)
-    
+
     implicit none
-    
+
     ! Arguments
     class(amg_sprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
-    
+
     ! Local variables
     integer(psb_ipk_)   :: me,err_act,i
     character(len=20)   :: name
-    
+
     info=psb_success_
     name = 'amg_sprecfree'
     call psb_erractionsave(err_act)
     if (psb_errstatus_fatal()) then
       info = psb_err_internal_error_; goto 9999
     end if
-    
+
     me=-1
-    if (allocated(prec%precv)) then 
-      do i=1,size(prec%precv) 
+    if (allocated(prec%precv)) then
+      do i=1,size(prec%precv)
         call prec%precv(i)%free(info)
       end do
       deallocate(prec%precv,stat=info)
     end if
     call psb_erractionrestore(err_act)
     return
-    
+
 9999 call psb_error_handler(err_act)
     return
-    
+
   end subroutine amg_s_prec_free
 
-  
+
 
   !
-  ! Top level methods. 
+  ! Top level methods.
   !
   subroutine amg_s_apply2_vect(prec,x,y,desc_data,info,trans,work)
-    implicit none 
+    implicit none
     type(psb_desc_type),intent(in)        :: desc_data
     class(amg_sprec_type), intent(inout)  :: prec
     type(psb_s_vect_type),intent(inout)   :: x
@@ -618,13 +618,13 @@ contains
 
     call psb_erractionsave(err_act)
 
-    select type(prec) 
+    select type(prec)
     type is (amg_sprec_type)
       call amg_precapply(prec,x,y,desc_data,info,trans,work)
     class default
       info = psb_err_missing_override_method_
       call psb_errpush(info,name)
-      goto 9999 
+      goto 9999
     end select
 
     call psb_erractionrestore(err_act)
@@ -636,7 +636,7 @@ contains
   end subroutine amg_s_apply2_vect
 
   subroutine amg_s_apply1_vect(prec,x,desc_data,info,trans,work)
-    implicit none 
+    implicit none
     type(psb_desc_type),intent(in)          :: desc_data
     class(amg_sprec_type), intent(inout)  :: prec
     type(psb_s_vect_type),intent(inout)   :: x
@@ -648,13 +648,13 @@ contains
 
     call psb_erractionsave(err_act)
 
-    select type(prec) 
+    select type(prec)
     type is (amg_sprec_type)
       call amg_precapply(prec,x,desc_data,info,trans,work)
     class default
       info = psb_err_missing_override_method_
       call psb_errpush(info,name)
-      goto 9999 
+      goto 9999
     end select
 
     call psb_erractionrestore(err_act)
@@ -667,7 +667,7 @@ contains
 
 
   subroutine amg_s_apply2v(prec,x,y,desc_data,info,trans,work)
-    implicit none 
+    implicit none
     type(psb_desc_type),intent(in)    :: desc_data
     class(amg_sprec_type), intent(inout) :: prec
     real(psb_spk_),intent(inout)      :: x(:)
@@ -680,13 +680,13 @@ contains
 
     call psb_erractionsave(err_act)
 
-    select type(prec) 
+    select type(prec)
     type is (amg_sprec_type)
       call amg_precapply(prec,x,y,desc_data,info,trans,work)
     class default
       info = psb_err_missing_override_method_
       call psb_errpush(info,name)
-      goto 9999 
+      goto 9999
     end select
 
     call psb_erractionrestore(err_act)
@@ -698,7 +698,7 @@ contains
   end subroutine amg_s_apply2v
 
   subroutine amg_s_apply1v(prec,x,desc_data,info,trans)
-    implicit none 
+    implicit none
     type(psb_desc_type),intent(in)    :: desc_data
     class(amg_sprec_type), intent(inout) :: prec
     real(psb_spk_),intent(inout)      :: x(:)
@@ -709,13 +709,13 @@ contains
 
     call psb_erractionsave(err_act)
 
-    select type(prec) 
+    select type(prec)
     type is (amg_sprec_type)
       call amg_precapply(prec,x,desc_data,info,trans)
     class default
       info = psb_err_missing_override_method_
       call psb_errpush(info,name)
-      goto 9999 
+      goto 9999
     end select
 
     call psb_erractionrestore(err_act)
@@ -730,8 +730,8 @@ contains
   subroutine amg_s_dump(prec,info,istart,iend,iproc,prefix,head,&
        & ac,rp,smoother,solver,tprol,&
        & global_num)
-    
-    implicit none 
+
+    implicit none
     class(amg_sprec_type), intent(in)     :: prec
     integer(psb_ipk_), intent(out)          :: info
     integer(psb_ipk_), intent(in), optional :: istart, iend, iproc
@@ -742,27 +742,27 @@ contains
     integer(psb_ipk_)   :: iam, np, iproc_
     character(len=80)   :: prefix_
     character(len=120)  :: fname ! len should be at least 20 more than
-    !  len of prefix_ 
+    !  len of prefix_
 
     info = 0
     icontxt = prec%ctxt
     call psb_info(icontxt,iam,np)
-    
+
     iln = size(prec%precv)
-    if (present(istart)) then 
+    if (present(istart)) then
       il1 = max(1,istart)
     else
       il1 = min(2,iln)
     end if
-    if (present(iend)) then 
+    if (present(iend)) then
       iln = min(iln, iend)
     end if
     iproc_ = -1
-    if (present(iproc)) then 
+    if (present(iproc)) then
       iproc_ = iproc
     end if
 
-    if ((iproc_ == -1).or.(iproc_==iam)) then 
+    if ((iproc_ == -1).or.(iproc_==iam)) then
       do lev=il1, iln
         call prec%precv(lev)%dump(lev,info,prefix=prefix,head=head,&
              & ac=ac,smoother=smoother,solver=solver,rp=rp,tprol=tprol, &
@@ -773,7 +773,7 @@ contains
 
   subroutine amg_s_cnv(prec,info,amold,vmold,imold)
 
-    implicit none 
+    implicit none
     class(amg_sprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)       :: info
     class(psb_s_base_sparse_mat), intent(in), optional :: amold
@@ -781,7 +781,7 @@ contains
     class(psb_i_base_vect_type), intent(in), optional  :: imold
 
     integer(psb_ipk_) :: i
-    
+
     info = psb_success_
     if (allocated(prec%precv)) then
       do i=1,size(prec%precv)
@@ -789,24 +789,24 @@ contains
              & call prec%precv(i)%cnv(info,amold=amold,vmold=vmold,imold=imold)
       end do
     end if
-    
+
   end subroutine amg_s_cnv
 
   subroutine amg_s_clone(prec,precout,info)
 
-    implicit none 
+    implicit none
     class(amg_sprec_type), intent(inout) :: prec
     class(psb_sprec_type), intent(inout) :: precout
     integer(psb_ipk_), intent(out)       :: info
-    
+
     call precout%free(info)
-    if (info == 0) call amg_s_inner_clone(prec,precout,info) 
+    if (info == 0) call amg_s_inner_clone(prec,precout,info)
 
   end subroutine amg_s_clone
 
   subroutine amg_s_inner_clone(prec,precout,info)
 
-    implicit none 
+    implicit none
     class(amg_sprec_type), intent(inout)         :: prec
     class(psb_sprec_type), target, intent(inout) :: precout
     integer(psb_ipk_), intent(out)             :: info
@@ -821,17 +821,17 @@ contains
       pout%ctxt         = prec%ctxt
       pout%ag_data       = prec%ag_data
       pout%outer_sweeps  = prec%outer_sweeps
-      if (allocated(prec%precv)) then 
-        ln = size(prec%precv) 
+      if (allocated(prec%precv)) then
+        ln = size(prec%precv)
         allocate(pout%precv(ln),stat=info)
         if (info /= psb_success_) goto 9999
-        if (ln >= 1) then 
+        if (ln >= 1) then
           call prec%precv(1)%clone(pout%precv(1),info)
         end if
         do lev=2, ln
           if (info /= psb_success_) exit
           call prec%precv(lev)%clone(pout%precv(lev),info)
-          if (info == psb_success_) then 
+          if (info == psb_success_) then
             pout%precv(lev)%base_a       => pout%precv(lev)%ac
             pout%precv(lev)%base_desc    => pout%precv(lev)%desc_ac
             pout%precv(lev)%map%p_desc_U => pout%precv(lev-1)%base_desc
@@ -842,7 +842,7 @@ contains
       if (allocated(prec%precv(1)%wrk)) &
            & call pout%allocate_wrk(info,vmold=prec%precv(1)%wrk%vx2l%v)
 
-    class default 
+    class default
       write(0,*) 'Error: wrong out type'
       info = psb_err_invalid_input_
     end select
@@ -854,14 +854,14 @@ contains
     implicit none
     class(amg_sprec_type), intent(inout) :: prec
     class(amg_sprec_type), intent(inout), target :: b
-    integer(psb_ipk_), intent(out) :: info 
+    integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: i
-    
-    if (same_type_as(prec,b)) then 
-      if (allocated(b%precv)) then 
+
+    if (same_type_as(prec,b)) then
+      if (allocated(b%precv)) then
         ! This might not be required if FINAL procedures are available.
         call b%free(info)
-        if (info /= psb_success_) then 
+        if (info /= psb_success_) then
           !?????
 !!$        return
         endif
@@ -869,7 +869,7 @@ contains
       b%ctxt         = prec%ctxt
       b%ag_data       = prec%ag_data
       b%outer_sweeps  = prec%outer_sweeps
-            
+
       call move_alloc(prec%precv,b%precv)
       ! Fix the pointers except on level 1.
       do i=2, size(b%precv)
@@ -878,7 +878,7 @@ contains
         b%precv(i)%map%p_desc_U => b%precv(i-1)%base_desc
         b%precv(i)%map%p_desc_V => b%precv(i)%base_desc
       end do
-            
+
     else
       write(0,*) 'Warning: PREC%move_alloc onto different type?'
       info = psb_err_internal_error_
@@ -888,7 +888,7 @@ contains
   subroutine amg_s_allocate_wrk(prec,info,vmold,desc)
     use psb_base_mod
     implicit none
-    
+
     ! Arguments
     class(amg_sprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -896,37 +896,37 @@ contains
     !
     ! In MLD the DESC optional argument is ignored, since
     ! the necessary info is contained in the various entries of the
-    ! PRECV component. 
+    ! PRECV component.
     type(psb_desc_type), intent(in), optional  :: desc
-    
+
     ! Local variables
     integer(psb_ipk_)   :: me,err_act,i,j,level,nlev, nc2l
     character(len=20)   :: name
-    
+
     info=psb_success_
     name = 'amg_s_allocate_wrk'
     call psb_erractionsave(err_act)
     if (psb_errstatus_fatal()) then
       info = psb_err_internal_error_; goto 9999
     end if
-    nlev   = size(prec%precv)  
+    nlev   = size(prec%precv)
     level = 1
     do level = 1, nlev
       call prec%precv(level)%allocate_wrk(info,vmold=vmold)
-      if (psb_errstatus_fatal()) then 
+      if (psb_errstatus_fatal()) then
         nc2l = prec%precv(level)%base_desc%get_local_cols()
         info=psb_err_alloc_request_
         call psb_errpush(info,name,i_err=(/2*nc2l/), a_err='real(psb_spk_)')
-        goto 9999      
+        goto 9999
       end if
     end do
 
     call psb_erractionrestore(err_act)
     return
-    
+
 9999 call psb_error_handler(err_act)
     return
-    
+
   end subroutine amg_s_allocate_wrk
 
   subroutine amg_s_free_wrk(prec,info)
@@ -948,13 +948,13 @@ contains
       info = psb_err_internal_error_; goto 9999
     end if
 
-    if (allocated(prec%precv)) then 
-      nlev   = size(prec%precv)  
+    if (allocated(prec%precv)) then
+      nlev   = size(prec%precv)
       do level = 1, nlev
         call prec%precv(level)%free_wrk(info)
       end do
     end if
-    
+
     call psb_erractionrestore(err_act)
     return
 
@@ -966,7 +966,7 @@ contains
   function amg_s_is_allocated_wrk(prec) result(res)
     use psb_base_mod
     implicit none
-    
+
     ! Arguments
     class(amg_sprec_type), intent(in) :: prec
     logical :: res
@@ -974,7 +974,7 @@ contains
     res = .false.
     if (.not.allocated(prec%precv)) return
     res = allocated(prec%precv(1)%wrk)
-     
+
   end function amg_s_is_allocated_wrk
 
 end module amg_s_prec_type
