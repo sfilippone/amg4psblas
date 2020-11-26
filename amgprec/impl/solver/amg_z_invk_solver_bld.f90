@@ -69,7 +69,7 @@ subroutine amg_z_invk_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
        & write(debug_unit,*) me,' ',trim(name),' start'
 
 
-  call psb_invk_bld(a,sv%fill_in,sv%inv_fill,&
+  call psb_invk_fact(a,sv%fill_in,sv%inv_fill,&
        & sv%w,sv%d,sv%z,desc_a,info,b)
 
 
