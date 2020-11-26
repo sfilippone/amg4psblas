@@ -32,20 +32,20 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amx_z_invk_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
+subroutine amg_z_invk_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
 
   use psb_base_mod
   use psb_z_invk_fact_mod ! This module contains the construction routines
 
-  use amx_z_invk_solver, amg_protect_name => amx_z_invk_solver_bld
+  use amg_z_invk_solver, amg_protect_name => amg_z_invk_solver_bld
 
   Implicit None
 
   ! Arguments
   type(psb_zspmat_type), intent(in), target            :: a
   Type(psb_desc_type), Intent(inout)                  :: desc_a
-  class(amx_z_invk_solver_type), intent(inout)        :: sv
+  class(amg_z_invk_solver_type), intent(inout)        :: sv
   integer(psb_ipk_), intent(out)                      :: info
   type(psb_zspmat_type), intent(in), target, optional :: b
   class(psb_z_base_sparse_mat), intent(in), optional  :: amold
@@ -90,4 +90,4 @@ subroutine amx_z_invk_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
 9999 call psb_error_handler(err_act)
   return
-end subroutine amx_z_invk_solver_bld
+end subroutine amg_z_invk_solver_bld

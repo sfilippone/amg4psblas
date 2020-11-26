@@ -32,15 +32,15 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amx_d_invk_solver_cseti(sv,what,val,info,idx)
+subroutine amg_d_invk_solver_cseti(sv,what,val,info,idx)
 
   use psb_base_mod
-  use amx_d_invk_solver, amg_protect_name => amx_d_invk_solver_cseti
+  use amg_d_invk_solver, amg_protect_name => amg_d_invk_solver_cseti
 
   Implicit None
 
   ! Arguments
-  class(amx_d_invk_solver_type), intent(inout) :: sv
+  class(amg_d_invk_solver_type), intent(inout) :: sv
   character(len=*), intent(in)                 :: what
   integer(psb_ipk_), intent(in)                :: val
   integer(psb_ipk_), intent(out)               :: info
@@ -58,7 +58,7 @@ subroutine amx_d_invk_solver_cseti(sv,what,val,info,idx)
   case('INV_FILLIN')
     sv%inv_fill  = val
   case default
-    call sv%amx_d_base_solver_type%set(what,val,info)
+    call sv%amg_d_base_solver_type%set(what,val,info)
   end select
 
   call psb_erractionrestore(err_act)
@@ -66,4 +66,4 @@ subroutine amx_d_invk_solver_cseti(sv,what,val,info,idx)
 
 9999 call psb_error_handler(err_act)
   return
-end subroutine amx_d_invk_solver_cseti
+end subroutine amg_d_invk_solver_cseti

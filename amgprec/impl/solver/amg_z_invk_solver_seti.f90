@@ -1,4 +1,4 @@
-!  
+!
 !
 !                       AMG-AINV: Approximate Inverse plugin for
 !                             AMG4PSBLAS version 1.0
@@ -32,16 +32,16 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amx_z_invk_solver_seti(sv,what,val,info)
+subroutine amg_z_invk_solver_seti(sv,what,val,info)
 
 
   use psb_base_mod
-  use amx_z_invk_solver, amg_protect_name => amx_z_invk_solver_seti
+  use amg_z_invk_solver, amg_protect_name => amg_z_invk_solver_seti
 
   Implicit None
 
   ! Arguments
-  class(amx_z_invk_solver_type), intent(inout) :: sv
+  class(amg_z_invk_solver_type), intent(inout) :: sv
   integer(psb_ipk_), intent(in)                :: what
   integer(psb_ipk_), intent(in)                :: val
   integer(psb_ipk_), intent(out)               :: info
@@ -58,7 +58,7 @@ subroutine amx_z_invk_solver_seti(sv,what,val,info)
   case(amg_inv_fillin_)
     sv%inv_fill  = val
   case default
-    call sv%amx_z_base_solver_type%set(what,val,info)
+    ! call sv%amg_z_base_solver_type%set(what,val,info)
   end select
 
   call psb_erractionrestore(err_act)
@@ -66,4 +66,4 @@ subroutine amx_z_invk_solver_seti(sv,what,val,info)
 
 9999 call psb_error_handler(err_act)
   return
-end subroutine amx_z_invk_solver_seti
+end subroutine amg_z_invk_solver_seti

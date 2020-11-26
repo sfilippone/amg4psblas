@@ -32,16 +32,16 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amx_d_invk_solver_descr(sv,info,iout,coarse)
+subroutine amg_d_invk_solver_descr(sv,info,iout,coarse)
 
 
   use psb_base_mod
-  use amx_d_invk_solver, amg_protect_name => amx_d_invk_solver_descr
+  use amg_d_invk_solver, amg_protect_name => amg_d_invk_solver_descr
 
   Implicit None
 
   ! Arguments
-  class(amx_d_invk_solver_type), intent(in) :: sv
+  class(amg_d_invk_solver_type), intent(in) :: sv
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: iout
   logical, intent(in), optional             :: coarse
@@ -50,7 +50,7 @@ subroutine amx_d_invk_solver_descr(sv,info,iout,coarse)
   integer(psb_ipk_)  :: err_act
   integer(psb_ipk_)  :: me, np
   type(psb_ctxt_type) :: ctxt
-  character(len=20), parameter :: name='amx_d_invk_solver_descr'
+  character(len=20), parameter :: name='amg_d_invk_solver_descr'
   integer(psb_ipk_) :: iout_
 
   call psb_erractionsave(err_act)
@@ -70,4 +70,4 @@ subroutine amx_d_invk_solver_descr(sv,info,iout,coarse)
 
 9999 call psb_error_handler(err_act)
   return
-end subroutine amx_d_invk_solver_descr
+end subroutine amg_d_invk_solver_descr

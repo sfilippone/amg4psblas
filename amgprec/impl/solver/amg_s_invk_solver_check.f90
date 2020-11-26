@@ -32,16 +32,16 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amx_s_invk_solver_check(sv,info)
+subroutine amg_s_invk_solver_check(sv,info)
 
 
   use psb_base_mod
-  use amx_s_invk_solver, amg_protect_name => amx_s_invk_solver_check
+  use amg_s_invk_solver, amg_protect_name => amg_s_invk_solver_check
 
   Implicit None
 
   ! Arguments
-  class(amx_s_invk_solver_type), intent(inout) :: sv
+  class(amg_s_invk_solver_type), intent(inout) :: sv
   integer(psb_ipk_), intent(out)               :: info
   Integer(Psb_Ipk_) :: err_act
   character(len=20) :: name='s_invk_solver_check'
@@ -61,4 +61,4 @@ subroutine amx_s_invk_solver_check(sv,info)
 
 9999 call psb_error_handler(err_act)
   return
-end subroutine amx_s_invk_solver_check
+end subroutine amg_s_invk_solver_check

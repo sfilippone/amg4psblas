@@ -36,16 +36,16 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amx_s_invk_solver_clone(sv,svout,info)
+subroutine amg_s_invk_solver_clone(sv,svout,info)
 
   use psb_base_mod
-  use amx_s_invk_solver, amg_protect_name => amx_s_invk_solver_clone
+  use amg_s_invk_solver, amg_protect_name => amg_s_invk_solver_clone
 
   Implicit None
 
   ! Arguments
-  class(amx_s_invk_solver_type), intent(inout)              :: sv
-  class(amx_s_base_solver_type), allocatable, intent(inout) :: svout
+  class(amg_s_invk_solver_type), intent(inout)              :: sv
+  class(amg_s_base_solver_type), allocatable, intent(inout) :: svout
   integer(psb_ipk_), intent(out)                            :: info
   ! Local variables
   integer(psb_ipk_) :: err_act
@@ -59,13 +59,13 @@ subroutine amx_s_invk_solver_clone(sv,svout,info)
     if (info == psb_success_) deallocate(svout, stat=info)
   end if
   if (info == psb_success_) &
-       & allocate(amx_s_invk_solver_type :: svout, stat=info)
+       & allocate(amg_s_invk_solver_type :: svout, stat=info)
   if (info /= 0) then
     info = psb_err_alloc_dealloc_
     goto 9999
   end if
   select type(svo => svout)
-  type is (amx_s_invk_solver_type)
+  type is (amg_s_invk_solver_type)
     svo%fill_in  = sv%fill_in
     svo%inv_fill = sv%inv_fill
     call psb_safe_ab_cpy(sv%d,svo%d,info)
@@ -87,4 +87,4 @@ subroutine amx_s_invk_solver_clone(sv,svout,info)
 
 9999 call psb_error_handler(err_act)
   return
-end subroutine amx_s_invk_solver_clone
+end subroutine amg_s_invk_solver_clone
