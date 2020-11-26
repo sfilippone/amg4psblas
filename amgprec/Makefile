@@ -52,7 +52,7 @@ CMODOBJS=amg_c_prec_type.o amg_c_ilu_fact_mod.o \
 
 MODOBJS=amg_base_prec_type.o amg_prec_type.o  amg_prec_mod.o \
 	 amg_s_prec_mod.o  amg_d_prec_mod.o amg_c_prec_mod.o amg_z_prec_mod.o \
-	 amg_base_ainv_mod.o \
+	 amg_base_ainv_mod.o amg_ainv_mod.o\
 	$(SMODOBJS) $(DMODOBJS) $(CMODOBJS) $(ZMODOBJS)
 
 
@@ -186,6 +186,10 @@ amg_s_invt_solver.o: amg_base_ainv_mod.o amg_s_base_ainv_mod.o
 amg_d_invt_solver.o: amg_base_ainv_mod.o amg_d_base_ainv_mod.o
 amg_c_invt_solver.o: amg_base_ainv_mod.o amg_c_base_ainv_mod.o
 amg_z_invt_solver.o: amg_base_ainv_mod.o amg_z_base_ainv_mod.o
+amg_ainv_mod.o: amg_s_ainv_solver.o amg_d_ainv_solver.o amg_c_ainv_solver.o \
+	amg_z_ainv_solver.o amg_s_invk_solver.o amg_d_invk_solver.o amg_c_invk_solver.o \
+	amg_z_invk_solver.o amg_s_invt_solver.o amg_d_invt_solver.o amg_c_invt_solver.o \
+	amg_z_invt_solver.o
 
 veryclean: clean
 	/bin/rm -f $(LIBNAME)

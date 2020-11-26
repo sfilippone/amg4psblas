@@ -16,8 +16,10 @@ FBGS                        ! Smoother type JACOBI FBGS GS BWGS BJAC AS. For 1-l
 0                           ! Number of overlap layers for AS preconditioner
 HALO                        ! AS restriction operator: NONE HALO
 NONE                        ! AS prolongation operator: NONE SUM AVG
-ILU                         ! Subdomain solver for BJAC/AS: JACOBI GS BGS ILU ILUT MILU MUMPS SLU UMF
+INVK                        ! Subdomain solver for BJAC/AS: JACOBI GS BGS ILU ILUT MILU MUMPS SLU UMF
+LLK                         ! AINV variant
 0                           ! Fill level P for ILU(P) and ILU(T,P)
+1                           ! Inverse Fill level P for INVK
 1.d-4                       ! Threshold T for ILU(T,P)
 %%%%%%%%%%%  Second smoother, always ignored for non-ML  %%%%%%%%%%%%%%%%
 NONE                        ! Second (post) smoother, ignored if NONE
@@ -26,7 +28,9 @@ NONE                        ! Second (post) smoother, ignored if NONE
 HALO                        ! AS restriction operator: NONE HALO
 NONE                        ! AS prolongation operator: NONE SUM AVG
 ILU                         ! Subdomain solver for BJAC/AS: JACOBI GS BGS ILU ILUT MILU MUMPS SLU UMF
+LLK                         ! AINV variant
 0                           ! Fill level P for ILU(P) and ILU(T,P)
+8                           ! Inverse Fill level P for INVK
 1.d-4                       ! Threshold T for ILU(T,P)
 %%%%%%%%%%%  Multilevel parameters %%%%%%%%%%%%%%%%
 VCYCLE                      ! Type of multilevel CYCLE: VCYCLE WCYCLE KCYCLE MULT ADD

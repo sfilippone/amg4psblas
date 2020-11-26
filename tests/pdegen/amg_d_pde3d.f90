@@ -74,6 +74,8 @@ program amg_d_pde3d
   use amg_d_pde3d_exp_mod
   use amg_d_pde3d_gauss_mod
   use amg_d_genpde_mod
+  use amg_ainv_mod
+  use amg_d_ilu_solver
   implicit none
 
   ! input parameters
@@ -113,6 +115,9 @@ program amg_d_pde3d
   type(solverdata)       :: s_choice
 
   ! preconditioner data
+  type(amg_d_invt_solver_type) :: invtsv
+  type(amg_d_invk_solver_type) :: invksv
+  type(amg_d_ainv_solver_type) :: ainvsv
   type precdata
 
     ! preconditioner type
@@ -144,7 +149,9 @@ program amg_d_pde3d
     character(len=16)  :: prol        ! prolongation over application of AS
     character(len=16)  :: solve       ! local subsolver type: ILU, MILU, ILUT,
                                       ! UMF, MUMPS, SLU, FWGS, BWGS, JAC
+    character(len=16)  :: variant     ! AINV variant: LLK, etc
     integer(psb_ipk_)  :: fill        ! fill-in for incomplete LU factorization
+    integer(psb_ipk_)  :: invfill     ! Inverse fill-in for INVK
     real(psb_dpk_)     :: thr         ! threshold for ILUT factorization
 
     ! AMG post-smoother; ignored by 1-lev preconditioner
@@ -155,8 +162,10 @@ program amg_d_pde3d
     character(len=16)  :: prol2       ! prolongation over application of AS
     character(len=16)  :: solve2      ! local subsolver type: ILU, MILU, ILUT,
                                       ! UMF, MUMPS, SLU, FWGS, BWGS, JAC
+    character(len=16)  :: variant2    ! AINV variant: LLK, etc
     integer(psb_ipk_)  :: fill2       ! fill-in for incomplete LU factorization
-    real(psb_dpk_)     :: thr2        ! threshold for ILUT factorization
+    integer(psb_ipk_)  :: invfill2    ! Inverse fill-in for INVK
+    real(psb_dpk_)      :: thr2        ! threshold for ILUT factorization
 
     ! coarsest-level solver
     character(len=16)  :: cmat        ! coarsest matrix layout: REPL, DIST
@@ -298,14 +307,26 @@ program amg_d_pde3d
     call prec%set('smoother_sweeps', p_choice%jsweeps,    info)
 
     select case (psb_toupper(p_choice%smther))
-    case ('GS','BWGS','FBGS','JACOBI','L1-JACOBI')
+    case ('GS','BWGS','FBGS','JACOBI','L1-JACOBI','L1-FBGS')
       ! do nothing
     case default
       call prec%set('sub_ovr',         p_choice%novr,       info)
       call prec%set('sub_restr',       p_choice%restr,      info)
       call prec%set('sub_prol',        p_choice%prol,       info)
-      call prec%set('sub_solve',       p_choice%solve,      info)
+      select case(trim(psb_toupper(p_choice%solve)))
+      case('INVK')
+        call prec%set(invksv, info)
+      case('INVT')
+        call prec%set(invtsv, info)
+      case('AINV')
+        call prec%set(ainvsv, info)
+        call prec%set('ainv_alg', p_choice%variant,   info)
+      case default
+        call prec%set('sub_solve',       p_choice%solve,   info)
+      end select
+
       call prec%set('sub_fillin',      p_choice%fill,       info)
+      call prec%set('inv_fillin',      p_choice%invfill,    info)
       call prec%set('sub_iluthrs',     p_choice%thr,        info)
     end select
 
@@ -313,14 +334,26 @@ program amg_d_pde3d
       call prec%set('smoother_type',   p_choice%smther2,   info,pos='post')
       call prec%set('smoother_sweeps', p_choice%jsweeps2,  info,pos='post')
       select case (psb_toupper(p_choice%smther2))
-      case ('GS','BWGS','FBGS','JACOBI','L1-JACOBI')
+      case ('GS','BWGS','FBGS','JACOBI','L1-JACOBI','L1-FBGS')
         ! do nothing
       case default
         call prec%set('sub_ovr',         p_choice%novr2,     info,pos='post')
         call prec%set('sub_restr',       p_choice%restr2,    info,pos='post')
         call prec%set('sub_prol',        p_choice%prol2,     info,pos='post')
-        call prec%set('sub_solve',       p_choice%solve2,    info,pos='post')
+        select case(trim(psb_toupper(p_choice%solve2)))
+        case('INVK')
+          call prec%set(invksv, info, pos='post')
+        case('INVT')
+          call prec%set(invtsv, info, pos='post')
+        case('AINV')
+          call prec%set(ainvsv, info, pos='post')
+          call prec%set('ainv_alg', p_choice%variant2,   info, pos='post')
+        case default
+          call prec%set('sub_solve',       p_choice%solve2,   info, pos='post')
+        end select
+
         call prec%set('sub_fillin',      p_choice%fill2,     info,pos='post')
+        call prec%set('inv_fillin',      p_choice%invfill2,  info,pos='post')
         call prec%set('sub_iluthrs',     p_choice%thr2,      info,pos='post')
       end select
     end if
@@ -508,7 +541,9 @@ contains
       call read_data(prec%restr,inp_unit)      ! restriction  over application of AS
       call read_data(prec%prol,inp_unit)       ! prolongation over application of AS
       call read_data(prec%solve,inp_unit)      ! local subsolver
+      call read_data(prec%variant,inp_unit)    ! AINV variant
       call read_data(prec%fill,inp_unit)       ! fill-in for incomplete LU
+      call read_data(prec%invfill,inp_unit)    !Inverse fill-in for INVK
       call read_data(prec%thr,inp_unit)        ! threshold for ILUT
       ! Second smoother/ AMG post-smoother (if NONE ignored in main)
       call read_data(prec%smther2,inp_unit)     ! smoother type
@@ -517,7 +552,9 @@ contains
       call read_data(prec%restr2,inp_unit)      ! restriction  over application of AS
       call read_data(prec%prol2,inp_unit)       ! prolongation over application of AS
       call read_data(prec%solve2,inp_unit)      ! local subsolver
+      call read_data(prec%variant2,inp_unit)    ! AINV variant
       call read_data(prec%fill2,inp_unit)       ! fill-in for incomplete LU
+      call read_data(prec%invfill2,inp_unit)    !Inverse fill-in for INVK
       call read_data(prec%thr2,inp_unit)        ! threshold for ILUT
       ! general AMG data
       call read_data(prec%mlcycle,inp_unit)     ! AMG cycle type
@@ -571,7 +608,9 @@ contains
     call psb_bcast(ctxt,prec%restr)
     call psb_bcast(ctxt,prec%prol)
     call psb_bcast(ctxt,prec%solve)
+    call psb_bcast(ctxt,prec%variant)
     call psb_bcast(ctxt,prec%fill)
+    call psb_bcast(ctxt,prec%invfill)
     call psb_bcast(ctxt,prec%thr)
     ! broadcast second (post-)smoother
     call psb_bcast(ctxt,prec%smther2)
@@ -580,7 +619,9 @@ contains
     call psb_bcast(ctxt,prec%restr2)
     call psb_bcast(ctxt,prec%prol2)
     call psb_bcast(ctxt,prec%solve2)
+    call psb_bcast(ctxt,prec%variant2)
     call psb_bcast(ctxt,prec%fill2)
+    call psb_bcast(ctxt,prec%invfill2)
     call psb_bcast(ctxt,prec%thr2)
 
     ! broadcast AMG parameters
