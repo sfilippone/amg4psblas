@@ -8,6 +8,7 @@ BICGSTAB                    ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS F
 1                           ! ITRACE
 30                          ! IRST (restart for RGMRES and BiCGSTABL)
 1.d-6                       ! EPS
+%%%%%%%%%%%  Main preconditioner choices %%%%%%%%%%%%%%%%
 ML-VCYCLE-BJAC-R-UMF        ! Longer descriptive name for preconditioner (up to 20 chars)
 ML                          ! Preconditioner type: NONE JACOBI GS FBGS BJAC AS ML
 %%%%%%%%%%%  First smoother (for all levels but coarsest) %%%%%%%%%%%%%%%%
