@@ -36,10 +36,11 @@
 module amg_base_ainv_mod
 
   use amg_base_prec_type
+  use psb_prec_const_mod, only : psb_inv_fillin_, psb_inv_thresh_
 
-  integer, parameter   :: amg_inv_fillin_ = amg_ifpsz_ + 1
+  integer, parameter   :: amg_inv_fillin_ = psb_inv_fillin_
   integer, parameter   :: amg_ainv_alg_   = amg_inv_fillin_ + 1
-  integer, parameter   :: amg_inv_thresh_ = amg_max_sub_solve_ + 1
+  integer, parameter   :: amg_inv_thresh_ = psb_inv_thresh_
 #if 0
   integer, parameter   :: amg_ainv_orth1_ = amg_inv_thresh_ + 1
   integer, parameter   :: amg_ainv_orth2_ = amg_ainv_orth1_ + 1
