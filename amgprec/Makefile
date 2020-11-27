@@ -128,6 +128,14 @@ amg_d_base_smoother_mod.o: amg_d_base_solver_mod.o
 amg_c_base_smoother_mod.o: amg_c_base_solver_mod.o
 amg_z_base_smoother_mod.o: amg_z_base_solver_mod.o
 
+amg_s_ainv_solver.o: amg_s_base_ainv_mod.o
+amg_c_ainv_solver.o: amg_c_base_ainv_mod.o
+amg_d_ainv_solver.o: amg_d_base_ainv_mod.o
+amg_z_ainv_solver.o: amg_z_base_ainv_mod.o
+amg_s_base_ainv_mod.o: amg_s_base_solver_mod.o amg_base_ainv_mod.o
+amg_c_base_ainv_mod.o: amg_c_base_solver_mod.o amg_base_ainv_mod.o
+amg_d_base_ainv_mod.o: amg_d_base_solver_mod.o amg_base_ainv_mod.o
+amg_z_base_ainv_mod.o: amg_z_base_solver_mod.o amg_base_ainv_mod.o
 
 amg_s_base_solver_mod.o amg_d_base_solver_mod.o amg_c_base_solver_mod.o amg_z_base_solver_mod.o: amg_base_prec_type.o
 

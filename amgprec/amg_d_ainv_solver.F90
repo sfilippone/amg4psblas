@@ -39,7 +39,6 @@
 !
 module amg_d_ainv_solver
 
-  use amg_d_prec_type
   use amg_d_base_ainv_mod
   use psb_base_mod, only : psb_d_vect_type
 

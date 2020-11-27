@@ -36,7 +36,7 @@
 module amg_c_base_ainv_mod
 
   use amg_base_ainv_mod
-  use amg_c_prec_type
+  use amg_c_base_solver_mod
   use psb_c_ainv_tools_mod
   use psb_base_mod, only : psb_c_vect_type, psb_spk_, psb_epk_
 
