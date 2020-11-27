@@ -37,7 +37,6 @@ subroutine amg_s_ainv_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
   use psb_base_mod
   use psb_s_ainv_fact_mod
-  use amg_prec_mod
   use amg_s_ainv_solver, amg_protect_name => amg_s_ainv_solver_bld
 
   Implicit None
