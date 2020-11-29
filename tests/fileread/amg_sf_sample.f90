@@ -154,7 +154,8 @@ program amg_sf_sample
   real(psb_dpk_)     :: t1, t2, tprec, thier, tslv
   real(psb_spk_)     :: resmx, resmxp, xdiffn2, xdiffni, xni, xn2
   integer(psb_ipk_)  :: nrhs, nv
-  integer(psb_ipk_), allocatable :: ivg(:), ipv(:), perm(:)
+  integer(psb_ipk_), allocatable :: ivg(:), ipv(:)
+  integer(psb_lpk_), allocatable :: perm(:)
   logical   :: have_guess=.false., have_ref=.false.
 
   call psb_init(ctxt)
