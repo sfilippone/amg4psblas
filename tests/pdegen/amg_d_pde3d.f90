@@ -76,6 +76,8 @@ program amg_d_pde3d
   use amg_d_genpde_mod
   use amg_ainv_mod
   use amg_d_ilu_solver
+  use amg_d_rkr_solver
+
   implicit none
 
   ! input parameters
@@ -118,6 +120,7 @@ program amg_d_pde3d
   type(amg_d_invt_solver_type) :: invtsv
   type(amg_d_invk_solver_type) :: invksv
   type(amg_d_ainv_solver_type) :: ainvsv
+  type(amg_d_rkr_solver_type)  :: rkr_slv
   type precdata
 
     ! preconditioner type
@@ -174,10 +177,22 @@ program amg_d_pde3d
                                       ! (repl. mat.)
     character(len=16)  :: csbsolve    ! coarsest-lev local subsolver: ILU, ILUT,
                                       ! MILU, UMF, MUMPS, SLU
+    character(len=16)  :: cvariant    ! AINV variant: LLK, etc
+    character(len=16)  :: ckryl       ! Krylov method for RKR, ignored otherwise
+                                      ! MILU, UMF, MUMPS, SLU
     integer(psb_ipk_)  :: cfill       ! fill-in for incomplete LU factorization
-    real(psb_dpk_)     :: cthres      ! threshold for ILUT factorization
+    integer(psb_ipk_)  :: cinvfill    ! Inverse fill-in for INVK
     integer(psb_ipk_)  :: cjswp       ! sweeps for GS or JAC coarsest-lev subsolver
-
+    real(psb_dpk_)     :: cthres       ! threshold for ILUT factorization
+    integer(psb_ipk_)  :: crkiter     ! Max iterations for RKR, ignored otherwise
+    real(psb_dpk_)     :: crkeps       ! eps for RKR, ignored otherwise
+    integer(psb_ipk_)  :: crktrace    ! ITRACE for RKR, ignored otherwise
+    character(len=16)  :: checkres    ! Check the BJAC residual
+    character(len=16)  :: printres    ! Print the BJAC residual
+    integer(psb_ipk_)  :: checkiter   ! ITRACE for residual check
+    integer(psb_ipk_)  :: printiter   ! ITRACE for residual print
+    real(psb_dpk_)     :: tol         ! Tolerance for exit from BJAC
+    logical            :: dump        ! dump on file
   end type precdata
   type(precdata)       :: p_choice
 
@@ -358,13 +373,72 @@ program amg_d_pde3d
       end select
     end if
 
-    call prec%set('coarse_solve',    p_choice%csolve,    info)
-    if (psb_toupper(p_choice%csolve) == 'BJAC') &
-         &  call prec%set('coarse_subsolve', p_choice%csbsolve,  info)
-    call prec%set('coarse_mat',      p_choice%cmat,      info)
-    call prec%set('coarse_fillin',   p_choice%cfill,     info)
-    call prec%set('coarse_iluthrs',  p_choice%cthres,    info)
-    call prec%set('coarse_sweeps',   p_choice%cjswp,     info)
+    nlv = size(prec%precv)
+    if (psb_toupper(p_choice%csolve) == 'RKR') then
+      call prec%set('coarse_solve',    'BJAC',    info)
+      call prec%set(rkr_slv,info,ilev=nlv)
+      call prec%set('rkr_method',p_choice%ckryl,info,ilev=nlv)
+      call prec%set('rkr_kprec',   'BJAC' ,     info,ilev=nlv)
+      call prec%set('rkr_global',   'global' ,     info,ilev=nlv)
+      call prec%set('rkr_eps',  p_choice%crkeps,info,ilev=nlv)
+      call prec%set('rkr_itmax',  p_choice%crkiter,info,ilev=nlv)
+      call prec%set('rkr_fillin',  p_choice%cfill,info,ilev=nlv)
+      call prec%set('coarse_mat',  p_choice%cmat,      info)
+      call prec%set('coarse_sweeps', p_choice%cjswp,     info)
+      call prec%set('rkr_itrace', p_choice%crktrace, info,ilev=nlv)
+    else
+      call prec%set('coarse_solve',    p_choice%csolve,    info)
+      select case(psb_toupper(trim(p_choice%csolve)))
+      case('BJAC','L1-BJAC')
+        select case(trim(psb_toupper(p_choice%csbsolve)))
+        case ('MUMPS')
+          call prec%set('MUMPS_LOC_GLOB','LOCAL_SOLVER',info)
+          !
+          ! Experimental: enable Block Low-Rank
+          !
+          call prec%set('MUMPS_IPAR_ENTRY',ione,info,idx=35_psb_ipk_)
+          call prec%set('MUMPS_RPAR_ENTRY',4.0_psb_dpk_,info,idx=7_psb_ipk_)
+        case('RKR')
+          call prec%set(rkr_slv,info,ilev=nlv)
+          call prec%set('rkr_method',p_choice%ckryl,info,ilev=nlv)
+          call prec%set('rkr_global',   'local' ,     info,ilev=nlv)
+          call prec%set('rkr_eps',  p_choice%crkeps,info,ilev=nlv)
+          call prec%set('rkr_itmax',  p_choice%crkiter,info,ilev=nlv)
+          call prec%set('rkr_itrace', p_choice%crktrace, info,ilev=nlv)
+          call prec%set('rkr_fillin',  p_choice%cfill,info,ilev=nlv)
+        case('INVK')
+          call prec%set(invksv, info,ilev=nlv)
+        case('INVT')
+          call prec%set(invtsv, info,ilev=nlv)
+        case('AINV')
+          call prec%set(ainvsv, info,ilev=nlv)
+          call prec%set('ainv_alg', p_choice%cvariant,   info, ilev=nlv)
+        case default
+          call prec%set('coarse_subsolve', p_choice%csbsolve,  info)
+        end select
+        !
+        ! Experimental: Use residual check on coarse BJAC solver
+        !
+        call prec%set('SMOOTHER_STOP',    p_choice%checkres,  info)
+        call prec%set('SMOOTHER_TRACE',   p_choice%printres,  info)
+        call prec%set('SMOOTHER_STOPTOL', p_choice%tol,       info)
+        call prec%set('SMOOTHER_ITRACE',  p_choice%printiter, info)
+        call prec%set('SMOOTHER_RESIDUAL',p_choice%checkiter, info)
+      case('L1-GS')
+        call prec%set('SMOOTHER_STOP',    p_choice%checkres,  info)
+        call prec%set('SMOOTHER_TRACE',   p_choice%printres,  info)
+        call prec%set('SMOOTHER_STOPTOL', p_choice%tol,       info)
+        call prec%set('SMOOTHER_ITRACE',  p_choice%printiter, info)
+        call prec%set('SMOOTHER_RESIDUAL',p_choice%checkiter, info)
+      case default
+        ! Do nothing, should have been already handled
+      end select
+      call prec%set('coarse_mat',      p_choice%cmat,      info)
+      call prec%set('coarse_fillin',   p_choice%cfill,     info)
+      call prec%set('inv_fillin',      p_choice%cinvfill,  info, ilev=nlv)
+      call prec%set('coarse_iluthrs',  p_choice%cthres,    info)
+      call prec%set('coarse_sweeps',   p_choice%cjswp,     info)
+    end if
 
   end select
 
@@ -578,10 +652,23 @@ contains
       ! coasest-level solver
       call read_data(prec%csolve,inp_unit)      ! coarsest-lev solver
       call read_data(prec%csbsolve,inp_unit)    ! coarsest-lev subsolver
+      call read_data(prec%cvariant,inp_unit)    ! AINV variant
+      call read_data(prec%ckryl,inp_unit)       ! RKR Krylov method choice
       call read_data(prec%cmat,inp_unit)        ! coarsest mat layout
       call read_data(prec%cfill,inp_unit)       ! fill-in for incompl LU
+      call read_data(prec%cinvfill,inp_unit)    ! Inverse fill-in for INVK
       call read_data(prec%cthres,inp_unit)      ! Threshold for ILUT
       call read_data(prec%cjswp,inp_unit)       ! sweeps for GS/JAC subsolver
+      call read_data(prec%crkiter,inp_unit)     ! Max iterations for RKR, ignored otherwise
+      call read_data(prec%crkeps,inp_unit)      ! eps for RKR, ignored otherwise
+      call read_data(prec%crktrace,inp_unit)    ! itrace for RKR, ignored otherwise
+      call read_data(prec%checkres,inp_unit)    ! Check the BJAC residual
+      call read_data(prec%printres,inp_unit)    ! Print the BJAC residual
+      call read_data(prec%checkiter,inp_unit)   ! ITRACE for residual check
+      call read_data(prec%printiter,inp_unit)   ! ITRACE for residual print
+      call read_data(prec%tol,inp_unit)         ! Tolerance for exit from BJAC
+
+      call read_data(prec%dump,inp_unit)        !
       if (inp_unit /= psb_inp_unit) then
         close(inp_unit)
       end if
@@ -641,13 +728,26 @@ contains
     end if
     call psb_bcast(ctxt,prec%athres)
 
+    ! broadcast coasest-level solver
     call psb_bcast(ctxt,prec%csize)
     call psb_bcast(ctxt,prec%cmat)
     call psb_bcast(ctxt,prec%csolve)
     call psb_bcast(ctxt,prec%csbsolve)
+    call psb_bcast(ctxt,prec%cvariant)
+    call psb_bcast(ctxt,prec%ckryl)
     call psb_bcast(ctxt,prec%cfill)
+    call psb_bcast(ctxt,prec%cinvfill)
     call psb_bcast(ctxt,prec%cthres)
     call psb_bcast(ctxt,prec%cjswp)
+    call psb_bcast(ctxt,prec%crkiter)
+    call psb_bcast(ctxt,prec%crkeps)
+    call psb_bcast(ctxt,prec%crktrace)
+    call psb_bcast(ctxt,prec%checkres)
+    call psb_bcast(ctxt,prec%printres)
+    call psb_bcast(ctxt,prec%checkiter)
+    call psb_bcast(ctxt,prec%printiter)
+    call psb_bcast(ctxt,prec%tol)
+    call psb_bcast(ctxt,prec%dump)
 
 
   end subroutine get_parms

@@ -300,7 +300,11 @@ amg_z_invk_solver_check.o \
 amg_z_invk_solver_clone.o \
 amg_z_invk_solver_cseti.o \
 amg_z_invk_solver_descr.o \
-amg_z_invk_solver_seti.o
+amg_z_invk_solver_seti.o \
+amg_d_rkr_solver_impl.o \
+amg_s_rkr_solver_impl.o \
+amg_c_rkr_solver_impl.o \
+amg_z_rkr_solver_impl.o
 
 LIBNAME=libamg_prec.a
 

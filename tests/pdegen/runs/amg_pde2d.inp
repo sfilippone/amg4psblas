@@ -46,10 +46,23 @@ FILTER                    ! Filtering of matrix:  FILTER NOFILTER
 -2                           ! Number of thresholds in vector, next line ignored if <= 0
 0.05 0.025                  ! Thresholds
 -0.0100d0                    ! Smoothed aggregation threshold, ignored if < 0
-%%%%%%%%%%%  Coarse level solver  %%%%%%%%%%%%%%%%
-BJAC                        ! Coarsest-level solver: MUMPS UMF SLU SLUDIST JACOBI GS BJAC
-ILU                         ! Coarsest-level subsolver for BJAC: ILU ILUT MILU UMF MUMPS SLU
+%%%%%%%%%%%  Coarse level solver %%%%%%%%%%%%%%%%
+RKR                         ! Coarsest-level solver: MUMPS(global) UMF SLU SLUDIST JACOBI GS BJAC RKR(global)
+NONE                        ! Coarsest-level subsolver for BJAC: ILU ILUT MILU UMF MUMPS(local) SLU RKR(local)
+LLK                         ! AINV Variant for the coarse solver
+BICGSTAB                    ! Krylov method for RKR solver/subsolver, ignored otherwise
 DIST                        ! Coarsest-level matrix distribution: DIST  REPL
-1                           ! Coarsest-level fillin P for ILU(P) and ILU(T,P)
+0                           ! Coarsest-level fillin P for ILU(P) and ILU(T,P)
+1                           ! Coarsest-level inverse Fill level P for INVK
 1.d-4                       ! Coarsest-level threshold T for ILU(T,P)
-1                           ! Number of sweeps for JACOBI/GS/BJAC coarsest-level solver
+30                          ! Number of sweeps for JACOBI/GS/BJAC coarsest-level solver
+30                          ! maxit for RKR
+1.d-4                       ! eps for RKR
+30                          ! itrace for RKR
+T                           ! Check the BJAC residual
+T                           ! Print the BJAC residual
+5                           ! ITRACE for residual check
+5                           ! ITRACE for residual print
+1.d-4                       ! Tolerance for exit from BJAC
+% dump
+T                           ! Dump preconditioner
