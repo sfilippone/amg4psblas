@@ -43,7 +43,7 @@ check: all
 
 
 clean:
-	/bin/rm -f data_input.o amg_d_pde3d.o amg_s_pde3d.o amg_d_pde2d.o amg_s_pde2d.o *$(.mod)\
+	/bin/rm -f data_input.o *.o *$(.mod)\
         $(EXEDIR)/mld_d_pde3d  $(EXEDIR)/mld_s_pde3d $(EXEDIR)/mld_d_pde2d  $(EXEDIR)/mld_s_pde2d
 
 verycleanlib:
