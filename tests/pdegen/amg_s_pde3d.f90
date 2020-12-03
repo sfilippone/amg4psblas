@@ -74,8 +74,6 @@ program amg_s_pde3d
   use amg_s_pde3d_exp_mod
   use amg_s_pde3d_gauss_mod
   use amg_s_genpde_mod
-  use amg_ainv_mod
-  use amg_s_ilu_solver
   implicit none
 
   ! input parameters
