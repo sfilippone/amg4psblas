@@ -48,7 +48,6 @@ subroutine amg_s_ainv_solver_descr(sv,info,iout,coarse)
 
   ! Local variables
   integer(psb_ipk_)      :: err_act
-  integer(psb_ipk_)      :: ictxt, me, np
   character(len=20), parameter :: name='amg_s_ainv_solver_descr'
   integer(psb_ipk_)      :: iout_
 

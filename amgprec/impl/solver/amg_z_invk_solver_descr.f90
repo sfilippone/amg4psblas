@@ -48,8 +48,6 @@ subroutine amg_z_invk_solver_descr(sv,info,iout,coarse)
 
   ! Local variables
   integer(psb_ipk_)  :: err_act
-  integer(psb_ipk_)  :: me, np
-  type(psb_ctxt_type) :: ctxt
   character(len=20), parameter :: name='amg_z_invk_solver_descr'
   integer(psb_ipk_) :: iout_
 
