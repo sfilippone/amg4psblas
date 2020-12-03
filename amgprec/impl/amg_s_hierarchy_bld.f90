@@ -457,7 +457,7 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
 
 
   !write(0,*) 'Should we remap? '
-  if (.true..and.(np>=4)) then
+  if (amg_get_do_remap().and.(np>=4)) then
     write(0,*) 'Going for remapping '
     if (.true.) then 
       associate(lv=>prec%precv(iszv), rmp => prec%precv(iszv)%remap_data)

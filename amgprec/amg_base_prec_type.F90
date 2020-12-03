@@ -408,8 +408,24 @@ module amg_base_prec_type
     module procedure amg_d_equal_aggregation, amg_s_equal_aggregation
   end interface amg_equal_aggregation
 
+  logical, private, save :: do_remap=.false.
+  
 contains
+  
+  function amg_get_do_remap() result(res)
+    implicit none
+    logical :: res
 
+    res = do_remap
+  end function amg_get_do_remap
+
+  subroutine amg_set_do_remap(val)
+    implicit none
+    logical, intent(in) :: val
+
+    do_remap = val
+  end subroutine amg_set_do_remap
+  
   !
   ! Function: amg_stringval
   !
