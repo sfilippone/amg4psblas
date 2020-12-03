@@ -127,7 +127,7 @@ module amg_c_prec_type
     procedure, pass(prec)               :: cseti  => amg_ccprecseti
     procedure, pass(prec)               :: csetc  => amg_ccprecsetc
     procedure, pass(prec)               :: csetr  => amg_ccprecsetr
-    generic, public                     :: set => cseti, csetc, csetr, setsm, setsv, setag 
+    generic, public                     :: set => setsm, setsv, setag 
     procedure, pass(prec)               :: get_smoother => amg_c_get_smootherp
     procedure, pass(prec)               :: get_solver   => amg_c_get_solverp
     procedure, pass(prec)               :: move_alloc   => c_prec_move_alloc
