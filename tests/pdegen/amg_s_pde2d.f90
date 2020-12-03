@@ -73,8 +73,6 @@ program amg_s_pde2d
   use amg_s_pde2d_exp_mod
   use amg_s_pde2d_box_mod
   use amg_s_genpde_mod
-  use amg_ainv_mod
-  use amg_s_ilu_solver
   implicit none
 
   ! input parameters
