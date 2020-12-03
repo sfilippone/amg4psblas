@@ -222,7 +222,7 @@ program amg_zexample_ml
     ! ILU(0) on the blocks) as pre- and post-smoother, and 8  block-Jacobi
     ! sweeps (with ILU(0) on the blocks) as coarsest-level solver
 
-    call P%init('ML',info)
+    call P%init(ctxt,'ML',info)
     call P%set('SMOOTHER_TYPE','BJAC',info)
     call P%set('COARSE_SOLVE','BJAC',info)
     call P%set('COARSE_SWEEPS',8,info)
@@ -234,7 +234,7 @@ program amg_zexample_ml
    ! GS sweeps as pre/post-smoother, a distributed coarsest
    ! matrix, and MUMPS as coarsest-level solver
 
-    call P%init('ML',info)
+    call P%init(ctxt,'ML',info)
     call P%set('ML_CYCLE','WCYCLE',info)
     call P%set('SMOOTHER_SWEEPS',2,info)
     call P%set('COARSE_SOLVE','MUMPS',info)

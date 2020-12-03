@@ -1,7 +1,7 @@
 include ../../../Make.inc
 LIBDIR=../../../lib
 INCDIR=../../../include
-MODDIR=../../../modules 
+MODDIR=../../../modules
 HERE=../..
 FINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(PSBLAS_INCLUDES)
 
@@ -191,15 +191,124 @@ amg_z_ilu_solver_dmp.o \
 amg_z_mumps_solver_apply.o \
 amg_z_mumps_solver_apply_vect.o \
 amg_z_mumps_solver_bld.o \
-
+amg_s_ainv_solver_bld.o \
+amg_s_ainv_solver_check.o \
+amg_s_ainv_solver_clone.o \
+amg_s_ainv_solver_csetc.o \
+amg_s_ainv_solver_cseti.o \
+amg_s_ainv_solver_csetr.o \
+amg_s_ainv_solver_descr.o \
+amg_s_ainv_solver_setc.o \
+amg_s_ainv_solver_seti.o \
+amg_s_ainv_solver_setr.o \
+amg_d_ainv_solver_bld.o \
+amg_d_ainv_solver_check.o \
+amg_d_ainv_solver_clone.o \
+amg_d_ainv_solver_csetc.o \
+amg_d_ainv_solver_cseti.o \
+amg_d_ainv_solver_csetr.o \
+amg_d_ainv_solver_descr.o \
+amg_d_ainv_solver_setc.o \
+amg_d_ainv_solver_seti.o \
+amg_d_ainv_solver_setr.o \
+amg_c_ainv_solver_bld.o \
+amg_c_ainv_solver_check.o \
+amg_c_ainv_solver_clone.o \
+amg_c_ainv_solver_csetc.o \
+amg_c_ainv_solver_cseti.o \
+amg_c_ainv_solver_csetr.o \
+amg_c_ainv_solver_descr.o \
+amg_c_ainv_solver_setc.o \
+amg_c_ainv_solver_seti.o \
+amg_c_ainv_solver_setr.o \
+amg_s_base_ainv_solver_apply_vect.o \
+amg_s_base_ainv_solver_apply.o \
+amg_s_base_ainv_solver_cnv.o \
+amg_s_base_ainv_solver_dmp.o \
+amg_s_base_ainv_solver_free.o \
+amg_s_base_ainv_update_a.o \
+amg_d_base_ainv_solver_apply_vect.o \
+amg_d_base_ainv_solver_apply.o \
+amg_d_base_ainv_solver_cnv.o \
+amg_d_base_ainv_solver_dmp.o \
+amg_d_base_ainv_solver_free.o \
+amg_d_base_ainv_update_a.o \
+amg_c_base_ainv_solver_apply_vect.o \
+amg_c_base_ainv_solver_apply.o \
+amg_c_base_ainv_solver_cnv.o \
+amg_c_base_ainv_solver_dmp.o \
+amg_c_base_ainv_solver_free.o \
+amg_c_base_ainv_update_a.o \
+amg_z_base_ainv_solver_apply_vect.o \
+amg_z_base_ainv_solver_apply.o \
+amg_z_base_ainv_solver_cnv.o \
+amg_z_base_ainv_solver_dmp.o \
+amg_z_base_ainv_solver_free.o \
+amg_z_base_ainv_update_a.o \
+amg_d_invt_solver_bld.o \
+amg_d_invt_solver_check.o \
+amg_d_invt_solver_clone.o \
+amg_d_invt_solver_cseti.o \
+amg_d_invt_solver_csetr.o \
+amg_d_invt_solver_descr.o \
+amg_d_invt_solver_seti.o \
+amg_d_invt_solver_setr.o \
+amg_d_invk_solver_bld.o \
+amg_d_invk_solver_check.o \
+amg_d_invk_solver_clone.o \
+amg_d_invk_solver_cseti.o \
+amg_d_invk_solver_descr.o \
+amg_d_invk_solver_seti.o \
+amg_s_invt_solver_bld.o \
+amg_s_invt_solver_check.o \
+amg_s_invt_solver_clone.o \
+amg_s_invt_solver_cseti.o \
+amg_s_invt_solver_csetr.o \
+amg_s_invt_solver_descr.o \
+amg_s_invt_solver_seti.o \
+amg_s_invt_solver_setr.o \
+amg_s_invk_solver_bld.o \
+amg_s_invk_solver_check.o \
+amg_s_invk_solver_clone.o \
+amg_s_invk_solver_cseti.o \
+amg_s_invk_solver_descr.o \
+amg_s_invk_solver_seti.o \
+amg_c_invt_solver_bld.o \
+amg_c_invt_solver_check.o \
+amg_c_invt_solver_clone.o \
+amg_c_invt_solver_cseti.o \
+amg_c_invt_solver_csetr.o \
+amg_c_invt_solver_descr.o \
+amg_c_invt_solver_seti.o \
+amg_c_invt_solver_setr.o \
+amg_c_invk_solver_bld.o \
+amg_c_invk_solver_check.o \
+amg_c_invk_solver_clone.o \
+amg_c_invk_solver_cseti.o \
+amg_c_invk_solver_descr.o \
+amg_c_invk_solver_seti.o \
+amg_z_invt_solver_bld.o \
+amg_z_invt_solver_check.o \
+amg_z_invt_solver_clone.o \
+amg_z_invt_solver_cseti.o \
+amg_z_invt_solver_csetr.o \
+amg_z_invt_solver_descr.o \
+amg_z_invt_solver_seti.o \
+amg_z_invt_solver_setr.o \
+amg_z_invk_solver_bld.o \
+amg_z_invk_solver_check.o \
+amg_z_invk_solver_clone.o \
+amg_z_invk_solver_cseti.o \
+amg_z_invk_solver_descr.o \
+amg_z_invk_solver_seti.o
 
 LIBNAME=libamg_prec.a
 
-lib:  $(OBJS) 
+lib:  $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
-mpobjs: 
+mpobjs:
 	(make $(MPFOBJS) FC="$(MPFC)" FCOPT="$(FCOPT)")
 	(make $(MPCOBJS) CC="$(MPCC)" CCOPT="$(CCOPT)")
 
@@ -208,4 +317,3 @@ veryclean: clean
 
 clean:
 	/bin/rm -f $(OBJS) $(LOCAL_MODS)
-

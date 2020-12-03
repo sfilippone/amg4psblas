@@ -121,7 +121,8 @@ program amg_df_sample
   type(precdata)       :: p_choice
 
   ! sparse matrices
-  type(psb_dspmat_type) :: a, aux_a
+  type(psb_dspmat_type)  :: a
+  type(psb_ldspmat_type) :: aux_a
 
   ! preconditioner data
   type(amg_dprec_type)  :: prec
@@ -135,8 +136,8 @@ program amg_df_sample
   type(psb_desc_type):: desc_a
 
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: iam, np
-
+  integer(psb_ipk_) :: iam, np
+  integer(psb_lpk_) :: lnp
   ! solver paramters
   integer(psb_ipk_) :: iter, ircode, nlv
   integer(psb_epk_) :: amatsize, precsize, descsize
@@ -149,11 +150,12 @@ program amg_df_sample
 
   ! other variables
   integer(psb_ipk_)  :: i, info, j, k, m_problem
-  integer(psb_ipk_)  :: lbw, ubw, prf
+  integer(psb_lpk_)  :: lbw, ubw, prf
   real(psb_dpk_)     :: t1, t2, tprec, thier, tslv
   real(psb_dpk_)     :: resmx, resmxp, xdiffn2, xdiffni, xni, xn2
   integer(psb_ipk_)  :: nrhs, nv
-  integer(psb_ipk_), allocatable :: ivg(:), ipv(:), perm(:)
+  integer(psb_ipk_), allocatable :: ivg(:), ipv(:)
+  integer(psb_lpk_), allocatable :: perm(:)
   logical   :: have_guess=.false., have_ref=.false.
 
   call psb_init(ctxt)
@@ -324,7 +326,11 @@ program amg_df_sample
     if (iam == psb_root_) then 
       write(psb_out_unit,'("Partition type: graph")')
       write(psb_out_unit,'(" ")')
-      call build_mtpart(aux_a,np)
+      !      write(psb_err_unit,'("Build type: graph")')
+      call aux_a%cscnv(info,type='csr')
+      lnp = np 
+      call build_mtpart(aux_a,lnp)
+
     endif
     call distr_mtpart(psb_root_,ctxt)
     call getv_mtpart(ivg)

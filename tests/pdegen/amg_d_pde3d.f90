@@ -1,15 +1,15 @@
-!   
-!   
+!
+!
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.5)
-!    
-!    (C) Copyright 2020 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Fabio Durastante        
-!   
+!
+!    (C) Copyright 2020
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,24 +33,24 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
+!
+!
 !
 ! File: amg_d_pde3d.f90
 !
 ! Program: amg_d_pde3d
 ! This sample program solves a linear system obtained by discretizing a
-! PDE with Dirichlet BCs. 
-! 
+! PDE with Dirichlet BCs.
+!
 !
 ! The PDE is a general second order equation in 3d
 !
-!   a1 dd(u)  a2 dd(u)    a3 dd(u)    b1 d(u)   b2 d(u)  b3 d(u)  
+!   a1 dd(u)  a2 dd(u)    a3 dd(u)    b1 d(u)   b2 d(u)  b3 d(u)
 ! -   ------ -  ------ -  ------ +  -----  +  ------  +  ------ + c u = f
-!      dxdx     dydy       dzdz        dx       dy         dz   
+!      dxdx     dydy       dzdz        dx       dy         dz
 !
 ! with Dirichlet boundary conditions
-!   u = g 
+!   u = g
 !
 !  on the unit cube  0<=x,y,z<=1.
 !
@@ -64,534 +64,27 @@
 ! 3. A 3D distribution in which the unit cube is partitioned
 !    into subcubes, each one assigned to a process.
 !
-module amg_d_pde3d_mod
-  use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_lpk_, psb_desc_type,&
-       &  psb_dspmat_type, psb_d_vect_type, dzero,&
-       &  psb_d_base_sparse_mat, psb_d_base_vect_type, &
-       &  psb_i_base_vect_type, psb_l_base_vect_type
-
-  interface 
-    function d_func_3d(x,y,z) result(val)
-      import :: psb_dpk_
-      real(psb_dpk_), intent(in) :: x,y,z
-      real(psb_dpk_) :: val
-    end function d_func_3d
-  end interface 
-
-  interface amg_gen_pde3d
-    module procedure  amg_d_gen_pde3d
-  end interface amg_gen_pde3d
-
-  
-contains
-
-  function d_null_func_3d(x,y,z) result(val)
-
-    real(psb_dpk_), intent(in) :: x,y,z
-    real(psb_dpk_) :: val
-    
-    val = dzero
-
-  end function d_null_func_3d
-  !
-  ! functions parametrizing the differential equation 
-  !  
-  !
-  ! Note: b1, b2 and b3 are the coefficients of the first
-  ! derivative of the unknown function. The default
-  ! we apply here is to have them zero, so that the resulting
-  ! matrix is symmetric/hermitian and suitable for
-  ! testing with CG and FCG.
-  ! When testing methods for non-hermitian matrices you can
-  ! change the B1/B2/B3 functions to e.g. done/sqrt((3*done))
-  !
-  function b1(x,y,z)
-    use psb_base_mod, only : psb_dpk_, done, dzero
-    implicit none 
-    real(psb_dpk_) :: b1
-    real(psb_dpk_), intent(in) :: x,y,z
-    b1=dzero
-  end function b1
-  function b2(x,y,z)
-    use psb_base_mod, only : psb_dpk_, done, dzero
-    implicit none 
-    real(psb_dpk_) ::  b2
-    real(psb_dpk_), intent(in) :: x,y,z
-    b2=dzero
-  end function b2
-  function b3(x,y,z)
-    use psb_base_mod, only : psb_dpk_, done, dzero
-    implicit none 
-    real(psb_dpk_) ::  b3
-    real(psb_dpk_), intent(in) :: x,y,z      
-
-    b3=dzero
-  end function b3
-  function c(x,y,z)
-    use psb_base_mod, only : psb_dpk_, done, dzero
-    implicit none 
-    real(psb_dpk_) ::  c
-    real(psb_dpk_), intent(in) :: x,y,z      
-    c=dzero
-  end function c
-  function a1(x,y,z)
-    use psb_base_mod, only : psb_dpk_, done, dzero
-    implicit none 
-    real(psb_dpk_) ::  a1   
-    real(psb_dpk_), intent(in) :: x,y,z
-    a1=done/80
-  end function a1
-  function a2(x,y,z)
-    use psb_base_mod, only : psb_dpk_, done, dzero
-    implicit none 
-    real(psb_dpk_) ::  a2
-    real(psb_dpk_), intent(in) :: x,y,z
-    a2=done/80
-  end function a2
-  function a3(x,y,z)
-    use psb_base_mod, only : psb_dpk_, done, dzero
-    implicit none 
-    real(psb_dpk_) ::  a3
-    real(psb_dpk_), intent(in) :: x,y,z
-    a3=done/80
-  end function a3
-  function g(x,y,z)
-    use psb_base_mod, only : psb_dpk_, done, dzero
-    implicit none 
-    real(psb_dpk_) ::  g
-    real(psb_dpk_), intent(in) :: x,y,z
-    g = dzero
-    if (x == done) then
-      g = done
-    else if (x == dzero) then 
-      g = exp(y**2-z**2)
-    end if
-  end function g
-
-  
-  !
-  !  subroutine to allocate and fill in the coefficient matrix and
-  !  the rhs. 
-  !
-  subroutine amg_d_gen_pde3d(ctxt,idim,a,bv,xv,desc_a,afmt,info,&
-       & f,amold,vmold,imold,partition,nrl,iv)
-    use psb_base_mod
-    use psb_util_mod
-    !
-    !   Discretizes the partial differential equation
-    ! 
-    !   a1 dd(u)  a2 dd(u)    a3 dd(u)    b1 d(u)   b2 d(u)  b3 d(u)  
-    ! -   ------ -  ------ -  ------ +  -----  +  ------  +  ------ + c u = f
-    !      dxdx     dydy       dzdz        dx       dy         dz   
-    !
-    ! with Dirichlet boundary conditions
-    !   u = g 
-    !
-    !  on the unit cube  0<=x,y,z<=1.
-    !
-    !
-    ! Note that if b1=b2=b3=c=0., the PDE is the  Laplace equation.
-    !
-    implicit none
-    integer(psb_ipk_)     :: idim
-    type(psb_dspmat_type) :: a
-    type(psb_d_vect_type) :: xv,bv
-    type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type)   :: ctxt
-    integer(psb_ipk_)     :: info
-    character(len=*)      :: afmt
-    procedure(d_func_3d), optional :: f
-    class(psb_d_base_sparse_mat), optional :: amold
-    class(psb_d_base_vect_type), optional :: vmold 
-    class(psb_i_base_vect_type), optional :: imold
-    integer(psb_ipk_), optional :: partition, nrl,iv(:)
-
-    ! Local variables.
-
-    integer(psb_ipk_), parameter :: nb=20
-    type(psb_d_csc_sparse_mat)  :: acsc
-    type(psb_d_coo_sparse_mat)  :: acoo
-    type(psb_d_csr_sparse_mat)  :: acsr
-    real(psb_dpk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_
-    integer(psb_lpk_) :: m,n,glob_row,nt
-    integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
-    ! For 3D partition
-    ! Note: integer control variables going directly into an MPI call
-    ! must be 4 bytes, i.e. psb_mpk_
-    integer(psb_mpk_) :: npdims(3), npp, minfo
-    integer(psb_ipk_) :: npx,npy,npz, iamx,iamy,iamz,mynx,myny,mynz
-    integer(psb_ipk_), allocatable :: bndx(:),bndy(:),bndz(:)
-    ! Process grid
-    integer(psb_ipk_) :: np, iam
-    integer(psb_ipk_) :: icoeff
-    integer(psb_lpk_), allocatable     :: irow(:),icol(:),myidx(:)
-    real(psb_dpk_), allocatable :: val(:)
-    ! deltah dimension of each grid cell
-    ! deltat discretization time
-    real(psb_dpk_)            :: deltah, sqdeltah, deltah2
-    real(psb_dpk_), parameter :: rhs=dzero,one=done,zero=dzero
-    real(psb_dpk_)    :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcdasb
-    integer(psb_ipk_) :: err_act
-    procedure(d_func_3d), pointer :: f_
-    character(len=20)  :: name, ch_err,tmpfmt
-
-    info = psb_success_
-    name = 'create_matrix'
-    call psb_erractionsave(err_act)
-
-    call psb_info(ctxt, iam, np)
-
-
-    if (present(f)) then 
-      f_ => f
-    else
-      f_ => d_null_func_3d
-    end if
-
-    deltah   = done/(idim+1)
-    sqdeltah = deltah*deltah
-    deltah2  = (2*done)* deltah
-
-    if (present(partition)) then
-      if ((1<= partition).and.(partition <= 3)) then
-        partition_ = partition
-      else
-        write(*,*) 'Invalid partition choice ',partition,' defaulting to 3'
-        partition_ = 3
-      end if
-    else
-      partition_ = 3
-    end if
-    
-    ! initialize array descriptor and sparse matrix storage. provide an
-    ! estimate of the number of non zeroes 
-    
-    m   = (1_psb_lpk_*idim)*idim*idim
-    n   = m
-    nnz = 7*((n+np-1)/np)
-    if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
-    t0 = psb_wtime()
-    select case(partition_)
-    case(1)
-      ! A BLOCK partition 
-      if (present(nrl)) then 
-        nr = nrl
-      else
-        !
-        ! Using a simple BLOCK distribution.
-        !
-        nt = (m+np-1)/np
-        nr = max(0,min(nt,m-(iam*nt)))
-      end if
-
-      nt = nr
-      call psb_sum(ctxt,nt) 
-      if (nt /= m) then 
-        write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
-        info = -1
-        call psb_barrier(ctxt)
-        call psb_abort(ctxt)
-        return    
-      end if
-
-      !
-      ! First example  of use of CDALL: specify for each process a number of
-      ! contiguous rows
-      ! 
-      call psb_cdall(ctxt,desc_a,info,nl=nr)
-      myidx = desc_a%get_global_indices()
-      nlr = size(myidx)
-
-    case(2)
-      ! A  partition  defined by the user through IV
-      
-      if (present(iv)) then 
-        if (size(iv) /= m) then
-          write(psb_err_unit,*) iam, 'Initialization error: wrong IV size',size(iv),m
-          info = -1
-          call psb_barrier(ctxt)
-          call psb_abort(ctxt)
-          return    
-        end if
-      else
-        write(psb_err_unit,*) iam, 'Initialization error: IV not present'
-        info = -1
-        call psb_barrier(ctxt)
-        call psb_abort(ctxt)
-        return    
-      end if
-
-      !
-      ! Second example  of use of CDALL: specify for each row the
-      ! process that owns it 
-      ! 
-      call psb_cdall(ctxt,desc_a,info,vg=iv)
-      myidx = desc_a%get_global_indices()
-      nlr = size(myidx)
-
-    case(3)
-      ! A 3-dimensional partition
-
-      ! A nifty MPI function will split the process list
-      npdims = 0
-      call mpi_dims_create(np,3,npdims,info)
-      npx = npdims(1)
-      npy = npdims(2)
-      npz = npdims(3)
-
-      allocate(bndx(0:npx),bndy(0:npy),bndz(0:npz))
-      ! We can reuse idx2ijk for process indices as well. 
-      call idx2ijk(iamx,iamy,iamz,iam,npx,npy,npz,base=0)
-      ! Now let's split the 3D cube in hexahedra
-      call dist1Didx(bndx,idim,npx)
-      mynx = bndx(iamx+1)-bndx(iamx)
-      call dist1Didx(bndy,idim,npy)
-      myny = bndy(iamy+1)-bndy(iamy)
-      call dist1Didx(bndz,idim,npz)
-      mynz = bndz(iamz+1)-bndz(iamz)
-
-      ! How many indices do I own? 
-      nlr = mynx*myny*mynz
-      allocate(myidx(nlr))
-      ! Now, let's generate the list of indices I own
-      nr = 0
-      do i=bndx(iamx),bndx(iamx+1)-1
-        do j=bndy(iamy),bndy(iamy+1)-1
-          do k=bndz(iamz),bndz(iamz+1)-1
-            nr = nr + 1
-            call ijk2idx(myidx(nr),i,j,k,idim,idim,idim)
-          end do
-        end do
-      end do
-      if (nr /= nlr) then
-        write(psb_err_unit,*) iam,iamx,iamy,iamz, 'Initialization error: NR vs NLR ',&
-             & nr,nlr,mynx,myny,mynz
-        info = -1
-        call psb_barrier(ctxt)
-        call psb_abort(ctxt)
-      end if
-
-      !
-      ! Third example  of use of CDALL: specify for each process
-      ! the set of global indices it owns.
-      ! 
-      call psb_cdall(ctxt,desc_a,info,vl=myidx)
-      
-    case default
-      write(psb_err_unit,*) iam, 'Initialization error: should not get here'
-      info = -1
-      call psb_barrier(ctxt)
-      call psb_abort(ctxt)
-      return
-    end select
-
-    
-    if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz)
-    ! define  rhs from boundary conditions; also build initial guess 
-    if (info == psb_success_) call psb_geall(xv,desc_a,info)
-    if (info == psb_success_) call psb_geall(bv,desc_a,info)
-
-    call psb_barrier(ctxt)
-    talc = psb_wtime()-t0
-
-    if (info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='allocation rout.'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-    ! we build an auxiliary matrix consisting of one row at a
-    ! time; just a small matrix. might be extended to generate 
-    ! a bunch of rows per call. 
-    ! 
-    allocate(val(20*nb),irow(20*nb),&
-         &icol(20*nb),stat=info)
-    if (info /= psb_success_ ) then 
-      info=psb_err_alloc_dealloc_
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-
-
-    ! loop over rows belonging to current process in a block
-    ! distribution.
-
-    call psb_barrier(ctxt)
-    t1 = psb_wtime()
-    do ii=1, nlr,nb
-      ib = min(nb,nlr-ii+1) 
-      icoeff = 1
-      do k=1,ib
-        i=ii+k-1
-        ! local matrix pointer 
-        glob_row=myidx(i)
-        ! compute gridpoint coordinates
-        call idx2ijk(ix,iy,iz,glob_row,idim,idim,idim)
-        ! x, y, z coordinates
-        x = (ix-1)*deltah
-        y = (iy-1)*deltah
-        z = (iz-1)*deltah
-        zt(k) = f_(x,y,z)
-        ! internal point: build discretization
-        !   
-        !  term depending on   (x-1,y,z)
-        !
-        val(icoeff) = -a1(x,y,z)/sqdeltah-b1(x,y,z)/deltah2
-        if (ix == 1) then 
-          zt(k) = g(dzero,y,z)*(-val(icoeff)) + zt(k)
-        else
-          call ijk2idx(icol(icoeff),ix-1,iy,iz,idim,idim,idim)
-          irow(icoeff) = glob_row
-          icoeff       = icoeff+1
-        endif
-        !  term depending on     (x,y-1,z)
-        val(icoeff)  = -a2(x,y,z)/sqdeltah-b2(x,y,z)/deltah2
-        if (iy == 1) then 
-          zt(k) = g(x,dzero,z)*(-val(icoeff))   + zt(k)
-        else
-          call ijk2idx(icol(icoeff),ix,iy-1,iz,idim,idim,idim)          
-          irow(icoeff) = glob_row
-          icoeff       = icoeff+1
-        endif
-        !  term depending on     (x,y,z-1)
-        val(icoeff)=-a3(x,y,z)/sqdeltah-b3(x,y,z)/deltah2
-        if (iz == 1) then 
-          zt(k) = g(x,y,dzero)*(-val(icoeff))   + zt(k)
-        else
-          call ijk2idx(icol(icoeff),ix,iy,iz-1,idim,idim,idim)          
-          irow(icoeff) = glob_row
-          icoeff       = icoeff+1
-        endif
-
-        !  term depending on     (x,y,z)
-        val(icoeff)=(2*done)*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah &
-             & + c(x,y,z)
-        call ijk2idx(icol(icoeff),ix,iy,iz,idim,idim,idim)          
-        irow(icoeff) = glob_row
-        icoeff       = icoeff+1                  
-        !  term depending on     (x,y,z+1)
-        val(icoeff)=-a3(x,y,z)/sqdeltah+b3(x,y,z)/deltah2
-        if (iz == idim) then 
-          zt(k) = g(x,y,done)*(-val(icoeff))   + zt(k)
-        else
-          call ijk2idx(icol(icoeff),ix,iy,iz+1,idim,idim,idim)          
-          irow(icoeff) = glob_row
-          icoeff       = icoeff+1
-        endif
-        !  term depending on     (x,y+1,z)
-        val(icoeff)=-a2(x,y,z)/sqdeltah+b2(x,y,z)/deltah2
-        if (iy == idim) then 
-          zt(k) = g(x,done,z)*(-val(icoeff))   + zt(k)
-        else
-          call ijk2idx(icol(icoeff),ix,iy+1,iz,idim,idim,idim)          
-          irow(icoeff) = glob_row
-          icoeff       = icoeff+1
-        endif
-        !  term depending on     (x+1,y,z)
-        val(icoeff)=-a1(x,y,z)/sqdeltah+b1(x,y,z)/deltah2
-        if (ix==idim) then 
-          zt(k) = g(done,y,z)*(-val(icoeff))   + zt(k)
-        else
-          call ijk2idx(icol(icoeff),ix+1,iy,iz,idim,idim,idim)          
-          irow(icoeff) = glob_row
-          icoeff       = icoeff+1
-        endif
-
-      end do
-      call psb_spins(icoeff-1,irow,icol,val,a,desc_a,info)
-      if(info /= psb_success_) exit
-      call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
-      if(info /= psb_success_) exit
-      zt(:)=dzero
-      call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
-      if(info /= psb_success_) exit
-    end do
-
-    tgen = psb_wtime()-t1
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='insert rout.'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-    deallocate(val,irow,icol)
-
-    call psb_barrier(ctxt)
-    t1 = psb_wtime()
-    call psb_cdasb(desc_a,info,mold=imold)
-    tcdasb = psb_wtime()-t1
-    call psb_barrier(ctxt)
-    t1 = psb_wtime()
-    if (info == psb_success_) then 
-      if (present(amold)) then 
-        call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,mold=amold)
-      else
-        call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
-      end if
-    end if
-    call psb_barrier(ctxt)
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='asb rout.'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-    if (info == psb_success_) call psb_geasb(xv,desc_a,info,mold=vmold)
-    if (info == psb_success_) call psb_geasb(bv,desc_a,info,mold=vmold)
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='asb rout.'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-    tasb = psb_wtime()-t1
-    call psb_barrier(ctxt)
-    ttot = psb_wtime() - t0 
-
-    call psb_amx(ctxt,talc)
-    call psb_amx(ctxt,tgen)
-    call psb_amx(ctxt,tasb)
-    call psb_amx(ctxt,ttot)
-    if(iam == psb_root_) then
-      tmpfmt = a%get_fmt()
-      write(psb_out_unit,'("The matrix has been generated and assembled in ",a3," format.")')&
-           &   tmpfmt
-      write(psb_out_unit,'("-allocation  time : ",es12.5)') talc
-      write(psb_out_unit,'("-coeff. gen. time : ",es12.5)') tgen
-      write(psb_out_unit,'("-desc asbly  time : ",es12.5)') tcdasb
-      write(psb_out_unit,'("- mat asbly  time : ",es12.5)') tasb
-      write(psb_out_unit,'("-total       time : ",es12.5)') ttot
-
-    end if
-    call psb_erractionrestore(err_act)
-    return
-
-9999 call psb_error_handler(ctxt,err_act)
-
-    return
-  end subroutine amg_d_gen_pde3d
-
-end module amg_d_pde3d_mod
-
 program amg_d_pde3d
   use psb_base_mod
   use amg_prec_mod
   use psb_krylov_mod
   use psb_util_mod
   use data_input
-  use amg_d_pde3d_mod
+  use amg_d_pde3d_base_mod
+  use amg_d_pde3d_exp_mod
+  use amg_d_pde3d_gauss_mod
+  use amg_d_genpde_mod
+  use amg_ainv_mod
+  use amg_d_ilu_solver
   implicit none
 
   ! input parameters
   character(len=20) :: kmethd, ptype
-  character(len=5)  :: afmt
+  character(len=5)  :: afmt, pdecoeff
   integer(psb_ipk_) :: idim
   integer(psb_epk_) :: system_size
 
-  ! miscellaneous 
+  ! miscellaneous
   real(psb_dpk_) :: t1, t2, tprec, thier, tslv
 
   ! sparse matrix and preconditioner
@@ -622,6 +115,9 @@ program amg_d_pde3d
   type(solverdata)       :: s_choice
 
   ! preconditioner data
+  type(amg_d_invt_solver_type) :: invtsv
+  type(amg_d_invk_solver_type) :: invksv
+  type(amg_d_ainv_solver_type) :: ainvsv
   type precdata
 
     ! preconditioner type
@@ -653,7 +149,9 @@ program amg_d_pde3d
     character(len=16)  :: prol        ! prolongation over application of AS
     character(len=16)  :: solve       ! local subsolver type: ILU, MILU, ILUT,
                                       ! UMF, MUMPS, SLU, FWGS, BWGS, JAC
+    character(len=16)  :: variant     ! AINV variant: LLK, etc
     integer(psb_ipk_)  :: fill        ! fill-in for incomplete LU factorization
+    integer(psb_ipk_)  :: invfill     ! Inverse fill-in for INVK
     real(psb_dpk_)     :: thr         ! threshold for ILUT factorization
 
     ! AMG post-smoother; ignored by 1-lev preconditioner
@@ -664,8 +162,10 @@ program amg_d_pde3d
     character(len=16)  :: prol2       ! prolongation over application of AS
     character(len=16)  :: solve2      ! local subsolver type: ILU, MILU, ILUT,
                                       ! UMF, MUMPS, SLU, FWGS, BWGS, JAC
+    character(len=16)  :: variant2    ! AINV variant: LLK, etc
     integer(psb_ipk_)  :: fill2       ! fill-in for incomplete LU factorization
-    real(psb_dpk_)     :: thr2        ! threshold for ILUT factorization
+    integer(psb_ipk_)  :: invfill2    ! Inverse fill-in for INVK
+    real(psb_dpk_)      :: thr2        ! threshold for ILUT factorization
 
     ! coarsest-level solver
     character(len=16)  :: cmat        ! coarsest matrix layout: REPL, DIST
@@ -691,7 +191,7 @@ program amg_d_pde3d
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
 
-  if (iam < 0) then 
+  if (iam < 0) then
     ! This should not happen, but just in case
     call psb_exit(ctxt)
     stop
@@ -702,23 +202,40 @@ program amg_d_pde3d
   !
   ! Hello world
   !
-  if (iam == psb_root_) then 
-    write(*,*) 'Welcome to MLD2P4 version: ',amg_version_string_
+  if (iam == psb_root_) then
+    write(*,*) 'Welcome to AMG4PSBLAS version: ',amg_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
   end if
 
   !
   !  get parameters
   !
-  call get_parms(ctxt,afmt,idim,s_choice,p_choice)
+  call get_parms(ctxt,afmt,idim,s_choice,p_choice,pdecoeff)
 
   !
-  !  allocate and fill in the coefficient matrix, rhs and initial guess 
+  !  allocate and fill in the coefficient matrix, rhs and initial guess
   !
 
   call psb_barrier(ctxt)
   t1 = psb_wtime()
-  call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,info)  
+  select case(psb_toupper(trim(pdecoeff)))
+  case("CONST")
+    call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
+        & a1,a2,a3,b1,b2,b3,c,g,info)
+  case("EXP")
+    call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
+        & a1_exp,a2_exp,a3_exp,b1_exp,b2_exp,b3_exp,c_exp,g_exp,info)
+  case("GAUSS")
+    call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
+        & a1_gauss,a2_gauss,a3_gauss,b1_gauss,b2_gauss,b3_gauss,c_gauss,g_gauss,info)
+  case default
+    info=psb_err_from_subroutine_
+    ch_err='amg_gen_pdecoeff'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end select
+
+
   call psb_barrier(ctxt)
   t2 = psb_wtime() - t1
   if(info /= psb_success_) then
@@ -728,6 +245,8 @@ program amg_d_pde3d
     goto 9999
   end if
 
+  if (iam == psb_root_) &
+       & write(psb_out_unit,'("PDE Coefficients             : ",a)')pdecoeff
   if (iam == psb_root_) &
        & write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) &
@@ -743,7 +262,7 @@ program amg_d_pde3d
   case ('JACOBI','L1-JACOBI','GS','FWGS','FBGS')
     ! 1-level sweeps from "outer_sweeps"
     call prec%set('smoother_sweeps', p_choice%jsweeps, info)
-    
+
   case ('BJAC')
     call prec%set('smoother_sweeps', p_choice%jsweeps, info)
     call prec%set('sub_solve',       p_choice%solve,   info)
@@ -758,8 +277,8 @@ program amg_d_pde3d
     call prec%set('sub_solve',       p_choice%solve,   info)
     call prec%set('sub_fillin',      p_choice%fill,    info)
     call prec%set('sub_iluthrs',     p_choice%thr,     info)
-    
-  case ('ML') 
+
+  case ('ML')
     ! multilevel preconditioner
 
     call prec%set('ml_cycle',        p_choice%mlcycle,    info)
@@ -788,14 +307,26 @@ program amg_d_pde3d
     call prec%set('smoother_sweeps', p_choice%jsweeps,    info)
 
     select case (psb_toupper(p_choice%smther))
-    case ('GS','BWGS','FBGS','JACOBI','L1-JACOBI')
+    case ('GS','BWGS','FBGS','JACOBI','L1-JACOBI','L1-FBGS')
       ! do nothing
     case default
       call prec%set('sub_ovr',         p_choice%novr,       info)
       call prec%set('sub_restr',       p_choice%restr,      info)
       call prec%set('sub_prol',        p_choice%prol,       info)
-      call prec%set('sub_solve',       p_choice%solve,      info)
+      select case(trim(psb_toupper(p_choice%solve)))
+      case('INVK')
+        call prec%set(invksv, info)
+      case('INVT')
+        call prec%set(invtsv, info)
+      case('AINV')
+        call prec%set(ainvsv, info)
+        call prec%set('ainv_alg', p_choice%variant,   info)
+      case default
+        call prec%set('sub_solve',       p_choice%solve,   info)
+      end select
+
       call prec%set('sub_fillin',      p_choice%fill,       info)
+      call prec%set('inv_fillin',      p_choice%invfill,    info)
       call prec%set('sub_iluthrs',     p_choice%thr,        info)
     end select
 
@@ -803,14 +334,26 @@ program amg_d_pde3d
       call prec%set('smoother_type',   p_choice%smther2,   info,pos='post')
       call prec%set('smoother_sweeps', p_choice%jsweeps2,  info,pos='post')
       select case (psb_toupper(p_choice%smther2))
-      case ('GS','BWGS','FBGS','JACOBI','L1-JACOBI')
+      case ('GS','BWGS','FBGS','JACOBI','L1-JACOBI','L1-FBGS')
         ! do nothing
       case default
         call prec%set('sub_ovr',         p_choice%novr2,     info,pos='post')
         call prec%set('sub_restr',       p_choice%restr2,    info,pos='post')
         call prec%set('sub_prol',        p_choice%prol2,     info,pos='post')
-        call prec%set('sub_solve',       p_choice%solve2,    info,pos='post')
+        select case(trim(psb_toupper(p_choice%solve2)))
+        case('INVK')
+          call prec%set(invksv, info, pos='post')
+        case('INVT')
+          call prec%set(invtsv, info, pos='post')
+        case('AINV')
+          call prec%set(ainvsv, info, pos='post')
+          call prec%set('ainv_alg', p_choice%variant2,   info, pos='post')
+        case default
+          call prec%set('sub_solve',       p_choice%solve2,   info, pos='post')
+        end select
+
         call prec%set('sub_fillin',      p_choice%fill2,     info,pos='post')
+        call prec%set('inv_fillin',      p_choice%invfill2,  info,pos='post')
         call prec%set('sub_iluthrs',     p_choice%thr2,      info,pos='post')
       end select
     end if
@@ -824,7 +367,7 @@ program amg_d_pde3d
     call prec%set('coarse_sweeps',   p_choice%cjswp,     info)
 
   end select
-  
+
   ! build the preconditioner
   call psb_barrier(ctxt)
   t1 = psb_wtime()
@@ -854,7 +397,7 @@ program amg_d_pde3d
   end if
 
   !
-  ! iterative method parameters 
+  ! iterative method parameters
   !
   call psb_barrier(ctxt)
   t1 = psb_wtime()
@@ -894,9 +437,10 @@ program amg_d_pde3d
   call psb_sum(ctxt,descsize)
   call psb_sum(ctxt,precsize)
   call prec%descr(iout=psb_out_unit)
-  if (iam == psb_root_) then 
+  if (iam == psb_root_) then
     write(psb_out_unit,'("Computed solution on ",i8," processors")')  np
     write(psb_out_unit,'("Linear system size                 : ",i12)') system_size
+    write(psb_out_unit,'("PDE Coefficients                   : ",a)') trim(pdecoeff)
     write(psb_out_unit,'("Krylov method                      : ",a)') trim(s_choice%kmethd)
     write(psb_out_unit,'("Preconditioner                     : ",a)') trim(p_choice%descr)
     write(psb_out_unit,'("Iterations to convergence          : ",i12)')    iter
@@ -918,7 +462,7 @@ program amg_d_pde3d
 
   end if
 
-  !  
+  !
   !  cleanup storage and exit
   !
   call psb_gefree(b,desc_a,info)
@@ -945,7 +489,7 @@ contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine get_parms(ctxt,afmt,idim,solve,prec)
+  subroutine get_parms(ctxt,afmt,idim,solve,prec,pdecoeff)
 
     implicit none
 
@@ -954,6 +498,7 @@ contains
     character(len=*)    :: afmt
     type(solverdata)    :: solve
     type(precdata)      :: prec
+    character(len=*)    :: pdecoeff
     integer(psb_ipk_)   :: iam, nm, np, inp_unit
     character(len=1024)   :: filename
 
@@ -978,6 +523,7 @@ contains
       !
       call read_data(afmt,inp_unit)            ! matrix storage format
       call read_data(idim,inp_unit)            ! Discretization grid size
+      call read_data(pdecoeff,inp_unit)        ! PDE Coefficients
       ! Krylov solver data
       call read_data(solve%kmethd,inp_unit)    ! Krylov solver
       call read_data(solve%istopc,inp_unit)    ! stopping criterion
@@ -995,7 +541,9 @@ contains
       call read_data(prec%restr,inp_unit)      ! restriction  over application of AS
       call read_data(prec%prol,inp_unit)       ! prolongation over application of AS
       call read_data(prec%solve,inp_unit)      ! local subsolver
+      call read_data(prec%variant,inp_unit)    ! AINV variant
       call read_data(prec%fill,inp_unit)       ! fill-in for incomplete LU
+      call read_data(prec%invfill,inp_unit)    !Inverse fill-in for INVK
       call read_data(prec%thr,inp_unit)        ! threshold for ILUT
       ! Second smoother/ AMG post-smoother (if NONE ignored in main)
       call read_data(prec%smther2,inp_unit)     ! smoother type
@@ -1004,7 +552,9 @@ contains
       call read_data(prec%restr2,inp_unit)      ! restriction  over application of AS
       call read_data(prec%prol2,inp_unit)       ! prolongation over application of AS
       call read_data(prec%solve2,inp_unit)      ! local subsolver
+      call read_data(prec%variant2,inp_unit)    ! AINV variant
       call read_data(prec%fill2,inp_unit)       ! fill-in for incomplete LU
+      call read_data(prec%invfill2,inp_unit)    !Inverse fill-in for INVK
       call read_data(prec%thr2,inp_unit)        ! threshold for ILUT
       ! general AMG data
       call read_data(prec%mlcycle,inp_unit)     ! AMG cycle type
@@ -1039,6 +589,7 @@ contains
 
     call psb_bcast(ctxt,afmt)
     call psb_bcast(ctxt,idim)
+    call psb_bcast(ctxt,pdecoeff)
 
     call psb_bcast(ctxt,solve%kmethd)
     call psb_bcast(ctxt,solve%istopc)
@@ -1051,29 +602,33 @@ contains
     call psb_bcast(ctxt,prec%ptype)
 
     ! broadcast first (pre-)smoother / 1-lev prec data
-    call psb_bcast(ctxt,prec%smther)     
+    call psb_bcast(ctxt,prec%smther)
     call psb_bcast(ctxt,prec%jsweeps)
     call psb_bcast(ctxt,prec%novr)
     call psb_bcast(ctxt,prec%restr)
     call psb_bcast(ctxt,prec%prol)
     call psb_bcast(ctxt,prec%solve)
+    call psb_bcast(ctxt,prec%variant)
     call psb_bcast(ctxt,prec%fill)
+    call psb_bcast(ctxt,prec%invfill)
     call psb_bcast(ctxt,prec%thr)
-    ! broadcast second (post-)smoother 
+    ! broadcast second (post-)smoother
     call psb_bcast(ctxt,prec%smther2)
     call psb_bcast(ctxt,prec%jsweeps2)
     call psb_bcast(ctxt,prec%novr2)
     call psb_bcast(ctxt,prec%restr2)
     call psb_bcast(ctxt,prec%prol2)
     call psb_bcast(ctxt,prec%solve2)
+    call psb_bcast(ctxt,prec%variant2)
     call psb_bcast(ctxt,prec%fill2)
+    call psb_bcast(ctxt,prec%invfill2)
     call psb_bcast(ctxt,prec%thr2)
-    
+
     ! broadcast AMG parameters
     call psb_bcast(ctxt,prec%mlcycle)
     call psb_bcast(ctxt,prec%outer_sweeps)
     call psb_bcast(ctxt,prec%maxlevs)
-    
+
     call psb_bcast(ctxt,prec%aggr_prol)
     call psb_bcast(ctxt,prec%par_aggr_alg)
     call psb_bcast(ctxt,prec%aggr_ord)
@@ -1085,7 +640,7 @@ contains
       call psb_bcast(ctxt,prec%athresv)
     end if
     call psb_bcast(ctxt,prec%athres)
-    
+
     call psb_bcast(ctxt,prec%csize)
     call psb_bcast(ctxt,prec%cmat)
     call psb_bcast(ctxt,prec%csolve)

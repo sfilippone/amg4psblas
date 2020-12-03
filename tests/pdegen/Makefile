@@ -9,42 +9,44 @@ FINCLUDES=$(FMFLAG). $(FMFLAG)$(AMGMODDIR) $(FMFLAG)$(AMGINCDIR) $(PSBLAS_INCLUD
 LINKOPT=
 EXEDIR=./runs
 
-all: amg_s_pde3d amg_d_pde3d amg_s_pde2d amg_d_pde2d 
+all: amg_s_pde3d amg_d_pde3d amg_s_pde2d amg_d_pde2d
 
-amg_d_pde3d: amg_d_pde3d.o  data_input.o
-	$(FLINK) $(LINKOPT) amg_d_pde3d.o  data_input.o -o amg_d_pde3d $(AMG_LIBS) $(PSBLAS_LIBS) $(LDLIBS)
+amg_d_pde3d: amg_d_pde3d.o amg_d_genpde_mod.o amg_d_pde3d_base_mod.o amg_d_pde3d_exp_mod.o amg_d_pde3d_gauss_mod.o data_input.o
+	$(FLINK) $(LINKOPT) amg_d_pde3d.o  amg_d_genpde_mod.o amg_d_pde3d_base_mod.o amg_d_pde3d_exp_mod.o amg_d_pde3d_gauss_mod.o data_input.o -o amg_d_pde3d $(AMG_LIBS) $(PSBLAS_LIBS) $(LDLIBS)
 	/bin/mv amg_d_pde3d $(EXEDIR)
 
-amg_s_pde3d: amg_s_pde3d.o   data_input.o
-	$(FLINK) $(LINKOPT) amg_s_pde3d.o  data_input.o -o amg_s_pde3d $(AMG_LIBS) $(PSBLAS_LIBS) $(LDLIBS)
+amg_s_pde3d: amg_s_pde3d.o amg_s_genpde_mod.o amg_s_pde3d_base_mod.o  amg_s_pde3d_exp_mod.o amg_s_pde3d_gauss_mod.o data_input.o
+	$(FLINK) $(LINKOPT) amg_s_pde3d.o  amg_s_genpde_mod.o amg_s_pde3d_base_mod.o amg_s_pde3d_exp_mod.o amg_s_pde3d_gauss_mod.o data_input.o -o amg_s_pde3d $(AMG_LIBS) $(PSBLAS_LIBS) $(LDLIBS)
 	/bin/mv amg_s_pde3d $(EXEDIR)
 
-amg_d_pde2d: amg_d_pde2d.o  data_input.o
-	$(FLINK) $(LINKOPT) amg_d_pde2d.o  data_input.o -o amg_d_pde2d $(AMG_LIBS) $(PSBLAS_LIBS) $(LDLIBS)
+amg_d_pde2d: amg_d_pde2d.o amg_d_genpde_mod.o amg_d_pde2d_base_mod.o amg_d_pde2d_exp_mod.o amg_d_pde2d_box_mod.o data_input.o
+	$(FLINK) $(LINKOPT) amg_d_pde2d.o amg_d_genpde_mod.o amg_d_pde2d_base_mod.o amg_d_pde2d_exp_mod.o amg_d_pde2d_box_mod.o data_input.o -o amg_d_pde2d $(AMG_LIBS) $(PSBLAS_LIBS) $(LDLIBS)
 	/bin/mv amg_d_pde2d $(EXEDIR)
 
-amg_s_pde2d: amg_s_pde2d.o   data_input.o
-	$(FLINK) $(LINKOPT) amg_s_pde2d.o  data_input.o -o amg_s_pde2d $(AMG_LIBS) $(PSBLAS_LIBS) $(LDLIBS)
+amg_s_pde2d: amg_s_pde2d.o amg_s_genpde_mod.o amg_s_pde2d_base_mod.o amg_s_pde2d_exp_mod.o amg_s_pde2d_box_mod.o data_input.o
+	$(FLINK) $(LINKOPT) amg_s_pde2d.o amg_s_genpde_mod.o amg_s_pde2d_base_mod.o amg_s_pde2d_exp_mod.o amg_s_pde2d_box_mod.o data_input.o -o amg_s_pde2d $(AMG_LIBS) $(PSBLAS_LIBS) $(LDLIBS)
 	/bin/mv amg_s_pde2d $(EXEDIR)
 
 amg_d_pde3d_rebld: amg_d_pde3d_rebld.o  data_input.o
 	$(FLINK) $(LINKOPT) amg_d_pde3d_rebld.o  data_input.o -o amg_d_pde3d_rebld $(AMG_LIBS) $(PSBLAS_LIBS) $(LDLIBS)
 	/bin/mv amg_d_pde3d_rebld $(EXEDIR)
 
-amg_d_pde3d.o amg_s_pde3d.o amg_d_pde2d.o amg_s_pde2d.o: data_input.o 
+amg_d_pde3d.o amg_s_pde3d.o amg_d_pde2d.o amg_s_pde2d.o: data_input.o
+
+amg_d_pde3d.o: amg_d_genpde_mod.o amg_d_pde3d_base_mod.o amg_d_pde3d_exp_mod.o amg_d_pde3d_gauss_mod.o
+amg_s_pde3d.o: amg_s_genpde_mod.o amg_s_pde3d_base_mod.o amg_s_pde3d_exp_mod.o amg_s_pde3d_gauss_mod.o
+amg_d_pde2d.o: amg_d_genpde_mod.o amg_d_pde2d_base_mod.o amg_d_pde2d_exp_mod.o amg_d_pde2d_box_mod.o
+amg_s_pde2d.o: amg_s_genpde_mod.o amg_s_pde2d_base_mod.o amg_s_pde2d_exp_mod.o amg_s_pde2d_box_mod.o
 
 check: all
 	cd runs && ./amg_d_pde2d <amg_pde2d.inp && ./amg_s_pde2d<amg_pde2d.inp
 
 
-clean: 
-	/bin/rm -f data_input.o amg_d_pde3d.o amg_s_pde3d.o amg_d_pde2d.o amg_s_pde2d.o *$(.mod)\
-        $(EXEDIR)/mld_d_pde3d  $(EXEDIR)/mld_s_pde3d $(EXEDIR)/mld_d_pde2d  $(EXEDIR)/mld_s_pde2d 
+clean:
+	/bin/rm -f data_input.o *.o *$(.mod)\
+        $(EXEDIR)/mld_d_pde3d  $(EXEDIR)/mld_s_pde3d $(EXEDIR)/mld_d_pde2d  $(EXEDIR)/mld_s_pde2d
 
-verycleanlib: 
+verycleanlib:
 	(cd ../..; make veryclean)
 lib:
 	(cd ../../; make library)
-
-
-

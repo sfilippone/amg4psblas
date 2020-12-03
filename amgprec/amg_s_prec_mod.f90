@@ -1,15 +1,15 @@
-!   
-!   
+!
+!
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.5)
-!    
-!    (C) Copyright 2020 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Fabio Durastante        
-!   
+!
+!    (C) Copyright 2020
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,8 +33,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
+!
+!
 ! File: amg_s_prec_mod.f90
 !
 ! Module: amg_s_prec_mod
@@ -52,6 +52,9 @@ module amg_s_prec_mod
   use amg_s_l1_diag_solver
   use amg_s_ilu_solver
   use amg_s_gs_solver
+  use amg_s_ainv_solver
+  use amg_s_invk_solver
+  use amg_s_invt_solver
 
   interface amg_precset
     module procedure amg_s_iprecsetsm, amg_s_iprecsetsv, &
@@ -78,7 +81,7 @@ module amg_s_prec_mod
       ! !$  character, intent(in), optional         :: upd
     end subroutine amg_s_extprol_bld
   end interface amg_extprol_bld
-  
+
 contains
 
   subroutine amg_s_iprecsetsm(p,val,info,pos)
@@ -108,7 +111,7 @@ contains
 
   subroutine amg_s_cprecseti(p,what,val,info,pos)
     type(amg_sprec_type), intent(inout)   :: p
-    character(len=*), intent(in)            :: what 
+    character(len=*), intent(in)            :: what
     integer(psb_ipk_), intent(in)           :: val
     integer(psb_ipk_), intent(out)          :: info
     character(len=*), optional, intent(in)      :: pos
@@ -118,7 +121,7 @@ contains
 
   subroutine amg_s_cprecsetr(p,what,val,info,pos)
     type(amg_sprec_type), intent(inout)   :: p
-    character(len=*), intent(in)            :: what 
+    character(len=*), intent(in)            :: what
     real(psb_spk_), intent(in)             :: val
     integer(psb_ipk_), intent(out)          :: info
     character(len=*), optional, intent(in)      :: pos
@@ -128,7 +131,7 @@ contains
 
   subroutine amg_s_cprecsetc(p,what,val,info,pos)
     type(amg_sprec_type), intent(inout)   :: p
-    character(len=*), intent(in)            :: what 
+    character(len=*), intent(in)            :: what
     character(len=*), intent(in)            :: val
     integer(psb_ipk_), intent(out)          :: info
     character(len=*), optional, intent(in)      :: pos
