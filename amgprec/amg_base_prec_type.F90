@@ -408,6 +408,10 @@ module amg_base_prec_type
     module procedure amg_d_equal_aggregation, amg_s_equal_aggregation
   end interface amg_equal_aggregation
 
+  !
+  ! default to no remapping.
+  ! Will need a more sophisticated strategy.
+  !
   logical, private, save :: do_remap=.false.
   
 contains
