@@ -112,9 +112,6 @@ program amg_d_pde2d
   type(solverdata)       :: s_choice
 
   ! preconditioner data
-  type(amg_d_invt_solver_type) :: invtsv
-  type(amg_d_invk_solver_type) :: invksv
-  type(amg_d_ainv_solver_type) :: ainvsv
   type precdata
 
     ! preconditioner type
@@ -309,11 +306,11 @@ program amg_d_pde2d
       call prec%set('sub_prol',        p_choice%prol,       info)
       select case(trim(psb_toupper(p_choice%solve)))
       case('INVK')
-        call prec%set(invksv, info)
+        call prec%set('sub_solve',       p_choice%solve,   info)
       case('INVT')
-        call prec%set(invtsv, info)
+        call prec%set('sub_solve',       p_choice%solve,   info)
       case('AINV')
-        call prec%set(ainvsv, info)
+        call prec%set('sub_solve',       p_choice%solve,   info)
         call prec%set('ainv_alg', p_choice%variant,   info)
       case default
         call prec%set('sub_solve',       p_choice%solve,   info)
@@ -336,12 +333,12 @@ program amg_d_pde2d
         call prec%set('sub_prol',        p_choice%prol2,     info,pos='post')
         select case(trim(psb_toupper(p_choice%solve2)))
         case('INVK')
-          call prec%set(invksv, info, pos='post')
+          call prec%set('sub_solve',       p_choice%solve,   info)
         case('INVT')
-          call prec%set(invtsv, info, pos='post')
+          call prec%set('sub_solve',       p_choice%solve,   info)
         case('AINV')
-          call prec%set(ainvsv, info, pos='post')
-          call prec%set('ainv_alg', p_choice%variant2,   info, pos='post')
+          call prec%set('sub_solve',       p_choice%solve,   info)
+          call prec%set('ainv_alg', p_choice%variant,   info)
         case default
           call prec%set('sub_solve',       p_choice%solve2,   info, pos='post')
         end select
