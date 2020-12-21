@@ -6,20 +6,20 @@ LIBDIR=../lib
 INCDIR=../include
 MODDIR=../modules/
 LIBNAME=$(CBINDLIBNAME)
-LIBNAME=libmld_cbind.a	
+LIBNAME=libamg_cbind.a	
 
 all: lib
 lib: amgprecd
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
 	/bin/cp -p $(CPUPDFLAG) *.h $(INCDIR)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)	
+	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 
 amgprecd:
-	$(MAKE) -C amgprec lib LIBNAME=$(LIBNAME) 
+	$(MAKE) -C amgprec lib LIBNAME=$(LIBNAME)
 
 
-clean: 
+clean:
 	$(MAKE) -C amgprec clean
 
 

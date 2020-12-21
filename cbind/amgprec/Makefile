@@ -14,9 +14,9 @@ OBJS=amg_prec_cbind_mod.o amg_dprec_cbind_mod.o  amg_c_dprec.o amg_zprec_cbind_m
 CMOD=amg_cbind.h amg_c_dprec.h  amg_c_zprec.h amg_const.h
 
 
-LIBMOD=amg_prec_cbind_mod$(.mod) amg_dprec_cbind_mod$(.mod) amg_zprec_cbind_mod$(.mod) 
+LIBMOD=amg_prec_cbind_mod$(.mod) amg_dprec_cbind_mod$(.mod) amg_zprec_cbind_mod$(.mod)
 LOCAL_MODS=$(LIBMOD)
-#LIBNAME=$(CPRECLIBNAME)	
+#LIBNAME=$(CPRECLIBNAME)
 
 
 lib:  $(OBJS) $(CMOD)
@@ -25,7 +25,7 @@ lib:  $(OBJS) $(CMOD)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(DEST)
 	/bin/cp -p $(LIBMOD) $(CMOD) $(DEST)
 
-amg_prec_cbind_mod.o: amg_dprec_cbind_mod.o  amg_zprec_cbind_mod.o 
+amg_prec_cbind_mod.o: amg_dprec_cbind_mod.o  amg_zprec_cbind_mod.o
 #amg_prec_cbind_mod.o: psb_prec_cbind_mod.o
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
