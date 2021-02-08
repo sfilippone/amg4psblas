@@ -129,7 +129,7 @@ save_FCFLAGS="$FCFLAGS";
 AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran])
 FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
-AC_PROG_CC([xlc pgcc icc gcc cc ])
+AC_PROG_CC([cc xlc pgcc icc gcc ])
 CFLAGS="$save_CFLAGS";
 dnl AC_PROG_CXX
 
