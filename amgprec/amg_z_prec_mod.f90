@@ -56,12 +56,6 @@ module amg_z_prec_mod
   use amg_z_invk_solver
   use amg_z_invt_solver
 
-!!$  interface amg_precset
-!!$    module procedure amg_z_iprecsetsm, amg_z_iprecsetsv, &
-!!$         & amg_z_cprecseti, amg_z_cprecsetc, amg_z_cprecsetr, &
-!!$         & amg_z_iprecsetag
-!!$  end interface amg_precset
-
   interface amg_extprol_bld
     subroutine amg_z_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
       import :: psb_zspmat_type, psb_desc_type, psb_dpk_, &
@@ -81,62 +75,5 @@ module amg_z_prec_mod
       ! !$  character, intent(in), optional         :: upd
     end subroutine amg_z_extprol_bld
   end interface amg_extprol_bld
-
-!!$contains
-!!$
-!!$  subroutine amg_z_iprecsetsm(p,val,info,pos)
-!!$    type(amg_zprec_type), intent(inout)    :: p
-!!$    class(amg_z_base_smoother_type), intent(in)   :: val
-!!$    integer(psb_ipk_), intent(out)           :: info
-!!$    character(len=*), optional, intent(in)      :: pos
-!!$
-!!$    call p%set(val,info,pos=pos)
-!!$  end subroutine amg_z_iprecsetsm
-!!$
-!!$  subroutine amg_z_iprecsetsv(p,val,info,pos)
-!!$    type(amg_zprec_type), intent(inout)    :: p
-!!$    class(amg_z_base_solver_type), intent(in)   :: val
-!!$    integer(psb_ipk_), intent(out)                :: info
-!!$    character(len=*), optional, intent(in)      :: pos
-!!$    call p%set(val,info, pos=pos)
-!!$  end subroutine amg_z_iprecsetsv
-!!$
-!!$  subroutine amg_z_iprecsetag(p,val,info,pos)
-!!$    type(amg_zprec_type), intent(inout)    :: p
-!!$    class(amg_z_base_aggregator_type), intent(in)   :: val
-!!$    integer(psb_ipk_), intent(out)                :: info
-!!$    character(len=*), optional, intent(in)      :: pos
-!!$    call p%set(val,info, pos=pos)
-!!$  end subroutine amg_z_iprecsetag
-!!$
-!!$  subroutine amg_z_cprecseti(p,what,val,info,pos)
-!!$    type(amg_zprec_type), intent(inout)   :: p
-!!$    character(len=*), intent(in)            :: what
-!!$    integer(psb_ipk_), intent(in)           :: val
-!!$    integer(psb_ipk_), intent(out)          :: info
-!!$    character(len=*), optional, intent(in)      :: pos
-!!$
-!!$    call p%set(what,val,info,pos=pos)
-!!$  end subroutine amg_z_cprecseti
-!!$
-!!$  subroutine amg_z_cprecsetr(p,what,val,info,pos)
-!!$    type(amg_zprec_type), intent(inout)   :: p
-!!$    character(len=*), intent(in)            :: what
-!!$    real(psb_dpk_), intent(in)             :: val
-!!$    integer(psb_ipk_), intent(out)          :: info
-!!$    character(len=*), optional, intent(in)      :: pos
-!!$
-!!$    call p%set(what,val,info,pos=pos)
-!!$  end subroutine amg_z_cprecsetr
-!!$
-!!$  subroutine amg_z_cprecsetc(p,what,val,info,pos)
-!!$    type(amg_zprec_type), intent(inout)   :: p
-!!$    character(len=*), intent(in)            :: what
-!!$    character(len=*), intent(in)            :: val
-!!$    integer(psb_ipk_), intent(out)          :: info
-!!$    character(len=*), optional, intent(in)      :: pos
-!!$
-!!$    call p%set(what,val,info,pos=pos)
-!!$  end subroutine amg_z_cprecsetc
 
 end module amg_z_prec_mod
