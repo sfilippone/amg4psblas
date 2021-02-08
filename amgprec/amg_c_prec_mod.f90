@@ -56,11 +56,11 @@ module amg_c_prec_mod
   use amg_c_invk_solver
   use amg_c_invt_solver
 
-  interface amg_precset
-    module procedure amg_c_iprecsetsm, amg_c_iprecsetsv, &
-         & amg_c_cprecseti, amg_c_cprecsetc, amg_c_cprecsetr, &
-         & amg_c_iprecsetag
-  end interface amg_precset
+!!$  interface amg_precset
+!!$    module procedure amg_c_iprecsetsm, amg_c_iprecsetsv, &
+!!$         & amg_c_cprecseti, amg_c_cprecsetc, amg_c_cprecsetr, &
+!!$         & amg_c_iprecsetag
+!!$  end interface amg_precset
 
   interface amg_extprol_bld
     subroutine amg_c_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
@@ -82,61 +82,61 @@ module amg_c_prec_mod
     end subroutine amg_c_extprol_bld
   end interface amg_extprol_bld
 
-contains
-
-  subroutine amg_c_iprecsetsm(p,val,info,pos)
-    type(amg_cprec_type), intent(inout)    :: p
-    class(amg_c_base_smoother_type), intent(in)   :: val
-    integer(psb_ipk_), intent(out)           :: info
-    character(len=*), optional, intent(in)      :: pos
-
-    call p%set(val,info,pos=pos)
-  end subroutine amg_c_iprecsetsm
-
-  subroutine amg_c_iprecsetsv(p,val,info,pos)
-    type(amg_cprec_type), intent(inout)    :: p
-    class(amg_c_base_solver_type), intent(in)   :: val
-    integer(psb_ipk_), intent(out)                :: info
-    character(len=*), optional, intent(in)      :: pos
-    call p%set(val,info, pos=pos)
-  end subroutine amg_c_iprecsetsv
-
-  subroutine amg_c_iprecsetag(p,val,info,pos)
-    type(amg_cprec_type), intent(inout)    :: p
-    class(amg_c_base_aggregator_type), intent(in)   :: val
-    integer(psb_ipk_), intent(out)                :: info
-    character(len=*), optional, intent(in)      :: pos
-    call p%set(val,info, pos=pos)
-  end subroutine amg_c_iprecsetag
-
-  subroutine amg_c_cprecseti(p,what,val,info,pos)
-    type(amg_cprec_type), intent(inout)   :: p
-    character(len=*), intent(in)            :: what
-    integer(psb_ipk_), intent(in)           :: val
-    integer(psb_ipk_), intent(out)          :: info
-    character(len=*), optional, intent(in)      :: pos
-
-    call p%set(what,val,info,pos=pos)
-  end subroutine amg_c_cprecseti
-
-  subroutine amg_c_cprecsetr(p,what,val,info,pos)
-    type(amg_cprec_type), intent(inout)   :: p
-    character(len=*), intent(in)            :: what
-    real(psb_spk_), intent(in)             :: val
-    integer(psb_ipk_), intent(out)          :: info
-    character(len=*), optional, intent(in)      :: pos
-
-    call p%set(what,val,info,pos=pos)
-  end subroutine amg_c_cprecsetr
-
-  subroutine amg_c_cprecsetc(p,what,val,info,pos)
-    type(amg_cprec_type), intent(inout)   :: p
-    character(len=*), intent(in)            :: what
-    character(len=*), intent(in)            :: val
-    integer(psb_ipk_), intent(out)          :: info
-    character(len=*), optional, intent(in)      :: pos
-
-    call p%set(what,val,info,pos=pos)
-  end subroutine amg_c_cprecsetc
+!!$contains
+!!$
+!!$  subroutine amg_c_iprecsetsm(p,val,info,pos)
+!!$    type(amg_cprec_type), intent(inout)    :: p
+!!$    class(amg_c_base_smoother_type), intent(in)   :: val
+!!$    integer(psb_ipk_), intent(out)           :: info
+!!$    character(len=*), optional, intent(in)      :: pos
+!!$
+!!$    call p%set(val,info,pos=pos)
+!!$  end subroutine amg_c_iprecsetsm
+!!$
+!!$  subroutine amg_c_iprecsetsv(p,val,info,pos)
+!!$    type(amg_cprec_type), intent(inout)    :: p
+!!$    class(amg_c_base_solver_type), intent(in)   :: val
+!!$    integer(psb_ipk_), intent(out)                :: info
+!!$    character(len=*), optional, intent(in)      :: pos
+!!$    call p%set(val,info, pos=pos)
+!!$  end subroutine amg_c_iprecsetsv
+!!$
+!!$  subroutine amg_c_iprecsetag(p,val,info,pos)
+!!$    type(amg_cprec_type), intent(inout)    :: p
+!!$    class(amg_c_base_aggregator_type), intent(in)   :: val
+!!$    integer(psb_ipk_), intent(out)                :: info
+!!$    character(len=*), optional, intent(in)      :: pos
+!!$    call p%set(val,info, pos=pos)
+!!$  end subroutine amg_c_iprecsetag
+!!$
+!!$  subroutine amg_c_cprecseti(p,what,val,info,pos)
+!!$    type(amg_cprec_type), intent(inout)   :: p
+!!$    character(len=*), intent(in)            :: what
+!!$    integer(psb_ipk_), intent(in)           :: val
+!!$    integer(psb_ipk_), intent(out)          :: info
+!!$    character(len=*), optional, intent(in)      :: pos
+!!$
+!!$    call p%set(what,val,info,pos=pos)
+!!$  end subroutine amg_c_cprecseti
+!!$
+!!$  subroutine amg_c_cprecsetr(p,what,val,info,pos)
+!!$    type(amg_cprec_type), intent(inout)   :: p
+!!$    character(len=*), intent(in)            :: what
+!!$    real(psb_spk_), intent(in)             :: val
+!!$    integer(psb_ipk_), intent(out)          :: info
+!!$    character(len=*), optional, intent(in)      :: pos
+!!$
+!!$    call p%set(what,val,info,pos=pos)
+!!$  end subroutine amg_c_cprecsetr
+!!$
+!!$  subroutine amg_c_cprecsetc(p,what,val,info,pos)
+!!$    type(amg_cprec_type), intent(inout)   :: p
+!!$    character(len=*), intent(in)            :: what
+!!$    character(len=*), intent(in)            :: val
+!!$    integer(psb_ipk_), intent(out)          :: info
+!!$    character(len=*), optional, intent(in)      :: pos
+!!$
+!!$    call p%set(what,val,info,pos=pos)
+!!$  end subroutine amg_c_cprecsetc
 
 end module amg_c_prec_mod
