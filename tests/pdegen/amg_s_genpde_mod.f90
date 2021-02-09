@@ -2,7 +2,7 @@ module amg_s_genpde_mod
 
 
   use psb_base_mod, only : psb_spk_, psb_ipk_, psb_desc_type,&
-       &  psb_sspmat_type, psb_s_vect_type, szero,&
+       &  psb_sspmat_type, psb_s_vect_type, szero, sone,&
        &  psb_s_base_sparse_mat, psb_s_base_vect_type, psb_i_base_vect_type
 
   interface
@@ -502,12 +502,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error(ctxt)
-      return
-    end if
+9999 call psb_error_handler(ctxt,err_act)
+
     return
   end subroutine amg_s_gen_pde3d
 

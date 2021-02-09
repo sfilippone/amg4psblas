@@ -36,7 +36,7 @@
 !   
 module amg_s_pde_mod
   use psb_base_mod, only : psb_spk_, psb_ipk_, psb_desc_type,&
-       &  psb_sspmat_type, psb_s_vect_type, szero,&
+       &  psb_sspmat_type, psb_s_vect_type, szero, sone,&
        &  psb_s_base_sparse_mat, psb_s_base_vect_type, psb_i_base_vect_type
 
   interface 
@@ -58,7 +58,7 @@ contains
 
     real(psb_spk_), intent(in) :: x,y,z
     real(psb_spk_) :: val
-    
+
     val = szero
 
   end function s_null_func_3d
@@ -92,9 +92,9 @@ contains
     type(psb_sspmat_type) :: a
     type(psb_s_vect_type) :: xv,bv
     type(psb_desc_type)   :: desc_a
-    type(psb_ctxt_type)   :: ctxt
     integer(psb_ipk_)     :: info
-    character(len=*)      :: afmt
+    type(psb_ctxt_type)   :: ctxt
+    character             :: afmt*5
     procedure(s_func_3d), optional :: f
     class(psb_s_base_sparse_mat), optional :: amold
     class(psb_s_base_vect_type), optional :: vmold 
@@ -107,16 +107,20 @@ contains
     type(psb_s_csc_sparse_mat)  :: acsc
     type(psb_s_coo_sparse_mat)  :: acoo
     type(psb_s_csr_sparse_mat)  :: acsr
-    real(psb_spk_)           :: zt(nb),x,y,z
-    integer(psb_ipk_) :: m,n,nnz,nr,nt,glob_row,nlr,i,j,ii,ib,k, partition_
+    real(psb_spk_)           :: zt(nb),x,y,z,xph,xmh,yph,ymh,zph,zmh
+    integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_
+    integer(psb_lpk_) :: m,n,glob_row,nt
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
     ! For 3D partition
-    integer(psb_ipk_) :: npx,npy,npz, npdims(3),iamx,iamy,iamz,mynx,myny,mynz
+    ! Note: integer control variables going directly into an MPI call
+    ! must be 4 bytes, i.e. psb_mpk_
+    integer(psb_mpk_) :: npdims(3), npp, minfo
+    integer(psb_ipk_) :: npx,npy,npz, iamx,iamy,iamz,mynx,myny,mynz
     integer(psb_ipk_), allocatable :: bndx(:),bndy(:),bndz(:)
     ! Process grid
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: icoeff
-    integer(psb_ipk_), allocatable     :: irow(:),icol(:),myidx(:)
+    integer(psb_lpk_), allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_spk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
@@ -142,7 +146,7 @@ contains
 
     deltah   = 1.d0/(idim+1)
     sqdeltah = deltah*deltah
-    deltah2  = 2.d0* deltah
+    deltah2  = 2.0_psb_spk_* deltah
 
     if (present(partition)) then
       if ((1<= partition).and.(partition <= 3)) then
@@ -156,11 +160,11 @@ contains
     end if
     
     ! initialize array descriptor and sparse matrix storage. provide an
-    ! estimate of the number of non zeroes 
-    
-    m   = idim*idim*idim
+    ! estimate of the number of non zeroes
+
+    m   = (1_psb_lpk_*idim)*idim*idim
     n   = m
-    nnz = ((n*9)/(np))
+    nnz = 7*((n+np-1)/np)
     if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
 
     select case(partition_)
@@ -248,7 +252,7 @@ contains
       ! Now, let's generate the list of indices I own
       nr = 0
       do i=bndx(iamx),bndx(iamx+1)-1
-        do j=bndy(iamy),bndx(iamy+1)-1
+        do j=bndy(iamy),bndy(iamy+1)-1
           do k=bndz(iamz),bndz(iamz+1)-1
             nr = nr + 1
             call ijk2idx(myidx(nr),i,j,k,idim,idim,idim)
@@ -373,62 +377,62 @@ contains
         !  term depending on   (x-1,y,z)
         !
         val(icoeff) = -a1(x,y,z)/sqdeltah-b1(x,y,z)/deltah2
-        if (ix == 1) then 
+        if (ix == 1) then
           zt(k) = g(szero,y,z)*(-val(icoeff)) + zt(k)
         else
-          icol(icoeff) = (ix-2)*idim*idim+(iy-1)*idim+(iz)
+          call ijk2idx(icol(icoeff),ix-1,iy,iz,idim,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
         !  term depending on     (x,y-1,z)
         val(icoeff)  = -a2(x,y,z)/sqdeltah-b2(x,y,z)/deltah2
-        if (iy == 1) then 
+        if (iy == 1) then
           zt(k) = g(x,szero,z)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim*idim+(iy-2)*idim+(iz)
+          call ijk2idx(icol(icoeff),ix,iy-1,iz,idim,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
         !  term depending on     (x,y,z-1)
         val(icoeff)=-a3(x,y,z)/sqdeltah-b3(x,y,z)/deltah2
-        if (iz == 1) then 
+        if (iz == 1) then
           zt(k) = g(x,y,szero)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim*idim+(iy-1)*idim+(iz-1)
+          call ijk2idx(icol(icoeff),ix,iy,iz-1,idim,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
 
         !  term depending on     (x,y,z)
-        val(icoeff)=2.d0*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah &
+        val(icoeff)=(2*sone)*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah &
              & + c(x,y,z)
-        icol(icoeff) = (ix-1)*idim*idim+(iy-1)*idim+(iz)
+        call ijk2idx(icol(icoeff),ix,iy,iz,idim,idim,idim)
         irow(icoeff) = glob_row
         icoeff       = icoeff+1                  
         !  term depending on     (x,y,z+1)
         val(icoeff)=-a3(x,y,z)/sqdeltah+b3(x,y,z)/deltah2
-        if (iz == idim) then 
+        if (iz == idim) then
           zt(k) = g(x,y,sone)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim*idim+(iy-1)*idim+(iz+1)
+          call ijk2idx(icol(icoeff),ix,iy,iz+1,idim,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
         !  term depending on     (x,y+1,z)
         val(icoeff)=-a2(x,y,z)/sqdeltah+b2(x,y,z)/deltah2
-        if (iy == idim) then 
+        if (iy == idim) then
           zt(k) = g(x,sone,z)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix-1)*idim*idim+(iy)*idim+(iz)
+          call ijk2idx(icol(icoeff),ix,iy+1,iz,idim,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
         !  term depending on     (x+1,y,z)
         val(icoeff)=-a1(x,y,z)/sqdeltah+b1(x,y,z)/deltah2
-        if (ix==idim) then 
+        if (ix==idim) then
           zt(k) = g(sone,y,z)*(-val(icoeff))   + zt(k)
         else
-          icol(icoeff) = (ix)*idim*idim+(iy-1)*idim+(iz)
+          call ijk2idx(icol(icoeff),ix+1,iy,iz,idim,idim,idim)
           irow(icoeff) = glob_row
           icoeff       = icoeff+1
         endif
@@ -438,7 +442,7 @@ contains
       if(info /= psb_success_) exit
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
       if(info /= psb_success_) exit
-      zt(:)=0.d0
+      zt(:)=szero
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
       if(info /= psb_success_) exit
     end do
