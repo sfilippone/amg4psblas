@@ -61,7 +61,6 @@ module amg_c_ainv_solver
     procedure, pass(sv) :: seti    => amg_c_ainv_solver_seti
     procedure, pass(sv) :: setc    => amg_c_ainv_solver_setc
     procedure, pass(sv) :: setr    => amg_c_ainv_solver_setr
-    generic, public :: set => seti, setr, setc
     procedure, pass(sv) :: descr   => amg_c_ainv_solver_descr
     procedure, pass(sv) :: default => c_ainv_solver_default
     procedure, nopass   :: stringval  => c_ainv_stringval

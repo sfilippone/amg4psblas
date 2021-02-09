@@ -52,7 +52,6 @@ module amg_d_invk_solver
     procedure, pass(sv) :: build   => amg_d_invk_solver_bld
     procedure, pass(sv) :: cseti   => amg_d_invk_solver_cseti
     procedure, pass(sv) :: seti    => amg_d_invk_solver_seti
-    generic, public     :: set     => seti
     procedure, pass(sv) :: descr   => amg_d_invk_solver_descr
     procedure, pass(sv) :: default => d_invk_solver_default
   end type amg_d_invk_solver_type

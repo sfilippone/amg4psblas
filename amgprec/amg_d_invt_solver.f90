@@ -54,7 +54,6 @@ module amg_d_invt_solver
     procedure, pass(sv) :: csetr   => amg_d_invt_solver_csetr
     procedure, pass(sv) :: seti    => amg_d_invt_solver_seti
     procedure, pass(sv) :: setr    => amg_d_invt_solver_setr
-    generic, public     :: set     => seti, setr
     procedure, pass(sv) :: descr   => amg_d_invt_solver_descr
     procedure, pass(sv) :: default => d_invt_solver_default
   end type amg_d_invt_solver_type
