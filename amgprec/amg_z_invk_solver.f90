@@ -51,7 +51,6 @@ module amg_z_invk_solver
     procedure, pass(sv) :: clone   => amg_z_invk_solver_clone
     procedure, pass(sv) :: build   => amg_z_invk_solver_bld
     procedure, pass(sv) :: cseti   => amg_z_invk_solver_cseti
-    procedure, pass(sv) :: seti    => amg_z_invk_solver_seti
     procedure, pass(sv) :: descr   => amg_z_invk_solver_descr
     procedure, pass(sv) :: default => z_invk_solver_default
   end type amg_z_invk_solver_type
@@ -133,18 +132,6 @@ module amg_z_invk_solver
       logical, intent(in), optional             :: coarse
 
     end subroutine amg_z_invk_solver_descr
-  end interface
-
-  interface
-    subroutine amg_z_invk_solver_seti(sv,what,val,info)
-      import :: amg_z_invk_solver_type, psb_ipk_
-      Implicit none
-      ! Arguments
-      class(amg_z_invk_solver_type), intent(inout) :: sv
-      integer(psb_ipk_), intent(in)                :: what
-      integer(psb_ipk_), intent(in)                :: val
-      integer(psb_ipk_), intent(out)               :: info
-    end subroutine amg_z_invk_solver_seti
   end interface
 
 contains

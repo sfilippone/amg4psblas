@@ -58,9 +58,9 @@ module amg_d_ainv_solver
     procedure, pass(sv) :: cseti   => amg_d_ainv_solver_cseti
     procedure, pass(sv) :: csetc   => amg_d_ainv_solver_csetc
     procedure, pass(sv) :: csetr   => amg_d_ainv_solver_csetr
-    procedure, pass(sv) :: seti    => amg_d_ainv_solver_seti
-    procedure, pass(sv) :: setc    => amg_d_ainv_solver_setc
-    procedure, pass(sv) :: setr    => amg_d_ainv_solver_setr
+!!$    procedure, pass(sv) :: seti    => amg_d_ainv_solver_seti
+!!$    procedure, pass(sv) :: setc    => amg_d_ainv_solver_setc
+!!$    procedure, pass(sv) :: setr    => amg_d_ainv_solver_setr
     procedure, pass(sv) :: descr   => amg_d_ainv_solver_descr
     procedure, pass(sv) :: default => d_ainv_solver_default
     procedure, nopass   :: stringval  => d_ainv_stringval
@@ -158,41 +158,41 @@ module amg_d_ainv_solver
     end subroutine amg_d_ainv_solver_csetr
   end interface
 
-  interface
-    subroutine amg_d_ainv_solver_setc(sv,what,val,info)
-      import :: amg_d_ainv_solver_type, psb_ipk_
-      Implicit none
-      ! Arguments
-      class(amg_d_ainv_solver_type), intent(inout) :: sv
-      integer(psb_ipk_), intent(in)                :: what
-      character(len=*), intent(in)                 :: val
-      integer(psb_ipk_), intent(out)               :: info
-    end subroutine amg_d_ainv_solver_setc
-  end interface
-
-  interface
-    subroutine amg_d_ainv_solver_seti(sv,what,val,info)
-      import :: amg_d_ainv_solver_type, psb_ipk_
-      Implicit none
-      ! Arguments
-      class(amg_d_ainv_solver_type), intent(inout) :: sv
-      integer(psb_ipk_), intent(in)                :: what
-      integer(psb_ipk_), intent(in)                :: val
-      integer(psb_ipk_), intent(out)               :: info
-    end subroutine amg_d_ainv_solver_seti
-  end interface
-
-  interface
-    subroutine amg_d_ainv_solver_setr(sv,what,val,info)
-      import :: amg_d_ainv_solver_type, psb_ipk_, psb_dpk_
-      Implicit none
-      ! Arguments
-      class(amg_d_ainv_solver_type), intent(inout) :: sv
-      integer(psb_ipk_), intent(in)                :: what
-      real(psb_dpk_), intent(in)                   :: val
-      integer(psb_ipk_), intent(out)               :: info
-    end subroutine amg_d_ainv_solver_setr
-  end interface
+!!$  interface
+!!$    subroutine amg_d_ainv_solver_setc(sv,what,val,info)
+!!$      import :: amg_d_ainv_solver_type, psb_ipk_
+!!$      Implicit none
+!!$      ! Arguments
+!!$      class(amg_d_ainv_solver_type), intent(inout) :: sv
+!!$      integer(psb_ipk_), intent(in)                :: what
+!!$      character(len=*), intent(in)                 :: val
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$    end subroutine amg_d_ainv_solver_setc
+!!$  end interface
+!!$
+!!$  interface
+!!$    subroutine amg_d_ainv_solver_seti(sv,what,val,info)
+!!$      import :: amg_d_ainv_solver_type, psb_ipk_
+!!$      Implicit none
+!!$      ! Arguments
+!!$      class(amg_d_ainv_solver_type), intent(inout) :: sv
+!!$      integer(psb_ipk_), intent(in)                :: what
+!!$      integer(psb_ipk_), intent(in)                :: val
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$    end subroutine amg_d_ainv_solver_seti
+!!$  end interface
+!!$
+!!$  interface
+!!$    subroutine amg_d_ainv_solver_setr(sv,what,val,info)
+!!$      import :: amg_d_ainv_solver_type, psb_ipk_, psb_dpk_
+!!$      Implicit none
+!!$      ! Arguments
+!!$      class(amg_d_ainv_solver_type), intent(inout) :: sv
+!!$      integer(psb_ipk_), intent(in)                :: what
+!!$      real(psb_dpk_), intent(in)                   :: val
+!!$      integer(psb_ipk_), intent(out)               :: info
+!!$    end subroutine amg_d_ainv_solver_setr
+!!$  end interface
 
   interface
     subroutine amg_d_ainv_solver_descr(sv,info,iout,coarse)

@@ -198,9 +198,6 @@ amg_s_ainv_solver_csetc.o \
 amg_s_ainv_solver_cseti.o \
 amg_s_ainv_solver_csetr.o \
 amg_s_ainv_solver_descr.o \
-amg_s_ainv_solver_setc.o \
-amg_s_ainv_solver_seti.o \
-amg_s_ainv_solver_setr.o \
 amg_d_ainv_solver_bld.o \
 amg_d_ainv_solver_check.o \
 amg_d_ainv_solver_clone.o \
@@ -208,9 +205,6 @@ amg_d_ainv_solver_csetc.o \
 amg_d_ainv_solver_cseti.o \
 amg_d_ainv_solver_csetr.o \
 amg_d_ainv_solver_descr.o \
-amg_d_ainv_solver_setc.o \
-amg_d_ainv_solver_seti.o \
-amg_d_ainv_solver_setr.o \
 amg_c_ainv_solver_bld.o \
 amg_c_ainv_solver_check.o \
 amg_c_ainv_solver_clone.o \
@@ -218,9 +212,6 @@ amg_c_ainv_solver_csetc.o \
 amg_c_ainv_solver_cseti.o \
 amg_c_ainv_solver_csetr.o \
 amg_c_ainv_solver_descr.o \
-amg_c_ainv_solver_setc.o \
-amg_c_ainv_solver_seti.o \
-amg_c_ainv_solver_setr.o \
 amg_z_ainv_solver_bld.o \
 amg_z_ainv_solver_check.o \
 amg_z_ainv_solver_clone.o \
@@ -228,9 +219,6 @@ amg_z_ainv_solver_csetc.o \
 amg_z_ainv_solver_cseti.o \
 amg_z_ainv_solver_csetr.o \
 amg_z_ainv_solver_descr.o \
-amg_z_ainv_solver_setc.o \
-amg_z_ainv_solver_seti.o \
-amg_z_ainv_solver_setr.o \
 amg_s_base_ainv_solver_apply_vect.o \
 amg_s_base_ainv_solver_apply.o \
 amg_s_base_ainv_solver_cnv.o \
@@ -261,56 +249,44 @@ amg_d_invt_solver_clone.o \
 amg_d_invt_solver_cseti.o \
 amg_d_invt_solver_csetr.o \
 amg_d_invt_solver_descr.o \
-amg_d_invt_solver_seti.o \
-amg_d_invt_solver_setr.o \
 amg_d_invk_solver_bld.o \
 amg_d_invk_solver_check.o \
 amg_d_invk_solver_clone.o \
 amg_d_invk_solver_cseti.o \
 amg_d_invk_solver_descr.o \
-amg_d_invk_solver_seti.o \
 amg_s_invt_solver_bld.o \
 amg_s_invt_solver_check.o \
 amg_s_invt_solver_clone.o \
 amg_s_invt_solver_cseti.o \
 amg_s_invt_solver_csetr.o \
 amg_s_invt_solver_descr.o \
-amg_s_invt_solver_seti.o \
-amg_s_invt_solver_setr.o \
 amg_s_invk_solver_bld.o \
 amg_s_invk_solver_check.o \
 amg_s_invk_solver_clone.o \
 amg_s_invk_solver_cseti.o \
 amg_s_invk_solver_descr.o \
-amg_s_invk_solver_seti.o \
 amg_c_invt_solver_bld.o \
 amg_c_invt_solver_check.o \
 amg_c_invt_solver_clone.o \
 amg_c_invt_solver_cseti.o \
 amg_c_invt_solver_csetr.o \
 amg_c_invt_solver_descr.o \
-amg_c_invt_solver_seti.o \
-amg_c_invt_solver_setr.o \
 amg_c_invk_solver_bld.o \
 amg_c_invk_solver_check.o \
 amg_c_invk_solver_clone.o \
 amg_c_invk_solver_cseti.o \
 amg_c_invk_solver_descr.o \
-amg_c_invk_solver_seti.o \
 amg_z_invt_solver_bld.o \
 amg_z_invt_solver_check.o \
 amg_z_invt_solver_clone.o \
 amg_z_invt_solver_cseti.o \
 amg_z_invt_solver_csetr.o \
 amg_z_invt_solver_descr.o \
-amg_z_invt_solver_seti.o \
-amg_z_invt_solver_setr.o \
 amg_z_invk_solver_bld.o \
 amg_z_invk_solver_check.o \
 amg_z_invk_solver_clone.o \
 amg_z_invk_solver_cseti.o \
-amg_z_invk_solver_descr.o \
-amg_z_invk_solver_seti.o
+amg_z_invk_solver_descr.o 
 
 LIBNAME=libamg_prec.a
 

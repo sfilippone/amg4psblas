@@ -52,8 +52,6 @@ module amg_d_invt_solver
     procedure, pass(sv) :: build   => amg_d_invt_solver_bld
     procedure, pass(sv) :: cseti   => amg_d_invt_solver_cseti
     procedure, pass(sv) :: csetr   => amg_d_invt_solver_csetr
-    procedure, pass(sv) :: seti    => amg_d_invt_solver_seti
-    procedure, pass(sv) :: setr    => amg_d_invt_solver_setr
     procedure, pass(sv) :: descr   => amg_d_invt_solver_descr
     procedure, pass(sv) :: default => d_invt_solver_default
   end type amg_d_invt_solver_type
@@ -145,30 +143,6 @@ module amg_d_invt_solver
       logical, intent(in), optional             :: coarse
 
     end subroutine amg_d_invt_solver_descr
-  end interface
-
-  interface
-    subroutine amg_d_invt_solver_setr(sv,what,val,info)
-      import :: amg_d_invt_solver_type, psb_dpk_, psb_ipk_
-      Implicit none
-      ! Arguments
-      class(amg_d_invt_solver_type), intent(inout) :: sv
-      integer(psb_ipk_), intent(in)                :: what
-      real(psb_dpk_), intent(in)                   :: val
-      integer(psb_ipk_), intent(out)               :: info
-    end subroutine amg_d_invt_solver_setr
-  end interface
-
-  interface
-    subroutine amg_d_invt_solver_seti(sv,what,val,info)
-      import :: amg_d_invt_solver_type, psb_ipk_
-      Implicit none
-      ! Arguments
-      class(amg_d_invt_solver_type), intent(inout) :: sv
-      integer(psb_ipk_), intent(in)                :: what
-      integer(psb_ipk_), intent(in)                :: val
-      integer(psb_ipk_), intent(out)               :: info
-    end subroutine
   end interface
 
 contains
