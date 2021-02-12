@@ -77,7 +77,7 @@ contains
 
     call stringc2f(what,fwhat)
 
-    call amg_precset(precp,fwhat,val,info)
+    call precp%set(fwhat,val,info)
 
     res = MLDC_ERR_FILTER(info)
     MLDC_ERR_HANDLE(res)
@@ -107,7 +107,7 @@ contains
 
     call stringc2f(what,fwhat)
 
-    call amg_precset(precp,fwhat,val,info)
+    call precp%set(fwhat,val,info)
 
     res = MLDC_ERR_FILTER(info)
     MLDC_ERR_HANDLE(res)
@@ -136,7 +136,7 @@ contains
     call stringc2f(what,fwhat)
     call stringc2f(val,fval)
 
-    call amg_precset(precp,fwhat,fval,info)
+    call precp%set(fwhat,fval,info)
 
     res = MLDC_ERR_FILTER(info)
     MLDC_ERR_HANDLE(res)
@@ -381,12 +381,12 @@ contains
    use psb_base_mod
    use amg_prec_mod
    implicit none
- 
+
    integer(psb_c_ipk_) :: res
    type(psb_c_object_type) :: ph
    integer               :: info
    type(amg_dprec_type), pointer :: precp
- 
+
    res = -1
    info = -1
    if (c_associated(ph%item)) then
@@ -394,11 +394,11 @@ contains
    else
      return
    end if
- 
- 
+
+
    call precp%descr()
    call flush(psb_out_unit)
- 
+
    info = 0
    res = MLDC_ERR_FILTER(info)
    MLDC_ERR_HANDLE(res)
