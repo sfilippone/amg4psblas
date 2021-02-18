@@ -35,21 +35,30 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine amg_s_base_onelev_descr(lv,il,nl,ilmin,info,iout)
+!
+!
+! verbosity:
+!        <0: suppress all messages
+!         0: normal
+!        >1: increased details 
+!
+subroutine amg_s_base_onelev_descr(lv,il,nl,ilmin,info,iout,verbosity)
   
   use psb_base_mod
   use amg_s_onelev_mod, amg_protect_name => amg_s_base_onelev_descr
   Implicit None
   ! Arguments
-  class(amg_s_onelev_type), intent(in)  :: lv
+  class(amg_s_onelev_type), intent(in)    :: lv
   integer(psb_ipk_), intent(in)           :: il,nl,ilmin
   integer(psb_ipk_), intent(out)          :: info
   integer(psb_ipk_), intent(in), optional :: iout
+  integer(psb_ipk_), intent(in), optional :: verbosity
+
 
   ! Local variables
-  integer(psb_ipk_)      :: err_act
+  integer(psb_ipk_)  :: err_act
   character(len=20), parameter :: name='amg_s_base_onelev_descr'
-  integer(psb_ipk_)      :: iout_
+  integer(psb_ipk_)  :: iout_, verbosity_
   logical      :: coarse
 
 
@@ -63,6 +72,13 @@ subroutine amg_s_base_onelev_descr(lv,il,nl,ilmin,info,iout)
   else 
     iout_ = psb_out_unit
   end if
+  
+  if (present(verbosity)) then
+    verbosity_ = verbosity
+  else
+    verbosity_ = 0
+  end if
+  if (verbosity_ < 0) goto 9998
 
   write(iout_,*) 
   if (il == ilmin) then 
@@ -91,10 +107,20 @@ subroutine amg_s_base_onelev_descr(lv,il,nl,ilmin,info,iout)
     if (nl > 1) then 
       if (allocated(lv%linmap%naggr)) then
         write(iout_,*) '  Coarse Matrix: Global size: ', &
-             &  sum((1_psb_lpk_*lv%linmap%naggr(:))),' Nonzeros: ',lv%ac_nz_tot
-        write(iout_,*) '          Local matrix sizes: ', &
-             &  lv%linmap%naggr(:)
-        write(iout_,*) '  Aggregation   ratio: ', &
+             &  lv%linmap%nagtot
+        write(iout_,*) '                    Nonzeros: ',lv%ac_nz_tot
+        if (verbosity_>0) then
+          write(iout_,*) '          Local matrix sizes: ', &
+               &  lv%linmap%naggr(:)
+        else 
+          write(iout_,'(2(a,1x,i12))') &
+               & '     Local  matrix sizes: min:', &
+               & lv%linmap%nagmin,'         max:', lv%linmap%nagmax
+          write(iout_,'(a,1x,f14.1)') &
+               & '                          avg:', &
+               & lv%linmap%nagavg
+        end if
+        write(iout_,'(a,1x,f14.2)') '          Aggregation   ratio: ', &
              &  lv%szratio
       end if
     end if
@@ -102,7 +128,8 @@ subroutine amg_s_base_onelev_descr(lv,il,nl,ilmin,info,iout)
     if (coarse.and.allocated(lv%sm)) &
          & call lv%sm%descr(info,iout=iout_,coarse=coarse)
   end if
-  
+
+9998 continue
   call psb_erractionrestore(err_act)
   return
 

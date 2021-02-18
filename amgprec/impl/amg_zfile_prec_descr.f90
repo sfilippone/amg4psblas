@@ -58,17 +58,26 @@
 !             The id of the process printing the message; -1 acts as a wildcard.
 !             Default is psb_root_
 !
-subroutine amg_zfile_prec_descr(prec,iout,root)
+!
+!
+! verbosity:
+!        <0: suppress all messages
+!         0: normal
+!        >1: increased details 
+!
+subroutine amg_zfile_prec_descr(prec,iout,root, verbosity)
   use psb_base_mod
   use amg_z_prec_mod, amg_protect_name => amg_zfile_prec_descr
   use amg_z_inner_mod
   use amg_z_gs_solver
-  
+
   implicit none 
   ! Arguments
   class(amg_zprec_type), intent(in)      :: prec
   integer(psb_ipk_), intent(in), optional :: iout
   integer(psb_ipk_), intent(in), optional :: root
+  integer(psb_ipk_), intent(in), optional   :: verbosity
+
 
   ! Local variables
   integer(psb_ipk_)   :: ilev, nlev, ilmin, info, nswps
@@ -76,8 +85,7 @@ subroutine amg_zfile_prec_descr(prec,iout,root)
   integer(psb_ipk_)   :: me, np
   logical             :: is_symgs
   character(len=20), parameter :: name='amg_file_prec_descr'
-  integer(psb_ipk_)  :: iout_
-  integer(psb_ipk_)  :: root_
+  integer(psb_ipk_)  :: iout_, root_, verbosity_
 
   info = psb_success_
   if (present(iout)) then 
@@ -86,6 +94,12 @@ subroutine amg_zfile_prec_descr(prec,iout,root)
     iout_ = psb_out_unit
   end if
   if (iout_ < 0) iout_ = psb_out_unit
+  if (present(verbosity)) then
+    verbosity_ = verbosity
+  else
+    verbosity_ = 0
+  end if
+  if (verbosity_ < 0) goto 9998
 
   ctxt = prec%ctxt
 
@@ -99,102 +113,104 @@ subroutine amg_zfile_prec_descr(prec,iout,root)
     end if
     if (root_ == -1) root_ = me
 
-    !
-    ! The preconditioner description is printed by processor psb_root_.
-    ! This agrees with the fact that all the parameters defining the
-    ! preconditioner have the same values on all the procs (this is
-    ! ensured by amg_precbld).
-    !
-    if (me == root_) then
-      nlev = size(prec%precv)
-      do ilev = 1, nlev 
-        if (.not.allocated(prec%precv(ilev)%sm)) then 
-          info = 3111
-          write(iout_,*) ' ',name,&
-               & ': error: inconsistent MLPREC part, should call amg_PRECINIT'
-          return
-        endif
-      end do
+    if (verbosity_ >=0) then 
+      !
+      ! The preconditioner description is printed by processor psb_root_.
+      ! This agrees with the fact that all the parameters defining the
+      ! preconditioner have the same values on all the procs (this is
+      ! ensured by amg_precbld).
+      !
+      if (me == root_) then
+        nlev = size(prec%precv)
+        do ilev = 1, nlev 
+          if (.not.allocated(prec%precv(ilev)%sm)) then 
+            info = 3111
+            write(iout_,*) ' ',name,&
+                 & ': error: inconsistent MLPREC part, should call amg_PRECINIT'
+            return
+          endif
+        end do
 
-      write(iout_,*) 
-      write(iout_,'(a)') 'Preconditioner description'
+        write(iout_,*) 
+        write(iout_,'(a)') 'Preconditioner description'
 
-      if (nlev == 1) then
-        !
-        ! Here we have a gigantic kludge just to handle Symmetrized Gauss-Seidel.
-        ! Will need rethinking...
-        !
-        if (allocated(prec%precv(1)%sm2a)) then
-          is_symgs = .false.
-          select type(sv2 => prec%precv(1)%sm2a%sv)
-          class is (amg_z_bwgs_solver_type)
-            select type(sv1 => prec%precv(1)%sm%sv)
-            class is (amg_z_gs_solver_type)
-              is_symgs = .true.
+        if (nlev == 1) then
+          !
+          ! Here we have a gigantic kludge just to handle Symmetrized Gauss-Seidel.
+          ! Will need rethinking...
+          !
+          if (allocated(prec%precv(1)%sm2a)) then
+            is_symgs = .false.
+            select type(sv2 => prec%precv(1)%sm2a%sv)
+            class is (amg_z_bwgs_solver_type)
+              select type(sv1 => prec%precv(1)%sm%sv)
+              class is (amg_z_gs_solver_type)
+                is_symgs = .true.
+              end select
             end select
-          end select
-          if (is_symgs) then
-            write(iout_,*) ' Forward-Backward (symmetrized) Hybrid Gauss-Seidel'
+            if (is_symgs) then
+              write(iout_,*) ' Forward-Backward (symmetrized) Hybrid Gauss-Seidel'
+            else
+              write(iout_,*) 'Pre Smoother: '
+              call prec%precv(1)%sm%descr(info,iout=iout_)
+              write(iout_,*) 'Post smoother:'
+              call prec%precv(1)%sm2a%descr(info,iout=iout_)
+            end if
+            nswps = max(prec%precv(1)%parms%sweeps_pre,prec%precv(1)%parms%sweeps_post)
+
           else
+            call prec%precv(1)%sm%descr(info,iout=iout_)
+            nswps = prec%precv(1)%parms%sweeps_pre
+          end if
+          if (nswps > 1)  write(iout_,*) '  Number of  sweeps : ',nswps
+          write(iout_,*) 
+
+        else if (nlev > 1) then
+          !
+          ! Print description of base preconditioner
+          !
+          write(iout_,*) 'Multilevel Preconditioner'
+          write(iout_,*) 'Outer sweeps:',prec%outer_sweeps
+          write(iout_,*) 
+          if (allocated(prec%precv(1)%sm2a)) then
             write(iout_,*) 'Pre Smoother: '
             call prec%precv(1)%sm%descr(info,iout=iout_)
             write(iout_,*) 'Post smoother:'
             call prec%precv(1)%sm2a%descr(info,iout=iout_)
+          else
+            write(iout_,*) 'Smoother: '
+            call prec%precv(1)%sm%descr(info,iout=iout_)
           end if
-          nswps = max(prec%precv(1)%parms%sweeps_pre,prec%precv(1)%parms%sweeps_post)
+          !
+          ! Print multilevel details
+          !
+          write(iout_,*) 
+          write(iout_,*) 'Multilevel hierarchy: '
+          write(iout_,*) ' Number of levels   : ',nlev
+          write(iout_,*) ' Operator complexity: ',prec%get_complexity()
+          write(iout_,*) ' Average coarsening : ',prec%get_avg_cr()
+          ilmin = 2
+          if (nlev == 2) ilmin=1
+          do ilev=ilmin,nlev
+            call prec%precv(ilev)%descr(ilev,nlev,ilmin,info, &
+                 & iout=iout_,verbosity=verbosity)
+          end do
+          write(iout_,*) 
 
         else
-          call prec%precv(1)%sm%descr(info,iout=iout_)
-          nswps = prec%precv(1)%parms%sweeps_pre
+          write(iout_,*) trim(name), &
+               & ': invalid preconditioner array size ?',nlev
+          info = -2
+          return
+
         end if
-        if (nswps > 1)  write(iout_,*) '  Number of  sweeps : ',nswps
-        write(iout_,*) 
-
-      else if (nlev > 1) then
-        !
-        ! Print description of base preconditioner
-        !
-        write(iout_,*) 'Multilevel Preconditioner'
-        write(iout_,*) 'Outer sweeps:',prec%outer_sweeps
-        write(iout_,*) 
-        if (allocated(prec%precv(1)%sm2a)) then
-          write(iout_,*) 'Pre Smoother: '
-          call prec%precv(1)%sm%descr(info,iout=iout_)
-          write(iout_,*) 'Post smoother:'
-          call prec%precv(1)%sm2a%descr(info,iout=iout_)
-        else
-          write(iout_,*) 'Smoother: '
-          call prec%precv(1)%sm%descr(info,iout=iout_)
-        end if
-        !
-        ! Print multilevel details
-        !
-        write(iout_,*) 
-        write(iout_,*) 'Multilevel hierarchy: '
-        write(iout_,*) ' Number of levels   : ',nlev
-        write(iout_,*) ' Operator complexity: ',prec%get_complexity()
-        write(iout_,*) ' Average coarsening : ',prec%get_avg_cr()
-        ilmin = 2
-        if (nlev == 2) ilmin=1
-        do ilev=ilmin,nlev
-          call prec%precv(ilev)%descr(ilev,nlev,ilmin,info,iout=iout_)
-        end do
-        write(iout_,*) 
-
-      else
-        write(iout_,*) trim(name), &
-             & ': invalid preconditioner array size ?',nlev
-        info = -2
-        return
-
       end if
     end if
-
   else
     write(iout_,*) trim(name), &
          & ': Error: no base preconditioner available, something is wrong!'
     info = -2
     return
   endif
-
+9998 continue
 end subroutine amg_zfile_prec_descr
