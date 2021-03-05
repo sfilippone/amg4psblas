@@ -1,21 +1,21 @@
 
 \clearpage
 
-\section{Adding new  smoother and solver objects to MLD2P4\label{sec:adding}}
+\section{Adding new smoother and solver objects to AMG4PSBLAS\label{sec:adding}}
 
 Developers can add completely new smoother and/or solver classes
 derived from the base objects in the library (see Remark~2 in Section~\ref{sec:precset}),
-without recompiling the library itself. 
+without recompiling the library itself.
 
 To do so, it is necessary first to select the base type to be extended.
 In our experience, it is quite likely that the new application needs
 only the definition of a ``solver'' object, which is almost
-always acting only on the local part of the distributed matrix. 
+always acting only on the local part of the distributed matrix.
 The parallel actions required to connect the various solver objects
 are most often already provided by the block-Jacobi or the additive
 Schwarz smoothers.  To define a new solver, the developer will then
 have to define its components and methods, perhaps taking one of the
-predefined solvers as a starting point, if possible. 
+predefined solvers as a starting point, if possible.
 
 Once the new smoother/solver class has been developed, to use it in
 the context of the multilevel preconditioners it is necessary to:
@@ -30,9 +30,9 @@ following:
 \item link the code implementing the various methods into the application executable.
 \end{itemize}
 The new solver object is then dynamically included in the
-preconditioner structure, and acts as a \emph{mold} to which the 
-preconditioner will conform, even though the MLD2P4 library has not
-been modified to account for this new development. 
+preconditioner structure, and acts as a \emph{mold} to which the
+preconditioner will conform, even though the AMG4PSBLAS library has not
+been modified to account for this new development.
 
 It is possible to define new values for the keyword \verb|WHAT| in the
 \verb|set| routine; if the library code does not recognize a keyword,
@@ -50,35 +50,35 @@ factorization under a new name). Because of the specifics of  this case, it is
 possible to reuse the basic structure of the ILU solver, with its
 L/D/U components and the methods needed to apply the solver; only a
 few methods, such as the description and most importantly the build,
-need to be ovverridden (rewritten). 
+need to be ovverridden (rewritten).
 
 The interfaces for the calls shown above are defined using
 \begin{center}
 \begin{tabular}{p{1.4cm}p{12cm}}
-\verb|smoother| & \verb|class(mld_x_base_smoother_type)| \\
+\verb|smoother| & \verb|class(amg_x_base_smoother_type)| \\
               & The user-defined new smoother to be employed in the
                 preconditioner.\\
-\verb|solver| & \verb|class(mld_x_base_solver_type)| \\
+\verb|solver| & \verb|class(amg_x_base_solver_type)| \\
               & The user-defined new solver to be employed in the
                 preconditioner.
 \end{tabular}
 \end{center}
 The other arguments are defined in the way described in
 Sec.~\ref{sec:precset}.  As an example, in  the \verb|tests/newslv|
-code we define a new object of type \verb|mld_d_tlu_solver_type|, and
+code we define a new object of type \verb|amg_d_tlu_solver_type|, and
 we pass it as follows:
 \begin{verbatim}
 
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a
-  type(mld_dprec_type)  :: prec
-  type(mld_d_tlu_solver_type) :: tlusv
+  type(amg_dprec_type)  :: prec
+  type(amg_d_tlu_solver_type) :: tlusv
 
 ......
   !
   !  prepare the preconditioner: an ML with defaults, but with TLU solver at
-  !  intermediate levels. All other parameters are at default values. 
-  !  
+  !  intermediate levels. All other parameters are at default values.
+  !
   call prec%init('ML',       info)
   call prec%hierarchy_build(a,desc_a,info)
   nlv = prec%get_nlevs()

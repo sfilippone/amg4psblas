@@ -33,39 +33,22 @@ class="cmr-12">1   </span></span> <a
 class="cmr-12">General Overview</span></h3>
 <!--l. 5--><p class="noindent" ><span 
 class="cmr-12">The </span><span 
-class="cmcsc-10x-x-120">M<span 
+class="cmcsc-10x-x-120">A<span 
+class="small-caps">l</span><span 
+class="small-caps">g</span><span 
+class="small-caps">e</span><span 
+class="small-caps">b</span><span 
+class="small-caps">r</span><span 
+class="small-caps">a</span><span 
+class="small-caps">i</span><span 
+class="small-caps">c</span> M<span 
 class="small-caps">u</span><span 
 class="small-caps">l</span><span 
 class="small-caps">t</span><span 
-class="small-caps">i</span>L<span 
-class="small-caps">e</span><span 
-class="small-caps">v</span><span 
-class="small-caps">e</span><span 
-class="small-caps">l</span> D<span 
-class="small-caps">o</span><span 
-class="small-caps">m</span><span 
-class="small-caps">a</span><span 
-class="small-caps">i</span><span 
-class="small-caps">n</span> D<span 
-class="small-caps">e</span><span 
-class="small-caps">c</span><span 
-class="small-caps">o</span><span 
-class="small-caps">m</span><span 
-class="small-caps">p</span><span 
-class="small-caps">o</span><span 
-class="small-caps">s</span><span 
-class="small-caps">i</span><span 
-class="small-caps">t</span><span 
-class="small-caps">i</span><span 
-class="small-caps">o</span><span 
-class="small-caps">n</span> P<span 
-class="small-caps">a</span><span 
+class="small-caps">i</span>G<span 
 class="small-caps">r</span><span 
-class="small-caps">a</span><span 
-class="small-caps">l</span><span 
-class="small-caps">l</span><span 
-class="small-caps">e</span><span 
-class="small-caps">l</span> P<span 
+class="small-caps">i</span><span 
+class="small-caps">d</span> P<span 
 class="small-caps">r</span><span 
 class="small-caps">e</span><span 
 class="small-caps">c</span><span 
@@ -79,9 +62,7 @@ class="small-caps">o</span><span
 class="small-caps">n</span><span 
 class="small-caps">e</span><span 
 class="small-caps">r</span><span 
-class="small-caps">s</span></span>
-<span 
-class="cmcsc-10x-x-120">P<span 
+class="small-caps">s</span> P<span 
 class="small-caps">a</span><span 
 class="small-caps">c</span><span 
 class="small-caps">k</span><span 
@@ -94,25 +75,21 @@ class="small-caps">s</span><span
 class="small-caps">e</span><span 
 class="small-caps">d</span> <span 
 class="small-caps">o</span><span 
-class="small-caps">n</span> PSBLAS (MLD2P4</span><span 
-class="cmr-12">) provides parallel Algebraic MultiGrid</span>
+class="small-caps">n</span> PSBLAS</span>
 <span 
-class="cmr-12">(AMG) and Domain Decomposition preconditioners (see, e.g., </span><span class="cite"><span 
+class="cmcsc-10x-x-120">(AMG4PSBLAS) </span><span 
+class="cmr-12">provides parallel Algebraic MultiGrid (AMG) preconditioners (see,</span>
+<span 
+class="cmr-12">e.g., </span><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#XBriggs2000"><span 
 class="cmr-12">3</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XStuben_01"><span 
-class="cmr-12">24</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli4.html#Xdd2_96"><span 
-class="cmr-12">22</span></a><span 
+class="cmr-12">26</span></a><span 
 class="cmr-12">]</span></span><span 
-class="cmr-12">), to be used</span>
-<span 
-class="cmr-12">in the iterative solution of linear systems,</span>
+class="cmr-12">), to be used in the iterative solution of linear systems,</span>
    <table 
 class="equation"><tr><td>
    <center class="math-display" >
@@ -121,25 +98,19 @@ src="userhtml0x.png" alt="Ax  = b,
 " class="math-display" ><a 
  id="x4-3001r1"></a></center></td><td class="equation-label"><span 
 class="cmr-12">(1)</span></td></tr></table>
-<!--l. 12--><p class="nopar" >
+<!--l. 11--><p class="nopar" >
 <span 
 class="cmr-12">where </span><span 
 class="cmmi-12">A </span><span 
-class="cmr-12">is a square, real or complex, sparse matrix. The name of the package comes</span>
+class="cmr-12">is a square, real or complex, sparse symmetric positive definite (s.p.d)</span>
 <span 
-class="cmr-12">from its original implementation, containing multilevel additive and hybrid Schwarz</span>
+class="cmr-12">matrix.</span>
+<!--l. 19--><p class="indent" >   <span 
+class="cmr-12">The preconditioners implemented in AMG4PSBLAS are obtained by combining 3</span>
 <span 
-class="cmr-12">preconditioners, as well as one-level additive Schwarz preconditioners. The current</span>
+class="cmr-12">different types of AMG cycles with smoothers and coarsest-level solvers. The V-, W-,</span>
 <span 
-class="cmr-12">version extends the original plan by including multilevel cycles and smoothers widely</span>
-<span 
-class="cmr-12">used in multigrid methods.</span>
-<!--l. 24--><p class="indent" >   <span 
-class="cmr-12">The multilevel preconditioners implemented in MLD2P4 are obtained by</span>
-<span 
-class="cmr-12">combining AMG cycles with smoothers and coarsest-level solvers. The V-, W-, and</span>
-<span 
-class="cmr-12">K-cycles</span><span 
+class="cmr-12">and a version of a Krylov-type cycle (K-cycle)</span><span 
 class="cmr-12">&#x00A0;</span><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#XBriggs2000"><span 
@@ -147,23 +118,26 @@ class="cmr-12">3</span></a><span
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XNotay2008"><span 
-class="cmr-12">20</span></a><span 
+class="cmr-12">22</span></a><span 
 class="cmr-12">]</span></span> <span 
-class="cmr-12">are available, which allow to define almost all the preconditioners in</span>
+class="cmr-12">are available, which can be</span>
 <span 
-class="cmr-12">the package, including the multilevel hybrid Schwarz ones; a specific cycle is</span>
+class="cmr-12">combined with weighted versions of Jacobi, hybrid forward/backward Gauss-Seidel,</span>
 <span 
-class="cmr-12">implemented to obtain multilevel additive Schwarz preconditioners. The Jacobi,</span>
+class="cmr-12">block-Jacobi, and additive Schwarz smoothers. An algebraic approach is used to</span>
 <span 
-class="cmr-12">hybrid forward/backward Gauss-Seidel, block-Jacobi, and additive Schwarz</span>
+class="cmr-12">generate a hierarchy of coarse-level matrices and operators, without explicitly using</span>
 <span 
-class="cmr-12">methods are available as smoothers. An algebraic approach is used to generate a</span>
+class="cmr-12">any information on the geometry of the original problem, e.g., the discretization of a</span>
 <span 
-class="cmr-12">hierarchy of coarse-level matrices and operators, without explicitly using any</span>
+class="cmr-12">PDE. To this end, two different coarsening strategies, based on aggregation, are</span>
 <span 
-class="cmr-12">information on the geometry of the original problem, e.g., the discretization of a</span>
-<span 
-class="cmr-12">PDE. To this end, the smoothed aggregation technique</span><span 
+class="cmr-12">available:</span>
+     <ul class="itemize1">
+     <li class="itemize"><span 
+class="cmr-12">a  decoupled  version  of  the  well  known  smoothed  aggregation  procedure</span>
+     <span 
+class="cmr-12">proposed in</span><span 
 class="cmr-12">&#x00A0;</span><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#XBREZINA_VANEK"><span 
@@ -171,39 +145,74 @@ class="cmr-12">2</span></a><span
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XVANEK_MANDEL_BREZINA"><span 
-class="cmr-12">26</span></a><span 
+class="cmr-12">28</span></a><span 
+class="cmr-12">]</span></span><span 
+class="cmr-12">, and already included in the previous versions of the</span>
+     <span 
+class="cmr-12">package</span><span 
+class="cmr-12">&#x00A0;</span><span class="cite"><span 
+class="cmr-12">[</span><a 
+href="userhtmlli4.html#XBDDF2007"><span 
+class="cmr-12">9</span></a><span 
+class="cmr-12">,</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlli4.html#XMLD2P4_TOMS"><span 
+class="cmr-12">8</span></a><span 
+class="cmr-12">]</span></span><span 
+class="cmr-12">;</span>
+     </li>
+     <li class="itemize"><span 
+class="cmr-12">the first parallel implementation of a coupled version of Coarsening based</span>
+     <span 
+class="cmr-12">on Compatible Weighted Matching introduced in</span><span 
+class="cmr-12">&#x00A0;</span><span class="cite"><span 
+class="cmr-12">[</span><a 
+href="userhtmlli4.html#XDV2013"><span 
+class="cmr-12">29</span></a><span 
+class="cmr-12">,</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlli4.html#XDFV2018"><span 
+class="cmr-12">30</span></a><span 
 class="cmr-12">]</span></span> <span 
-class="cmr-12">is applied.</span>
-<span 
-class="cmr-12">Either exact or approximate solvers can be used on the coarsest-level system.</span>
-<span 
-class="cmr-12">Specifically, different sparse LU factorizations from external packages, and</span>
-<span 
-class="cmr-12">native incomplete LU factorizations and Jacobi, hybrid Gauss-Seidel, and</span>
+class="cmr-12">and described in</span>
                                                                                
 
                                                                                
+     <span 
+class="cmr-12">details in</span><span 
+class="cmr-12">&#x00A0;</span><span class="cite"><span 
+class="cmr-12">[</span><a 
+href="userhtmlli4.html#XDDF2020"><span 
+class="cmr-12">10</span></a><span 
+class="cmr-12">]</span></span><span 
+class="cmr-12">;</span></li></ul>
+<!--l. 31--><p class="indent" >   <span 
+class="cmr-12">Either exact or approximate solvers can be used on the coarsest-level system.</span>
 <span 
-class="cmr-12">block-Jacobi solvers are available. All smoothers can be also exploited as one-level</span>
+class="cmr-12">Specifically, different sparse LU factorizations from external packages, native</span>
+<span 
+class="cmr-12">incomplete LU factorizations, weighted Jacobi, hybrid Gauss-Seidel, and block-Jacobi</span>
+<span 
+class="cmr-12">solvers are available. All the smoothers can be also exploited as one-level</span>
 <span 
 class="cmr-12">preconditioners.</span>
-<!--l. 42--><p class="indent" >   <span 
-class="cmr-12">MLD2P4 is written in Fortran</span><span 
+<!--l. 36--><p class="indent" >   <span 
+class="cmr-12">AMG4PSBLAS is written in Fortran</span><span 
 class="cmr-12">&#x00A0;2003, following an object-oriented design</span>
 <span 
 class="cmr-12">through the exploitation of features such as abstract data type creation, type</span>
 <span 
-class="cmr-12">extension, functional overloading, and dynamic memory management. The</span>
+class="cmr-12">extension, functional overloading, and dynamic memory management. The parallel</span>
 <span 
-class="cmr-12">parallel implementation is based on a Single Program Multiple Data (SPMD)</span>
+class="cmr-12">implementation is based on a Single Program Multiple Data (SPMD) paradigm.</span>
 <span 
-class="cmr-12">paradigm. Single and double precision implementations of MLD2P4 are available</span>
+class="cmr-12">Single and double precision implementations of AMG4PSBLAS are available</span>
 <span 
 class="cmr-12">for both the real and the complex case, which can be used through a single</span>
 <span 
 class="cmr-12">interface.</span>
-<!--l. 53--><p class="indent" >   <span 
-class="cmr-12">MLD2P4 has been designed to implement scalable and easy-to-use multilevel</span>
+<!--l. 46--><p class="indent" >   <span 
+class="cmr-12">AMG4PSBLAS has been designed to implement scalable and easy-to-use multilevel</span>
 <span 
 class="cmr-12">preconditioners in the context of the PSBLAS (Parallel Sparse BLAS) computational</span>
 <span 
@@ -211,39 +220,43 @@ class="cmr-12">framework</span><span
 class="cmr-12">&#x00A0;</span><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#Xpsblas_00"><span 
-class="cmr-12">15</span></a><span 
+class="cmr-12">17</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XPSBLAS3"><span 
-class="cmr-12">14</span></a><span 
+class="cmr-12">16</span></a><span 
 class="cmr-12">]</span></span><span 
 class="cmr-12">. PSBLAS provides basic linear algebra operators and data</span>
 <span 
 class="cmr-12">management facilities for distributed sparse matrices, as well as parallel Krylov solvers</span>
 <span 
-class="cmr-12">which can be used with the MLD2P4 preconditioners. The choice of PSBLAS has been</span>
+class="cmr-12">which can be used with the AMG4PSBLAS preconditioners. The choice of PSBLAS</span>
 <span 
-class="cmr-12">mainly motivated by the need of having a portable and efficient software infrastructure</span>
+class="cmr-12">has been mainly motivated by the need of having a portable and efficient</span>
 <span 
-class="cmr-12">implementing &#8220;de facto&#8221; standard parallel sparse linear algebra kernels, to pursue goals</span>
+class="cmr-12">software infrastructure implementing &#8220;de facto&#8221; standard parallel sparse linear</span>
 <span 
-class="cmr-12">such as performance, portability, modularity ed extensibility in the development of the</span>
+class="cmr-12">algebra kernels, to pursue goals such as performance, portability, modularity</span>
 <span 
-class="cmr-12">preconditioner package. On the other hand, the implementation of MLD2P4 has led to</span>
+class="cmr-12">ed extensibility in the development of the preconditioner package. On the</span>
 <span 
-class="cmr-12">some revisions and extentions of the original PSBLAS kernels. The inter-process</span>
+class="cmr-12">other hand, the implementation of AMG4PSBLAS, which was driven by the</span>
 <span 
-class="cmr-12">comunication required by MLD2P4 is encapsulated in the PSBLAS routines; therefore,</span>
+class="cmr-12">need to face the exascale challenge, has led to some important revisions and</span>
 <span 
-class="cmr-12">MLD2P4 can be run on any parallel machine where PSBLAS implementations are</span>
+class="cmr-12">extentions of the PSBLAS infrastructure. The inter-process comunication</span>
 <span 
-class="cmr-12">available.</span>
-<!--l. 70--><p class="indent" >   <span 
-class="cmr-12">MLD2P4 has a layered and modular software architecture where three main layers</span>
+class="cmr-12">required by AMG4PSBLAS is encapsulated in the PSBLAS routines; therefore,</span>
 <span 
-class="cmr-12">can be identified. The lower layer consists of the PSBLAS kernels, the middle one</span>
+class="cmr-12">AMG4PSBLAS can be run on any parallel machine where PSBLAS implementations</span>
 <span 
-class="cmr-12">implements the construction and application phases of the preconditioners, and the</span>
+class="cmr-12">are available.</span>
+<!--l. 61--><p class="indent" >   <span 
+class="cmr-12">AMG4PSBLAS has a layered and modular software architecture where three main</span>
+<span 
+class="cmr-12">layers can be identified. The lower layer consists of the PSBLAS kernels, the middle</span>
+<span 
+class="cmr-12">one implements the construction and application phases of the preconditioners, and the</span>
 <span 
 class="cmr-12">upper one provides a uniform interface to all the preconditioners. This architecture</span>
 <span 
@@ -251,7 +264,7 @@ class="cmr-12">allows for different levels of use of the package: few black-box 
 <span 
 class="cmr-12">layer allow all users to easily build and apply any preconditioner available in</span>
 <span 
-class="cmr-12">MLD2P4; facilities are also available allowing expert users to extend the set of</span>
+class="cmr-12">AMG4PSBLAS; facilities are also available allowing expert users to extend the set of</span>
 <span 
 class="cmr-12">smoothers and solvers for building new versions of the preconditioners (see</span>
 <span 
@@ -260,28 +273,7 @@ class="cmr-12">&#x00A0;</span><a
 href="userhtmlse7.html#x29-330007"><span 
 class="cmr-12">7</span><!--tex4ht:ref: sec:adding --></a><span 
 class="cmr-12">).</span>
-<!--l. 81--><p class="indent" >   <span 
-class="cmr-12">We note that the user interface of MLD2P4 2.1 has been extended with respect to</span>
-<span 
-class="cmr-12">the previous versions in order to separate the construction of the multilevel</span>
-<span 
-class="cmr-12">hierarchy from the construction of the smoothers and solvers, and to allow for</span>
-<span 
-class="cmr-12">more flexibility at each level. The software architecture described in</span><span 
-class="cmr-12">&#x00A0;</span><span class="cite"><span 
-class="cmr-12">[</span><a 
-href="userhtmlli4.html#XMLD2P4_TOMS"><span 
-class="cmr-12">8</span></a><span 
-class="cmr-12">]</span></span> <span 
-class="cmr-12">has</span>
-<span 
-class="cmr-12">significantly evolved too, in order to fully exploit the Fortran</span><span 
-class="cmr-12">&#x00A0;2003 features</span>
-<span 
-class="cmr-12">implemented in PSBLAS 3. However, compatibility with previous versions has been</span>
-<span 
-class="cmr-12">preserved.</span>
-<!--l. 88--><p class="indent" >   <span 
+<!--l. 72--><p class="indent" >   <span 
 class="cmr-12">This guide is organized as follows. General information on the distribution of the</span>
 <span 
 class="cmr-12">source code is reported in Section</span><span 
@@ -294,47 +286,41 @@ class="cmr-12">of the package are given in Section</span><span
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse3.html#x7-60003"><span 
 class="cmr-12">3</span><!--tex4ht:ref: sec:building --></a><span 
-class="cmr-12">. A short description of the preconditioners</span>
+class="cmr-12">. The basics for building and applying the</span>
 <span 
-class="cmr-12">implemented in MLD2P4 is provided in Section</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlse4.html#x13-120004"><span 
-class="cmr-12">4</span><!--tex4ht:ref: sec:background --></a><span 
-class="cmr-12">, to help the users in choosing among</span>
-                                                                               
-
-                                                                               
+class="cmr-12">preconditioners with the Krylov solvers implemented in PSBLAS are reported</span>
 <span 
-class="cmr-12">them. The basics for building and applying the preconditioners with the Krylov solvers</span>
-<span 
-class="cmr-12">implemented in PSBLAS are reported in</span><span 
+class="cmr-12">in</span><span 
 class="cmr-12">&#x00A0;Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse5.html#x17-160005"><span 
 class="cmr-12">5</span><!--tex4ht:ref: sec:started --></a><span 
-class="cmr-12">, where the Fortran codes of a few</span>
+class="cmr-12">, where the Fortran codes of a few sample programs are also shown.</span>
+                                                                               
+
+                                                                               
 <span 
-class="cmr-12">sample programs are also shown. A reference guide for the user interface routines is</span>
-<span 
-class="cmr-12">provided in Section</span><span 
+class="cmr-12">A reference guide for the user interface routines is provided in Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse6.html#x19-180006"><span 
 class="cmr-12">6</span><!--tex4ht:ref: sec:userinterface --></a><span 
-class="cmr-12">. Information on the extension of the package through the</span>
+class="cmr-12">.</span>
 <span 
-class="cmr-12">addition of new smoothers and solvers is reported in Section</span><span 
+class="cmr-12">Information on the extension of the package through the addition of new</span>
+<span 
+class="cmr-12">smoothers and solvers is reported in Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse7.html#x29-330007"><span 
 class="cmr-12">7</span><!--tex4ht:ref: sec:adding --></a><span 
-class="cmr-12">. The error handling</span>
+class="cmr-12">. The error handling mechanism</span>
 <span 
-class="cmr-12">mechanism used by the package is briefly described in Section</span><span 
+class="cmr-12">used by the package is briefly described in Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse8.html#x30-340008"><span 
 class="cmr-12">8</span><!--tex4ht:ref: sec:errors --></a><span 
-class="cmr-12">. The copyright</span>
+class="cmr-12">. The copyright terms</span>
 <span 
-class="cmr-12">terms concerning the distribution and modification of MLD2P4 are reported in</span>
+class="cmr-12">concerning the distribution and modification of AMG4PSBLAS are reported in</span>
 <span 
 class="cmr-12">Appendix</span><span 
 class="cmr-12">&#x00A0;</span><a 

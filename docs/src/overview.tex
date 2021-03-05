@@ -1,105 +1,87 @@
 \section{General Overview\label{sec:overview}}
-\markboth{\textsc{MLD2P4 User's and Reference Guide}}
+\markboth{\textsc{AMG4PSBLAS User's and Reference Guide}}
          {\textsc{\ref{sec:overview} General Overview}}
-            
-The \textsc{MultiLevel Domain Decomposition Parallel Preconditioners Package based on
-PSBLAS (MLD2P4}) provides parallel Algebraic MultiGrid (AMG) and Domain 
-Decomposition preconditioners (see, e.g., \cite{Briggs2000,Stuben_01,dd2_96}),
+
+The \textsc{Algebraic MultiGrid Preconditioners Package based on
+PSBLAS (AMG4PSBLAS)} provides parallel Algebraic MultiGrid (AMG) preconditioners (see, e.g., \cite{Briggs2000,Stuben_01}),
 to be used in the iterative solution of  linear systems,
-\begin{equation} 
-Ax=b, 
+\begin{equation}
+Ax=b,
 \label{system1}
-\end{equation} 
-where $A$ is a square, real or complex, sparse matrix. 
+\end{equation}
+where $A$ is a square, real or complex, sparse symmetric positive definite (s.p.d) matrix.
 %
-%\textbf{NOTA: Caso non simmetrico, aggregazione con $(A+A^T)$ fatta! 
+%\textbf{NOTA: Caso non simmetrico, aggregazione con $(A+A^T)$ fatta!
 %Dovremmo implementare uno smoothed prolongator
 %adeguato e fare qualcosa di consistente anche con 1-lev Schwarz.}
 %
-The name of the package comes from its original implementation, containing
-multilevel additive and hybrid Schwarz preconditioners, as well as one-level additive
-Schwarz preconditioners. The current version extends the original plan by including
-multilevel cycles and smoothers widely used in multigrid methods.
 
-The multilevel preconditioners implemented in MLD2P4 are obtained by combining
-AMG cycles with smoothers and coarsest-level solvers. The V-, W-, and
-K-cycles~\cite{Briggs2000,Notay2008} are available, which allow to define
-almost all the preconditioners in the package, including the multilevel hybrid
-Schwarz ones; a specific cycle is implemented to obtain multilevel additive
-Schwarz preconditioners. The Jacobi, hybrid
+The preconditioners implemented in AMG4PSBLAS are obtained by combining
+3 different types of AMG cycles with smoothers and coarsest-level solvers. The V-, W-, and a version of a Krylov-type cycle (K-cycle)~\cite{Briggs2000,Notay2008} are available, which can be combined with weighted versions of Jacobi, hybrid
 %\footnote{see Note 2 in Table~\ref{tab:p_coarse}, p.~28.}
-forward/backward Gauss-Seidel, block-Jacobi, and additive Schwarz methods
-are available as smoothers. An algebraic approach is used to generate a hierarchy of
+forward/backward Gauss-Seidel, block-Jacobi, and additive Schwarz smoothers. An algebraic approach is used to generate a hierarchy of
 coarse-level matrices and operators, without explicitly using any information on the
 geometry of the original problem, e.g., the discretization of a PDE. To this end,
-the smoothed aggregation technique~\cite{BREZINA_VANEK,VANEK_MANDEL_BREZINA}
-is applied. Either exact or approximate solvers can be used on the coarsest-level
-system. Specifically, different sparse LU factorizations from external
-packages, and native incomplete LU factorizations and Jacobi, hybrid Gauss-Seidel,
-and block-Jacobi solvers are available. All smoothers can be also exploited as one-level 
+two different coarsening strategies, based on aggregation, are available:
+\begin{itemize}
+\item a decoupled version of the well known smoothed aggregation procedure proposed in~\cite{BREZINA_VANEK,VANEK_MANDEL_BREZINA}, and already included in the previous versions of the package~\cite{BDDF2007,MLD2P4_TOMS};
+\item the first parallel implementation of a coupled version of Coarsening based on Compatible Weighted Matching introduced in~\cite{DV2013,DFV2018} and described in details in~\cite{DDF2020};
+\end{itemize}
+
+Either exact or approximate solvers can be used on the coarsest-level system. Specifically, different sparse LU factorizations from external
+packages, native incomplete LU factorizations, weighted Jacobi, hybrid Gauss-Seidel,
+and block-Jacobi solvers are available. All the smoothers can be also exploited as one-level
 preconditioners.
 
-MLD2P4 is written in Fortran~2003, following an
+AMG4PSBLAS is written in Fortran~2003, following an
 object-oriented design through the exploitation of features
 such as abstract data type creation, type extension, functional overloading, and
-dynamic memory management. % \textbf{Va bene cos\'{i} o \`e meglio
-% fare riferimento alle classi?}
+dynamic memory management.
 The parallel implementation is based on a Single Program Multiple Data
 (SPMD) paradigm.  Single and
-double precision implementations of MLD2P4 are available for both the
+double precision implementations of AMG4PSBLAS are available for both the
 real and the complex case, which can be used through a single
-interface. 
+interface.
 
-MLD2P4 has been designed to implement scalable and easy-to-use
+AMG4PSBLAS has been designed to implement scalable and easy-to-use
 multilevel preconditioners in the context of the PSBLAS (Parallel Sparse BLAS)
 computational framework~\cite{psblas_00,PSBLAS3}. PSBLAS provides basic linear algebra
 operators and data management facilities for distributed sparse matrices,
-as well as parallel Krylov solvers which can be used with the MLD2P4 preconditioners.
+as well as parallel Krylov solvers which can be used with the AMG4PSBLAS preconditioners.
 The choice of PSBLAS has been mainly motivated by the need of having
 a portable and efficient software infrastructure implementing ``de facto'' standard
 parallel sparse linear algebra kernels, to pursue goals such as performance,
 portability, modularity ed extensibility in the development of the preconditioner
-package. On the other hand, the implementation of MLD2P4 has led to some
-revisions and extentions of the original PSBLAS kernels.
-The inter-process comunication required by MLD2P4 is encapsulated
+package. On the other hand, the implementation of AMG4PSBLAS, which was driven by the need to face the exascale challenge, has led to some important  revisions and extentions of the PSBLAS infrastructure.
+The inter-process comunication required by AMG4PSBLAS is encapsulated
 in the PSBLAS routines;
-% , except few cases where MPI~\cite{MPI1} is explicitly called. 
-therefore, MLD2P4 can be run on any parallel machine where PSBLAS 
+therefore, AMG4PSBLAS can be run on any parallel machine where PSBLAS
 implementations are available.
 
-MLD2P4 has a layered and modular software architecture where three main layers can be
+AMG4PSBLAS has a layered and modular software architecture where three main layers can be
 identified.  The lower layer consists of the PSBLAS kernels, the middle one implements
 the construction and application phases of the preconditioners, and the upper one
-provides a uniform interface to all the preconditioners. 
+provides a uniform interface to all the preconditioners.
 This architecture allows for different levels of use of the package:
 few black-box routines at the upper layer allow all users to easily
-build and apply any preconditioner available in MLD2P4;
-facilities are also available allowing  expert users to extend the set of smoothers
+build and apply any preconditioner available in AMG4PSBLAS;
+facilities are also available allowing expert users to extend the set of smoothers
 and solvers for building new versions of the preconditioners (see
-Section~\ref{sec:adding}). 
-
-We note that the user interface of MLD2P4 2.1 has been extended with respect to the
-previous versions in order to separate the construction of the multilevel hierarchy from
-the construction of the smoothers and solvers, and to allow for more flexibility
-at each level. The software architecture described in~\cite{MLD2P4_TOMS} has significantly
-evolved too, in order to fully exploit the Fortran~2003 features implemented in PSBLAS 3.
-However, compatibility with previous versions has been preserved.
+Section~\ref{sec:adding}).
 
 This guide is organized as follows. General information on the distribution of the source
 code is reported in Section~\ref{sec:distribution}, while details on the configuration
-and installation of the package are given in Section~\ref{sec:building}. A short description
-of the preconditioners implemented in MLD2P4 is provided in Section~\ref{sec:background},
-to help the users in choosing among them. The basics for building and applying the
-preconditioners with the Krylov solvers implemented in PSBLAS are reported 
+and installation of the package are given in Section~\ref{sec:building}. The basics for building and applying the
+preconditioners with the Krylov solvers implemented in PSBLAS are reported
 in~Section~\ref{sec:started}, where the Fortran codes of a few sample programs
 are also shown. A reference guide for the user interface routines is provided
 in Section~\ref{sec:userinterface}. Information on the extension of the package
-through the addition of new smoothers and solvers is reported in Section~\ref{sec:adding}. 
+through the addition of new smoothers and solvers is reported in Section~\ref{sec:adding}.
 The error handling mechanism used by the package
 is briefly described in Section~\ref{sec:errors}. The copyright terms concerning the
-distribution and modification of MLD2P4 are reported in Appendix~\ref{sec:license}.
+distribution and modification of AMG4PSBLAS are reported in Appendix~\ref{sec:license}.
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "userguide"
-%%% End: 
+%%% End:

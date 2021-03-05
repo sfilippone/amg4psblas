@@ -1,8 +1,8 @@
 \section{Error Handling\label{sec:errors}}
-\markboth{\textsc{MLD2P4 User's and Reference Guide}}
+\markboth{\textsc{AMG4PSBLAS User's and Reference Guide}}
          {\textsc{\ref{sec:errors} Error handling}}
 
-The error handling in MLD2P4 is based on the PSBLAS error
+The error handling in AMG4PSBLAS is based on the PSBLAS error
 handling. Error conditions are signaled via an integer argument
 \verb|info|; whenever an error condition is detected, an error trace
 stack is built by the library up to the top-level, user-callable
@@ -12,9 +12,9 @@ program or by returning the error condition to the user code, which
 will then take action, and whether
 an error message should be printed. These options may be set by using
 the PSBLAS error handling routines; for further details see the PSBLAS
-User's Guide \cite{PSBLASGUIDE}. 
+User's Guide \cite{PSBLASGUIDE}.
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "userguide"
-%%% End: 
+%%% End:

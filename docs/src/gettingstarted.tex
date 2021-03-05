@@ -1,17 +1,17 @@
 \section{Getting Started\label{sec:started}}
-\markboth{\textsc{MLD2P4 User's and Reference Guide}}
+\markboth{\textsc{AMG4PSBLAS User's and Reference Guide}}
          {\textsc{\ref{sec:started} Getting Started}}
 
-We describe the basics for building and applying MLD2P4 one-level and multilevel
+We describe the basics for building and applying AMG4PSBLAS one-level and multilevel
 (i.e., AMG) preconditioners with the Krylov solvers included in PSBLAS \cite{PSBLASGUIDE}.
 The following steps are required:
-\begin{enumerate} 
+\begin{enumerate}
 \item \emph{Declare the preconditioner data structure}. It is a derived data type,
-  \verb|mld_|\-\emph{x}\verb|prec_| \verb|type|, where \emph{x} may be \verb|s|, \verb|d|, \verb|c|
+  \verb|amg_|\-\emph{x}\verb|prec_| \verb|type|, where \emph{x} may be \verb|s|, \verb|d|, \verb|c|
 	or \verb|z|, according to the basic data type of the sparse matrix
 	(\verb|s| = real single precision; \verb|d| = real double precision;
 	\verb|c| = complex single precision; \verb|z| = complex double precision).
-	This data structure is accessed by the user only through the MLD2P4 routines,
+	This data structure is accessed by the user only through the AMG4PSBLAS routines,
 	following an object-oriented approach.
 \item \emph{Allocate and initialize the preconditioner data structure, according to
 	a preconditioner type chosen by the user}. This is performed by the routine
@@ -21,21 +21,14 @@ The following steps are required:
 	\verb|init| to identify the preconditioner types are also given.
 	Note that these strings are valid also if uppercase letters are substituted by
 	corresponding lowercase ones.
-%\item \emph{Modify the aggregation  parameters (for multilevel preconditioners only).}
-%  This is performed by the routine \verb|mld_precset|. 
-%  This routine must be called only if the user wants to modify the default values
-%  of the parameters associated with the aggregation hierarchy construction.
-%  Examples of use of \verb|mld_precset| are given in
-%  Section~\ref{sec:examples}; a complete list of all the
-%  preconditioner parameters and their allowed and default values is provided in 
-%  Section~\ref{sec:userinterface}, Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}. 
+
 \item \emph{Modify the selected preconditioner type, by properly setting
   preconditioner parameters.} This is performed by the routine \verb|set|.
   This routine must be called only if the user wants to modify the default values
   of the parameters associated with the selected preconditioner type, to obtain a variant
   of that preconditioner. Examples of use of \verb|set| are given in
   Section~\ref{sec:examples}; a complete list of all the
-  preconditioner parameters and their allowed and default values is provided in 
+  preconditioner parameters and their allowed and default values is provided in
   Section~\ref{sec:userinterface}, Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}.
 \item \emph{Build the preconditioner for a given matrix}. If the selected preconditioner
  is multilevel, then two steps must be performed, as specified next.
@@ -58,7 +51,7 @@ performed by the routine \verb|bld|.
 
 All the previous routines are available as methods of the preconditioner object.
 A detailed description of them is given in Section~\ref{sec:userinterface}.
-Examples showing the basic use of MLD2P4 are reported in Section~\ref{sec:examples}.
+Examples showing the basic use of AMG4PSBLAS are reported in Section~\ref{sec:examples}.
 
 \begin{table}[h!]
 \begin{center}
@@ -81,7 +74,7 @@ Block Jacobi      & \verb|'BJAC'| & Block-Jacobi with ILU(0) on the local blocks
 Additive Schwarz  & \verb|'AS'|   & Additive Schwarz (AS),
                                     with overlap~1 and ILU(0) on the local blocks. \\ \hline
 Multilevel        &\verb|'ML'|    & V-cycle with one hybrid forward Gauss-Seidel
-                                    (GS) sweep as pre-smoother and one hybrid backward 
+                                    (GS) sweep as pre-smoother and one hybrid backward
                                     GS sweep as post-smoother, basic smoothed aggregation
                                    as coarsening algorithm, and LU (plus triangular solve)
                                    as coarsest-level solver. See the default values in
@@ -95,8 +88,8 @@ Multilevel        &\verb|'ML'|    & V-cycle with one hybrid forward Gauss-Seidel
 \end{center}
 \end{table}
 
-Note that the module \verb|mld_prec_mod|, containing the definition of the 
-preconditioner data type and the interfaces to the routines of MLD2P4,
+Note that the module \verb|amg_prec_mod|, containing the definition of the
+preconditioner data type and the interfaces to the routines of AMG4PSBLAS,
 must be used in any program calling such routines.
 The modules \verb|psb_base_mod|, for the sparse matrix and communication descriptor
 data types, and \verb|psb_krylov_mod|, for interfacing with the
@@ -108,36 +101,30 @@ usually lead to smaller numbers of preconditioned Krylov
 iterations than inexact solvers, when the linear system comes from
 a standard discretization of basic scalar elliptic PDE problems. However,
 this does not necessarily correspond to the smallest execution time
-on parallel computers. 
-% \ \\
-% \textbf{Remark 2.} The include path for MLD2P4 must override
-% those for PSBLAS, i.e.\ the former must come first in the sequence
-% passed to the compiler, as the MLD2P4 version of the Krylov solver
-% interfaces must override that of PSBLAS. This will change in the future
-% when the support for the \verb|class| statement becomes widespread in Fortran
-% compilers. 
+on parallel computers.
 
 
+{\em DA MODIFICARE PER INSERIRE TIPO DI AGGREGAZIONE}
 
 \subsection{Examples\label{sec:examples}}
 
 The code reported in Figure~\ref{fig:ex1} shows how to set and apply the default
 multilevel preconditioner available in the real double precision version
-of MLD2P4 (see Table~\ref{tab:precinit}). This preconditioner is chosen
+of AMG4PSBLAS (see Table~\ref{tab:precinit}). This preconditioner is chosen
 by simply specifying \verb|'ML'| as the second argument of \verb|P%init|
 (a call to \verb|P%set| is not needed) and is applied with the CG
 solver provided by PSBLAS (the matrix of the system to be solved is
 assumed to be positive definite). As previously observed, the modules
-\verb|psb_base_mod|, \verb|mld_prec_mod| and \verb|psb_krylov_mod|
+\verb|psb_base_mod|, \verb|amg_prec_mod| and \verb|psb_krylov_mod|
 must be used by the example program.
- 
+
 The part of the code concerning the
 reading and assembling of the sparse matrix and the right-hand side vector, performed
 through the PSBLAS routines for sparse matrix and vector management, is not reported
 here for brevity; the statements concerning the deallocation of the PSBLAS
 data structure are neglected too.
-The complete code can be found in the example program file \verb|mld_dexample_ml.f90|,
-in the directory \verb|examples/fileread| of the MLD2P4 implementation (see
+The complete code can be found in the example program file \verb|amg_dexample_ml.f90|,
+in the directory \verb|examples/fileread| of the AMG4PSBLAS implementation (see
 Section~\ref{sec:ex_and_test}). A sample test problem along with the relevant
 input data is available in \verb|examples/fileread/runs|.
 For details on the use of the PSBLAS routines, see the PSBLAS User's
@@ -151,11 +138,11 @@ the corresponding codes are available in \verb|examples/fileread/|.
 
 \begin{figure}[tbp]
 \begin{center}
-\begin{minipage}{.90\textwidth} 
+\begin{minipage}{.90\textwidth}
 {\small
 \begin{verbatim}
   use psb_base_mod
-  use mld_prec_mod
+  use amg_prec_mod
   use psb_krylov_mod
 ... ...
 !
@@ -164,7 +151,7 @@ the corresponding codes are available in \verb|examples/fileread/|.
 ! sparse matrix descriptor
   type(psb_desc_type)   :: desc_A
 ! preconditioner
-  type(mld_dprec_type)  :: P
+  type(amg_dprec_type)  :: P
 ! right-hand side and solution vectors
   type(psb_d_vect_type) :: b, x
 ... ...
@@ -174,7 +161,7 @@ the corresponding codes are available in \verb|examples/fileread/|.
   call psb_info(ictxt,iam,np)
 ... ...
 !
-! read and assemble the spd matrix A and the right-hand side b 
+! read and assemble the spd matrix A and the right-hand side b
 ! using PSBLAS routines for sparse matrix / vector management
 ... ...
 !
@@ -230,41 +217,31 @@ and solves the coarsest-level system with the multifrontal LU factorization
 implemented in MUMPS. It is specified that the coarsest-level
 matrix is distributed, since MUMPS can be used on both
 replicated and distributed matrices, and by default
-it is used on replicated ones. 
+it is used on replicated ones.
 %Note the use of the parameter \verb|pos|
 %to specify a property only for the pre-smoother or the post-smoother
 %(see Section~\ref{sec:precset} for more details).
 The code fragments shown in Figures~\ref{fig:ex2} and \ref{fig:ex3} are
-included in the example program file \verb|mld_dexample_ml.f90| too.
+included in the example program file \verb|amg_dexample_ml.f90| too.
 
 Finally, Figure~\ref{fig:ex4} shows the setup of a one-level
 additive Schwarz preconditioner, i.e., RAS with overlap 2.
 Note also that a Krylov method different from CG must be used to solve
 the preconditioned system, since the preconditione in nonsymmetric.
 The corresponding example program is available in the file
-\verb|mld_dexample_1lev.f90|. 
+\verb|amg_dexample_1lev.f90|.
 
 For all the previous preconditioners, example programs where the sparse matrix and
 the right-hand side are generated by discretizing a PDE with Dirichlet
 boundary conditions are also available in the directory \verb|examples/pdegen|.
 
-% \ \\
-% \textbf{Remark 2.} Any PSBLAS-based program using the basic preconditioners
-% implemented in PSBLAS 3.0, i.e.\ the diagonal and block-Jacobi ones,
-% can use the diagonal and block-Jacobi preconditioners
-% implemented in MLD2P4 without  change in the code.
-% The PSBLAS-based program must be only recompiled
-% and linked to the MLD2P4 library.
-% \\
-
-
 \begin{figure}[tbh]
 \begin{center}
-\begin{minipage}{.90\textwidth} 
+\begin{minipage}{.90\textwidth}
 {\small
 \begin{verbatim}
 ... ...
-! build a V-cycle preconditioner with 1 block-Jacobi sweep (with 
+! build a V-cycle preconditioner with 1 block-Jacobi sweep (with
 ! ILU(0) on the blocks) as pre- and post-smoother, and 8  block-Jacobi
 ! sweeps (with ILU(0) on the blocks) as coarsest-level solver
   call P%init('ML',info)
@@ -284,7 +261,7 @@ boundary conditions are also available in the directory \verb|examples/pdegen|.
 
 \begin{figure}[h!]
 \begin{center}
-\begin{minipage}{.90\textwidth} 
+\begin{minipage}{.90\textwidth}
 {\small
 \begin{verbatim}
 ... ...
@@ -309,7 +286,7 @@ boundary conditions are also available in the directory \verb|examples/pdegen|.
 
 \begin{figure}[h!]
 \begin{center}
-\begin{minipage}{.90\textwidth} 
+\begin{minipage}{.90\textwidth}
 {\small
 \begin{verbatim}
 ... ...
@@ -328,7 +305,7 @@ boundary conditions are also available in the directory \verb|examples/pdegen|.
 \end{figure}
 
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "userguide"
-%%% End: 
+%%% End:

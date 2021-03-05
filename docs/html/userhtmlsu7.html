@@ -11,89 +11,96 @@
 </head><body 
 >
    <!--l. 133--><div class="crosslinks"><p class="noindent"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">[</span><a 
 href="userhtmlsu8.html" ><span 
-class="cmr-12">next</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">next</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu6.html" ><span 
-class="cmr-12">prev</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">prev</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu6.html#tailuserhtmlsu6.html" ><span 
-class="cmr-12">prev-tail</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">prev-tail</span></a><span 
+class="cmbx-12">] [</span><a 
 href="#tailuserhtmlsu7.html"><span 
-class="cmr-12">tail</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">tail</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlse4.html#userhtmlsu7.html" ><span 
-class="cmr-12">up</span></a><span 
-class="cmr-12">] </span></p></div>
+class="cmbx-12">up</span></a><span 
+class="cmbx-12">] </span></p></div>
    <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmr-12">4.2   </span></span> <a 
+class="cmbx-12">4.2   </span></span> <a 
  id="x15-140004.2"></a><span 
-class="cmr-12">Smoothed Aggregation</span></h4>
+class="cmbx-12">Smoothed Aggregation</span></h4>
 <!--l. 135--><p class="noindent" ><span 
-class="cmr-12">In order to define the prolongator </span><span 
+class="cmbx-12">In order to define the prolongator </span><span 
 class="cmmi-12">P</span><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">, used to compute the coarse-level matrix </span><span 
+class="cmbx-12">, used to compute the coarse-level</span>
+<span 
+class="cmbx-12">matrix </span><span 
 class="cmmi-12">A</span><sup><span 
 class="cmmi-8">k</span><span 
 class="cmr-8">+1</span></sup><span 
-class="cmr-12">,</span>
+class="cmbx-12">, MLD2P4 uses the smoothed aggregation algorithm described</span>
 <span 
-class="cmr-12">MLD2P4 uses the smoothed aggregation algorithm described in </span><span class="cite"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">in </span><span class="cite"><span 
+class="cmbx-12">[</span><a 
 href="userhtmlli4.html#XBREZINA_VANEK"><span 
-class="cmr-12">2</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
+class="cmbx-12">2</span></a><span 
+class="cmbx-12">,</span><span 
+class="cmbx-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XVANEK_MANDEL_BREZINA"><span 
-class="cmr-12">26</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">. The basic idea</span>
+class="cmbx-12">28</span></a><span 
+class="cmbx-12">]</span></span><span 
+class="cmbx-12">. The basic idea of this algorithm is to build a coarse set of indices</span>
 <span 
-class="cmr-12">of this algorithm is to build a coarse set of indices &#x03A9;</span><sup><span 
+class="cmr-12">&#x03A9;</span><sup><span 
 class="cmmi-8">k</span><span 
-class="cmr-8">+1</span></sup> <span 
-class="cmr-12">by suitably grouping the</span>
-<span 
-class="cmr-12">indices of &#x03A9;</span><sup><span 
+class="cmr-8">+1</span></sup>  <span 
+class="cmbx-12">by suitably grouping the indices of </span><span 
+class="cmr-12">&#x03A9;</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">into disjoint subsets (aggregates), and to define the coarse-to-fine space</span>
+class="cmbx-12">into disjoint subsets</span>
 <span 
-class="cmr-12">transfer operator </span><span 
+class="cmbx-12">(aggregates), and to define the coarse-to-fine space transfer operator </span><span 
 class="cmmi-12">P</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">by applying a suitable smoother to a simple piecewise constant</span>
+class="cmbx-12">by</span>
 <span 
-class="cmr-12">prolongation operator, with the aim of improving the quality of the coarse-space</span>
+class="cmbx-12">applying a suitable smoother to a simple piecewise constant prolongation</span>
 <span 
-class="cmr-12">correction.</span>
+class="cmbx-12">operator, with the aim of improving the quality of the coarse-space</span>
+<span 
+class="cmbx-12">correction.</span>
 <!--l. 144--><p class="indent" >   <span 
-class="cmr-12">Three main steps can be identified in the smoothed aggregation procedure:</span>
+class="cmbx-12">Three main steps can be identified in the smoothed aggregation</span>
+<span 
+class="cmbx-12">procedure:</span>
      <ol  class="enumerate1" >
      <li 
   class="enumerate" id="x15-14002x1"><span 
-class="cmr-12">aggregation of the indices of &#x03A9;</span><sup><span 
+class="cmbx-12">aggregation of the indices of </span><span 
+class="cmr-12">&#x03A9;</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">to obtain &#x03A9;</span><sup><span 
+class="cmbx-12">to obtain </span><span 
+class="cmr-12">&#x03A9;</span><sup><span 
 class="cmmi-8">k</span><span 
 class="cmr-8">+1</span></sup><span 
-class="cmr-12">;</span>
+class="cmbx-12">;</span>
      </li>
      <li 
   class="enumerate" id="x15-14004x2"><span 
-class="cmr-12">construction of the prolongator </span><span 
+class="cmbx-12">construction of the prolongator </span><span 
 class="cmmi-12">P</span><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">;</span>
+class="cmbx-12">;</span>
      </li>
      <li 
   class="enumerate" id="x15-14006x3"><span 
-class="cmr-12">application of </span><span 
+class="cmbx-12">application of </span><span 
 class="cmmi-12">P</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">and </span><span 
+class="cmbx-12">and </span><span 
 class="cmmi-12">R</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
 class="cmr-12">= (</span><span 
@@ -101,51 +108,51 @@ class="cmmi-12">P</span><sup><span
 class="cmmi-8">k</span></sup><span 
 class="cmr-12">)</span><sup><span 
 class="cmmi-8">T</span> </sup> <span 
-class="cmr-12">to build </span><span 
+class="cmbx-12">to build </span><span 
 class="cmmi-12">A</span><sup><span 
 class="cmmi-8">k</span><span 
 class="cmr-8">+1</span></sup><span 
-class="cmr-12">.</span></li></ol>
+class="cmbx-12">.</span></li></ol>
 <!--l. 151--><p class="indent" >   <span 
-class="cmr-12">In order to perform the coarsening step, the smoothed aggregation algorithm</span>
+class="cmbx-12">In order to perform the coarsening step, the smoothed aggregation</span>
 <span 
-class="cmr-12">described in</span><span 
-class="cmr-12">&#x00A0;</span><span class="cite"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">algorithm described in</span><span 
+class="cmbx-12">&#x00A0;</span><span class="cite"><span 
+class="cmbx-12">[</span><a 
 href="userhtmlli4.html#XVANEK_MANDEL_BREZINA"><span 
-class="cmr-12">26</span></a><span 
-class="cmr-12">]</span></span> <span 
-class="cmr-12">is used. In this algorithm, each index </span><span 
+class="cmbx-12">28</span></a><span 
+class="cmbx-12">]</span></span> <span 
+class="cmbx-12">is used. In this algorithm, each index </span><span 
 class="cmmi-12">j </span><span 
 class="cmsy-10x-x-120">&#x2208; </span><span 
 class="cmr-12">&#x03A9;</span><sup><span 
 class="cmmi-8">k</span><span 
-class="cmr-8">+1</span></sup> <span 
-class="cmr-12">corresponds</span>
+class="cmr-8">+1</span></sup>
 <span 
-class="cmr-12">to an aggregate &#x03A9;</span><sub><span 
+class="cmbx-12">corresponds to an aggregate </span><span 
+class="cmr-12">&#x03A9;</span><sub><span 
 class="cmmi-8">j</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">of &#x03A9;</span><sup><span 
+class="cmbx-12">of </span><span 
+class="cmr-12">&#x03A9;</span><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">, consisting of a suitably chosen index </span><span 
+class="cmbx-12">, consisting of a suitably chosen index</span>
+<span 
 class="cmmi-12">i </span><span 
 class="cmsy-10x-x-120">&#x2208; </span><span 
 class="cmr-12">&#x03A9;</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">and</span>
+class="cmbx-12">and indices that are (usually) contained in a strongly-coupled</span>
 <span 
-class="cmr-12">indices that are (usually) contained in a strongly-coupled neighborood of </span><span 
+class="cmbx-12">neighborood of </span><span 
 class="cmmi-12">i</span><span 
-class="cmr-12">,</span>
-<span 
-class="cmr-12">i.e.,</span>
+class="cmbx-12">, i.e.,</span>
    <table 
 class="equation"><tr><td>
    <center class="math-display" >
 <img 
-src="userhtml13x.png" alt="               {                 &#x2218; -------}
-&#x03A9;kj &#x2282; N ki (&#x03B8;) =  r &#x2208; &#x03A9;k : |akir| &#x003E; &#x03B8; |akiiakrr|  &#x222A; {i} ,
+src="userhtml13x.png" alt="               {                 &#x2218;  ------}
+&#x03A9;kj &#x2282; N ki (&#x03B8;) =  r &#x2208; &#x03A9;k : |akir| &#x003E; &#x03B8;  |akiiakrr|  &#x222A; {i} ,
 " class="math-display" ><a 
  id="x15-14007r3"></a></center></td><td class="equation-label"><span 
 class="cmr-12">(3)</span></td></tr></table>
@@ -154,53 +161,57 @@ class="cmr-12">(3)</span></td></tr></table>
                                                                                
 <!--l. 160--><p class="nopar" >
 <span 
-class="cmr-12">for a given threshold </span><span 
+class="cmbx-12">for a given threshold </span><span 
 class="cmmi-12">&#x03B8; </span><span 
 class="cmsy-10x-x-120">&#x2208; </span><span 
 class="cmr-12">[0</span><span 
 class="cmmi-12">, </span><span 
-class="cmr-12">1] (see</span><span 
-class="cmr-12">&#x00A0;</span><span class="cite"><span 
-class="cmr-12">[</span><a 
+class="cmr-12">1] </span><span 
+class="cmbx-12">(see</span><span 
+class="cmbx-12">&#x00A0;</span><span class="cite"><span 
+class="cmbx-12">[</span><a 
 href="userhtmlli4.html#XVANEK_MANDEL_BREZINA"><span 
-class="cmr-12">26</span></a><span 
-class="cmr-12">]</span></span> <span 
-class="cmr-12">for the details). Since this algorithm has a</span>
+class="cmbx-12">28</span></a><span 
+class="cmbx-12">]</span></span> <span 
+class="cmbx-12">for the details). Since this algorithm</span>
 <span 
-class="cmr-12">sequential nature, a decoupled version of it is applied, where each processor</span>
+class="cmbx-12">has a sequential nature, a decoupled version of it is applied, where each</span>
 <span 
-class="cmr-12">independently executes the algorithm on the set of indices assigned to it in the initial</span>
+class="cmbx-12">processor independently executes the algorithm on the set of indices</span>
 <span 
-class="cmr-12">data distribution. This version is embarrassingly parallel, since it does not require any</span>
+class="cmbx-12">assigned to it in the initial data distribution. This version is embarrassingly</span>
 <span 
-class="cmr-12">data communication. On the other hand, it may produce some nonuniform aggregates</span>
+class="cmbx-12">parallel, since it does not require any data communication. On the other</span>
 <span 
-class="cmr-12">and is strongly dependent on the number of processors and on the initial</span>
+class="cmbx-12">hand, it may produce some nonuniform aggregates and is strongly</span>
 <span 
-class="cmr-12">partitioning of the matrix </span><span 
+class="cmbx-12">dependent on the number of processors and on the initial partitioning of</span>
+<span 
+class="cmbx-12">the matrix </span><span 
 class="cmmi-12">A</span><span 
-class="cmr-12">. Nevertheless, this parallel algorithm has been chosen</span>
+class="cmbx-12">. Nevertheless, this parallel algorithm has been chosen for</span>
 <span 
-class="cmr-12">for MLD2P4, since it has been shown to produce good results in practice</span>
+class="cmbx-12">MLD2P4, since it has been shown to produce good results in practice</span>
 <span class="cite"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">[</span><a 
 href="userhtmlli4.html#Xaaecc_07"><span 
-class="cmr-12">5</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
+class="cmbx-12">5</span></a><span 
+class="cmbx-12">,</span><span 
+class="cmbx-12">&#x00A0;</span><a 
 href="userhtmlli4.html#Xapnum_07"><span 
-class="cmr-12">7</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
+class="cmbx-12">7</span></a><span 
+class="cmbx-12">,</span><span 
+class="cmbx-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XTUMINARO_TONG"><span 
-class="cmr-12">25</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">.</span>
+class="cmbx-12">27</span></a><span 
+class="cmbx-12">]</span></span><span 
+class="cmbx-12">.</span>
 <!--l. 172--><p class="indent" >   <span 
-class="cmr-12">The prolongator </span><span 
+class="cmbx-12">The prolongator </span><span 
 class="cmmi-12">P</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is built starting from a tentative prolongator</span> <span class="bar-css"><span 
+class="cmbx-12">is built starting from a tentative prolongator</span>
+<span class="bar-css"><span 
 class="cmmi-12">P</span></span><sup><span 
 class="cmmi-8">k</span></sup> <span 
 class="cmsy-10x-x-120">&#x2208; </span><span 
@@ -211,41 +222,41 @@ class="cmsy-8">&#x00D7;</span><span
 class="cmmi-8">n</span><sub><span 
 class="cmmi-6">k</span><span 
 class="cmr-6">+1</span></sub></sup><span 
-class="cmr-12">,</span>
-<span 
-class="cmr-12">defined as</span>
+class="cmbx-12">, defined as</span>
    <table 
 class="equation"><tr><td>
    <center class="math-display" >
 <img 
-src="userhtml14x.png" alt="                   {              k
-P¯k = (¯pkij),  p¯kij =    1    if i &#x2208; &#x03A9; j,
-                      0    otherwise,
+src="userhtml14x.png" alt="                   {               k
+P¯k = (¯pk),   ¯pk =    1     if i &#x2208; &#x03A9; j,
+        ij     ij     0     otherwise,
 " class="math-display" ><a 
  id="x15-14008r4"></a></center></td><td class="equation-label"><span 
 class="cmr-12">(4)</span></td></tr></table>
 <!--l. 181--><p class="nopar" >
 <span 
-class="cmr-12">where &#x03A9;</span><sub><span 
+class="cmbx-12">where </span><span 
+class="cmr-12">&#x03A9;</span><sub><span 
 class="cmmi-8">j</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is the aggregate of &#x03A9;</span><sup><span 
+class="cmbx-12">is the aggregate of </span><span 
+class="cmr-12">&#x03A9;</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">corresponding to the index </span><span 
+class="cmbx-12">corresponding to the index </span><span 
 class="cmmi-12">j </span><span 
 class="cmsy-10x-x-120">&#x2208; </span><span 
 class="cmr-12">&#x03A9;</span><sup><span 
 class="cmmi-8">k</span><span 
 class="cmr-8">+1</span></sup><span 
-class="cmr-12">. </span><span 
+class="cmbx-12">. </span><span 
 class="cmmi-12">P</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is obtained</span>
+class="cmbx-12">is</span>
 <span 
-class="cmr-12">by applying to</span> <span class="bar-css"><span 
+class="cmbx-12">obtained by applying to</span> <span class="bar-css"><span 
 class="cmmi-12">P</span></span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">a smoother </span><span 
+class="cmbx-12">a smoother </span><span 
 class="cmmi-12">S</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
 class="cmsy-10x-x-120">&#x2208; </span><span 
@@ -255,45 +266,48 @@ class="cmmi-6">k</span></sub><span
 class="cmsy-8">&#x00D7;</span><span 
 class="cmmi-8">n</span><sub><span 
 class="cmmi-6">k</span></sub></sup><span 
-class="cmr-12">:</span>
+class="cmbx-12">:</span>
    <center class="math-display" >
 <img 
-src="userhtml15x.png" alt="Pk = Sk ¯Pk,  " class="math-display" ></center> <span 
-class="cmr-12">in</span>
+src="userhtml15x.png" alt="Pk = Sk ¯P k,  " class="math-display" ></center>
 <span 
-class="cmr-12">order to remove nonsmooth components from the range of the prolongator, and hence</span>
+class="cmbx-12">in order to remove nonsmooth components from the range of the</span>
 <span 
-class="cmr-12">to improve the convergence properties of the multilevel method</span><span 
-class="cmr-12">&#x00A0;</span><span class="cite"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">prolongator, and hence to improve the convergence properties of the</span>
+<span 
+class="cmbx-12">multilevel method</span><span 
+class="cmbx-12">&#x00A0;</span><span class="cite"><span 
+class="cmbx-12">[</span><a 
 href="userhtmlli4.html#XBREZINA_VANEK"><span 
-class="cmr-12">2</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
+class="cmbx-12">2</span></a><span 
+class="cmbx-12">,</span><span 
+class="cmbx-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XStuben_01"><span 
-class="cmr-12">24</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">. A simple</span>
-<span 
-class="cmr-12">choice for </span><span 
+class="cmbx-12">26</span></a><span 
+class="cmbx-12">]</span></span><span 
+class="cmbx-12">. A simple choice for </span><span 
 class="cmmi-12">S</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is the damped Jacobi smoother:</span>
+class="cmbx-12">is the damped Jacobi</span>
+<span 
+class="cmbx-12">smoother:</span>
+                                                                               
+
+                                                                               
    <center class="math-display" >
 <img 
-src="userhtml16x.png" alt="  k        k   k -1  k
-S  =  I - &#x03C9; (D  )  A F,
+src="userhtml16x.png" alt="Sk =  I - &#x03C9;k(Dk )-1AkF,
 " class="math-display" ></center>
 <!--l. 195--><p class="nopar" > <span 
-class="cmr-12">where </span><span 
+class="cmbx-12">where </span><span 
 class="cmmi-12">D</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is the diagonal matrix with the same diagonal entries as </span><span 
+class="cmbx-12">is the diagonal matrix with the same diagonal entries as </span><span 
 class="cmmi-12">A</span><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">, </span><span 
-class="cmmi-12">A</span><sub>
+class="cmbx-12">,</span>
 <span 
+class="cmmi-12">A</span><sub><span 
 class="cmmi-8">F</span> </sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
 class="cmr-12">= (</span><span class="bar-css"><span 
@@ -301,33 +315,37 @@ class="cmmi-12">a</span></span><sub>
 <span 
 class="cmmi-8">ij</span></sub><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">) is</span>
-<span 
-class="cmr-12">the filtered matrix defined as</span>
+class="cmr-12">) </span><span 
+class="cmbx-12">is the filtered matrix defined as</span>
    <table 
 class="equation"><tr><td>
    <center class="math-display" >
 <img 
-src="userhtml17x.png" alt="      {   k          k                             &#x2211;
-a¯kij =    aij  if j &#x2208; N i (&#x03B8;), (j &#x2044;= i),   ¯akii = akii -   (akij - ¯akij),
-         0   otherwise,                            j&#x2044;=i
+src="userhtml17x.png" alt="      {
+¯ak =    akij  if j &#x2208; N ki (&#x03B8;), (j &#x2044;= i),     ¯ak = ak - &#x2211;  (ak -  ¯ak),
+ ij     0    otherwise,                   ii    ii       ij    ij
+                                                   j&#x2044;=i
 " class="math-display" ><a 
  id="x15-14009r5"></a></center></td><td class="equation-label"><span 
 class="cmr-12">(5)</span></td></tr></table>
 <!--l. 208--><p class="nopar" >
 <span 
-class="cmr-12">and </span><span 
+class="cmbx-12">and </span><span 
 class="cmmi-12">&#x03C9;</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is an approximation of 4</span><span 
+class="cmbx-12">is an approximation of </span><span 
+class="cmr-12">4</span><span 
 class="cmmi-12">&#x2215;</span><span 
 class="cmr-12">(3</span><span 
 class="cmmi-12">&#x03C1;</span><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">), where </span><span 
+class="cmr-12">)</span><span 
+class="cmbx-12">, where </span><span 
 class="cmmi-12">&#x03C1;</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is the spectral radius of (</span><span 
+class="cmbx-12">is the spectral radius of</span>
+<span 
+class="cmr-12">(</span><span 
 class="cmmi-12">D</span><sup><span 
 class="cmmi-8">k</span></sup><span 
 class="cmr-12">)</span><sup><span 
@@ -336,60 +354,61 @@ class="cmr-8">1</span></sup><span
 class="cmmi-12">A</span><sub>
 <span 
 class="cmmi-8">F</span> </sub><sup><span 
-class="cmmi-8">k</span></sup>
-<span class="cite"><span 
-class="cmr-12">[</span><a 
+class="cmmi-8">k</span></sup> <span class="cite"><span 
+class="cmbx-12">[</span><a 
 href="userhtmlli4.html#XBREZINA_VANEK"><span 
-class="cmr-12">2</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">. In MLD2P4 this approximation is obtained by using </span><span 
+class="cmbx-12">2</span></a><span 
+class="cmbx-12">]</span></span><span 
+class="cmbx-12">. In MLD2P4 this approximation is obtained by using </span><span 
 class="cmsy-10x-x-120">&#x2225;</span><span 
-class="cmmi-12">A</span><sub><span 
-class="cmmi-8">F</span> </sub><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmsy-10x-x-120">&#x2225;</span><sub>
-<span 
-class="cmsy-8">&#x221E;</span></sub> <span 
-class="cmr-12">as an estimate of </span><span 
-class="cmmi-12">&#x03C1;</span><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmr-12">.</span>
-<span 
-class="cmr-12">Note that for systems coming from uniformly elliptic problems, filtering the matrix </span><span 
-class="cmmi-12">A</span><sup><span 
-class="cmmi-8">k</span></sup>
-<span 
-class="cmr-12">has little or no effect, and </span><span 
-class="cmmi-12">A</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">can be used instead of </span><span 
 class="cmmi-12">A</span><sub>
 <span 
 class="cmmi-8">F</span> </sub><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">. The latter choice is the</span>
+class="cmsy-10x-x-120">&#x2225;</span><sub>
 <span 
-class="cmr-12">default in MLD2P4.</span>
+class="cmsy-8">&#x221E;</span></sub>
+<span 
+class="cmbx-12">as an estimate of </span><span 
+class="cmmi-12">&#x03C1;</span><sup><span 
+class="cmmi-8">k</span></sup><span 
+class="cmbx-12">. Note that for systems coming from uniformly</span>
+<span 
+class="cmbx-12">elliptic problems, filtering the matrix </span><span 
+class="cmmi-12">A</span><sup><span 
+class="cmmi-8">k</span></sup> <span 
+class="cmbx-12">has little or no effect, and</span>
+<span 
+class="cmmi-12">A</span><sup><span 
+class="cmmi-8">k</span></sup> <span 
+class="cmbx-12">can be used instead of </span><span 
+class="cmmi-12">A</span><sub>
+<span 
+class="cmmi-8">F</span> </sub><sup><span 
+class="cmmi-8">k</span></sup><span 
+class="cmbx-12">. The latter choice is the default in</span>
+<span 
+class="cmbx-12">MLD2P4.</span>
                                                                                
 
                                                                                
    <!--l. 216--><div class="crosslinks"><p class="noindent"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">[</span><a 
 href="userhtmlsu8.html" ><span 
-class="cmr-12">next</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">next</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu6.html" ><span 
-class="cmr-12">prev</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">prev</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu6.html#tailuserhtmlsu6.html" ><span 
-class="cmr-12">prev-tail</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">prev-tail</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu7.html" ><span 
-class="cmr-12">front</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">front</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlse4.html#userhtmlsu7.html" ><span 
-class="cmr-12">up</span></a><span 
-class="cmr-12">] </span></p></div>
+class="cmbx-12">up</span></a><span 
+class="cmbx-12">] </span></p></div>
 <!--l. 216--><p class="indent" >   <a 
  id="tailuserhtmlsu7.html"></a>  
 </body></html> 

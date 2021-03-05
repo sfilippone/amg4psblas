@@ -11,69 +11,73 @@
 </head><body 
 >
    <!--l. 216--><div class="crosslinks"><p class="noindent"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">[</span><a 
 href="userhtmlsu7.html" ><span 
-class="cmr-12">prev</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">prev</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu7.html#tailuserhtmlsu7.html" ><span 
-class="cmr-12">prev-tail</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">prev-tail</span></a><span 
+class="cmbx-12">] [</span><a 
 href="#tailuserhtmlsu8.html"><span 
-class="cmr-12">tail</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">tail</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlse4.html#userhtmlsu8.html" ><span 
-class="cmr-12">up</span></a><span 
-class="cmr-12">] </span></p></div>
+class="cmbx-12">up</span></a><span 
+class="cmbx-12">] </span></p></div>
    <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmr-12">4.3   </span></span> <a 
+class="cmbx-12">4.3   </span></span> <a 
  id="x16-150004.3"></a><span 
-class="cmr-12">Smoothers and coarsest-level solvers</span></h4>
+class="cmbx-12">Smoothers and coarsest-level solvers</span></h4>
 <!--l. 218--><p class="noindent" ><span 
-class="cmr-12">The smoothers implemented in MLD2P4 include the Jacobi and block-Jacobi methods,</span>
+class="cmbx-12">The smoothers implemented in MLD2P4 include the Jacobi and</span>
 <span 
-class="cmr-12">a hybrid version of the forward and backward Gauss-Seidel methods, and the additive</span>
+class="cmbx-12">block-Jacobi methods, a hybrid version of the forward and backward</span>
 <span 
-class="cmr-12">Schwarz (AS) ones (see, e.g., </span><span class="cite"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">Gauss-Seidel methods, and the additive Schwarz (AS) ones (see, e.g.,</span>
+<span class="cite"><span 
+class="cmbx-12">[</span><a 
 href="userhtmlli4.html#XSaad_book"><span 
-class="cmr-12">21</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
+class="cmbx-12">23</span></a><span 
+class="cmbx-12">,</span><span 
+class="cmbx-12">&#x00A0;</span><a 
 href="userhtmlli4.html#Xdd2_96"><span 
-class="cmr-12">22</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">).</span>
+class="cmbx-12">24</span></a><span 
+class="cmbx-12">]</span></span><span 
+class="cmbx-12">).</span>
 <!--l. 222--><p class="indent" >   <span 
-class="cmr-12">The hybrid Gauss-Seidel version is considered because the original Gauss-Seidel</span>
+class="cmbx-12">The hybrid Gauss-Seidel version is considered because the original</span>
 <span 
-class="cmr-12">method is inherently sequential. At each iteration of the hybrid version, each parallel</span>
+class="cmbx-12">Gauss-Seidel method is inherently sequential. At each iteration of the</span>
 <span 
-class="cmr-12">process uses the most recent values of its own local variables and the values</span>
+class="cmbx-12">hybrid version, each parallel process uses the most recent values of its own</span>
 <span 
-class="cmr-12">of the non-local variables computed at the previous iteration, obtained by</span>
+class="cmbx-12">local variables and the values of the non-local variables computed at the</span>
 <span 
-class="cmr-12">exchanging data with other processes before the beginning of the current</span>
+class="cmbx-12">previous iteration, obtained by exchanging data with other processes before</span>
 <span 
-class="cmr-12">iteration.</span>
+class="cmbx-12">the beginning of the current iteration.</span>
 <!--l. 229--><p class="indent" >   <span 
-class="cmr-12">In the AS methods, the index space &#x03A9;</span><sup><span 
+class="cmbx-12">In the AS methods, the index space </span><span 
+class="cmr-12">&#x03A9;</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is divided into </span><span 
+class="cmbx-12">is divided into </span><span 
 class="cmmi-12">m</span><sub>
 <span 
 class="cmmi-8">k</span></sub> <span 
-class="cmr-12">subsets &#x03A9;</span><sub><span 
+class="cmbx-12">subsets </span><span 
+class="cmr-12">&#x03A9;</span><sub><span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">of</span>
+class="cmbx-12">of</span>
 <span 
-class="cmr-12">size </span><span 
+class="cmbx-12">size </span><span 
 class="cmmi-12">n</span><sub><span 
 class="cmmi-8">k,i</span></sub><span 
-class="cmr-12">, possibly overlapping. For each </span><span 
+class="cmbx-12">, possibly overlapping. For each </span><span 
 class="cmmi-12">i </span><span 
-class="cmr-12">we consider the restriction operator</span>
+class="cmbx-12">we consider the restriction</span>
 <span 
+class="cmbx-12">operator </span><span 
 class="cmmi-12">R</span><sub><span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
@@ -84,25 +88,27 @@ class="cmmi-6">k,i</span></sub><span
 class="cmsy-8">&#x00D7;</span><span 
 class="cmmi-8">n</span><sub><span 
 class="cmmi-6">k</span></sub></sup> <span 
-class="cmr-12">that maps a vector </span><span 
+class="cmbx-12">that maps a vector </span><span 
 class="cmmi-12">x</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">to the vector </span><span 
+class="cmbx-12">to the vector </span><span 
 class="cmmi-12">x</span><sub>
 <span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">made of the components of</span>
+class="cmbx-12">made of the</span>
 <span 
+class="cmbx-12">components of </span><span 
 class="cmmi-12">x</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">with indices in &#x03A9;</span><sub>
+class="cmbx-12">with indices in </span><span 
+class="cmr-12">&#x03A9;</span><sub>
 <span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">, and the prolongation operator </span><span 
-class="cmmi-12">P</span><sub>
+class="cmbx-12">, and the prolongation operator</span>
 <span 
+class="cmmi-12">P</span><sub><span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
 class="cmr-12">= (</span><span 
@@ -112,10 +118,9 @@ class="cmmi-8">i</span></sub><sup><span
 class="cmmi-8">k</span></sup><span 
 class="cmr-12">)</span><sup><span 
 class="cmmi-8">T</span> </sup><span 
-class="cmr-12">. These</span>
+class="cmbx-12">. These operators are then used to build </span><span 
+class="cmmi-12">A</span><sub>
 <span 
-class="cmr-12">operators are then used to build </span><span 
-class="cmmi-12">A</span><sub><span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
 class="cmr-12">= </span><span 
@@ -129,39 +134,41 @@ class="cmmi-12">P</span><sub>
 <span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">, which is the restriction of</span>
+class="cmbx-12">, which is</span>
 <span 
+class="cmbx-12">the restriction of </span><span 
 class="cmmi-12">A</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">to the index space &#x03A9;</span><sub>
+class="cmbx-12">to the index space </span><span 
+class="cmr-12">&#x03A9;</span><sub>
 <span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">. The classical AS preconditioner </span><span 
-class="cmmi-12">M</span><sub>
+class="cmbx-12">. The classical AS preconditioner</span>
 <span 
+class="cmmi-12">M</span><sub><span 
 class="cmmi-8">AS</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is defined</span>
-<span 
-class="cmr-12">as</span>
+class="cmbx-12">is defined as</span>
    <center class="math-display" >
 <img 
-src="userhtml18x.png" alt="            m&#x2211;k
-(M AkS )-1 =     Pki (Aki)-1Rki,
-            i=1
+src="userhtml18x.png" alt="   k  -1   m&#x2211;k   k   k -1  k
+(M  AS)   =     Pi (A i) R i,
+           i=1
 " class="math-display" ></center>
 <!--l. 241--><p class="nopar" > <span 
-class="cmr-12">where </span><span 
+class="cmbx-12">where </span><span 
 class="cmmi-12">A</span><sub><span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is supposed to be nonsingular. We observe that an approximate inverse of</span>
+class="cmbx-12">is supposed to be nonsingular. We observe that an approximate</span>
 <span 
+class="cmbx-12">inverse of </span><span 
 class="cmmi-12">A</span><sub><span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is usually considered instead of (</span><span 
+class="cmbx-12">is usually considered instead of </span><span 
+class="cmr-12">(</span><span 
 class="cmmi-12">A</span><sub>
 <span 
 class="cmmi-8">i</span></sub><sup><span 
@@ -169,47 +176,48 @@ class="cmmi-8">k</span></sup><span
 class="cmr-12">)</span><sup><span 
 class="cmsy-8">-</span><span 
 class="cmr-8">1</span></sup><span 
-class="cmr-12">. The setup of </span><span 
+class="cmbx-12">. The setup of </span><span 
 class="cmmi-12">M</span><sub>
 <span 
 class="cmmi-8">AS</span></sub><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">during the multilevel</span>
+class="cmmi-8">k</span></sup>
 <span 
-class="cmr-12">build phase involves</span>
+class="cmbx-12">during the multilevel build phase involves</span>
      <ul class="itemize1">
      <li class="itemize"><span 
-class="cmr-12">the definition of the index subspaces &#x03A9;</span><sub><span 
+class="cmbx-12">the definition of the index subspaces </span><span 
+class="cmr-12">&#x03A9;</span><sub><span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">and of the corresponding operators</span>
+class="cmbx-12">and of the corresponding</span>
      <span 
+class="cmbx-12">operators </span><span 
 class="cmmi-12">R</span><sub><span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">(and </span><span 
+class="cmbx-12">(and </span><span 
 class="cmmi-12">P</span><sub>
 <span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">);</span>
+class="cmbx-12">);</span>
      </li>
      <li class="itemize"><span 
-class="cmr-12">the computation of the submatrices </span><span 
+class="cmbx-12">the computation of the submatrices </span><span 
 class="cmmi-12">A</span><sub><span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">;</span>
+class="cmbx-12">;</span>
      </li>
      <li class="itemize"><span 
-class="cmr-12">the computation of their inverses (usually approximated through some form</span>
+class="cmbx-12">the computation of their inverses (usually approximated through</span>
      <span 
-class="cmr-12">of incomplete factorization).</span></li></ul>
+class="cmbx-12">some form of incomplete factorization).</span></li></ul>
                                                                                
 
                                                                                
 <!--l. 253--><p class="noindent" ><span 
-class="cmr-12">The computation of </span><span 
+class="cmbx-12">The computation of </span><span 
 class="cmmi-12">z</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
 class="cmr-12">= </span><span 
@@ -219,27 +227,27 @@ class="cmmi-8">AS</span></sub><sup><span
 class="cmmi-8">k</span></sup><span 
 class="cmmi-12">w</span><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">, with </span><span 
+class="cmbx-12">, with </span><span 
 class="cmmi-12">w</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
 class="cmsy-10x-x-120">&#x2208; </span><span 
 class="msbm-10x-x-120">&#x211D;</span><sup><span 
 class="cmmi-8">n</span><sub><span 
 class="cmmi-6">k</span></sub></sup><span 
-class="cmr-12">, during the multilevel application</span>
+class="cmbx-12">, during the multilevel</span>
 <span 
-class="cmr-12">phase, requires</span>
+class="cmbx-12">application phase, requires</span>
      <ul class="itemize1">
      <li class="itemize"><span 
-class="cmr-12">the restriction of </span><span 
+class="cmbx-12">the restriction of </span><span 
 class="cmmi-12">w</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmr-12">to the subspaces </span><span 
+class="cmbx-12">to the subspaces </span><span 
 class="msbm-10x-x-120">&#x211D;</span><sup><span 
 class="cmmi-8">n</span><sub><span 
 class="cmmi-6">k,i</span></sub></sup><span 
-class="cmr-12">, i.e.</span><span 
-class="cmr-12">&#x00A0;</span><span 
+class="cmbx-12">, i.e.</span><span 
+class="cmbx-12">&#x00A0;</span><span 
 class="cmmi-12">w</span><sub>
 <span 
 class="cmmi-8">i</span></sub><sup><span 
@@ -251,10 +259,10 @@ class="cmmi-8">i</span></sub><sup><span
 class="cmmi-8">k</span></sup><span 
 class="cmmi-12">w</span><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">;</span>
+class="cmbx-12">;</span>
      </li>
      <li class="itemize"><span 
-class="cmr-12">the computation of the vectors </span><span 
+class="cmbx-12">the computation of the vectors </span><span 
 class="cmmi-12">z</span><sub><span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup> <span 
@@ -270,13 +278,13 @@ class="cmmi-12">w</span><sub>
 <span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">;</span>
+class="cmbx-12">;</span>
      </li>
      <li class="itemize"><span 
-class="cmr-12">the  prolongation  and  the  sum  of  the  previous  vectors,  i.e.</span><span 
-class="cmr-12">&#x00A0;</span><span 
+class="cmbx-12">the prolongation and the sum of the previous vectors, i.e.</span><span 
+class="cmbx-12">&#x00A0;</span><span 
 class="cmmi-12">z</span><sup><span 
-class="cmmi-8">k</span></sup>    <span 
+class="cmmi-8">k</span></sup>  <span 
 class="cmr-12">=</span>
      <span 
 class="cmex-10x-x-120">&#x2211;</span>
@@ -293,43 +301,47 @@ class="cmmi-12">z</span><sub>
 <span 
 class="cmmi-8">i</span></sub><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmr-12">.</span></li></ul>
+class="cmbx-12">.</span></li></ul>
 <!--l. 262--><p class="noindent" ><span 
-class="cmr-12">Variants of the classical AS method, which use modifications of the restriction and</span>
+class="cmbx-12">Variants of the classical AS method, which use modifications of the restriction</span>
 <span 
-class="cmr-12">prolongation operators, are also implemented in MLD2P4. Among them, the Restricted</span>
+class="cmbx-12">and prolongation operators, are also implemented in MLD2P4. Among</span>
 <span 
-class="cmr-12">AS (RAS) preconditioner usually outperforms the classical AS preconditioner in terms</span>
+class="cmbx-12">them, the Restricted AS (RAS) preconditioner usually outperforms</span>
 <span 
-class="cmr-12">of convergence rate and of computation and communication time on parallel</span>
+class="cmbx-12">the classical AS preconditioner in terms of convergence rate and of</span>
 <span 
-class="cmr-12">distributed-memory computers, and is therefore the most widely used among the AS</span>
+class="cmbx-12">computation and communication time on parallel distributed-memory</span>
 <span 
-class="cmr-12">preconditioners</span><span 
-class="cmr-12">&#x00A0;</span><span class="cite"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">computers, and is therefore the most widely used among the AS</span>
+<span 
+class="cmbx-12">preconditioners</span><span 
+class="cmbx-12">&#x00A0;</span><span class="cite"><span 
+class="cmbx-12">[</span><a 
 href="userhtmlli4.html#XCAI_SARKIS"><span 
-class="cmr-12">6</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">.</span>
+class="cmbx-12">6</span></a><span 
+class="cmbx-12">]</span></span><span 
+class="cmbx-12">.</span>
 <!--l. 270--><p class="indent" >   <span 
-class="cmr-12">Direct solvers based on sparse LU factorizations, implemented in the third-party</span>
+class="cmbx-12">Direct solvers based on sparse LU factorizations, implemented in</span>
 <span 
-class="cmr-12">libraries reported in Section</span><span 
-class="cmr-12">&#x00A0;</span><a 
+class="cmbx-12">the third-party libraries reported in Section</span><span 
+class="cmbx-12">&#x00A0;</span><a 
 href="userhtmlsu2.html#x9-80003.2"><span 
-class="cmr-12">3.2</span><!--tex4ht:ref: sec:third-party --></a><span 
-class="cmr-12">, can be applied as coarsest-level solvers by</span>
+class="cmbx-12">3.2</span><!--tex4ht:ref: sec:third-party --></a><span 
+class="cmbx-12">, can be applied as</span>
 <span 
-class="cmr-12">MLD2P4. Native inexact solvers based on incomplete LU factorizations, as well as</span>
+class="cmbx-12">coarsest-level solvers by MLD2P4. Native inexact solvers based on</span>
 <span 
-class="cmr-12">Jacobi, hybrid (forward) Gauss-Seidel, and block Jacobi preconditioners are</span>
+class="cmbx-12">incomplete LU factorizations, as well as Jacobi, hybrid (forward)</span>
 <span 
-class="cmr-12">also available. Direct solvers usually lead to more effective preconditioners in</span>
+class="cmbx-12">Gauss-Seidel, and block Jacobi preconditioners are also available. Direct</span>
 <span 
-class="cmr-12">terms of algorithmic scalability; however, this does not guarantee parallel</span>
+class="cmbx-12">solvers usually lead to more effective preconditioners in terms of</span>
 <span 
-class="cmr-12">efficiency.</span>
+class="cmbx-12">algorithmic scalability; however, this does not guarantee parallel</span>
+<span 
+class="cmbx-12">efficiency.</span>
                                                                                
 
                                                                                
@@ -337,19 +349,19 @@ class="cmr-12">efficiency.</span>
 
                                                                                
    <!--l. 1--><div class="crosslinks"><p class="noindent"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">[</span><a 
 href="userhtmlsu7.html" ><span 
-class="cmr-12">prev</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">prev</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu7.html#tailuserhtmlsu7.html" ><span 
-class="cmr-12">prev-tail</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">prev-tail</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu8.html" ><span 
-class="cmr-12">front</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">front</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlse4.html#userhtmlsu8.html" ><span 
-class="cmr-12">up</span></a><span 
-class="cmr-12">] </span></p></div>
+class="cmbx-12">up</span></a><span 
+class="cmbx-12">] </span></p></div>
 <!--l. 1--><p class="indent" >   <a 
  id="tailuserhtmlsu8.html"></a>  
 </body></html> 

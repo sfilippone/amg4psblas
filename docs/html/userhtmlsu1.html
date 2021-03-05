@@ -36,15 +36,15 @@ class="cmbx-12">BLAS</span> </dt><dd
 class="description"><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#Xblas3"><span 
-class="cmr-12">11</span></a><span 
+class="cmr-12">13</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#Xblas2"><span 
-class="cmr-12">12</span></a><span 
+class="cmr-12">14</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#Xblas1"><span 
-class="cmr-12">18</span></a><span 
+class="cmr-12">20</span></a><span 
 class="cmr-12">]</span></span> <span 
 class="cmr-12">Many vendors provide optimized versions of BLAS; if no</span>
      <span 
@@ -60,11 +60,11 @@ href="www.netlib.org/blas" class="url" ><span
 class="cmtt-12">www.netlib.org/blas</span></a><span 
 class="cmr-12">)  are  meant  to  define  the  standard</span>
      <span 
-class="cmr-12">behaviour  of  the  BLAS  interface,  so  they  are  not  optimized  for  any</span>
+class="cmr-12">behaviour of the BLAS interface, so they are not optimized for any particular</span>
      <span 
-class="cmr-12">particular plaftorm, and should only be used as a last resort. Note that</span>
+class="cmr-12">platform,  and  should  only  be  used  as  a  last  resort.  Note  that  BLAS</span>
      <span 
-class="cmr-12">BLAS computations form a relatively small part of the MLD2P4/PSBLAS</span>
+class="cmr-12">computations form a relatively small part of the AMG4PSBLAS/PSBLAS</span>
      <span 
 class="cmr-12">computations; they are however critical when using preconditioners based</span>
      <span 
@@ -89,11 +89,11 @@ class="cmbx-12">MPI</span> </dt><dd
 class="description"><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#XMPI2"><span 
-class="cmr-12">17</span></a><span 
+class="cmr-12">19</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XMPI1"><span 
-class="cmr-12">23</span></a><span 
+class="cmr-12">25</span></a><span 
 class="cmr-12">]</span></span> <span 
 class="cmr-12">A version of MPI is available on most high-performance computing</span>
      <span 
@@ -104,25 +104,29 @@ class="cmbx-12">PSBLAS</span> </dt><dd
 class="description"><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#XPSBLASGUIDE"><span 
-class="cmr-12">13</span></a><span 
+class="cmr-12">15</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#Xpsblas_00"><span 
-class="cmr-12">15</span></a><span 
+class="cmr-12">17</span></a><span 
 class="cmr-12">]</span></span>   <span 
 class="cmr-12">Parallel   Sparse   BLAS   (PSBLAS)   is   available   from</span>
      <a 
 href="github.com/sfilippone/psblas3" class="url" ><span 
-class="cmtt-12">github.com/sfilippone/psblas3</span></a><span 
-class="cmr-12">;  version  3.5.0  (or  later)  is  required.</span>
+class="cmtt-12">github.com/sfilippone/psblas3</span></a> <span 
+class="cmr-12">?? </span><span 
+class="cmbx-12">Mettere tutto sotto psctoolkit</span><span 
+class="cmr-12">;</span>
      <span 
-class="cmr-12">Indeed, all the prerequisites listed so far are also prerequisites of PSBLAS.</span></dd></dl>
+class="cmr-12">version 3.5.0 (or later) is required. Indeed, all the prerequisites listed so far</span>
+     <span 
+class="cmr-12">are also prerequisites of PSBLAS.</span></dd></dl>
 <!--l. 56--><p class="noindent" ><span 
 class="cmr-12">Please note that the four previous libraries must have Fortran interfaces compatible with</span>
 <span 
-class="cmr-12">MLD2P4; usually this means that they should all be built with the same compiler as</span>
+class="cmr-12">AMG4PSBLAS; usually this means that they should all be built with the same</span>
 <span 
-class="cmr-12">MLD2P4.</span>
+class="cmr-12">compiler as AMG4PSBLAS.</span>
                                                                                
 
                                                                                

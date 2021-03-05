@@ -10,236 +10,243 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 740--><div class="crosslinks"><p class="noindent"><span 
-class="cmr-12">[</span><a 
+   <!--l. 640--><div class="crosslinks"><p class="noindent"><span 
+class="cmbx-12">[</span><a 
 href="userhtmlsu15.html" ><span 
-class="cmr-12">next</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">next</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu13.html" ><span 
-class="cmr-12">prev</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">prev</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu13.html#tailuserhtmlsu13.html" ><span 
-class="cmr-12">prev-tail</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">prev-tail</span></a><span 
+class="cmbx-12">] [</span><a 
 href="#tailuserhtmlsu14.html"><span 
-class="cmr-12">tail</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">tail</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlse6.html#userhtmlsu14.html" ><span 
-class="cmr-12">up</span></a><span 
-class="cmr-12">] </span></p></div>
+class="cmbx-12">up</span></a><span 
+class="cmbx-12">] </span></p></div>
    <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmr-12">6.5   </span></span> <a 
+class="cmbx-12">6.5   </span></span> <a 
  id="x24-230006.5"></a><span 
-class="cmr-12">Method build</span></h4>
+class="cmbx-12">Method build</span></h4>
 <div class="center" 
 >
-<!--l. 742--><p class="noindent" >
-<!--l. 743--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+<!--l. 642--><p class="noindent" >
+<!--l. 643--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">call</span><span 
 class="cmtt-12">&#x00A0;p%build(a,desc_a,info[,amold,vmold,imold])</span></span></span><br />
 </div>
-<!--l. 746--><p class="noindent" ><span 
-class="cmr-12">This method builds the preconditioner </span><span class="obeylines-h"><span class="verb"><span 
+<!--l. 646--><p class="noindent" ><span 
+class="cmbx-12">This method builds the preconditioner </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">p</span></span></span> <span 
-class="cmr-12">according to the requirements made by the</span>
+class="cmbx-12">according to the requirements</span>
 <span 
-class="cmr-12">user through the methods </span><span class="obeylines-h"><span class="verb"><span 
+class="cmbx-12">made by the user through the methods </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">init</span></span></span> <span 
-class="cmr-12">and </span><span class="obeylines-h"><span class="verb"><span 
+class="cmbx-12">and </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">set</span></span></span> <span 
-class="cmr-12">(see Sections</span><span 
-class="cmr-12">&#x00A0;</span><a 
+class="cmbx-12">(see Sections</span><span 
+class="cmbx-12">&#x00A0;</span><a 
 href="userhtmlsu12.html#x22-210006.3"><span 
-class="cmr-12">6.3</span><!--tex4ht:ref: sec:hier_bld --></a> <span 
-class="cmr-12">and</span><span 
-class="cmr-12">&#x00A0;</span><a 
+class="cmbx-12">6.3</span><!--tex4ht:ref: sec:hier_bld --></a>
+<span 
+class="cmbx-12">and</span><span 
+class="cmbx-12">&#x00A0;</span><a 
 href="userhtmlsu13.html#x23-220006.4"><span 
-class="cmr-12">6.4</span><!--tex4ht:ref: sec:smooth_bld --></a> <span 
-class="cmr-12">for multilevel</span>
+class="cmbx-12">6.4</span><!--tex4ht:ref: sec:smooth_bld --></a> <span 
+class="cmbx-12">for multilevel preconditioners). It is mostly provided for backward</span>
 <span 
-class="cmr-12">preconditioners). It is mostly provided for backward compatibility; indeed, it is</span>
+class="cmbx-12">compatibility; indeed, it is internally implemented by invoking the</span>
 <span 
-class="cmr-12">internally implemented by invoking the two previous methods </span><span class="obeylines-h"><span class="verb"><span 
+class="cmbx-12">two previous methods </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">hierarchy_build</span></span></span> <span 
-class="cmr-12">and</span>
-<span class="obeylines-h"><span class="verb"><span 
+class="cmbx-12">and </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">smoothers_build</span></span></span><span 
-class="cmr-12">, whose nomenclature would however be somewhat unnatural when</span>
+class="cmbx-12">, whose</span>
 <span 
-class="cmr-12">dealing with simple one-level preconditioners.</span>
-<!--l. 756--><p class="noindent" ><span 
+class="cmbx-12">nomenclature would however be somewhat unnatural when dealing with</span>
+<span 
+class="cmbx-12">simple one-level preconditioners.</span>
+<!--l. 656--><p class="noindent" ><span 
 class="cmbx-12">Arguments</span>
+                                                                               
+
+                                                                               
    <div class="tabular"> <table id="TBL-13" class="tabular" 
 cellspacing="0" cellpadding="0"  
 ><colgroup id="TBL-13-1g"><col 
 id="TBL-13-1"><col 
 id="TBL-13-2"></colgroup><tr  
  style="vertical-align:baseline;" id="TBL-13-1-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-1-1"  
-class="td11"><!--l. 759--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 659--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">a</span></span></span>     </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-1-2"  
-class="td11"><!--l. 759--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 659--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">type(psb_</span></span></span><span 
-class="cmti-12">x</span><span class="obeylines-h"><span class="verb"><span 
+class="cmbxti-10x-x-120">x</span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">spmat_type),</span><span 
 class="cmtt-12">&#x00A0;intent(in)</span></span></span><span 
-class="cmr-12">.</span>                                  </td>
+class="cmbx-12">.</span>                             </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-13-2-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-2-1"  
-class="td11"><!--l. 760--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-2-2"  
-class="td11"><!--l. 760--><p class="noindent" ><span 
-class="cmr-12">The sparse matrix structure containing the local part of the matrix</span>
+class="td11"><!--l. 660--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-2-2"  
+class="td11"><!--l. 660--><p class="noindent" ><span 
+class="cmbx-12">The  sparse  matrix  structure  containing  the  local  part</span>
 <span 
-class="cmr-12">to be preconditioned. Note that </span><span 
-class="cmti-12">x  </span><span 
-class="cmr-12">must be chosen according to</span>
+class="cmbx-12">of  the  matrix  to  be  preconditioned.  Note  that  </span><span 
+class="cmbxti-10x-x-120">x  </span><span 
+class="cmbx-12">must</span>
 <span 
-class="cmr-12">the real/complex, single/double precision version of MLD2P4 under</span>
+class="cmbx-12">be  chosen  according  to  the  real/complex,  single/double</span>
 <span 
-class="cmr-12">use. See the PSBLAS User&#8217;s Guide for details </span><span class="cite"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">precision version of MLD2P4 under use. See the PSBLAS</span>
+<span 
+class="cmbx-12">User&#8217;s Guide for details </span><span class="cite"><span 
+class="cmbx-12">[</span><a 
 href="userhtmlli4.html#XPSBLASGUIDE"><span 
-class="cmr-12">13</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">.</span>                     </td>
+class="cmbx-12">15</span></a><span 
+class="cmbx-12">]</span></span><span 
+class="cmbx-12">.</span>                                      </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-13-3-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-3-1"  
-class="td11"><!--l. 764--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 664--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">desc_a</span></span></span></td><td  style="white-space:wrap; text-align:left;" id="TBL-13-3-2"  
-class="td11"><!--l. 764--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 664--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">type(psb_desc_type),</span><span 
 class="cmtt-12">&#x00A0;intent(in)</span></span></span><span 
-class="cmr-12">.</span>                                     </td>
+class="cmbx-12">.</span>                                 </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-13-4-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-4-1"  
-class="td11"><!--l. 765--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-4-2"  
-class="td11"><!--l. 765--><p class="noindent" ><span 
-class="cmr-12">The communication descriptor of </span><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 665--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-4-2"  
+class="td11"><!--l. 665--><p class="noindent" ><span 
+class="cmbx-12">The  communication  descriptor  of  </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">a</span></span></span><span 
-class="cmr-12">. See the PSBLAS User&#8217;s Guide</span>
+class="cmbx-12">.  See  the  PSBLAS</span>
 <span 
-class="cmr-12">for details </span><span class="cite"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">User&#8217;s Guide for details </span><span class="cite"><span 
+class="cmbx-12">[</span><a 
 href="userhtmlli4.html#XPSBLASGUIDE"><span 
-class="cmr-12">13</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">.</span>                                                                    </td>
+class="cmbx-12">15</span></a><span 
+class="cmbx-12">]</span></span><span 
+class="cmbx-12">.</span>                                      </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-13-5-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-5-1"  
-class="td11"><!--l. 770--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 667--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">info</span></span></span>  </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-5-2"  
-class="td11"><!--l. 770--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 667--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">integer,</span><span 
 class="cmtt-12">&#x00A0;intent(out)</span></span></span><span 
-class="cmr-12">.</span>                                                       </td>
+class="cmbx-12">.</span>                                                </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-13-6-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-6-1"  
-class="td11"><!--l. 771--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-6-2"  
-class="td11"><!--l. 771--><p class="noindent" ><span 
-class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
-class="cmr-12">&#x00A0;</span><a 
+class="td11"><!--l. 668--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-6-2"  
+class="td11"><!--l. 668--><p class="noindent" ><span 
+class="cmbx-12">Error code. If no error, 0 is returned. See Section</span><span 
+class="cmbx-12">&#x00A0;</span><a 
 href="userhtmlse8.html#x30-340008"><span 
-class="cmr-12">8</span><!--tex4ht:ref: sec:errors --></a> <span 
-class="cmr-12">for details.</span>     </td>
+class="cmbx-12">8</span><!--tex4ht:ref: sec:errors --></a> <span 
+class="cmbx-12">for</span>
+<span 
+class="cmbx-12">details.</span>                                                                   </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-13-7-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-7-1"  
-class="td11"><!--l. 772--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 669--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">amold</span></span></span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-7-2"  
-class="td11"><!--l. 772--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 669--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">class(psb_</span></span></span><span 
-class="cmti-12">x</span><span class="obeylines-h"><span class="verb"><span 
+class="cmbxti-10x-x-120">x</span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">_base_sparse_mat),</span><span 
 class="cmtt-12">&#x00A0;intent(in),</span><span 
 class="cmtt-12">&#x00A0;optional</span></span></span><span 
-class="cmr-12">.</span>       </td>
+class="cmbx-12">.</span>      </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-13-8-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-8-1"  
-class="td11"><!--l. 773--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-8-2"  
-class="td11"><!--l. 773--><p class="noindent" ><span 
-class="cmr-12">The  desired  dynamic  type  for  internal  matrix  components;  this</span>
+class="td11"><!--l. 670--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-8-2"  
+class="td11"><!--l. 670--><p class="noindent" ><span 
+class="cmbx-12">The desired dynamic type for internal matrix components;</span>
 <span 
-class="cmr-12">allows  e.g.  running  on  GPUs;  it  needs  not  be  the  same  on  all</span>
+class="cmbx-12">this allows e.g. running on GPUs; it needs not be the same</span>
 <span 
-class="cmr-12">processes. See the PSBLAS User&#8217;s Guide for details </span><span class="cite"><span 
-class="cmr-12">[</span><a 
+class="cmbx-12">on all processes. See the PSBLAS User&#8217;s Guide for details</span>
+<span class="cite"><span 
+class="cmbx-12">[</span><a 
 href="userhtmlli4.html#XPSBLASGUIDE"><span 
-class="cmr-12">13</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">.</span>             </td>
+class="cmbx-12">15</span></a><span 
+class="cmbx-12">]</span></span><span 
+class="cmbx-12">.</span>                                                                      </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-13-9-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-9-1"  
-class="td11"><!--l. 777--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 674--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">vmold</span></span></span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-9-2"  
-class="td11"><!--l. 777--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 674--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">class(psb_</span></span></span><span 
-class="cmti-12">x</span><span class="obeylines-h"><span class="verb"><span 
+class="cmbxti-10x-x-120">x</span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">_base_vect_type),</span><span 
 class="cmtt-12">&#x00A0;intent(in),</span><span 
 class="cmtt-12">&#x00A0;optional</span></span></span><span 
-class="cmr-12">.</span>         </td>
+class="cmbx-12">.</span>       </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-13-10-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-10-1"  
-class="td11"><!--l. 778--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-10-2"  
-class="td11"><!--l. 778--><p class="noindent" ><span 
-class="cmr-12">The  desired  dynamic  type  for  internal  vector  components;  this</span>
+class="td11"><!--l. 675--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-10-2"  
+class="td11"><!--l. 675--><p class="noindent" ><span 
+class="cmbx-12">The desired dynamic type for internal vector components;</span>
 <span 
-class="cmr-12">allows e.g. running on GPUs.</span>                                                 </td>
+class="cmbx-12">this allows e.g. running on GPUs.</span>                               </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-13-11-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-11-1"  
-class="td11"><!--l. 780--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 677--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">imold</span></span></span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-11-2"  
-class="td11"><!--l. 780--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="td11"><!--l. 677--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">class(psb_i_base_vect_type),</span><span 
 class="cmtt-12">&#x00A0;intent(in),</span><span 
 class="cmtt-12">&#x00A0;optional</span></span></span><span 
-class="cmr-12">.</span>         </td>
+class="cmbx-12">.</span>        </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-13-12-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-12-1"  
-class="td11"><!--l. 781--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-12-2"  
-class="td11"><!--l. 781--><p class="noindent" ><span 
-class="cmr-12">The desired dynamic type for internal integer vector components;</span>
+class="td11"><!--l. 678--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-12-2"  
+class="td11"><!--l. 678--><p class="noindent" ><span 
+class="cmbx-12">The  desired  dynamic  type  for  internal  integer  vector</span>
 <span 
-class="cmr-12">this allows e.g. running on GPUs.</span>                                           </td>
+class="cmbx-12">components; this allows e.g. running on GPUs.</span>              </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-13-13-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-13-1"  
 class="td11">      </td> </tr></table></div>
-                                                                               
-
-                                                                               
-<!--l. 786--><p class="indent" >   <span 
-class="cmr-12">For compatibility with the previous versions of MLD2P4, this method can be also</span>
+<!--l. 683--><p class="indent" >   <span 
+class="cmbx-12">For compatibility with the previous versions of MLD2P4, this method</span>
 <span 
-class="cmr-12">invoked as follows:</span>
+class="cmbx-12">can be also invoked as follows:</span>
 <div class="center" 
 >
-<!--l. 789--><p class="noindent" >
-<!--l. 790--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+<!--l. 686--><p class="noindent" >
+<!--l. 687--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">call</span><span 
-class="cmtt-12">&#x00A0;mld_precbld(p,what,val,info[,amold,vmold,imold])</span></span></span></div>
-<!--l. 793--><p class="noindent" ><span 
-class="cmr-12">The method can be used to build multilevel preconditioners too.</span>
+class="cmtt-12">&#x00A0;amg_precbld(p,what,val,info[,amold,vmold,imold])</span></span></span></div>
+<!--l. 690--><p class="noindent" ><span 
+class="cmbx-12">The method can be used to build multilevel preconditioners too.</span>
                                                                                
 
                                                                                
                                                                                
 
                                                                                
-   <!--l. 798--><div class="crosslinks"><p class="noindent"><span 
-class="cmr-12">[</span><a 
+   <!--l. 695--><div class="crosslinks"><p class="noindent"><span 
+class="cmbx-12">[</span><a 
 href="userhtmlsu15.html" ><span 
-class="cmr-12">next</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">next</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu13.html" ><span 
-class="cmr-12">prev</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">prev</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu13.html#tailuserhtmlsu13.html" ><span 
-class="cmr-12">prev-tail</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">prev-tail</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlsu14.html" ><span 
-class="cmr-12">front</span></a><span 
-class="cmr-12">] [</span><a 
+class="cmbx-12">front</span></a><span 
+class="cmbx-12">] [</span><a 
 href="userhtmlse6.html#userhtmlsu14.html" ><span 
-class="cmr-12">up</span></a><span 
-class="cmr-12">] </span></p></div>
-<!--l. 798--><p class="indent" >   <a 
+class="cmbx-12">up</span></a><span 
+class="cmbx-12">] </span></p></div>
+<!--l. 695--><p class="indent" >   <a 
  id="tailuserhtmlsu14.html"></a>  
 </body></html> 
