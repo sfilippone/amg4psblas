@@ -65,13 +65,7 @@ This method allocates and initializes the preconditioner
 
 \end{tabular}
 
-\vskip1.5\baselineskip
-For compatibility with the previous versions of MLD2P4, this method can be also invoked
-as follows:
 
-\begin{center}
-\verb|call amg_precinit(p,ptype,info)|
-\end{center}
 
 
 \clearpage
@@ -132,13 +126,6 @@ contained in \verb|val|.
                 underlying objects.
 \end{tabular}
 
-\vskip1.5\baselineskip
-For compatibility with the previous versions of MLD2P4, this method can be also invoked
-as follows:
-
-\begin{center}
-\verb|call amg_precset(p,what,val,info)|
-\end{center}
 
 \noindent
 However, in this case the optional arguments \verb|ilev|,
@@ -238,13 +225,9 @@ See also Sec.~\ref{sec:adding}.
 \verb|what|              & \textsc{data type}        &  \verb|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
 \verb|'ML_CYCLE'|     & \verb|character(len=*)|
-                         & \texttt{'VCYCLE'} \par \texttt{'WCYCLE'}   \par \texttt{'KCYCLE'} \par
-                             \texttt{'MULT'} \par \texttt{'ADD'}
+                         & \texttt{'VCYCLE'} \par \texttt{'WCYCLE'}   \par \texttt{'KCYCLE'} \par \texttt{'ADD'}
                          & \texttt{'VCYCLE'}
-                         &Multilevel cycle: V-cycle, W-cycle, K-cycle, hybrid Multiplicative Schwarz,
-                           and Additive Schwarz. \par
-                           Note that hybrid Multiplicative Schwarz is equivalent to V-cycle and
-                           is included for compatibility with previous versions of MLD2P4. \\ \hline
+                         &Multilevel cycle: V-cycle, W-cycle, K-cycle, and additive composition. \\ \hline
  \verb|'OUTER_SWEEPS'| & \texttt{integer} &
                            Any integer \par number $\ge 1$  & 1 &
                            Number of multilevel cycles. \\ \hline
@@ -290,7 +273,7 @@ be applied.
                            if the number of levels reaches this value (see Note). \\ \hline
 
 \verb|'PAR_AGGR_ALG'|  & \verb|character(len=*)| \hspace*{-3mm}
-                         & \texttt{'DEC'}, \texttt{'SYMDEC'}
+                         & \texttt{'DEC'}, \texttt{'SYMDEC'}, \texttt{'COUPLED'}
                          & \texttt{'DEC'}
                          & Parallel aggregation algorithm. \par Currently, only the
                          decoupled aggregation (\verb|DEC|) is available; the
@@ -301,7 +284,8 @@ be applied.
 \verb|'AGGR_TYPE'|  & \verb|character(len=*)| \hspace*{-3mm}
                          & \textbf{\texttt{'SOC1'}} &
                                                       \textbf{\texttt{'SOC1'}},
-                                                      \textbf{\texttt{'SOC2'}}
+                                                      \textbf{\texttt{'SOC2'}},
+                                                      \textbf{\texttt{'MATCHBOXP'}}
                          & Type of aggregation algorithm: currently,
                            we implement to measures of strength of
                            connection, the one by Van\v{e}k, Mandel
@@ -582,7 +566,7 @@ made by the user through the methods \verb|init| and \verb|set|.
               & The sparse matrix structure containing the local part of the
                 matrix to be preconditioned. Note that \emph{x} must be chosen according
                 to the real/complex,
-single/double precision version of MLD2P4 under use.
+single/double precision version of AMG4PSBLAS under use.
                 See the PSBLAS User's Guide for details \cite{PSBLASGUIDE}.\\
 \verb|desc_a| & \verb|type(psb_desc_type), intent(in)|. \\
               & The communication descriptor of \verb|a|. See the PSBLAS User's Guide for
@@ -615,7 +599,7 @@ hierarchy produced by a previous call to \verb|hierarchy_build|
 \verb|a|      & \verb|type(psb_|\emph{x}\verb|spmat_type), intent(in)|. \\
               & The sparse matrix structure containing the local part of the
                 matrix to be preconditioned. Note that \emph{x} must be chosen according
-                to the real/complex, single/double precision version of MLD2P4 under use.
+                to the real/complex, single/double precision version of AMG4PSBLAS under use.
                 See the PSBLAS User's Guide for details \cite{PSBLASGUIDE}.\\
 \verb|desc_a| & \verb|type(psb_desc_type), intent(in)|. \\
               & The communication descriptor of \verb|a|. See the PSBLAS User's Guide for
@@ -659,7 +643,7 @@ unnatural when dealing with simple one-level preconditioners.
 \verb|a|  & \verb|type(psb_|\emph{x}\verb|spmat_type), intent(in)|. \\
               & The sparse matrix structure containing the local part of the
                 matrix to be preconditioned. Note that \emph{x} must be chosen according
-                to the real/complex, single/double precision version of MLD2P4 under use.
+                to the real/complex, single/double precision version of AMG4PSBLAS under use.
                 See the PSBLAS User's Guide for details \cite{PSBLASGUIDE}.\\
 \verb|desc_a| & \verb|type(psb_desc_type), intent(in)|. \\
               & The communication descriptor of \verb|a|. See the PSBLAS User's Guide for
@@ -679,13 +663,6 @@ unnatural when dealing with simple one-level preconditioners.
   components; this allows e.g. running on GPUs. \\
 \end{tabular}
 
-\vskip1.5\baselineskip
-For compatibility with the previous versions of MLD2P4, this method can be also invoked
-as follows:
-
-\begin{center}
-\verb|call amg_precbld(p,what,val,info[,amold,vmold,imold])|
-\end{center}
 
 \noindent
 The method can be used to build multilevel preconditioners too.
@@ -703,7 +680,7 @@ This method computes $y = op(B^{-1})\, x$, where $B$ is a previously built
 preconditioner, stored into \verb|p|, and $op$
 denotes the preconditioner itself or its transpose, according to
 the value of \verb|trans|.
-Note that, when MLD2P4 is used with a Krylov solver from PSBLAS,
+Note that, when AMG4PSBLAS is used with a Krylov solver from PSBLAS,
 \verb|p%apply| is called within the PSBLAS method \verb|psb_krylov|
 and hence it is completely transparent to the user.
 
@@ -713,11 +690,11 @@ and hence it is completely transparent to the user.
 \verb|x|      & \emph{type}\verb|(|\emph{kind\_parameter}\verb|), dimension(:), intent(in)|.\\
               & The local part of the vector $x$. Note that \emph{type} and
                 \emph{kind\_parameter} must be chosen according
-                to the real/complex, single/double precision version of MLD2P4 under use.\\
+                to the real/complex, single/double precision version of AMG4PSBLAS under use.\\
 \verb|y|      & \emph{type}\verb|(|\emph{kind\_parameter}\verb|), dimension(:), intent(out)|.\\
               & The local part of the vector $y$. Note that \emph{type} and
                 \emph{kind\_parameter} must be chosen according
-                to the real/complex, single/double precision version of MLD2P4 under use.\\
+                to the real/complex, single/double precision version of AMG4PSBLAS under use.\\
 \verb|desc_a| & \verb|type(psb_desc_type), intent(in)|. \\
               & The communication descriptor associated to the matrix to be
                 preconditioned.\\
@@ -732,16 +709,9 @@ and hence it is completely transparent to the user.
              & Workspace. Its size should be at
                least \verb|4 * psb_cd_get_local_| \verb|cols(desc_a)| (see the PSBLAS User's Guide).
                Note that \emph{type} and \emph{kind\_parameter} must be chosen according
-               to the real/complex, single/double precision version of MLD2P4 under use.\\
+               to the real/complex, single/double precision version of AMG4PSBLAS under use.\\
 \end{tabular}
 
-\vskip1.5\baselineskip
-For compatibility with the previous versions of MLD2P4, this method can be also invoked
-as follows:
-
-\begin{center}
-\verb|call amg_precaply(p,what,val,info)|
-\end{center}
 
 \clearpage
 
@@ -760,14 +730,6 @@ This method deallocates the preconditioner data structure \verb|p|.
 \verb|info|   & \verb|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
 \end{tabular}
-
-\vskip1.5\baselineskip
-For compatibility with the previous versions of MLD2P4, this method can be also invoked
-as follows:
-
-\begin{center}
-\verb|call amg_precfree(p,info)|
-\end{center}
 
 
 \clearpage
@@ -792,14 +754,6 @@ or \verb|build|, have been called.
               & The id of the file where the preconditioner description
                 will be printed; the default is the standard output.\\
 \end{tabular}
-
-\vskip1.5\baselineskip
-For compatibility with the previous versions of MLD2P4, this method can be also invoked
-as follows:
-
-\begin{center}
-\verb|call amg_precdescr(p,info [,iout])|
-\end{center}
 
 
 \subsection{Auxiliary Methods\label{sec:auxil}}
@@ -843,7 +797,7 @@ Create a (deep) copy of the preconditioner object.
 \verb|pout|  & \verb|type(amg_|\emph{x}\verb|prec_type), intent(out)|.\\
               & The copy of the preconditioner data structure. Note
                 that \emph{x} must be chosen according
-                to the real/complex, single/double precision version of MLD2P4 under use.\\
+                to the real/complex, single/double precision version of AMG4PSBLAS under use.\\
 \verb|info|   & \verb|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
 \end{tabular}

@@ -29,8 +29,7 @@ two different coarsening strategies, based on aggregation, are available:
 \end{itemize}
 
 Either exact or approximate solvers can be used on the coarsest-level system. Specifically, different sparse LU factorizations from external
-packages, native incomplete LU factorizations, weighted Jacobi, hybrid Gauss-Seidel,
-and block-Jacobi solvers are available. All the smoothers can be also exploited as one-level
+packages, native incomplete LU and approximate inverse factorizations, weighted Jacobi, hybrid Gauss-Seidel, block-Jacobi solvers and recursive call to preconditioned Krylov methods are available. All the smoothers can be also exploited as one-level
 preconditioners.
 
 AMG4PSBLAS is written in Fortran~2003, following an

@@ -33,7 +33,7 @@ The following steps are required:
 \item \emph{Build the preconditioner for a given matrix}. If the selected preconditioner
  is multilevel, then two steps must be performed, as specified next.
 \begin{enumerate}
-\item[4.1] \emph{Build the aggregation hierarchy for a given matrix.} This is
+\item[4.1] \emph{Build the AMG hierarchy for a given matrix.} This is
 performed by the routine \verb|hierarchy_build|.
 \item[4.2] \emph{Build the preconditioner for a given matrix.} This is performed
 by the routine \verb|smoothers_build|.
@@ -56,26 +56,26 @@ Examples showing the basic use of AMG4PSBLAS are reported in Section~\ref{sec:ex
 \begin{table}[h!]
 \begin{center}
 %{\small
-\begin{tabular}{|l|p{1.8cm}|p{8.2cm}|}
+\begin{tabular}{|l|p{2cm}|p{8cm}|}
 \hline
 \textsc{type}       & \textsc{string} & \textsc{default preconditioner} \\ \hline
 No preconditioner &\verb|'NONE'|& Considered  to use the PSBLAS
                                     Krylov solvers with no preconditioner. \\ \hline
-Diagonal          & \verb|'DIAG'| or \verb|'JACOBI'| & Diagonal preconditioner.
+Diagonal          & \verb|'DIAG'|, \verb|'JACOBI'|, \verb|'L1-JACOBI'| & Diagonal preconditioner.
                          For any zero diagonal entry of the matrix to be preconditioned,
                          the corresponding entry of the preconditioner is set to~1.\\ \hline
-Gauss-Seidel      & \verb|'GS'|     & Hybrid Gauss-Seidel (forward), that is,
+Gauss-Seidel      & \verb|'GS'|, \verb|'L1-GS'|     & Hybrid Gauss-Seidel (forward), that is,
                                       global block Jacobi with
                                       Gauss-Seidel as local solver.\\ \hline
-Symmetrized Gauss-Seidel      & \verb|'FBGS'|     & Symmetrized hybrid Gauss-Seidel,that is,
+Symmetrized Gauss-Seidel      & \verb|'FBGS'|, \verb|'L1-FBGS'|     & Symmetrized hybrid Gauss-Seidel, that is,
                                       forward Gauss-Seidel followed by
                                                     backward Gauss-Seidel.\\ \hline
-Block Jacobi      & \verb|'BJAC'| & Block-Jacobi with ILU(0) on the local blocks.\\ \hline
+Block Jacobi      & \verb|'BJAC'|, \verb|'L1-BJAC'| & Block-Jacobi with ILU(0) on the local blocks.\\ \hline
 Additive Schwarz  & \verb|'AS'|   & Additive Schwarz (AS),
                                     with overlap~1 and ILU(0) on the local blocks. \\ \hline
 Multilevel        &\verb|'ML'|    & V-cycle with one hybrid forward Gauss-Seidel
                                     (GS) sweep as pre-smoother and one hybrid backward
-                                    GS sweep as post-smoother, basic smoothed aggregation
+                                    GS sweep as post-smoother, decoupled smoothed aggregation
                                    as coarsening algorithm, and LU (plus triangular solve)
                                    as coarsest-level solver. See the default values in
                                    Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}
@@ -100,7 +100,7 @@ such as those implemented in UMFPACK, MUMPS, SuperLU, and SuperLU\_Dist,
 usually lead to smaller numbers of preconditioned Krylov
 iterations than inexact solvers, when the linear system comes from
 a standard discretization of basic scalar elliptic PDE problems. However,
-this does not necessarily correspond to the smallest execution time
+this does not necessarily correspond to the shortest execution time
 on parallel computers.
 
 
