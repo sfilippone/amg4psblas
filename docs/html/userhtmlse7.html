@@ -11,71 +11,65 @@
 </head><body 
 >
    <!--l. 4--><div class="crosslinks"><p class="noindent"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">[</span><a 
 href="userhtmlse8.html" ><span 
-class="cmbx-12">next</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">next</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse6.html" ><span 
-class="cmbx-12">prev</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse6.html#tailuserhtmlse6.html" ><span 
-class="cmbx-12">prev-tail</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev-tail</span></a><span 
+class="cmr-12">] [</span><a 
 href="#tailuserhtmlse7.html"><span 
-class="cmbx-12">tail</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">tail</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtml.html#userhtmlse7.html" ><span 
-class="cmbx-12">up</span></a><span 
-class="cmbx-12">] </span></p></div>
+class="cmr-12">up</span></a><span 
+class="cmr-12">] </span></p></div>
    <h3 class="sectionHead"><span class="titlemark"><span 
-class="cmbx-12">7   </span></span> <a 
+class="cmr-12">7   </span></span> <a 
  id="x29-330007"></a><span 
-class="cmbx-12">Adding new smoother and solver objects to AMG4PSBLAS</span></h3>
+class="cmr-12">Adding new smoother and solver objects to AMG4PSBLAS</span></h3>
 <!--l. 6--><p class="noindent" ><span 
-class="cmbx-12">Developers can add completely new smoother and/or solver classes derived</span>
+class="cmr-12">Developers can add completely new smoother and/or solver classes derived from the</span>
 <span 
-class="cmbx-12">from the base objects in the library (see Remark</span><span 
-class="cmbx-12">&#x00A0;2 in Section</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">base objects in the library (see Remark</span><span 
+class="cmr-12">&#x00A0;2 in Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlsu11.html#x21-200006.2"><span 
-class="cmbx-12">6.2</span><!--tex4ht:ref: sec:precset --></a><span 
-class="cmbx-12">), without</span>
+class="cmr-12">6.2</span><!--tex4ht:ref: sec:precset --></a><span 
+class="cmr-12">), without recompiling the</span>
 <span 
-class="cmbx-12">recompiling the library itself.</span>
+class="cmr-12">library itself.</span>
 <!--l. 10--><p class="indent" >   <span 
-class="cmbx-12">To do so, it is necessary first to select the base type to be extended. In</span>
+class="cmr-12">To do so, it is necessary first to select the base type to be extended. In our</span>
 <span 
-class="cmbx-12">our experience, it is quite likely that the new application needs only the</span>
+class="cmr-12">experience, it is quite likely that the new application needs only the definition of a</span>
 <span 
-class="cmbx-12">definition of a &#8220;solver&#8221; object, which is almost always acting only on the</span>
+class="cmr-12">&#8220;solver&#8221; object, which is almost always acting only on the local part of the distributed</span>
 <span 
-class="cmbx-12">local part of the distributed matrix. The parallel actions required to</span>
+class="cmr-12">matrix. The parallel actions required to connect the various solver objects are most</span>
 <span 
-class="cmbx-12">connect the various solver objects are most often already provided by the</span>
+class="cmr-12">often already provided by the block-Jacobi or the additive Schwarz smoothers. To</span>
 <span 
-class="cmbx-12">block-Jacobi or the additive Schwarz smoothers. To define a new solver, the</span>
+class="cmr-12">define a new solver, the developer will then have to define its components and</span>
 <span 
-class="cmbx-12">developer will then have to define its components and methods,</span>
+class="cmr-12">methods, perhaps taking one of the predefined solvers as a starting point, if</span>
 <span 
-class="cmbx-12">perhaps taking one of the predefined solvers as a starting point, if</span>
-<span 
-class="cmbx-12">possible.</span>
+class="cmr-12">possible.</span>
 <!--l. 20--><p class="indent" >   <span 
-class="cmbx-12">Once the new smoother/solver class has been developed, to use</span>
+class="cmr-12">Once the new smoother/solver class has been developed, to use it in the context of</span>
 <span 
-class="cmbx-12">it in the context of the multilevel preconditioners it is necessary</span>
-<span 
-class="cmbx-12">to:</span>
+class="cmr-12">the multilevel preconditioners it is necessary to:</span>
      <ul class="itemize1">
      <li class="itemize"><span 
-class="cmbx-12">declare in the application program a variable of the new type;</span>
+class="cmr-12">declare in the application program a variable of the new type;</span>
      </li>
      <li class="itemize"><span 
-class="cmbx-12">pass that variable as the argument to the </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">pass that variable as the argument to the </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">set</span></span></span> <span 
-class="cmbx-12">routine as in the</span>
-     <span 
-class="cmbx-12">following:</span>
+class="cmr-12">routine as in the following:</span>
      <div class="center" 
 >
 <!--l. 26--><p class="noindent" >
@@ -89,60 +83,57 @@ class="cmtt-12">&#x00A0;p%set(solver,info</span><span
 class="cmtt-12">&#x00A0;[,ilev,ilmax,pos])</span></span></span></div>
      </li>
      <li class="itemize"><span 
-class="cmbx-12">link the code implementing the various methods into the application</span>
+class="cmr-12">link the code implementing the various methods into the application</span>
      <span 
-class="cmbx-12">executable.</span></li></ul>
+class="cmr-12">executable.</span></li></ul>
 <!--l. 32--><p class="noindent" ><span 
-class="cmbx-12">The new solver object is then dynamically included in the preconditioner</span>
+class="cmr-12">The new solver object is then dynamically included in the preconditioner structure,</span>
 <span 
-class="cmbx-12">structure, and acts as a </span><span 
-class="cmbxti-10x-x-120">mold </span><span 
-class="cmbx-12">to which the preconditioner will conform,</span>
+class="cmr-12">and acts as a </span><span 
+class="cmti-12">mold </span><span 
+class="cmr-12">to which the preconditioner will conform, even though</span>
 <span 
-class="cmbx-12">even though the AMG4PSBLAS library has not been modified to account</span>
+class="cmr-12">the AMG4PSBLAS library has not been modified to account for this new</span>
 <span 
-class="cmbx-12">for this new development.</span>
+class="cmr-12">development.</span>
                                                                                
 
                                                                                
 <!--l. 37--><p class="indent" >   <span 
-class="cmbx-12">It is possible to define new values for the keyword </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">It is possible to define new values for the keyword </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">WHAT</span></span></span> <span 
-class="cmbx-12">in the </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">set</span></span></span>
+class="cmr-12">in the </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">set</span></span></span> <span 
+class="cmr-12">routine; if the</span>
 <span 
-class="cmbx-12">routine; if the library code does not recognize a keyword, it passes it down</span>
+class="cmr-12">library code does not recognize a keyword, it passes it down the composition hierarchy</span>
 <span 
-class="cmbx-12">the composition hierarchy (levels containing smoothers containing in turn</span>
+class="cmr-12">(levels containing smoothers containing in turn solvers), so that it can be eventually</span>
 <span 
-class="cmbx-12">solvers), so that it can be eventually caught by the new solver. By the</span>
+class="cmr-12">caught by the new solver. By the same token, any keyword/value pair that does not</span>
 <span 
-class="cmbx-12">same token, any keyword/value pair that does not pertain to a given</span>
+class="cmr-12">pertain to a given smoother should be passed down to the contained solver, and</span>
 <span 
-class="cmbx-12">smoother should be passed down to the contained solver, and any</span>
+class="cmr-12">any keyword/value pair that does not pertain to a given solver is by default</span>
 <span 
-class="cmbx-12">keyword/value pair that does not pertain to a given solver is by default</span>
-<span 
-class="cmbx-12">ignored.</span>
+class="cmr-12">ignored.</span>
 <!--l. 46--><p class="indent" >   <span 
-class="cmbx-12">An example is provided in the source code distribution under the folder</span>
+class="cmr-12">An example is provided in the source code distribution under the folder</span>
 <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">tests/newslv</span></span></span><span 
-class="cmbx-12">. In this example we are implementing a new incomplete</span>
+class="cmr-12">. In this example we are implementing a new incomplete factorization</span>
 <span 
-class="cmbx-12">factorization variant (which is simply the ILU(0) factorization under a new</span>
+class="cmr-12">variant (which is simply the ILU(0) factorization under a new name). Because of the</span>
 <span 
-class="cmbx-12">name). Because of the specifics of this case, it is possible to reuse the basic</span>
+class="cmr-12">specifics of this case, it is possible to reuse the basic structure of the ILU solver, with</span>
 <span 
-class="cmbx-12">structure of the ILU solver, with its L/D/U components and the</span>
+class="cmr-12">its L/D/U components and the methods needed to apply the solver; only a few</span>
 <span 
-class="cmbx-12">methods needed to apply the solver; only a few methods, such as the</span>
+class="cmr-12">methods, such as the description and most importantly the build, need to be</span>
 <span 
-class="cmbx-12">description and most importantly the build, need to be ovverridden</span>
-<span 
-class="cmbx-12">(rewritten).</span>
+class="cmr-12">ovverridden (rewritten).</span>
 <!--l. 55--><p class="indent" >   <span 
-class="cmbx-12">The interfaces for the calls shown above are defined using</span>
+class="cmr-12">The interfaces for the calls shown above are defined using</span>
 <div class="center" 
 >
 <!--l. 56--><p class="noindent" >
@@ -160,9 +151,9 @@ class="cmtt-12">class(amg_x_base_smoother_type)</span></span></span>            
  style="vertical-align:baseline;" id="TBL-21-2-"><td  style="white-space:wrap; text-align:left;" id="TBL-21-2-1"  
 class="td11"><!--l. 59--><p class="noindent" >       </td><td  style="white-space:wrap; text-align:left;" id="TBL-21-2-2"  
 class="td11"><!--l. 59--><p class="noindent" ><span 
-class="cmbx-12">The  user-defined  new  smoother  to  be  employed  in  the</span>
+class="cmr-12">The   user-defined   new   smoother   to   be   employed   in   the</span>
 <span 
-class="cmbx-12">preconditioner.</span>                                                        </td>
+class="cmr-12">preconditioner.</span>                                                                    </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-21-3-"><td  style="white-space:wrap; text-align:left;" id="TBL-21-3-1"  
 class="td11"><!--l. 61--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
@@ -173,23 +164,20 @@ class="cmtt-12">class(amg_x_base_solver_type)</span></span></span>              
  style="vertical-align:baseline;" id="TBL-21-4-"><td  style="white-space:wrap; text-align:left;" id="TBL-21-4-1"  
 class="td11"><!--l. 62--><p class="noindent" >       </td><td  style="white-space:wrap; text-align:left;" id="TBL-21-4-2"  
 class="td11"><!--l. 62--><p class="noindent" ><span 
-class="cmbx-12">The  user-defined  new  solver  to  be  employed  in  the</span>
-<span 
-class="cmbx-12">preconditioner.</span>                                                        </td>
-</tr></table></div></div>
+class="cmr-12">The user-defined new solver to be employed in the preconditioner.</span></td></tr></table></div></div>
 <!--l. 66--><p class="noindent" ><span 
-class="cmbx-12">The other arguments are defined in the way described in Sec.</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">The other arguments are defined in the way described in Sec.</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlsu11.html#x21-200006.2"><span 
-class="cmbx-12">6.2</span><!--tex4ht:ref: sec:precset --></a><span 
-class="cmbx-12">. As an</span>
-<span 
-class="cmbx-12">example, in the </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">tests/newslv</span></span></span> <span 
-class="cmbx-12">code we define a new object of type</span>
+class="cmr-12">6.2</span><!--tex4ht:ref: sec:precset --></a><span 
+class="cmr-12">. As an example, in the</span>
 <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">tests/newslv</span></span></span> <span 
+class="cmr-12">code we define a new object of type </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">amg_d_tlu_solver_type</span></span></span><span 
-class="cmbx-12">, and we pass it as follows:</span>
+class="cmr-12">, and we</span>
+<span 
+class="cmr-12">pass it as follows:</span>
                                                                                
 
                                                                                
@@ -222,22 +210,22 @@ class="cmbx-12">, and we pass it as follows:</span>
 
                                                                                
    <!--l. 1--><div class="crosslinks"><p class="noindent"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">[</span><a 
 href="userhtmlse8.html" ><span 
-class="cmbx-12">next</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">next</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse6.html" ><span 
-class="cmbx-12">prev</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse6.html#tailuserhtmlse6.html" ><span 
-class="cmbx-12">prev-tail</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev-tail</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse7.html" ><span 
-class="cmbx-12">front</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">front</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtml.html#userhtmlse7.html" ><span 
-class="cmbx-12">up</span></a><span 
-class="cmbx-12">] </span></p></div>
+class="cmr-12">up</span></a><span 
+class="cmr-12">] </span></p></div>
 <!--l. 1--><p class="indent" >   <a 
  id="tailuserhtmlse7.html"></a>  
 </body></html> 

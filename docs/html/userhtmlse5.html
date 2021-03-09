@@ -11,222 +11,208 @@
 </head><body 
 >
    <!--l. 1--><div class="crosslinks"><p class="noindent"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">[</span><a 
 href="userhtmlse6.html" ><span 
-class="cmbx-12">next</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">next</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse4.html" ><span 
-class="cmbx-12">prev</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse4.html#tailuserhtmlse4.html" ><span 
-class="cmbx-12">prev-tail</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev-tail</span></a><span 
+class="cmr-12">] [</span><a 
 href="#tailuserhtmlse5.html"><span 
-class="cmbx-12">tail</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">tail</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtml.html#userhtmlse5.html" ><span 
-class="cmbx-12">up</span></a><span 
-class="cmbx-12">] </span></p></div>
+class="cmr-12">up</span></a><span 
+class="cmr-12">] </span></p></div>
    <h3 class="sectionHead"><span class="titlemark"><span 
-class="cmbx-12">5   </span></span> <a 
+class="cmr-12">5   </span></span> <a 
  id="x17-160005"></a><span 
-class="cmbx-12">Getting Started</span></h3>
+class="cmr-12">Getting Started</span></h3>
 <!--l. 5--><p class="noindent" ><span 
-class="cmbx-12">We describe the basics for building and applying AMG4PSBLAS one-level</span>
+class="cmr-12">We describe the basics for building and applying AMG4PSBLAS one-level and</span>
 <span 
-class="cmbx-12">and multilevel (i.e., AMG) preconditioners with the Krylov solvers included</span>
-<span 
-class="cmbx-12">in PSBLAS </span><span class="cite"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">multilevel (i.e., AMG) preconditioners with the Krylov solvers included in PSBLAS</span>
+<span class="cite"><span 
+class="cmr-12">[</span><a 
 href="userhtmlli4.html#XPSBLASGUIDE"><span 
-class="cmbx-12">15</span></a><span 
-class="cmbx-12">]</span></span><span 
-class="cmbx-12">. The following steps are required:</span>
+class="cmr-12">15</span></a><span 
+class="cmr-12">]</span></span><span 
+class="cmr-12">. The following steps are required:</span>
      <ol  class="enumerate1" >
      <li 
   class="enumerate" id="x17-16002x1"><span 
-class="cmbxti-10x-x-120">Declare the preconditioner data structure</span><span 
-class="cmbx-12">. It is a derived data</span>
-     <span 
-class="cmbx-12">type, </span><span class="obeylines-h"><span class="verb"><span 
+class="cmti-12">Declare  the  preconditioner  data  structure</span><span 
+class="cmr-12">.  It  is  a  derived  data  type,</span>
+     <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">amg_</span></span></span><span 
-class="cmbxti-10x-x-120">x</span><span class="obeylines-h"><span class="verb"><span 
+class="cmti-12">x</span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">prec_</span></span></span> <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">type</span></span></span><span 
-class="cmbx-12">, where </span><span 
-class="cmbxti-10x-x-120">x </span><span 
-class="cmbx-12">may be </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">, where </span><span 
+class="cmti-12">x </span><span 
+class="cmr-12">may be </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">s</span></span></span><span 
-class="cmbx-12">, </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">, </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">d</span></span></span><span 
-class="cmbx-12">, </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">, </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">c</span></span></span> <span 
-class="cmbx-12">or </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">or </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">z</span></span></span><span 
-class="cmbx-12">, according to the</span>
+class="cmr-12">, according to the basic data</span>
      <span 
-class="cmbx-12">basic data type of the sparse matrix (</span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">type of the sparse matrix (</span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">s</span></span></span> <span 
-class="cmbx-12">= real single precision; </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">= real single precision; </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">d</span></span></span> <span 
-class="cmbx-12">=</span>
-     <span 
-class="cmbx-12">real double precision; </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">= real double precision;</span>
+     <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">c</span></span></span> <span 
-class="cmbx-12">= complex single precision; </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">= complex single precision; </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">z</span></span></span> <span 
-class="cmbx-12">= complex</span>
+class="cmr-12">= complex double precision). This data</span>
      <span 
-class="cmbx-12">double precision). This data structure is accessed by the user only</span>
+class="cmr-12">structure is accessed by the user only through the AMG4PSBLAS routines,</span>
      <span 
-class="cmbx-12">through the AMG4PSBLAS routines, following an object-oriented</span>
-     <span 
-class="cmbx-12">approach.</span>
+class="cmr-12">following an object-oriented approach.</span>
      </li>
      <li 
   class="enumerate" id="x17-16004x2"><span 
-class="cmbxti-10x-x-120">Allocate   and   initialize   the   preconditioner   data   structure,</span>
+class="cmti-12">Allocate  and  initialize  the  preconditioner  data  structure,  according  to  a</span>
      <span 
-class="cmbxti-10x-x-120">according to a preconditioner type chosen by the user</span><span 
-class="cmbx-12">. This is</span>
-     <span 
-class="cmbx-12">performed by the routine </span><span class="obeylines-h"><span class="verb"><span 
+class="cmti-12">preconditioner type chosen by the user</span><span 
+class="cmr-12">. This is performed by the routine</span>
+     <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">init</span></span></span><span 
-class="cmbx-12">, which also sets defaults for each</span>
+class="cmr-12">,  which  also  sets  defaults  for  each  preconditioner  type  selected  by</span>
      <span 
-class="cmbx-12">preconditioner type selected by the user. The preconditioner types</span>
+class="cmr-12">the user. The preconditioner types and the defaults associated with them</span>
      <span 
-class="cmbx-12">and the defaults associated with them are given in Table</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">are  given  in  Table</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="#x17-160151"><span 
-class="cmbx-12">1</span><!--tex4ht:ref: tab:precinit --></a><span 
-class="cmbx-12">, where</span>
-     <span 
-class="cmbx-12">the strings used by </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">1</span><!--tex4ht:ref: tab:precinit --></a><span 
+class="cmr-12">,  where  the  strings  used  by  </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">init</span></span></span> <span 
-class="cmbx-12">to identify the preconditioner types are</span>
+class="cmr-12">to  identify  the</span>
      <span 
-class="cmbx-12">also given. Note that these strings are valid also if uppercase letters</span>
+class="cmr-12">preconditioner types are also given. Note that these strings are valid also if</span>
      <span 
-class="cmbx-12">are substituted by corresponding lowercase ones.</span>
+class="cmr-12">uppercase letters are substituted by corresponding lowercase ones.</span>
      </li>
      <li 
   class="enumerate" id="x17-16006x3"><span 
-class="cmbxti-10x-x-120">Modify  the  selected  preconditioner  type,  by  properly  setting</span>
+class="cmti-12">Modify the selected preconditioner type, by properly setting preconditioner</span>
      <span 
-class="cmbxti-10x-x-120">preconditioner parameters. </span><span 
-class="cmbx-12">This is performed by the routine </span><span class="obeylines-h"><span class="verb"><span 
+class="cmti-12">parameters. </span><span 
+class="cmr-12">This is performed by the routine </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">set</span></span></span><span 
-class="cmbx-12">.</span>
+class="cmr-12">. This routine must be</span>
      <span 
-class="cmbx-12">This  routine  must  be  called  only  if  the  user  wants  to  modify</span>
+class="cmr-12">called only if the user wants to modify the default values of the parameters</span>
      <span 
-class="cmbx-12">the default values of the parameters associated with the selected</span>
+class="cmr-12">associated with the selected preconditioner type, to obtain a variant of that</span>
      <span 
-class="cmbx-12">preconditioner type, to obtain a variant of that preconditioner.</span>
-     <span 
-class="cmbx-12">Examples of use of </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">preconditioner. Examples of use of </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">set</span></span></span> <span 
-class="cmbx-12">are given in Section</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">are given in Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlsu9.html#x18-170005.1"><span 
-class="cmbx-12">5.1</span><!--tex4ht:ref: sec:examples --></a><span 
-class="cmbx-12">; a complete list</span>
+class="cmr-12">5.1</span><!--tex4ht:ref: sec:examples --></a><span 
+class="cmr-12">; a complete</span>
      <span 
-class="cmbx-12">of all the preconditioner parameters and their allowed and default</span>
+class="cmr-12">list of all the preconditioner parameters and their allowed and default values</span>
      <span 
-class="cmbx-12">values is provided in Section</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">is provided in Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse6.html#x19-180006"><span 
-class="cmbx-12">6</span><!--tex4ht:ref: sec:userinterface --></a><span 
-class="cmbx-12">, Tables</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">6</span><!--tex4ht:ref: sec:userinterface --></a><span 
+class="cmr-12">, Tables</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlsu11.html#x21-200092"><span 
-class="cmbx-12">2</span><!--tex4ht:ref: tab:p_cycle --></a><span 
-class="cmbx-12">-</span><a 
+class="cmr-12">2</span><!--tex4ht:ref: tab:p_cycle --></a><span 
+class="cmr-12">-</span><a 
 href="userhtmlsu11.html#x21-200158"><span 
-class="cmbx-12">8</span><!--tex4ht:ref: tab:p_smoother_1 --></a><span 
-class="cmbx-12">.</span>
+class="cmr-12">8</span><!--tex4ht:ref: tab:p_smoother_1 --></a><span 
+class="cmr-12">.</span>
      </li>
      <li 
   class="enumerate" id="x17-16008x4"><span 
-class="cmbxti-10x-x-120">Build the preconditioner for a given matrix</span><span 
-class="cmbx-12">. If the selected</span>
+class="cmti-12">Build the preconditioner for a given matrix</span><span 
+class="cmr-12">. If the selected preconditioner is</span>
      <span 
-class="cmbx-12">preconditioner is multilevel, then two steps must be performed, as</span>
-     <span 
-class="cmbx-12">specified next.</span>
-                                                                               
-
-                                                                               
+class="cmr-12">multilevel, then two steps must be performed, as specified next.</span>
           <ol  class="enumerate2" >
           <li 
   class="enumerate" id="x17-16009x0"><span 
-class="cmbxti-10x-x-120">Build the aggregation hierarchy for a given matrix. </span><span 
-class="cmbx-12">This is</span>
+class="cmti-12">Build the AMG hierarchy for a given matrix. </span><span 
+class="cmr-12">This is performed by the</span>
           <span 
-class="cmbx-12">performed by the routine </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">routine </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">hierarchy_build</span></span></span><span 
-class="cmbx-12">.</span>
+class="cmr-12">.</span>
+                                                                               
+
+                                                                               
           </li>
           <li 
   class="enumerate" id="x17-16010x0"><span 
-class="cmbxti-10x-x-120">Build  the  preconditioner  for  a  given  matrix.  </span><span 
-class="cmbx-12">This  is</span>
+class="cmti-12">Build the preconditioner for a given matrix. </span><span 
+class="cmr-12">This is performed by the</span>
           <span 
-class="cmbx-12">performed by the routine </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">routine </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">smoothers_build</span></span></span><span 
-class="cmbx-12">.</span></li></ol>
+class="cmr-12">.</span></li></ol>
      <!--l. 41--><p class="noindent" ><span 
-class="cmbx-12">If the selected preconditioner is one-level, it is built in a single step,</span>
+class="cmr-12">If the selected preconditioner is one-level, it is built in a single step, performed by</span>
      <span 
-class="cmbx-12">performed by the routine </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">the routine </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">bld</span></span></span><span 
-class="cmbx-12">.</span>
+class="cmr-12">.</span>
      </li>
      <li 
   class="enumerate" id="x17-16012x5"><span 
-class="cmbxti-10x-x-120">Apply the preconditioner at each iteration of a Krylov solver. </span><span 
-class="cmbx-12">This is</span>
+class="cmti-12">Apply the preconditioner at each iteration of a Krylov solver. </span><span 
+class="cmr-12">This is performed by</span>
      <span 
-class="cmbx-12">performed by the method </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">the method </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">apply</span></span></span><span 
-class="cmbx-12">. When using the PSBLAS Krylov</span>
+class="cmr-12">. When using the PSBLAS Krylov solvers, this step is</span>
      <span 
-class="cmbx-12">solvers, this step is completely transparent to the user, since </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">completely transparent to the user, since </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">apply</span></span></span> <span 
-class="cmbx-12">is</span>
+class="cmr-12">is called by the PSBLAS routine</span>
      <span 
-class="cmbx-12">called by the PSBLAS routine implementing the Krylov solver</span>
-     <span 
-class="cmbx-12">(</span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">implementing the Krylov solver (</span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">psb_krylov</span></span></span><span 
-class="cmbx-12">).</span>
+class="cmr-12">).</span>
      </li>
      <li 
   class="enumerate" id="x17-16014x6"><span 
-class="cmbxti-10x-x-120">Free the preconditioner data structure</span><span 
-class="cmbx-12">. This is performed by the</span>
-     <span 
-class="cmbx-12">routine </span><span class="obeylines-h"><span class="verb"><span 
+class="cmti-12">Free the preconditioner data structure</span><span 
+class="cmr-12">. This is performed by the routine </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">free</span></span></span><span 
-class="cmbx-12">. This step is complementary to step 1 and should be</span>
+class="cmr-12">.</span>
      <span 
-class="cmbx-12">performed when the preconditioner is no more used.</span></li></ol>
+class="cmr-12">This step is complementary to step 1 and should be performed when the</span>
+     <span 
+class="cmr-12">preconditioner is no more used.</span></li></ol>
 <!--l. 52--><p class="indent" >   <span 
-class="cmbx-12">All the previous routines are available as methods of the preconditioner</span>
+class="cmr-12">All the previous routines are available as methods of the preconditioner object. A</span>
 <span 
-class="cmbx-12">object. A detailed description of them is given in Section</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">detailed description of them is given in Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse6.html#x19-180006"><span 
-class="cmbx-12">6</span><!--tex4ht:ref: sec:userinterface --></a><span 
-class="cmbx-12">. Examples</span>
+class="cmr-12">6</span><!--tex4ht:ref: sec:userinterface --></a><span 
+class="cmr-12">. Examples showing the basic use of</span>
 <span 
-class="cmbx-12">showing the basic use of AMG4PSBLAS are reported in Section</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">AMG4PSBLAS are reported in Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlsu9.html#x18-170005.1"><span 
-class="cmbx-12">5.1</span><!--tex4ht:ref: sec:examples --></a><span 
-class="cmbx-12">.</span>
+class="cmr-12">5.1</span><!--tex4ht:ref: sec:examples --></a><span 
+class="cmr-12">.</span>
    <div class="table">
                                                                                
 
@@ -261,7 +247,7 @@ class="small-caps">t</span><span
 class="small-caps">r</span><span 
 class="small-caps">i</span><span 
 class="small-caps">n</span><span 
-class="small-caps">g</span></span>    </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-1-3"  
+class="small-caps">g</span></span>     </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-1-3"  
 class="td11"><!--l. 61--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">d</span><span 
@@ -284,73 +270,82 @@ class="small-caps">i</span><span
 class="small-caps">o</span><span 
 class="small-caps">n</span><span 
 class="small-caps">e</span><span 
-class="small-caps">r</span></span>                         </td></tr><tr 
+class="small-caps">r</span></span>                       </td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-2-1"  
 class="td11">No preconditioner </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-2-2"  
 class="td11"><!--l. 62--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10x-x-109">&#8217;NONE&#8217;</span></span></span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-2-3"  
 class="td11"><!--l. 62--><p class="noindent" >Considered to use the PSBLAS Krylov solvers
-with no preconditioner.                                 </td>
+with no preconditioner.                                </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-3-1"  
 class="td11">Diagonal                       </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-3-2"  
 class="td11"><!--l. 64--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10x-x-109">&#8217;DIAG&#8217;</span></span></span> or
+class="cmtt-10x-x-109">&#8217;DIAG&#8217;</span></span></span>,
 <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10x-x-109">&#8217;JACOBI&#8217;</span></span></span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-3-3"  
+class="cmtt-10x-x-109">&#8217;JACOBI&#8217;</span></span></span>,
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;L1-JACOBI&#8217;</span></span></span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-3-3"  
 class="td11"><!--l. 64--><p class="noindent" >Diagonal preconditioner. For any zero diagonal
-entry  of  the  matrix  to  be  preconditioned,  the
+entry of the matrix to be preconditioned, the
 corresponding entry of the preconditioner is set
-to&#x00A0;1.                                                         </td>
+to&#x00A0;1.                                                        </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-4-1"  
 class="td11">Gauss-Seidel                  </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-4-2"  
 class="td11"><!--l. 67--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10x-x-109">&#8217;GS&#8217;</span></span></span>     </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-4-3"  
-class="td11"><!--l. 67--><p class="noindent" >Hybrid  Gauss-Seidel  (forward),  that  is,  global
-block Jacobi with Gauss-Seidel as local solver.   </td>
+class="cmtt-10x-x-109">&#8217;GS&#8217;</span></span></span>,
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;L1-GS&#8217;</span></span></span>   </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-4-3"  
+class="td11"><!--l. 67--><p class="noindent" >Hybrid Gauss-Seidel (forward), that is, global
+block Jacobi with Gauss-Seidel as local solver.  </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-5-1"  
 class="td11">Symmetrized Gauss-Seidel</td><td  style="white-space:wrap; text-align:left;" id="TBL-1-5-2"  
 class="td11"><!--l. 70--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10x-x-109">&#8217;FBGS&#8217;</span></span></span>   </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-5-3"  
-class="td11"><!--l. 70--><p class="noindent" >Symmetrized
-hybrid Gauss-Seidel,that is, forward Gauss-Seidel
-followed by backward Gauss-Seidel.                 </td>
+class="cmtt-10x-x-109">&#8217;FBGS&#8217;</span></span></span>,
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;L1-FBGS&#8217;</span></span></span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-5-3"  
+class="td11"><!--l. 70--><p class="noindent" >Symmetrized   hybrid   Gauss-Seidel,   that   is,
+forward  Gauss-Seidel  followed  by  backward
+Gauss-Seidel.                                             </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-6-1"  
 class="td11">Block Jacobi                  </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-6-2"  
 class="td11"><!--l. 73--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10x-x-109">&#8217;BJAC&#8217;</span></span></span>   </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-6-3"  
-class="td11"><!--l. 73--><p class="noindent" >Block-Jacobi with ILU(0) on the local blocks.    </td>
+class="cmtt-10x-x-109">&#8217;BJAC&#8217;</span></span></span>,
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;L1-BJAC&#8217;</span></span></span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-6-3"  
+class="td11"><!--l. 73--><p class="noindent" >Block-Jacobi with ILU(0) on the local blocks.  </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-7-1"  
 class="td11">Additive Schwarz            </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-7-2"  
 class="td11"><!--l. 74--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10x-x-109">&#8217;AS&#8217;</span></span></span>     </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-7-3"  
+class="cmtt-10x-x-109">&#8217;AS&#8217;</span></span></span>      </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-7-3"  
 class="td11"><!--l. 74--><p class="noindent" >Additive  Schwarz  (AS),  with  overlap&#x00A0;1  and
-ILU(0) on the local blocks.                             </td>
+ILU(0) on the local blocks.                           </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-8-1"  
 class="td11">Multilevel                      </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-8-2"  
 class="td11"><!--l. 76--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10x-x-109">&#8217;ML&#8217;</span></span></span>     </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-8-3"  
-class="td11"><!--l. 76--><p class="noindent" >V-cycle  with  one  hybrid  forward  Gauss-Seidel
-(GS)  sweep  as  pre-smoother  and  one  hybrid
-backward  GS  sweep  as  post-smoother,  basic
-smoothed  aggregation  as  coarsening  algorithm,
-and LU (plus triangular solve) as coarsest-level
-solver. See the default values in Tables&#x00A0;<a 
+class="cmtt-10x-x-109">&#8217;ML&#8217;</span></span></span>      </td><td  style="white-space:wrap; text-align:left;" id="TBL-1-8-3"  
+class="td11"><!--l. 76--><p class="noindent" >V-cycle with one hybrid forward Gauss-Seidel
+(GS)                                                sweep
+as pre-smoother and one hybrid backward GS
+sweep  as  post-smoother,  decoupled  smoothed
+aggregation  as  coarsening  algorithm,  and  LU
+(plus triangular solve) as coarsest-level solver.
+See the default values in Tables&#x00A0;<a 
 href="userhtmlsu11.html#x21-200092">2<!--tex4ht:ref: tab:p_cycle --></a>-<a 
-href="userhtmlsu11.html#x21-200158">8<!--tex4ht:ref: tab:p_smoother_1 --></a> for
-further details of the preconditioner.                </td>
+href="userhtmlsu11.html#x21-200158">8<!--tex4ht:ref: tab:p_smoother_1 --></a> for further
+details of the preconditioner.                         </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-9-1"  
@@ -365,72 +360,70 @@ class="content">Preconditioner types, corresponding strings and default choices.
    </div><hr class="endfloat" />
    </div>
 <!--l. 91--><p class="indent" >   <span 
-class="cmbx-12">Note that the module </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">Note that the module </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">amg_prec_mod</span></span></span><span 
-class="cmbx-12">, containing the definition of</span>
+class="cmr-12">, containing the definition of the preconditioner</span>
 <span 
-class="cmbx-12">the preconditioner data type and the interfaces to the routines of</span>
+class="cmr-12">data type and the interfaces to the routines of AMG4PSBLAS, must be used</span>
 <span 
-class="cmbx-12">AMG4PSBLAS, must be used in any program calling such routines. The</span>
-<span 
-class="cmbx-12">modules </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">in any program calling such routines. The modules </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">psb_base_mod</span></span></span><span 
-class="cmbx-12">, for the sparse matrix and communication descriptor</span>
+class="cmr-12">, for the</span>
 <span 
-class="cmbx-12">data types, and </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">sparse matrix and communication descriptor data types, and </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">psb_krylov_mod</span></span></span><span 
-class="cmbx-12">, for interfacing with the Krylov solvers,</span>
+class="cmr-12">,</span>
 <span 
-class="cmbx-12">must be also used (see Section</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">for interfacing with the Krylov solvers, must be also used (see Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlsu9.html#x18-170005.1"><span 
-class="cmbx-12">5.1</span><!--tex4ht:ref: sec:examples --></a><span 
-class="cmbx-12">). </span><br 
+class="cmr-12">5.1</span><!--tex4ht:ref: sec:examples --></a><span 
+class="cmr-12">).</span>
+<br 
 class="newline" />
 <!--l. 98--><p class="indent" >   <span 
-class="cmbx-12">Remark 1. Coarsest-level solvers based on the LU factorization, such as</span>
+class="cmbx-12">Remark 1. </span><span 
+class="cmr-12">Coarsest-level solvers based on the LU factorization, such as those</span>
 <span 
-class="cmbx-12">those implemented in UMFPACK, MUMPS, SuperLU, and SuperLU</span><span 
-class="cmbx-12">_Dist,</span>
+class="cmr-12">implemented in UMFPACK, MUMPS, SuperLU, and SuperLU</span><span 
+class="cmr-12">_Dist, usually lead to</span>
 <span 
-class="cmbx-12">usually lead to smaller numbers of preconditioned Krylov iterations</span>
+class="cmr-12">smaller numbers of preconditioned Krylov iterations than inexact solvers, when the</span>
 <span 
-class="cmbx-12">than inexact solvers, when the linear system comes from a standard</span>
+class="cmr-12">linear system comes from a standard discretization of basic scalar elliptic PDE</span>
 <span 
-class="cmbx-12">discretization of basic scalar elliptic PDE problems. However, this does not</span>
+class="cmr-12">problems. However, this does not necessarily correspond to the shortest execution time</span>
 <span 
-class="cmbx-12">necessarily correspond to the smallest execution time on parallel</span>
-<span 
-class="cmbx-12">computers.</span>
+class="cmr-12">on parallel computers.</span>
 <!--l. 107--><p class="indent" >   <span 
-class="cmbxti-10x-x-120">DA MODIFICARE PER INSERIRE TIPO DI AGGREGAZIONE</span>
+class="cmti-12">DA MODIFICARE PER INSERIRE TIPO DI AGGREGAZIONE</span>
    <div class="subsectionTOCS">
    <span 
-class="cmbx-12">&#x00A0;</span><span class="subsectionToc" ><span 
-class="cmbx-12">5.1 </span><a 
+class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+class="cmr-12">5.1 </span><a 
 href="userhtmlsu9.html#x18-170005.1"><span 
-class="cmbx-12">Examples</span></a></span>
+class="cmr-12">Examples</span></a></span>
    </div>
                                                                                
 
                                                                                
    <!--l. 1--><div class="crosslinks"><p class="noindent"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">[</span><a 
 href="userhtmlse6.html" ><span 
-class="cmbx-12">next</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">next</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse4.html" ><span 
-class="cmbx-12">prev</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse4.html#tailuserhtmlse4.html" ><span 
-class="cmbx-12">prev-tail</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev-tail</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse5.html" ><span 
-class="cmbx-12">front</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">front</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtml.html#userhtmlse5.html" ><span 
-class="cmbx-12">up</span></a><span 
-class="cmbx-12">] </span></p></div>
+class="cmr-12">up</span></a><span 
+class="cmr-12">] </span></p></div>
 <!--l. 1--><p class="indent" >   <a 
  id="tailuserhtmlse5.html"></a>  
 </body></html> 

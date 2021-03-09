@@ -191,12 +191,14 @@ class="cmr-12">Either exact or approximate solvers can be used on the coarsest-l
 <span 
 class="cmr-12">Specifically, different sparse LU factorizations from external packages, native</span>
 <span 
-class="cmr-12">incomplete LU factorizations, weighted Jacobi, hybrid Gauss-Seidel, and block-Jacobi</span>
+class="cmr-12">incomplete LU and approximate inverse factorizations, weighted Jacobi, hybrid</span>
 <span 
-class="cmr-12">solvers are available. All the smoothers can be also exploited as one-level</span>
+class="cmr-12">Gauss-Seidel, block-Jacobi solvers and recursive call to preconditioned Krylov</span>
+<span 
+class="cmr-12">methods are available. All the smoothers can be also exploited as one-level</span>
 <span 
 class="cmr-12">preconditioners.</span>
-<!--l. 36--><p class="indent" >   <span 
+<!--l. 35--><p class="indent" >   <span 
 class="cmr-12">AMG4PSBLAS is written in Fortran</span><span 
 class="cmr-12">&#x00A0;2003, following an object-oriented design</span>
 <span 
@@ -211,7 +213,7 @@ class="cmr-12">Single and double precision implementations of AMG4PSBLAS are ava
 class="cmr-12">for both the real and the complex case, which can be used through a single</span>
 <span 
 class="cmr-12">interface.</span>
-<!--l. 46--><p class="indent" >   <span 
+<!--l. 45--><p class="indent" >   <span 
 class="cmr-12">AMG4PSBLAS has been designed to implement scalable and easy-to-use multilevel</span>
 <span 
 class="cmr-12">preconditioners in the context of the PSBLAS (Parallel Sparse BLAS) computational</span>
@@ -251,7 +253,7 @@ class="cmr-12">required by AMG4PSBLAS is encapsulated in the PSBLAS routines; th
 class="cmr-12">AMG4PSBLAS can be run on any parallel machine where PSBLAS implementations</span>
 <span 
 class="cmr-12">are available.</span>
-<!--l. 61--><p class="indent" >   <span 
+<!--l. 60--><p class="indent" >   <span 
 class="cmr-12">AMG4PSBLAS has a layered and modular software architecture where three main</span>
 <span 
 class="cmr-12">layers can be identified. The lower layer consists of the PSBLAS kernels, the middle</span>
@@ -273,7 +275,7 @@ class="cmr-12">&#x00A0;</span><a
 href="userhtmlse7.html#x29-330007"><span 
 class="cmr-12">7</span><!--tex4ht:ref: sec:adding --></a><span 
 class="cmr-12">).</span>
-<!--l. 72--><p class="indent" >   <span 
+<!--l. 71--><p class="indent" >   <span 
 class="cmr-12">This guide is organized as follows. General information on the distribution of the</span>
 <span 
 class="cmr-12">source code is reported in Section</span><span 
@@ -289,6 +291,9 @@ class="cmr-12">3</span><!--tex4ht:ref: sec:building --></a><span
 class="cmr-12">. The basics for building and applying the</span>
 <span 
 class="cmr-12">preconditioners with the Krylov solvers implemented in PSBLAS are reported</span>
+                                                                               
+
+                                                                               
 <span 
 class="cmr-12">in</span><span 
 class="cmr-12">&#x00A0;Section</span><span 
@@ -296,9 +301,6 @@ class="cmr-12">&#x00A0;</span><a
 href="userhtmlse5.html#x17-160005"><span 
 class="cmr-12">5</span><!--tex4ht:ref: sec:started --></a><span 
 class="cmr-12">, where the Fortran codes of a few sample programs are also shown.</span>
-                                                                               
-
-                                                                               
 <span 
 class="cmr-12">A reference guide for the user interface routines is provided in Section</span><span 
 class="cmr-12">&#x00A0;</span><a 

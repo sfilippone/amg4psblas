@@ -51,38 +51,39 @@ class="cmr-12">Many vendors provide optimized versions of BLAS; if no</span>
 class="cmr-12">vendor  version  is  available  for  a  given  platform,  the  ATLAS  software</span>
      <span 
 class="cmr-12">(</span><a 
-href="math-atlas.sourceforge.net" class="url" ><span 
-class="cmtt-12">math-atlas.sourceforge.net</span></a><span 
-class="cmr-12">) may be employed. The reference BLAS</span>
+href="http://math-atlas.sourceforge.net" ><span 
+class="cmr-12">math-atlas.sourceforge.net</span></a><span 
+class="cmr-12">) may be employed. The reference BLAS from</span>
      <span 
-class="cmr-12">from  Netlib  (</span><a 
-href="www.netlib.org/blas" class="url" ><span 
-class="cmtt-12">www.netlib.org/blas</span></a><span 
-class="cmr-12">)  are  meant  to  define  the  standard</span>
+class="cmr-12">Netlib (</span><a 
+href="http://www.netlib.org/blas" ><span 
+class="cmr-12">www.netlib.org/blas</span></a><span 
+class="cmr-12">) are meant to define the standard behaviour of</span>
      <span 
-class="cmr-12">behaviour of the BLAS interface, so they are not optimized for any particular</span>
+class="cmr-12">the BLAS interface, so they are not optimized for any particular platform,</span>
      <span 
-class="cmr-12">platform,  and  should  only  be  used  as  a  last  resort.  Note  that  BLAS</span>
+class="cmr-12">and should only be used as a last resort. Note that BLAS computations</span>
      <span 
-class="cmr-12">computations form a relatively small part of the AMG4PSBLAS/PSBLAS</span>
+class="cmr-12">form a relatively small part of the AMG4PSBLAS/PSBLAS computations;</span>
      <span 
-class="cmr-12">computations; they are however critical when using preconditioners based</span>
+class="cmr-12">they are however critical when using preconditioners based on MUMPS,</span>
      <span 
-class="cmr-12">on  MUMPS,  UMFPACK  or  SuperLU  third  party  libraries.  Note  that</span>
+class="cmr-12">UMFPACK or SuperLU third party libraries. Note that UMFPACK requires</span>
      <span 
-class="cmr-12">UMFPACK  requires  a  full  LAPACK  library;  our  experience  is  that</span>
+class="cmr-12">a  full  LAPACK  library;  our  experience  is  that  configuring  ATLAS  for</span>
      <span 
-class="cmr-12">configuring  ATLAS  for  building  full  LAPACK  does  not  work  in  the</span>
+class="cmr-12">building full LAPACK does not work in the correct way. Our advice is first</span>
      <span 
-class="cmr-12">correct  way.  Our  advice  is  first  to  download  the  LAPACK  tarfile  from</span>
-     <a 
-href="www.netlib.org/lapack" class="url" ><span 
-class="cmtt-12">www.netlib.org/lapack</span></a> <span 
-class="cmr-12">and install it independently of ATLAS. In this</span>
+class="cmr-12">to download the LAPACK tarfile from </span><a 
+href="http://www.netlib.org/lapack" ><span 
+class="cmr-12">www.netlib.org/lapack</span></a> <span 
+class="cmr-12">and install it</span>
      <span 
-class="cmr-12">case, you need to modify the OPTS and NOOPT definitions for including</span>
+class="cmr-12">independently of ATLAS. In this case, you need to modify the OPTS and</span>
      <span 
-class="cmr-12">-fPIC compilation option in the make.inc file of the LAPACK library.</span>
+class="cmr-12">NOOPT definitions for including -fPIC compilation option in the make.inc</span>
+     <span 
+class="cmr-12">file of the LAPACK library.</span>
      </dd><dt class="description">
 <span 
 class="cmbx-12">MPI</span> </dt><dd 
@@ -112,15 +113,11 @@ class="cmr-12">17</span></a><span
 class="cmr-12">]</span></span>   <span 
 class="cmr-12">Parallel   Sparse   BLAS   (PSBLAS)   is   available   from</span>
      <a 
-href="github.com/sfilippone/psblas3" class="url" ><span 
-class="cmtt-12">github.com/sfilippone/psblas3</span></a> <span 
-class="cmr-12">?? </span><span 
-class="cmbx-12">Mettere tutto sotto psctoolkit</span><span 
-class="cmr-12">;</span>
+href="https://psctoolkit.github.io/products/psblas/" ><span 
+class="cmr-12">psctoolkit.github.io/products/psblas/</span></a><span 
+class="cmr-12">; version 3.7.0 (or later) is required.</span>
      <span 
-class="cmr-12">version 3.5.0 (or later) is required. Indeed, all the prerequisites listed so far</span>
-     <span 
-class="cmr-12">are also prerequisites of PSBLAS.</span></dd></dl>
+class="cmr-12">Indeed, all the prerequisites listed so far are also prerequisites of PSBLAS.</span></dd></dl>
 <!--l. 56--><p class="noindent" ><span 
 class="cmr-12">Please note that the four previous libraries must have Fortran interfaces compatible with</span>
 <span 

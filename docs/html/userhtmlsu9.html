@@ -11,105 +11,103 @@
 </head><body 
 >
    <!--l. 109--><div class="crosslinks"><p class="noindent"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">[</span><a 
 href="#tailuserhtmlsu9.html"><span 
-class="cmbx-12">tail</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">tail</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse5.html#userhtmlsu9.html" ><span 
-class="cmbx-12">up</span></a><span 
-class="cmbx-12">] </span></p></div>
+class="cmr-12">up</span></a><span 
+class="cmr-12">] </span></p></div>
    <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmbx-12">5.1   </span></span> <a 
+class="cmr-12">5.1   </span></span> <a 
  id="x18-170005.1"></a><span 
-class="cmbx-12">Examples</span></h4>
+class="cmr-12">Examples</span></h4>
 <!--l. 111--><p class="noindent" ><span 
-class="cmbx-12">The code reported in Figure</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">The code reported in Figure</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="#x18-170012"><span 
-class="cmbx-12">2</span><!--tex4ht:ref: fig:ex1 --></a> <span 
-class="cmbx-12">shows how to set and apply the default</span>
+class="cmr-12">2</span><!--tex4ht:ref: fig:ex1 --></a> <span 
+class="cmr-12">shows how to set and apply the default multilevel</span>
 <span 
-class="cmbx-12">multilevel preconditioner available in the real double precision version of</span>
+class="cmr-12">preconditioner available in the real double precision version of AMG4PSBLAS</span>
 <span 
-class="cmbx-12">AMG4PSBLAS (see Table</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">(see Table</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse5.html#x17-160151"><span 
-class="cmbx-12">1</span><!--tex4ht:ref: tab:precinit --></a><span 
-class="cmbx-12">). This preconditioner is chosen by simply</span>
-<span 
-class="cmbx-12">specifying </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">1</span><!--tex4ht:ref: tab:precinit --></a><span 
+class="cmr-12">). This preconditioner is chosen by simply specifying </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">&#8217;ML&#8217;</span></span></span> <span 
-class="cmbx-12">as the second argument of </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">as the</span>
+<span 
+class="cmr-12">second argument of </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">P%init</span></span></span> <span 
-class="cmbx-12">(a call to </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">(a call to </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">P%set</span></span></span> <span 
-class="cmbx-12">is not</span>
+class="cmr-12">is not needed) and is applied</span>
 <span 
-class="cmbx-12">needed) and is applied with the CG solver provided by PSBLAS (the</span>
+class="cmr-12">with the CG solver provided by PSBLAS (the matrix of the system to be</span>
 <span 
-class="cmbx-12">matrix of the system to be solved is assumed to be positive definite). As</span>
-<span 
-class="cmbx-12">previously observed, the modules </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">solved is assumed to be positive definite). As previously observed, the modules</span>
+<span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">psb_base_mod</span></span></span><span 
-class="cmbx-12">, </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">, </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">amg_prec_mod</span></span></span> <span 
-class="cmbx-12">and</span>
-<span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">and </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">psb_krylov_mod</span></span></span> <span 
-class="cmbx-12">must be used by the example program.</span>
+class="cmr-12">must be used by the example</span>
+<span 
+class="cmr-12">program.</span>
 <!--l. 121--><p class="indent" >   <span 
-class="cmbx-12">The part of the code concerning the reading and assembling of the</span>
+class="cmr-12">The part of the code concerning the reading and assembling of the sparse matrix</span>
 <span 
-class="cmbx-12">sparse matrix and the right-hand side vector, performed through the</span>
+class="cmr-12">and the right-hand side vector, performed through the PSBLAS routines for sparse</span>
 <span 
-class="cmbx-12">PSBLAS routines for sparse matrix and vector management, is not</span>
+class="cmr-12">matrix and vector management, is not reported here for brevity; the statements</span>
 <span 
-class="cmbx-12">reported here for brevity; the statements concerning the deallocation of the</span>
+class="cmr-12">concerning the deallocation of the PSBLAS data structure are neglected too. The</span>
 <span 
-class="cmbx-12">PSBLAS data structure are neglected too. The complete code can be found</span>
-<span 
-class="cmbx-12">in the example program file </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">complete code can be found in the example program file </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">amg_dexample_ml.f90</span></span></span><span 
-class="cmbx-12">, in the directory</span>
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">examples/fileread</span></span></span> <span 
-class="cmbx-12">of the AMG4PSBLAS implementation (see Section</span><span 
-class="cmbx-12">&#x00A0;</span><a 
-href="userhtmlsu5.html#x12-110003.5"><span 
-class="cmbx-12">3.5</span><!--tex4ht:ref: sec:ex_and_test --></a><span 
-class="cmbx-12">).</span>
+class="cmr-12">, in the</span>
 <span 
-class="cmbx-12">A sample test problem along with the relevant input data is available in</span>
+class="cmr-12">directory </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">examples/fileread</span></span></span> <span 
+class="cmr-12">of the AMG4PSBLAS implementation (see</span>
+<span 
+class="cmr-12">Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlsu5.html#x12-110003.5"><span 
+class="cmr-12">3.5</span><!--tex4ht:ref: sec:ex_and_test --></a><span 
+class="cmr-12">). A sample test problem along with the relevant input data is available in</span>
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">examples/fileread/runs</span></span></span><span 
+class="cmr-12">. For details on the use of the PSBLAS routines, see the</span>
+<span 
+class="cmr-12">PSBLAS User&#8217;s Guide</span><span 
+class="cmr-12">&#x00A0;</span><span class="cite"><span 
+class="cmr-12">[</span><a 
+href="userhtmlli4.html#XPSBLASGUIDE"><span 
+class="cmr-12">15</span></a><span 
+class="cmr-12">]</span></span><span 
+class="cmr-12">.</span>
                                                                                
 
                                                                                
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">examples/fileread/runs</span></span></span><span 
-class="cmbx-12">. For details on the use of the PSBLAS routines, see</span>
-<span 
-class="cmbx-12">the PSBLAS User&#8217;s Guide</span><span 
-class="cmbx-12">&#x00A0;</span><span class="cite"><span 
-class="cmbx-12">[</span><a 
-href="userhtmlli4.html#XPSBLASGUIDE"><span 
-class="cmbx-12">15</span></a><span 
-class="cmbx-12">]</span></span><span 
-class="cmbx-12">.</span>
 <!--l. 133--><p class="indent" >   <span 
-class="cmbx-12">The setup and application of the default multilevel preconditioner for</span>
+class="cmr-12">The setup and application of the default multilevel preconditioner for the real single</span>
 <span 
-class="cmbx-12">the real single precision and the complex, single and double precision,</span>
+class="cmr-12">precision and the complex, single and double precision, versions are obtained</span>
 <span 
-class="cmbx-12">versions are obtained with straightforward modifications of the previous</span>
-<span 
-class="cmbx-12">example (see Section</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">with straightforward modifications of the previous example (see Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse6.html#x19-180006"><span 
-class="cmbx-12">6</span><!--tex4ht:ref: sec:userinterface --></a> <span 
-class="cmbx-12">for details). If these versions are installed, the</span>
+class="cmr-12">6</span><!--tex4ht:ref: sec:userinterface --></a> <span 
+class="cmr-12">for</span>
 <span 
-class="cmbx-12">corresponding codes are available in </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">details). If these versions are installed, the corresponding codes are available in</span>
+<span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">examples/fileread/</span></span></span><span 
-class="cmbx-12">.</span>
+class="cmr-12">.</span>
 <!--l. 139--><p class="indent" >   <hr class="figure"><div class="figure" 
 >
                                                                                
@@ -192,83 +190,77 @@ class="content">setup and application of the default multilevel preconditioner (
                                                                                
 <!--l. 201--><p class="indent" >   </div><hr class="endfigure">
 <!--l. 203--><p class="indent" >   <span 
-class="cmbx-12">Different versions of the multilevel preconditioner can be obtained by</span>
+class="cmr-12">Different versions of the multilevel preconditioner can be obtained by changing the</span>
 <span 
-class="cmbx-12">changing the default values of the preconditioner parameters. The code</span>
-<span 
-class="cmbx-12">reported in Figure</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">default values of the preconditioner parameters. The code reported in Figure</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="#x18-170023"><span 
-class="cmbx-12">3</span><!--tex4ht:ref: fig:ex2 --></a> <span 
-class="cmbx-12">shows how to set a V-cycle preconditioner which</span>
+class="cmr-12">3</span><!--tex4ht:ref: fig:ex2 --></a> <span 
+class="cmr-12">shows</span>
 <span 
-class="cmbx-12">applies 1 block-Jacobi sweep as pre- and post-smoother, and solves the</span>
+class="cmr-12">how to set a V-cycle preconditioner which applies 1 block-Jacobi sweep as pre- and</span>
 <span 
-class="cmbx-12">coarsest-level system with 8 block-Jacobi sweeps. Note that the ILU(0)</span>
+class="cmr-12">post-smoother, and solves the coarsest-level system with 8 block-Jacobi sweeps. Note</span>
 <span 
-class="cmbx-12">factorization (plus triangular solve) is used as local solver for the</span>
+class="cmr-12">that the ILU(0) factorization (plus triangular solve) is used as local solver for the</span>
 <span 
-class="cmbx-12">block-Jacobi sweeps, since this is the default associated with block-Jacobi</span>
+class="cmr-12">block-Jacobi sweeps, since this is the default associated with block-Jacobi and set</span>
 <span 
-class="cmbx-12">and set by</span><span 
-class="cmbx-12">&#x00A0;</span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">by</span><span 
+class="cmr-12">&#x00A0;</span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">P%init</span></span></span><span 
-class="cmbx-12">. Furthermore, specifying block-Jacobi as coarsest-level</span>
+class="cmr-12">. Furthermore, specifying block-Jacobi as coarsest-level solver implies that</span>
 <span 
-class="cmbx-12">solver implies that the coarsest-level matrix is distributed among the</span>
-<span 
-class="cmbx-12">processes. Figure</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">the coarsest-level matrix is distributed among the processes. Figure</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="#x18-170034"><span 
-class="cmbx-12">4</span><!--tex4ht:ref: fig:ex3 --></a> <span 
-class="cmbx-12">shows how to set a W-cycle preconditioner which</span>
+class="cmr-12">4</span><!--tex4ht:ref: fig:ex3 --></a> <span 
+class="cmr-12">shows how to set</span>
 <span 
-class="cmbx-12">applies 2 hybrid Gauss-Seidel sweeps as pre- and post-smoother, and solves</span>
+class="cmr-12">a W-cycle preconditioner which applies 2 hybrid Gauss-Seidel sweeps as pre- and</span>
 <span 
-class="cmbx-12">the coarsest-level system with the multifrontal LU factorization</span>
+class="cmr-12">post-smoother, and solves the coarsest-level system with the multifrontal LU</span>
 <span 
-class="cmbx-12">implemented in MUMPS. It is specified that the coarsest-level matrix is</span>
+class="cmr-12">factorization implemented in MUMPS. It is specified that the coarsest-level matrix is</span>
 <span 
-class="cmbx-12">distributed, since MUMPS can be used on both replicated and distributed</span>
+class="cmr-12">distributed, since MUMPS can be used on both replicated and distributed matrices,</span>
 <span 
-class="cmbx-12">matrices, and by default it is used on replicated ones. The code fragments</span>
+class="cmr-12">and by default it is used on replicated ones. The code fragments shown in</span>
 <span 
-class="cmbx-12">shown in Figures</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">Figures</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="#x18-170023"><span 
-class="cmbx-12">3</span><!--tex4ht:ref: fig:ex2 --></a> <span 
-class="cmbx-12">and </span><a 
+class="cmr-12">3</span><!--tex4ht:ref: fig:ex2 --></a> <span 
+class="cmr-12">and </span><a 
 href="#x18-170034"><span 
-class="cmbx-12">4</span><!--tex4ht:ref: fig:ex3 --></a> <span 
-class="cmbx-12">are included in the example program file</span>
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">amg_dexample_ml.f90</span></span></span> <span 
-class="cmbx-12">too.</span>
+class="cmr-12">4</span><!--tex4ht:ref: fig:ex3 --></a> <span 
+class="cmr-12">are included in the example program file </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">amg_dexample_ml.f90</span></span></span>
+<span 
+class="cmr-12">too.</span>
 <!--l. 227--><p class="indent" >   <span 
-class="cmbx-12">Finally, Figure</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">Finally, Figure</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="#x18-170045"><span 
-class="cmbx-12">5</span><!--tex4ht:ref: fig:ex4 --></a> <span 
-class="cmbx-12">shows the setup of a one-level additive Schwarz</span>
+class="cmr-12">5</span><!--tex4ht:ref: fig:ex4 --></a> <span 
+class="cmr-12">shows the setup of a one-level additive Schwarz preconditioner,</span>
 <span 
-class="cmbx-12">preconditioner, i.e., RAS with overlap 2. Note also that a Krylov method</span>
+class="cmr-12">i.e., RAS with overlap 2. Note also that a Krylov method different from CG</span>
 <span 
-class="cmbx-12">different from CG must be used to solve the preconditioned system, since</span>
+class="cmr-12">must be used to solve the preconditioned system, since the preconditione in</span>
 <span 
-class="cmbx-12">the preconditione in nonsymmetric. The corresponding example program is</span>
-<span 
-class="cmbx-12">available in the file </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">amg_dexample_1lev.f90</span></span></span><span 
-class="cmbx-12">.</span>
-<!--l. 234--><p class="indent" >   <span 
-class="cmbx-12">For all the previous preconditioners, example programs where the sparse</span>
-<span 
-class="cmbx-12">matrix and the right-hand side are generated by discretizing a PDE with</span>
-<span 
-class="cmbx-12">Dirichlet boundary conditions are also available in the directory</span>
+class="cmr-12">nonsymmetric. The corresponding example program is available in the file</span>
 <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">amg_dexample_1lev.f90</span></span></span><span 
+class="cmr-12">.</span>
+<!--l. 234--><p class="indent" >   <span 
+class="cmr-12">For all the previous preconditioners, example programs where the sparse matrix and</span>
+<span 
+class="cmr-12">the right-hand side are generated by discretizing a PDE with Dirichlet boundary</span>
+<span 
+class="cmr-12">conditions are also available in the directory </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">examples/pdegen</span></span></span><span 
-class="cmbx-12">.</span>
+class="cmr-12">.</span>
 <!--l. 238--><p class="indent" >   <hr class="figure"><div class="figure" 
 >
                                                                                
@@ -380,13 +372,13 @@ class="content">setup of a one-level Schwarz preconditioner.</span></div><!--tex
 
                                                                                
    <!--l. 1--><div class="crosslinks"><p class="noindent"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">[</span><a 
 href="userhtmlsu9.html" ><span 
-class="cmbx-12">front</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">front</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse5.html#userhtmlsu9.html" ><span 
-class="cmbx-12">up</span></a><span 
-class="cmbx-12">] </span></p></div>
+class="cmr-12">up</span></a><span 
+class="cmr-12">] </span></p></div>
 <!--l. 1--><p class="indent" >   <a 
  id="tailuserhtmlsu9.html"></a>  
 </body></html> 

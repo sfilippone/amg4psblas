@@ -26,7 +26,6 @@
 .cmsy-8{font-size:72%;}
 .cmex-10x-x-120{font-size:109%;}
 .msbm-10x-x-120{font-size:109%;}
-.cmbxti-10x-x-120{font-size:109%; font-weight: bold; font-style: italic;}
 .cmmi-10x-x-109{font-style: italic;}
 .cmsy-10x-x-109{}
 .cmex-10x-x-109{}
@@ -189,9 +188,9 @@ div.abstract {width:100%;}
 #TBL-5{border-collapse:collapse;}
 #TBL-5 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-5{border-collapse:collapse;}
-td#TBL-5-8-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
-td#TBL-5-9-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
-td#TBL-5-10-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-5-8-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-5-9-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-5-10-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-6 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-6{border-collapse:collapse;}
 #TBL-6 colgroup{border-left: 1px solid black;border-right:1px solid black;}
@@ -204,8 +203,8 @@ td#TBL-5-10-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-6{border-collapse:collapse;}
 #TBL-6 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-6{border-collapse:collapse;}
-td#TBL-6-5-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
-td#TBL-6-6-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-6-5-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-6-6-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-7 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-7{border-collapse:collapse;}
 #TBL-7 colgroup{border-left: 1px solid black;border-right:1px solid black;}
@@ -218,9 +217,9 @@ td#TBL-6-6-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-7{border-collapse:collapse;}
 #TBL-7 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-7{border-collapse:collapse;}
-td#TBL-7-5-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
-td#TBL-7-6-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
-td#TBL-7-7-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-7-5-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-7-6-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-7-7-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-8 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-8{border-collapse:collapse;}
 #TBL-8 colgroup{border-left: 1px solid black;border-right:1px solid black;}

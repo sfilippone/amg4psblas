@@ -11,38 +11,35 @@
 </head><body 
 >
    <!--l. 56--><div class="crosslinks"><p class="noindent"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">[</span><a 
 href="userhtmlsu7.html" ><span 
-class="cmbx-12">next</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">next</span></a><span 
+class="cmr-12">] [</span><a 
 href="#tailuserhtmlsu6.html"><span 
-class="cmbx-12">tail</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">tail</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse4.html#userhtmlsu6.html" ><span 
-class="cmbx-12">up</span></a><span 
-class="cmbx-12">] </span></p></div>
+class="cmr-12">up</span></a><span 
+class="cmr-12">] </span></p></div>
    <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmbx-12">4.1   </span></span> <a 
+class="cmr-12">4.1   </span></span> <a 
  id="x14-130004.1"></a><span 
-class="cmbx-12">AMG preconditioners</span></h4>
+class="cmr-12">AMG preconditioners</span></h4>
 <!--l. 58--><p class="noindent" ><span 
-class="cmbx-12">In order to describe the AMG preconditioners available in MLD2P4, we</span>
+class="cmr-12">In order to describe the AMG preconditioners available in MLD2P4, we consider a</span>
 <span 
-class="cmbx-12">consider a linear system</span>
+class="cmr-12">linear system</span>
    <table 
 class="equation"><tr><td>
    <center class="math-display" >
 <img 
 src="userhtml2x.png" alt="Ax  = b,
-                                                                               
-
-                                                                               
 " class="math-display" ><a 
  id="x14-13001r2"></a></center></td><td class="equation-label"><span 
 class="cmr-12">(2)</span></td></tr></table>
 <!--l. 62--><p class="nopar" >
 <span 
-class="cmbx-12">where </span><span 
+class="cmr-12">where </span><span 
 class="cmmi-12">A </span><span 
 class="cmr-12">= (</span><span 
 class="cmmi-12">a</span><sub><span 
@@ -53,18 +50,20 @@ class="msbm-10x-x-120">&#x211D;</span><sup><span
 class="cmmi-8">n</span><span 
 class="cmsy-8">&#x00D7;</span><span 
 class="cmmi-8">n</span></sup> <span 
-class="cmbx-12">is a nonsingular sparse matrix; for ease of</span>
+class="cmr-12">is a nonsingular sparse matrix; for ease of presentation we</span>
 <span 
-class="cmbx-12">presentation we assume </span><span 
+class="cmr-12">assume </span><span 
 class="cmmi-12">A </span><span 
-class="cmbx-12">has a symmetric sparsity pattern.</span>
+class="cmr-12">has a symmetric sparsity pattern.</span>
+                                                                               
+
+                                                                               
 <!--l. 67--><p class="indent" >   <span 
-class="cmbx-12">Let us consider as finest index space the set of row (column) indices of </span><span 
+class="cmr-12">Let us consider as finest index space the set of row (column) indices of </span><span 
 class="cmmi-12">A</span><span 
-class="cmbx-12">,</span>
+class="cmr-12">,</span>
 <span 
-class="cmbx-12">i.e., </span><span 
-class="cmr-12">&#x03A9; = </span><span 
+class="cmr-12">i.e., &#x03A9; = </span><span 
 class="cmsy-10x-x-120">{</span><span 
 class="cmr-12">1</span><span 
 class="cmmi-12">, </span><span 
@@ -73,68 +72,66 @@ class="cmmi-12">,</span><span
 class="cmmi-12">&#x2026;</span><span 
 class="cmmi-12">,n</span><span 
 class="cmsy-10x-x-120">}</span><span 
-class="cmbx-12">. Any algebraic multilevel preconditioners implemented in</span>
+class="cmr-12">. Any algebraic multilevel preconditioners implemented in</span>
 <span 
-class="cmbx-12">MLD2P4 generates a hierarchy of index spaces and a corresponding</span>
+class="cmr-12">MLD2P4 generates a hierarchy of index spaces and a corresponding hierarchy of</span>
 <span 
-class="cmbx-12">hierarchy of matrices,</span>
+class="cmr-12">matrices,</span>
    <center class="math-display" >
 <img 
-src="userhtml3x.png" alt="&#x03A9;1 &#x2261; &#x03A9;  &#x2283; &#x03A9;2 &#x2283;  ...&#x2283; &#x03A9;nlev,   A1 &#x2261; A, A2, ...,Anlev,
+src="userhtml3x.png" alt=" 1          2          nlev     1       2       nlev
+&#x03A9;  &#x2261; &#x03A9;  &#x2283; &#x03A9;  &#x2283;  ...&#x2283; &#x03A9;    ,  A   &#x2261; A, A ,...,A    ,
 " class="math-display" ></center>
 <!--l. 72--><p class="nopar" > <span 
-class="cmbx-12">by using the information contained in </span><span 
+class="cmr-12">by using the information contained in </span><span 
 class="cmmi-12">A</span><span 
-class="cmbx-12">, without assuming any knowledge</span>
+class="cmr-12">, without assuming any knowledge of</span>
 <span 
-class="cmbx-12">of the geometry of the problem from which </span><span 
+class="cmr-12">the geometry of the problem from which </span><span 
 class="cmmi-12">A </span><span 
-class="cmbx-12">originates. A vector space </span><span 
+class="cmr-12">originates. A vector space </span><span 
 class="msbm-10x-x-120">&#x211D;</span><sup><span 
 class="cmmi-8">n</span><sub><span 
-class="cmmi-6">k</span></sub></sup>
+class="cmmi-6">k</span></sub></sup> <span 
+class="cmr-12">is</span>
 <span 
-class="cmbx-12">is associated with </span><span 
-class="cmr-12">&#x03A9;</span><sup><span 
+class="cmr-12">associated with &#x03A9;</span><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmbx-12">, where </span><span 
+class="cmr-12">, where </span><span 
 class="cmmi-12">n</span><sub>
 <span 
 class="cmmi-8">k</span></sub> <span 
-class="cmbx-12">is the size of </span><span 
-class="cmr-12">&#x03A9;</span><sup><span 
+class="cmr-12">is the size of &#x03A9;</span><sup><span 
 class="cmmi-8">k</span></sup><span 
-class="cmbx-12">. For all </span><span 
+class="cmr-12">. For all </span><span 
 class="cmmi-12">k &#x003C; nlev</span><span 
-class="cmbx-12">, a</span>
+class="cmr-12">, a restriction</span>
 <span 
-class="cmbx-12">restriction operator and a prolongation one are built, which connect two</span>
+class="cmr-12">operator and a prolongation one are built, which connect two levels </span><span 
+class="cmmi-12">k </span><span 
+class="cmr-12">and</span>
 <span 
-class="cmbx-12">levels </span><span 
 class="cmmi-12">k </span><span 
-class="cmbx-12">and </span><span 
-class="cmmi-12">k </span><span 
-class="cmr-12">+ 1</span><span 
-class="cmbx-12">:</span>
+class="cmr-12">+ 1:</span>
    <center class="math-display" >
 <img 
-src="userhtml4x.png" alt="  k    nk&#x00D7;nk+1      k    nk+1&#x00D7;nk
-P   &#x2208; &#x211D;       ,   R  &#x2208; &#x211D;        ;
+src="userhtml4x.png" alt="P k &#x2208; &#x211D;nk&#x00D7;nk+1,   Rk &#x2208; &#x211D;nk+1&#x00D7;nk ;
 " class="math-display" ></center>
 <!--l. 82--><p class="nopar" > <span 
-class="cmbx-12">the matrix </span><span 
+class="cmr-12">the matrix </span><span 
 class="cmmi-12">A</span><sup><span 
 class="cmmi-8">k</span><span 
-class="cmr-8">+1</span></sup>  <span 
-class="cmbx-12">is computed by using the previous operators according to</span>
+class="cmr-8">+1</span></sup> <span 
+class="cmr-12">is computed by using the previous operators according to the</span>
 <span 
-class="cmbx-12">the Galerkin approach, i.e.,</span>
+class="cmr-12">Galerkin approach, i.e.,</span>
    <center class="math-display" >
 <img 
-src="userhtml5x.png" alt="Ak+1  = RkAkP  k.
+src="userhtml5x.png" alt="  k+1     k k  k
+A    =  R  A P  .
 " class="math-display" ></center>
 <!--l. 87--><p class="nopar" > <span 
-class="cmbx-12">In the current implementation of MLD2P4 we have </span><span 
+class="cmr-12">In the current implementation of MLD2P4 we have </span><span 
 class="cmmi-12">R</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
 class="cmr-12">= (</span><span 
@@ -142,30 +139,28 @@ class="cmmi-12">P</span><sup><span
 class="cmmi-8">k</span></sup><span 
 class="cmr-12">)</span><sup><span 
 class="cmmi-8">T</span> </sup> <span 
-class="cmbx-12">A smoother</span>
+class="cmr-12">A smoother with</span>
 <span 
-class="cmbx-12">with iteration matrix </span><span 
+class="cmr-12">iteration matrix </span><span 
 class="cmmi-12">M</span><sup><span 
 class="cmmi-8">k</span></sup> <span 
-class="cmbx-12">is set up at each level </span><span 
+class="cmr-12">is set up at each level </span><span 
 class="cmmi-12">k &#x003C; nlev</span><span 
-class="cmbx-12">, and a solver is set</span>
+class="cmr-12">, and a solver is set up at the</span>
 <span 
-class="cmbx-12">up at the coarsest level, so that they are ready for application (for example,</span>
+class="cmr-12">coarsest level, so that they are ready for application (for example, setting up a solver</span>
 <span 
-class="cmbx-12">setting up a solver based on the </span><span 
+class="cmr-12">based on the </span><span 
 class="cmmi-12">LU </span><span 
-class="cmbx-12">factorization means computing and</span>
-<span 
-class="cmbx-12">storing the </span><span 
+class="cmr-12">factorization means computing and storing the </span><span 
 class="cmmi-12">L </span><span 
-class="cmbx-12">and </span><span 
+class="cmr-12">and </span><span 
 class="cmmi-12">U </span><span 
-class="cmbx-12">factors). The construction of the hierarchy of AMG</span>
+class="cmr-12">factors). The</span>
 <span 
-class="cmbx-12">components described so far corresponds to the so-called build phase of the</span>
+class="cmr-12">construction of the hierarchy of AMG components described so far corresponds to the</span>
 <span 
-class="cmbx-12">preconditioner.</span>
+class="cmr-12">so-called build phase of the preconditioner.</span>
 <!--l. 95--><p class="indent" >   <hr class="figure"><div class="figure" 
 >
                                                                                
@@ -183,9 +178,9 @@ class="cmbx-12">preconditioner.</span>
 cellpadding="0" border="0" cellspacing="0" 
 class="tabbing"><tr  
 style="vertical-align:baseline;" class="tabbing"><td style="width:16;" 
-class="tabbing">  </td><td style="width:16;" 
-class="tabbing">  </td><td style="width:16;" 
-class="tabbing">  </td><td  
+class="tabbing">   </td><td style="width:16;" 
+class="tabbing">   </td><td style="width:16;" 
+class="tabbing">   </td><td  
 class="tabbing"></td></tr></table>
 <!--l. 115--><p class="noindent" ><table  
 cellpadding="0" border="0" cellspacing="0" 
@@ -336,71 +331,69 @@ class="content">Application phase of a V-cycle preconditioner.</span></div><!--t
                                                                                
 <!--l. 118--><p class="indent" >   </div><hr class="endfigure">
 <!--l. 120--><p class="indent" >   <span 
-class="cmbx-12">The components produced in the build phase may be combined in</span>
+class="cmr-12">The components produced in the build phase may be combined in several ways to</span>
 <span 
-class="cmbx-12">several ways to obtain different multilevel preconditioners; this is done in</span>
+class="cmr-12">obtain different multilevel preconditioners; this is done in the application phase, i.e., in</span>
 <span 
-class="cmbx-12">the application phase, i.e., in the computation of a vector of type </span><span 
+class="cmr-12">the computation of a vector of type </span><span 
 class="cmmi-12">w </span><span 
 class="cmr-12">= </span><span 
 class="cmmi-12">B</span><sup><span 
 class="cmsy-8">-</span><span 
 class="cmr-8">1</span></sup><span 
 class="cmmi-12">v</span><span 
-class="cmbx-12">,</span>
-<span 
-class="cmbx-12">where </span><span 
+class="cmr-12">, where </span><span 
 class="cmmi-12">B </span><span 
-class="cmbx-12">denotes the preconditioner, usually within an iteration of a Krylov</span>
+class="cmr-12">denotes the preconditioner,</span>
 <span 
-class="cmbx-12">solver </span><span class="cite"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">usually within an iteration of a Krylov solver </span><span class="cite"><span 
+class="cmr-12">[</span><a 
 href="userhtmlli4.html#XSaad_book"><span 
-class="cmbx-12">23</span></a><span 
-class="cmbx-12">]</span></span><span 
-class="cmbx-12">. An example of such a combination, known as V-cycle, is given in</span>
+class="cmr-12">23</span></a><span 
+class="cmr-12">]</span></span><span 
+class="cmr-12">. An example of such a combination,</span>
 <span 
-class="cmbx-12">Figure</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">known as V-cycle, is given in Figure</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="#x14-130021"><span 
-class="cmbx-12">1</span><!--tex4ht:ref: fig:application_alg --></a><span 
-class="cmbx-12">. In this case, a single iteration of the same smoother is used before</span>
+class="cmr-12">1</span><!--tex4ht:ref: fig:application_alg --></a><span 
+class="cmr-12">. In this case, a single iteration of the same</span>
 <span 
-class="cmbx-12">and after the the recursive call to the V-cycle (i.e., in the pre-smoothing</span>
+class="cmr-12">smoother is used before and after the the recursive call to the V-cycle (i.e., in the</span>
 <span 
-class="cmbx-12">and post-smoothing phases); however, different choices can be performed.</span>
+class="cmr-12">pre-smoothing and post-smoothing phases); however, different choices can be</span>
 <span 
-class="cmbx-12">Other cycles can be defined; in MLD2P4, we implemented the standard</span>
+class="cmr-12">performed. Other cycles can be defined; in MLD2P4, we implemented the</span>
 <span 
-class="cmbx-12">V-cycle and W-cycle</span><span 
-class="cmbx-12">&#x00A0;</span><span class="cite"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">standard V-cycle and W-cycle</span><span 
+class="cmr-12">&#x00A0;</span><span class="cite"><span 
+class="cmr-12">[</span><a 
 href="userhtmlli4.html#XBriggs2000"><span 
-class="cmbx-12">3</span></a><span 
-class="cmbx-12">]</span></span><span 
-class="cmbx-12">, and a version of the K-cycle described</span>
+class="cmr-12">3</span></a><span 
+class="cmr-12">]</span></span><span 
+class="cmr-12">, and a version of the K-cycle described</span>
 <span 
-class="cmbx-12">in</span><span 
-class="cmbx-12">&#x00A0;</span><span class="cite"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">in</span><span 
+class="cmr-12">&#x00A0;</span><span class="cite"><span 
+class="cmr-12">[</span><a 
 href="userhtmlli4.html#XNotay2008"><span 
-class="cmbx-12">22</span></a><span 
-class="cmbx-12">]</span></span><span 
-class="cmbx-12">.</span>
+class="cmr-12">22</span></a><span 
+class="cmr-12">]</span></span><span 
+class="cmr-12">.</span>
                                                                                
 
                                                                                
    <!--l. 133--><div class="crosslinks"><p class="noindent"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">[</span><a 
 href="userhtmlsu7.html" ><span 
-class="cmbx-12">next</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">next</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlsu6.html" ><span 
-class="cmbx-12">front</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">front</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse4.html#userhtmlsu6.html" ><span 
-class="cmbx-12">up</span></a><span 
-class="cmbx-12">] </span></p></div>
+class="cmr-12">up</span></a><span 
+class="cmr-12">] </span></p></div>
 <!--l. 133--><p class="indent" >   <a 
  id="tailuserhtmlsu6.html"></a>  
 </body></html> 

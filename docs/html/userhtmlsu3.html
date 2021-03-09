@@ -40,7 +40,7 @@ class="cmr-12">main directory to generate the necessary makefile.</span>
 <!--l. 105--><p class="indent" >   <span 
 class="cmbx-12">DA RISCRIVERE</span>
 <!--l. 107--><p class="indent" >   <span 
-class="cmbx-12">As a minimal example consider the following:</span>
+class="cmr-12">As a minimal example consider the following:</span>
                                                                                
 
                                                                                
@@ -48,22 +48,20 @@ class="cmbx-12">As a minimal example consider the following:</span>
 ./configure&#x00A0;--with-psblas=PSB-INSTALL-DIR
 </div>
 <!--l. 110--><p class="nopar" > <span 
-class="cmbx-12">which assumes that the various MPI compilers and support libraries are</span>
+class="cmr-12">which assumes that the various MPI compilers and support libraries are available in</span>
 <span 
-class="cmbx-12">available in the standard directories on the system, and specifies only</span>
+class="cmr-12">the standard directories on the system, and specifies only the PSBLAS install directory</span>
 <span 
-class="cmbx-12">the PSBLAS install directory (note that the latter directory must</span>
+class="cmr-12">(note that the latter directory must be specified with an </span><span 
+class="cmti-12">absolute </span><span 
+class="cmr-12">path). The full set of</span>
 <span 
-class="cmbx-12">be specified with an </span><span 
-class="cmbxti-10x-x-120">absolute </span><span 
-class="cmbx-12">path). The full set of options may</span>
-<span 
-class="cmbx-12">be looked at by issuing the command </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">options may be looked at by issuing the command </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">./configure</span><span 
 class="cmtt-12">&#x00A0;--help</span></span></span><span 
-class="cmbx-12">, which</span>
+class="cmr-12">, which</span>
 <span 
-class="cmbx-12">produces:</span>
+class="cmr-12">produces:</span>
                                                                                
 
                                                                                
@@ -243,15 +241,16 @@ class="cmbx-12">produces:</span>
 </div>
 <!--l. 281--><p class="nopar" >
 <!--l. 283--><p class="indent" >   <span 
-class="cmbx-12">For instance, if a user has built and installed PSBLAS 3.5 under the</span>
+class="cmr-12">For instance, if a user has built and installed PSBLAS 3.7 under the </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">/opt</span></span></span> <span 
+class="cmr-12">directory</span>
                                                                                
 
                                                                                
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">/opt</span></span></span> <span 
-class="cmbx-12">directory and is using the SuiteSparse package (which includes</span>
 <span 
-class="cmbx-12">UMFPACK), then MLD2P4 might be configured with:</span>
+class="cmr-12">and is using the SuiteSparse package (which includes UMFPACK), then MLD2P4</span>
+<span 
+class="cmr-12">might be configured with:</span>
                                                                                
 
                                                                                
@@ -260,38 +259,36 @@ class="cmbx-12">UMFPACK), then MLD2P4 might be configured with:</span>
 &#x00A0;<br />&#x00A0;--with-umfpackincdir=/usr/include/suitesparse/
 </div>
 <!--l. 290--><p class="nopar" > <span 
-class="cmbx-12">Once the configure script has completed execution, it will have generated</span>
-<span 
-class="cmbx-12">the file </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">Once the configure script has completed execution, it will have generated the file</span>
+<span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">Make.inc</span></span></span> <span 
-class="cmbx-12">which will then be used by all Makefiles in the directory</span>
+class="cmr-12">which will then be used by all Makefiles in the directory tree; this file will be</span>
 <span 
-class="cmbx-12">tree; this file will be copied in the install directory under the name</span>
-<span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">copied in the install directory under the name </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">Make.inc.MLD2P4</span></span></span><span 
-class="cmbx-12">.</span>
+class="cmr-12">.</span>
 <!--l. 296--><p class="indent" >   <span 
-class="cmbx-12">To use the MUMPS solver package, the user has to add the appropriate</span>
+class="cmr-12">To use the MUMPS solver package, the user has to add the appropriate options to</span>
 <span 
-class="cmbx-12">options to the configure script; by default we are looking for the libraries</span>
-<span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">the configure script; by default we are looking for the libraries </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">-ldmumps</span><span 
-class="cmtt-12">&#x00A0;-lsmumps</span></span></span> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">&#x00A0;-lsmumps</span></span></span>
+<span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">&#x00A0;-lzmumps</span><span 
 class="cmtt-12">&#x00A0;-lcmumps</span><span 
 class="cmtt-12">&#x00A0;-mumps_common</span><span 
 class="cmtt-12">&#x00A0;-lpord</span></span></span><span 
-class="cmbx-12">. MUMPS often</span>
+class="cmr-12">. MUMPS often uses additional</span>
 <span 
-class="cmbx-12">uses additional packages such as ScaLAPACK, ParMETIS, SCOTCH, as</span>
+class="cmr-12">packages such as ScaLAPACK, ParMETIS, SCOTCH, as well as enabling OpenMP; in</span>
 <span 
-class="cmbx-12">well as enabling OpenMP; in such cases it is necessary to add linker options</span>
-<span 
-class="cmbx-12">with the </span><span class="obeylines-h"><span class="verb"><span 
+class="cmr-12">such cases it is necessary to add linker options with the </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">--with-extra-libs</span></span></span> <span 
-class="cmbx-12">configure option.</span>
+class="cmr-12">configure</span>
+<span 
+class="cmr-12">option.</span>
 <!--l. 304--><p class="indent" >   <span 
-class="cmbx-12">To build the library the user will now enter</span>
+class="cmr-12">To build the library the user will now enter</span>
                                                                                
 
                                                                                
@@ -299,7 +296,7 @@ class="cmbx-12">To build the library the user will now enter</span>
 make
 </div>
 <!--l. 307--><p class="nopar" > <span 
-class="cmbx-12">followed (optionally) by</span>
+class="cmr-12">followed (optionally) by</span>
                                                                                
 
                                                                                
@@ -311,22 +308,22 @@ make&#x00A0;install
 
                                                                                
    <!--l. 312--><div class="crosslinks"><p class="noindent"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">[</span><a 
 href="userhtmlsu4.html" ><span 
-class="cmbx-12">next</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">next</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlsu2.html" ><span 
-class="cmbx-12">prev</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlsu2.html#tailuserhtmlsu2.html" ><span 
-class="cmbx-12">prev-tail</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev-tail</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlsu3.html" ><span 
-class="cmbx-12">front</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">front</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse3.html#userhtmlsu3.html" ><span 
-class="cmbx-12">up</span></a><span 
-class="cmbx-12">] </span></p></div>
+class="cmr-12">up</span></a><span 
+class="cmr-12">] </span></p></div>
 <!--l. 312--><p class="indent" >   <a 
  id="tailuserhtmlsu3.html"></a>  
 </body></html> 

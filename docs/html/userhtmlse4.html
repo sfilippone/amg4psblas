@@ -11,199 +11,188 @@
 </head><body 
 >
    <!--l. 1--><div class="crosslinks"><p class="noindent"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">[</span><a 
 href="userhtmlse5.html" ><span 
-class="cmbx-12">next</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">next</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse3.html" ><span 
-class="cmbx-12">prev</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse3.html#tailuserhtmlse3.html" ><span 
-class="cmbx-12">prev-tail</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev-tail</span></a><span 
+class="cmr-12">] [</span><a 
 href="#tailuserhtmlse4.html"><span 
-class="cmbx-12">tail</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">tail</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtml.html#userhtmlse4.html" ><span 
-class="cmbx-12">up</span></a><span 
-class="cmbx-12">] </span></p></div>
+class="cmr-12">up</span></a><span 
+class="cmr-12">] </span></p></div>
    <h3 class="sectionHead"><span class="titlemark"><span 
-class="cmbx-12">4   </span></span> <a 
+class="cmr-12">4   </span></span> <a 
  id="x13-120004"></a><span 
-class="cmbx-12">Multigrid Background</span></h3>
+class="cmr-12">Multigrid Background</span></h3>
 <!--l. 5--><p class="noindent" ><span 
-class="cmbx-12">Multigrid preconditioners, coupled with Krylov iterative solvers, are widely</span>
+class="cmr-12">Multigrid preconditioners, coupled with Krylov iterative solvers, are widely used in the</span>
 <span 
-class="cmbx-12">used in the parallel solution of large and sparse linear systems, because of</span>
+class="cmr-12">parallel solution of large and sparse linear systems, because of their optimality in the</span>
 <span 
-class="cmbx-12">their optimality in the solution of linear systems arising from the</span>
+class="cmr-12">solution of linear systems arising from the discretization of scalar elliptic Partial</span>
 <span 
-class="cmbx-12">discretization of scalar elliptic Partial Differential Equations (PDEs) on</span>
+class="cmr-12">Differential Equations (PDEs) on regular grids. Optimality, also known as algorithmic</span>
 <span 
-class="cmbx-12">regular grids. Optimality, also known as algorithmic scalability, is the</span>
+class="cmr-12">scalability, is the property of having a computational cost per iteration that depends</span>
 <span 
-class="cmbx-12">property of having a computational cost per iteration that depends linearly</span>
+class="cmr-12">linearly on the problem size, and a convergence rate that is independent of the problem</span>
 <span 
-class="cmbx-12">on the problem size, and a convergence rate that is independent of the</span>
-<span 
-class="cmbx-12">problem size.</span>
+class="cmr-12">size.</span>
 <!--l. 13--><p class="indent" >   <span 
-class="cmbx-12">Multigrid preconditioners are based on a recursive application of a</span>
+class="cmr-12">Multigrid preconditioners are based on a recursive application of a two-grid process</span>
 <span 
-class="cmbx-12">two-grid process consisting of smoother iterations and a coarse-space (or</span>
+class="cmr-12">consisting of smoother iterations and a coarse-space (or coarse-level) correction. The</span>
 <span 
-class="cmbx-12">coarse-level) correction. The smoothers may be either basic iterative</span>
+class="cmr-12">smoothers may be either basic iterative methods, such as the Jacobi and Gauss-Seidel</span>
 <span 
-class="cmbx-12">methods, such as the Jacobi and Gauss-Seidel ones, or more complex</span>
+class="cmr-12">ones, or more complex subspace-correction methods, such as the Schwarz ones. The</span>
 <span 
-class="cmbx-12">subspace-correction methods, such as the Schwarz ones. The coarse-space</span>
+class="cmr-12">coarse-space correction consists of solving, in an appropriately chosen coarse space, the</span>
 <span 
-class="cmbx-12">correction consists of solving, in an appropriately chosen coarse space, the</span>
+class="cmr-12">residual equation associated with the approximate solution computed by the</span>
 <span 
-class="cmbx-12">residual equation associated with the approximate solution computed by</span>
+class="cmr-12">smoother, and of using the solution of this equation to correct the previous</span>
 <span 
-class="cmbx-12">the smoother, and of using the solution of this equation to correct the</span>
+class="cmr-12">approximation. The transfer of information between the original (fine) space and</span>
 <span 
-class="cmbx-12">previous approximation. The transfer of information between the original</span>
+class="cmr-12">the coarse one is performed by using suitable restriction and prolongation</span>
 <span 
-class="cmbx-12">(fine) space and the coarse one is performed by using suitable restriction</span>
+class="cmr-12">operators. The construction of the coarse space and the corresponding transfer</span>
 <span 
-class="cmbx-12">and prolongation operators. The construction of the coarse space and the</span>
+class="cmr-12">operators is carried out by applying a so-called coarsening algorithm to the</span>
 <span 
-class="cmbx-12">corresponding transfer operators is carried out by applying a so-called</span>
+class="cmr-12">system matrix. Two main approaches can be used to perform coarsening:</span>
 <span 
-class="cmbx-12">coarsening algorithm to the system matrix. Two main approaches</span>
+class="cmr-12">the geometric approach, which exploits the knowledge of some physical grid</span>
 <span 
-class="cmbx-12">can be used to perform coarsening: the geometric approach, which</span>
+class="cmr-12">associated with the matrix and requires the user to define transfer operators</span>
 <span 
-class="cmbx-12">exploits the knowledge of some physical grid associated with the</span>
+class="cmr-12">from the fine to the coarse level and vice versa, and the algebraic approach,</span>
 <span 
-class="cmbx-12">matrix and requires the user to define transfer operators from the</span>
+class="cmr-12">which builds the coarse-space correction and the associate transfer operators</span>
 <span 
-class="cmbx-12">fine to the coarse level and vice versa, and the algebraic approach,</span>
+class="cmr-12">using only matrix information. The first approach may be difficult when the</span>
 <span 
-class="cmbx-12">which builds the coarse-space correction and the associate transfer</span>
+class="cmr-12">system comes from discretizations on complex geometries; furthermore, ad hoc</span>
 <span 
-class="cmbx-12">operators using only matrix information. The first approach may be</span>
+class="cmr-12">one-level smoothers may be required to get an efficient interplay between</span>
 <span 
-class="cmbx-12">difficult when the system comes from discretizations on complex</span>
+class="cmr-12">fine and coarse levels, e.g., when matrices with highly varying coefficients are</span>
 <span 
-class="cmbx-12">geometries; furthermore, ad hoc one-level smoothers may be required to</span>
+class="cmr-12">considered. The second approach performs a fully automatic coarsening and</span>
 <span 
-class="cmbx-12">get an efficient interplay between fine and coarse levels, e.g., when</span>
+class="cmr-12">enforces the interplay between fine and coarse level by suitably choosing the</span>
 <span 
-class="cmbx-12">matrices with highly varying coefficients are considered. The second</span>
-<span 
-class="cmbx-12">approach performs a fully automatic coarsening and enforces the</span>
-<span 
-class="cmbx-12">interplay between fine and coarse level by suitably choosing the coarse</span>
-<span 
-class="cmbx-12">space and the coarse-to-fine interpolation (see, e.g., </span><span class="cite"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">coarse space and the coarse-to-fine interpolation (see, e.g., </span><span class="cite"><span 
+class="cmr-12">[</span><a 
 href="userhtmlli4.html#XBriggs2000"><span 
-class="cmbx-12">3</span></a><span 
-class="cmbx-12">,</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">3</span></a><span 
+class="cmr-12">,</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XStuben_01"><span 
-class="cmbx-12">26</span></a><span 
-class="cmbx-12">,</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">26</span></a><span 
+class="cmr-12">,</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#Xdd2_96"><span 
-class="cmbx-12">24</span></a><span 
-class="cmbx-12">]</span></span> <span 
-class="cmbx-12">for</span>
+class="cmr-12">24</span></a><span 
+class="cmr-12">]</span></span> <span 
+class="cmr-12">for</span>
+<span 
+class="cmr-12">details.)</span>
+<!--l. 37--><p class="indent" >   <span 
+class="cmr-12">MLD2P4 uses a pure algebraic approach, based on the smoothed aggregation</span>
+<span 
+class="cmr-12">algorithm </span><span class="cite"><span 
+class="cmr-12">[</span><a 
+href="userhtmlli4.html#XBREZINA_VANEK"><span 
+class="cmr-12">2</span></a><span 
+class="cmr-12">,</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlli4.html#XVANEK_MANDEL_BREZINA"><span 
+class="cmr-12">28</span></a><span 
+class="cmr-12">]</span></span><span 
+class="cmr-12">, for building the sequence of coarse matrices and transfer</span>
+<span 
+class="cmr-12">operators, starting from the original one. A decoupled version of this algorithm</span>
                                                                                
 
                                                                                
 <span 
-class="cmbx-12">details.)</span>
-<!--l. 37--><p class="indent" >   <span 
-class="cmbx-12">MLD2P4 uses a pure algebraic approach, based on the smoothed</span>
+class="cmr-12">is implemented, where the smoothed aggregation is applied locally to each</span>
 <span 
-class="cmbx-12">aggregation algorithm </span><span class="cite"><span 
-class="cmbx-12">[</span><a 
-href="userhtmlli4.html#XBREZINA_VANEK"><span 
-class="cmbx-12">2</span></a><span 
-class="cmbx-12">,</span><span 
-class="cmbx-12">&#x00A0;</span><a 
-href="userhtmlli4.html#XVANEK_MANDEL_BREZINA"><span 
-class="cmbx-12">28</span></a><span 
-class="cmbx-12">]</span></span><span 
-class="cmbx-12">, for building the sequence of coarse matrices</span>
-<span 
-class="cmbx-12">and transfer operators, starting from the original one. A decoupled version</span>
-<span 
-class="cmbx-12">of this algorithm is implemented, where the smoothed aggregation is</span>
-<span 
-class="cmbx-12">applied locally to each submatrix </span><span class="cite"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">submatrix </span><span class="cite"><span 
+class="cmr-12">[</span><a 
 href="userhtmlli4.html#XTUMINARO_TONG"><span 
-class="cmbx-12">27</span></a><span 
-class="cmbx-12">]</span></span><span 
-class="cmbx-12">. A brief description of the AMG</span>
+class="cmr-12">27</span></a><span 
+class="cmr-12">]</span></span><span 
+class="cmr-12">. A brief description of the AMG preconditioners implemented in</span>
 <span 
-class="cmbx-12">preconditioners implemented in MLD2P4 is given in Sections</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">MLD2P4 is given in Sections</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlsu6.html#x14-130004.1"><span 
-class="cmbx-12">4.1</span><!--tex4ht:ref: sec:multilevel --></a><span 
-class="cmbx-12">-</span><a 
+class="cmr-12">4.1</span><!--tex4ht:ref: sec:multilevel --></a><span 
+class="cmr-12">-</span><a 
 href="userhtmlsu8.html#x16-150004.3"><span 
-class="cmbx-12">4.3</span><!--tex4ht:ref: sec:smoothers --></a><span 
-class="cmbx-12">. For</span>
-<span 
-class="cmbx-12">further details the reader is referred to </span><span class="cite"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">4.3</span><!--tex4ht:ref: sec:smoothers --></a><span 
+class="cmr-12">. For further details the reader is referred to</span>
+<span class="cite"><span 
+class="cmr-12">[</span><a 
 href="userhtmlli4.html#Xpara_04"><span 
-class="cmbx-12">4</span></a><span 
-class="cmbx-12">,</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">4</span></a><span 
+class="cmr-12">,</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#Xaaecc_07"><span 
-class="cmbx-12">5</span></a><span 
-class="cmbx-12">,</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">5</span></a><span 
+class="cmr-12">,</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#Xapnum_07"><span 
-class="cmbx-12">7</span></a><span 
-class="cmbx-12">,</span><span 
-class="cmbx-12">&#x00A0;</span><a 
+class="cmr-12">7</span></a><span 
+class="cmr-12">,</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XMLD2P4_TOMS"><span 
-class="cmbx-12">8</span></a><span 
-class="cmbx-12">]</span></span><span 
-class="cmbx-12">.</span>
+class="cmr-12">8</span></a><span 
+class="cmr-12">]</span></span><span 
+class="cmr-12">.</span>
 <!--l. 47--><p class="indent" >   <span 
-class="cmbx-12">We note that optimal multigrid preconditioners do not necessarily</span>
+class="cmr-12">We note that optimal multigrid preconditioners do not necessarily correspond to</span>
 <span 
-class="cmbx-12">correspond to minimum execution times in a parallel setting. Indeed, to</span>
+class="cmr-12">minimum execution times in a parallel setting. Indeed, to obtain effective parallel</span>
 <span 
-class="cmbx-12">obtain effective parallel multigrid preconditioners, a tradeoff between the</span>
+class="cmr-12">multigrid preconditioners, a tradeoff between the optimality and the cost of</span>
 <span 
-class="cmbx-12">optimality and the cost of building and applying the smoothers and</span>
+class="cmr-12">building and applying the smoothers and the coarse-space corrections must be</span>
 <span 
-class="cmbx-12">the coarse-space corrections must be achieved. Effective parallel</span>
+class="cmr-12">achieved. Effective parallel preconditioners require algorithmic scalability to</span>
 <span 
-class="cmbx-12">preconditioners require algorithmic scalability to be coupled with</span>
+class="cmr-12">be coupled with implementation scalability, i.e., a computational cost per</span>
 <span 
-class="cmbx-12">implementation scalability, i.e., a computational cost per iteration</span>
+class="cmr-12">iteration which remains (almost) constant as the number of parallel processors</span>
 <span 
-class="cmbx-12">which remains (almost) constant as the number of parallel processors</span>
-<span 
-class="cmbx-12">increases.</span>
+class="cmr-12">increases.</span>
 <!--l. 56--><p class="noindent" >
    <div class="subsectionTOCS">
    <span 
-class="cmbx-12">&#x00A0;</span><span class="subsectionToc" ><span 
-class="cmbx-12">4.1 </span><a 
+class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+class="cmr-12">4.1 </span><a 
 href="userhtmlsu6.html#x14-130004.1"><span 
-class="cmbx-12">AMG preconditioners</span></a></span>
+class="cmr-12">AMG preconditioners</span></a></span>
 <br />   <span 
-class="cmbx-12">&#x00A0;</span><span class="subsectionToc" ><span 
-class="cmbx-12">4.2 </span><a 
+class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+class="cmr-12">4.2 </span><a 
 href="userhtmlsu7.html#x15-140004.2"><span 
-class="cmbx-12">Smoothed Aggregation</span></a></span>
+class="cmr-12">Smoothed Aggregation</span></a></span>
 <br />   <span 
-class="cmbx-12">&#x00A0;</span><span class="subsectionToc" ><span 
-class="cmbx-12">4.3 </span><a 
+class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+class="cmr-12">4.3 </span><a 
 href="userhtmlsu8.html#x16-150004.3"><span 
-class="cmbx-12">Smoothers and coarsest-level solvers</span></a></span>
+class="cmr-12">Smoothers and coarsest-level solvers</span></a></span>
    </div>
 
 
@@ -211,22 +200,22 @@ class="cmbx-12">Smoothers and coarsest-level solvers</span></a></span>
 
                                                                                
    <!--l. 1--><div class="crosslinks"><p class="noindent"><span 
-class="cmbx-12">[</span><a 
+class="cmr-12">[</span><a 
 href="userhtmlse5.html" ><span 
-class="cmbx-12">next</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">next</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse3.html" ><span 
-class="cmbx-12">prev</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse3.html#tailuserhtmlse3.html" ><span 
-class="cmbx-12">prev-tail</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">prev-tail</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtmlse4.html" ><span 
-class="cmbx-12">front</span></a><span 
-class="cmbx-12">] [</span><a 
+class="cmr-12">front</span></a><span 
+class="cmr-12">] [</span><a 
 href="userhtml.html#userhtmlse4.html" ><span 
-class="cmbx-12">up</span></a><span 
-class="cmbx-12">] </span></p></div>
+class="cmr-12">up</span></a><span 
+class="cmr-12">] </span></p></div>
 <!--l. 1--><p class="indent" >   <a 
  id="tailuserhtmlse4.html"></a>  
 </body></html> 
