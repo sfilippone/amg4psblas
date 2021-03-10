@@ -242,20 +242,30 @@ be applied.
 \bsideways
 \begin{center}
 %\begin{tabular}{|p{5cm}|l|p{2.4cm}|p{2.5cm}|p{5cm}|}
-\begin{tabular}{|p{3.9cm}|l|p{2.3cm}|p{2.9cm}|p{6.9cm}|}
+\begin{tabular}{|p{5.7cm}|l|p{2.3cm}|p{2.5cm}|p{6.9cm}|}
 \hline
 \verb|what|              & \textsc{data type}        &  \verb|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
+\verb|'MIN_COARSE_SIZE_PER_PROCESS'| & \verb|integer|
+                         & Any number \par $> 0$
+                         & $200$
+                         & Coarse size threshold per process. The aggregation stops
+                            if  the global number of variables of the
+                            computed coarsest matrix
+                            is lower than or equal to this threshold
+                           multiplied by the number of processes.
+
+                           \\ \hline
 \verb|'MIN_COARSE_SIZE'| & \verb|integer|
                          & Any number \par $> 0$
-                         & $\lfloor 40 \sqrt[3]{n} \rfloor$, where $n$ is the dimension
-                            of the matrix at the finest level
+                         & -1
                          & Coarse size threshold. The aggregation stops
                             if  the global number of variables of the
                             computed coarsest matrix
                             is lower than or equal to this threshold
-                           (see Note).
-
+                           (see Note). If negative, it is ignored in
+                           favour of the default for
+                           \verb|'MIN_COARSE_SIZE_PER_PROCESS'|. 
                            \\ \hline
 
 \verb|'MIN_CR_RATIO'| & \verb|real|

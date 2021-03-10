@@ -35,7 +35,7 @@ LLK                         ! AINV variant
 1.d-4                       ! Threshold T for ILU(T,P)
 %%%%%%%%%%%  Multilevel parameters %%%%%%%%%%%%%%%%
 VCYCLE                      ! Type of multilevel CYCLE: VCYCLE WCYCLE KCYCLE MULT ADD
-4                           ! Number of outer sweeps for ML
+1                           ! Number of outer sweeps for ML
 -3                          ! Max Number of levels in a multilevel preconditioner; if <0, lib default
 -3                          ! Target coarse matrix size; if <0, lib default
 SMOOTHED                    ! Type of aggregation: SMOOTHED UNSMOOTHED
