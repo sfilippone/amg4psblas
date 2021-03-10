@@ -24,6 +24,12 @@
 \usemintedstyle{friendly}
 \definecolor{bg}{rgb}{0.95,0.95,0.95}
 \usepackage{breakurl}
+\ifpdf
+\newmintinline[fortinline]{fortran}{}
+\else%
+\def\fortinline{\lstinline[basicstyle=\ttfamily,language=fortran]}
+\fi
+
 %\newboolean{mtc}
 %\setboolean{mtc}{true}
 

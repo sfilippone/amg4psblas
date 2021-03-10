@@ -22,6 +22,11 @@
 %\setboolean{mtc}{true}
 \usepackage{microtype}
 \usepackage{listings}
+\ifpdf
+\newmintinline[fortinline]{fortran}{}
+\else%
+\def\fortinline{\lstinline[basicstyle=\ttfamily,language=fortran]}
+\fi
 
 \pdfoutput=0
 \relax

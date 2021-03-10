@@ -59,21 +59,21 @@ Examples showing the basic use of AMG4PSBLAS are reported in Section~\ref{sec:ex
 \begin{tabular}{|l|p{2cm}|p{6.8cm}|}
 \hline
 \textsc{type}       & \textsc{string} & \textsc{default preconditioner} \\ \hline
-No preconditioner &\verb|'NONE'|& Considered  to use the PSBLAS
+No preconditioner &\fortinline|'NONE'|& Considered  to use the PSBLAS
                                     Krylov solvers with no preconditioner. \\ \hline
-Diagonal          & \verb|'DIAG'|, \verb|'JACOBI'|, \verb|'L1-JACOBI'| & Diagonal preconditioner.
+Diagonal          & \fortinline|'DIAG'|, \fortinline|'JACOBI'|, \fortinline|'L1-JACOBI'| & Diagonal preconditioner.
                          For any zero diagonal entry of the matrix to be preconditioned,
                          the corresponding entry of the preconditioner is set to~1.\\ \hline
-Gauss-Seidel      & \verb|'GS'|, \verb|'L1-GS'|     & Hybrid Gauss-Seidel (forward), that is,
+Gauss-Seidel      & \fortinline|'GS'|, \fortinline|'L1-GS'|     & Hybrid Gauss-Seidel (forward), that is,
                                       global block Jacobi with
                                       Gauss-Seidel as local solver.\\ \hline
-Symmetrized Gauss-Seidel      & \verb|'FBGS'|, \verb|'L1-FBGS'|     & Symmetrized hybrid Gauss-Seidel, that is,
+Symmetrized Gauss-Seidel      & \fortinline|'FBGS'|, \fortinline|'L1-FBGS'|     & Symmetrized hybrid Gauss-Seidel, that is,
                                       forward Gauss-Seidel followed by
                                                     backward Gauss-Seidel.\\ \hline
-Block Jacobi      & \verb|'BJAC'|, \verb|'L1-BJAC'| & Block-Jacobi with ILU(0) on the local blocks.\\ \hline
-Additive Schwarz  & \verb|'AS'|   & Additive Schwarz (AS),
+Block Jacobi      & \fortinline|'BJAC'|, \fortinline|'L1-BJAC'| & Block-Jacobi with ILU(0) on the local blocks.\\ \hline
+Additive Schwarz  & \fortinline|'AS'|   & Additive Schwarz (AS),
                                     with overlap~1 and ILU(0) on the local blocks. \\ \hline
-Multilevel        &\verb|'ML'|    & V-cycle with one hybrid forward Gauss-Seidel
+Multilevel        &\fortinline|'ML'|    & V-cycle with one hybrid forward Gauss-Seidel
                                     (GS) sweep as pre-smoother and one hybrid backward
                                     GS sweep as post-smoother, decoupled smoothed aggregation
                                    as coarsening algorithm, and LU (plus triangular solve)
