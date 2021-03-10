@@ -112,10 +112,10 @@ DATE     = $(shell date +%Y-%m-%d)
 ##
 ## Programs
 #
-LATEX    = latex
-LTX2HTML = latex2html -local_icons
-LTX2HTML = htlatex 
-PDFLATEX = pdflatex
+LATEX    = latex -shell-escape
+LTX2HTML = latex2html -local_icons 
+LTX2HTML = htlatex
+PDFLATEX = pdflatex -shell-escape
 ACRO     = evince
 XPDF     = xpdf
 WC       = wc
@@ -213,10 +213,10 @@ ps: $(PS)
 
 clean:
 	rm -f $(PDF) $(PS)
-	cd tmp ; rm -f *
+	cd tmp ; rm -r -f *
 
 clean-tmp:
-	cd tmp ; rm -f *
+	cd tmp ; rm -r -f *
 
 #----------------------------------------------------------------------------
 

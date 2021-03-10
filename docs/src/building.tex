@@ -32,7 +32,7 @@ The following base libraries are needed:
 \item[BLAS] \cite{blas3,blas2,blas1} Many vendors provide optimized versions
   of BLAS; if no vendor version is
   available for a given platform, the ATLAS software
-  (\href{http://math-atlas.sourceforge.net}{math-atlas.sourceforge.net})
+  (\href{http://math-atlas.sourceforge.net}{math-atlas.sourceforge .net})
   may be employed.  The reference BLAS from Netlib
   (\href{http://www.netlib.org/blas}{www.netlib.org/blas}) are meant to define the standard
   behaviour of the BLAS interface, so they are not optimized for any
@@ -49,7 +49,7 @@ in the make.inc file of the LAPACK library.
 \item[MPI] \cite{MPI2,MPI1} A version of MPI is available on most
   high-performance computing systems.
  \item[PSBLAS] \cite{PSBLASGUIDE,psblas_00} Parallel Sparse BLAS (PSBLAS) is
-  available from \href{https://psctoolkit.github.io/products/psblas/}{psctoolkit.github.io/products/psblas/}; version
+  available from \href{https://psctoolkit.github.io/products/psblas/}{psctoolkit.github.io/ products/psblas/}; version
   3.7.0  (or later) is required. Indeed, all the prerequisites
   listed so far are also prerequisites of PSBLAS.
 \end{description}
@@ -114,184 +114,29 @@ only the PSBLAS install  directory (note that the latter directory must
 be specified with an {\em absolute} path).
 The full set of options may be looked at by issuing the command
 \verb|./configure --help|, which produces:
-\begin{verbatim}
-`configure' configures MLD2P4 2.1.1 to adapt to many kinds of systems.
-
-Usage: ./configure [OPTION]... [VAR=VALUE]...
-
-To assign environment variables (e.g., CC, CFLAGS...), specify them as
-VAR=VALUE.  See below for descriptions of some of the useful variables.
-
-Defaults for the options are specified in brackets.
-
-Configuration:
-  -h, --help              display this help and exit
-      --help=short        display options specific to this package
-      --help=recursive    display the short help of all the included packages
-  -V, --version           display version information and exit
-  -q, --quiet, --silent   do not print `checking ...' messages
-      --cache-file=FILE   cache test results in FILE [disabled]
-  -C, --config-cache      alias for `--cache-file=config.cache'
-  -n, --no-create         do not create output files
-      --srcdir=DIR        find the sources in DIR [configure dir or `..']
-
-Installation directories:
-  --prefix=PREFIX         install architecture-independent files in PREFIX
-                          [/usr/local]
-  --exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
-                          [PREFIX]
-
-By default, `make install' will install all the files in
-`/usr/local/bin', `/usr/local/lib' etc.  You can specify
-an installation prefix other than `/usr/local' using `--prefix',
-for instance `--prefix=$HOME'.
-
-For better control, use the options below.
-
-Fine tuning of the installation directories:
-  --bindir=DIR            user executables [EPREFIX/bin]
-  --sbindir=DIR           system admin executables [EPREFIX/sbin]
-  --libexecdir=DIR        program executables [EPREFIX/libexec]
-  --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
-  --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
-  --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
-  --libdir=DIR            object code libraries [EPREFIX/lib]
-  --includedir=DIR        C header files [PREFIX/include]
-  --oldincludedir=DIR     C header files for non-gcc [/usr/include]
-  --datarootdir=DIR       read-only arch.-independent data root [PREFIX/share]
-  --datadir=DIR           read-only architecture-independent data [DATAROOTDIR]
-  --infodir=DIR           info documentation [DATAROOTDIR/info]
-  --localedir=DIR         locale-dependent data [DATAROOTDIR/locale]
-  --mandir=DIR            man documentation [DATAROOTDIR/man]
-  --docdir=DIR            documentation root [DATAROOTDIR/doc/mld2p4]
-  --htmldir=DIR           html documentation [DOCDIR]
-  --dvidir=DIR            dvi documentation [DOCDIR]
-  --pdfdir=DIR            pdf documentation [DOCDIR]
-  --psdir=DIR             ps documentation [DOCDIR]
-
-Program names:
-  --program-prefix=PREFIX            prepend PREFIX to installed program names
-  --program-suffix=SUFFIX            append SUFFIX to installed program names
-  --program-transform-name=PROGRAM   run sed PROGRAM on installed program names
-
-Optional Features:
-  --disable-option-checking  ignore unrecognized --enable/--with options
-  --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
-  --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-silent-rules   less verbose build output (undo: "make V=1")
-  --disable-silent-rules  verbose build output (undo: "make V=0")
-  --enable-dependency-tracking
-                          do not reject slow dependency extractors
-  --disable-dependency-tracking
-                          speeds up one-time build
-  --enable-serial         Specify whether to enable a fake mpi library to run
-                          in serial mode.
-  --enable-long-integers  Specify usage of 64 bits integers.
-
-Optional Packages:
-  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
-  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-psblas=DIR       The install directory for PSBLAS, for example,
-                          --with-psblas=/opt/packages/psblas-3.5
-  --with-psblas-incdir=DIR
-                          Specify the directory for PSBLAS C includes.
-  --with-psblas-moddir=DIR
-                          Specify the directory for PSBLAS Fortran modules.
-  --with-psblas-libdir=DIR
-                          Specify the directory for PSBLAS library.
-  --with-ccopt            additional [CCOPT] flags to be added: will prepend
-                          to [CCOPT]
-  --with-fcopt            additional [FCOPT] flags to be added: will prepend
-                          to [FCOPT]
-  --with-libs             List additional link flags here. For example,
-                          --with-libs=-lspecial_system_lib or
-                          --with-libs=-L/path/to/libs
-  --with-clibs            additional [CLIBS] flags to be added: will prepend
-                          to [CLIBS]
-  --with-flibs            additional [FLIBS] flags to be added: will prepend
-                          to [FLIBS]
-  --with-library-path     additional [LIBRARYPATH] flags to be added: will
-                          prepend to [LIBRARYPATH]
-  --with-include-path     additional [INCLUDEPATH] flags to be added: will
-                          prepend to [INCLUDEPATH]
-  --with-module-path      additional [MODULE_PATH] flags to be added: will
-                          prepend to [MODULE_PATH]
-  --with-extra-libs       List additional link flags here. For example,
-                          --with-extra-libs=-lspecial_system_lib or
-                          --with-extra-libs=-L/path/to/libs
-  --with-blas=<lib>       use BLAS library <lib>
-  --with-blasdir=<dir>    search for BLAS library in <dir>
-  --with-lapack=<lib>     use LAPACK library <lib>
-  --with-mumps=LIBNAME    Specify the libname for MUMPS. Default: autodetect
-                          with minimum "-lmumps_common -lpord"
-  --with-mumpsdir=DIR     Specify the directory for MUMPS library and
-                          includes. Note: you will need to add auxiliary
-                          libraries with --extra-libs; this depends on how
-                          MUMPS was configured and installed, at a minimum you
-                          will need SCALAPACK and BLAS
-  --with-mumpsincdir=DIR  Specify the directory for MUMPS includes.
-  --with-mumpsmoddir=DIR  Specify the directory for MUMPS Fortran modules.
-  --with-mumpslibdir=DIR  Specify the directory for MUMPS library.
-  --with-umfpack=LIBNAME  Specify the library name for UMFPACK and its support
-                          libraries. Default: "-lumfpack -lamd"
-  --with-umfpackdir=DIR   Specify the directory for UMFPACK library and
-                          includes.
-  --with-umfpackincdir=DIR
-                          Specify the directory for UMFPACK includes.
-  --with-umfpacklibdir=DIR
-                          Specify the directory for UMFPACK library.
-  --with-superlu=LIBNAME  Specify the library name for SUPERLU library.
-                          Default: "-lsuperlu"
-  --with-superludir=DIR   Specify the directory for SUPERLU library and
-                          includes.
-  --with-superluincdir=DIR
-                          Specify the directory for SUPERLU includes.
-  --with-superlulibdir=DIR
-                          Specify the directory for SUPERLU library.
-  --with-superludist=LIBNAME
-                          Specify the libname for SUPERLUDIST library.
-                          Requires you also specify SuperLU. Default:
-                          "-lsuperlu_dist"
-  --with-superludistdir=DIR
-                          Specify the directory for SUPERLUDIST library and
-                          includes.
-  --with-superludistincdir=DIR
-                          Specify the directory for SUPERLUDIST includes.
-  --with-superludistlibdir=DIR
-                          Specify the directory for SUPERLUDIST library.
-
-Some influential environment variables:
-  FC          Fortran compiler command
-  FCFLAGS     Fortran compiler flags
-  LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
-              nonstandard directory <lib dir>
-  LIBS        libraries to pass to the linker, e.g. -l<library>
-  CC          C compiler command
-  CFLAGS      C compiler flags
-  CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
-              you have headers in a nonstandard directory <include dir>
-  MPICC       MPI C compiler command
-  MPIFC       MPI Fortran compiler command
-  CPP         C preprocessor
-
-Use these variables to override the choices made by `configure' or to help
-it to find libraries and programs with nonstandard names/locations.
-
-Report bugs to <https://github.com/sfilippone/mld2p4-2/issues>.
-\end{verbatim}
-
+\ifpdf
+\inputminted[breaklines=true,bgcolor=bg,fontsize=\small]{console}{../configureout.txt}
+\else
+\lstinputlisting{../configureout.txt}
+\fi
 For instance, if a user has built and installed PSBLAS 3.7 under the
 \verb|/opt| directory and is
-using the SuiteSparse package (which includes UMFPACK), then MLD2P4
+using the SuiteSparse package (which includes UMFPACK), then AMG4PSBLAS
 might be configured with:
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{console}
+./configure --with-psblas=/opt/psblas-3.5/ --with-umfpackincdir=/usr/include/suitesparse/
+\end{minted}
+\else
 \begin{verbatim}
- ./configure --with-psblas=/opt/psblas-3.5/ \
- --with-umfpackincdir=/usr/include/suitesparse/
+./configure --with-psblas=/opt/psblas-3.5/ \
+--with-umfpackincdir=/usr/include/suitesparse/
 \end{verbatim}
+\fi
 Once the configure script has completed execution, it will have
 generated the file \verb|Make.inc| which will then be used by all
 Makefiles in the directory tree; this file will be copied in the
-install directory under the name \verb|Make.inc.MLD2P4|.
+install directory under the name \verb|Make.inc.AMG4PSBLAS|.
 
 To use the MUMPS solver package,
 the user has to add the appropriate options to the configure script;
@@ -302,13 +147,25 @@ SCOTCH, as well as enabling OpenMP; in such cases it is necessary to
 add linker options with the \verb|--with-extra-libs| configure option.
 
 To build the library the user will now enter
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{console}
+make
+\end{minted}
+\else
 \begin{verbatim}
 make
 \end{verbatim}
+\fi
 followed (optionally) by
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{console}
+make install
+\end{minted}
+\else
 \begin{verbatim}
 make install
 \end{verbatim}
+\fi
 \subsection{Bug reporting}
 If you find any bugs in our codes, please report them through our
 issues page on \\[2mm]

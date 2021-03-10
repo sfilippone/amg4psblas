@@ -158,6 +158,10 @@ div.abstract {width:100%;}
 .shadowbox { padding-left:3pt; padding-right:3pt; border:solid thin; border-right:solid thick; border-bottom:solid thick; }
 .doublebox { padding-left:3pt; padding-right:3pt; border-style:double; border:solid thick; }
 .figure img.graphics {margin-left:10%;}
+.lstlisting .label{margin-right:0.5em; }
+div.lstlisting{font-family: monospace; white-space: nowrap; margin-top:0.5em; margin-bottom:0.5em; }
+div.lstinputlisting{ font-family: monospace; white-space: nowrap; }
+.lstinputlisting .label{margin-right:0.5em;}
 #TBL-1 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-1{border-collapse:collapse;}
 #TBL-1 colgroup{border-left: 1px solid black;border-right:1px solid black;}
