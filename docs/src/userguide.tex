@@ -19,6 +19,7 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
 \usepackage{rotating}
+\usepackage{microtype}
 %\newboolean{mtc}
 %\setboolean{mtc}{true}
 
@@ -92,6 +93,7 @@
 %\newcommand{\Ref}[1]{\mbox{(\ref{#1})}}
 
 \begin{document}
+{
 \pdfbookmark{AMG4PSBLAS User's and Reference Guide}{title}
 \newlength{\centeroffset}
 %\setlength{\centeroffset}{-0.5\oddsidemargin}
@@ -143,11 +145,12 @@ Preconditioners Package based on PSBLAS}
 \vspace*{1cm}
 \centerline{\emph{\large This page intentionally left blank}}
 \clearpage
-
+}
 \pagenumbering{roman}   % Roman numbering
 \setcounter{page}{1}    % Abstract starts on page i
 
 \include{abstract}
+{
 %\cleardoublepage
 \clearpage
 \thispagestyle{empty}
@@ -165,7 +168,7 @@ Preconditioners Package based on PSBLAS}
 \vspace*{1cm}
 \centerline{\emph{\large This page intentionally left blank}}
 \clearpage
-
+}
 \pagenumbering{arabic}  % Arabic numbering
 \setcounter{page}{1}    % Chapters start on page 1
 
