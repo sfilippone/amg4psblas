@@ -38,7 +38,7 @@ The following base libraries are needed:
   behaviour of the BLAS interface, so they are not optimized for any
   particular platform, and should only be used as a last
   resort. Note that BLAS computations form a relatively small part of
-  the AMG4PSBLAS/PSBLAS computations; they are however critical when using
+  the AMG4PSBLAS/\-PSBLAS computations; they are however critical when using
   preconditioners based on MUMPS, UMFPACK or SuperLU third party
   libraries. Note that UMFPACK requires a full LAPACK library; our
 experience is that configuring ATLAS for building full LAPACK does not
@@ -105,9 +105,15 @@ in the main directory to generate the necessary makefile.
 \textbf{DA RISCRIVERE}
 
 As a minimal example consider the following:
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{console}
+./configure --with-psblas=PSB-INSTALL-DIR
+\end{minted}
+\else
 \begin{verbatim}
 ./configure --with-psblas=PSB-INSTALL-DIR
 \end{verbatim}
+\fi
 which assumes that the various MPI compilers and support libraries are
 available in the standard directories on the system, and specifies
 only the PSBLAS install  directory (note that the latter directory must

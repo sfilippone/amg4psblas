@@ -15,18 +15,18 @@ The following steps are required:
 	following an object-oriented approach.
 \item \emph{Allocate and initialize the preconditioner data structure, according to
 	a preconditioner type chosen by the user}. This is performed by the routine
-	\verb|init|, which also sets defaults for each preconditioner
+	\fortinline|init|, which also sets defaults for each preconditioner
 	type selected by the user. The preconditioner types and the defaults associated
 	with them are given in Table~\ref{tab:precinit}, where the strings used by
-	\verb|init| to identify the preconditioner types are also given.
+	\fortinline|init| to identify the preconditioner types are also given.
 	Note that these strings are valid also if uppercase letters are substituted by
 	corresponding lowercase ones.
 
 \item \emph{Modify the selected preconditioner type, by properly setting
-  preconditioner parameters.} This is performed by the routine \verb|set|.
+  preconditioner parameters.} This is performed by the routine \fortinline|set|.
   This routine must be called only if the user wants to modify the default values
   of the parameters associated with the selected preconditioner type, to obtain a variant
-  of that preconditioner. Examples of use of \verb|set| are given in
+  of that preconditioner. Examples of use of \fortinline|set| are given in
   Section~\ref{sec:examples}; a complete list of all the
   preconditioner parameters and their allowed and default values is provided in
   Section~\ref{sec:userinterface}, Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}.
@@ -34,18 +34,18 @@ The following steps are required:
  is multilevel, then two steps must be performed, as specified next.
 \begin{enumerate}
 \item[4.1] \emph{Build the AMG hierarchy for a given matrix.} This is
-performed by the routine \verb|hierarchy_build|.
+performed by the routine \fortinline|hierarchy_build|.
 \item[4.2] \emph{Build the preconditioner for a given matrix.} This is performed
-by the routine \verb|smoothers_build|.
+by the routine \fortinline|smoothers_build|.
 \end{enumerate}
  If the selected preconditioner is one-level, it is built in a single step,
-performed by the routine \verb|bld|.
+performed by the routine \fortinline|bld|.
 \item \emph{Apply the preconditioner at each iteration of a Krylov solver.}
-  This is performed by the method \verb|apply|. When using the PSBLAS Krylov solvers,
-  this step is completely transparent to the user, since \verb|apply| is called
-  by the PSBLAS routine implementing the Krylov solver (\verb|psb_krylov|).
+  This is performed by the method \fortinline|apply|. When using the PSBLAS Krylov solvers,
+  this step is completely transparent to the user, since \fortinline|apply| is called
+  by the PSBLAS routine implementing the Krylov solver (\fortinline|psb_krylov|).
 \item \emph{Free the preconditioner data structure}. This is performed by
-  the routine \verb|free|. This step is complementary to step 1 and should
+  the routine \fortinline|free|. This step is complementary to step 1 and should
   be performed when the preconditioner is no more used.
 \end{enumerate}
 
@@ -88,11 +88,11 @@ Multilevel        &\fortinline|'ML'|    & V-cycle with one hybrid forward Gauss-
 \end{center}
 \end{table}
 
-Note that the module \verb|amg_prec_mod|, containing the definition of the
+Note that the module \fortinline|amg_prec_mod|, containing the definition of the
 preconditioner data type and the interfaces to the routines of AMG4PSBLAS,
 must be used in any program calling such routines.
-The modules \verb|psb_base_mod|, for the sparse matrix and communication descriptor
-data types, and \verb|psb_krylov_mod|, for interfacing with the
+The modules \fortinline|psb_base_mod|, for the sparse matrix and communication descriptor
+data types, and \fortinline|psb_krylov_mod|, for interfacing with the
 Krylov solvers, must be also used (see Section~\ref{sec:examples}). \\
 
 \textbf{Remark 1.} Coarsest-level solvers based on the LU factorization,
@@ -109,11 +109,11 @@ on parallel computers.
 The code reported in Figure~\ref{fig:ex1} shows how to set and apply the default
 multilevel preconditioner available in the real double precision version
 of AMG4PSBLAS (see Table~\ref{tab:precinit}). This preconditioner is chosen
-by simply specifying \verb|'ML'| as the second argument of \verb|P%init|
-(a call to \verb|P%set| is not needed) and is applied with the CG
+by simply specifying \fortinline|'ML'| as the second argument of \fortinline|P%init|
+(a call to \fortinline|P%set| is not needed) and is applied with the CG
 solver provided by PSBLAS (the matrix of the system to be solved is
 assumed to be positive definite). As previously observed, the modules
-\verb|psb_base_mod|, \verb|amg_prec_mod| and \verb|psb_krylov_mod|
+\fortinline|psb_base_mod|, \fortinline|amg_prec_mod| and \fortinline|psb_krylov_mod|
 must be used by the example program.
 
 The part of the code concerning the
@@ -134,9 +134,64 @@ precision, versions are obtained with straightforward modifications of the previ
 example (see Section~\ref{sec:userinterface} for details). If these versions are installed,
 the corresponding codes are available in \verb|examples/fileread/|.
 
-\begin{figure}[tbp]
+\begin{listing}[tbp]
 \begin{center}
 \begin{minipage}{.90\textwidth}
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+  use psb_base_mod
+  use amg_prec_mod
+  use psb_krylov_mod
+... ...
+!
+! sparse matrix
+  type(psb_dspmat_type) :: A
+! sparse matrix descriptor
+  type(psb_desc_type)   :: desc_A
+! preconditioner
+  type(amg_dprec_type)  :: P
+! right-hand side and solution vectors
+  type(psb_d_vect_type) :: b, x
+... ...
+!
+! initialize the parallel environment
+  call psb_init(ctxt)
+  call psb_info(ctxt,iam,np)
+... ...
+!
+! read and assemble the spd matrix A and the right-hand side b
+! using PSBLAS routines for sparse matrix / vector management
+... ...
+!
+! initialize the default multilevel preconditioner, i.e. V-cycle
+! with basic smoothed aggregation, 1 hybrid forward/backward
+! GS sweep as pre/post-smoother and UMFPACK as coarsest-level
+! solver
+  call P%init('ML',info)
+!
+! build the preconditioner
+  call P%hierarchy_build(A,desc_A,info)
+  call P%smoothers_build(A,desc_A,info)
+
+!
+! set the solver parameters and the initial guess
+... ...
+!
+! solve Ax=b with preconditioned CG
+  call psb_krylov('CG',A,P,b,x,tol,desc_A,info)
+... ...
+!
+! deallocate the preconditioner
+  call P%free(info)
+!
+! deallocate other data structures
+... ...
+!
+! exit the parallel environment
+  call psb_exit(ctxt)
+stop
+\end{minted}
+\else
 {\small
 \begin{verbatim}
   use psb_base_mod
@@ -155,8 +210,8 @@ the corresponding codes are available in \verb|examples/fileread/|.
 ... ...
 !
 ! initialize the parallel environment
-  call psb_init(ictxt)
-  call psb_info(ictxt,iam,np)
+  call psb_init(ctxt)
+  call psb_info(ctxt,iam,np)
 ... ...
 !
 ! read and assemble the spd matrix A and the right-hand side b
@@ -188,15 +243,16 @@ the corresponding codes are available in \verb|examples/fileread/|.
   ... ...
 !
 ! exit the parallel environment
-  call psb_exit(ictxt)
+  call psb_exit(ctxt)
   stop
 \end{verbatim}
 }
+\fi
 \end{minipage}
 \caption{setup and application of the default multilevel preconditioner (example 1).
 \label{fig:ex1}}
 \end{center}
-\end{figure}
+\end{listing}
 
 Different versions of the multilevel preconditioner can be obtained by changing
 the default values of the preconditioner parameters. The code reported in
@@ -205,7 +261,7 @@ which applies 1 block-Jacobi sweep as pre- and post-smoother,
 and solves the coarsest-level system with 8 block-Jacobi sweeps.
 Note that the ILU(0) factorization (plus triangular solve) is used as
 local solver for the block-Jacobi sweeps, since this is the default associated
-with block-Jacobi and set by~\verb|P%init|.
+with block-Jacobi and set by~\fortinline|P%init|.
 Furthermore, specifying block-Jacobi as coarsest-level
 solver implies that the coarsest-level matrix is distributed
 among the processes.
@@ -216,7 +272,7 @@ implemented in MUMPS. It is specified that the coarsest-level
 matrix is distributed, since MUMPS can be used on both
 replicated and distributed matrices, and by default
 it is used on replicated ones.
-%Note the use of the parameter \verb|pos|
+%Note the use of the parameter \fortinline|pos|
 %to specify a property only for the pre-smoother or the post-smoother
 %(see Section~\ref{sec:precset} for more details).
 The code fragments shown in Figures~\ref{fig:ex2} and \ref{fig:ex3} are
@@ -232,8 +288,20 @@ The corresponding example program is available in the file
 For all the previous preconditioners, example programs where the sparse matrix and
 the right-hand side are generated by discretizing a PDE with Dirichlet
 boundary conditions are also available in the directory \verb|examples/pdegen|.
-
-\begin{figure}[tbh]
+\vspace{-1em}\begin{listing}[tbh]
+\ifpdf%
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+! build a V-cycle preconditioner with 1 block-Jacobi sweep (with
+! ILU(0) on the blocks) as pre- and post-smoother, and 8  block-Jacobi
+! sweeps (with ILU(0) on the blocks) as coarsest-level solver
+call P%init('ML',info)
+call P%set('SMOOTHER_TYPE','BJAC',info)
+call P%set('COARSE_SOLVE','BJAC',info)
+call P%set('COARSE_SWEEPS',8,info)
+call P%hierarchy_build(A,desc_A,info)
+call P%smoothers_build(A,desc_A,info)
+\end{minted}
+\else%
 \begin{center}
 \begin{minipage}{.90\textwidth}
 {\small
@@ -243,7 +311,7 @@ boundary conditions are also available in the directory \verb|examples/pdegen|.
 ! ILU(0) on the blocks) as pre- and post-smoother, and 8  block-Jacobi
 ! sweeps (with ILU(0) on the blocks) as coarsest-level solver
   call P%init('ML',info)
-  call_P%set('SMOOTHER_TYPE','BJAC',info)
+  call P%set('SMOOTHER_TYPE','BJAC',info)
   call P%set('COARSE_SOLVE','BJAC',info)
   call P%set('COARSE_SWEEPS',8,info)
   call P%hierarchy_build(A,desc_A,info)
@@ -252,12 +320,27 @@ boundary conditions are also available in the directory \verb|examples/pdegen|.
 \end{verbatim}
 }
 \end{minipage}
-
-\caption{setup of a multilevel preconditioner based on the default decoupled coarsening\label{fig:ex2}}
 \end{center}
-\end{figure}
-
-\begin{figure}[h!]
+\fi\vspace{-2em}%
+\caption{setup of a multilevel preconditioner based on the default decoupled coarsening\label{fig:ex2}}
+\end{listing}\vspace*{-2em}
+\begin{listing}[h!]
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+! build a W-cycle preconditioner with 2 hybrid Gauss-Seidel sweeps
+! as pre- and post-smoother, a distributed coarsest
+! matrix, and MUMPS as coarsest-level solver
+call P%init('ML',info)
+call P%set('PAR_AGGR_ALG','COUPLED',info)
+call P%set('ML_CYCLE','WCYCLE',info)
+call P%set('SMOOTHER_TYPE','FBGS',info)
+call P%set('SMOOTHER_SWEEPS',2,info)
+call P%set('COARSE_SOLVE','MUMPS',info)
+call P%set('COARSE_MAT','DIST',info)
+call P%hierarchy_build(A,desc_A,info)
+call P%smoothers_build(A,desc_A,info)
+\end{minted}
+\else
 \begin{center}
 \begin{minipage}{.90\textwidth}
 {\small
@@ -279,11 +362,27 @@ boundary conditions are also available in the directory \verb|examples/pdegen|.
 \end{verbatim}
 }
 \end{minipage}
-\caption{setup of a multilevel preconditioner based on the coupled coarsening based on weighted matching\label{fig:ex3}}
 \end{center}
-\end{figure}
-
-\begin{figure}[h!]
+\fi\vspace{-2em}%
+\caption{setup of a multilevel preconditioner based on the coupled coarsening based on weighted matching\label{fig:ex3}}
+\end{listing}\vspace*{-2em}
+\begin{listing}[h!]
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+! build a W-cycle preconditioner with 2 hybrid Gauss-Seidel sweeps
+! as pre- and post-smoother, a distributed coarsest
+! matrix, and MUMPS as coarsest-level solver
+call P%init('ML',info)
+call P%set('PAR_AGGR_ALG','COUPLED',info)
+call P%set('ML_CYCLE','WCYCLE',info)
+call P%set('SMOOTHER_TYPE','FBGS',info)
+call P%set('SMOOTHER_SWEEPS',2,info)
+call P%set('COARSE_SOLVE','MUMPS',info)
+call P%set('COARSE_MAT','DIST',info)
+call P%hierarchy_build(A,desc_A,info)
+call P%smoothers_build(A,desc_A,info)
+\end{minted}
+\else
 \begin{center}
 \begin{minipage}{.90\textwidth}
 {\small
@@ -299,9 +398,10 @@ boundary conditions are also available in the directory \verb|examples/pdegen|.
 \end{verbatim}
 }
 \end{minipage}
-\caption{setup of a one-level Schwarz preconditioner.\label{fig:ex4}}
 \end{center}
-\end{figure}
+\fi\vspace{-2em}%
+\caption{setup of a one-level Schwarz preconditioner.\label{fig:ex4}}
+\end{listing}
 
 
 %%% Local Variables:

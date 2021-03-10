@@ -21,11 +21,16 @@
 %\newboolean{mtc}
 %\setboolean{mtc}{true}
 \usepackage{microtype}
-\usepackage{listings}
 \ifpdf
 \newmintinline[fortinline]{fortran}{}
 \else%
+\usepackage{listings}
 \def\fortinline{\lstinline[basicstyle=\ttfamily,language=fortran]}
+\usepackage{float}
+\newfloat{listing}{htbp}{lop}
+\floatname{listing}{Listing}
+\def\lstfloatautorefname{Listing} % needed for hyperref/auroref
+
 \fi
 
 \pdfoutput=0

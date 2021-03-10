@@ -3,13 +3,13 @@
          {\textsc{\ref{sec:userinterface} User Interface}}
 
 The basic user interface of AMG4PBLAS consists of eight methods. The six
-methods \verb|init|, \verb|set|, \verb|build|,
-\verb|hierarchy_build|, \verb|smoothers_build| and \verb|apply|
+methods \fortinline|init|, \fortinline|set|, \fortinline|build|,
+\fortinline|hierarchy_build|, \fortinline|smoothers_build| and \fortinline|apply|
 encapsulate all the functionalities for the setup and the application
 of any multilevel and one-level preconditioner implemented in the
 package.
-The method \verb|free| deallocates the preconditioner data structure, while
-\verb|descr| prints a description of the preconditioner setup by the user.
+The method \fortinline|free| deallocates the preconditioner data structure, while
+\fortinline|descr| prints a description of the preconditioner setup by the user.
 For backward compatibility,  methods are also accessible as
 stand-alone subroutines.
 
@@ -43,24 +43,24 @@ A description of each method is given in the remainder of this section.
 \subsection{Method init\label{sec:precinit}}
 
 \begin{center}
-\verb|call p%init(icontx,ptype,info)|
+\fortinline|call p%init(contxt,ptype,info)|
 \end{center}
 
 \noindent
 This method allocates and initializes the preconditioner
-\verb|p|, according to the preconditioner type chosen by the user.
+\fortinline|p|, according to the preconditioner type chosen by the user.
 
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{12cm}}
 
-  \verb|icontxt| & \verb|integer, intent(in)|.\\
+  \fortinline|contxt| & \fortinline|type(psb_ctxt_type), intent(in)|.\\
           &  The communication context.\\
-\verb|ptype|  & \verb|character(len=*), intent(in)|.\\
+\fortinline|ptype|  & \fortinline|character(len=*), intent(in)|.\\
               & The type of preconditioner. Its values are specified
               in Table~\ref{tab:precinit}.\\
               & Note that the strings are case insensitive.\\
-\verb|info|   & \verb|integer, intent(out)|.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
 
 \end{tabular}
@@ -73,63 +73,63 @@ This method allocates and initializes the preconditioner
 \subsection{Method set\label{sec:precset}}
 
 \begin{center}
-\verb|call p%set(what,val,info [,ilev, ilmax, pos, idx])|
+\fortinline|call p%set(what,val,info [,ilev, ilmax, pos, idx])|
 \end{center}
 
 \noindent
-This method sets the parameters defining the preconditioner \verb|p|. More
-precisely, the parameter identified by \verb|what| is assigned the value
-contained in \verb|val|.
+This method sets the parameters defining the preconditioner \fortinline|p|. More
+precisely, the parameter identified by \fortinline|what| is assigned the value
+contained in \fortinline|val|.
 
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{12cm}}
-\verb|what|   & \verb|character(len=*)|. \\
+\fortinline|what|   & \fortinline|character(len=*)|. \\
               & The parameter to be set. It can be specified through its name;
                 the string is case-insensitive. See
                 Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}.\\
-\verb|val |   & \verb|integer| \emph{or} \verb|character(len=*)| \emph{or}
-                \verb|real(psb_spk_)| \emph{or} \verb|real(psb_dpk_)|,
-                \verb|intent(in)|.\\
+\fortinline|val |   & \fortinline|integer| \emph{or} \fortinline|character(len=*)| \emph{or}
+                \fortinline|real(psb_spk_)| \emph{or} \fortinline|real(psb_dpk_)|,
+                \fortinline|intent(in)|.\\
               & The value of the parameter to be set. The list of allowed
                 values and the corresponding data types is given in
                 Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}.
-                When the value is of type \verb|character(len=*)|,
+                When the value is of type \fortinline|character(len=*)|,
                 it is also treated as case insensitive.\\
-\verb|info|   & \verb|integer, intent(out)|.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors}
                 for details.\\
-\verb|ilev|   & \verb|integer, optional, intent(in)|.\\
+\fortinline|ilev|   & \fortinline|integer, optional, intent(in)|.\\
               & For the multilevel preconditioner, the level at which the
                 preconditioner parameter has to be set.
                 The levels are numbered in increasing
                 order starting from the finest one, i.e., level 1 is the finest level.
-                If \verb|ilev| is not present, the parameter identified by \verb|what|
+                If \fortinline|ilev| is not present, the parameter identified by \fortinline|what|
                 is set at all the appropriate levels (see
                 Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}).\\
-\verb|ilmax|   & \verb|integer, optional, intent(in)|.\\
+\fortinline|ilmax|   & \fortinline|integer, optional, intent(in)|.\\
               & For the multilevel preconditioner, when both
-                \verb|ilev| and \verb|ilmax| are present, the settings
-                are applied at all levels \verb|ilev:ilmax|. When
-                \verb|ilev| is present but \verb|ilmax| is not, then
-                the default is \verb|ilmax=ilev|.
+                \fortinline|ilev| and \fortinline|ilmax| are present, the settings
+                are applied at all levels \fortinline|ilev:ilmax|. When
+                \fortinline|ilev| is present but \fortinline|ilmax| is not, then
+                the default is \fortinline|ilmax=ilev|.
                 The levels are numbered in increasing
                 order starting from the finest one, i.e., level 1 is the finest level. \\
-\verb|pos|   & \verb|charater(len=*), optional, intent(in)|.\\
-              & Whether the other arguments apply only to the pre-smoother (\verb|'PRE'|)
-                or to the post-smoother (\verb|'POST'|). If \verb|pos| is not present,
+\fortinline|pos|   & \fortinline|character(len=*), optional, intent(in)|.\\
+              & Whether the other arguments apply only to the pre-smoother (\fortinline|'PRE'|)
+                or to the post-smoother (\fortinline|'POST'|). If \fortinline|pos| is not present,
                 the other arguments are applied to both smoothers.
-                If the preconditioner is one-level or the parameter identified by \verb|what|
-                does not concern the smoothers, \verb|pos| is ignored.\\
-\verb|idx|   & \verb|integer, optional, intent(in)|.\\
+                If the preconditioner is one-level or the parameter identified by \fortinline|what|
+                does not concern the smoothers, \fortinline|pos| is ignored.\\
+\fortinline|idx|   & \fortinline|integer, optional, intent(in)|.\\
               & An auxiliary input argument that can be passed to the
                 underlying objects.
 \end{tabular}
 
 
 \noindent
-However, in this case the optional arguments \verb|ilev|,
-\verb|ilmax|, \verb|pos| and \verb|idx|
+However, in this case the optional arguments \fortinline|ilev|,
+\fortinline|ilmax|, \fortinline|pos| and \fortinline|idx|
 cannot be used. \\
 
 A variety of preconditioners can be obtained
@@ -148,7 +148,7 @@ A list of the parameters that can be set, along with their allowed and
 default values, is given in Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}.\\
 
 \textbf{Remark 2.} A smoother is usually obtained by combining two objects:
-a smoother (\verb|SMOOTHER_TYPE|) and a local solver (\verb|SUB_SOLVE|),
+a smoother (\fortinline|'SMOOTHER_TYPE'|) and a local solver (\fortinline|'SUB_SOLVE'|),
 as specified in Tables~\ref{tab:p_smoother}-\ref{tab:p_smoother_1}.
 For example, the block-Jacobi smoother using
 ILU(0) on the blocks is obtained by combining the block-Jacobi smoother
@@ -160,9 +160,9 @@ result of combining the block-Jacobi smoother object with a single sweep
 of the point-Jacobi solver object. However, for simplicity, shortcuts are
 provided to set point-Jacobi, hybrid (forward) Gauss-Seidel, and
 hybrid backward Gauss-Seidel, i.e., the previous smoothers can be defined
-by setting only \verb|SMOOTHER_TYPE| to appropriate values (see
+by setting only \fortinline|'SMOOTHER_TYPE'| to appropriate values (see
 Tables~\ref{tab:p_smoother}), i.e., without setting
-\verb|SUB_SOLVE| too.
+\fortinline|'SUB_SOLVE'| too.
 
 The smoother and solver objects are arranged in a
 hierarchical manner. When specifying a smoother object, its parameters,
@@ -205,9 +205,9 @@ Likewise, the replicated layout can be used with any solver but SuperLu\_Dist;
 therefore, if SuperLu\_Dist has been previously set, the coarsest-level
 solver is changed to the default sequential solver.
 
-\textbf{Remark 4.}  The argument \verb|idx| can be used to allow finer
+\textbf{Remark 4.}  The argument \fortinline|idx| can be used to allow finer
 control for those solvers; for instance, by specifying the keyword
-\verb|MUMPS_IPAR_ENTRY| and an appropriate value for \verb|idx|, it is
+\fortinline|'MUMPS_IPAR_ENTRY'| and an appropriate value for \fortinline|idx|, it is
 possible to set any entry in the MUMPS integer control array.
 See also Sec.~\ref{sec:adding}.
 %The \verb|what,val| pairs described here are those of the predefined
@@ -220,13 +220,13 @@ See also Sec.~\ref{sec:adding}.
 %\begin{tabular}{|p{5cm}|l|p{2.4cm}|p{2.5cm}|p{5cm}|}
 \begin{tabular}{|p{3.6cm}|l|p{2.4cm}|p{2.4cm}|p{7.2cm}|}
 \hline
-\verb|what|              & \textsc{data type}        &  \verb|val|      &  \textsc{default}  &
+\fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
-\verb|'ML_CYCLE'|     & \verb|character(len=*)|
+\fortinline|'ML_CYCLE'|     & \fortinline|character(len=*)|
                          & \texttt{'VCYCLE'} \par \texttt{'WCYCLE'}   \par \texttt{'KCYCLE'} \par \texttt{'ADD'}
                          & \texttt{'VCYCLE'}
                          &Multilevel cycle: V-cycle, W-cycle, K-cycle, and additive composition. \\ \hline
- \verb|'OUTER_SWEEPS'| & \texttt{integer} &
+ \fortinline|'OUTER_SWEEPS'| & \texttt{integer} &
                            Any integer \par number $\ge 1$  & 1 &
                            Number of multilevel cycles. \\ \hline
 
@@ -242,9 +242,9 @@ be applied.
 %\begin{tabular}{|p{5cm}|l|p{2.4cm}|p{2.5cm}|p{5cm}|}
 \begin{tabular}{|p{5.7cm}|l|p{2.3cm}|p{2.5cm}|p{6.9cm}|}
 \hline
-\verb|what|              & \textsc{data type}        &  \verb|val|      &  \textsc{default}  &
+\fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
-\verb|'MIN_COARSE_SIZE_PER_PROCESS'| & \verb|integer|
+\fortinline|'MIN_COARSE_SIZE_PER_PROCESS'| & \fortinline|integer|
                          & Any number \par $> 0$
                          & $200$
                          & Coarse size threshold per process. The aggregation stops
@@ -254,7 +254,7 @@ be applied.
                            multiplied by the number of processes.
 
                            \\ \hline
-\verb|'MIN_COARSE_SIZE'| & \verb|integer|
+\fortinline|'MIN_COARSE_SIZE'| & \fortinline|integer|
                          & Any number \par $> 0$
                          & -1
                          & Coarse size threshold. The aggregation stops
@@ -263,10 +263,10 @@ be applied.
                             is lower than or equal to this threshold
                            (see Note). If negative, it is ignored in
                            favour of the default for
-                           \verb|'MIN_COARSE_SIZE_PER_PROCESS'|. 
+                           \fortinline|'MIN_COARSE_SIZE_PER_PROCESS'|. 
                            \\ \hline
 
-\verb|'MIN_CR_RATIO'| & \verb|real|
+\fortinline|'MIN_CR_RATIO'| & \fortinline|real|
                          & Any number \par $> 1$
                          & 1.5
                          & Minimum coarsening ratio. The aggregation stops
@@ -274,21 +274,21 @@ be applied.
                             at two consecutive levels is lower than or equal to this
                             threshold (see Note).\\ \hline
 
-\verb|'MAX_LEVS'| & \verb|integer|
+\fortinline|'MAX_LEVS'| & \fortinline|integer|
                          & Any integer \par number $> 1$
                          & 20
                          & Maximum number of levels. The aggregation stops
                            if the number of levels reaches this value (see Note). \\ \hline
 
-\verb|'PAR_AGGR_ALG'|  & \verb|character(len=*)| \hspace*{-3mm}
+\fortinline|'PAR_AGGR_ALG'|  & \fortinline|character(len=*)| \hspace*{-3mm}
                          & \texttt{'DEC'}, \texttt{'SYMDEC'}, \texttt{'COUPLED'}
                          & \texttt{'DEC'}
                          & Parallel aggregation algorithm. \par the
-                           \verb|SYMDEC| option applies decoupled
+                           \fortinline|SYMDEC| option applies decoupled
                            aggregation to  the sparsity pattern
                            of $A+A^T$.\\ \hline
 
-\verb|'AGGR_TYPE'|  & \verb|character(len=*)| \hspace*{-3mm}
+\fortinline|'AGGR_TYPE'|  & \fortinline|character(len=*)| \hspace*{-3mm}
                          & \textbf{\texttt{'SOC1'}} &
                                                       \textbf{\texttt{'SOC1'}},
                                                       \textbf{\texttt{'SOC2'}},
@@ -302,7 +302,7 @@ be applied.
 			   matching implemented in the MatchBox-P software package
 			   {\bf AGGIUNGERE LINK AL PACKAGE?}\\ \hline
 
-\verb|'AGGR_SIZE'|  & \verb|integer| \hspace*{-3mm}
+\fortinline|'AGGR_SIZE'|  & \fortinline|integer| \hspace*{-3mm}
                          & Any integer \par number power of $2$ and $> 2$
                          & 4
                          & Maximum size of aggregates when the coupled aggregation based on 
@@ -310,7 +310,7 @@ be applied.
 			  aggregate larger than $8$ we recommend the use of smoothed prolongators.
 			   {\bf MODIFICARE CODICE}\\ \hline
 
-\verb|'AGGR_PROL'|  & \verb|character(len=*)| \hspace*{-3mm}
+\fortinline|'AGGR_PROL'|  & \fortinline|character(len=*)| \hspace*{-3mm}
                          & \texttt{'SMOOTHED'}, \texttt{'UNSMOOTHED'} & \texttt{'SMOOTHED'}
                          & Prolongator used by the aggregation algorithm: smoothed or unsmoothed
                          (i.e., tentative prolongator). \\
@@ -334,10 +334,10 @@ of levels. } \\
 %\begin{tabular}{|p{5cm}|l|p{2.4cm}|p{2.5cm}|p{5cm}|}
 \begin{tabular}{|p{3.8cm}|l|p{2.5cm}|p{2.3cm}|p{6.6cm}|}
 \hline
-\verb|what|              & \textsc{data type}        &  \verb|val|      &  \textsc{default}  &
+\fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
 
-\verb|'AGGR_ORD'|  & \verb|character(len=*)|
+\fortinline|'AGGR_ORD'|  & \fortinline|character(len=*)|
                          & \texttt{'NATURAL'} \par \texttt{'DEGREE'}
                          & \texttt{'NATURAL'}
                          & Initial ordering of indices for the decoupled aggregation
@@ -347,14 +347,14 @@ of levels. } \\
                             %Since aggregation is
                             %heuristic, results will be different.
 
-\verb|'AGGR_THRESH'| & \verb|real(|\emph{kind\_parameter}\verb|)|
+\fortinline|'AGGR_THRESH'| & \fortinline|real(|\emph{kind\_parameter}\fortinline|)|
                          & Any~real \par number~$\in [0, 1]$
                          & 0.01
                          & The threshold $\theta$ in the decoupled aggregation algorithm,
                             see (\ref{eq:strongly_coup}) in Section~\ref{sec:aggregation}.
                             See also the note at the bottom of this table. \\ \hline
-\verb|'AGGR_FILTER'|
-                         & \verb|character(len=*)|
+\fortinline|'AGGR_FILTER'|
+                         & \fortinline|character(len=*)|
                          & \texttt{'FILTER'} \par \texttt{'NOFILTER'}
                         & \texttt{'NOFILTER'} & Matrix used in computing the smoothed
                            prolongator: filtered or unfiltered (see~(\ref{eq:filtered}) in Section~\ref{sec:aggregation}). \\
@@ -375,14 +375,14 @@ the parameter \texttt{ilev}.} \\
 \begin{center}
 \begin{tabular}{|p{3.9cm}|l|p{1.7cm}|p{1.7cm}|p{8.6cm}|}
 \hline
-\verb|what|              & \textsc{data type}        &  \verb|val|      &  \textsc{default}  &
+\fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
-\verb|'COARSE_MAT'|  & \verb|character(len=*)|
+\fortinline|'COARSE_MAT'|  & \fortinline|character(len=*)|
                          & \texttt{'DIST'} \par \texttt{'REPL'}
                          & \texttt{'REPL'}
                          & Coarsest matrix layout: distributed among the processes or
                            replicated on each of them. \\ \hline
-\verb|'COARSE_SOLVE'| & \verb|character(len=*)|
+\fortinline|'COARSE_SOLVE'| & \fortinline|character(len=*)|
                           & \texttt{'MUMPS'} \par \texttt{'UMF'} \par
                            \texttt{'SLU'} \par \texttt{'SLUDIST'} \par
 			   \texttt{'JACOBI'} \par \texttt{'GS'} \par \texttt{'BJAC'} \par \texttt{'PCG'}
@@ -404,7 +404,7 @@ the parameter \texttt{ilev}.} \\
                            value which allows the use of the solver (see Remark 3, p.~24).
                            Note also that UMFPACK and SuperLU\_Dist
                            are available only in double precision. \\ \hline
-\verb|'COARSE_SUBSOLVE'| & \verb|character(len=*)|
+\fortinline|'COARSE_SUBSOLVE'| & \fortinline|character(len=*)|
                          & \texttt{'ILU'} \par \texttt{'ILUT'} \par \texttt{'MILU'} \par
                             \texttt{'MUMPS'} \par \texttt{'SLU'} \par \texttt{'UMF'}
                          & See~Note.
@@ -435,19 +435,19 @@ level.\label{tab:p_coarse}}
 \begin{center}
 \begin{tabular}{|p{3.9cm}|l|p{2cm}|p{1.5cm}|p{7.5cm}|}
 \hline
-\verb|what|              & \textsc{data type}        &  \verb|val|      &  \textsc{default}  &
+\fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
-\verb|'COARSE_SWEEPS'| & \verb|integer|
+\fortinline|'COARSE_SWEEPS'| & \fortinline|integer|
                          & Any integer \par number $> 0$
                          & 10
-                         & Number of sweeps when \verb|JACOBI|, \verb|GS| or \verb|BJAC|
+                         & Number of sweeps when \fortinline|JACOBI|, \fortinline|GS| or \fortinline|BJAC|
 			   is chosen as coarsest-level solver. {\bf Aggiungere criterio di arresto del PCG?}\\ \hline
-\verb|'COARSE_FILLIN'| & \verb|integer|
+\fortinline|'COARSE_FILLIN'| & \fortinline|integer|
                          & Any integer \par number $\ge 0$
                          & 0
                          & Fill-in level $p$ of the ILU factorizations. \\ \hline
-\verb|'COARSE_ILUTHRS'|
-                         & \verb|real(|\emph{kind\_parameter}\verb|)|
+\fortinline|'COARSE_ILUTHRS'|
+                         & \fortinline|real(|\emph{kind\_parameter}\fortinline|)|
                          & Any real \par number $\ge 0$
                          & 0
                          & Drop tolerance $t$ in the ILU($p,t$) factorization. \\
@@ -463,19 +463,19 @@ level (continued).\label{tab:p_coarse_1}}
 \small
 \begin{tabular}{|p{3.6cm}|l|p{1.9cm}|p{3.6cm}|p{6.5cm}|}
 \hline
-\verb|what|              & \textsc{data type}        &  \verb|val|      &  \textsc{default}  &
+\fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
 
-\verb|'SMOOTHER_TYPE'|  & \verb|character(len=*)|
-                         & \verb|'JACOBI'| \par \verb|'GS'| \par \verb|'BGS'| \par \verb|'BJAC'|
-                            \par \verb|'AS'|
-                         & \verb|'FBGS'|
+\fortinline|'SMOOTHER_TYPE'|  & \fortinline|character(len=*)|
+                         & \fortinline|'JACOBI'| \par \fortinline|'GS'| \par \fortinline|'BGS'| \par \fortinline|'BJAC'|
+                            \par \fortinline|'AS'|
+                         & \fortinline|'FBGS'|
                          & Type of smoother used in the multilevel preconditioner:
                             point-Jacobi, hybrid (forward) Gauss-Seidel,
 			    hybrid backward Gauss-Seidel, block-Jacobi, \textbf{$\ell_1$-versions?} and
                             Additive Schwarz. \par
                             It is ignored by one-level preconditioners. \\ \hline
-\verb|'SUB_SOLVE'|  & \verb|character(len=*)|
+\fortinline|'SUB_SOLVE'|  & \fortinline|character(len=*)|
                          & \texttt{'JACOBI'} \par
                            \texttt{'GS'} \par \texttt{'BGS'} \par \texttt{'ILU'} \par
                            \texttt{'ILUT'} \par \texttt{'MILU'} \par
@@ -492,15 +492,15 @@ level (continued).\label{tab:p_coarse_1}}
                            LU from MUMPS, SuperLU or UMFPACK
                            (plus triangular solve). See Note for details on hybrid
                            Gauss-Seidel. \\ \hline
-\verb|'SMOOTHER_SWEEPS'|  & \verb|integer|
+\fortinline|'SMOOTHER_SWEEPS'|  & \fortinline|integer|
                          & Any integer \par number~$\ge 0$
                          & 1
                          & Number of sweeps of the smoother or one-level preconditioner.
                             In the multilevel case, no pre-smother or
                             post-smoother is used if this parameter is set to 0
-                            together with \verb|pos='PRE'| or \verb|pos='POST|,
+                            together with \fortinline|pos='PRE'| or \fortinline|pos='POST|,
                            respectively. \\ \hline
-\verb|'SUB_OVR'|  & \verb|integer|
+\fortinline|'SUB_OVR'|  & \fortinline|integer|
                          & Any integer \par number~$\ge 0$
                          & 1
                          & Number of overlap layers, for Additive Schwarz only. \\
@@ -514,51 +514,51 @@ level (continued).\label{tab:p_coarse_1}}
 \bsideways
 \begin{center}
 \small
-\begin{tabular}{|p{3cm}|l|p{2.5cm}|p{2.2cm}|p{7.1cm}|}
+\begin{tabular}{|p{3.2cm}|l|p{2.6cm}|p{2.6cm}|p{6.7cm}|}
 \hline
-\verb|what|              & \textsc{data type}        &  \verb|val|      &  \textsc{default}  &
+\fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
-\verb|'SUB_RESTR'|   & \verb|character(len=*)|
-                         & \texttt{'HALO'} \par \texttt{'NONE'}
-                         & \texttt{'HALO'}
+\fortinline|'SUB_RESTR'|   & \fortinline|character(len=*)|
+                         & \fortinline|'HALO'| \par \fortinline|'NONE'|
+                         & \fortinline|'HALO'|
                          & Type of restriction operator,  for Additive Schwarz only:
-                           \texttt{HALO} for taking into account the overlap, \texttt{NONE}
+                           \texttt{HALO} for taking into account the overlap, \fortinline|'NONE'|
                            for neglecting it. \par
                            Note that \texttt{HALO} must be chosen for
                           the classical Addditive Schwarz smoother and its RAS variant.\\ \hline
-\verb|'SUB_PROL'|   & \verb|character(len=*)|
-                         & \texttt{'SUM'} \par \texttt{'NONE'}
-                         & \texttt{'NONE'}
+\fortinline|'SUB_PROL'|   & \fortinline|character(len=*)|
+                         & \fortinline|'SUM'| \par \fortinline|'NONE'|
+                         & \fortinline|'NONE'|
                          & Type of prolongation operator, for Additive Schwarz only:
-                           \texttt{SUM} for adding the contributions from the overlap, \texttt{NONE}
+                           \fortinline|'SUM'| for adding the contributions from the overlap, \fortinline|'NONE'|
                            for neglecting them.   \par
-                          Note that \texttt{SUM} must be chosen for the classical Additive
-                          Schwarz smoother, and \texttt{NONE} for its RAS variant. \\ \hline
-\verb|'SUB_FILLIN'|  & \verb|integer|
+                          Note that \fortinline|'SUM'| must be chosen for the classical Additive
+                          Schwarz smoother, and \fortinline|'NONE'| for its RAS variant. \\ \hline
+\fortinline|'SUB_FILLIN'|  & \fortinline|integer|
                          & Any integer \par number~$\ge 0$
                          & 0
                          & Fill-in level $p$ of the incomplete LU factorizations. \\ \hline
-\verb|'SUB_ILUTHRS'|  & \verb|real(|\emph{kind\_parameter}\verb|)|
+\fortinline|'SUB_ILUTHRS'|  & \fortinline|real(|\emph{kind\_parameter}\fortinline|)|
                          & Any real number~$\ge 0$
                          & 0
                          & Drop tolerance $t$ in the ILU($p,t$) factorization. \\ %\hline
-\verb|'MUMPS_LOC_GLOB'|  & \verb|character(len=*)|
-                         & \texttt{LOCAL\_SOLVER'} \par \texttt{GLOBAL\_SOLVER'}
-                         & \texttt{GLOBAL\_SOLVER'}
+\fortinline|'MUMPS_LOC_GLOB'|  & \fortinline|character(len=*)|
+                         & \fortinline|'LOCAL_SOLVER'| \par \fortinline|'GLOBAL_SOLVER'|
+                         & \fortinline|'GLOBAL_SOLVER'|
                          & Whether MUMPS should be used as a
                            distributed solver, or as a serial solver
                            acting only on the part of the matrix local
                            to each process. \\ %\hline
-\verb|'MUMPS_IPAR_ENTRY'|  & \verb|integer|
+\fortinline|'MUMPS_IPAR_ENTRY'|  & \fortinline|integer|
                          & Any integer  number
                          & 0
                          & Set an entry in the MUMPS integer control array, as
-                           chosen via the \verb|idx| optional argument. \\ %\hline
-\verb|'MUMPS_RPAR_ENTRY'|  & \verb|real|
+                           chosen via the \fortinline|idx| optional argument. \\ %\hline
+\fortinline|'MUMPS_RPAR_ENTRY'|  & \fortinline|real|
                          & Any real number
                          & 0
                          & Set an entry in the MUMPS real control array, as
-                           chosen via the \verb|idx| optional argument. \\ %\hline
+                           chosen via the \fortinline|idx| optional argument. \\ %\hline
 \hline
 \end{tabular}
 \end{center}
@@ -572,28 +572,27 @@ level (continued).\label{tab:p_coarse_1}}
 \subsection{Method hierarchy\_build\label{sec:hier_bld}}
 
 \begin{center}
-\verb|call p%hierarchy_build(a,desc_a,info)|\\
+\fortinline|call p%hierarchy_build(a,desc_a,info)|\\
 \end{center}
 
 \noindent
 This method builds the hierarchy of matrices and restriction/prolongation
-operators for the multilevel preconditioner \verb|p|, according to the requirements
-made by the user through the methods \verb|init| and \verb|set|.
+operators for the multilevel preconditioner \fortinline|p|, according to the requirements
+made by the user through the methods \fortinline|init| and \fortinline|set|.
 
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{12cm}}
-\verb|a|      & \verb|type(psb_|\emph{x}\verb|spmat_type), intent(in)|. \\
+\fortinline|a|      & \fortinline|type(psb_|\emph{x}\fortinline|spmat_type), intent(in)|. \\
               & The sparse matrix structure containing the local part of the
                 matrix to be preconditioned. Note that \emph{x} must be chosen according
-                to the real/complex,
+                to the \fortinline|real|/\fortinline|complex|,
 single/double precision version of AMG4PSBLAS under use.
                 See the PSBLAS User's Guide for details \cite{PSBLASGUIDE}.\\
-\verb|desc_a| & \verb|type(psb_desc_type), intent(in)|. \\
-              & The communication descriptor of \verb|a|. See the PSBLAS User's Guide for
+\fortinline|desc_a| & \fortinline|type(psb_desc_type), intent(in)|. \\
+              & The communication descriptor of \fortinline|a|. See the PSBLAS User's Guide for
                 details \cite{PSBLASGUIDE}.\\
-
-\verb|info|   & \verb|integer, intent(out)|.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
 \end{tabular}
 
@@ -604,38 +603,38 @@ single/double precision version of AMG4PSBLAS under use.
 
 
 \begin{center}
-\verb|call p%smoothers_build(a,desc_a,p,info[,amold,vmold,imold])|\\
+\fortinline|call p%smoothers_build(a,desc_a,p,info[,amold,vmold,imold])|\\
 \end{center}
 
 \noindent
 This method builds the smoothers and the coarsest-level solvers for the
-multilevel preconditioner \verb|p|, according to the requirements made by
-the user through the methods \verb|init| and \verb|set|, and based on the aggregation
-hierarchy produced by a previous call to \verb|hierarchy_build|
+multilevel preconditioner \fortinline|p|, according to the requirements made by
+the user through the methods \fortinline|init| and \fortinline|set|, and based on the aggregation
+hierarchy produced by a previous call to \fortinline|hierarchy_build|
 (see Section~\ref{sec:hier_bld}).
 
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{12cm}}
-\verb|a|      & \verb|type(psb_|\emph{x}\verb|spmat_type), intent(in)|. \\
+\fortinline|a|      & \fortinline|type(psb_|\emph{x}\fortinline|spmat_type), intent(in)|. \\
               & The sparse matrix structure containing the local part of the
                 matrix to be preconditioned. Note that \emph{x} must be chosen according
-                to the real/complex, single/double precision version of AMG4PSBLAS under use.
+                to the \fortinline|real|/\fortinline|complex|, single/double precision version of AMG4PSBLAS under use.
                 See the PSBLAS User's Guide for details \cite{PSBLASGUIDE}.\\
-\verb|desc_a| & \verb|type(psb_desc_type), intent(in)|. \\
-              & The communication descriptor of \verb|a|. See the PSBLAS User's Guide for
+\fortinline|desc_a| & \fortinline|type(psb_desc_type), intent(in)|. \\
+              & The communication descriptor of \fortinline|a|. See the PSBLAS User's Guide for
                 details \cite{PSBLASGUIDE}.\\
-\verb|info|   & \verb|integer, intent(out)|.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
-\verb|amold| & \verb|class(psb_|\emph{x}\verb|_base_sparse_mat), intent(in), optional|. \\
+\fortinline|amold| & \fortinline|class(psb_|\emph{x}\fortinline|_base_sparse_mat), intent(in), optional|. \\
  & The desired dynamic type for internal matrix
   components; this allows e.g. running on GPUs; it needs not be the
   same on all processes. See the PSBLAS User's Guide for
   details \cite{PSBLASGUIDE}. \\
-  \verb|vmold| & \verb|class(psb_|\emph{x}\verb|_base_vect_type), intent(in), optional|. \\
+  \fortinline|vmold| & \fortinline|class(psb_|\emph{x}\fortinline|_base_vect_type), intent(in), optional|. \\
   & The desired dynamic type for internal vector
   components; this allows e.g. running on GPUs. \\
-  \verb|imold| & \verb|class(psb_i_base_vect_type), intent(in), optional|. \\
+  \fortinline|imold| & \fortinline|class(psb_i_base_vect_type), intent(in), optional|. \\
   & The desired dynamic type for internal integer vector
   components; this allows e.g. running on GPUs. \\
 \end{tabular}
@@ -645,41 +644,41 @@ hierarchy produced by a previous call to \verb|hierarchy_build|
 \subsection{Method build\label{sec:precbld}}
 
 \begin{center}
-\verb|call p%build(a,desc_a,info[,amold,vmold,imold])|\\
+\fortinline|call p%build(a,desc_a,info[,amold,vmold,imold])|\\
 \end{center}
 
 \noindent
-This method builds the preconditioner \verb|p| according to the requirements
-made by the user through the methods \verb|init| and \verb|set|
+This method builds the preconditioner \fortinline|p| according to the requirements
+made by the user through the methods \fortinline|init| and \fortinline|set|
 (see Sections~\ref{sec:hier_bld} and~\ref{sec:smooth_bld} for
 multilevel preconditioners). It is mostly provided for backward
 compatibility; indeed, it is internally implemented by invoking the
-two previous methods \verb|hierarchy_build| and
-\verb|smoothers_build|, whose nomenclature would however  be somewhat
+two previous methods \fortinline|hierarchy_build| and
+\fortinline|smoothers_build|, whose nomenclature would however  be somewhat
 unnatural when dealing with simple one-level preconditioners.
 
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{12cm}}
-\verb|a|  & \verb|type(psb_|\emph{x}\verb|spmat_type), intent(in)|. \\
+\fortinline|a|  & \fortinline|type(psb_|\emph{x}\fortinline|spmat_type), intent(in)|. \\
               & The sparse matrix structure containing the local part of the
                 matrix to be preconditioned. Note that \emph{x} must be chosen according
-                to the real/complex, single/double precision version of AMG4PSBLAS under use.
+                to the \fortinline|real|/\fortinline|complex|, single/double precision version of AMG4PSBLAS under use.
                 See the PSBLAS User's Guide for details \cite{PSBLASGUIDE}.\\
-\verb|desc_a| & \verb|type(psb_desc_type), intent(in)|. \\
-              & The communication descriptor of \verb|a|. See the PSBLAS User's Guide for
+\fortinline|desc_a| & \fortinline|type(psb_desc_type), intent(in)|. \\
+              & The communication descriptor of \fortinline|a|. See the PSBLAS User's Guide for
                 details \cite{PSBLASGUIDE}.\\
-\verb|info|   & \verb|integer, intent(out)|.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
-\verb|amold| & \verb|class(psb_|\emph{x}\verb|_base_sparse_mat), intent(in), optional|. \\
+\fortinline|amold| & \fortinline|class(psb_|\emph{x}\fortinline|_base_sparse_mat), intent(in), optional|. \\
  & The desired dynamic type for internal matrix
   components; this allows e.g. running on GPUs; it needs not be the
   same on all processes. See the PSBLAS User's Guide for
   details \cite{PSBLASGUIDE}. \\
-  \verb|vmold| & \verb|class(psb_|\emph{x}\verb|_base_vect_type), intent(in), optional|. \\
+  \fortinline|vmold| & \fortinline|class(psb_|\emph{x}\fortinline|_base_vect_type), intent(in), optional|. \\
   & The desired dynamic type for internal vector
   components; this allows e.g. running on GPUs. \\
-  \verb|imold| & \verb|class(psb_i_base_vect_type), intent(in), optional|. \\
+  \fortinline|imold| & \fortinline|class(psb_i_base_vect_type), intent(in), optional|. \\
   & The desired dynamic type for internal integer vector
   components; this allows e.g. running on GPUs. \\
 \end{tabular}
@@ -693,44 +692,44 @@ The method can be used to build multilevel preconditioners too.
 \subsection{Method apply\label{sec:precapply}}
 
 \begin{center}
-\verb|call p%apply(x,y,desc_a,info [,trans,work])|\\
+\fortinline|call p%apply(x,y,desc_a,info [,trans,work])|\\
 \end{center}
 
 \noindent
 This method computes $y = op(B^{-1})\, x$, where $B$ is a previously built
-preconditioner, stored into \verb|p|, and $op$
+preconditioner, stored into \fortinline|p|, and $op$
 denotes the preconditioner itself or its transpose, according to
-the value of \verb|trans|.
+the value of \fortinline|trans|.
 Note that, when AMG4PSBLAS is used with a Krylov solver from PSBLAS,
-\verb|p%apply| is called within the PSBLAS method \verb|psb_krylov|
+\fortinline|p%apply| is called within the PSBLAS method \fortinline|psb_krylov|
 and hence it is completely transparent to the user.
 
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{12cm}}
-\verb|x|      & \emph{type}\verb|(|\emph{kind\_parameter}\verb|), dimension(:), intent(in)|.\\
+\fortinline|x|      & \emph{type}\fortinline|(|\emph{kind\_parameter}\fortinline|), dimension(:), intent(in)|.\\
               & The local part of the vector $x$. Note that \emph{type} and
                 \emph{kind\_parameter} must be chosen according
-                to the real/complex, single/double precision version of AMG4PSBLAS under use.\\
-\verb|y|      & \emph{type}\verb|(|\emph{kind\_parameter}\verb|), dimension(:), intent(out)|.\\
+                to the \fortinline|real|/\fortinline|complex|, single/double precision version of AMG4PSBLAS under use.\\
+\fortinline|y|      & \emph{type}\fortinline|(|\emph{kind\_parameter}\fortinline|), dimension(:), intent(out)|.\\
               & The local part of the vector $y$. Note that \emph{type} and
                 \emph{kind\_parameter} must be chosen according
-                to the real/complex, single/double precision version of AMG4PSBLAS under use.\\
-\verb|desc_a| & \verb|type(psb_desc_type), intent(in)|. \\
+                to the \fortinline|real|/\fortinline|complex|, single/double precision version of AMG4PSBLAS under use.\\
+\fortinline|desc_a| & \fortinline|type(psb_desc_type), intent(in)|. \\
               & The communication descriptor associated to the matrix to be
                 preconditioned.\\
-\verb|info|   & \verb|integer, intent(out)|.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
-\verb|trans|  & \verb|character(len=1), optional, intent(in).|\\
-              & If \verb|trans| = \verb|'N','n'| then $op(B^{-1}) = B^{-1}$;
-                if \verb|trans| = \verb|'T','t'| then $op(B^{-1}) = B^{-T}$
-                (transpose of $B^{-1})$;  if \verb|trans| = \verb|'C','c'| then $op(B^{-1}) = B^{-C}$
+\fortinline|trans|  & \fortinline|character(len=1), optional, intent(in).|\\
+              & If \fortinline|trans| = \fortinline|'N','n'| then $op(B^{-1}) = B^{-1}$;
+                if \fortinline|trans| = \fortinline|'T','t'| then $op(B^{-1}) = B^{-T}$
+                (transpose of $B^{-1})$;  if \fortinline|trans| = \fortinline|'C','c'| then $op(B^{-1}) = B^{-C}$
                 (conjugate transpose of $B^{-1})$.\\
-\verb|work|  & \emph{type}\verb|(|\emph{kind\_parameter}\verb|), dimension(:), optional, target|.\\
+\fortinline|work|  & \emph{type}\fortinline|(|\emph{kind\_parameter}\fortinline|), dimension(:), optional, target|.\\
              & Workspace. Its size should be at
-               least \verb|4 * psb_cd_get_local_| \verb|cols(desc_a)| (see the PSBLAS User's Guide).
+               least \fortinline|4 * psb_cd_get_local_| \fortinline|cols(desc_a)| (see the PSBLAS User's Guide).
                Note that \emph{type} and \emph{kind\_parameter} must be chosen according
-               to the real/complex, single/double precision version of AMG4PSBLAS under use.\\
+               to the \fortinline|real|/\fortinline|complex|, single/double precision version of AMG4PSBLAS under use.\\
 \end{tabular}
 
 
@@ -739,16 +738,16 @@ and hence it is completely transparent to the user.
 \subsection{Method free\label{sec:precfree}}
 
 \begin{center}
-\verb|call p%free(p,info)|\\
+\fortinline|call p%free(p,info)|\\
 \end{center}
 
 \noindent
-This method deallocates the preconditioner data structure \verb|p|.
+This method deallocates the preconditioner data structure \fortinline|p|.
 
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{10.5cm}}
-\verb|info|   & \verb|integer, intent(out)|.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
 \end{tabular}
 
@@ -758,20 +757,20 @@ This method deallocates the preconditioner data structure \verb|p|.
 \subsection{Method descr\label{sec:precdescr}}
 
 \begin{center}
-\verb|call p%descr(info, [iout])|\\
+\fortinline|call p%descr(info, [iout])|\\
 \end{center}
 
 \noindent
-This method prints a description of the preconditioner \verb|p| to the standard output or
-to a file. It must be called after \verb|hierachy_build| and \verb|smoothers_build|,
-or \verb|build|, have been called.
+This method prints a description of the preconditioner \fortinline|p| to the standard output or
+to a file. It must be called after \fortinline|hierachy_build| and \fortinline|smoothers_build|,
+or \fortinline|build|, have been called.
 
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{12cm}}
-\verb|info|   & \verb|integer, intent(out)|.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
-\verb|iout|   & \verb|integer, intent(in), optional|.\\
+\fortinline|iout|   & \fortinline|integer, intent(in), optional|.\\
               & The id of the file where the preconditioner description
                 will be printed; the default is the standard output.\\
 \end{tabular}
@@ -784,7 +783,7 @@ preconditioner object.
 \subsubsection{Method: dump}
 
 \begin{center}
-\verb|call p%dump(info[,istart,iend,prefix,head,ac,rp,smoother,solver,global_num])|\\
+\fortinline|call p%dump(info[,istart,iend,prefix,head,ac,rp,smoother,solver,global_num])|\\
 \end{center}
 
 \noindent
@@ -793,9 +792,9 @@ Dump on file.
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{12cm}}
-\verb|info|   & \verb|integer, intent(out)|.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
-\verb|amold| & \verb|class(psb_|\emph{x}\verb|_base_sparse_mat), intent(in), optional|. \\
+\fortinline|amold| & \fortinline|class(psb_|\emph{x}\fortinline|_base_sparse_mat), intent(in), optional|. \\
  & The desired dynamic type for internal matrix
   components; this allows e.g. running on GPUs; it needs not be the
   same on all processes. See the PSBLAS User's Guide for
@@ -806,7 +805,7 @@ Dump on file.
 \subsubsection{Method: clone}
 
 \begin{center}
-\verb|call p%clone(pout,info)|\\
+\fortinline|call p%clone(pout,info)|\\
 \end{center}
 
 \noindent
@@ -815,11 +814,11 @@ Create a (deep) copy of the preconditioner object.
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{12cm}}
-\verb|pout|  & \verb|type(amg_|\emph{x}\verb|prec_type), intent(out)|.\\
+\fortinline|pout|  & \fortinline|type(amg_|\emph{x}\fortinline|prec_type), intent(out)|.\\
               & The copy of the preconditioner data structure. Note
                 that \emph{x} must be chosen according
-                to the real/complex, single/double precision version of AMG4PSBLAS under use.\\
-\verb|info|   & \verb|integer, intent(out)|.\\
+                to the \fortinline|real|/\fortinline|complex|, single/double precision version of AMG4PSBLAS under use.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
 \end{tabular}
 
@@ -828,7 +827,7 @@ Create a (deep) copy of the preconditioner object.
 \subsubsection{Method: sizeof}
 
 \begin{center}
-\verb|sz =  p%sizeof()|\\
+\fortinline|sz =  p%sizeof()|\\
 \end{center}
 
 \noindent
@@ -837,7 +836,7 @@ Return memory footprint in bytes.
 \subsubsection{Method: allocate\_wrk}
 
 \begin{center}
-\verb|call p%allocate_wrk(info[, vmold])|\\
+\fortinline|call p%allocate_wrk(info[, vmold])|\\
 \end{center}
 
 \noindent
@@ -850,18 +849,18 @@ on some platforms, most notably GPUs, memory allocation is
 a slow  operation, and the default behaviour would lead to a
 slowdown.  This method allows to trade space for time by preallocating
 the internal workspace outside of the invocation of a Krylov
-method. When using GPUs or other specialized devices, the \verb|vmold|
+method. When using GPUs or other specialized devices, the \fortinline|vmold|
 argument is also necessary to ensure the internal work vectors are of
 the appropriate dynamic type to exploit the accelerator hardware; when
 allocation occurs internally this is taken care of based on the dynamic
-type of the \verb|x| argument to the \verb|apply| method.
+type of the \fortinline|x| argument to the \fortinline|apply| method.
 
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{12cm}}
-\verb|info|   & \verb|integer, intent(out)|.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
-  \verb|vmold| & \verb|class(psb_|\emph{x}\verb|_base_vect_type), intent(in), optional|. \\
+  \fortinline|vmold| & \fortinline|class(psb_|\emph{x}\fortinline|_base_vect_type), intent(in), optional|. \\
   & The desired dynamic type for internal vector
   components; this allows e.g. running on GPUs. \\
 \end{tabular}
@@ -871,7 +870,7 @@ type of the \verb|x| argument to the \verb|apply| method.
 \subsubsection{Method: free\_wrk}
 
 \begin{center}
-\verb|call p%free_wrk(info)|\\
+\fortinline|call p%free_wrk(info)|\\
 \end{center}
 
 \noindent
@@ -880,7 +879,7 @@ Deallocate internal work vectors.
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{12cm}}
-\verb|info|   & \verb|integer, intent(out)|.\\
+\fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
 \end{tabular}
 
