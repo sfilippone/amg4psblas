@@ -87,7 +87,7 @@ class="cmr-12">3</span></a><span
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XStuben_01"><span 
-class="cmr-12">26</span></a><span 
+class="cmr-12">27</span></a><span 
 class="cmr-12">]</span></span><span 
 class="cmr-12">), to be used in the iterative solution of linear systems,</span>
    <table 
@@ -118,19 +118,24 @@ class="cmr-12">3</span></a><span
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XNotay2008"><span 
-class="cmr-12">22</span></a><span 
+class="cmr-12">23</span></a><span 
 class="cmr-12">]</span></span> <span 
 class="cmr-12">are available, which can be</span>
 <span 
 class="cmr-12">combined with weighted versions of Jacobi, hybrid forward/backward Gauss-Seidel,</span>
 <span 
-class="cmr-12">block-Jacobi, and additive Schwarz smoothers. An algebraic approach is used to</span>
+class="cmr-12">block-Jacobi, and additive Schwarz smoothers. Also </span><span 
+class="cmmi-12">&#x2113;</span><sub><span 
+class="cmr-8">1</span></sub> <span 
+class="cmr-12">versions of Jacobi, block-Jacobi</span>
 <span 
-class="cmr-12">generate a hierarchy of coarse-level matrices and operators, without explicitly using</span>
+class="cmr-12">and Gauss-Seidel smoothers are available. An algebraic approach is used to generate a</span>
 <span 
-class="cmr-12">any information on the geometry of the original problem, e.g., the discretization of a</span>
+class="cmr-12">hierarchy of coarse-level matrices and operators, without explicitly using any</span>
 <span 
-class="cmr-12">PDE. To this end, two different coarsening strategies, based on aggregation, are</span>
+class="cmr-12">information on the geometry of the original problem, e.g., the discretization of a PDE.</span>
+<span 
+class="cmr-12">To this end, two different coarsening strategies, based on aggregation, are</span>
 <span 
 class="cmr-12">available:</span>
      <ul class="itemize1">
@@ -145,7 +150,7 @@ class="cmr-12">2</span></a><span
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XVANEK_MANDEL_BREZINA"><span 
-class="cmr-12">28</span></a><span 
+class="cmr-12">29</span></a><span 
 class="cmr-12">]</span></span><span 
 class="cmr-12">, and already included in the previous versions of the</span>
      <span 
@@ -153,13 +158,16 @@ class="cmr-12">package</span><span
 class="cmr-12">&#x00A0;</span><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#XBDDF2007"><span 
-class="cmr-12">9</span></a><span 
+class="cmr-12">10</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XMLD2P4_TOMS"><span 
-class="cmr-12">8</span></a><span 
+class="cmr-12">9</span></a><span 
 class="cmr-12">]</span></span><span 
 class="cmr-12">;</span>
+                                                                               
+
+                                                                               
      </li>
      <li class="itemize"><span 
 class="cmr-12">the first parallel implementation of a coupled version of Coarsening based</span>
@@ -168,25 +176,22 @@ class="cmr-12">on Compatible Weighted Matching introduced in</span><span
 class="cmr-12">&#x00A0;</span><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#XDV2013"><span 
-class="cmr-12">29</span></a><span 
+class="cmr-12">30</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XDFV2018"><span 
-class="cmr-12">30</span></a><span 
+class="cmr-12">31</span></a><span 
 class="cmr-12">]</span></span> <span 
 class="cmr-12">and described in</span>
-                                                                               
-
-                                                                               
      <span 
 class="cmr-12">details in</span><span 
 class="cmr-12">&#x00A0;</span><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#XDDF2020"><span 
-class="cmr-12">10</span></a><span 
+class="cmr-12">11</span></a><span 
 class="cmr-12">]</span></span><span 
 class="cmr-12">;</span></li></ul>
-<!--l. 31--><p class="indent" >   <span 
+<!--l. 32--><p class="indent" >   <span 
 class="cmr-12">Either exact or approximate solvers can be used on the coarsest-level system.</span>
 <span 
 class="cmr-12">Specifically, different sparse LU factorizations from external packages, native</span>
@@ -198,7 +203,7 @@ class="cmr-12">Gauss-Seidel, block-Jacobi solvers and recursive call to precondi
 class="cmr-12">methods are available. All the smoothers can be also exploited as one-level</span>
 <span 
 class="cmr-12">preconditioners.</span>
-<!--l. 35--><p class="indent" >   <span 
+<!--l. 36--><p class="indent" >   <span 
 class="cmr-12">AMG4PSBLAS is written in Fortran</span><span 
 class="cmr-12">&#x00A0;2003, following an object-oriented design</span>
 <span 
@@ -213,52 +218,69 @@ class="cmr-12">Single and double precision implementations of AMG4PSBLAS are ava
 class="cmr-12">for both the real and the complex case, which can be used through a single</span>
 <span 
 class="cmr-12">interface.</span>
-<!--l. 45--><p class="indent" >   <span 
-class="cmr-12">AMG4PSBLAS has been designed to implement scalable and easy-to-use multilevel</span>
+<!--l. 46--><p class="indent" >   <span 
+class="cmr-12">AMG4PSBLAS has been designed to implement scalable and easy-to-use</span>
 <span 
-class="cmr-12">preconditioners in the context of the PSBLAS (Parallel Sparse BLAS) computational</span>
+class="cmr-12">multilevel preconditioners in the context of the PSBLAS (Parallel Sparse BLAS)</span>
 <span 
-class="cmr-12">framework</span><span 
+class="cmr-12">computational framework</span><span 
 class="cmr-12">&#x00A0;</span><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#Xpsblas_00"><span 
-class="cmr-12">17</span></a><span 
+class="cmr-12">18</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XPSBLAS3"><span 
-class="cmr-12">16</span></a><span 
+class="cmr-12">17</span></a><span 
 class="cmr-12">]</span></span><span 
-class="cmr-12">. PSBLAS provides basic linear algebra operators and data</span>
+class="cmr-12">. PSBLAS provides basic linear algebra operators</span>
 <span 
-class="cmr-12">management facilities for distributed sparse matrices, as well as parallel Krylov solvers</span>
+class="cmr-12">and data management facilities for distributed sparse matrices, kernels for</span>
 <span 
-class="cmr-12">which can be used with the AMG4PSBLAS preconditioners. The choice of PSBLAS</span>
+class="cmr-12">sequential incomplete factorizations needed for the parallel block-Jacobi and</span>
 <span 
-class="cmr-12">has been mainly motivated by the need of having a portable and efficient</span>
+class="cmr-12">additive Schwarz smoothers, and parallel Krylov solvers which can be used with</span>
 <span 
-class="cmr-12">software infrastructure implementing &#8220;de facto&#8221; standard parallel sparse linear</span>
+class="cmr-12">the AMG4PSBLAS preconditioners. The choice of PSBLAS has been mainly</span>
 <span 
-class="cmr-12">algebra kernels, to pursue goals such as performance, portability, modularity</span>
+class="cmr-12">motivated by the need of having a portable and efficient software infrastructure</span>
 <span 
-class="cmr-12">ed extensibility in the development of the preconditioner package. On the</span>
+class="cmr-12">implementing &#8220;de facto&#8221; standard parallel sparse linear algebra kernels, to</span>
 <span 
-class="cmr-12">other hand, the implementation of AMG4PSBLAS, which was driven by the</span>
+class="cmr-12">pursue goals such as performance, portability, modularity ed extensibility</span>
 <span 
-class="cmr-12">need to face the exascale challenge, has led to some important revisions and</span>
+class="cmr-12">in the development of the preconditioner package. On the other hand, the</span>
 <span 
-class="cmr-12">extentions of the PSBLAS infrastructure. The inter-process comunication</span>
+class="cmr-12">implementation of AMG4PSBLAS, which was driven by the need to face the exascale</span>
 <span 
-class="cmr-12">required by AMG4PSBLAS is encapsulated in the PSBLAS routines; therefore,</span>
+class="cmr-12">challenge, has led to some important revisions and extentions of the PSBLAS</span>
 <span 
-class="cmr-12">AMG4PSBLAS can be run on any parallel machine where PSBLAS implementations</span>
+class="cmr-12">infrastructure. The inter-process comunication required by AMG4PSBLAS</span>
 <span 
-class="cmr-12">are available.</span>
-<!--l. 60--><p class="indent" >   <span 
+class="cmr-12">is encapsulated in the PSBLAS routines; therefore, AMG4PSBLAS can be</span>
+<span 
+class="cmr-12">run on any parallel machine where PSBLAS implementations are available.</span>
+<span 
+class="cmr-12">In the most recent version of PSBLAS (release 3.7), a plug-in for GPU is</span>
+<span 
+class="cmr-12">included; it includes CUDA versions of main vector operations and of sparse</span>
+<span 
+class="cmr-12">matrix-vector multiplication, so that Krylov methods coupled with AMG4PBLAS</span>
+<span 
+class="cmr-12">preconditioners relying on Jacobi and block-Jacobi smoothers with sparse</span>
+<span 
+class="cmr-12">approximate inverses on the blocks can be efficiently executed on cluster of</span>
+<span 
+class="cmr-12">GPUs.</span>
+<!--l. 64--><p class="indent" >   <span 
 class="cmr-12">AMG4PSBLAS has a layered and modular software architecture where three main</span>
 <span 
 class="cmr-12">layers can be identified. The lower layer consists of the PSBLAS kernels, the middle</span>
 <span 
 class="cmr-12">one implements the construction and application phases of the preconditioners, and the</span>
+                                                                               
+
+                                                                               
 <span 
 class="cmr-12">upper one provides a uniform interface to all the preconditioners. This architecture</span>
 <span 
@@ -275,7 +297,7 @@ class="cmr-12">&#x00A0;</span><a
 href="userhtmlse7.html#x29-330007"><span 
 class="cmr-12">7</span><!--tex4ht:ref: sec:adding --></a><span 
 class="cmr-12">).</span>
-<!--l. 71--><p class="indent" >   <span 
+<!--l. 75--><p class="indent" >   <span 
 class="cmr-12">This guide is organized as follows. General information on the distribution of the</span>
 <span 
 class="cmr-12">source code is reported in Section</span><span 
@@ -291,9 +313,6 @@ class="cmr-12">3</span><!--tex4ht:ref: sec:building --></a><span
 class="cmr-12">. The basics for building and applying the</span>
 <span 
 class="cmr-12">preconditioners with the Krylov solvers implemented in PSBLAS are reported</span>
-                                                                               
-
-                                                                               
 <span 
 class="cmr-12">in</span><span 
 class="cmr-12">&#x00A0;Section</span><span 

@@ -1,5 +1,6 @@
  
 /* start css.sty */
+.cmr-7{font-size:63%;}
 .cmr-10{font-size:90%;}
 .cmmi-10{font-size:90%;font-style: italic;}
 .cmsy-10{font-size:90%;}
@@ -7,10 +8,12 @@
 .cmbx-12x-x-144{font-size:157%; font-weight: bold;}
 .cmbx-12x-x-144{ font-weight: bold;}
 .cmbx-12x-x-144{ font-weight: bold;}
+.cmbx-12x-x-144{ font-weight: bold;}
 .cmti-10x-x-109{ font-style: italic;}
 .cmti-12{font-size:109%; font-style: italic;}
 .cmr-12{font-size:109%;}
 .cmbx-12{font-size:109%; font-weight: bold;}
+.cmbx-12{ font-weight: bold;}
 .cmbx-12{ font-weight: bold;}
 .cmbx-12{ font-weight: bold;}
 .cmtt-12{font-size:109%;font-family: monospace,monospace;}
@@ -39,7 +42,12 @@
 .cmbx-10x-x-109{ font-weight: bold;}
 .cmbx-10x-x-109{ font-weight: bold;}
 .cmbx-10x-x-109{ font-weight: bold;}
+.cmbx-10x-x-109{ font-weight: bold;}
 .cmcsc-10{font-size:90%;}
+.cmbx-10{font-size:90%; font-weight: bold;}
+.cmbx-10{ font-weight: bold;}
+.cmbx-10{ font-weight: bold;}
+.cmbx-10{ font-weight: bold;}
 .cmti-10{font-size:90%; font-style: italic;}
 .small-caps{font-variant: small-caps; }
 p{margin-top:0;margin-bottom:0}
@@ -187,9 +195,9 @@ div.abstract {width:100%;}
 #TBL-5{border-collapse:collapse;}
 #TBL-5 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-5{border-collapse:collapse;}
-td#TBL-5-9-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 td#TBL-5-10-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 td#TBL-5-11-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-5-12-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-6 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-6{border-collapse:collapse;}
 #TBL-6 colgroup{border-left: 1px solid black;border-right:1px solid black;}

@@ -211,8 +211,9 @@ with block-Jacobi and set by~\verb|P%init|.
 Furthermore, specifying block-Jacobi as coarsest-level
 solver implies that the coarsest-level matrix is distributed
 among the processes.
-Figure~\ref{fig:ex3} shows how to set a W-cycle preconditioner which
-applies 2 hybrid Gauss-Seidel sweeps as pre- and post-smoother,
+Figure~\ref{fig:ex3} shows how to set a W-cycle preconditioner using
+the Coarsening based on Compatible Weighted Matching. It applies 
+2 hybrid Gauss-Seidel sweeps as pre- and post-smoother,
 and solves the coarsest-level system with the multifrontal LU factorization
 implemented in MUMPS. It is specified that the coarsest-level
 matrix is distributed, since MUMPS can be used on both
@@ -222,7 +223,7 @@ it is used on replicated ones.
 %to specify a property only for the pre-smoother or the post-smoother
 %(see Section~\ref{sec:precset} for more details).
 The code fragments shown in Figures~\ref{fig:ex2} and \ref{fig:ex3} are
-included in the example program file \verb|amg_dexample_ml.f90| too.
+included in the example program file \verb|amg_dexample_ml.f90| too. \textbf{DA CORREGGERE NEL CODICE ESEMPIO 3}
 
 Finally, Figure~\ref{fig:ex4} shows the setup of a one-level
 additive Schwarz preconditioner, i.e., RAS with overlap 2.
@@ -255,7 +256,7 @@ boundary conditions are also available in the directory \verb|examples/pdegen|.
 }
 \end{minipage}
 
-\caption{setup of a multilevel preconditioner\label{fig:ex2}}
+\caption{setup of a multilevel preconditioner based on the default decoupled coarsening\label{fig:ex2}}
 \end{center}
 \end{figure}
 
@@ -269,6 +270,7 @@ boundary conditions are also available in the directory \verb|examples/pdegen|.
 ! as pre- and post-smoother, a distributed coarsest
 ! matrix, and MUMPS as coarsest-level solver
   call P%init('ML',info)
+  call P%set('PAR_AGGR_ALG','COUPLED',info)
   call P%set('ML_CYCLE','WCYCLE',info)
   call P%set('SMOOTHER_TYPE','FBGS',info)
   call P%set('SMOOTHER_SWEEPS',2,info)
@@ -280,7 +282,7 @@ boundary conditions are also available in the directory \verb|examples/pdegen|.
 \end{verbatim}
 }
 \end{minipage}
-\caption{setup of a multilevel preconditioner\label{fig:ex3}}
+\caption{setup of a multilevel preconditioner based on the coupled coarsening based on weighted matching\label{fig:ex3}}
 \end{center}
 \end{figure}
 

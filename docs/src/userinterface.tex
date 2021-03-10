@@ -137,7 +137,7 @@ by a suitable setting of the preconditioner parameters. These parameters
 can be logically divided into four groups, i.e., parameters defining
 \begin{enumerate}
 	\item the type of multilevel cycle and how many cycles must be applied;
-        \item the aggregation algorithm;
+        \item the coarsening algorithm;
         \item the coarse-space correction at the coarsest level (for multilevel
                  preconditioners only);
 	\item the smoother of the multilevel preconditioners, or the one-level
@@ -145,9 +145,7 @@ can be logically divided into four groups, i.e., parameters defining
 	
 \end{enumerate}
 A list of the parameters that can be set, along with their allowed and
-default values, is given in Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}.
-For a description of the meaning of the parameters, please
-refer also to Section~\ref{sec:background}. \\
+default values, is given in Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}.\\
 
 \textbf{Remark 2.} A smoother is usually obtained by combining two objects:
 a smoother (\verb|SMOOTHER_TYPE|) and a local solver (\verb|SUB_SOLVE|),
@@ -159,7 +157,7 @@ the hybrid Gauss-Seidel smoother (see Note in Table~\ref{tab:p_smoother})
 is obtained by combining the block-Jacobi smoother object with a single sweep
 of the Gauss-Seidel solver object, while the point-Jacobi smoother is the
 result of combining the block-Jacobi smoother object with a single sweep
-of the pointwise-Jacobi solver object. However, for simplicity, shortcuts are
+of the point-Jacobi solver object. However, for simplicity, shortcuts are
 provided to set point-Jacobi, hybrid (forward) Gauss-Seidel, and
 hybrid backward Gauss-Seidel, i.e., the previous smoothers can be defined
 by setting only \verb|SMOOTHER_TYPE| to appropriate values (see
@@ -272,7 +270,7 @@ be applied.
                          & Any number \par $> 1$
                          & 1.5
                          & Minimum coarsening ratio. The aggregation stops
-                            if the ratio between the matrix dimensions
+                            if the ratio between the global matrix dimensions
                             at two consecutive levels is lower than or equal to this
                             threshold (see Note).\\ \hline
 
@@ -285,9 +283,8 @@ be applied.
 \verb|'PAR_AGGR_ALG'|  & \verb|character(len=*)| \hspace*{-3mm}
                          & \texttt{'DEC'}, \texttt{'SYMDEC'}, \texttt{'COUPLED'}
                          & \texttt{'DEC'}
-                         & Parallel aggregation algorithm. \par Currently, only the
-                         decoupled aggregation (\verb|DEC|) is available; the
-                           \verb|SYMDEC| option  applies decoupled
+                         & Parallel aggregation algorithm. \par the
+                           \verb|SYMDEC| option applies decoupled
                            aggregation to  the sparsity pattern
                            of $A+A^T$.\\ \hline
 
@@ -297,10 +294,21 @@ be applied.
                                                       \textbf{\texttt{'SOC2'}},
                                                       \textbf{\texttt{'MATCHBOXP'}}
                          & Type of aggregation algorithm: currently,
-                           we implement to measures of strength of
+                           for the decoupled aggregation we implement two measures of strength of
                            connection, the one by Van\v{e}k, Mandel
                            and Brezina~\cite{VANEK_MANDEL_BREZINA},
-                           and the one by Gratton et al~\cite{GrHeJi:16}. \\ \hline
+                           and the one by Gratton et al~\cite{GrHeJi:16}.  The coupled
+			   aggregation is based on a parallel version of the half-approximate 
+			   matching implemented in the MatchBox-P software package
+			   {\bf AGGIUNGERE LINK AL PACKAGE?}\\ \hline
+
+\verb|'AGGR_SIZE'|  & \verb|integer| \hspace*{-3mm}
+                         & Any integer \par number power of $2$ and $> 2$
+                         & 4
+                         & Maximum size of aggregates when the coupled aggregation based on 
+			  matching is applied. For aggressive coarsening with size of
+			  aggregate larger than $8$ we recommend the use of smoothed prolongators.
+			   {\bf MODIFICARE CODICE}\\ \hline
 
 \verb|'AGGR_PROL'|  & \verb|character(len=*)| \hspace*{-3mm}
                          & \texttt{'SMOOTHED'}, \texttt{'UNSMOOTHED'} & \texttt{'SMOOTHED'}
@@ -309,7 +317,7 @@ be applied.
 \hline
 \multicolumn{5}{|l|}{{\bfseries Note.} The aggregation algorithm stops when
 at least one of the following criteria is met:
-the coarse size threshold, the} \\
+the coarse size threshold, the coarse size threshold per process, the} \\
 \multicolumn{5}{|l|}{minimum coarsening ratio, or the maximum number
 of levels is reached. Therefore, the actual number of levels may be} \\
 \multicolumn{5}{|l|}{smaller than the specified maximum number
@@ -332,7 +340,7 @@ of levels. } \\
 \verb|'AGGR_ORD'|  & \verb|character(len=*)|
                          & \texttt{'NATURAL'} \par \texttt{'DEGREE'}
                          & \texttt{'NATURAL'}
-                         & Initial ordering of indices for the aggregation
+                         & Initial ordering of indices for the decoupled aggregation
                             algorithm: either natural ordering or sorted by
                             descending degrees of the nodes in the
                             matrix graph. \\ \hline
@@ -342,7 +350,7 @@ of levels. } \\
 \verb|'AGGR_THRESH'| & \verb|real(|\emph{kind\_parameter}\verb|)|
                          & Any~real \par number~$\in [0, 1]$
                          & 0.01
-                         & The threshold $\theta$ in the aggregation algorithm,
+                         & The threshold $\theta$ in the decoupled aggregation algorithm,
                             see (\ref{eq:strongly_coup}) in Section~\ref{sec:aggregation}.
                             See also the note at the bottom of this table. \\ \hline
 \verb|'AGGR_FILTER'|
@@ -377,18 +385,20 @@ the parameter \texttt{ilev}.} \\
 \verb|'COARSE_SOLVE'| & \verb|character(len=*)|
                           & \texttt{'MUMPS'} \par \texttt{'UMF'} \par
                            \texttt{'SLU'} \par \texttt{'SLUDIST'} \par
-                           \texttt{'JACOBI'} \par \texttt{'GS'} \par \texttt{'BJAC'}
+			   \texttt{'JACOBI'} \par \texttt{'GS'} \par \texttt{'BJAC'} \par \texttt{'PCG'}
                          & See~Note.
                          & Solver used at the coarsest level: sequential
                            LU from MUMPS, UMFPACK, or SuperLU
                            (plus tri\-an\-gular solve);
                            distributed LU from MUMPS or SuperLU\_Dist
                            (plus triangular solve);
-                           point-Jacobi, hybrid Gauss-Seidel or block-Jacobi. \par
+                           point-Jacobi, hybrid Gauss-Seidel or block-Jacobi and related $\ell_1$-versions;
+			   {\bf preconditioned Conjugate Gradient coupled with the block-Jacobi preconditioner
+			   with ILU(0) on the blocks}. \par
                            Note that \texttt{UMF} and \texttt{SLU} require the coarsest
                            matrix to be replicated, \texttt{SLUDIST},  \texttt{JACOBI},
-                           \texttt{GS} and \texttt{BJAC} require it to be
-                           distributed, and \texttt{MUMPS} can be used with either
+			   \texttt{GS}, \texttt{BJAC} and \texttt{PCG} require it to be
+                           distributed, \texttt{MUMPS} can be used with either
                            a replicated or a distributed matrix. When any of the previous
                            solvers is specified, the matrix layout is set to a default
                            value which allows the use of the solver (see Remark 3, p.~24).
@@ -402,7 +412,7 @@ the parameter \texttt{ilev}.} \\
                            in case the block Jacobi solver
                            is chosen as coarsest-level solver: ILU($p$), ILU($p,t$),
                            MILU($p$), LU from MUMPS, SuperLU or UMFPACK
-                          (plus triangular solve).
+			  (plus triangular solve). {\bf Aggiungere Sparse Approssimate per GPU?}
                           Note that UMFPACK and SuperLU\_Dist
                           are available only in double precision. \\
 \hline
@@ -431,7 +441,7 @@ level.\label{tab:p_coarse}}
                          & Any integer \par number $> 0$
                          & 10
                          & Number of sweeps when \verb|JACOBI|, \verb|GS| or \verb|BJAC|
-                           is chosen as coarsest-level solver. \\ \hline
+			   is chosen as coarsest-level solver. {\bf Aggiungere criterio di arresto del PCG?}\\ \hline
 \verb|'COARSE_FILLIN'| & \verb|integer|
                          & Any integer \par number $\ge 0$
                          & 0
@@ -462,7 +472,7 @@ level (continued).\label{tab:p_coarse_1}}
                          & \verb|'FBGS'|
                          & Type of smoother used in the multilevel preconditioner:
                             point-Jacobi, hybrid (forward) Gauss-Seidel,
-                            hybrid backward Gauss-Seidel, block-Jacobi, and
+			    hybrid backward Gauss-Seidel, block-Jacobi, \textbf{$\ell_1$-versions?} and
                             Additive Schwarz. \par
                             It is ignored by one-level preconditioners. \\ \hline
 \verb|'SUB_SOLVE'|  & \verb|character(len=*)|
@@ -474,6 +484,7 @@ level (continued).\label{tab:p_coarse_1}}
                             of multilevel preconditioners, respectively \par
                             \texttt{ILU} for block-Jacobi and Additive Schwarz
                             one-level preconditioners
+			    \textbf{$\ell_1$-versions?}
                          & The local solver to be used with the smoother or one-level
                             preconditioner (see Remark~2, page~24): point-Jacobi,
                             hybrid (forward) Gauss-Seidel, hybrid backward

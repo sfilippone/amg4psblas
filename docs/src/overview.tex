@@ -19,7 +19,8 @@ where $A$ is a square, real or complex, sparse symmetric positive definite (s.p.
 The preconditioners implemented in AMG4PSBLAS are obtained by combining
 3 different types of AMG cycles with smoothers and coarsest-level solvers. The V-, W-, and a version of a Krylov-type cycle (K-cycle)~\cite{Briggs2000,Notay2008} are available, which can be combined with weighted versions of Jacobi, hybrid
 %\footnote{see Note 2 in Table~\ref{tab:p_coarse}, p.~28.}
-forward/backward Gauss-Seidel, block-Jacobi, and additive Schwarz smoothers. An algebraic approach is used to generate a hierarchy of
+forward/backward Gauss-Seidel, block-Jacobi, and additive Schwarz smoothers. Also $\ell_1$ versions of Jacobi, block-Jacobi and Gauss-Seidel smoothers are available.
+An algebraic approach is used to generate a hierarchy of
 coarse-level matrices and operators, without explicitly using any information on the
 geometry of the original problem, e.g., the discretization of a PDE. To this end,
 two different coarsening strategies, based on aggregation, are available:
@@ -46,7 +47,8 @@ AMG4PSBLAS has been designed to implement scalable and easy-to-use
 multilevel preconditioners in the context of the PSBLAS (Parallel Sparse BLAS)
 computational framework~\cite{psblas_00,PSBLAS3}. PSBLAS provides basic linear algebra
 operators and data management facilities for distributed sparse matrices,
-as well as parallel Krylov solvers which can be used with the AMG4PSBLAS preconditioners.
+kernels for sequential incomplete factorizations needed for the parallel block-Jacobi and additive Schwarz smoothers, and
+parallel Krylov solvers which can be used with the AMG4PSBLAS preconditioners.
 The choice of PSBLAS has been mainly motivated by the need of having
 a portable and efficient software infrastructure implementing ``de facto'' standard
 parallel sparse linear algebra kernels, to pursue goals such as performance,
@@ -55,7 +57,9 @@ package. On the other hand, the implementation of AMG4PSBLAS, which was driven b
 The inter-process comunication required by AMG4PSBLAS is encapsulated
 in the PSBLAS routines;
 therefore, AMG4PSBLAS can be run on any parallel machine where PSBLAS
-implementations are available.
+implementations are available. In the most recent version of PSBLAS (release 3.7), a plug-in for GPU is included; it includes CUDA versions of
+main vector operations and of sparse matrix-vector multiplication, so that Krylov methods coupled with AMG4PBLAS preconditioners 
+relying on Jacobi and block-Jacobi smoothers with sparse approximate inverses on the blocks can be efficiently executed on cluster of GPUs.
 
 AMG4PSBLAS has a layered and modular software architecture where three main layers can be
 identified.  The lower layer consists of the PSBLAS kernels, the middle one implements
