@@ -104,8 +104,6 @@ this does not necessarily correspond to the shortest execution time
 on parallel computers.
 
 
-{\em DA MODIFICARE PER INSERIRE TIPO DI AGGREGAZIONE}
-
 \subsection{Examples\label{sec:examples}}
 
 The code reported in Figure~\ref{fig:ex1} shows how to set and apply the default
@@ -211,8 +209,7 @@ with block-Jacobi and set by~\verb|P%init|.
 Furthermore, specifying block-Jacobi as coarsest-level
 solver implies that the coarsest-level matrix is distributed
 among the processes.
-Figure~\ref{fig:ex3} shows how to set a W-cycle preconditioner using
-the Coarsening based on Compatible Weighted Matching. It applies 
+Figure~\ref{fig:ex3} shows how to set a W-cycle preconditioner using the Coarsening based on Compatible Weighted Matching. It applies
 2 hybrid Gauss-Seidel sweeps as pre- and post-smoother,
 and solves the coarsest-level system with the multifrontal LU factorization
 implemented in MUMPS. It is specified that the coarsest-level

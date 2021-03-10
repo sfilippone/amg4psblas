@@ -3,11 +3,15 @@
 
 \textsc{AMG4PSBLAS (Algebraic MultiGrid Preconditioners Package
 based on PSBLAS}) is a package of parallel algebraic multilevel preconditioners included in the PSCToolkit (Parallel Sparse Computation Toolkit) software framework.
-It is a progress of a software development project started in 2007, named MLD2P4, which implemented a multilevel version of some domain decomposition preconditioners of additive-Schwarz type and was based on a parallel decoupled version of the well known smoothed
-aggregation method to generate the multilevel hierarchy of coarser matrices. In the last years, within the context of the EU-H2020 EoCoE project (Energy Oriented Center of Excellence), the package was extended including new algorithms and functionalities for setup and application of new AMG preconditioners with the final aims of improving efficiency and scalability when tens of thousands cores are
-used and of boosting reliability in dealing with general symmetric positive definite linear systems. Due to the significant number of changes and the increase in scope, we decided to rename the package as AMG4PSBLAS.
+It is a progress of a software development project started in 2007, named MLD2P4, which originally implemented a 
+multilevel version of some domain decomposition preconditioners of additive-Schwarz type and was based on a parallel decoupled version of the well known smoothed
+aggregation method to generate the multilevel hierarchy of coarser matrices. 
+In the last years, within the context of the EU-H2020 EoCoE project (Energy Oriented Center of Excellence), the package is being extended for including new algorithms and 
+functionalities to setup and apply new AMG preconditioners with the final aims of improving efficiency and scalability when tens of thousands cores are
+used and of boosting reliability in dealing with general symmetric positive definite linear systems. 
+Due to the significant number of changes and the increase in scope, we decided to rename the package as AMG4PSBLAS.
 
-AMG4PSBLAS has been designed to provide scalable and easy-to-use preconditioners
+AMG4PSBLAS is designed to provide scalable and easy-to-use preconditioners
 in the context of the PSBLAS (Parallel Sparse Basic Linear Algebra Subprograms)
 computational framework and can be used in conjuction with the Krylov solvers
 available in this framework.

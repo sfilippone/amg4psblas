@@ -86,7 +86,7 @@
 TOPFILE   = userguide.tex
 HTMLFILE  = userhtml.tex
 SECFILE   = abstract.tex overview.tex distribution.tex newobjects.tex\
-		building.tex background.tex gettingstarted.tex userinterface.tex \
+		building.tex gettingstarted.tex userinterface.tex \
             errors.tex bibliography.tex license.tex 
 FIGDIR    = figures
 
@@ -258,8 +258,7 @@ define header
   @echo
   @echo "#---------------------------------------------------------------------"
   @echo "MAKEFILE = LaTeX PDF Makefile"
-  @echo "AUTHOR   = Alfredo Buttari"
-  @echo 'ID       = $$Id: Makefile 1524 2007-01-17 17:06:06Z sfilippo $ ' 
+  @echo 'ID       = $$Id: Makefile AMG4PSBLAS 1.0 March 2021$ ' 
   @echo "#---------------------------------------------------------------------"
   @echo
   @echo "ACRO     = $(ACRO) $(ACROFLAGS) $(PDF)"
