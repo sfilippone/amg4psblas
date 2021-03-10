@@ -26,9 +26,6 @@ class="cmr-12">] </span></p></div>
 class="cmr-12">Abstract</span></h3>
 <a 
  id="Q1-2-2"></a>
-                                                                               
-
-                                                                               
 <!--l. 5--><p class="noindent" ><span 
 class="cmcsc-10x-x-120">AMG4PSBLAS (A<span 
 class="small-caps">l</span><span 
@@ -79,9 +76,12 @@ class="cmr-12">) is a package of parallel algebraic multilevel preconditioners i
 <span 
 class="cmr-12">PSCToolkit (Parallel Sparse Computation Toolkit) software framework. It is a progress</span>
 <span 
-class="cmr-12">of a software development project started in 2007, named MLD2P4, which</span>
+class="cmr-12">of a software development project started in 2007, named MLD2P4, which originally</span>
 <span 
 class="cmr-12">implemented a multilevel version of some domain decomposition preconditioners of</span>
+                                                                               
+
+                                                                               
 <span 
 class="cmr-12">additive-Schwarz type and was based on a parallel decoupled version of the well known</span>
 <span 
@@ -89,9 +89,9 @@ class="cmr-12">smoothed aggregation method to generate the multilevel hierarchy 
 <span 
 class="cmr-12">matrices. In the last years, within the context of the EU-H2020 EoCoE project</span>
 <span 
-class="cmr-12">(Energy Oriented Center of Excellence), the package was extended including</span>
+class="cmr-12">(Energy Oriented Center of Excellence), the package is being extended for</span>
 <span 
-class="cmr-12">new algorithms and functionalities for setup and application of new AMG</span>
+class="cmr-12">including new algorithms and functionalities to setup and apply new AMG</span>
 <span 
 class="cmr-12">preconditioners with the final aims of improving efficiency and scalability when tens of</span>
 <span 
@@ -102,25 +102,25 @@ class="cmr-12">symmetric positive definite linear systems. Due to the significan
 class="cmr-12">of changes and the increase in scope, we decided to rename the package as</span>
 <span 
 class="cmr-12">AMG4PSBLAS.</span>
-<!--l. 10--><p class="indent" >   <span 
-class="cmr-12">AMG4PSBLAS has been designed to provide scalable and easy-to-use</span>
+<!--l. 14--><p class="indent" >   <span 
+class="cmr-12">AMG4PSBLAS is designed to provide scalable and easy-to-use preconditioners in</span>
 <span 
-class="cmr-12">preconditioners in the context of the PSBLAS (Parallel Sparse Basic Linear Algebra</span>
+class="cmr-12">the context of the PSBLAS (Parallel Sparse Basic Linear Algebra Subprograms)</span>
 <span 
-class="cmr-12">Subprograms) computational framework and can be used in conjuction with the Krylov</span>
+class="cmr-12">computational framework and can be used in conjuction with the Krylov solvers</span>
 <span 
-class="cmr-12">solvers available in this framework. Our package is based on a completely algebraic</span>
+class="cmr-12">available in this framework. Our package is based on a completely algebraic approach</span>
 <span 
-class="cmr-12">approach and users level interfaces assume that the system matrix and preconditioners</span>
+class="cmr-12">and users level interfaces assume that the system matrix and preconditioners are</span>
 <span 
-class="cmr-12">are represented as PSBLAS distributed sparse matrices. AMG4PSBLAS enables the</span>
+class="cmr-12">represented as PSBLAS distributed sparse matrices. AMG4PSBLAS enables the user</span>
 <span 
-class="cmr-12">user to easily specify different features of an algebraic multilevel preconditioner, thus</span>
+class="cmr-12">to easily specify different features of an algebraic multilevel preconditioner, thus</span>
 <span 
 class="cmr-12">allowing to experiment with different preconditioners for the problem and parallel</span>
 <span 
 class="cmr-12">computers at hand.</span>
-<!--l. 21--><p class="indent" >   <span 
+<!--l. 25--><p class="indent" >   <span 
 class="cmr-12">The package employs object-oriented design techniques in Fortran</span><span 
 class="cmr-12">&#x00A0;2003, with</span>
 <span 
@@ -134,7 +134,7 @@ class="cmr-12">parallel implementation is based on a Single Program Multiple Dat
 class="cmr-12">paradigm; the inter-process communication is based on MPI and is managed mainly</span>
 <span 
 class="cmr-12">through PSBLAS.</span>
-<!--l. 29--><p class="indent" >   <span 
+<!--l. 33--><p class="indent" >   <span 
 class="cmr-12">This guide provides a brief description of the functionalities and the user interface</span>
 <span 
 class="cmr-12">of AMG4PSBLAS.</span>

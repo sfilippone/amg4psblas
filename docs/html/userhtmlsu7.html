@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
   "http://www.w3.org/TR/html4/loose.dtd">  
 <html > 
-<head><title>Smoothed Aggregation</title> 
+<head><title>Method init</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
 <meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
@@ -10,386 +10,110 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 133--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 43--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu8.html" ><span 
 class="cmr-12">next</span></a><span 
-class="cmr-12">] [</span><a 
-href="userhtmlsu6.html" ><span 
-class="cmr-12">prev</span></a><span 
-class="cmr-12">] [</span><a 
-href="userhtmlsu6.html#tailuserhtmlsu6.html" ><span 
-class="cmr-12">prev-tail</span></a><span 
 class="cmr-12">] [</span><a 
 href="#tailuserhtmlsu7.html"><span 
 class="cmr-12">tail</span></a><span 
 class="cmr-12">] [</span><a 
-href="userhtmlse4.html#userhtmlsu7.html" ><span 
+href="userhtmlse5.html#userhtmlsu7.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
    <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmr-12">4.2   </span></span> <a 
- id="x15-140004.2"></a><span 
-class="cmr-12">Smoothed Aggregation</span></h4>
-<!--l. 135--><p class="noindent" ><span 
-class="cmr-12">In order to define the prolongator </span><span 
-class="cmmi-12">P</span><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmr-12">, used to compute the coarse-level matrix </span><span 
-class="cmmi-12">A</span><sup><span 
-class="cmmi-8">k</span><span 
-class="cmr-8">+1</span></sup><span 
-class="cmr-12">,</span>
+class="cmr-12">5.1   </span></span> <a 
+ id="x16-150005.1"></a><span 
+class="cmr-12">Method init</span></h4>
+<div class="center" 
+>
+<!--l. 45--><p class="noindent" >
+<!--l. 46--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">call</span><span 
+class="cmtt-12">&#x00A0;p%init(icontx,ptype,info)</span></span></span></div>
+<!--l. 49--><p class="noindent" ><span 
+class="cmr-12">This method allocates and initializes the preconditioner </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">p</span></span></span><span 
+class="cmr-12">, according to the</span>
 <span 
-class="cmr-12">MLD2P4 uses the smoothed aggregation algorithm described in </span><span class="cite"><span 
-class="cmr-12">[</span><a 
-href="userhtmlli4.html#XBREZINA_VANEK"><span 
-class="cmr-12">2</span></a><span 
-class="cmr-12">,</span><span 
+class="cmr-12">preconditioner type chosen by the user.</span>
+<!--l. 53--><p class="noindent" ><span 
+class="cmbx-12">Arguments</span>
+   <div class="tabular"> <table id="TBL-2" class="tabular" 
+cellspacing="0" cellpadding="0"  
+><colgroup id="TBL-2-1g"><col 
+id="TBL-2-1"><col 
+id="TBL-2-2"></colgroup><tr  
+ style="vertical-align:baseline;" id="TBL-2-1-"><td  style="white-space:normal; text-align:left;" id="TBL-2-1-1"  
+class="td11"><!--l. 57--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">icontxt</span></span></span> </td> <td  style="white-space:normal; text-align:left;" id="TBL-2-1-2"  
+class="td11"><!--l. 57--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">integer,</span><span 
+class="cmtt-12">&#x00A0;intent(in)</span></span></span><span 
+class="cmr-12">.</span>                                                        </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-2-"><td  style="white-space:normal; text-align:left;" id="TBL-2-2-1"  
+class="td11"><!--l. 58--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-2-2"  
+class="td11"><!--l. 58--><p class="noindent" ><span 
+class="cmr-12">The communication context.</span>                                                  </td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-3-"><td  style="white-space:normal; text-align:left;" id="TBL-2-3-1"  
+class="td11"><!--l. 59--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">ptype</span></span></span> </td> <td  style="white-space:normal; text-align:left;" id="TBL-2-3-2"  
+class="td11"><!--l. 59--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">character(len=*),</span><span 
+class="cmtt-12">&#x00A0;intent(in)</span></span></span><span 
+class="cmr-12">.</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-4-"><td  style="white-space:normal; text-align:left;" id="TBL-2-4-1"  
+class="td11"><!--l. 60--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-4-2"  
+class="td11"><!--l. 60--><p class="noindent" ><span 
+class="cmr-12">The type of preconditioner. Its values are specified in Table</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli4.html#XVANEK_MANDEL_BREZINA"><span 
-class="cmr-12">29</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">. The basic idea</span>
-<span 
-class="cmr-12">of this algorithm is to build a coarse set of indices &#x03A9;</span><sup><span 
-class="cmmi-8">k</span><span 
-class="cmr-8">+1</span></sup> <span 
-class="cmr-12">by suitably grouping the</span>
-<span 
-class="cmr-12">indices of &#x03A9;</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">into disjoint subsets (aggregates), and to define the coarse-to-fine space</span>
-<span 
-class="cmr-12">transfer operator </span><span 
-class="cmmi-12">P</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">by applying a suitable smoother to a simple piecewise constant</span>
-<span 
-class="cmr-12">prolongation operator, with the aim of improving the quality of the coarse-space</span>
-<span 
-class="cmr-12">correction.</span>
-<!--l. 144--><p class="indent" >   <span 
-class="cmr-12">Three main steps can be identified in the smoothed aggregation procedure:</span>
-     <ol  class="enumerate1" >
-     <li 
-  class="enumerate" id="x15-14002x1"><span 
-class="cmr-12">aggregation of the indices of &#x03A9;</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">to obtain &#x03A9;</span><sup><span 
-class="cmmi-8">k</span><span 
-class="cmr-8">+1</span></sup><span 
-class="cmr-12">;</span>
-     </li>
-     <li 
-  class="enumerate" id="x15-14004x2"><span 
-class="cmr-12">construction of the prolongator </span><span 
-class="cmmi-12">P</span><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmr-12">;</span>
-     </li>
-     <li 
-  class="enumerate" id="x15-14006x3"><span 
-class="cmr-12">application of </span><span 
-class="cmmi-12">P</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">and </span><span 
-class="cmmi-12">R</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">= (</span><span 
-class="cmmi-12">P</span><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmr-12">)</span><sup><span 
-class="cmmi-8">T</span> </sup> <span 
-class="cmr-12">to build </span><span 
-class="cmmi-12">A</span><sup><span 
-class="cmmi-8">k</span><span 
-class="cmr-8">+1</span></sup><span 
-class="cmr-12">.</span></li></ol>
-<!--l. 151--><p class="indent" >   <span 
-class="cmr-12">In order to perform the coarsening step, the smoothed aggregation algorithm</span>
-<span 
-class="cmr-12">described in</span><span 
-class="cmr-12">&#x00A0;</span><span class="cite"><span 
-class="cmr-12">[</span><a 
-href="userhtmlli4.html#XVANEK_MANDEL_BREZINA"><span 
-class="cmr-12">29</span></a><span 
-class="cmr-12">]</span></span> <span 
-class="cmr-12">is used. In this algorithm, each index </span><span 
-class="cmmi-12">j </span><span 
-class="cmsy-10x-x-120">&#x2208; </span><span 
-class="cmr-12">&#x03A9;</span><sup><span 
-class="cmmi-8">k</span><span 
-class="cmr-8">+1</span></sup> <span 
-class="cmr-12">corresponds</span>
-<span 
-class="cmr-12">to an aggregate &#x03A9;</span><sub><span 
-class="cmmi-8">j</span></sub><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">of &#x03A9;</span><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmr-12">, consisting of a suitably chosen index </span><span 
-class="cmmi-12">i </span><span 
-class="cmsy-10x-x-120">&#x2208; </span><span 
-class="cmr-12">&#x03A9;</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">and</span>
-<span 
-class="cmr-12">indices that are (usually) contained in a strongly-coupled neighborood of </span><span 
-class="cmmi-12">i</span><span 
-class="cmr-12">,</span>
-<span 
-class="cmr-12">i.e.,</span>
-   <table 
-class="equation"><tr><td>
-   <center class="math-display" >
-<img 
-src="userhtml13x.png" alt="               {                 &#x2218; -------}
-&#x03A9;kj &#x2282; N ki (&#x03B8;) =  r &#x2208; &#x03A9;k : |akir| &#x003E; &#x03B8; |akiiakrr|  &#x222A; {i} ,
-" class="math-display" ><a 
- id="x15-14007r3"></a></center></td><td class="equation-label"><span 
-class="cmr-12">(3)</span></td></tr></table>
+href="userhtmlse4.html#x13-120151"><span 
+class="cmr-12">1</span><!--tex4ht:ref: tab:precinit --></a><span 
+class="cmr-12">.</span>     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-5-"><td  style="white-space:normal; text-align:left;" id="TBL-2-5-1"  
+class="td11"><!--l. 62--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-5-2"  
+class="td11"><!--l. 62--><p class="noindent" ><span 
+class="cmr-12">Note that the strings are case insensitive.</span>                                 </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-6-"><td  style="white-space:normal; text-align:left;" id="TBL-2-6-1"  
+class="td11"><!--l. 63--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">info</span></span></span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-2-6-2"  
+class="td11"><!--l. 63--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">integer,</span><span 
+class="cmtt-12">&#x00A0;intent(out)</span></span></span><span 
+class="cmr-12">.</span>                                                       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-7-"><td  style="white-space:normal; text-align:left;" id="TBL-2-7-1"  
+class="td11"><!--l. 64--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-7-2"  
+class="td11"><!--l. 64--><p class="noindent" ><span 
+class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlse7.html#x26-300007"><span 
+class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span 
+class="cmr-12">for details.</span>     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-8-"><td  style="white-space:normal; text-align:left;" id="TBL-2-8-1"  
+class="td11">      </td> </tr></table></div>
                                                                                
 
                                                                                
-<!--l. 160--><p class="nopar" >
-<span 
-class="cmr-12">for a given threshold </span><span 
-class="cmmi-12">&#x03B8; </span><span 
-class="cmsy-10x-x-120">&#x2208; </span><span 
-class="cmr-12">[0</span><span 
-class="cmmi-12">, </span><span 
-class="cmr-12">1] (see</span><span 
-class="cmr-12">&#x00A0;</span><span class="cite"><span 
-class="cmr-12">[</span><a 
-href="userhtmlli4.html#XVANEK_MANDEL_BREZINA"><span 
-class="cmr-12">29</span></a><span 
-class="cmr-12">]</span></span> <span 
-class="cmr-12">for the details). Since this algorithm has a</span>
-<span 
-class="cmr-12">sequential nature, a decoupled version of it is applied, where each processor</span>
-<span 
-class="cmr-12">independently executes the algorithm on the set of indices assigned to it in the initial</span>
-<span 
-class="cmr-12">data distribution. This version is embarrassingly parallel, since it does not require any</span>
-<span 
-class="cmr-12">data communication. On the other hand, it may produce some nonuniform aggregates</span>
-<span 
-class="cmr-12">and is strongly dependent on the number of processors and on the initial</span>
-<span 
-class="cmr-12">partitioning of the matrix </span><span 
-class="cmmi-12">A</span><span 
-class="cmr-12">. Nevertheless, this parallel algorithm has been chosen</span>
-<span 
-class="cmr-12">for MLD2P4, since it has been shown to produce good results in practice</span>
-<span class="cite"><span 
-class="cmr-12">[</span><a 
-href="userhtmlli4.html#Xaaecc_07"><span 
-class="cmr-12">5</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli4.html#Xapnum_07"><span 
-class="cmr-12">8</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli4.html#XTUMINARO_TONG"><span 
-class="cmr-12">28</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">.</span>
-<!--l. 172--><p class="indent" >   <span 
-class="cmr-12">The prolongator </span><span 
-class="cmmi-12">P</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is built starting from a tentative prolongator</span> <span class="bar-css"><span 
-class="cmmi-12">P</span></span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmsy-10x-x-120">&#x2208; </span><span 
-class="msbm-10x-x-120">&#x211D;</span><sup><span 
-class="cmmi-8">n</span><sub><span 
-class="cmmi-6">k</span></sub><span 
-class="cmsy-8">&#x00D7;</span><span 
-class="cmmi-8">n</span><sub><span 
-class="cmmi-6">k</span><span 
-class="cmr-6">+1</span></sub></sup><span 
-class="cmr-12">,</span>
-<span 
-class="cmr-12">defined as</span>
-   <table 
-class="equation"><tr><td>
-   <center class="math-display" >
-<img 
-src="userhtml14x.png" alt="                   {              k
-P¯k = (¯pkij),  p¯kij =    1    if i &#x2208; &#x03A9; j,
-                      0    otherwise,
-" class="math-display" ><a 
- id="x15-14008r4"></a></center></td><td class="equation-label"><span 
-class="cmr-12">(4)</span></td></tr></table>
-<!--l. 181--><p class="nopar" >
-<span 
-class="cmr-12">where &#x03A9;</span><sub><span 
-class="cmmi-8">j</span></sub><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is the aggregate of &#x03A9;</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">corresponding to the index </span><span 
-class="cmmi-12">j </span><span 
-class="cmsy-10x-x-120">&#x2208; </span><span 
-class="cmr-12">&#x03A9;</span><sup><span 
-class="cmmi-8">k</span><span 
-class="cmr-8">+1</span></sup><span 
-class="cmr-12">. </span><span 
-class="cmmi-12">P</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is obtained</span>
-<span 
-class="cmr-12">by applying to</span> <span class="bar-css"><span 
-class="cmmi-12">P</span></span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">a smoother </span><span 
-class="cmmi-12">S</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmsy-10x-x-120">&#x2208; </span><span 
-class="msbm-10x-x-120">&#x211D;</span><sup><span 
-class="cmmi-8">n</span><sub><span 
-class="cmmi-6">k</span></sub><span 
-class="cmsy-8">&#x00D7;</span><span 
-class="cmmi-8">n</span><sub><span 
-class="cmmi-6">k</span></sub></sup><span 
-class="cmr-12">:</span>
-   <center class="math-display" >
-<img 
-src="userhtml15x.png" alt="Pk = Sk ¯Pk,  " class="math-display" ></center> <span 
-class="cmr-12">in</span>
-<span 
-class="cmr-12">order to remove nonsmooth components from the range of the prolongator, and hence</span>
-<span 
-class="cmr-12">to improve the convergence properties of the multilevel method</span><span 
-class="cmr-12">&#x00A0;</span><span class="cite"><span 
-class="cmr-12">[</span><a 
-href="userhtmlli4.html#XBREZINA_VANEK"><span 
-class="cmr-12">2</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli4.html#XStuben_01"><span 
-class="cmr-12">27</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">. A simple</span>
-<span 
-class="cmr-12">choice for </span><span 
-class="cmmi-12">S</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is the damped Jacobi smoother:</span>
-   <center class="math-display" >
-<img 
-src="userhtml16x.png" alt="  k        k   k -1  k
-S  =  I - &#x03C9; (D  )  A F,
-" class="math-display" ></center>
-<!--l. 195--><p class="nopar" > <span 
-class="cmr-12">where </span><span 
-class="cmmi-12">D</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is the diagonal matrix with the same diagonal entries as </span><span 
-class="cmmi-12">A</span><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmr-12">, </span><span 
-class="cmmi-12">A</span><sub>
-<span 
-class="cmmi-8">F</span> </sub><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">= (</span><span class="bar-css"><span 
-class="cmmi-12">a</span></span><sub>
-<span 
-class="cmmi-8">ij</span></sub><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmr-12">) is</span>
-<span 
-class="cmr-12">the filtered matrix defined as</span>
-   <table 
-class="equation"><tr><td>
-   <center class="math-display" >
-<img 
-src="userhtml17x.png" alt="      {   k          k                             &#x2211;
-a¯kij =    aij  if j &#x2208; N i (&#x03B8;), (j &#x2044;= i),   ¯akii = akii -   (akij - ¯akij),
-         0   otherwise,                            j&#x2044;=i
-" class="math-display" ><a 
- id="x15-14009r5"></a></center></td><td class="equation-label"><span 
-class="cmr-12">(5)</span></td></tr></table>
-<!--l. 208--><p class="nopar" >
-<span 
-class="cmr-12">and </span><span 
-class="cmmi-12">&#x03C9;</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is an approximation of 4</span><span 
-class="cmmi-12">&#x2215;</span><span 
-class="cmr-12">(3</span><span 
-class="cmmi-12">&#x03C1;</span><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmr-12">), where </span><span 
-class="cmmi-12">&#x03C1;</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">is the spectral radius of (</span><span 
-class="cmmi-12">D</span><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmr-12">)</span><sup><span 
-class="cmsy-8">-</span><span 
-class="cmr-8">1</span></sup><span 
-class="cmmi-12">A</span><sub>
-<span 
-class="cmmi-8">F</span> </sub><sup><span 
-class="cmmi-8">k</span></sup>
-<span class="cite"><span 
-class="cmr-12">[</span><a 
-href="userhtmlli4.html#XBREZINA_VANEK"><span 
-class="cmr-12">2</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">. In MLD2P4 this approximation is obtained by using </span><span 
-class="cmsy-10x-x-120">&#x2225;</span><span 
-class="cmmi-12">A</span><sub><span 
-class="cmmi-8">F</span> </sub><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmsy-10x-x-120">&#x2225;</span><sub>
-<span 
-class="cmsy-8">&#x221E;</span></sub> <span 
-class="cmr-12">as an estimate of </span><span 
-class="cmmi-12">&#x03C1;</span><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmr-12">.</span>
-<span 
-class="cmr-12">Note that for systems coming from uniformly elliptic problems, filtering the matrix </span><span 
-class="cmmi-12">A</span><sup><span 
-class="cmmi-8">k</span></sup>
-<span 
-class="cmr-12">has little or no effect, and </span><span 
-class="cmmi-12">A</span><sup><span 
-class="cmmi-8">k</span></sup> <span 
-class="cmr-12">can be used instead of </span><span 
-class="cmmi-12">A</span><sub>
-<span 
-class="cmmi-8">F</span> </sub><sup><span 
-class="cmmi-8">k</span></sup><span 
-class="cmr-12">. The latter choice is the</span>
-<span 
-class="cmr-12">default in MLD2P4.</span>
                                                                                
 
                                                                                
-   <!--l. 216--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 73--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu8.html" ><span 
 class="cmr-12">next</span></a><span 
 class="cmr-12">] [</span><a 
-href="userhtmlsu6.html" ><span 
-class="cmr-12">prev</span></a><span 
-class="cmr-12">] [</span><a 
-href="userhtmlsu6.html#tailuserhtmlsu6.html" ><span 
-class="cmr-12">prev-tail</span></a><span 
-class="cmr-12">] [</span><a 
 href="userhtmlsu7.html" ><span 
 class="cmr-12">front</span></a><span 
 class="cmr-12">] [</span><a 
-href="userhtmlse4.html#userhtmlsu7.html" ><span 
+href="userhtmlse5.html#userhtmlsu7.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
-<!--l. 216--><p class="indent" >   <a 
+<!--l. 73--><p class="indent" >   <a 
  id="tailuserhtmlsu7.html"></a>  
 </body></html> 

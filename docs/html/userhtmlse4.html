@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
   "http://www.w3.org/TR/html4/loose.dtd">  
 <html > 
-<head><title>Multigrid Background</title> 
+<head><title>Getting Started</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
 <meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
@@ -30,172 +30,378 @@ class="cmr-12">] </span></p></div>
    <h3 class="sectionHead"><span class="titlemark"><span 
 class="cmr-12">4   </span></span> <a 
  id="x13-120004"></a><span 
-class="cmr-12">Multigrid Background</span></h3>
+class="cmr-12">Getting Started</span></h3>
 <!--l. 5--><p class="noindent" ><span 
-class="cmr-12">Multigrid preconditioners, coupled with Krylov iterative solvers, are widely used in the</span>
+class="cmr-12">We describe the basics for building and applying AMG4PSBLAS one-level and</span>
 <span 
-class="cmr-12">parallel solution of large and sparse linear systems, because of their optimality in the</span>
-<span 
-class="cmr-12">solution of linear systems arising from the discretization of scalar elliptic Partial</span>
-<span 
-class="cmr-12">Differential Equations (PDEs) on regular grids. Optimality, also known as algorithmic</span>
-<span 
-class="cmr-12">scalability, is the property of having a computational cost per iteration that depends</span>
-<span 
-class="cmr-12">linearly on the problem size, and a convergence rate that is independent of the problem</span>
-<span 
-class="cmr-12">size.</span>
-<!--l. 13--><p class="indent" >   <span 
-class="cmr-12">Multigrid preconditioners are based on a recursive application of a two-grid process</span>
-<span 
-class="cmr-12">consisting of smoother iterations and a coarse-space (or coarse-level) correction. The</span>
-<span 
-class="cmr-12">smoothers may be either basic iterative methods, such as the Jacobi and Gauss-Seidel</span>
-<span 
-class="cmr-12">ones, or more complex subspace-correction methods, such as the Schwarz ones. The</span>
-<span 
-class="cmr-12">coarse-space correction consists of solving, in an appropriately chosen coarse space, the</span>
-<span 
-class="cmr-12">residual equation associated with the approximate solution computed by the</span>
-<span 
-class="cmr-12">smoother, and of using the solution of this equation to correct the previous</span>
-<span 
-class="cmr-12">approximation. The transfer of information between the original (fine) space and</span>
-<span 
-class="cmr-12">the coarse one is performed by using suitable restriction and prolongation</span>
-<span 
-class="cmr-12">operators. The construction of the coarse space and the corresponding transfer</span>
-<span 
-class="cmr-12">operators is carried out by applying a so-called coarsening algorithm to the</span>
-<span 
-class="cmr-12">system matrix. Two main approaches can be used to perform coarsening:</span>
-<span 
-class="cmr-12">the geometric approach, which exploits the knowledge of some physical grid</span>
-<span 
-class="cmr-12">associated with the matrix and requires the user to define transfer operators</span>
-<span 
-class="cmr-12">from the fine to the coarse level and vice versa, and the algebraic approach,</span>
-<span 
-class="cmr-12">which builds the coarse-space correction and the associate transfer operators</span>
-<span 
-class="cmr-12">using only matrix information. The first approach may be difficult when the</span>
-<span 
-class="cmr-12">system comes from discretizations on complex geometries; furthermore, ad hoc</span>
-<span 
-class="cmr-12">one-level smoothers may be required to get an efficient interplay between</span>
-<span 
-class="cmr-12">fine and coarse levels, e.g., when matrices with highly varying coefficients are</span>
-<span 
-class="cmr-12">considered. The second approach performs a fully automatic coarsening and</span>
-<span 
-class="cmr-12">enforces the interplay between fine and coarse level by suitably choosing the</span>
-<span 
-class="cmr-12">coarse space and the coarse-to-fine interpolation (see, e.g., </span><span class="cite"><span 
+class="cmr-12">multilevel (i.e., AMG) preconditioners with the Krylov solvers included in PSBLAS</span>
+<span class="cite"><span 
 class="cmr-12">[</span><a 
-href="userhtmlli4.html#XBriggs2000"><span 
-class="cmr-12">3</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli4.html#XStuben_01"><span 
-class="cmr-12">27</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli4.html#Xdd2_96"><span 
-class="cmr-12">25</span></a><span 
-class="cmr-12">]</span></span> <span 
-class="cmr-12">for</span>
-<span 
-class="cmr-12">details.)</span>
-<!--l. 37--><p class="indent" >   <span 
-class="cmr-12">MLD2P4 uses a pure algebraic approach, based on the smoothed aggregation</span>
-<span 
-class="cmr-12">algorithm </span><span class="cite"><span 
-class="cmr-12">[</span><a 
-href="userhtmlli4.html#XBREZINA_VANEK"><span 
-class="cmr-12">2</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli4.html#XVANEK_MANDEL_BREZINA"><span 
-class="cmr-12">29</span></a><span 
+href="userhtmlli4.html#XPSBLASGUIDE"><span 
+class="cmr-12">16</span></a><span 
 class="cmr-12">]</span></span><span 
-class="cmr-12">, for building the sequence of coarse matrices and transfer</span>
-<span 
-class="cmr-12">operators, starting from the original one. A decoupled version of this algorithm</span>
+class="cmr-12">. The following steps are required:</span>
+     <ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x13-12002x1"><span 
+class="cmti-12">Declare  the  preconditioner  data  structure</span><span 
+class="cmr-12">.  It  is  a  derived  data  type,</span>
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">amg_</span></span></span><span 
+class="cmti-12">x</span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">prec_</span></span></span> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">type</span></span></span><span 
+class="cmr-12">, where </span><span 
+class="cmti-12">x </span><span 
+class="cmr-12">may be </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">s</span></span></span><span 
+class="cmr-12">, </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">d</span></span></span><span 
+class="cmr-12">, </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">c</span></span></span> <span 
+class="cmr-12">or </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">z</span></span></span><span 
+class="cmr-12">, according to the basic data</span>
+     <span 
+class="cmr-12">type of the sparse matrix (</span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">s</span></span></span> <span 
+class="cmr-12">= real single precision; </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">d</span></span></span> <span 
+class="cmr-12">= real double precision;</span>
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">c</span></span></span> <span 
+class="cmr-12">= complex single precision; </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">z</span></span></span> <span 
+class="cmr-12">= complex double precision). This data</span>
+     <span 
+class="cmr-12">structure is accessed by the user only through the AMG4PSBLAS routines,</span>
+     <span 
+class="cmr-12">following an object-oriented approach.</span>
+     </li>
+     <li 
+  class="enumerate" id="x13-12004x2"><span 
+class="cmti-12">Allocate  and  initialize  the  preconditioner  data  structure,  according  to  a</span>
+     <span 
+class="cmti-12">preconditioner type chosen by the user</span><span 
+class="cmr-12">. This is performed by the routine</span>
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">init</span></span></span><span 
+class="cmr-12">,  which  also  sets  defaults  for  each  preconditioner  type  selected  by</span>
+     <span 
+class="cmr-12">the user. The preconditioner types and the defaults associated with them</span>
+     <span 
+class="cmr-12">are  given  in  Table</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="#x13-120151"><span 
+class="cmr-12">1</span><!--tex4ht:ref: tab:precinit --></a><span 
+class="cmr-12">,  where  the  strings  used  by  </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">init</span></span></span> <span 
+class="cmr-12">to  identify  the</span>
+     <span 
+class="cmr-12">preconditioner types are also given. Note that these strings are valid also if</span>
+     <span 
+class="cmr-12">uppercase letters are substituted by corresponding lowercase ones.</span>
+     </li>
+     <li 
+  class="enumerate" id="x13-12006x3"><span 
+class="cmti-12">Modify the selected preconditioner type, by properly setting preconditioner</span>
+     <span 
+class="cmti-12">parameters. </span><span 
+class="cmr-12">This is performed by the routine </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">set</span></span></span><span 
+class="cmr-12">. This routine must be</span>
+     <span 
+class="cmr-12">called only if the user wants to modify the default values of the parameters</span>
+     <span 
+class="cmr-12">associated with the selected preconditioner type, to obtain a variant of that</span>
+     <span 
+class="cmr-12">preconditioner. Examples of use of </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">set</span></span></span> <span 
+class="cmr-12">are given in Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlsu6.html#x14-130004.1"><span 
+class="cmr-12">4.1</span><!--tex4ht:ref: sec:examples --></a><span 
+class="cmr-12">; a complete</span>
+     <span 
+class="cmr-12">list of all the preconditioner parameters and their allowed and default values</span>
+     <span 
+class="cmr-12">is provided in Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlse5.html#x15-140005"><span 
+class="cmr-12">5</span><!--tex4ht:ref: sec:userinterface --></a><span 
+class="cmr-12">, Tables</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlsu8.html#x17-160092"><span 
+class="cmr-12">2</span><!--tex4ht:ref: tab:p_cycle --></a><span 
+class="cmr-12">-</span><a 
+href="userhtmlsu8.html#x17-160158"><span 
+class="cmr-12">8</span><!--tex4ht:ref: tab:p_smoother_1 --></a><span 
+class="cmr-12">.</span>
+     </li>
+     <li 
+  class="enumerate" id="x13-12008x4"><span 
+class="cmti-12">Build the preconditioner for a given matrix</span><span 
+class="cmr-12">. If the selected preconditioner is</span>
+     <span 
+class="cmr-12">multilevel, then two steps must be performed, as specified next.</span>
+          <ol  class="enumerate2" >
+          <li 
+  class="enumerate" id="x13-12009x0"><span 
+class="cmti-12">Build the AMG hierarchy for a given matrix. </span><span 
+class="cmr-12">This is performed by the</span>
                                                                                
 
                                                                                
+          <span 
+class="cmr-12">routine </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">hierarchy_build</span></span></span><span 
+class="cmr-12">.</span>
+          </li>
+          <li 
+  class="enumerate" id="x13-12010x0"><span 
+class="cmti-12">Build the preconditioner for a given matrix. </span><span 
+class="cmr-12">This is performed by the</span>
+          <span 
+class="cmr-12">routine </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">smoothers_build</span></span></span><span 
+class="cmr-12">.</span></li></ol>
+     <!--l. 41--><p class="noindent" ><span 
+class="cmr-12">If the selected preconditioner is one-level, it is built in a single step, performed by</span>
+     <span 
+class="cmr-12">the routine </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">bld</span></span></span><span 
+class="cmr-12">.</span>
+     </li>
+     <li 
+  class="enumerate" id="x13-12012x5"><span 
+class="cmti-12">Apply the preconditioner at each iteration of a Krylov solver. </span><span 
+class="cmr-12">This is performed by</span>
+     <span 
+class="cmr-12">the method </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">apply</span></span></span><span 
+class="cmr-12">. When using the PSBLAS Krylov solvers, this step is</span>
+     <span 
+class="cmr-12">completely transparent to the user, since </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">apply</span></span></span> <span 
+class="cmr-12">is called by the PSBLAS routine</span>
+     <span 
+class="cmr-12">implementing the Krylov solver (</span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">psb_krylov</span></span></span><span 
+class="cmr-12">).</span>
+     </li>
+     <li 
+  class="enumerate" id="x13-12014x6"><span 
+class="cmti-12">Free the preconditioner data structure</span><span 
+class="cmr-12">. This is performed by the routine </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">free</span></span></span><span 
+class="cmr-12">.</span>
+     <span 
+class="cmr-12">This step is complementary to step 1 and should be performed when the</span>
+     <span 
+class="cmr-12">preconditioner is no more used.</span></li></ol>
+<!--l. 52--><p class="indent" >   <span 
+class="cmr-12">All the previous routines are available as methods of the preconditioner object. A</span>
 <span 
-class="cmr-12">is implemented, where the smoothed aggregation is applied locally to each</span>
+class="cmr-12">detailed description of them is given in Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlse5.html#x15-140005"><span 
+class="cmr-12">5</span><!--tex4ht:ref: sec:userinterface --></a><span 
+class="cmr-12">. Examples showing the basic use of</span>
 <span 
-class="cmr-12">submatrix </span><span class="cite"><span 
-class="cmr-12">[</span><a 
-href="userhtmlli4.html#XTUMINARO_TONG"><span 
-class="cmr-12">28</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">. A brief description of the AMG preconditioners implemented in</span>
-<span 
-class="cmr-12">MLD2P4 is given in Sections</span><span 
+class="cmr-12">AMG4PSBLAS are reported in Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlsu6.html#x14-130004.1"><span 
-class="cmr-12">4.1</span><!--tex4ht:ref: sec:multilevel --></a><span 
-class="cmr-12">-</span><a 
-href="userhtmlsu8.html#x16-150004.3"><span 
-class="cmr-12">4.3</span><!--tex4ht:ref: sec:smoothers --></a><span 
-class="cmr-12">. For further details the reader is referred to</span>
-<span class="cite"><span 
-class="cmr-12">[</span><a 
-href="userhtmlli4.html#Xpara_04"><span 
-class="cmr-12">4</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli4.html#Xaaecc_07"><span 
-class="cmr-12">5</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli4.html#Xapnum_07"><span 
-class="cmr-12">8</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli4.html#XMLD2P4_TOMS"><span 
-class="cmr-12">9</span></a><span 
-class="cmr-12">]</span></span><span 
+class="cmr-12">4.1</span><!--tex4ht:ref: sec:examples --></a><span 
 class="cmr-12">.</span>
-<!--l. 47--><p class="indent" >   <span 
-class="cmr-12">We note that optimal multigrid preconditioners do not necessarily correspond to</span>
+   <div class="table">
+                                                                               
+
+                                                                               
+<!--l. 56--><p class="indent" >   <a 
+ id="x13-120151"></a><hr class="float"><div class="float" 
+>
+                                                                               
+
+                                                                               
+<div class="center" 
+>
+<!--l. 57--><p class="noindent" >
+<div class="tabular"> <table id="TBL-1" class="tabular" 
+cellspacing="0" cellpadding="0"  
+><colgroup id="TBL-1-1g"><col 
+id="TBL-1-1"></colgroup><colgroup id="TBL-1-2g"><col 
+id="TBL-1-2"></colgroup><colgroup id="TBL-1-3g"><col 
+id="TBL-1-3"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-1-1"  
+class="td11"><span 
+class="cmcsc-10x-x-109"><span 
+class="small-caps">t</span><span 
+class="small-caps">y</span><span 
+class="small-caps">p</span><span 
+class="small-caps">e</span>                        </span></td><td  style="white-space:normal; text-align:left;" id="TBL-1-1-2"  
+class="td11"><!--l. 61--><p class="noindent" ><span 
+class="cmcsc-10x-x-109"><span 
+class="small-caps">s</span><span 
+class="small-caps">t</span><span 
+class="small-caps">r</span><span 
+class="small-caps">i</span><span 
+class="small-caps">n</span><span 
+class="small-caps">g</span></span>     </td><td  style="white-space:normal; text-align:left;" id="TBL-1-1-3"  
+class="td11"><!--l. 61--><p class="noindent" ><span 
+class="cmcsc-10x-x-109"><span 
+class="small-caps">d</span><span 
+class="small-caps">e</span><span 
+class="small-caps">f</span><span 
+class="small-caps">a</span><span 
+class="small-caps">u</span><span 
+class="small-caps">l</span><span 
+class="small-caps">t</span> <span 
+class="small-caps">p</span><span 
+class="small-caps">r</span><span 
+class="small-caps">e</span><span 
+class="small-caps">c</span><span 
+class="small-caps">o</span><span 
+class="small-caps">n</span><span 
+class="small-caps">d</span><span 
+class="small-caps">i</span><span 
+class="small-caps">t</span><span 
+class="small-caps">i</span><span 
+class="small-caps">o</span><span 
+class="small-caps">n</span><span 
+class="small-caps">e</span><span 
+class="small-caps">r</span></span>                       </td></tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-2-1"  
+class="td11">No preconditioner </td><td  style="white-space:normal; text-align:left;" id="TBL-1-2-2"  
+class="td11"><!--l. 62--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;NONE&#8217;</span></span></span> </td><td  style="white-space:normal; text-align:left;" id="TBL-1-2-3"  
+class="td11"><!--l. 62--><p class="noindent" >Considered to use the PSBLAS Krylov solvers
+with no preconditioner.                                </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-3-1"  
+class="td11">Diagonal                       </td><td  style="white-space:normal; text-align:left;" id="TBL-1-3-2"  
+class="td11"><!--l. 64--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;DIAG&#8217;</span></span></span>,
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;JACOBI&#8217;</span></span></span>,
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;L1-JACOBI&#8217;</span></span></span> </td><td  style="white-space:normal; text-align:left;" id="TBL-1-3-3"  
+class="td11"><!--l. 64--><p class="noindent" >Diagonal preconditioner. For any zero diagonal
+entry of the matrix to be preconditioned, the
+corresponding entry of the preconditioner is set
+to&#x00A0;1.                                                        </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-4-1"  
+class="td11">Gauss-Seidel                  </td><td  style="white-space:normal; text-align:left;" id="TBL-1-4-2"  
+class="td11"><!--l. 67--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;GS&#8217;</span></span></span>,
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;L1-GS&#8217;</span></span></span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-1-4-3"  
+class="td11"><!--l. 67--><p class="noindent" >Hybrid Gauss-Seidel (forward), that is, global
+block Jacobi with Gauss-Seidel as local solver.  </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-5-1"  
+class="td11">Symmetrized Gauss-Seidel</td><td  style="white-space:normal; text-align:left;" id="TBL-1-5-2"  
+class="td11"><!--l. 70--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;FBGS&#8217;</span></span></span>,
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;L1-FBGS&#8217;</span></span></span> </td><td  style="white-space:normal; text-align:left;" id="TBL-1-5-3"  
+class="td11"><!--l. 70--><p class="noindent" >Symmetrized   hybrid   Gauss-Seidel,   that   is,
+forward  Gauss-Seidel  followed  by  backward
+Gauss-Seidel.                                             </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-6-1"  
+class="td11">Block Jacobi                  </td><td  style="white-space:normal; text-align:left;" id="TBL-1-6-2"  
+class="td11"><!--l. 73--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;BJAC&#8217;</span></span></span>,
+<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;L1-BJAC&#8217;</span></span></span> </td><td  style="white-space:normal; text-align:left;" id="TBL-1-6-3"  
+class="td11"><!--l. 73--><p class="noindent" >Block-Jacobi with ILU(0) on the local blocks.  </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-7-1"  
+class="td11">Additive Schwarz            </td><td  style="white-space:normal; text-align:left;" id="TBL-1-7-2"  
+class="td11"><!--l. 74--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;AS&#8217;</span></span></span>      </td><td  style="white-space:normal; text-align:left;" id="TBL-1-7-3"  
+class="td11"><!--l. 74--><p class="noindent" >Additive  Schwarz  (AS),  with  overlap&#x00A0;1  and
+ILU(0) on the local blocks.                           </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-8-1"  
+class="td11">Multilevel                      </td><td  style="white-space:normal; text-align:left;" id="TBL-1-8-2"  
+class="td11"><!--l. 76--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10x-x-109">&#8217;ML&#8217;</span></span></span>      </td><td  style="white-space:normal; text-align:left;" id="TBL-1-8-3"  
+class="td11"><!--l. 76--><p class="noindent" >V-cycle with one hybrid forward Gauss-Seidel
+(GS)                                                sweep
+as pre-smoother and one hybrid backward GS
+sweep  as  post-smoother,  decoupled  smoothed
+aggregation  as  coarsening  algorithm,  and  LU
+(plus triangular solve) as coarsest-level solver.
+See the default values in Tables&#x00A0;<a 
+href="userhtmlsu8.html#x17-160092">2<!--tex4ht:ref: tab:p_cycle --></a>-<a 
+href="userhtmlsu8.html#x17-160158">8<!--tex4ht:ref: tab:p_smoother_1 --></a> for further
+details of the preconditioner.                         </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-9-1"  
+class="td11">                      </td></tr></table></div>
+<br /> <div class="caption" 
+><span class="id">Table&#x00A0;1: </span><span  
+class="content">Preconditioner types, corresponding strings and default choices. </span></div><!--tex4ht:label?: x13-120151 -->
+</div>
+                                                                               
+
+                                                                               
+   </div><hr class="endfloat" />
+   </div>
+<!--l. 91--><p class="indent" >   <span 
+class="cmr-12">Note that the module </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">amg_prec_mod</span></span></span><span 
+class="cmr-12">, containing the definition of the preconditioner</span>
 <span 
-class="cmr-12">minimum execution times in a parallel setting. Indeed, to obtain effective parallel</span>
+class="cmr-12">data type and the interfaces to the routines of AMG4PSBLAS, must be used</span>
 <span 
-class="cmr-12">multigrid preconditioners, a tradeoff between the optimality and the cost of</span>
+class="cmr-12">in any program calling such routines. The modules </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">psb_base_mod</span></span></span><span 
+class="cmr-12">, for the</span>
 <span 
-class="cmr-12">building and applying the smoothers and the coarse-space corrections must be</span>
+class="cmr-12">sparse matrix and communication descriptor data types, and </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">psb_krylov_mod</span></span></span><span 
+class="cmr-12">,</span>
 <span 
-class="cmr-12">achieved. Effective parallel preconditioners require algorithmic scalability to</span>
+class="cmr-12">for interfacing with the Krylov solvers, must be also used (see Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlsu6.html#x14-130004.1"><span 
+class="cmr-12">4.1</span><!--tex4ht:ref: sec:examples --></a><span 
+class="cmr-12">).</span>
+<br 
+class="newline" />
+<!--l. 98--><p class="indent" >   <span 
+class="cmbx-12">Remark 1. </span><span 
+class="cmr-12">Coarsest-level solvers based on the LU factorization, such as those</span>
 <span 
-class="cmr-12">be coupled with implementation scalability, i.e., a computational cost per</span>
+class="cmr-12">implemented in UMFPACK, MUMPS, SuperLU, and SuperLU</span><span 
+class="cmr-12">_Dist, usually lead to</span>
 <span 
-class="cmr-12">iteration which remains (almost) constant as the number of parallel processors</span>
+class="cmr-12">smaller numbers of preconditioned Krylov iterations than inexact solvers, when the</span>
 <span 
-class="cmr-12">increases.</span>
-<!--l. 56--><p class="noindent" >
+class="cmr-12">linear system comes from a standard discretization of basic scalar elliptic PDE</span>
+<span 
+class="cmr-12">problems. However, this does not necessarily correspond to the shortest execution time</span>
+<span 
+class="cmr-12">on parallel computers.</span>
    <div class="subsectionTOCS">
    <span 
 class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
 class="cmr-12">4.1 </span><a 
 href="userhtmlsu6.html#x14-130004.1"><span 
-class="cmr-12">AMG preconditioners</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
-class="cmr-12">4.2 </span><a 
-href="userhtmlsu7.html#x15-140004.2"><span 
-class="cmr-12">Smoothed Aggregation</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
-class="cmr-12">4.3 </span><a 
-href="userhtmlsu8.html#x16-150004.3"><span 
-class="cmr-12">Smoothers and coarsest-level solvers</span></a></span>
+class="cmr-12">Examples</span></a></span>
    </div>
-
-
                                                                                
 
                                                                                

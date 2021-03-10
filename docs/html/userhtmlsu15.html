@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
   "http://www.w3.org/TR/html4/loose.dtd">  
 <html > 
-<head><title>Method apply</title> 
+<head><title>Auxiliary Methods</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
 <meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
@@ -10,11 +10,8 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 693--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 780--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
-href="userhtmlsu16.html" ><span 
-class="cmr-12">next</span></a><span 
-class="cmr-12">] [</span><a 
 href="userhtmlsu14.html" ><span 
 class="cmr-12">prev</span></a><span 
 class="cmr-12">] [</span><a 
@@ -24,247 +21,292 @@ class="cmr-12">] [</span><a
 href="#tailuserhtmlsu15.html"><span 
 class="cmr-12">tail</span></a><span 
 class="cmr-12">] [</span><a 
-href="userhtmlse6.html#userhtmlsu15.html" ><span 
+href="userhtmlse5.html#userhtmlsu15.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
    <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmr-12">6.6   </span></span> <a 
- id="x25-240006.6"></a><span 
-class="cmr-12">Method apply</span></h4>
+class="cmr-12">5.9   </span></span> <a 
+ id="x24-230005.9"></a><span 
+class="cmr-12">Auxiliary Methods</span></h4>
+<!--l. 781--><p class="noindent" ><span 
+class="cmr-12">Various functionalities are implemented as additional methods of the preconditioner</span>
+<span 
+class="cmr-12">object.</span>
+<!--l. 784--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark"><span 
+class="cmr-12">5.9.1   </span></span> <a 
+ id="x24-240005.9.1"></a><span 
+class="cmr-12">Method: dump</span></h5>
 <div class="center" 
 >
-<!--l. 695--><p class="noindent" >
-<!--l. 696--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+<!--l. 786--><p class="noindent" >
+<!--l. 787--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">call</span><span 
-class="cmtt-12">&#x00A0;p%apply(x,y,desc_a,info</span><span 
-class="cmtt-12">&#x00A0;[,trans,work])</span></span></span><br />
+class="cmtt-12">&#x00A0;p%dump(info[,istart,iend,prefix,head,ac,rp,smoother,solver,global_num])</span></span></span><br />
 </div>
-<!--l. 699--><p class="noindent" ><span 
-class="cmr-12">This method computes </span><span 
-class="cmmi-12">y </span><span 
-class="cmr-12">= </span><span 
-class="cmmi-12">op</span><span 
-class="cmr-12">(</span><span 
-class="cmmi-12">B</span><sup><span 
-class="cmsy-8">-</span><span 
-class="cmr-8">1</span></sup><span 
-class="cmr-12">) </span><span 
-class="cmmi-12">x</span><span 
-class="cmr-12">, where </span><span 
-class="cmmi-12">B </span><span 
-class="cmr-12">is a previously built preconditioner,</span>
-<span 
-class="cmr-12">stored into </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">p</span></span></span><span 
-class="cmr-12">, and </span><span 
-class="cmmi-12">op </span><span 
-class="cmr-12">denotes the preconditioner itself or its transpose, according to the</span>
-<span 
-class="cmr-12">value of </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">trans</span></span></span><span 
-class="cmr-12">. Note that, when AMG4PSBLAS is used with a Krylov solver from</span>
-<span 
-class="cmr-12">PSBLAS, </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">p%apply</span></span></span> <span 
-class="cmr-12">is called within the PSBLAS method </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">psb_krylov</span></span></span> <span 
-class="cmr-12">and hence it is</span>
-<span 
-class="cmr-12">completely transparent to the user.</span>
-<!--l. 708--><p class="noindent" ><span 
+<!--l. 790--><p class="noindent" ><span 
+class="cmr-12">Dump on file.</span>
+<!--l. 793--><p class="noindent" ><span 
 class="cmbx-12">Arguments</span>
-   <div class="tabular"> <table id="TBL-14" class="tabular" 
+   <div class="tabular"> <table id="TBL-17" class="tabular" 
 cellspacing="0" cellpadding="0"  
-><colgroup id="TBL-14-1g"><col 
-id="TBL-14-1"><col 
-id="TBL-14-2"></colgroup><tr  
- style="vertical-align:baseline;" id="TBL-14-1-"><td  style="white-space:normal; text-align:left;" id="TBL-14-1-1"  
-class="td11"><!--l. 711--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">x</span></span></span>     </td><td  style="white-space:normal; text-align:left;" id="TBL-14-1-2"  
-class="td11"><!--l. 711--><p class="noindent" ><span 
-class="cmti-12">type</span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">(</span></span></span><span 
-class="cmti-12">kind</span><span 
-class="cmti-12">_parameter</span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">),</span><span 
-class="cmtt-12">&#x00A0;dimension(:),</span><span 
-class="cmtt-12">&#x00A0;intent(in)</span></span></span><span 
-class="cmr-12">.</span>                 </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-14-2-"><td  style="white-space:normal; text-align:left;" id="TBL-14-2-1"  
-class="td11"><!--l. 712--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-14-2-2"  
-class="td11"><!--l. 712--><p class="noindent" ><span 
-class="cmr-12">The local part of the vector </span><span 
-class="cmmi-12">x</span><span 
-class="cmr-12">. Note that </span><span 
-class="cmti-12">type </span><span 
-class="cmr-12">and </span><span 
-class="cmti-12">kind</span><span 
-class="cmti-12">_parameter</span>
-<span 
-class="cmr-12">must  be  chosen  according  to  the  real/complex,  single/double</span>
-<span 
-class="cmr-12">precision version of AMG4PSBLAS under use.</span>                          </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-14-3-"><td  style="white-space:normal; text-align:left;" id="TBL-14-3-1"  
-class="td11"><!--l. 715--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">y</span></span></span>     </td><td  style="white-space:normal; text-align:left;" id="TBL-14-3-2"  
-class="td11"><!--l. 715--><p class="noindent" ><span 
-class="cmti-12">type</span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">(</span></span></span><span 
-class="cmti-12">kind</span><span 
-class="cmti-12">_parameter</span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">),</span><span 
-class="cmtt-12">&#x00A0;dimension(:),</span><span 
-class="cmtt-12">&#x00A0;intent(out)</span></span></span><span 
-class="cmr-12">.</span>               </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-14-4-"><td  style="white-space:normal; text-align:left;" id="TBL-14-4-1"  
-class="td11"><!--l. 716--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-14-4-2"  
-class="td11"><!--l. 716--><p class="noindent" ><span 
-class="cmr-12">The local part of the vector </span><span 
-class="cmmi-12">y</span><span 
-class="cmr-12">. Note that </span><span 
-class="cmti-12">type </span><span 
-class="cmr-12">and </span><span 
-class="cmti-12">kind</span><span 
-class="cmti-12">_parameter</span>
-<span 
-class="cmr-12">must  be  chosen  according  to  the  real/complex,  single/double</span>
-<span 
-class="cmr-12">precision version of AMG4PSBLAS under use.</span>                          </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-14-5-"><td  style="white-space:normal; text-align:left;" id="TBL-14-5-1"  
-class="td11"><!--l. 719--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">desc_a</span></span></span></td><td  style="white-space:normal; text-align:left;" id="TBL-14-5-2"  
-class="td11"><!--l. 719--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">type(psb_desc_type),</span><span 
-class="cmtt-12">&#x00A0;intent(in)</span></span></span><span 
-class="cmr-12">.</span>                                     </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-14-6-"><td  style="white-space:normal; text-align:left;" id="TBL-14-6-1"  
-class="td11"><!--l. 720--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-14-6-2"  
-class="td11"><!--l. 720--><p class="noindent" ><span 
-class="cmr-12">The  communication  descriptor  associated  to  the  matrix  to  be</span>
-<span 
-class="cmr-12">preconditioned.</span>                                                                   </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-14-7-"><td  style="white-space:normal; text-align:left;" id="TBL-14-7-1"  
-class="td11"><!--l. 722--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">info</span></span></span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-14-7-2"  
-class="td11"><!--l. 722--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+><colgroup id="TBL-17-1g"><col 
+id="TBL-17-1"><col 
+id="TBL-17-2"></colgroup><tr  
+ style="vertical-align:baseline;" id="TBL-17-1-"><td  style="white-space:normal; text-align:left;" id="TBL-17-1-1"  
+class="td11"><!--l. 796--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">info</span></span></span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-17-1-2"  
+class="td11"><!--l. 796--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">integer,</span><span 
 class="cmtt-12">&#x00A0;intent(out)</span></span></span><span 
 class="cmr-12">.</span>                                                       </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-14-8-"><td  style="white-space:normal; text-align:left;" id="TBL-14-8-1"  
-class="td11"><!--l. 723--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-14-8-2"  
-class="td11"><!--l. 723--><p class="noindent" ><span 
+ style="vertical-align:baseline;" id="TBL-17-2-"><td  style="white-space:normal; text-align:left;" id="TBL-17-2-1"  
+class="td11"><!--l. 797--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-17-2-2"  
+class="td11"><!--l. 797--><p class="noindent" ><span 
 class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="userhtmlse8.html#x30-340008"><span 
-class="cmr-12">8</span><!--tex4ht:ref: sec:errors --></a> <span 
+href="userhtmlse7.html#x26-300007"><span 
+class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span 
 class="cmr-12">for details.</span>     </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-14-9-"><td  style="white-space:normal; text-align:left;" id="TBL-14-9-1"  
-class="td11"><!--l. 724--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">trans</span></span></span> </td><td  style="white-space:normal; text-align:left;" id="TBL-14-9-2"  
-class="td11"><!--l. 724--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">character(len=1),</span><span 
-class="cmtt-12">&#x00A0;optional,</span><span 
-class="cmtt-12">&#x00A0;intent(in).</span></span></span>                </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-14-10-"><td  style="white-space:normal; text-align:left;" id="TBL-14-10-1"  
-class="td11"><!--l. 725--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-14-10-2"  
-class="td11"><!--l. 725--><p class="noindent" ><span 
-class="cmr-12">If </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">trans</span></span></span> <span 
-class="cmr-12">= </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">&#8217;N&#8217;,&#8217;n&#8217;</span></span></span> <span 
-class="cmr-12">then </span><span 
-class="cmmi-12">op</span><span 
-class="cmr-12">(</span><span 
-class="cmmi-12">B</span><sup><span 
-class="cmsy-8">-</span><span 
-class="cmr-8">1</span></sup><span 
-class="cmr-12">)  =  </span><span 
-class="cmmi-12">B</span><sup><span 
-class="cmsy-8">-</span><span 
-class="cmr-8">1</span></sup><span 
-class="cmr-12">; if </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">trans</span></span></span> <span 
-class="cmr-12">= </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">&#8217;T&#8217;,&#8217;t&#8217;</span></span></span>
-<span 
-class="cmr-12">then </span><span 
-class="cmmi-12">op</span><span 
-class="cmr-12">(</span><span 
-class="cmmi-12">B</span><sup><span 
-class="cmsy-8">-</span><span 
-class="cmr-8">1</span></sup><span 
-class="cmr-12">) = </span><span 
-class="cmmi-12">B</span><sup><span 
-class="cmsy-8">-</span><span 
-class="cmmi-8">T</span> </sup> <span 
-class="cmr-12">(transpose of </span><span 
-class="cmmi-12">B</span><sup><span 
-class="cmsy-8">-</span><span 
-class="cmr-8">1</span></sup><span 
-class="cmr-12">); if </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">trans</span></span></span> <span 
-class="cmr-12">= </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">&#8217;C&#8217;,&#8217;c&#8217;</span></span></span> <span 
-class="cmr-12">then</span>
-<span 
-class="cmmi-12">op</span><span 
-class="cmr-12">(</span><span 
-class="cmmi-12">B</span><sup><span 
-class="cmsy-8">-</span><span 
-class="cmr-8">1</span></sup><span 
-class="cmr-12">) = </span><span 
-class="cmmi-12">B</span><sup><span 
-class="cmsy-8">-</span><span 
-class="cmmi-8">C</span></sup> <span 
-class="cmr-12">(conjugate transpose of </span><span 
-class="cmmi-12">B</span><sup><span 
-class="cmsy-8">-</span><span 
-class="cmr-8">1</span></sup><span 
-class="cmr-12">).</span>                           </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-14-11-"><td  style="white-space:normal; text-align:left;" id="TBL-14-11-1"  
-class="td11"><!--l. 729--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">work</span></span></span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-14-11-2"  
-class="td11"><!--l. 729--><p class="noindent" ><span 
-class="cmti-12">type</span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">(</span></span></span><span 
-class="cmti-12">kind</span><span 
-class="cmti-12">_parameter</span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">),</span><span 
-class="cmtt-12">&#x00A0;dimension(:),</span><span 
-class="cmtt-12">&#x00A0;optional,</span><span 
-class="cmtt-12">&#x00A0;target</span></span></span><span 
+ style="vertical-align:baseline;" id="TBL-17-3-"><td  style="white-space:normal; text-align:left;" id="TBL-17-3-1"  
+class="td11"><!--l. 798--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">amold</span></span></span> </td><td  style="white-space:normal; text-align:left;" id="TBL-17-3-2"  
+class="td11"><!--l. 798--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">class(psb_</span></span></span><span 
+class="cmti-12">x</span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">_base_sparse_mat),</span><span 
+class="cmtt-12">&#x00A0;intent(in),</span><span 
+class="cmtt-12">&#x00A0;optional</span></span></span><span 
 class="cmr-12">.</span>       </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-14-12-"><td  style="white-space:normal; text-align:left;" id="TBL-14-12-1"  
-class="td11"><!--l. 730--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-14-12-2"  
-class="td11"><!--l. 730--><p class="noindent" ><span 
-class="cmr-12">Workspace.  Its  size  should  be  at  least  </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">4</span><span 
-class="cmtt-12">&#x00A0;*</span><span 
-class="cmtt-12">&#x00A0;psb_cd_get_local_</span></span></span>
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">cols(desc_a)</span></span></span> <span 
-class="cmr-12">(see  the  PSBLAS  User&#8217;s  Guide).  Note  that  </span><span 
-class="cmti-12">type</span>
+ style="vertical-align:baseline;" id="TBL-17-4-"><td  style="white-space:normal; text-align:left;" id="TBL-17-4-1"  
+class="td11"><!--l. 799--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-17-4-2"  
+class="td11"><!--l. 799--><p class="noindent" ><span 
+class="cmr-12">The  desired  dynamic  type  for  internal  matrix  components;  this</span>
 <span 
-class="cmr-12">and </span><span 
-class="cmti-12">kind</span><span 
-class="cmti-12">_parameter </span><span 
-class="cmr-12">must be chosen according to the real/complex,</span>
+class="cmr-12">allows  e.g.  running  on  GPUs;  it  needs  not  be  the  same  on  all</span>
 <span 
-class="cmr-12">single/double precision version of AMG4PSBLAS under use.</span>        </td>
+class="cmr-12">processes. See the PSBLAS User&#8217;s Guide for details </span><span class="cite"><span 
+class="cmr-12">[</span><a 
+href="userhtmlli4.html#XPSBLASGUIDE"><span 
+class="cmr-12">16</span></a><span 
+class="cmr-12">]</span></span><span 
+class="cmr-12">.</span>             </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-14-13-"><td  style="white-space:normal; text-align:left;" id="TBL-14-13-1"  
+ style="vertical-align:baseline;" id="TBL-17-5-"><td  style="white-space:normal; text-align:left;" id="TBL-17-5-1"  
+class="td11">      </td> </tr></table></div>
+<!--l. 806--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark"><span 
+class="cmr-12">5.9.2   </span></span> <a 
+ id="x24-250005.9.2"></a><span 
+class="cmr-12">Method: clone</span></h5>
+<div class="center" 
+>
+<!--l. 808--><p class="noindent" >
+<!--l. 809--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">call</span><span 
+class="cmtt-12">&#x00A0;p%clone(pout,info)</span></span></span><br />
+</div>
+                                                                               
+
+                                                                               
+<!--l. 812--><p class="noindent" ><span 
+class="cmr-12">Create a (deep) copy of the preconditioner object.</span>
+<!--l. 815--><p class="noindent" ><span 
+class="cmbx-12">Arguments</span>
+   <div class="tabular"> <table id="TBL-18" class="tabular" 
+cellspacing="0" cellpadding="0"  
+><colgroup id="TBL-18-1g"><col 
+id="TBL-18-1"><col 
+id="TBL-18-2"></colgroup><tr  
+ style="vertical-align:baseline;" id="TBL-18-1-"><td  style="white-space:normal; text-align:left;" id="TBL-18-1-1"  
+class="td11"><!--l. 818--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">pout</span></span></span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-18-1-2"  
+class="td11"><!--l. 818--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">type(amg_</span></span></span><span 
+class="cmti-12">x</span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">prec_type),</span><span 
+class="cmtt-12">&#x00A0;intent(out)</span></span></span><span 
+class="cmr-12">.</span>                                  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-2-"><td  style="white-space:normal; text-align:left;" id="TBL-18-2-1"  
+class="td11"><!--l. 819--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-18-2-2"  
+class="td11"><!--l. 819--><p class="noindent" ><span 
+class="cmr-12">The copy of the preconditioner data structure. Note that </span><span 
+class="cmti-12">x </span><span 
+class="cmr-12">must</span>
+<span 
+class="cmr-12">be chosen according to the real/complex, single/double precision</span>
+<span 
+class="cmr-12">version of AMG4PSBLAS under use.</span>                                       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-3-"><td  style="white-space:normal; text-align:left;" id="TBL-18-3-1"  
+class="td11"><!--l. 822--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">info</span></span></span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-18-3-2"  
+class="td11"><!--l. 822--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">integer,</span><span 
+class="cmtt-12">&#x00A0;intent(out)</span></span></span><span 
+class="cmr-12">.</span>                                                       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-4-"><td  style="white-space:normal; text-align:left;" id="TBL-18-4-1"  
+class="td11"><!--l. 823--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-18-4-2"  
+class="td11"><!--l. 823--><p class="noindent" ><span 
+class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlse7.html#x26-300007"><span 
+class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span 
+class="cmr-12">for details.</span>     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-18-5-"><td  style="white-space:normal; text-align:left;" id="TBL-18-5-1"  
+class="td11">      </td> </tr></table></div>
+<!--l. 828--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark"><span 
+class="cmr-12">5.9.3   </span></span> <a 
+ id="x24-260005.9.3"></a><span 
+class="cmr-12">Method: sizeof</span></h5>
+<div class="center" 
+>
+<!--l. 830--><p class="noindent" >
+<!--l. 831--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">sz</span><span 
+class="cmtt-12">&#x00A0;=</span><span 
+class="cmtt-12">&#x00A0;</span><span 
+class="cmtt-12">&#x00A0;p%sizeof()</span></span></span><br />
+</div>
+<!--l. 834--><p class="noindent" ><span 
+class="cmr-12">Return memory footprint in bytes.</span>
+<!--l. 837--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark"><span 
+class="cmr-12">5.9.4   </span></span> <a 
+ id="x24-270005.9.4"></a><span 
+class="cmr-12">Method: allocate</span><span 
+class="cmr-12">_wrk</span></h5>
+<div class="center" 
+>
+<!--l. 839--><p class="noindent" >
+<!--l. 840--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">call</span><span 
+class="cmtt-12">&#x00A0;p%allocate_wrk(info[,</span><span 
+class="cmtt-12">&#x00A0;vmold])</span></span></span><br />
+</div>
+<!--l. 843--><p class="noindent" ><span 
+class="cmr-12">Allocate internal work vectors. Each application of the preconditioner uses a number of</span>
+<span 
+class="cmr-12">work vectors which are allocated internally as necessary; therefore allocation and</span>
+<span 
+class="cmr-12">deallocation of memory occurs multiple times during the execution of a Krylov method.</span>
+<span 
+class="cmr-12">In most cases this strategy is perfectly acceptable, but on some platforms, most</span>
+<span 
+class="cmr-12">notably GPUs, memory allocation is a slow operation, and the default behaviour would</span>
+<span 
+class="cmr-12">lead to a slowdown. This method allows to trade space for time by preallocating</span>
+<span 
+class="cmr-12">the internal workspace outside of the invocation of a Krylov method. When</span>
+<span 
+class="cmr-12">using GPUs or other specialized devices, the </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">vmold</span></span></span> <span 
+class="cmr-12">argument is also necessary</span>
+<span 
+class="cmr-12">to ensure the internal work vectors are of the appropriate dynamic type to</span>
+                                                                               
+
+                                                                               
+<span 
+class="cmr-12">exploit the accelerator hardware; when allocation occurs internally this is</span>
+<span 
+class="cmr-12">taken care of based on the dynamic type of the </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">x</span></span></span> <span 
+class="cmr-12">argument to the </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">apply</span></span></span>
+<span 
+class="cmr-12">method.</span>
+<!--l. 859--><p class="noindent" ><span 
+class="cmbx-12">Arguments</span>
+   <div class="tabular"> <table id="TBL-19" class="tabular" 
+cellspacing="0" cellpadding="0"  
+><colgroup id="TBL-19-1g"><col 
+id="TBL-19-1"><col 
+id="TBL-19-2"></colgroup><tr  
+ style="vertical-align:baseline;" id="TBL-19-1-"><td  style="white-space:normal; text-align:left;" id="TBL-19-1-1"  
+class="td11"><!--l. 862--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">info</span></span></span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-19-1-2"  
+class="td11"><!--l. 862--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">integer,</span><span 
+class="cmtt-12">&#x00A0;intent(out)</span></span></span><span 
+class="cmr-12">.</span>                                                       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-19-2-"><td  style="white-space:normal; text-align:left;" id="TBL-19-2-1"  
+class="td11"><!--l. 863--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-19-2-2"  
+class="td11"><!--l. 863--><p class="noindent" ><span 
+class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlse7.html#x26-300007"><span 
+class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span 
+class="cmr-12">for details.</span>     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-19-3-"><td  style="white-space:normal; text-align:left;" id="TBL-19-3-1"  
+class="td11"><!--l. 864--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">vmold</span></span></span> </td><td  style="white-space:normal; text-align:left;" id="TBL-19-3-2"  
+class="td11"><!--l. 864--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">class(psb_</span></span></span><span 
+class="cmti-12">x</span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">_base_vect_type),</span><span 
+class="cmtt-12">&#x00A0;intent(in),</span><span 
+class="cmtt-12">&#x00A0;optional</span></span></span><span 
+class="cmr-12">.</span>         </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-19-4-"><td  style="white-space:normal; text-align:left;" id="TBL-19-4-1"  
+class="td11"><!--l. 865--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-19-4-2"  
+class="td11"><!--l. 865--><p class="noindent" ><span 
+class="cmr-12">The  desired  dynamic  type  for  internal  vector  components;  this</span>
+<span 
+class="cmr-12">allows e.g. running on GPUs.</span>                                                 </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-19-5-"><td  style="white-space:normal; text-align:left;" id="TBL-19-5-1"  
+class="td11">      </td> </tr></table></div>
+<!--l. 871--><p class="noindent" >
+   <h5 class="subsubsectionHead"><span class="titlemark"><span 
+class="cmr-12">5.9.5   </span></span> <a 
+ id="x24-280005.9.5"></a><span 
+class="cmr-12">Method: free</span><span 
+class="cmr-12">_wrk</span></h5>
+<div class="center" 
+>
+<!--l. 873--><p class="noindent" >
+<!--l. 874--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">call</span><span 
+class="cmtt-12">&#x00A0;p%free_wrk(info)</span></span></span><br />
+</div>
+<!--l. 877--><p class="noindent" ><span 
+class="cmr-12">Deallocate internal work vectors.</span>
+<!--l. 880--><p class="noindent" ><span 
+class="cmbx-12">Arguments</span>
+   <div class="tabular"> <table id="TBL-20" class="tabular" 
+cellspacing="0" cellpadding="0"  
+><colgroup id="TBL-20-1g"><col 
+id="TBL-20-1"><col 
+id="TBL-20-2"></colgroup><tr  
+ style="vertical-align:baseline;" id="TBL-20-1-"><td  style="white-space:normal; text-align:left;" id="TBL-20-1-1"  
+class="td11"><!--l. 883--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">info</span></span></span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-20-1-2"  
+class="td11"><!--l. 883--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">integer,</span><span 
+class="cmtt-12">&#x00A0;intent(out)</span></span></span><span 
+class="cmr-12">.</span>                                                       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-2-"><td  style="white-space:normal; text-align:left;" id="TBL-20-2-1"  
+class="td11"><!--l. 884--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-20-2-2"  
+class="td11"><!--l. 884--><p class="noindent" ><span 
+class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlse7.html#x26-300007"><span 
+class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span 
+class="cmr-12">for details.</span>     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-20-3-"><td  style="white-space:normal; text-align:left;" id="TBL-20-3-1"  
 class="td11">      </td> </tr></table></div>
                                                                                
 
@@ -272,11 +314,11 @@ class="td11">      </td> </tr></table></div>
                                                                                
 
                                                                                
-   <!--l. 739--><div class="crosslinks"><p class="noindent"><span 
+                                                                               
+
+                                                                               
+   <!--l. 4--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
-href="userhtmlsu16.html" ><span 
-class="cmr-12">next</span></a><span 
-class="cmr-12">] [</span><a 
 href="userhtmlsu14.html" ><span 
 class="cmr-12">prev</span></a><span 
 class="cmr-12">] [</span><a 
@@ -286,9 +328,9 @@ class="cmr-12">] [</span><a
 href="userhtmlsu15.html" ><span 
 class="cmr-12">front</span></a><span 
 class="cmr-12">] [</span><a 
-href="userhtmlse6.html#userhtmlsu15.html" ><span 
+href="userhtmlse5.html#userhtmlsu15.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
-<!--l. 739--><p class="indent" >   <a 
- id="tailuserhtmlsu15.html"></a>  
+<!--l. 4--><p class="indent" >   <a 
+ id="tailuserhtmlsu15.html"></a>   
 </body></html> 
