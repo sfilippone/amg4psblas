@@ -223,10 +223,10 @@ See also Sec.~\ref{sec:adding}.
 \fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
 \fortinline|'ML_CYCLE'|     & \fortinline|character(len=*)|
-                         & \texttt{'VCYCLE'} \par \texttt{'WCYCLE'}   \par \texttt{'KCYCLE'} \par \texttt{'ADD'}
-                         & \texttt{'VCYCLE'}
+                         & \fortinline|'VCYCLE'| \par \fortinline|'WCYCLE'|   \par \fortinline|'KCYCLE'| \par \fortinline|'ADD'|
+                         & \fortinline|'VCYCLE'|
                          &Multilevel cycle: V-cycle, W-cycle, K-cycle, and additive composition. \\ \hline
- \fortinline|'OUTER_SWEEPS'| & \texttt{integer} &
+ \fortinline|'OUTER_SWEEPS'| & \fortinline|integer| &
                            Any integer \par number $\ge 1$  & 1 &
                            Number of multilevel cycles. \\ \hline
 
@@ -279,54 +279,63 @@ be applied.
                          & 20
                          & Maximum number of levels. The aggregation stops
                            if the number of levels reaches this value (see Note). \\ \hline
-
 \fortinline|'PAR_AGGR_ALG'|  & \fortinline|character(len=*)| \hspace*{-3mm}
-                         & \texttt{'DEC'}, \texttt{'SYMDEC'}, \texttt{'COUPLED'}
-                         & \texttt{'DEC'}
-                         & Parallel aggregation algorithm. \par the
-                           \fortinline|SYMDEC| option applies decoupled
-                           aggregation to  the sparsity pattern
-                           of $A+A^T$.\\ \hline
-
-\fortinline|'AGGR_TYPE'|  & \fortinline|character(len=*)| \hspace*{-3mm}
-                         & \textbf{\texttt{'SOC1'}} &
-                                                      \textbf{\texttt{'SOC1'}},
-                                                      \textbf{\texttt{'SOC2'}},
-                                                      \textbf{\texttt{'MATCHBOXP'}}
-                         & Type of aggregation algorithm: currently,
-                           for the decoupled aggregation we implement two measures of strength of
-                           connection, the one by Van\v{e}k, Mandel
-                           and Brezina~\cite{VANEK_MANDEL_BREZINA},
-                           and the one by Gratton et al~\cite{GrHeJi:16}.  The coupled
-			   aggregation is based on a parallel version of the half-approximate 
-			   matching implemented in the MatchBox-P software package
-			   {\bf AGGIUNGERE LINK AL PACKAGE?}\\ \hline
-
-\fortinline|'AGGR_SIZE'|  & \fortinline|integer| \hspace*{-3mm}
-                         & Any integer \par number power of $2$ and $> 2$
-                         & 4
-                         & Maximum size of aggregates when the coupled aggregation based on 
-			  matching is applied. For aggressive coarsening with size of
-			  aggregate larger than $8$ we recommend the use of smoothed prolongators.
-			   {\bf MODIFICARE CODICE}\\ \hline
-
-\fortinline|'AGGR_PROL'|  & \fortinline|character(len=*)| \hspace*{-3mm}
-                         & \texttt{'SMOOTHED'}, \texttt{'UNSMOOTHED'} & \texttt{'SMOOTHED'}
-                         & Prolongator used by the aggregation algorithm: smoothed or unsmoothed
-                         (i.e., tentative prolongator). \\
-\hline
-\multicolumn{5}{|l|}{{\bfseries Note.} The aggregation algorithm stops when
-at least one of the following criteria is met:
-the coarse size threshold, the coarse size threshold per process, the} \\
-\multicolumn{5}{|l|}{minimum coarsening ratio, or the maximum number
-of levels is reached. Therefore, the actual number of levels may be} \\
-\multicolumn{5}{|l|}{smaller than the specified maximum number
-of levels. } \\
-\hline
+& \texttt{'DEC'}, \texttt{'SYMDEC'}, \texttt{'COUPLED'}
+& \texttt{'DEC'}
+& Parallel aggregation algorithm. \par the
+\fortinline|SYMDEC| option applies decoupled
+aggregation to  the sparsity pattern
+of $A+A^T$.\\ \hline
+\ifpdf
 \end{tabular}
 \end{center}
+\esideways
+\bsideways
+\ContinuedFloat
+\begin{center}
+\begin{tabular}{|p{5.7cm}|l|p{2.3cm}|p{2.5cm}|p{5.9cm}|}
+\hline
+\fi
+\fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
+\textsc{comments} \\ \hline
+\fortinline|'AGGR_TYPE'|  & \fortinline|character(len=*)| \hspace*{-3mm}
+& \fortinline|'SOC1'| &
+\fortinline|'SOC1'|,
+\fortinline|'SOC2'|,
+\fortinline|'MATCHBOXP'|
+& Type of aggregation algorithm: currently,
+for the decoupled aggregation we implement two measures of strength of
+connection, the one by Van\v{e}k, Mandel
+and Brezina~\cite{VANEK_MANDEL_BREZINA},
+and the one by Gratton et al~\cite{GrHeJi:16}.  The coupled
+aggregation is based on a parallel version of the half-approximate 
+matching implemented in the MatchBox-P software package~\cite{MatchBoxP}.\\ \hline
+
+\fortinline|'AGGR_SIZE'|  & \fortinline|integer| \hspace*{-3mm}
+& Any integer \par number power of $2$ and $> 2$
+& 4
+& Maximum size of aggregates when the coupled aggregation based on 
+matching is applied. For aggressive coarsening with size of
+aggregate larger than $8$ we recommend the use of smoothed prolongators.
+{\bf MODIFICARE CODICE}\\ \hline
+
+\fortinline|'AGGR_PROL'|  & \fortinline|character(len=*)| \hspace*{-3mm}
+& \fortinline|'SMOOTHED'|, \fortinline|'UNSMOOTHED'| & \fortinline|'SMOOTHED'|
+& Prolongator used by the aggregation algorithm: smoothed or unsmoothed
+(i.e., tentative prolongator). \\
+\hline
+\multicolumn{5}{|l|}{{\bfseries Note.} The aggregation algorithm stops when
+	at least one of the following criteria is met:
+	the coarse size threshold, } \\
+\multicolumn{5}{|l|}{the coarse size threshold per process, the minimum coarsening ratio, or the maximum number
+	of levels is reached.} \\
+\multicolumn{5}{|l|}{Therefore, the actual number of levels may be smaller than the specified maximum number
+	of levels. } \\
+\hline
+\end{tabular}
 \caption{Parameters defining the aggregation algorithm.
 \label{tab:p_aggregation}}
+\end{center}
 \esideways
 
 \bsideways
@@ -378,14 +387,14 @@ the parameter \texttt{ilev}.} \\
 \fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
 \fortinline|'COARSE_MAT'|  & \fortinline|character(len=*)|
-                         & \texttt{'DIST'} \par \texttt{'REPL'}
-                         & \texttt{'REPL'}
+                         & \fortinline|'DIST'| \par \fortinline|'REPL'|
+                         & \fortinline|'REPL'|
                          & Coarsest matrix layout: distributed among the processes or
                            replicated on each of them. \\ \hline
 \fortinline|'COARSE_SOLVE'| & \fortinline|character(len=*)|
-                          & \texttt{'MUMPS'} \par \texttt{'UMF'} \par
-                           \texttt{'SLU'} \par \texttt{'SLUDIST'} \par
-			   \texttt{'JACOBI'} \par \texttt{'GS'} \par \texttt{'BJAC'} \par \texttt{'PCG'}
+                          & \fortinline|'MUMPS'| \par \fortinline|'UMF'| \par
+                           \fortinline|'SLU'| \par \fortinline|'SLUDIST'| \par
+			   \fortinline|'JACOBI'| \par \fortinline|'GS'| \par \fortinline|'BJAC'| \par \fortinline|'RKR'| 
                          & See~Note.
                          & Solver used at the coarsest level: sequential
                            LU from MUMPS, UMFPACK, or SuperLU
@@ -394,7 +403,7 @@ the parameter \texttt{ilev}.} \\
                            (plus triangular solve);
                            point-Jacobi, hybrid Gauss-Seidel or block-Jacobi and related $\ell_1$-versions;
 			   {\bf preconditioned Conjugate Gradient coupled with the block-Jacobi preconditioner
-			   with ILU(0) on the blocks}. \par
+			   with ILU(0) on the blocks}. 
                            Note that \texttt{UMF} and \texttt{SLU} require the coarsest
                            matrix to be replicated, \texttt{SLUDIST},  \texttt{JACOBI},
 			   \texttt{GS}, \texttt{BJAC} and \texttt{PCG} require it to be
@@ -404,15 +413,28 @@ the parameter \texttt{ilev}.} \\
                            value which allows the use of the solver (see Remark 3, p.~24).
                            Note also that UMFPACK and SuperLU\_Dist
                            are available only in double precision. \\ \hline
+\ifpdf
+\end{tabular}
+\end{center}
+\esideways
+\bsideways
+\ContinuedFloat
+\begin{center}
+\begin{tabular}{|p{3.9cm}|l|p{1.7cm}|p{1.7cm}|p{8.6cm}|}
+\hline
+\fi                           
 \fortinline|'COARSE_SUBSOLVE'| & \fortinline|character(len=*)|
-                         & \texttt{'ILU'} \par \texttt{'ILUT'} \par \texttt{'MILU'} \par
-                            \texttt{'MUMPS'} \par \texttt{'SLU'} \par \texttt{'UMF'}
+                         & \fortinline|'ILU'| \par \fortinline|'ILUT'| \par \fortinline|'MILU'| \par
+                            \fortinline|'MUMPS'| \par \fortinline|'SLU'| \par \fortinline|'UMF'| \par
+                            \fortinline|'INVT'| \par \fortinline|'INVK'| \par \fortinline|'AINV'|
                          & See~Note.
                          & Solver for the diagonal blocks of the coarse matrix,
                            in case the block Jacobi solver
                            is chosen as coarsest-level solver: ILU($p$), ILU($p,t$),
                            MILU($p$), LU from MUMPS, SuperLU or UMFPACK
-			  (plus triangular solve). {\bf Aggiungere Sparse Approssimate per GPU?}
+			  (plus triangular solve). Suitable for GPUs (no triangular solve)
+			  			   approximate inverse solvers INVK($p,q$), INVT($p_1,p2,t_1,t_2$) and
+			  			   AINV($t$), see~\cite{BERTACCINIFILIPPONE}.
                           Note that UMFPACK and SuperLU\_Dist
                           are available only in double precision. \\
 \hline
@@ -425,16 +447,16 @@ the parameter \texttt{ilev}.} \\
                                then \texttt{MUMPS} if installed, then \texttt{SLU} if
                                installed, \texttt{ILU} otherwise.}\\
 \hline
-\end{tabular}
-\end{center}
-\caption{Parameters defining the coarse-space correction at the coarsest
-level.\label{tab:p_coarse}}
-\esideways
-
-\bsideways
-\begin{center}
-\begin{tabular}{|p{3.9cm}|l|p{2cm}|p{1.5cm}|p{7.5cm}|}
-\hline
+%\end{tabular}
+%\end{center}
+%\caption{Parameters defining the coarse-space correction at the coarsest
+%level.\label{tab:p_coarse}}
+%\esideways
+%
+%\bsideways
+%\begin{center}
+%\begin{tabular}{|p{3.9cm}|l|p{2cm}|p{1.5cm}|p{7.5cm}|}
+%\hline
 \fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
 \fortinline|'COARSE_SWEEPS'| & \fortinline|integer|
@@ -476,10 +498,10 @@ level (continued).\label{tab:p_coarse_1}}
                             Additive Schwarz. \par
                             It is ignored by one-level preconditioners. \\ \hline
 \fortinline|'SUB_SOLVE'|  & \fortinline|character(len=*)|
-                         & \texttt{'JACOBI'} \par
-                           \texttt{'GS'} \par \texttt{'BGS'} \par \texttt{'ILU'} \par
-                           \texttt{'ILUT'} \par \texttt{'MILU'} \par
-                           \par \texttt{'MUMPS'} \par \texttt{'SLU'} \par \texttt{'UMF'}
+                         & \fortinline|'JACOBI'| \par
+                           \fortinline|'GS'| \par \texttt{'BGS'} \par \fortinline|'ILU'| \par
+                           \fortinline|'ILUT'| \par \fortinline|'MILU'| \par
+                           \par \fortinline|'MUMPS'| \par \fortinline|'SLU'| \par \fortinline|'UMF'|
                          & \texttt{GS} and \texttt{BGS} for pre- and post-smoothers
                             of multilevel preconditioners, respectively \par
                             \texttt{ILU} for block-Jacobi and Additive Schwarz

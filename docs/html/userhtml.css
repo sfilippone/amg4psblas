@@ -194,9 +194,9 @@ div.lstinputlisting{ font-family: monospace; white-space: nowrap; }
 #TBL-5{border-collapse:collapse;}
 #TBL-5 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-5{border-collapse:collapse;}
-td#TBL-5-10-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 td#TBL-5-11-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 td#TBL-5-12-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-5-13-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-6 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-6{border-collapse:collapse;}
 #TBL-6 colgroup{border-left: 1px solid black;border-right:1px solid black;}
@@ -250,17 +250,5 @@ td#TBL-7-7-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-9{border-collapse:collapse;}
 #TBL-9 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-9{border-collapse:collapse;}
-#TBL-10 colgroup{border-left: 1px solid black;border-right:1px solid black;}
-#TBL-10{border-collapse:collapse;}
-#TBL-10 colgroup{border-left: 1px solid black;border-right:1px solid black;}
-#TBL-10{border-collapse:collapse;}
-#TBL-10 colgroup{border-left: 1px solid black;border-right:1px solid black;}
-#TBL-10{border-collapse:collapse;}
-#TBL-10 colgroup{border-left: 1px solid black;border-right:1px solid black;}
-#TBL-10{border-collapse:collapse;}
-#TBL-10 colgroup{border-left: 1px solid black;border-right:1px solid black;}
-#TBL-10{border-collapse:collapse;}
-#TBL-10 colgroup{border-left: 1px solid black;border-right:1px solid black;}
-#TBL-10{border-collapse:collapse;}
 /* end css.sty */
 
