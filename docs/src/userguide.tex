@@ -16,6 +16,7 @@
 \usepackage{html}
 \usepackage{ifthen}
 \usepackage{graphicx}
+\usepackage{subfig}
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
 \usepackage{rotating}
@@ -24,6 +25,14 @@
 \usemintedstyle{friendly}
 \definecolor{bg}{rgb}{0.95,0.95,0.95}
 \usepackage{breakurl}
+\usepackage{mathpazo}
+\usepackage[english]{babel}
+\ifpdf
+\newmintinline[fortinline]{fortran}{}
+\else%
+\def\fortinline{\lstinline[basicstyle=\ttfamily,language=fortran]}
+\fi
+
 %\newboolean{mtc}
 %\setboolean{mtc}{true}
 
@@ -186,6 +195,7 @@ Preconditioners Package based on PSBLAS}
 \clearpage
 \appendix
 \include{license}
+\include{covenant}
 \clearpage
 \include{bibliography}
 

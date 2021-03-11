@@ -108,9 +108,15 @@ in the main directory to generate the necessary makefile.
 \textbf{DA RISCRIVERE}
 
 As a minimal example consider the following:
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{console}
+./configure --with-psblas=PSB-INSTALL-DIR
+\end{minted}
+\else
 \begin{verbatim}
 ./configure --with-psblas=PSB-INSTALL-DIR
 \end{verbatim}
+\fi
 which assumes that the various MPI compilers and support libraries are
 available in the standard directories on the system, and specifies
 only the PSBLAS install  directory (note that the latter directory must

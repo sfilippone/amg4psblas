@@ -28,12 +28,22 @@ class="cmr-12">Method init</span></h4>
 <div class="center" 
 >
 <!--l. 45--><p class="noindent" >
-<!--l. 46--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+<!--l. 46--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">call</span><span 
-class="cmtt-12">&#x00A0;p%init(icontx,ptype,info)</span></span></span></div>
+class="cmtt-12">&#x00A0;</span><span 
+class="cmtt-12">p</span><span 
+class="cmtt-12">%</span><span 
+class="cmtt-12">init</span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">contxt</span><span 
+class="cmtt-12">,</span><span 
+class="cmtt-12">ptype</span><span 
+class="cmtt-12">,</span><span 
+class="cmtt-12">info</span><span 
+class="cmtt-12">)</span></div>
 <!--l. 49--><p class="noindent" ><span 
-class="cmr-12">This method allocates and initializes the preconditioner </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">p</span></span></span><span 
+class="cmr-12">This method allocates and initializes the preconditioner </span><span class="lstinline"></span><span 
+class="cmtt-12">p</span><span 
 class="cmr-12">, according to the</span>
 <span 
 class="cmr-12">preconditioner type chosen by the user.</span>
@@ -45,23 +55,37 @@ cellspacing="0" cellpadding="0"
 id="TBL-2-1"><col 
 id="TBL-2-2"></colgroup><tr  
  style="vertical-align:baseline;" id="TBL-2-1-"><td  style="white-space:normal; text-align:left;" id="TBL-2-1-1"  
-class="td11"><!--l. 57--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">icontxt</span></span></span> </td> <td  style="white-space:normal; text-align:left;" id="TBL-2-1-2"  
-class="td11"><!--l. 57--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">integer,</span><span 
-class="cmtt-12">&#x00A0;intent(in)</span></span></span><span 
-class="cmr-12">.</span>                                                        </td>
+class="td11"><!--l. 57--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">contxt</span> </td> <td  style="white-space:normal; text-align:left;" id="TBL-2-1-2"  
+class="td11"><!--l. 57--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">type</span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">psb_ctxt_type</span><span 
+class="cmtt-12">),</span><span 
+class="cmtt-12">&#x00A0;</span><span 
+class="cmtt-12">intent</span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">in</span><span 
+class="cmtt-12">)</span><span 
+class="cmr-12">.</span>                                     </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-2-2-"><td  style="white-space:normal; text-align:left;" id="TBL-2-2-1"  
 class="td11"><!--l. 58--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-2-2"  
 class="td11"><!--l. 58--><p class="noindent" ><span 
 class="cmr-12">The communication context.</span>                                                  </td></tr><tr  
  style="vertical-align:baseline;" id="TBL-2-3-"><td  style="white-space:normal; text-align:left;" id="TBL-2-3-1"  
-class="td11"><!--l. 59--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">ptype</span></span></span> </td> <td  style="white-space:normal; text-align:left;" id="TBL-2-3-2"  
-class="td11"><!--l. 59--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">character(len=*),</span><span 
-class="cmtt-12">&#x00A0;intent(in)</span></span></span><span 
+class="td11"><!--l. 59--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">ptype</span>  </td> <td  style="white-space:normal; text-align:left;" id="TBL-2-3-2"  
+class="td11"><!--l. 59--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">character</span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">len</span><span 
+class="cmtt-12">=*),</span><span 
+class="cmtt-12">&#x00A0;</span><span 
+class="cmtt-12">intent</span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">in</span><span 
+class="cmtt-12">)</span> <span 
 class="cmr-12">.</span></td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-2-4-"><td  style="white-space:normal; text-align:left;" id="TBL-2-4-1"  
@@ -69,7 +93,7 @@ class="td11"><!--l. 60--><p class="noindent" >      </td><td  style="white-space
 class="td11"><!--l. 60--><p class="noindent" ><span 
 class="cmr-12">The type of preconditioner. Its values are specified in Table</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="userhtmlse4.html#x13-120151"><span 
+href="userhtmlse4.html#x13-12015r1"><span 
 class="cmr-12">1</span><!--tex4ht:ref: tab:precinit --></a><span 
 class="cmr-12">.</span>     </td>
 </tr><tr  
@@ -79,11 +103,16 @@ class="td11"><!--l. 62--><p class="noindent" ><span
 class="cmr-12">Note that the strings are case insensitive.</span>                                 </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-2-6-"><td  style="white-space:normal; text-align:left;" id="TBL-2-6-1"  
-class="td11"><!--l. 63--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">info</span></span></span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-2-6-2"  
-class="td11"><!--l. 63--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">integer,</span><span 
-class="cmtt-12">&#x00A0;intent(out)</span></span></span><span 
+class="td11"><!--l. 63--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">info</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-2-6-2"  
+class="td11"><!--l. 63--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">integer</span><span 
+class="cmtt-12">,</span><span 
+class="cmtt-12">&#x00A0;</span><span 
+class="cmtt-12">intent</span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">out</span><span 
+class="cmtt-12">)</span><span 
 class="cmr-12">.</span>                                                       </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-2-7-"><td  style="white-space:normal; text-align:left;" id="TBL-2-7-1"  

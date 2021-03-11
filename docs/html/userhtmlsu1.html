@@ -36,15 +36,15 @@ class="cmbx-12">BLAS</span> </dt><dd
 class="description"><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#Xblas3"><span 
-class="cmr-12">14</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli4.html#Xblas2"><span 
 class="cmr-12">15</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
+href="userhtmlli4.html#Xblas2"><span 
+class="cmr-12">16</span></a><span 
+class="cmr-12">,</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#Xblas1"><span 
-class="cmr-12">21</span></a><span 
+class="cmr-12">22</span></a><span 
 class="cmr-12">]</span></span> <span 
 class="cmr-12">Many vendors provide optimized versions of BLAS; if no</span>
      <span 
@@ -62,39 +62,50 @@ class="cmr-12">) are meant to define the standard behaviour of</span>
      <span 
 class="cmr-12">the BLAS interface, so they are not optimized for any particular platform,</span>
      <span 
-class="cmr-12">and should only be used as a last resort. Note that BLAS computations form</span>
+class="cmr-12">and should only be used as a last resort. Note that BLAS computations</span>
      <span 
-class="cmr-12">a relatively small part of the AMG4PSBLAS/PSBLAS; however they are</span>
+class="cmr-12">form a relatively small part of ¡¡¡¡¡¡¡ HEAD the AMG4PSBLAS/PSBLAS;</span>
      <span 
-class="cmr-12">critical when using preconditioners based on the MUMPS, UMFPACK or</span>
+class="cmr-12">however they are critical when using preconditioners based on the MUMPS,</span>
      <span 
-class="cmr-12">SuperLU third party libraries. UMFPACK requires a full LAPACK library;</span>
+class="cmr-12">UMFPACK  or  SuperLU  third  party  libraries.  UMFPACK  requires  a</span>
      <span 
-class="cmr-12">our experience is that configuring ATLAS for building full LAPACK does</span>
+class="cmr-12">full  LAPACK  library;  our  experience  is  that  configuring  ATLAS  for</span>
      <span 
-class="cmr-12">not always work in the expected way. Our advice is first to download the</span>
+class="cmr-12">building  full  LAPACK  does  not  always  work  in  the  expected  way.  Our</span>
      <span 
-class="cmr-12">LAPACK tarfile from </span><a 
+class="cmr-12">advice  is  first  to  download  the  LAPACK  tarfile  from  =======  the</span>
+     <span 
+class="cmr-12">AMG4PSBLAS/PSBLAS  computations;  they  are  however  critical  when</span>
+     <span 
+class="cmr-12">using  preconditioners  based  on  MUMPS,  UMFPACK  or  SuperLU  third</span>
+     <span 
+class="cmr-12">party  libraries.  Note  that  UMFPACK  requires  a  full  LAPACK  library;</span>
+     <span 
+class="cmr-12">our  experience  is  that  configuring  ATLAS  for  building  full  LAPACK</span>
+     <span 
+class="cmr-12">does  not  work  in  the  correct  way.  Our  advice  is  first  to  download  the</span>
+     <span 
+class="cmr-12">LAPACK tarfile from ¿¿¿¿¿¿¿ ea6411c730befe4e0e4091caa6f03379ad3712cc</span>
+     <a 
 href="http://www.netlib.org/lapack" ><span 
 class="cmr-12">www.netlib.org/lapack</span></a> <span 
-class="cmr-12">and install it independently of</span>
+class="cmr-12">and install it independently of ATLAS. In this case,</span>
      <span 
-class="cmr-12">ATLAS. In this case, you need to modify the OPTS and NOOPT definitions</span>
+class="cmr-12">you need to modify the OPTS and NOOPT definitions for including -fPIC</span>
      <span 
-class="cmr-12">for including -fPIC compilation option in the make.inc file of the LAPACK</span>
-     <span 
-class="cmr-12">library.</span>
+class="cmr-12">compilation option in the make.inc file of the LAPACK library.</span>
      </dd><dt class="description">
 <span 
 class="cmbx-12">MPI</span> </dt><dd 
 class="description"><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#XMPI2"><span 
-class="cmr-12">20</span></a><span 
+class="cmr-12">21</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#XMPI1"><span 
-class="cmr-12">26</span></a><span 
+class="cmr-12">27</span></a><span 
 class="cmr-12">]</span></span> <span 
 class="cmr-12">A version of MPI is available on most high-performance computing</span>
      <span 
@@ -105,11 +116,11 @@ class="cmbx-12">PSBLAS</span> </dt><dd
 class="description"><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#XPSBLASGUIDE"><span 
-class="cmr-12">16</span></a><span 
+class="cmr-12">17</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli4.html#Xpsblas_00"><span 
-class="cmr-12">18</span></a><span 
+class="cmr-12">19</span></a><span 
 class="cmr-12">]</span></span>   <span 
 class="cmr-12">Parallel   Sparse   BLAS   (PSBLAS)   is   available   from</span>
      <a 
@@ -118,7 +129,7 @@ class="cmr-12">psctoolkit.github.io/ products/psblas/</span></a><span
 class="cmr-12">; version 3.7.0 (or later) is required.</span>
      <span 
 class="cmr-12">Indeed, all the prerequisites listed so far are also prerequisites of PSBLAS.</span></dd></dl>
-<!--l. 58--><p class="noindent" ><span 
+<!--l. 68--><p class="noindent" ><span 
 class="cmr-12">Please note that the four previous libraries must have Fortran interfaces compatible with</span>
 <span 
 class="cmr-12">AMG4PSBLAS; usually this means that they should all be built with the same</span>
@@ -127,7 +138,7 @@ class="cmr-12">compiler being used for AMG4PSBLAS.</span>
                                                                                
 
                                                                                
-   <!--l. 62--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 72--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu2.html" ><span 
 class="cmr-12">next</span></a><span 
@@ -138,6 +149,6 @@ class="cmr-12">] [</span><a
 href="userhtmlse3.html#userhtmlsu1.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
-<!--l. 62--><p class="indent" >   <a 
+<!--l. 72--><p class="indent" >   <a 
  id="tailuserhtmlsu1.html"></a>  
 </body></html> 
