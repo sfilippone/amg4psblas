@@ -757,7 +757,7 @@ This method deallocates the preconditioner data structure \fortinline|p|.
 \subsection{Method descr\label{sec:precdescr}}
 
 \begin{center}
-\fortinline|call p%descr(info, [iout])|\\
+\fortinline|call p%descr(info, [iout, root, verbosity])|\\
 \end{center}
 
 \noindent
@@ -767,12 +767,20 @@ or \fortinline|build|, have been called.
 
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
-\begin{tabular}{p{1.2cm}p{12cm}}
+\begin{tabular}{p{2.2cm}p{11cm}}
 \fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
 \fortinline|iout|   & \fortinline|integer, intent(in), optional|.\\
               & The id of the file where the preconditioner description
                 will be printed; the default is the standard output.\\
+\fortinline|root|   & \fortinline|integer, intent(in), optional|.\\
+					& The id of the process where the preconditioner description
+					will be printed; the default is \fortinline|psb_root_|.\\
+\fortinline|verbosity|   & \fortinline|integer, intent(in), optional|.\\
+						 & The verbosity level of the description. Default value
+						 is 0. For values higher than 0, it prints out further
+						 information, e.g., for a distributed multilevel preconditioner
+						 the size of the coarse matrices on every process.\\
 \end{tabular}
 
 

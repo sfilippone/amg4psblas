@@ -24,8 +24,8 @@ the context of the multilevel preconditioners it is necessary to:
 \item  pass that variable as the argument to the \verb|set| routine as in the
 following:
 \begin{center}
-\verb|call p%set(smoother,info [,ilev,ilmax,pos])|\\
-\verb|call p%set(solver,info [,ilev,ilmax,pos])|
+\fortinline|call p%set(smoother,info [,ilev,ilmax,pos])|\\
+\fortinline|call p%set(solver,info [,ilev,ilmax,pos])|
 \end{center}
 \item link the code implementing the various methods into the application executable.
 \end{itemize}
@@ -55,10 +55,10 @@ need to be ovverridden (rewritten).
 The interfaces for the calls shown above are defined using
 \begin{center}
 \begin{tabular}{p{1.4cm}p{12cm}}
-\verb|smoother| & \verb|class(amg_x_base_smoother_type)| \\
+\fortinline|smoother| & \fortinline|class(amg_x_base_smoother_type)| \\
               & The user-defined new smoother to be employed in the
                 preconditioner.\\
-\verb|solver| & \verb|class(amg_x_base_solver_type)| \\
+\fortinline|solver| & \fortinline|class(amg_x_base_solver_type)| \\
               & The user-defined new solver to be employed in the
                 preconditioner.
 \end{tabular}
@@ -67,6 +67,25 @@ The other arguments are defined in the way described in
 Sec.~\ref{sec:precset}.  As an example, in  the \verb|tests/newslv|
 code we define a new object of type \verb|amg_d_tlu_solver_type|, and
 we pass it as follows:
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+! sparse matrix and preconditioner
+type(psb_dspmat_type) :: a
+type(amg_dprec_type)  :: prec
+type(amg_d_tlu_solver_type) :: tlusv
+
+......
+!
+!  prepare the preconditioner: an ML with defaults, but with TLU solver at
+!  intermediate levels. All other parameters are at default values.
+!
+call prec%init('ML',       info)
+call prec%hierarchy_build(a,desc_a,info)
+nlv = prec%get_nlevs()
+call prec%set(tlusv,   info,ilev=1,ilmax=max(1,nlv-1))
+call prec%smoothers_build(a,desc_a,info)
+\end{minted}
+\else
 \begin{verbatim}
 
   ! sparse matrix and preconditioner
@@ -86,3 +105,4 @@ we pass it as follows:
   call prec%smoothers_build(a,desc_a,info)
 
 \end{verbatim}
+\fi
