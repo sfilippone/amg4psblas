@@ -199,8 +199,10 @@ subroutine amg_z_hierarchy_bld(a,desc_a,prec,info)
   !    coarse size is hit, or the gain falls below the min_cr_ratio
   !    threshold.
   !
-  if ((mncszpp < 0).and.(mncsize<0)) mncszpp = 200 
-
+  if ((mncszpp < 0).and.(mncsize<0)) then 
+    mncszpp = 200
+    prec%ag_data%min_coarse_size_per_process = mncszpp
+  end if
   if (mncszpp > 0) then
     casize = mncszpp*np
     if (casize > huge(ione)) casize = huge(ione)
