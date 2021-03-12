@@ -134,7 +134,7 @@ program amg_d_pde3d
     real(psb_dpk_), allocatable :: athresv(:) ! smoothed aggregation threshold vector
     integer(psb_ipk_)  :: thrvsz      ! size of threshold vector
     real(psb_dpk_)     :: athres      ! smoothed aggregation threshold
-    integer(psb_ipk_)  :: csize       ! minimum size of coarsest matrix
+    integer(psb_ipk_)  :: csizepp     ! minimum size of coarsest matrix per process
 
     ! AMG smoother or pre-smoother; also 1-lev preconditioner
     character(len=16)  :: smther      ! (pre-)smoother type: BJAC, AS
@@ -278,8 +278,8 @@ program amg_d_pde3d
 
     call prec%set('ml_cycle',        p_choice%mlcycle,    info)
     call prec%set('outer_sweeps',    p_choice%outer_sweeps,info)
-    if (p_choice%csize>0)&
-         & call prec%set('min_coarse_size', p_choice%csize,      info)
+    if (p_choice%csizepp>0)&
+         & call prec%set('min_coarse_size_per_process', p_choice%csizepp,    info)
     if (p_choice%mncrratio>1)&
          & call prec%set('min_cr_ratio',   p_choice%mncrratio, info)
     if (p_choice%maxlevs>0)&
@@ -555,7 +555,7 @@ contains
       call read_data(prec%mlcycle,inp_unit)     ! AMG cycle type
       call read_data(prec%outer_sweeps,inp_unit) ! number of 1lev/outer sweeps
       call read_data(prec%maxlevs,inp_unit)    ! max number of levels in AMG prec
-      call read_data(prec%csize,inp_unit)       ! min size coarsest mat
+      call read_data(prec%csizepp,inp_unit)       ! min size coarsest mat
       ! aggregation
       call read_data(prec%aggr_prol,inp_unit)    ! aggregation type
       call read_data(prec%par_aggr_alg,inp_unit)    ! parallel aggregation alg
@@ -636,7 +636,7 @@ contains
     end if
     call psb_bcast(ctxt,prec%athres)
 
-    call psb_bcast(ctxt,prec%csize)
+    call psb_bcast(ctxt,prec%csizepp)
     call psb_bcast(ctxt,prec%cmat)
     call psb_bcast(ctxt,prec%csolve)
     call psb_bcast(ctxt,prec%csbsolve)

@@ -37,7 +37,7 @@ LLK                         ! AINV variant
 VCYCLE                      ! Type of multilevel CYCLE: VCYCLE WCYCLE KCYCLE MULT ADD
 4                           ! Number of outer sweeps for ML
 -3                          ! Max Number of levels in a multilevel preconditioner; if <0, lib default
--3                          ! Target coarse matrix size; if <0, lib default
+-3                          ! Target coarse matrix size per process; if <0, lib default
 SMOOTHED                    ! Type of aggregation: SMOOTHED UNSMOOTHED
 DEC                         ! Parallel aggregation: DEC, SYMDEC
 NATURAL                     ! Ordering of aggregation NATURAL DEGREE
