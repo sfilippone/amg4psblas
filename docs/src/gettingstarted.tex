@@ -2,34 +2,41 @@
 \markboth{\textsc{AMG4PSBLAS User's and Reference Guide}}
          {\textsc{\ref{sec:started} Getting Started}}
 
-We describe the basics for building and applying AMG4PSBLAS one-level and multilevel
-(i.e., AMG) preconditioners with the Krylov solvers included in PSBLAS \cite{PSBLASGUIDE}.
+This section  describes the basics for building and applying
+AMG4PSBLAS one-level and multilevel (i.e., AMG) preconditioners with
+the Krylov solvers included in PSBLAS \cite{PSBLASGUIDE}.
+
 The following steps are required:
 \begin{enumerate}
 \item \emph{Declare the preconditioner data structure}. It is a derived data type,
-  \verb|amg_|\-\emph{x}\verb|prec_| \verb|type|, where \emph{x} may be \verb|s|, \verb|d|, \verb|c|
-	or \verb|z|, according to the basic data type of the sparse matrix
-	(\verb|s| = real single precision; \verb|d| = real double precision;
-	\verb|c| = complex single precision; \verb|z| = complex double precision).
-	This data structure is accessed by the user only through the AMG4PSBLAS routines,
-	following an object-oriented approach.
-\item \emph{Allocate and initialize the preconditioner data structure, according to
-	a preconditioner type chosen by the user}. This is performed by the routine
-	\fortinline|init|, which also sets defaults for each preconditioner
-	type selected by the user. The preconditioner types and the defaults associated
-	with them are given in Table~\ref{tab:precinit}, where the strings used by
-	\fortinline|init| to identify the preconditioner types are also given.
-	Note that these strings are valid also if uppercase letters are substituted by
-	corresponding lowercase ones.
+  \verb|amg_|\-\emph{x}\verb|prec_| \verb|type|, where \emph{x} may be
+  \verb|s|, \verb|d|, \verb|c| or \verb|z|, according to the basic
+  data type of the sparse matrix (\verb|s| = real single precision;
+  \verb|d| = real double precision; 	\verb|c| = complex single
+  precision; \verb|z| = complex double precision). 	This data
+  structure is accessed by the user only through the AMG4PSBLAS
+  routines, 	following an object-oriented approach.
+\item \emph{Allocate and initialize the preconditioner data structure,
+    according to a preconditioner type chosen by the user}. This is
+  performed by the routine  	\fortinline|init|, which also sets
+  defaults for each preconditioner 	type selected by the user. The
+  preconditioner types and the defaults associated 	with them are
+  given in Table~\ref{tab:precinit}, where the strings used by
+  \fortinline|init| to identify the preconditioner types are also
+  given. 	Note that these strings are valid also if uppercase
+  letters are substituted by 	corresponding lowercase ones. 
 
-\item \emph{Modify the selected preconditioner type, by properly setting
-  preconditioner parameters.} This is performed by the routine \fortinline|set|.
-  This routine must be called only if the user wants to modify the default values
-  of the parameters associated with the selected preconditioner type, to obtain a variant
-  of that preconditioner. Examples of use of \fortinline|set| are given in
-  Section~\ref{sec:examples}; a complete list of all the
-  preconditioner parameters and their allowed and default values is provided in
-  Section~\ref{sec:userinterface}, Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}.
+\item \emph{Modify the selected preconditioner type, by properly
+    setting   preconditioner parameters.} This is performed by the
+  routine \fortinline|set|.   This routine must be called if the
+  user wants to modify the default values  of the parameters
+  associated with the selected preconditioner type, to obtain a
+  variant   of that preconditioner. Examples of use of
+  \fortinline|set| are given in   Section~\ref{sec:examples}; a
+  complete list of all the   preconditioner parameters and their
+  allowed and default values is provided in
+  Section~\ref{sec:userinterface},
+  Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}. 
 \item \emph{Build the preconditioner for a given matrix}. If the selected preconditioner
  is multilevel, then two steps must be performed, as specified next.
 \begin{enumerate}
@@ -116,11 +123,11 @@ assumed to be positive definite). As previously observed, the modules
 \fortinline|psb_base_mod|, \fortinline|amg_prec_mod| and \fortinline|psb_krylov_mod|
 must be used by the example program.
 
-The part of the code concerning the
-reading and assembling of the sparse matrix and the right-hand side vector, performed
+The part of the code dealing with reading and assembling  the sparse
+matrix and the right-hand side vector and the deallocation of the
+relevant data structured, performed 
 through the PSBLAS routines for sparse matrix and vector management, is not reported
-here for brevity; the statements concerning the deallocation of the PSBLAS
-data structure are neglected too.
+here for the sake of conciseness.
 The complete code can be found in the example program file \verb|amg_dexample_ml.f90|,
 in the directory \verb|examples/fileread| of the AMG4PSBLAS implementation (see
 Section~\ref{sec:ex_and_test}). A sample test problem along with the relevant

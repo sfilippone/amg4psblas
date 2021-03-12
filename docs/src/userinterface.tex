@@ -14,15 +14,14 @@ For backward compatibility,  methods are also accessible as
 stand-alone subroutines.
 
 For each method, the same user interface is overloaded with
-respect to the real/ complex case and the single/double precision;
-arguments with appropriate data types must be passed to the method,
-i.e.,
+respect to the real/complex  and single/double precision data;
+arguments with appropriate data types must be passed to the method, i.e.,
 \begin{itemize}
 \item the sparse matrix data structure, containing the matrix to be
-  preconditioned, must be of type \verb|psb_|\emph{x}\verb|spmat_type|
-	with \emph{x} = \verb|s| for real single precision, \emph{x} = \verb|d|
-	for real double precision, \emph{x} = \verb|c| for complex single precision,
-	\emph{x} = \verb|z| for complex double precision;
+  preconditioned, must be of type \verb|psb_|\emph{x}\verb|spmat_type| 
+  with \emph{x} = \verb|s| for real single precision, \emph{x} =
+  \verb|d| for real double precision, \emph{x} = \verb|c| for complex
+  single precision, \emph{x} = \verb|z| for complex double precision;
 \item the preconditioner data structure must be of type
   \verb|amg_|\emph{x}\verb|prec_type|, with \emph{x} =
   \verb|s|, \verb|d|, \verb|c|, \verb|z|, according to the sparse
@@ -59,7 +58,7 @@ This method allocates and initializes the preconditioner
 \fortinline|ptype|  & \fortinline|character(len=*), intent(in)|.\\
               & The type of preconditioner. Its values are specified
               in Table~\ref{tab:precinit}.\\
-              & Note that the strings are case insensitive.\\
+              & Note that strings are case insensitive.\\
 \fortinline|info|   & \fortinline|integer, intent(out)|.\\
               & Error code. If no error, 0 is returned. See Section~\ref{sec:errors} for details.\\
 
@@ -105,7 +104,7 @@ contained in \fortinline|val|.
                 The levels are numbered in increasing
                 order starting from the finest one, i.e., level 1 is the finest level.
                 If \fortinline|ilev| is not present, the parameter identified by \fortinline|what|
-                is set at all the appropriate levels (see
+                is set at all  levels that are appropriate (see
                 Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}).\\
 \fortinline|ilmax|   & \fortinline|integer, optional, intent(in)|.\\
               & For the multilevel preconditioner, when both
@@ -128,21 +127,20 @@ contained in \fortinline|val|.
 
 
 \noindent
-However, in this case the optional arguments \fortinline|ilev|,
-\fortinline|ilmax|, \fortinline|pos| and \fortinline|idx|
-cannot be used. \\
+%However, in this case the optional arguments \fortinline|ilev|,
+%\fortinline|ilmax|, \fortinline|pos| and \fortinline|idx|
+%cannot be used. \\
 
-A variety of preconditioners can be obtained
-by a suitable setting of the preconditioner parameters. These parameters
-can be logically divided into four groups, i.e., parameters defining
+A variety of preconditioners can be obtained by setting the
+appropriate preconditioner parameters. These parameters  can be
+logically divided into four groups, i.e., parameters defining 
 \begin{enumerate}
 	\item the type of multilevel cycle and how many cycles must be applied;
         \item the coarsening algorithm;
         \item the coarse-space correction at the coarsest level (for multilevel
                  preconditioners only);
 	\item the smoother of the multilevel preconditioners, or the one-level
-                  preconditioner.
-	
+                  preconditioner.	
 \end{enumerate}
 A list of the parameters that can be set, along with their allowed and
 default values, is given in Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}.\\
@@ -160,9 +158,9 @@ result of combining the block-Jacobi smoother object with a single sweep
 of the point-Jacobi solver object. However, for simplicity, shortcuts are
 provided to set point-Jacobi, hybrid (forward) Gauss-Seidel, and
 hybrid backward Gauss-Seidel, i.e., the previous smoothers can be defined
-by setting only \fortinline|'SMOOTHER_TYPE'| to appropriate values (see
-Tables~\ref{tab:p_smoother}), i.e., without setting
-\fortinline|'SUB_SOLVE'| too.
+just by setting \fortinline|'SMOOTHER_TYPE'| to certain specific
+values (see Tables~\ref{tab:p_smoother}), without the need to set
+\fortinline|'SUB_SOLVE'| as well.
 
 The smoother and solver objects are arranged in a
 hierarchical manner. When specifying a smoother object, its parameters,
@@ -177,8 +175,8 @@ Similar considerations apply to the point-Jacobi, Gauss-Seidel and block-Jacobi
 coarsest-level solvers, and shortcuts are available
 in this case too (see Table~\ref{tab:p_coarse}). \\
 
-\textbf{Remark 3.} In general, a coarsest-level solver cannot be used with
-both the replicated and distributed coarsest-matrix layout;
+\textbf{Remark 3.} Many of the coarsest-level solvers cannot be used
+with both the replicated and distributed coarsest-matrix layout; 
 therefore, setting the solver after the layout may change the layout.
 Similarly, setting the layout after the solver may change the solver.
 
@@ -857,9 +855,14 @@ Create a (deep) copy of the preconditioner object.
 \subsubsection{Method: sizeof}
 
 \begin{center}
-\fortinline|sz =  p%sizeof()|\\
+\fortinline|sz =  p%sizeof([global])|\\
 \end{center}
 
+\begin{tabular}{p{1.2cm}p{12cm}}
+\fortinline|global|  & \fortinline|logical, optional|.\\
+              & Whether the global or local preconditioner size is
+                desired. Default:  \fortinline|.false.|.\\
+\end{tabular}
 \noindent
 Return memory footprint in bytes.
 

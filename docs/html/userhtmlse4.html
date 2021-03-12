@@ -32,15 +32,18 @@ class="cmr-12">4   </span></span> <a
  id="x13-120004"></a><span 
 class="cmr-12">Getting Started</span></h3>
 <!--l. 5--><p class="noindent" ><span 
-class="cmr-12">We describe the basics for building and applying AMG4PSBLAS one-level and</span>
+class="cmr-12">This section describes the basics for building and applying AMG4PSBLAS one-level</span>
 <span 
-class="cmr-12">multilevel (i.e., AMG) preconditioners with the Krylov solvers included in PSBLAS</span>
-<span class="cite"><span 
+class="cmr-12">and multilevel (i.e., AMG) preconditioners with the Krylov solvers included in</span>
+<span 
+class="cmr-12">PSBLAS </span><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli4.html#XPSBLASGUIDE"><span 
 class="cmr-12">17</span></a><span 
 class="cmr-12">]</span></span><span 
-class="cmr-12">. The following steps are required:</span>
+class="cmr-12">.</span>
+<!--l. 9--><p class="indent" >   <span 
+class="cmr-12">The following steps are required:</span>
      <ol  class="enumerate1" >
      <li 
   class="enumerate" id="x13-12002x1"><span 
@@ -111,7 +114,7 @@ class="cmr-12">This is performed by the routine </span><span class="lstinline"><
 class="cmtt-12">set</span><span 
 class="cmr-12">. This routine must be</span>
      <span 
-class="cmr-12">called only if the user wants to modify the default values of the parameters</span>
+class="cmr-12">called  if  the  user  wants  to  modify  the  default  values  of  the  parameters</span>
      <span 
 class="cmr-12">associated with the selected preconditioner type, to obtain a variant of that</span>
      <span 
@@ -144,14 +147,14 @@ class="cmti-12">Build the preconditioner for a given matrix</span><span
 class="cmr-12">. If the selected preconditioner is</span>
      <span 
 class="cmr-12">multilevel, then two steps must be performed, as specified next.</span>
+                                                                               
+
+                                                                               
           <ol  class="enumerate2" >
           <li 
   class="enumerate" id="x13-12009x0"><span 
 class="cmti-12">Build the AMG hierarchy for a given matrix. </span><span 
 class="cmr-12">This is performed by the</span>
-                                                                               
-
-                                                                               
           <span 
 class="cmr-12">routine </span><span class="lstinline"></span><span 
 class="cmtt-12">hierarchy_build</span><span 
@@ -165,7 +168,7 @@ class="cmr-12">This is performed by the</span>
 class="cmr-12">routine </span><span class="lstinline"></span><span 
 class="cmtt-12">smoothers_build</span><span 
 class="cmr-12">.</span></li></ol>
-     <!--l. 41--><p class="noindent" ><span 
+     <!--l. 48--><p class="noindent" ><span 
 class="cmr-12">If the selected preconditioner is one-level, it is built in a single step, performed by</span>
      <span 
 class="cmr-12">the routine </span><span class="lstinline"></span><span 
@@ -199,7 +202,7 @@ class="cmr-12">.</span>
 class="cmr-12">This step is complementary to step 1 and should be performed when the</span>
      <span 
 class="cmr-12">preconditioner is no more used.</span></li></ol>
-<!--l. 52--><p class="indent" >   <span 
+<!--l. 59--><p class="indent" >   <span 
 class="cmr-12">All the previous routines are available as methods of the preconditioner object. A</span>
 <span 
 class="cmr-12">detailed description of them is given in Section</span><span 
@@ -217,7 +220,7 @@ class="cmr-12">.</span>
                                                                                
 
                                                                                
-<!--l. 56--><p class="indent" >   <a 
+<!--l. 63--><p class="indent" >   <a 
  id="x13-12015r1"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -225,7 +228,7 @@ class="cmr-12">.</span>
                                                                                
 <div class="center" 
 >
-<!--l. 57--><p class="noindent" >
+<!--l. 64--><p class="noindent" >
 <div class="tabular"> <table id="TBL-1" class="tabular" 
 cellspacing="0" cellpadding="0"  
 ><colgroup id="TBL-1-1g"><col 
@@ -240,7 +243,7 @@ class="small-caps">t</span><span
 class="small-caps">y</span><span 
 class="small-caps">p</span><span 
 class="small-caps">e</span>                        </span></td><td  style="white-space:normal; text-align:left;" id="TBL-1-1-2"  
-class="td11"><!--l. 61--><p class="noindent" ><span 
+class="td11"><!--l. 68--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">s</span><span 
 class="small-caps">t</span><span 
@@ -248,7 +251,7 @@ class="small-caps">r</span><span
 class="small-caps">i</span><span 
 class="small-caps">n</span><span 
 class="small-caps">g</span></span>     </td><td  style="white-space:normal; text-align:left;" id="TBL-1-1-3"  
-class="td11"><!--l. 61--><p class="noindent" ><span 
+class="td11"><!--l. 68--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">d</span><span 
 class="small-caps">e</span><span 
@@ -274,17 +277,17 @@ class="small-caps">r</span></span>               </td></tr><tr
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-2-1"  
 class="td11">No preconditioner </td><td  style="white-space:normal; text-align:left;" id="TBL-1-2-2"  
-class="td11"><!--l. 62--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 69--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">NONE</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-1-2-3"  
-class="td11"><!--l. 62--><p class="noindent" >Considered to use the PSBLAS Krylov
+class="td11"><!--l. 69--><p class="noindent" >Considered to use the PSBLAS Krylov
 solvers with no preconditioner.             </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-3-1"  
 class="td11">Diagonal                       </td><td  style="white-space:normal; text-align:left;" id="TBL-1-3-2"  
-class="td11"><!--l. 64--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 71--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">DIAG</span><span 
 class="cmtt-10x-x-109">&#8217;</span>,
@@ -298,7 +301,7 @@ class="cmtt-10x-x-109">L1</span><span
 class="cmtt-10x-x-109">-</span><span 
 class="cmtt-10x-x-109">JACOBI</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-1-3-3"  
-class="td11"><!--l. 64--><p class="noindent" >Diagonal  preconditioner.  For  any  zero
+class="td11"><!--l. 71--><p class="noindent" >Diagonal  preconditioner.  For  any  zero
 diagonal  entry  of  the  matrix  to  be
 preconditioned, the corresponding entry
 of the preconditioner is set to&#x00A0;1.          </td>
@@ -306,7 +309,7 @@ of the preconditioner is set to&#x00A0;1.          </td>
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-4-1"  
 class="td11">Gauss-Seidel                  </td><td  style="white-space:normal; text-align:left;" id="TBL-1-4-2"  
-class="td11"><!--l. 67--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 74--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">GS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>,
@@ -316,14 +319,14 @@ class="cmtt-10x-x-109">L1</span><span
 class="cmtt-10x-x-109">-</span><span 
 class="cmtt-10x-x-109">GS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-1-4-3"  
-class="td11"><!--l. 67--><p class="noindent" >Hybrid Gauss-Seidel (forward), that is,
+class="td11"><!--l. 74--><p class="noindent" >Hybrid Gauss-Seidel (forward), that is,
 global block Jacobi with Gauss-Seidel as
 local solver.                                      </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-5-1"  
 class="td11">Symmetrized Gauss-Seidel</td><td  style="white-space:normal; text-align:left;" id="TBL-1-5-2"  
-class="td11"><!--l. 70--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 77--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">FBGS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>,
@@ -333,14 +336,14 @@ class="cmtt-10x-x-109">L1</span><span
 class="cmtt-10x-x-109">-</span><span 
 class="cmtt-10x-x-109">FBGS</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-1-5-3"  
-class="td11"><!--l. 70--><p class="noindent" >Symmetrized  hybrid  Gauss-Seidel,  that
+class="td11"><!--l. 77--><p class="noindent" >Symmetrized  hybrid  Gauss-Seidel,  that
 is,  forward  Gauss-Seidel  followed  by
 backward Gauss-Seidel.                      </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-6-1"  
 class="td11">Block Jacobi                  </td><td  style="white-space:normal; text-align:left;" id="TBL-1-6-2"  
-class="td11"><!--l. 73--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 80--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">BJAC</span><span 
 class="cmtt-10x-x-109">&#8217;</span>,
@@ -350,27 +353,27 @@ class="cmtt-10x-x-109">L1</span><span
 class="cmtt-10x-x-109">-</span><span 
 class="cmtt-10x-x-109">BJAC</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-1-6-3"  
-class="td11"><!--l. 73--><p class="noindent" >Block-Jacobi  with  ILU(0)  on  the  local
+class="td11"><!--l. 80--><p class="noindent" >Block-Jacobi  with  ILU(0)  on  the  local
 blocks.                                            </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-7-1"  
 class="td11">Additive Schwarz            </td><td  style="white-space:normal; text-align:left;" id="TBL-1-7-2"  
-class="td11"><!--l. 74--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 81--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">AS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>      </td><td  style="white-space:normal; text-align:left;" id="TBL-1-7-3"  
-class="td11"><!--l. 74--><p class="noindent" >Additive Schwarz (AS), with overlap&#x00A0;1
+class="td11"><!--l. 81--><p class="noindent" >Additive Schwarz (AS), with overlap&#x00A0;1
 and ILU(0) on the local blocks.            </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-8-1"  
 class="td11">Multilevel                      </td><td  style="white-space:normal; text-align:left;" id="TBL-1-8-2"  
-class="td11"><!--l. 76--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 83--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">ML</span><span 
 class="cmtt-10x-x-109">&#8217;</span>      </td><td  style="white-space:normal; text-align:left;" id="TBL-1-8-3"  
-class="td11"><!--l. 76--><p class="noindent" >V-cycle        with        one        hybrid
+class="td11"><!--l. 83--><p class="noindent" >V-cycle        with        one        hybrid
 forward  Gauss-Seidel  (GS)  sweep  as
 pre-smoother and one hybrid backward
 GS  sweep  as  post-smoother,  decoupled
@@ -394,7 +397,7 @@ class="content">Preconditioner types, corresponding strings and default choices.
                                                                                
    </div><hr class="endfloat" />
    </div>
-<!--l. 91--><p class="indent" >   <span 
+<!--l. 98--><p class="indent" >   <span 
 class="cmr-12">Note that the module </span><span class="lstinline"></span><span 
 class="cmtt-12">amg_prec_mod</span><span 
 class="cmr-12">, containing the definition of the preconditioner</span>
@@ -416,7 +419,7 @@ class="cmr-12">4.1</span><!--tex4ht:ref: sec:examples --></a><span
 class="cmr-12">).</span>
 <br 
 class="newline" />
-<!--l. 98--><p class="indent" >   <span 
+<!--l. 105--><p class="indent" >   <span 
 class="cmbx-12">Remark 1. </span><span 
 class="cmr-12">Coarsest-level solvers based on the LU factorization, such as those</span>
 <span 
