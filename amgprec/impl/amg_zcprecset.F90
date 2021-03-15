@@ -158,6 +158,9 @@ subroutine amg_zcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
   case ('MIN_COARSE_SIZE')
     p%ag_data%min_coarse_size = max(val,-1)
     return
+  case ('MIN_COARSE_SIZE_PER_PROCESS')
+    p%ag_data%min_coarse_size_per_process = max(val,-1)
+    return
   case('MAX_LEVS')
     p%ag_data%max_levs = max(val,1)
     return

@@ -120,7 +120,9 @@ module amg_base_prec_type
     procedure, pass(pm) :: printout => d_ml_parms_printout
   end type amg_dml_parms
 
-  type amg_saggr_data
+  
+
+  type amg_iaggr_data
     !
     ! Aggregation data and defaults:
     !
@@ -129,28 +131,21 @@ module amg_base_prec_type
     !                             We are assuming that the coarse size fits in
     !                             integer range of psb_ipk_, but this is
     !                             not very restrictive
-    integer(psb_ipk_)                  :: min_coarse_size = izero
+    integer(psb_ipk_)                  :: min_coarse_size = -ione
+    integer(psb_ipk_)                  :: min_coarse_size_per_process = -ione
+    integer(psb_lpk_)                  :: target_coarse_size
     ! 2. maximum number of levels.   Defaults to  20 
     integer(psb_ipk_)                  :: max_levs    = 20_psb_ipk_
+  end type amg_iaggr_data
+  
+  type, extends(amg_iaggr_data) :: amg_saggr_data
     ! 3. min_cr_ratio   = 1.5     
     real(psb_spk_)                     :: min_cr_ratio   = 1.5_psb_spk_
     real(psb_spk_)                     :: op_complexity  = szero
     real(psb_spk_)                     :: avg_cr         = szero
   end type amg_saggr_data
 
-  type amg_daggr_data
-    !
-    ! Aggregation data and defaults:
-    !
-    !
-    ! 1. min_coarse_size = 0      Default target size will be computed  as
-    !                               40*(N_fine)**(1./3.)
-    !                             We are assuming that the coarse size fits in
-    !                             integer range of psb_ipk_, but this is
-    !                             not very restrictive
-    integer(psb_ipk_)                  :: min_coarse_size = izero
-    ! 2. maximum number of levels.   Defaults to  20 
-    integer(psb_ipk_)                  :: max_levs    = 20_psb_ipk_
+  type, extends(amg_iaggr_data) :: amg_daggr_data
     ! 3. min_cr_ratio   = 1.5     
     real(psb_dpk_)                     :: min_cr_ratio   = 1.5_psb_dpk_
     real(psb_dpk_)                     :: op_complexity  = dzero

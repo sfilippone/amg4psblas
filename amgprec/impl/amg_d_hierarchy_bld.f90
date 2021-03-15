@@ -72,9 +72,9 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
   Implicit None
 
   ! Arguments
-  type(psb_dspmat_type),intent(in), target           :: a
+  type(psb_dspmat_type),intent(in), target             :: a
   type(psb_desc_type), intent(inout), target           :: desc_a
-  class(amg_dprec_type),intent(inout),target          :: prec
+  class(amg_dprec_type),intent(inout),target           :: prec
   integer(psb_ipk_), intent(out)                       :: info
 
   ! Local Variables
@@ -82,7 +82,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
   integer(psb_ipk_)   :: me,np
   integer(psb_ipk_)   :: err,i,k, err_act, iszv, newsz,&
        & nplevs, mxplevs
-  integer(psb_lpk_) :: iaggsize, casize
+  integer(psb_lpk_) :: iaggsize, casize, mncsize, mncszpp
   real(psb_dpk_)     :: mnaggratio, sizeratio, athresh, aomega
   class(amg_d_base_smoother_type), allocatable :: coarse_sm, med_sm, &
        & med_sm2, coarse_sm2
@@ -132,15 +132,22 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
   newsz      = -1
   mxplevs    = prec%ag_data%max_levs
   mnaggratio = prec%ag_data%min_cr_ratio
-  casize     = prec%ag_data%min_coarse_size
+  mncsize    = prec%ag_data%min_coarse_size
+  mncszpp    = prec%ag_data%min_coarse_size_per_process
   iszv       = size(prec%precv)
   call psb_bcast(ctxt,iszv)
-  call psb_bcast(ctxt,casize)
+  call psb_bcast(ctxt,mncsize)
+  call psb_bcast(ctxt,mncszpp)
   call psb_bcast(ctxt,mxplevs)
   call psb_bcast(ctxt,mnaggratio)
-  if (casize /= prec%ag_data%min_coarse_size) then 
+  if (mncsize /= prec%ag_data%min_coarse_size) then 
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Inconsistent min_coarse_size')
+    goto 9999
+  end if
+  if (mncszpp /= prec%ag_data%min_coarse_size_per_process) then 
+    info=psb_err_internal_error_
+    call psb_errpush(info,name,a_err='Inconsistent min_coarse_size_per_process')
     goto 9999
   end if
   if (mxplevs /= prec%ag_data%max_levs) then 
@@ -175,7 +182,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
     !
     prec%precv(1)%base_a    => a
     prec%precv(1)%base_desc => desc_a
-  
+
     call psb_erractionrestore(err_act)
     return
   endif
@@ -192,26 +199,23 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
   !    coarse size is hit, or the gain falls below the min_cr_ratio
   !    threshold.
   !
-  
-  if (casize < 0) then
-    !
-    ! Default to the cubic root of the size at base level.
-    ! 
-    casize = desc_a%get_global_rows()
-    casize = int((done*casize)**(done/(done*3)),psb_lpk_)
-    casize = max(casize,lone)
-    casize = casize*40_psb_lpk_
-    call psb_bcast(ctxt,casize)
-    if (casize > huge(prec%ag_data%min_coarse_size)) then
-      !
-      ! computed coarse size does not fit in IPK_.
-      ! This is very unlikely, but make sure to put a positive number
-      !
-      prec%ag_data%min_coarse_size = huge(prec%ag_data%min_coarse_size)
-    else
-      prec%ag_data%min_coarse_size = casize
-    end if
+  if ((mncszpp < 0).and.(mncsize<0)) then 
+    mncszpp = 200
+    prec%ag_data%min_coarse_size_per_process = mncszpp
   end if
+  if (mncszpp > 0) then
+    casize = mncszpp*np
+    if (casize > huge(ione)) casize = huge(ione)
+  else
+    if (mncsize < np) then
+      if (me == 0) write(0,*) &
+           & 'Warning: resetting coarse size to NP (1 variable per process)'
+      mncsize = np
+    end if
+    casize = mncsize
+  end if
+  prec%ag_data%target_coarse_size = casize
+  
   nplevs = max(itwo,mxplevs)
 
   !
@@ -248,7 +252,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
       end do
       deallocate(tmp_aggr,stat=info)
     end if
-            
+
     ! Then coarse
     if (info == 0) tprecv(nplevs)%parms = coarseparms
     if (info == 0) call restore_smoothers(tprecv(nplevs),coarse_sm,coarse_sm2,info)
@@ -369,7 +373,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
       end if
     end if
     call psb_bcast(ctxt,newsz)
-    
+
     if (newsz > 0) then
       !
       ! This is awkward, we are saving the aggregation parms, for the sake
@@ -380,7 +384,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
       if (info == 0) prec%precv(newsz)%parms = coarseparms
       prec%precv(newsz)%parms%aggr_thresh    =  athresh
       prec%precv(newsz)%parms%aggr_omega_val =  aomega 
-      
+
       if (info == 0) call restore_smoothers(prec%precv(newsz),&
            & coarse_sm,coarse_sm2,info)
       if (newsz < i) then
@@ -476,7 +480,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
         lv%linmap%p_desc_V => rmp%desc_ac_pre_remap
         lv%base_a          => lv%ac
         lv%base_desc       => lv%desc_ac
-      end associate 
+      end associate
     end if
   end if
 
@@ -525,7 +529,7 @@ contains
       allocate(save2, mold=level%sm2a,stat=info) 
       if (info == 0) call level%sm2a%clone_settings(save2,info)
     end if
-    
+
     return
   end subroutine save_smoothers
 
@@ -544,9 +548,9 @@ contains
       if (info  == 0) allocate(level%sm,mold=save1,stat=info)
       if (info == 0) call save1%clone_settings(level%sm,info)
     end if
-    
+
     if (info /= 0) return
-    
+
     if (allocated(level%sm2a)) then
       if (info  == 0) call level%sm2a%free(info)
       if (info  == 0) deallocate(level%sm2a,stat=info)
@@ -560,6 +564,6 @@ contains
     end if
 
     return
-  end subroutine restore_smoothers    
-  
+  end subroutine restore_smoothers
+
 end subroutine amg_d_hierarchy_bld

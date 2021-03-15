@@ -127,7 +127,8 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
     endif
   endif
   prec%ctxt = ctxt
-  prec%ag_data%min_coarse_size = -1
+  prec%ag_data%min_coarse_size             = -1
+  prec%ag_data%min_coarse_size_per_process = -1
 
   select case(psb_toupper(trim(ptype)))
   case ('NOPREC','NONE') 
