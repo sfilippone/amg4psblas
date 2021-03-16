@@ -15,7 +15,7 @@ DMODOBJS=amg_d_prec_type.o \
 	amg_d_base_aggregator_mod.o \
 	amg_d_dec_aggregator_mod.o amg_d_symdec_aggregator_mod.o \
 	amg_d_ainv_solver.o amg_d_base_ainv_mod.o \
-	amg_d_invk_solver.o amg_d_invt_solver.o
+	amg_d_invk_solver.o amg_d_invt_solver.o amg_d_rkr_solver.o
 #amg_d_bcmatch_aggregator_mod.o
 
 SMODOBJS=amg_s_prec_type.o amg_s_ilu_fact_mod.o \
@@ -26,7 +26,7 @@ SMODOBJS=amg_s_prec_type.o amg_s_ilu_fact_mod.o \
 	amg_s_base_aggregator_mod.o  \
 	amg_s_dec_aggregator_mod.o amg_s_symdec_aggregator_mod.o \
 	amg_s_ainv_solver.o amg_s_base_ainv_mod.o \
-	amg_s_invk_solver.o amg_s_invt_solver.o
+	amg_s_invk_solver.o amg_s_invt_solver.o amg_s_rkr_solver.o
 
 ZMODOBJS=amg_z_prec_type.o amg_z_ilu_fact_mod.o \
 	amg_z_inner_mod.o amg_z_ilu_solver.o amg_z_diag_solver.o amg_z_jac_smoother.o amg_z_as_smoother.o \
@@ -36,7 +36,7 @@ ZMODOBJS=amg_z_prec_type.o amg_z_ilu_fact_mod.o \
 	amg_z_base_aggregator_mod.o  \
 	amg_z_dec_aggregator_mod.o amg_z_symdec_aggregator_mod.o \
 	amg_z_ainv_solver.o amg_z_base_ainv_mod.o \
-	amg_z_invk_solver.o amg_z_invt_solver.o
+	amg_z_invk_solver.o amg_z_invt_solver.o amg_z_rkr_solver.o
 
 CMODOBJS=amg_c_prec_type.o amg_c_ilu_fact_mod.o \
 	amg_c_inner_mod.o amg_c_ilu_solver.o amg_c_diag_solver.o amg_c_jac_smoother.o amg_c_as_smoother.o \
@@ -46,7 +46,7 @@ CMODOBJS=amg_c_prec_type.o amg_c_ilu_fact_mod.o \
 	amg_c_base_aggregator_mod.o  \
 	amg_c_dec_aggregator_mod.o amg_c_symdec_aggregator_mod.o \
 	amg_c_ainv_solver.o amg_c_base_ainv_mod.o \
-	amg_c_invk_solver.o amg_c_invt_solver.o
+	amg_c_invk_solver.o amg_c_invt_solver.o amg_c_rkr_solver.o
 
 
 
@@ -80,6 +80,15 @@ amg_base_prec_type.o: amg_const.h
 amg_s_prec_type.o amg_d_prec_type.o amg_c_prec_type.o amg_z_prec_type.o	: amg_base_prec_type.o
 amg_prec_type.o: amg_s_prec_type.o amg_d_prec_type.o amg_c_prec_type.o amg_z_prec_type.o
 amg_prec_mod.o: amg_prec_type.o amg_s_prec_mod.o amg_d_prec_mod.o amg_c_prec_mod.o amg_z_prec_mod.o
+amg_s_rkr_solver.o: amg_s_prec_type.o  amg_s_base_solver_mod.o 
+amg_d_rkr_solver.o: amg_d_prec_type.o  amg_d_base_solver_mod.o 
+amg_c_rkr_solver.o: amg_c_prec_type.o  amg_c_base_solver_mod.o 
+amg_z_rkr_solver.o: amg_z_prec_type.o  amg_z_base_solver_mod.o 	
+
+amg_s_prec_mod.o: amg_s_rkr_solver.o
+amg_d_prec_mod.o: amg_d_rkr_solver.o 
+amg_c_prec_mod.o: amg_c_rkr_solver.o 
+amg_z_prec_mod.o: amg_z_rkr_solver.o 
 
 $(SINNEROBJS) $(SOUTEROBJS): $(SMODOBJS)
 $(DINNEROBJS) $(DOUTEROBJS): $(DMODOBJS)
