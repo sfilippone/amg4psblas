@@ -305,6 +305,7 @@ subroutine amg_zcprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
 #if defined(HAVE_MUMPS_)
   use amg_z_mumps_solver
 #endif
+  use amg_z_rkr_solver, only : amg_z_rkr_solver_type
 
 
   implicit none
@@ -549,6 +550,14 @@ subroutine amg_zcprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
             call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_l1_bjac_,info,pos=pos)
             call p%precv(nlev_)%set('SUB_SOLVE',amg_gs_,info,pos=pos)
             call p%precv(nlev_)%set('COARSE_MAT',amg_distr_mat_,info,pos=pos)
+          case('RKR')
+            block
+              type(amg_z_rkr_solver_type)          :: rkr_slv
+              call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
+              call p%precv(nlev_)%set(rkr_slv,info)
+              call p%precv(nlev_)%default()
+              call p%precv(nlev_)%set('COARSE_MAT',amg_distr_mat_,info,pos=pos)
+            end block
           end select
 
       end if
@@ -705,6 +714,14 @@ subroutine amg_zcprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
           call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_l1_bjac_,info,pos=pos)
           call p%precv(nlev_)%set('SUB_SOLVE',amg_gs_,info,pos=pos)
           call p%precv(nlev_)%set('COARSE_MAT',amg_distr_mat_,info,pos=pos)
+          case('RKR')
+            block
+              type(amg_z_rkr_solver_type)          :: rkr_slv
+              call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
+              call p%precv(nlev_)%set(rkr_slv,info)
+              call p%precv(nlev_)%default()
+              call p%precv(nlev_)%set('COARSE_MAT',amg_distr_mat_,info,pos=pos)
+            end block
         end select
     endif
 

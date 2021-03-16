@@ -55,6 +55,7 @@ module amg_z_prec_mod
   use amg_z_ainv_solver
   use amg_z_invk_solver
   use amg_z_invt_solver
+  use amg_z_rkr_solver
 
   interface amg_extprol_bld
     subroutine amg_z_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
