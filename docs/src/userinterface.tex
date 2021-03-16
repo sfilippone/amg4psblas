@@ -860,7 +860,8 @@ Create a (deep) copy of the preconditioner object.
 
 \begin{tabular}{p{1.2cm}p{12cm}}
 \fortinline|global|  & \fortinline|logical, optional|.\\
-              & Whether the global or local preconditioner size is
+              & Whether the global or local preconditioner memory
+                occupatio  is
                 desired. Default:  \fortinline|.false.|.\\
 \end{tabular}
 \noindent
@@ -871,7 +872,7 @@ Return memory footprint in bytes.
 \begin{center}
 \fortinline|call p%allocate_wrk(info[, vmold])|\\
 \end{center}
-
+n
 \noindent
 Allocate internal work vectors. Each application of the preconditioner
 uses a number of  work vectors which are allocated internally as
