@@ -97,8 +97,8 @@
 \makeatother
 \newcommand{\example}{\stepcounter{example}%
 \section*{\examplename~\theexample}}
-\def\bsideways{\sidewaystable}
-\def\esideways{\endsidewaystable}
+\def\bsideways{\begin{sidewaystable}}
+\def\esideways{\end{sidewaystable}}
 
 \newcommand{\precdata}{\hyperlink{precdata}{{\tt mld\_prec\_type}}}
 \newcommand{\descdata}{\hyperlink{descdata}{{\tt psb\_desc\_type}}}
