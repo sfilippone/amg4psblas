@@ -249,8 +249,7 @@ be applied.
                             if  the global number of variables of the
                             computed coarsest matrix
                             is lower than or equal to this threshold
-                           multiplied by the number of processes.
-
+                           multiplied by the number of processes (see Note).
                            \\ \hline
 \fortinline|'MIN_COARSE_SIZE'| & \fortinline|integer|
                          & Any number \par $> 0$
@@ -311,12 +310,12 @@ aggregation is based on a parallel version of the half-approximate
 matching implemented in the MatchBox-P software package~\cite{MatchBoxP}.\\ \hline
 
 \fortinline|'AGGR_SIZE'|  & \fortinline|integer| \hspace*{-3mm}
-& Any integer \par number power of $2$ and $> 2$
+& Any integer \par power of $2$, with $\texttt{aggr\_size} \ge 2$
 & 4
 & Maximum size of aggregates when the coupled aggregation based on 
 matching is applied. For aggressive coarsening with size of
 aggregate larger than $8$ we recommend the use of smoothed prolongators.
-{\bf MODIFICARE CODICE}\\ \hline
+ Used only with  \texttt{'COUPLED'} and  \texttt{'MATCHBOXP'}\\ \hline
 
 \fortinline|'AGGR_PROL'|  & \fortinline|character(len=*)| \hspace*{-3mm}
 & \fortinline|'SMOOTHED'|, \fortinline|'UNSMOOTHED'| & \fortinline|'SMOOTHED'|
