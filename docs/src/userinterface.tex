@@ -354,17 +354,19 @@ aggregate larger than $8$ we recommend the use of smoothed prolongators.
                             %Since aggregation is
                             %heuristic, results will be different.
 
-\fortinline|'AGGR_THRESH'| & \fortinline|real(|\emph{kind\_parameter}\fortinline|)|
+\fortinline|'AGGR_THRESH'| & \fortinline|real(kind_parameter)|
                          & Any~real \par number~$\in [0, 1]$
                          & 0.01
-                         & The threshold $\theta$ in the decoupled aggregation algorithm,
-                            see (\ref{eq:strongly_coup}) in Section~\ref{sec:aggregation}.
+                         & The threshold $\theta$ in the strength of
+                           connection algorithm.
                             See also the note at the bottom of this table. \\ \hline
 \fortinline|'AGGR_FILTER'|
                          & \fortinline|character(len=*)|
                          & \texttt{'FILTER'} \par \texttt{'NOFILTER'}
-                        & \texttt{'NOFILTER'} & Matrix used in computing the smoothed
-                           prolongator: filtered or unfiltered (see~(\ref{eq:filtered}) in Section~\ref{sec:aggregation}). \\
+                         & \texttt{'NOFILTER'} &
+                           Matrix used in computing the smoothed
+                          prolongator: filtered or unfiltered. % (see~(\ref{eq:filtered}) in Section~\ref{sec:aggregation})
+                             \\
 \hline
 \multicolumn{5}{|l|}{{\bfseries Note.} Different thresholds at different levels, such as
 those used in \cite[Section~5.1]{VANEK_MANDEL_BREZINA}, can be easily set  by
@@ -468,7 +470,7 @@ the parameter \texttt{ilev}.} \\
                          & 0
                          & Fill-in level $p$ of the ILU factorizations. \\ \hline
 \fortinline|'COARSE_ILUTHRS'|
-                         & \fortinline|real(|\emph{kind\_parameter}\fortinline|)|
+                         & \fortinline|real(kind_parameter)|
                          & Any real \par number $\ge 0$
                          & 0
                          & Drop tolerance $t$ in the ILU($p,t$) factorization. \\
@@ -559,22 +561,22 @@ level (continued).\label{tab:p_coarse_1}}
                          & Any integer \par number~$\ge 0$
                          & 0
                          & Fill-in level $p$ of the incomplete LU factorizations. \\ \hline
-\fortinline|'SUB_ILUTHRS'|  & \fortinline|real(|\emph{kind\_parameter}\fortinline|)|
+\fortinline|'SUB_ILUTHRS'|  & \fortinline|real(kind_parameter)|
                          & Any real number~$\ge 0$
                          & 0
-                         & Drop tolerance $t$ in the ILU($p,t$) factorization. \\ %\hline
+                         & Drop tolerance $t$ in the ILU($p,t$) factorization. \\ \hline
 \fortinline|'MUMPS_LOC_GLOB'|  & \fortinline|character(len=*)|
                          & \fortinline|'LOCAL_SOLVER'| \par \fortinline|'GLOBAL_SOLVER'|
                          & \fortinline|'GLOBAL_SOLVER'|
                          & Whether MUMPS should be used as a
                            distributed solver, or as a serial solver
                            acting only on the part of the matrix local
-                           to each process. \\ %\hline
+                           to each process. \\ \hline
 \fortinline|'MUMPS_IPAR_ENTRY'|  & \fortinline|integer|
                          & Any integer  number
                          & 0
                          & Set an entry in the MUMPS integer control array, as
-                           chosen via the \fortinline|idx| optional argument. \\ %\hline
+                           chosen via the \fortinline|idx| optional argument. \\ \hline
 \fortinline|'MUMPS_RPAR_ENTRY'|  & \fortinline|real|
                          & Any real number
                          & 0
@@ -728,11 +730,11 @@ and hence it is completely transparent to the user.
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
 \begin{tabular}{p{1.2cm}p{12cm}}
-\fortinline|x|      & \emph{type}\fortinline|(|\emph{kind\_parameter}\fortinline|), dimension(:), intent(in)|.\\
+\fortinline|x|      & \emph{type}\fortinline|(kind_parameter)|, dimension(:), intent(in)|.\\
               & The local part of the vector $x$. Note that \emph{type} and
                 \emph{kind\_parameter} must be chosen according
                 to the \fortinline|real|/\fortinline|complex|, single/double precision version of AMG4PSBLAS under use.\\
-\fortinline|y|      & \emph{type}\fortinline|(|\emph{kind\_parameter}\fortinline|), dimension(:), intent(out)|.\\
+\fortinline|y|      & \emph{type}\fortinline|(kind_parameter)|, dimension(:), intent(out)|.\\
               & The local part of the vector $y$. Note that \emph{type} and
                 \emph{kind\_parameter} must be chosen according
                 to the \fortinline|real|/\fortinline|complex|, single/double precision version of AMG4PSBLAS under use.\\
@@ -746,7 +748,7 @@ and hence it is completely transparent to the user.
                 if \fortinline|trans| = \fortinline|'T','t'| then $op(B^{-1}) = B^{-T}$
                 (transpose of $B^{-1})$;  if \fortinline|trans| = \fortinline|'C','c'| then $op(B^{-1}) = B^{-C}$
                 (conjugate transpose of $B^{-1})$.\\
-\fortinline|work|  & \emph{type}\fortinline|(|\emph{kind\_parameter}\fortinline|), dimension(:), optional, target|.\\
+\fortinline|work|  & \emph{type}\fortinline|(kind_parameter)|, dimension(:), optional, target|.\\
              & Workspace. Its size should be at
                least \fortinline|4 * psb_cd_get_local_| \fortinline|cols(desc_a)| (see the PSBLAS User's Guide).
                Note that \emph{type} and \emph{kind\_parameter} must be chosen according
