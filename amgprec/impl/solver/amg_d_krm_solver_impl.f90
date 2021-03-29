@@ -69,32 +69,32 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-! File: amg_s_rkr_solver_impl.f90
+! File: amg_d_krm_solver_impl.f90
 !
-!  This is the implementation file corresponding to amg_s_rkr_solver_mod.
+!  This is the implementation file corresponding to amg_d_krm_solver_mod.
 !
 !
-subroutine amg_s_rkr_solver_bld(a,desc_a,sv,info,b,amold,vmold)
+subroutine amg_d_krm_solver_bld(a,desc_a,sv,info,b,amold,vmold)
 
   use psb_base_mod
-  use amg_s_rkr_solver, amg_protect_name => amg_s_rkr_solver_bld
+  use amg_d_krm_solver, amg_protect_name => amg_d_krm_solver_bld
 
   Implicit None
 
   ! Arguments
-  type(psb_sspmat_type), intent(inout), target        :: a
+  type(psb_dspmat_type), intent(inout), target        :: a
   Type(psb_desc_type), Intent(inout)                  :: desc_a
-  class(amg_s_rkr_solver_type), intent(inout)         :: sv
+  class(amg_d_krm_solver_type), intent(inout)         :: sv
   integer(psb_ipk_), intent(out)                      :: info
-  type(psb_sspmat_type), intent(in), target, optional :: b
-  class(psb_s_base_sparse_mat), intent(in), optional  :: amold
-  class(psb_s_base_vect_type), intent(in), optional   :: vmold
+  type(psb_dspmat_type), intent(in), target, optional :: b
+  class(psb_d_base_sparse_mat), intent(in), optional  :: amold
+  class(psb_d_base_vect_type), intent(in), optional   :: vmold
   ! Local variables
   integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota
   integer(psb_lpk_) :: lnr
   integer(psb_ipk_) :: np,me,i, err_act, debug_unit, debug_level
   type(psb_ctxt_type) :: ctxt, l_ctxt
-  character(len=20)   :: name='s_rkr_solver_bld', ch_err
+  character(len=20)   :: name='@Z@_krm_solver_bld', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -159,32 +159,32 @@ subroutine amg_s_rkr_solver_bld(a,desc_a,sv,info,b,amold,vmold)
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine amg_s_rkr_solver_bld
+end subroutine amg_d_krm_solver_bld
 
-subroutine amg_s_rkr_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
+subroutine amg_d_krm_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
      & trans,work,wv,info,init,initu)
 
   use psb_base_mod
   use psb_krylov_mod
-  use amg_s_rkr_solver, amg_protect_name => amg_s_rkr_solver_apply_vect
+  use amg_d_krm_solver, amg_protect_name => amg_d_krm_solver_apply_vect
 
   Implicit None
   type(psb_desc_type), intent(in)             :: desc_data
-  class(amg_s_rkr_solver_type), intent(inout) :: sv
-  type(psb_s_vect_type),intent(inout)         :: x
-  type(psb_s_vect_type),intent(inout)         :: y
-  real(psb_spk_),intent(in)                    :: alpha,beta
+  class(amg_d_krm_solver_type), intent(inout) :: sv
+  type(psb_d_vect_type),intent(inout)         :: x
+  type(psb_d_vect_type),intent(inout)         :: y
+  real(psb_dpk_),intent(in)                    :: alpha,beta
   character(len=1),intent(in)                   :: trans
-  real(psb_spk_),target, intent(inout)         :: work(:)
-  type(psb_s_vect_type),intent(inout)         :: wv(:)
+  real(psb_dpk_),target, intent(inout)         :: work(:)
+  type(psb_d_vect_type),intent(inout)         :: wv(:)
   integer(psb_ipk_), intent(out)                :: info
   character, intent(in), optional                :: init
-  type(psb_s_vect_type),intent(inout), optional   :: initu
+  type(psb_d_vect_type),intent(inout), optional   :: initu
 
-  type(psb_s_vect_type)   :: z
+  type(psb_d_vect_type)   :: z
   integer(psb_ipk_) :: np,me,i, err_act, debug_unit, debug_level
   type(psb_ctxt_type) :: ctxt
-  character(len=20) :: name='s_rkr_solver_apply_v', ch_err
+  character(len=20) :: name='@Z@_krm_solver_apply_v', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -211,7 +211,7 @@ subroutine amg_s_rkr_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
 !!$  call sv%prec%apply(x,z,desc_data,info,trans=trans,work=work)
     call psb_geaxpby(alpha,z,beta,y,desc_data,info)
   else
-    call psb_geaxpby(sone,x,szero,sv%x_local,sv%desc_local,info)
+    call psb_geaxpby(done,x,dzero,sv%x_local,sv%desc_local,info)
     call psb_krylov(sv%method,sv%a_local,sv%prec,sv%x_local,sv%z_local,sv%eps,&
          & sv%desc_local,info,itmax=sv%itmax,itrace=sv%itrace,&
          & istop=sv%istopc,irst=sv%irst)
@@ -224,28 +224,28 @@ subroutine amg_s_rkr_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine amg_s_rkr_solver_apply_vect
+end subroutine amg_d_krm_solver_apply_vect
 
 
-subroutine amg_s_rkr_solver_apply(alpha,sv,x,beta,y,desc_data,&
+subroutine amg_d_krm_solver_apply(alpha,sv,x,beta,y,desc_data,&
      & trans,work,info,init,initu)
   use psb_base_mod
-  use amg_s_rkr_solver, amg_protect_name => amg_s_rkr_solver_apply
+  use amg_d_krm_solver, amg_protect_name => amg_d_krm_solver_apply
   implicit none
   type(psb_desc_type), intent(in)      :: desc_data
-  class(amg_s_rkr_solver_type), intent(inout) :: sv
-  real(psb_spk_),intent(inout)         :: x(:)
-  real(psb_spk_),intent(inout)         :: y(:)
-  real(psb_spk_),intent(in)            :: alpha,beta
+  class(amg_d_krm_solver_type), intent(inout) :: sv
+  real(psb_dpk_),intent(inout)         :: x(:)
+  real(psb_dpk_),intent(inout)         :: y(:)
+  real(psb_dpk_),intent(in)            :: alpha,beta
   character(len=1),intent(in)           :: trans
-  real(psb_spk_),target, intent(inout) :: work(:)
+  real(psb_dpk_),target, intent(inout) :: work(:)
   integer(psb_ipk_), intent(out)        :: info
   character, intent(in), optional       :: init
-  real(psb_spk_),intent(inout), optional :: initu(:)
-  real(psb_spk_), allocatable    :: z(:)
+  real(psb_dpk_),intent(inout), optional :: initu(:)
+  real(psb_dpk_), allocatable    :: z(:)
   integer(psb_ipk_) :: np,me,i, err_act, debug_unit, debug_level
   type(psb_ctxt_type) :: ctxt
-  character(len=20) :: name='s_rkr_solver_apply', ch_err
+  character(len=20) :: name='@Z@_krm_solver_apply', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -268,4 +268,4 @@ subroutine amg_s_rkr_solver_apply(alpha,sv,x,beta,y,desc_data,&
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine amg_s_rkr_solver_apply
+end subroutine amg_d_krm_solver_apply

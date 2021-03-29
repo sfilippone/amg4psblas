@@ -53,6 +53,7 @@ amg_c_ilu_solver_dmp.o \
 amg_c_mumps_solver_apply.o \
 amg_c_mumps_solver_apply_vect.o \
 amg_c_mumps_solver_bld.o \
+amg_c_krm_solver_impl.o \
 amg_d_base_solver_apply.o \
 amg_d_base_solver_apply_vect.o \
 amg_d_base_solver_bld.o \
@@ -99,6 +100,7 @@ amg_d_ilu_solver_dmp.o \
 amg_d_mumps_solver_apply.o \
 amg_d_mumps_solver_apply_vect.o \
 amg_d_mumps_solver_bld.o \
+amg_d_krm_solver_impl.o \
 amg_s_base_solver_apply.o \
 amg_s_base_solver_apply_vect.o \
 amg_s_base_solver_bld.o \
@@ -145,6 +147,7 @@ amg_s_ilu_solver_dmp.o \
 amg_s_mumps_solver_apply.o \
 amg_s_mumps_solver_apply_vect.o \
 amg_s_mumps_solver_bld.o \
+amg_s_krm_solver_impl.o \
 amg_z_base_solver_apply.o \
 amg_z_base_solver_apply_vect.o \
 amg_z_base_solver_bld.o \
@@ -286,7 +289,8 @@ amg_z_invk_solver_bld.o \
 amg_z_invk_solver_check.o \
 amg_z_invk_solver_clone.o \
 amg_z_invk_solver_cseti.o \
-amg_z_invk_solver_descr.o 
+amg_z_invk_solver_descr.o \
+amg_z_krm_solver_impl.o 
 
 LIBNAME=libamg_prec.a
 
