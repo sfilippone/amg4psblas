@@ -224,7 +224,7 @@ See also Sec.~\ref{sec:adding}.
                          & \fortinline|'VCYCLE'| \par \fortinline|'WCYCLE'|   \par \fortinline|'KCYCLE'| \par \fortinline|'ADD'|
                          & \fortinline|'VCYCLE'|
                          &Multilevel cycle: V-cycle, W-cycle, K-cycle, and additive composition. \\ \hline
- \fortinline|'OUTER_SWEEPS'| & \fortinline|integer| &
+ \fortinline|'CYCLE_SWEEPS'| & \fortinline|integer| &
                            Any integer \par number $\ge 1$  & 1 &
                            Number of multilevel cycles. \\ \hline
 
@@ -325,7 +325,7 @@ aggregate larger than $8$ we recommend the use of smoothed prolongators.
 \multicolumn{5}{|l|}{{\bfseries Note.} The aggregation algorithm stops when
 	at least one of the following criteria is met:
 	the coarse size threshold, } \\
-\multicolumn{5}{|l|}{the coarse size threshold per process, the minimum coarsening ratio, or the maximum number
+\multicolumn{5}{|l|}{the minimum coarsening ratio, or the maximum number
 	of levels is reached.} \\
 \multicolumn{5}{|l|}{Therefore, the actual number of levels may be smaller than the specified maximum number
 	of levels. } \\
@@ -394,19 +394,21 @@ the parameter \texttt{ilev}.} \\
 \fortinline|'COARSE_SOLVE'| & \fortinline|character(len=*)|
                           & \fortinline|'MUMPS'| \par \fortinline|'UMF'| \par
                            \fortinline|'SLU'| \par \fortinline|'SLUDIST'| \par
-			   \fortinline|'JACOBI'| \par \fortinline|'GS'| \par \fortinline|'BJAC'| \par \fortinline|'RKR'| 
+			   \fortinline|'JACOBI'| \par \fortinline|'GS'| \par \fortinline|'BJAC'| \par \fortinline|'KRM'| 
                          & See~Note.
                          & Solver used at the coarsest level: sequential
                            LU from MUMPS, UMFPACK, or SuperLU
                            (plus tri\-an\-gular solve);
                            distributed LU from MUMPS or SuperLU\_Dist
                            (plus triangular solve);
-                           point-Jacobi, hybrid Gauss-Seidel or block-Jacobi and related $\ell_1$-versions;
-			   {\bf preconditioned Conjugate Gradient coupled with the block-Jacobi preconditioner
-			   with ILU(0) on the blocks}. 
+                           point-Jacobi, hybrid Gauss-Seidel or
+                           block-Jacobi and related $\ell_1$-versions; 
+			   Krylov Method (Flexible  Conjugate Gradient) coupled with
+                           the block-Jacobi preconditioner 
+			   with ILU(0) on the blocks. 
                            Note that \texttt{UMF} and \texttt{SLU} require the coarsest
                            matrix to be replicated, \texttt{SLUDIST},  \texttt{JACOBI},
-			   \texttt{GS}, \texttt{BJAC} and \texttt{PCG} require it to be
+			   \texttt{GS}, \texttt{BJAC} and \texttt{KRM} require it to be
                            distributed, \texttt{MUMPS} can be used with either
                            a replicated or a distributed matrix. When any of the previous
                            solvers is specified, the matrix layout is set to a default
@@ -433,9 +435,11 @@ the parameter \texttt{ilev}.} \\
                            in case the block Jacobi solver
                            is chosen as coarsest-level solver: ILU($p$), ILU($p,t$),
                            MILU($p$), LU from MUMPS, SuperLU or UMFPACK
-			  (plus triangular solve). Suitable for GPUs (no triangular solve)
-			  			   approximate inverse solvers INVK($p,q$), INVT($p_1,p2,t_1,t_2$) and
-			  			   AINV($t$), see~\cite{BERTACCINIFILIPPONE}.
+			  (plus triangular solve), Approximate
+                           Inverses  INVK($p,q$), INVT($p_1,p2,t_1,t_2$) and
+                           AINV($t$); note  that approximate inverses
+                           are specifically suited for GPUs since they
+                           do not employ triangular system solve kernels, see~\cite{BERTACCINIFILIPPONE}.
                           Note that UMFPACK and SuperLU\_Dist
                           are available only in double precision. \\
 \hline
@@ -468,12 +472,14 @@ the parameter \texttt{ilev}.} \\
 \fortinline|'COARSE_FILLIN'| & \fortinline|integer|
                          & Any integer \par number $\ge 0$
                          & 0
-                         & Fill-in level $p$ of the ILU factorizations. \\ \hline
+                         & Fill-in level $p$ of the ILU factorizations
+                           and first fill-in for the approximate inverses. \\ \hline
 \fortinline|'COARSE_ILUTHRS'|
                          & \fortinline|real(kind_parameter)|
                          & Any real \par number $\ge 0$
                          & 0
-                         & Drop tolerance $t$ in the ILU($p,t$) factorization. \\
+                         & Drop tolerance $t$ in the ILU($p,t$)
+                           factorization and first drop-tolerance for the approximate inverses. \\
 \hline
 \end{tabular}
 \end{center}
@@ -502,7 +508,9 @@ level (continued).\label{tab:p_coarse_1}}
                          & \fortinline|'JACOBI'| \par
                            \fortinline|'GS'| \par \texttt{'BGS'} \par \fortinline|'ILU'| \par
                            \fortinline|'ILUT'| \par \fortinline|'MILU'| \par
-                           \par \fortinline|'MUMPS'| \par \fortinline|'SLU'| \par \fortinline|'UMF'|
+                           \par \fortinline|'MUMPS'| \par
+                           \fortinline|'SLU'| \par \fortinline|'UMF'|
+                            \par \fortinline|'INVT'| \par \fortinline|'INVK'| \par \fortinline|'AINV'|
                          & \texttt{GS} and \texttt{BGS} for pre- and post-smoothers
                             of multilevel preconditioners, respectively \par
                             \texttt{ILU} for block-Jacobi and Additive Schwarz
@@ -513,7 +521,14 @@ level (continued).\label{tab:p_coarse_1}}
                             hybrid (forward) Gauss-Seidel, hybrid backward
                            Gauss-Seidel, ILU($p$),  ILU($p,t$), MILU($p$),
                            LU from MUMPS, SuperLU or UMFPACK
-                           (plus triangular solve). See Note for details on hybrid
+                           (plus triangular solve), Approximate
+                           Inverses  INVK($p,q$), INVT($p_1,p2,t_1,t_2$) and
+                           AINV($t$); note  that approximate inverses
+                           are specifically suited for GPUs since they
+                           do not employ triangular system solve
+                           kernels,
+                           see~\cite{BERTACCINIFILIPPONE}. See Note
+                           for details on hybrid 
                            Gauss-Seidel. \\ \hline
 \fortinline|'SMOOTHER_SWEEPS'|  & \fortinline|integer|
                          & Any integer \par number~$\ge 0$
