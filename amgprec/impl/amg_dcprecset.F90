@@ -199,6 +199,24 @@ subroutine amg_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
         end if
         call p%precv(nlev_)%set('SUB_FILLIN',val,info,pos=pos)
 
+     case('BJAC_ITRACE')
+       if (ilev_ /= nlev_) then
+         write(psb_err_unit,*) name,&
+              & ': Error: Inconsistent specification of WHAT vs. ILEV'
+         info = -2
+         return
+       end if
+       call p%precv(nlev_)%set('SMOOTHER_ITRACE',val,info,pos=pos)
+
+    case('BJAC_RESCHECK')
+      if (ilev_ /= nlev_) then
+        write(psb_err_unit,*) name,&
+             & ': Error: Inconsistent specification of WHAT vs. ILEV'
+        info = -2
+        return
+      end if
+      call p%precv(nlev_)%set('SMOOTHER_RESIDUAL',val,info,pos=pos)
+
       case default
         do il=ilev_, ilmax_
           call p%precv(il)%set(what,val,info,pos=pos,idx=idx)
@@ -230,6 +248,14 @@ subroutine amg_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
         call p%precv(nlev_)%set('SUB_FILLIN',val,info,pos=pos)
       end if
 
+    case('BJAC_ITRACE')
+      if (nlev_ > 1) then
+        call p%precv(nlev_)%set('SMOOTHER_ITRACE',val,info,pos=pos)
+      end if
+    case('BJAC_RESCHECK')
+      if (nlev_ > 1) then
+        call p%precv(nlev_)%set('SMOOTHER_RESIDUAL',val,info,pos=pos)
+      end if
     case default
       do ilev_=1,nlev_
         call p%precv(ilev_)%set(what,val,info,pos=pos,idx=idx)
