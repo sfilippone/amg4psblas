@@ -447,6 +447,14 @@ subroutine amg_zcprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
           do il=ilev_, ilmax_
             call p%precv(il)%set(what,amg_repl_mat_,info,pos=pos)
           end do
+      case('BJAC_STOP')
+        do il=ilev_, ilmax_
+          call p%precv(il)%set('SMOOTHER_STOP',string,info,pos=pos)
+        end do
+      case('BJAC_TRACE')
+        do il=ilev_, ilmax_
+          call p%precv(il)%set('SMOOTHER_TRACE',string,info,pos=pos)
+        end do
       case('COARSE_SUBSOLVE')
         if (ilev_ /= nlev_) then
           write(psb_err_unit,*) name,&
@@ -751,6 +759,15 @@ subroutine amg_zcprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
         end select
     endif
 
+    case('BJAC_STOP')
+      if (nlev_ > 1) then
+        call p%precv(il)%set('SMOOTHER_STOP',string,info,pos=pos)
+      end if
+    case('BJAC_TRACE')
+      if (nlev_ > 1) then
+        call p%precv(il)%set('SMOOTHER_TRACE',string,info,pos=pos)
+      end if
+
     case('COARSE_SUBSOLVE')
       if (nlev_ > 1) then
         call p%precv(nlev_)%set('SUB_SOLVE',string,info,pos=pos)
@@ -880,10 +897,17 @@ subroutine amg_zcprecsetr(p,what,val,info,ilev,ilmax,pos,idx)
   !
   if (present(ilev)) then
 
-    do il=ilev_, ilmax_
-      call p%precv(il)%set(what,val,info,pos=pos,idx=idx)
-    end do
-
+    select case(psb_toupper(trim(what)))
+    case('BJAC_STOPTOL')
+      do il=ilev_, ilmax_
+        call p%precv(il)%set('SMOOTHER_STOPTOL',val,info,pos=pos)
+      end do
+    case default
+      ! Nothing to do here, setted elsewhere
+      do il=ilev_, ilmax_
+        call p%precv(il)%set(what,val,info,pos=pos,idx=idx)
+      end do
+    end select
   else if (.not.present(ilev)) then
     !
     ! ilev not specified: set preconditioner parameters at all the appropriate levels
@@ -893,7 +917,9 @@ subroutine amg_zcprecsetr(p,what,val,info,ilev,ilmax,pos,idx)
     case('COARSE_ILUTHRS')
       ilev_=nlev_
       call p%precv(ilev_)%set('SUB_ILUTHRS',val,info,pos=pos)
-
+    case('BJAC_STOPTOL')
+      ilev_=nlev_
+      call p%precv(ilev_)%set('SMOOTHER_STOPTOL',val,info,pos=pos)
     case default
 
       do il=1,nlev_
