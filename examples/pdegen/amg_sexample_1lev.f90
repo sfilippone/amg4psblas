@@ -3,7 +3,7 @@
 !   
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !    
 !    (C) Copyright 2020 
 !  
@@ -40,8 +40,8 @@
 !
 ! This sample program solves a linear system obtained by discretizing a
 ! PDE with Dirichlet BCs. The solver is BiCGStab preconditioned by
-! RAS with overlap 2 and ILU(0) on the local blocks, as explained in Section 5.1 
-! of the MLD2P4 User's and Reference Guide.
+! RAS with overlap 2 and ILU(0) on the local blocks, as explained in Section 4.1 
+! of the AMG4PSBLAS User's and Reference Guide.
 !
 !
 ! The PDE is a general second order equation in 3d
@@ -116,7 +116,7 @@ program amg_sexample_1lev
   ! Hello world
   !
   if (iam == psb_root_) then 
-    write(*,*) 'Welcome to MLD2P4 version: ',amg_version_string_
+    write(*,*) 'Welcome to AMG4PSBLAS version: ',amg_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
   end if
 

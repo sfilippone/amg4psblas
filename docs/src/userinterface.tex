@@ -297,10 +297,10 @@ of $A+A^T$.\\ \hline
 \textsc{comments} \\ \hline
 \fi
 \fortinline|'AGGR_TYPE'|  & \fortinline|character(len=*)| \hspace*{-3mm}
-& \fortinline|'SOC1'| &
-\fortinline|'SOC1'|,
+	&\fortinline|'SOC1'|,
 \fortinline|'SOC2'|,
 \fortinline|'MATCHBOXP'|
+& \fortinline|'SOC1'|
 & Type of aggregation algorithm: currently,
 for the decoupled aggregation we implement two measures of strength of
 connection, the one by Van\v{e}k, Mandel
@@ -403,7 +403,7 @@ the parameter \texttt{ilev}.} \\
                            (plus triangular solve);
                            point-Jacobi, hybrid Gauss-Seidel or
                            block-Jacobi and related $\ell_1$-versions; 
-			   Krylov Method (Flexible  Conjugate Gradient) coupled with
+			   Krylov Method (flexible  Conjugate Gradient) coupled with
                            the block-Jacobi preconditioner 
 			   with ILU(0) on the blocks. 
                            Note that \texttt{UMF} and \texttt{SLU} require the coarsest
@@ -431,7 +431,7 @@ the parameter \texttt{ilev}.} \\
                             \fortinline|'MUMPS'| \par \fortinline|'SLU'| \par \fortinline|'UMF'| \par
                             \fortinline|'INVT'| \par \fortinline|'INVK'| \par \fortinline|'AINV'|
                          & See~Note.
-                         & Solver for the diagonal blocks of the coarse matrix,
+                         & Solver for the diagonal blocks of the coarsest matrix,
                            in case the block Jacobi solver
                            is chosen as coarsest-level solver: ILU($p$), ILU($p,t$),
                            MILU($p$), LU from MUMPS, SuperLU or UMFPACK
@@ -486,7 +486,7 @@ the parameter \texttt{ilev}.} \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Parameters defining the coarse-space correction at the coarsest
+\caption{Parameters defining the solver at the coarsest
 level (continued).\label{tab:p_coarse_1}}
 \esideways
 
@@ -505,7 +505,7 @@ level (continued).\label{tab:p_coarse_1}}
 		\hline
 	\end{tabular}
 \end{center}
-\caption{Additional parameters defining the coarse-space correction at the coarsest
+\caption{Additional parameters defining the solver at the coarsest
 	level.\label{tab:p_coarse_2}}
 \esideways
 

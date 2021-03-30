@@ -66,7 +66,7 @@ class="cmr-12">program.</span>
 <!--l. 126--><p class="indent" >   <span 
 class="cmr-12">The part of the code dealing with reading and assembling the sparse matrix and the</span>
 <span 
-class="cmr-12">right-hand side vector and the deallocation of the relevant data structured, performed</span>
+class="cmr-12">right-hand side vector and the deallocation of the relevant data structures, performed</span>
 <span 
 class="cmr-12">through the PSBLAS routines for sparse matrix and vector management, is not</span>
 <span 
@@ -92,7 +92,7 @@ class="cmr-12">the use of the PSBLAS routines, see the PSBLAS User&#8217;s Guide
 class="cmr-12">&#x00A0;</span><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli5.html#XPSBLASGUIDE"><span 
-class="cmr-12">17</span></a><span 
+class="cmr-12">18</span></a><span 
 class="cmr-12">]</span></span><span 
 class="cmr-12">.</span>
 <!--l. 138--><p class="indent" >   <span 
@@ -203,54 +203,58 @@ href="#x15-14002r2"><span
 class="cmr-12">2</span><!--tex4ht:ref: fig:ex2 --></a> <span 
 class="cmr-12">shows</span>
 <span 
-class="cmr-12">how to set a V-cycle preconditioner which applies 1 block-Jacobi sweep as pre- and</span>
+class="cmr-12">how to set a V-cycle preconditioner which applies 1 block-Jacobi sweep as pre-</span>
 <span 
-class="cmr-12">post-smoother, and solves the coarsest-level system with 8 block-Jacobi sweeps. Note</span>
+class="cmr-12">and post-smoother, and solves the coarsest-level system with 8 block-Jacobi</span>
 <span 
-class="cmr-12">that the ILU(0) factorization (plus triangular solve) is used as local solver for the</span>
+class="cmr-12">sweeps. Note that the ILU(0) factorization (plus triangular solve) is used as</span>
 <span 
-class="cmr-12">block-Jacobi sweeps, since this is the default associated with block-Jacobi</span>
+class="cmr-12">local solver for the block-Jacobi sweeps, since this is the default associated</span>
 <span 
-class="cmr-12">and set by</span><span 
+class="cmr-12">with block-Jacobi and set by</span><span 
 class="cmr-12">&#x00A0;</span><span class="lstinline"></span><span 
 class="cmtt-12">P</span><span 
 class="cmtt-12">%</span><span 
 class="cmtt-12">init</span><span 
-class="cmr-12">. Furthermore, specifying block-Jacobi as coarsest-level</span>
+class="cmr-12">. Furthermore, specifying block-Jacobi as</span>
 <span 
-class="cmr-12">solver implies that the coarsest-level matrix is distributed among the processes.</span>
+class="cmr-12">coarsest-level solver implies that the coarsest-level matrix is distributed among</span>
 <span 
-class="cmr-12">Figure</span><span 
+class="cmr-12">the processes. Figure</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="#x15-14003r3"><span 
 class="cmr-12">3</span><!--tex4ht:ref: fig:ex3 --></a> <span 
-class="cmr-12">shows how to set a W-cycle preconditioner using the Coarsening</span>
+class="cmr-12">shows how to set a W-cycle preconditioner using the</span>
 <span 
-class="cmr-12">based on Compatible Weighted Matching. It applies 2 hybrid Gauss-Seidel</span>
+class="cmr-12">Coarsening based on Compatible Weighted Matching, aggregates of size at</span>
 <span 
-class="cmr-12">sweeps as pre- and post-smoother, and solves the coarsest-level system with the</span>
+class="cmr-12">most 8 and smoothed prolongators. It applies 2 hybrid Gauss-Seidel sweeps as</span>
 <span 
-class="cmr-12">multifrontal LU factorization implemented in MUMPS. It is specified that the</span>
+class="cmr-12">pre- and post-smoother, and solves the coarsest-level system with the parallel</span>
 <span 
-class="cmr-12">coarsest-level matrix is distributed, since MUMPS can be used on both replicated and</span>
+class="cmr-12">flexible Conjugate Gradient method (KRM) coupled with the block-Jacobi</span>
 <span 
-class="cmr-12">distributed matrices, and by default it is used on replicated ones. The code</span>
+class="cmr-12">preconditioner having ILU(0) on the blocks. Default parameters are used for stopping</span>
 <span 
-class="cmr-12">fragments shown in Figures</span><span 
+class="cmr-12">criterion of the coarsest solver. Note that, also in this case, specifying KRM as</span>
+<span 
+class="cmr-12">coarsest-level solver implies that the coarsest-level matrix is distributed among the</span>
+<span 
+class="cmr-12">processes.</span>
+<!--l. 291--><p class="indent" >   <span 
+class="cmr-12">The code fragments shown in Figures</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="#x15-14002r2"><span 
 class="cmr-12">2</span><!--tex4ht:ref: fig:ex2 --></a> <span 
 class="cmr-12">and </span><a 
 href="#x15-14003r3"><span 
 class="cmr-12">3</span><!--tex4ht:ref: fig:ex3 --></a> <span 
-class="cmr-12">are included in the example program file</span>
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">amg_dexample_ml.f90</span></span></span> <span 
-class="cmr-12">too. </span><span 
-class="cmbx-12">DA CORREGGERE NEL CODICE ESEMPIO</span>
+class="cmr-12">are included in the example program</span>
 <span 
-class="cmbx-12">3</span>
-<!--l. 288--><p class="indent" >   <span 
+class="cmr-12">file </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">amg_dexample_ml.f90</span></span></span> <span 
+class="cmr-12">too.</span>
+<!--l. 294--><p class="indent" >   <span 
 class="cmr-12">Finally, Figure</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="#x15-14004r4"><span 
@@ -265,7 +269,7 @@ class="cmr-12">nonsymmetric. The corresponding example program is available in t
 <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">amg_dexample_1lev.f90</span></span></span><span 
 class="cmr-12">.</span>
-<!--l. 295--><p class="indent" >   <span 
+<!--l. 301--><p class="indent" >   <span 
 class="cmr-12">For all the previous preconditioners, example programs where the sparse matrix</span>
 <span 
 class="cmr-12">and the right-hand side are generated by discretizing a PDE with Dirichlet</span>
@@ -276,7 +280,7 @@ class="cmr-12">.</span>
                                                                                
 
                                                                                
-<!--l. 298--><p class="indent" >   <a 
+<!--l. 304--><p class="indent" >   <a 
  id="x15-14002r2"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -284,7 +288,7 @@ class="cmr-12">.</span>
                                                                                
 <div class="center" 
 >
-<!--l. 312--><p class="noindent" >
+<!--l. 318--><p class="noindent" >
 <div class="minipage"><div class="verbatim" id="verbatim-7">
 ...&#x00A0;...
 &#x00A0;<br />!&#x00A0;build&#x00A0;a&#x00A0;V-cycle&#x00A0;preconditioner&#x00A0;with&#x00A0;1&#x00A0;block-Jacobi&#x00A0;sweep&#x00A0;(with
@@ -298,7 +302,7 @@ class="cmr-12">.</span>
 &#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
 &#x00A0;<br />...&#x00A0;...
 </div>
-<!--l. 327--><p class="nopar" ></div></div>
+<!--l. 333--><p class="nopar" ></div></div>
 <br /><div class="caption" 
 ><span class="id">Listing 2: </span><span  
 class="content">setup of a multilevel preconditioner based on the default decoupled coarsening</span></div><!--tex4ht:label?: x15-14002r2 -->
@@ -309,7 +313,7 @@ class="content">setup of a multilevel preconditioner based on the default decoup
                                                                                
 
                                                                                
-<!--l. 334--><p class="indent" >   <a 
+<!--l. 340--><p class="indent" >   <a 
  id="x15-14003r3"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -317,7 +321,7 @@ class="content">setup of a multilevel preconditioner based on the default decoup
                                                                                
 <div class="center" 
 >
-<!--l. 351--><p class="noindent" >
+<!--l. 360--><p class="noindent" >
 <div class="minipage"><div class="verbatim" id="verbatim-8">
 ...&#x00A0;...
 &#x00A0;<br />!&#x00A0;build&#x00A0;a&#x00A0;W-cycle&#x00A0;preconditioner&#x00A0;with&#x00A0;2&#x00A0;hybrid&#x00A0;Gauss-Seidel&#x00A0;sweeps
@@ -325,20 +329,21 @@ class="content">setup of a multilevel preconditioner based on the default decoup
 &#x00A0;<br />!&#x00A0;matrix,&#x00A0;and&#x00A0;MUMPS&#x00A0;as&#x00A0;coarsest-level&#x00A0;solver
 &#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;ML&#8217;,info)
 &#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;PAR_AGGR_ALG&#8217;,&#8217;COUPLED&#8217;,info)
+&#x00A0;<br />call&#x00A0;P%set(&#8217;AGGR_TYPE&#8217;,&#8217;MATCHBOXP&#8217;,info)
+&#x00A0;<br />call&#x00A0;P%set(&#8217;AGGR_SIZE&#8217;,8,info)
 &#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;ML_CYCLE&#8217;,&#8217;WCYCLE&#8217;,info)
 &#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_TYPE&#8217;,&#8217;FBGS&#8217;,info)
 &#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_SWEEPS&#8217;,2,info)
-&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SOLVE&#8217;,&#8217;MUMPS&#8217;,info)
-&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_MAT&#8217;,&#8217;DIST&#8217;,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SOLVE&#8217;,&#8217;KRM&#8217;,info)
 &#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
 &#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
 &#x00A0;<br />...&#x00A0;...
 </div>
-<!--l. 369--><p class="nopar" ></div></div>
+<!--l. 379--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 3: </span><span  
-class="content">setup of a multilevel preconditioner based on the coupled coarsening based
-on weighted matching</span></div><!--tex4ht:label?: x15-14003r3 -->
+class="content">setup of a multilevel preconditioner based on the coupled coarsening using
+weighted matching</span></div><!--tex4ht:label?: x15-14003r3 -->
                                                                                
 
                                                                                
@@ -346,7 +351,7 @@ on weighted matching</span></div><!--tex4ht:label?: x15-14003r3 -->
                                                                                
 
                                                                                
-<!--l. 376--><p class="indent" >   <a 
+<!--l. 386--><p class="indent" >   <a 
  id="x15-14004r4"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -354,7 +359,7 @@ on weighted matching</span></div><!--tex4ht:label?: x15-14003r3 -->
                                                                                
 <div class="center" 
 >
-<!--l. 393--><p class="noindent" >
+<!--l. 398--><p class="noindent" >
 <div class="minipage"><div class="verbatim" id="verbatim-9">
 ...&#x00A0;...
 &#x00A0;<br />!&#x00A0;set&#x00A0;RAS&#x00A0;with&#x00A0;overlap&#x00A0;2&#x00A0;and&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;local&#x00A0;blocks
@@ -365,7 +370,7 @@ on weighted matching</span></div><!--tex4ht:label?: x15-14003r3 -->
 &#x00A0;<br />!&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;BiCGSTAB
 &#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;BICGSTAB&#8217;,A,P,b,x,tol,desc_A,info)
 </div>
-<!--l. 405--><p class="nopar" ></div></div>
+<!--l. 410--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 4: </span><span  
 class="content">setup of a one-level Schwarz preconditioner.</span></div><!--tex4ht:label?: x15-14004r4 -->

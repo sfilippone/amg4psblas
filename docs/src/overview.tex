@@ -20,11 +20,12 @@ The preconditioners implemented in AMG4PSBLAS are obtained by combining
 3 different types of AMG cycles with smoothers and coarsest-level
 solvers. Available multigrid cycles include the V-, W-, and a version of a Krylov-type cycle
 (K-cycle)~\cite{Briggs2000,Notay2008}; they can  be
-combined with Jacobi hybrid 
+combined with Jacobi, hybrid 
 %\footnote{see Note 2 in Table~\ref{tab:p_coarse}, p.~28.}
-forward/backward Gauss-Seidel, block-Jacobi, and additive Schwarz
-smoothers. The  Jacobi, block-Jacobi and
-Gauss-Seidel smoothers are also available in the $\ell_1$  version.
+forward/backward Gauss-Seidel, block-Jacobi and additive Schwarz
+smoothers with various versions of local incomplete factorizations and approximate inverses 
+on the blocks. The Jacobi, block-Jacobi and
+Gauss-Seidel smoothers are also available in the $\ell_1$ version~\cite{DDF2020}.
 
 An algebraic approach is used to generate a hierarchy of
 coarse-level matrices and operators, without explicitly using any information on the
@@ -34,16 +35,16 @@ two different coarsening strategies, based on aggregation, are available:
 \item a decoupled version of the  smoothed aggregation procedure
   proposed in~\cite{BREZINA_VANEK,VANEK_MANDEL_BREZINA}, and already
   included in the previous versions of the
-  package~\cite{BDDF2007,MLD2P4_TOMS}; 
+  package~\cite{aaecc_07,MLD2P4_TOMS}; 
 \item a coupled,  parallel implementation of the  Coarsening based on
   Compatible Weighted Matching introduced   in~\cite{DV2013,DFV2018}
   and described in detail in~\cite{DDF2020};  
 \end{itemize}
 Either exact or approximate solvers can be used on the coarsest-level
-system. We provide interfaces to various  sparse LU factorizations from external 
-packages, native incomplete LU and approximate inverse factorizations,
-weighted Jacobi, hybrid Gauss-Seidel, block-Jacobi solvers and
-a recursive call to preconditioned Krylov methods;  all 
+system. We provide interfaces to various parallel and sequential sparse LU factorizations from external 
+packages, sequential native incomplete LU and approximate inverse factorizations,
+parallel weighted Jacobi, hybrid Gauss-Seidel, block-Jacobi solvers and
+calls to preconditioned Krylov methods;  all 
 smoothers can be also exploited as one-level preconditioners.
 
 AMG4PSBLAS is written in Fortran~2003, following an
@@ -76,7 +77,7 @@ therefore, AMG4PSBLAS can be run on any parallel machine where PSBLAS
 implementations are available. In the most recent version of PSBLAS
 (release 3.7), a plug-in for GPU is included; it includes CUDA
 versions of main vector operations and of sparse matrix-vector
-multiplication, so that Krylov methods coupled with AMG4PBLAS
+multiplication, so that Krylov methods coupled with AMG4PSBLAS
 preconditioners    relying on Jacobi and block-Jacobi smoothers with
 sparse approximate inverses on the blocks can be efficiently executed
 on cluster of GPUs. 

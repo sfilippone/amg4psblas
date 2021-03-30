@@ -125,7 +125,7 @@ must be used by the example program.
 
 The part of the code dealing with reading and assembling  the sparse
 matrix and the right-hand side vector and the deallocation of the
-relevant data structured, performed 
+relevant data structures, performed 
 through the PSBLAS routines for sparse matrix and vector management, is not reported
 here for the sake of conciseness.
 The complete code can be found in the example program file \verb|amg_dexample_ml.f90|,
@@ -272,18 +272,24 @@ with block-Jacobi and set by~\fortinline|P%init|.
 Furthermore, specifying block-Jacobi as coarsest-level
 solver implies that the coarsest-level matrix is distributed
 among the processes.
-Figure~\ref{fig:ex3} shows how to set a W-cycle preconditioner using the Coarsening based on Compatible Weighted Matching. It applies
+Figure~\ref{fig:ex3} shows how to set a W-cycle preconditioner using the Coarsening based on Compatible Weighted Matching, aggregates of size at most $8$ and smoothed prolongators. It applies
 2 hybrid Gauss-Seidel sweeps as pre- and post-smoother,
-and solves the coarsest-level system with the multifrontal LU factorization
-implemented in MUMPS. It is specified that the coarsest-level
-matrix is distributed, since MUMPS can be used on both
-replicated and distributed matrices, and by default
-it is used on replicated ones.
+and solves the coarsest-level system with the parallel flexible Conjugate Gradient method (KRM) coupled with the block-Jacobi preconditioner having ILU(0) on the blocks. Default parameters are used for stopping criterion of the coarsest solver.
+Note that, also in this case, specifying KRM as coarsest-level
+solver implies that the coarsest-level matrix is distributed
+among the processes.
+%It is specified that the coarsest-level
+
+%matrix is distributed, since MUMPS can be used on both
+
+%replicated and distributed matrices, and by default
+
+%it is used on replicated ones.
 %Note the use of the parameter \fortinline|pos|
 %to specify a property only for the pre-smoother or the post-smoother
 %(see Section~\ref{sec:precset} for more details).
 The code fragments shown in Figures~\ref{fig:ex2} and \ref{fig:ex3} are
-included in the example program file \verb|amg_dexample_ml.f90| too. \textbf{DA CORREGGERE NEL CODICE ESEMPIO 3}
+included in the example program file \verb|amg_dexample_ml.f90| too.
 
 Finally, Figure~\ref{fig:ex4} shows the setup of a one-level
 additive Schwarz preconditioner, i.e., RAS with overlap 2.
@@ -334,16 +340,19 @@ call P%smoothers_build(A,desc_A,info)
 \begin{listing}[h!]
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
-! build a W-cycle preconditioner with 2 hybrid Gauss-Seidel sweeps
-! as pre- and post-smoother, a distributed coarsest
-! matrix, and MUMPS as coarsest-level solver
+!build a W-cycle using the coupled coarsening based on weighted matching, 
+!aggregates of size at most 8 and smoothed prolongators,
+!2 hybrid Gauss-Seidel sweeps as pre- and post-smoother,
+!and parallel flexible Conjugate Gradient coupled with the block-Jacobi 
+!preconditioner having ILU(0) on the blocks as coarsest solver. 
 call P%init('ML',info)
 call P%set('PAR_AGGR_ALG','COUPLED',info)
+call P%set('AGGR_TYPE','MATCHBOXP',info)
+call P%set('AGGR_SIZE',8,info)
 call P%set('ML_CYCLE','WCYCLE',info)
 call P%set('SMOOTHER_TYPE','FBGS',info)
 call P%set('SMOOTHER_SWEEPS',2,info)
-call P%set('COARSE_SOLVE','MUMPS',info)
-call P%set('COARSE_MAT','DIST',info)
+call P%set('COARSE_SOLVE','KRM',info)
 call P%hierarchy_build(A,desc_A,info)
 call P%smoothers_build(A,desc_A,info)
 \end{minted}
@@ -358,11 +367,12 @@ call P%smoothers_build(A,desc_A,info)
 ! matrix, and MUMPS as coarsest-level solver
   call P%init('ML',info)
   call P%set('PAR_AGGR_ALG','COUPLED',info)
+call P%set('AGGR_TYPE','MATCHBOXP',info)
+call P%set('AGGR_SIZE',8,info)
   call P%set('ML_CYCLE','WCYCLE',info)
   call P%set('SMOOTHER_TYPE','FBGS',info)
   call P%set('SMOOTHER_SWEEPS',2,info)
-  call P%set('COARSE_SOLVE','MUMPS',info)
-  call P%set('COARSE_MAT','DIST',info)
+  call P%set('COARSE_SOLVE','KRM',info)
   call P%hierarchy_build(A,desc_A,info)
   call P%smoothers_build(A,desc_A,info)
 ... ...
@@ -371,23 +381,18 @@ call P%smoothers_build(A,desc_A,info)
 \end{minipage}
 \end{center}
 \fi\vspace{-2em}%
-\caption{setup of a multilevel preconditioner based on the coupled coarsening based on weighted matching\label{fig:ex3}}
+\caption{setup of a multilevel preconditioner based on the coupled coarsening using weighted matching\label{fig:ex3}}
 \end{listing}\vspace*{-2em}
 \begin{listing}[h!]
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
-! build a W-cycle preconditioner with 2 hybrid Gauss-Seidel sweeps
-! as pre- and post-smoother, a distributed coarsest
-! matrix, and MUMPS as coarsest-level solver
-call P%init('ML',info)
-call P%set('PAR_AGGR_ALG','COUPLED',info)
-call P%set('ML_CYCLE','WCYCLE',info)
-call P%set('SMOOTHER_TYPE','FBGS',info)
-call P%set('SMOOTHER_SWEEPS',2,info)
-call P%set('COARSE_SOLVE','MUMPS',info)
-call P%set('COARSE_MAT','DIST',info)
-call P%hierarchy_build(A,desc_A,info)
-call P%smoothers_build(A,desc_A,info)
+! build a one-level RAS with overlap 2 and ILU(0) on the local blocks.
+call P%init('AS',info)
+call P%set('SUB_OVR',2,info)
+call P%build(A,desc_A,info)
+... ...
+! solve Ax=b with preconditioned BiCGSTAB
+  call psb_krylov('BICGSTAB',A,P,b,x,tol,desc_A,info)
 \end{minted}
 \else
 \begin{center}

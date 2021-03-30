@@ -2,7 +2,7 @@
 !   
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !    
 !    (C) Copyright 2020 
 !  
@@ -39,21 +39,26 @@
 !
 ! This sample program solves a linear system obtained by discretizing a
 ! PDE with Dirichlet BCs. The solver is CG, coupled with one of the 
-! following multi-level preconditioner, as explained in Section 5.1 of
-! the MLD2P4 User's and Reference Guide:
+! following multi-level preconditioner, as explained in Section 4.1 of
+! the AMG4PSBLAS User's and Reference Guide:
 !
 ! - choice = 1, the default multi-level preconditioner solver, i.e., 
-! V-cycle with basic smoothed aggregation, 1 hybrid forward/backward
+! V-cycle with decoupled smoothed aggregation, 1 hybrid forward/backward
 ! GS sweep as pre/post-smoother and UMFPACK as coarsest-level
-! solver (Sec. 5.1, Fig. 2)
+! solver (Sec. 4.1, Listing 1)
 !
 ! - choice = 2, a V-cycle preconditioner with 1 block-Jacobi sweep
 ! (with ILU(0) on the blocks) as pre- and post-smoother, and 8 block-Jacobi
-! sweeps (with ILU(0) on the blocks) as coarsest-level solver (Sec. 5.1, Fig. 3)
+! sweeps (with ILU(0) on the blocks) as coarsest-level solver (Sec. 4.1, Listing 2)
 !
-! - choice = 3, a W-cycle preconditioner with 2 hybrid forward/backward
-! GS sweeps as pre/post-smoother, a distributed coarsest matrix,
-! and MUMPS as coarsest-level solver (Sec. 5.1, Fig. 4)
+! - choice = 3,  W-cycle preconditioner based on the coupled aggregation relying on matching,
+! with maximum size of aggregates equal to 8 and smoothed prolongators,
+! 2 hybrid forward/backward GS sweeps as pre/post-smoother, a distributed coarsest
+! matrix, and preconditioned Flexible Conjugate Gradient as coarsest-level solver (Sec. 4.1, Listing 3)
+!
+! The matrix and the rhs are read from files (if an rhs is not available, the
+! unit rhs is set).
+!
 !
 ! The PDE is a general second order equation in 3d
 !
@@ -136,7 +141,7 @@ program amg_sexample_ml
   ! Hello world
   !
   if (iam == psb_root_) then 
-    write(*,*) 'Welcome to MLD2P4 version: ',amg_version_string_
+    write(*,*) 'Welcome to AMG4PSBLAS version: ',amg_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
   end if
 
@@ -187,19 +192,21 @@ program amg_sexample_ml
 
   case(3)
 
-   ! initialize a W-cycle preconditioner with 2 hybrid forward/backward
-   ! GS sweeps as pre/post-smoother, a distributed coarsest
-   ! matrix, and MUMPS as coarsest-level solver
+   ! initialize a W-cycle preconditioner based on the coupled aggregation relying on matching,
+   ! with maximum size of aggregates equal to 8 and smoothed prolongators,
+   ! 2 hybrid forward/backward GS sweeps as pre/post-smoother, a distributed coarsest
+   ! matrix, and preconditioned Flexible Conjugate Gradient as coarsest-level solver
 
     call P%init(ctxt,'ML',info)
+    call P%set('PAR_AGGR_ALG','COUPLED',info)
+    call P%set('AGGR_TYPE','MATCHBOXP',info)
+    call P%set('AGGR_SIZE',8,info)
     call P%set('ML_CYCLE','WCYCLE',info)
     call P%set('SMOOTHER_SWEEPS',2,info)
-    call P%set('COARSE_SOLVE','MUMPS',info)
+    call P%set('COARSE_SOLVE','KRM',info)
     call P%set('COARSE_MAT','DIST',info)
     kmethod = 'CG'
-
   end select
-
   call psb_barrier(ctxt)
   t1 = psb_wtime()
 
