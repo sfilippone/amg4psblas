@@ -468,7 +468,7 @@ the parameter \texttt{ilev}.} \\
                          & Any integer \par number $> 0$
                          & 10
                          & Number of sweeps when \fortinline|JACOBI|, \fortinline|GS| or \fortinline|BJAC|
-			   is chosen as coarsest-level solver. {\bf Aggiungere criterio di arresto del PCG?}\\ \hline
+			   is chosen as coarsest-level solver.\\ \hline
 \fortinline|'COARSE_FILLIN'| & \fortinline|integer|
                          & Any integer \par number $\ge 0$
                          & 0
@@ -481,10 +481,32 @@ the parameter \texttt{ilev}.} \\
                          & Drop tolerance $t$ in the ILU($p,t$)
                            factorization and first drop-tolerance for the approximate inverses. \\
 \hline
+\multicolumn{5}{|l|}{{\bfseries Note.} Further options for coarse solvers are contained in Table~\ref{tab:p_coarse_2}.} \\
+\multicolumn{5}{|l|}{For a first use it is suggested to use the default options obtained by simply selecting the solver type.} \\
+\hline
 \end{tabular}
 \end{center}
 \caption{Parameters defining the coarse-space correction at the coarsest
 level (continued).\label{tab:p_coarse_1}}
+\esideways
+
+\bsideways
+\begin{center}
+	\begin{tabular}{|p{3.9cm}|l|p{1.7cm}|p{1.7cm}|p{8cm}|}
+		\hline
+		\fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
+		\textsc{comments} \\ \hline
+		\fortinline|'BJAC_STOP'|    & \fortinline|character(len=*)| & \fortinline|'FALSE'| \par \fortinline|'TRUE'| & \fortinline|'FALSE'| & Select whether to use a stopping criterion for the Block-Jacobi method used as a coarse solver.  \\ \hline
+		\fortinline|'BJAC_TRACE'|   & \fortinline|character(len=*)| & \fortinline|'FALSE'| \par \fortinline|'TRUE'| & \fortinline|'FALSE'| & Select whether to print a trace for the calculated residual for the Block-Jacobi method used as a coarse solver. \\ \hline 
+		\fortinline|'BJAC_ITRACE'|  & \fortinline|integer| & Any integer $>0$ & -1 & Number of iterations after which a trace is to be printed. \\ \hline 
+		\fortinline|'BJAC_RESCHECK'|& \fortinline|integer| & Any integer $>0$ & -1 & Number of iterations after which a residual is to be calculated. \\ \hline
+		\fortinline|'BJAC_STOPTOL'| & \fortinline|real(kind_parameter)| & Any real $<1$ & 0 & Tolerance for the stopping criterion on the residual.  \\ \hline
+		
+		\hline
+	\end{tabular}
+\end{center}
+\caption{Additional parameters defining the coarse-space correction at the coarsest
+	level.\label{tab:p_coarse_2}}
 \esideways
 
 \bsideways
@@ -497,16 +519,16 @@ level (continued).\label{tab:p_coarse_1}}
 
 \fortinline|'SMOOTHER_TYPE'|  & \fortinline|character(len=*)|
                          & \fortinline|'JACOBI'| \par \fortinline|'GS'| \par \fortinline|'BGS'| \par \fortinline|'BJAC'|
-                            \par \fortinline|'AS'|
+                            \par \fortinline|'AS'| \par \fortinline|'L1-JACOBI'| \par \fortinline|'L1-BJAC'| \par \fortinline|'L1-FBGS'|
                          & \fortinline|'FBGS'|
                          & Type of smoother used in the multilevel preconditioner:
                             point-Jacobi, hybrid (forward) Gauss-Seidel,
-			    hybrid backward Gauss-Seidel, block-Jacobi, \textbf{$\ell_1$-versions?} and
+			    hybrid backward Gauss-Seidel, block-Jacobi, $\ell_1$-Jacobi, $\ell_1$--hybrid (forward) Gauss-Seidel, $\ell_1$-point-Jacobi  and
                             Additive Schwarz. \par
                             It is ignored by one-level preconditioners. \\ \hline
 \fortinline|'SUB_SOLVE'|  & \fortinline|character(len=*)|
-                         & \fortinline|'JACOBI'| \par
-                           \fortinline|'GS'| \par \texttt{'BGS'} \par \fortinline|'ILU'| \par
+                         & \fortinline|'JACOBI'|
+                           \fortinline|'GS'| \par \fortinline|'BGS'| \par \fortinline|'ILU'| \par
                            \fortinline|'ILUT'| \par \fortinline|'MILU'| \par
                            \par \fortinline|'MUMPS'| \par
                            \fortinline|'SLU'| \par \fortinline|'UMF'|
@@ -515,7 +537,6 @@ level (continued).\label{tab:p_coarse_1}}
                             of multilevel preconditioners, respectively \par
                             \texttt{ILU} for block-Jacobi and Additive Schwarz
                             one-level preconditioners
-			    \textbf{$\ell_1$-versions?}
                          & The local solver to be used with the smoother or one-level
                             preconditioner (see Remark~2, page~24): point-Jacobi,
                             hybrid (forward) Gauss-Seidel, hybrid backward
@@ -536,7 +557,7 @@ level (continued).\label{tab:p_coarse_1}}
                          & Number of sweeps of the smoother or one-level preconditioner.
                             In the multilevel case, no pre-smother or
                             post-smoother is used if this parameter is set to 0
-                            together with \fortinline|pos='PRE'| or \fortinline|pos='POST|,
+                            together with \fortinline|pos='PRE'| or \fortinline|pos='POST'|,
                            respectively. \\ \hline
 \fortinline|'SUB_OVR'|  & \fortinline|integer|
                          & Any integer \par number~$\ge 0$
