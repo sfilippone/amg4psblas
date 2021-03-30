@@ -243,7 +243,6 @@ program amg_dexample_ml
     call P%set('ML_CYCLE','WCYCLE',info)
     call P%set('SMOOTHER_SWEEPS',2,info)
     call P%set('COARSE_SOLVE','KRM',info)
-    call P%set('COARSE_MAT','DIST',info)
     kmethod = 'CG'
   end select
 

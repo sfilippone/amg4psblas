@@ -230,18 +230,20 @@ program amg_sexample_ml
     
   case(3)
 
-   ! initialize a W-cycle preconditioner with 2 hybrid forward/backward
-   ! GS sweeps as pre/post-smoother, a distributed coarsest
-   ! matrix, and MUMPS as coarsest-level solver
+   ! initialize a W-cycle preconditioner based on the coupled aggregation relying on matching,
+   ! with maximum size of aggregates equal to 8 and smoothed prolongators,
+   ! 2 hybrid forward/backward GS sweeps as pre/post-smoother, a distributed coarsest
+   ! matrix, and preconditioned Flexible Conjugate Gradient as coarsest-level solver
 
     call P%init(ctxt,'ML',info)
+    call P%set('PAR_AGGR_ALG','COUPLED',info)
+    call P%set('AGGR_TYPE','MATCHBOXP',info)
+    call P%set('AGGR_SIZE',8,info)
     call P%set('ML_CYCLE','WCYCLE',info)
     call P%set('SMOOTHER_SWEEPS',2,info)
-    call P%set('COARSE_SOLVE','MUMPS',info)
-    call P%set('COARSE_MAT','DIST',info)
+    call P%set('COARSE_SOLVE','KRM',info)
     kmethod = 'CG'
   end select
-
   ! build the preconditioner
 
   call psb_barrier(ctxt)
