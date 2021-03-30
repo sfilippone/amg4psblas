@@ -492,7 +492,7 @@ level (continued).\label{tab:p_coarse_1}}
 
 \bsideways
 \begin{center}
-	\begin{tabular}{|p{3.9cm}|l|p{1.7cm}|p{1.7cm}|p{8cm}|}
+	\begin{tabular}{|p{3.9cm}|l|p{2cm}|p{1.7cm}|p{7.7cm}|}
 		\hline
 		\fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 		\textsc{comments} \\ \hline
@@ -501,8 +501,48 @@ level (continued).\label{tab:p_coarse_1}}
 		\fortinline|'BJAC_ITRACE'|  & \fortinline|integer| & Any integer $>0$ & -1 & Number of iterations after which a trace is to be printed. \\ \hline 
 		\fortinline|'BJAC_RESCHECK'|& \fortinline|integer| & Any integer $>0$ & -1 & Number of iterations after which a residual is to be calculated. \\ \hline
 		\fortinline|'BJAC_STOPTOL'| & \fortinline|real(kind_parameter)| & Any real $<1$ & 0 & Tolerance for the stopping criterion on the residual.  \\ \hline
-		
-		\hline
+		\fortinline|'KRM_METHOD'| & \fortinline|character(len=*)| & \fortinline|'CG'| \par \fortinline|'FCG'| \par \fortinline|'CGS'| \par \fortinline|'CGR'| \par \fortinline|'BICG'| \par \fortinline|'BICGSTAB'| \par \fortinline|'BICGSTABL'| \par \fortinline|'RGMRES'| & \fortinline|'FCG'| & A string that defines the iterative method to be
+		used. \texttt{CG} the Conjugate Gradient method;
+		\texttt{CGS} the Conjugate Gradient Stabilized method;
+		\texttt{GCR} the Generalized Conjugate Residual method;
+		\texttt{FCG} the Flexible Conjugate Gradient method;
+		\texttt{BICG} the Bi-Conjugate Gradient method;
+		\texttt{BICGSTAB} the Bi-Conjugate Gradient Stabilized method;
+		\texttt{BICGSTABL} the Bi-Conjugate Gradient Stabilized method with restarting;
+		\texttt{RGMRES} the Generalized Minimal Residual method with restarting. Refer to the PSBLAS guide~\cite{PSBLASGUIDE} for further information. \\ \hline
+		\fortinline|'KRM_KPREC'|  & \fortinline|character(len=*)| & Table~\ref{tab:precinit} & \fortinline|'BJAC'| & The one-level preconditioners from the Table~\ref{tab:precinit} can be used for the coarse Krylov solver.  \\ \hline
+\ifpdf
+\phantomcaption
+\end{tabular}
+\end{center}
+\esideways
+\bsideways
+\ContinuedFloat
+\begin{center}
+\begin{tabular}{|p{3.9cm}|l|p{1.7cm}|p{1.7cm}|p{8.6cm}|}
+\hline
+\fi     
+		\fortinline|'KRM_SUB_SOLVE'|  & \fortinline|character(len=*)| & Table~\ref{tab:p_coarse_1} & \fortinline|'ILU'| & Solver for the diagonal blocks of the coarsest matrix preconditioner,
+		in case the block Jacobi solver
+		is chosen as \fortinline|'KRM_KPREC'|: ILU($p$), ILU($p,t$),
+		MILU($p$), LU from MUMPS, SuperLU or UMFPACK
+		(plus triangular solve), Approximate
+		Inverses  INVK($p,q$), INVT($p_1,p2,t_1,t_2$) and
+		AINV($t$); The same caveat from Table~\ref{tab:p_coarse_1} applies here. \\ \hline
+		\fortinline|'KRM_GLOBAL'|  & \fortinline|character(len=*)| & \fortinline|'TRUE'|, \fortinline|'FALSE'|  & \fortinline|'FALSE'| & Choose between a global Krylov solver, all unknowns on a single node, or a distributed one. The default choice is the distributed solver.  \\ \hline                      
+		\fortinline|'KRM_EPS'|  & \fortinline|real(kind_parameter)| & Real $< 1$ & $10^{-6}$ & The stopping tolerance. \\ \hline
+		\fortinline|'KRM_IRST'|  & \fortinline|integer|  & Integer \par $\ge 1$ & 30 & An integer specifying the restart parameter. This is employed for the \texttt{BiCGSTABL} or \texttt{RGMRES} methods, otherwise it is ignored. \\ \hline
+		\fortinline|'KRM_ISTOPC'|  & \fortinline|integer|  & Integers 1,2,3 & 2 & If \texttt{1} then the method uses the normwise backward error in the infinity
+		norm; if \texttt{2}, the it uses the relative residual in the 2-norm; if \texttt{3} the relative residual reduction in the 2-norm is used instead; refer to the PSBLAS~\cite{PSBLASGUIDE} guide for the details. \\ \hline
+		\fortinline|'KRM_ITMAX'|  & \fortinline|integer|   & Integer \par $\ge 1$ & 40 & The maximum number of iterations to perform. \\ \hline
+		\fortinline|'KRM_ITRACE'|  & \fortinline|integer|  & Integer \par $\ge 0$ & -1 & If $>0$  print out an informational message about
+		convergence  every \fortinline|'KRM_ITRACE'| iterations. If $=0$ print a message in
+		case of convergence failure. \\ \hline
+%		\fortinline|'KRM_SUB_SOLVE'|  & \fortinline|integer|  & Integer \par $\ge 1$ & -1 & If $>0$ the number of iteration made by the solver for the diagonal blocks. \\ \hline
+		\fortinline|'KRM_FILLIN'| & \fortinline|integer|  & Integer \par $\ge 0$
+		& 0
+		& Fill-in level $p$ of the ILU factorizations
+		and first fill-in for the approximate inverses. \\ \hline
 	\end{tabular}
 \end{center}
 \caption{Additional parameters defining the solver at the coarsest
