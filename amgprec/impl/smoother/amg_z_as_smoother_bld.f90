@@ -2,9 +2,9 @@
 !   
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !    
-!    (C) Copyright 2020 
+!    (C) Copyright 2021 
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
@@ -97,7 +97,7 @@ subroutine amg_z_as_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
     ! Build the auxiliary descriptor desc_p%matrix_data(psb_n_row_).
     ! This is done by psb_cdbldext (interface to psb_cdovr), which is
     ! independent of CSR, and has been placed in the tools directory
-    ! of PSBLAS, instead of the mlprec directory of MLD2P4, because it
+    ! of PSBLAS, instead of the mlprec directory of AMG4PSBLAS, because it
     ! might be used independently of the AS preconditioner, to build
     ! a descriptor for an extended stencil in a PDE solver. 
     !

@@ -1,11 +1,14 @@
-!   
-!   
-!                             MLD2P4  Extensions
-!    
-!    (C) Copyright 2019
 !  
-!                        Salvatore Filippone  Cranfield University
-!        Pasqua D'Ambra         IAC-CNR, Naples, IT
+!   
+!                             AMG4PSBLAS version 1.0
+!    Algebraic Multigrid Package
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
+!    
+!    (C) Copyright 2021 
+!  
+!        Salvatore Filippone  
+!        Pasqua D'Ambra   
+!        Fabio Durastante 
 !   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions

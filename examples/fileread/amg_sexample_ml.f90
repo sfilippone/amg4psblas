@@ -4,7 +4,7 @@
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !    
-!    (C) Copyright 2020 
+!    (C) Copyright 2021 
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
@@ -42,17 +42,19 @@
 ! of the AMG4PSBLAS User's and Reference Guide:
 !
 ! - choice = 1, the default multi-level preconditioner solver, i.e., 
-! V-cycle with basic smoothed aggregation, 1 hybrid forward/backward
+! V-cycle with decoupled smoothed aggregation, 1 hybrid forward/backward
 ! GS sweep as pre/post-smoother and UMFPACK as coarsest-level
-! solver (Sec. 5.1, Fig. 2)
+! solver (Sec. 4.1, Listing 1)
 !
 ! - choice = 2, a V-cycle preconditioner with 1 block-Jacobi sweep
 ! (with ILU(0) on the blocks) as pre- and post-smoother, and 8 block-Jacobi
-! sweeps (with ILU(0) on the blocks) as coarsest-level solver (Sec. 5.1, Fig. 3)
+! sweeps (with ILU(0) on the blocks) as coarsest-level solver (Sec. 4.1, Listing 2)
 !
-! - choice = 3, a W-cycle preconditioner with 2 hybrid forward/backward
-!  GS sweeps as pre/post-smoother, a distributed coarsest
-! matrix, and MUMPS as coarsest-level solver (Sec. 5.1, Fig. 4)
+! - choice = 3,  W-cycle preconditioner based on the coupled aggregation relying on matching, 
+! with maximum size of aggregates equal to 8 and smoothed prolongators,
+! 2 hybrid forward/backward GS sweeps as pre/post-smoother, a distributed coarsest
+! matrix, and preconditioned Flexible Conjugate Gradient as coarsest-level solver
+! (Sec. 4.1, Listing 3)
 !
 ! The matrix and the rhs are read from files (if an rhs is not available, the
 ! unit rhs is set).
@@ -209,7 +211,7 @@ program amg_sexample_ml
   case(1)
 
     ! initialize the default multi-level preconditioner, i.e. V-cycle
-    ! with basic smoothed aggregation, 1 hybrid forward/backward
+    ! with decoupled smoothed aggregation, 1 hybrid forward/backward
     ! GS sweep as pre/post-smoother and UMFPACK as coarsest-level
     ! solver
 
@@ -244,6 +246,7 @@ program amg_sexample_ml
     call P%set('COARSE_SOLVE','KRM',info)
     kmethod = 'CG'
   end select
+
   ! build the preconditioner
 
   call psb_barrier(ctxt)

@@ -1,11 +1,14 @@
 !  
-!
-!                       AMG-AINV: Approximate Inverse plugin for
+!   
 !                             AMG4PSBLAS version 1.0
-!
-!    (C) Copyright 2020
-!
-!                        Salvatore Filippone  University of Rome Tor Vergata
+!    Algebraic Multigrid Package
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
+!    
+!    (C) Copyright 2021 
+!  
+!        Salvatore Filippone  
+!        Pasqua D'Ambra   
+!        Fabio Durastante 
 !
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions

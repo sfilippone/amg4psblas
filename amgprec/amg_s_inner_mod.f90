@@ -2,9 +2,9 @@
 !   
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !    
-!    (C) Copyright 2020 
+!    (C) Copyright 2021 
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
@@ -39,7 +39,7 @@
 !
 ! Module: amg_inner_mod
 !
-!  This module defines the interfaces to inner MLD2P4 routines.
+!  This module defines the interfaces to inner AMG4PSBLAS routines.
 !  The interfaces  of the user level routines are defined in amg_prec_mod.f90.
 !
 module amg_s_inner_mod

@@ -2,9 +2,9 @@
 !   
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !    
-!    (C) Copyright 2020 
+!    (C) Copyright 2021 
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
@@ -75,9 +75,9 @@
 !     by p%aggr%bld_tprol. This is called tentative prolongator.
 !  2. The smoothed aggregation uses as prolongator the operator obtained by applying
 !     a damped Jacobi smoother to the tentative prolongator.
-!  3. The "bizarre" aggregation uses a prolongator proposed by the authors of MLD2P4.
-!     This prolongator still requires a deep analysis and testing and its use is
-!     not recommended.
+!  3. The "bizarre" aggregation uses a prolongator proposed by the authors of AMG4PSBLAS.
+!     This prolongator requires a deeper analysis and testing and its use is
+!     not recommended at this time.
 !  4. Minimum energy aggregation
 !
 !  For more details see

@@ -4,7 +4,7 @@
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !    
-!    (C) Copyright 2020 
+!    (C) Copyright 2021 
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
@@ -38,7 +38,7 @@
 ! File: amg_sexample_ml.f90
 !
 ! This sample program solves a linear system obtained by discretizing a
-! PDE with Dirichlet BCs. The solver is CG, coupled with one of the 
+! PDE with Dirichlet BCs. The solver is CG, coupled with one of the
 ! following multi-level preconditioner, as explained in Section 4.1 of
 ! the AMG4PSBLAS User's and Reference Guide:
 !
@@ -51,10 +51,11 @@
 ! (with ILU(0) on the blocks) as pre- and post-smoother, and 8 block-Jacobi
 ! sweeps (with ILU(0) on the blocks) as coarsest-level solver (Sec. 4.1, Listing 2)
 !
-! - choice = 3,  W-cycle preconditioner based on the coupled aggregation relying on matching,
-! with maximum size of aggregates equal to 8 and smoothed prolongators,
+! - choice = 3,  W-cycle preconditioner based on the coupled aggregation relying
+! on matching, with maximum size of aggregates equal to 8 and smoothed prolongators,
 ! 2 hybrid forward/backward GS sweeps as pre/post-smoother, a distributed coarsest
-! matrix, and preconditioned Flexible Conjugate Gradient as coarsest-level solver (Sec. 4.1, Listing 3)
+! matrix, and preconditioned Flexible Conjugate Gradient as coarsest-level solver
+! (Sec. 4.1, Listing 3)
 !
 ! The matrix and the rhs are read from files (if an rhs is not available, the
 ! unit rhs is set).
@@ -206,7 +207,9 @@ program amg_sexample_ml
     call P%set('COARSE_SOLVE','KRM',info)
     call P%set('COARSE_MAT','DIST',info)
     kmethod = 'CG'
+
   end select
+
   call psb_barrier(ctxt)
   t1 = psb_wtime()
 

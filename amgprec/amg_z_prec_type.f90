@@ -2,9 +2,9 @@
 !
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !
-!    (C) Copyright 2020
+!    (C) Copyright 2021
 !
 !        Salvatore Filippone
 !        Pasqua D'Ambra
@@ -66,7 +66,7 @@ module amg_z_prec_type
   !
   !  This is the data type containing all the information about the multilevel
   !  preconditioner ('d', 's', 'c' and 'z', according to the real/complex,
-  !  single/double precision version of  MLD2P4).
+  !  single/double precision version of  AMG4PSBLAS).
   !  It consists of an array of 'one-level' intermediate data structures
   !  of type amg_zonelev_type, each containing the information needed to apply
   !  the smoothing and the coarse-space correction at a generic level. RT is the

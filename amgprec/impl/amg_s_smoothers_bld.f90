@@ -2,9 +2,9 @@
 !   
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !    
-!    (C) Copyright 2020 
+!    (C) Copyright 2021 
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
@@ -162,7 +162,7 @@ subroutine amg_s_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
     case(amg_umf_,amg_slu_)
       if (prec%precv(iszv)%sm%sv%get_id() /= coarse_solve_id) then
         write(psb_err_unit,*) &
-             & 'MLD2P4: Warning: original coarse solver was requested as ',&
+             & 'AMG4PSBLAS: Warning: original coarse solver was requested as ',&
              & amg_fact_names(coarse_solve_id)
         if (prec%precv(iszv)%parms%coarse_mat == amg_repl_mat_) then
           write(psb_err_unit,*) ' but I am building ',&
@@ -177,19 +177,19 @@ subroutine amg_s_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
         write(psb_err_unit,*) 'This may happen if: '
         write(psb_err_unit,*) '  1. coarse_subsolve has been reset, or '
         write(psb_err_unit,*) '  2. the solver ', amg_fact_names(coarse_solve_id),&
-             & ' was not configured at MLD2P4 build time, or'
+             & ' was not configured at AMG4PSBLAS build time, or'
         write(psb_err_unit,*) '  3. an unsupported solver setup was specified.'
       end if
       if (prec%precv(iszv)%parms%coarse_mat /= amg_repl_mat_) then
         write(psb_err_unit,*) &
-             & 'MLD2P4: Warning: original coarse matrix was requested as replicated', &
+             & 'AMG4PSBLAS: Warning: original coarse matrix was requested as replicated', &
              & ' but it has been changed to distributed.'
       end if
             
     case(psb_ilu_n_, psb_ilu_t_,psb_milu_n_)
       if (prec%precv(iszv)%sm%sv%get_id() /= psb_ilu_n_) then
         write(psb_err_unit,*) &
-             & 'MLD2P4: Warning: original coarse solver was requested as ',&
+             & 'AMG4PSBLAS: Warning: original coarse solver was requested as ',&
              & amg_fact_names(coarse_solve_id)
         if (prec%precv(iszv)%parms%coarse_mat == amg_repl_mat_) then
           write(psb_err_unit,*) ' but I am building ',&
@@ -206,7 +206,7 @@ subroutine amg_s_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
       end if
       if (prec%precv(iszv)%parms%coarse_mat /= amg_repl_mat_) then
         write(psb_err_unit,*) &
-             & 'MLD2P4: Warning: original coarse solver was requested as ',&
+             & 'AMG4PSBLAS: Warning: original coarse solver was requested as ',&
              & amg_fact_names(coarse_solve_id),&
              & ' but the coarse matrix has been changed to distributed'
       end if
@@ -214,7 +214,7 @@ subroutine amg_s_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
     case(amg_mumps_)
       if (prec%precv(iszv)%sm%sv%get_id() /= amg_mumps_) then
         write(psb_err_unit,*) &
-             & 'MLD2P4: Warning: original coarse solver was requested as ',&
+             & 'AMG4PSBLAS: Warning: original coarse solver was requested as ',&
              & amg_fact_names(coarse_solve_id)
         if (prec%precv(iszv)%parms%coarse_mat == amg_repl_mat_) then
           write(psb_err_unit,*) ' but I am building ',&
@@ -229,14 +229,14 @@ subroutine amg_s_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
         write(psb_err_unit,*) 'This may happen if: '
         write(psb_err_unit,*) '  1. coarse_subsolve has been reset, or '
         write(psb_err_unit,*) '  2. the solver ', amg_fact_names(coarse_solve_id),&
-             & ' was not configured at MLD2P4 build time, or'
+             & ' was not configured at AMG4PSBLAS build time, or'
         write(psb_err_unit,*) '  3. an unsupported solver setup was specified.'
       end if
       
     case(amg_sludist_)
       if (prec%precv(iszv)%sm%sv%get_id() /= coarse_solve_id) then
         write(psb_err_unit,*) &
-             & 'MLD2P4: Warning: original coarse solver was requested as ',&
+             & 'AMG4PSBLAS: Warning: original coarse solver was requested as ',&
              & amg_fact_names(coarse_solve_id)
         if (prec%precv(iszv)%parms%coarse_mat == amg_repl_mat_) then
           write(psb_err_unit,*) ' but I am building ',&
@@ -251,12 +251,12 @@ subroutine amg_s_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
         write(psb_err_unit,*) 'This may happen if: '
         write(psb_err_unit,*) '  1. coarse_subsolve has been reset, or '
         write(psb_err_unit,*) '  2. the solver ', amg_fact_names(coarse_solve_id), &
-             & ' was not configured at MLD2P4 build time, or'
+             & ' was not configured at AMG4PSBLAS build time, or'
         write(psb_err_unit,*) '  3. an unsupported solver setup was specified.'
       end if
       if (prec%precv(iszv)%parms%coarse_mat /= amg_distr_mat_) then
         write(psb_err_unit,*) &
-             & 'MLD2P4: Warning: original coarse solver was requested as ',&
+             & 'AMG4PSBLAS: Warning: original coarse solver was requested as ',&
              & amg_fact_names(coarse_solve_id),&
              & ' but the coarse matrix has been changed to replicated'
       end if
@@ -264,7 +264,7 @@ subroutine amg_s_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
     case(amg_bjac_,amg_l1_bjac_,amg_jac_, amg_l1_jac_, amg_gs_, amg_fbgs_, amg_l1_gs_,amg_l1_fbgs_)
       if (prec%precv(iszv)%parms%coarse_mat /= amg_distr_mat_) then
         write(psb_err_unit,*) &
-             & 'MLD2P4: Warning: original coarse solver was requested as ',&
+             & 'AMG4PSBLAS: Warning: original coarse solver was requested as ',&
              & amg_fact_names(coarse_solve_id),&
              & ' but the coarse matrix has been changed to replicated'
       end if

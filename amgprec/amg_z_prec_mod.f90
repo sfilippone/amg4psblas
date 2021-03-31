@@ -2,9 +2,9 @@
 !
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !
-!    (C) Copyright 2020
+!    (C) Copyright 2021
 !
 !        Salvatore Filippone
 !        Pasqua D'Ambra
@@ -40,7 +40,7 @@
 ! Module: amg_z_prec_mod
 !
 !  This module defines the user interfaces to the real/complex, single/double
-!  precision versions of the user-level MLD2P4 routines.
+!  precision versions of the user-level AMG4PSBLAS routines.
 !
 module amg_z_prec_mod
 

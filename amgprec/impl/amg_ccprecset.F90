@@ -2,9 +2,9 @@
 !
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !
-!    (C) Copyright 2020
+!    (C) Copyright 2021
 !
 !        Salvatore Filippone
 !        Pasqua D'Ambra
@@ -56,10 +56,10 @@
 !    what    -  integer, input.
 !               The number identifying the parameter to be set.
 !               A mnemonic constant has been associated to each of these
-!               numbers, as reported in the MLD2P4 User's and Reference Guide.
+!               numbers, as reported in the AMG4PSBLAS User's and Reference Guide.
 !    val     -  integer, input.
 !               The value of the parameter to be set. The list of allowed
-!               values is reported in the MLD2P4 User's and Reference Guide.
+!               values is reported in the AMG4PSBLAS User's and Reference Guide.
 !    info    -  integer, output.
 !               Error code.
 !    ilev    -  integer, optional, input.
@@ -69,7 +69,7 @@
 !               is set at all the appropriate levels.
 !
 !  NOTE: currently, the use of the argument ilev is not "safe" and is reserved to
-!  MLD2P4 developers. Indeed, by using ilev it is possible to set different values
+!  AMG4PSBLAS developers. Indeed, by using ilev it is possible to set different values
 !  of the same parameter at different levels 1,...,nlev-1, even in cases where
 !  the parameter must have the same value at all the levels but the coarsest one.
 !  For this reason, the interface amg_precset to this routine has been built in
@@ -280,10 +280,10 @@ end subroutine amg_ccprecseti
 !    what    -  integer, input.
 !               The number identifying the parameter to be set.
 !               A mnemonic constant has been associated to each of these
-!               numbers, as reported in the MLD2P4 User's and Reference Guide.
+!               numbers, as reported in the AMG4PSBLAS User's and Reference Guide.
 !    string  -  character(len=*), input.
 !               The value of the parameter to be set. The list of allowed
-!               values is reported in the MLD2P4 User's and Reference Guide.
+!               values is reported in the AMG4PSBLAS User's and Reference Guide.
 !    info    -  integer, output.
 !               Error code.
 !    ilev    -  integer, optional, input.
@@ -293,7 +293,7 @@ end subroutine amg_ccprecseti
 !               is set at all the appropriate levels.
 !
 !  NOTE: currently, the use of the argument ilev is not "safe" and is reserved to
-!  MLD2P4 developers. Indeed, by using ilev it is possible to set different values
+!  AMG4PSBLAS developers. Indeed, by using ilev it is possible to set different values
 !  of the same parameter at different levels 1,...,nlev-1, even in cases where
 !  the parameter must have the same value at all the levels but the coarsest one.
 !  For this reason, the interface amg_precset to this routine has been built in
@@ -764,10 +764,10 @@ end subroutine amg_ccprecsetc
 !    what    -  integer, input.
 !               The number identifying the parameter to be set.
 !               A mnemonic constant has been associated to each of these
-!               numbers, as reported in the MLD2P4 User's and Reference Guide.
+!               numbers, as reported in the AMG4PSBLAS User's and Reference Guide.
 !    val     -  real(psb_spk_), input.
 !               The value of the parameter to be set. The list of allowed
-!               values is reported in the MLD2P4 User's and Reference Guide.
+!               values is reported in the AMG4PSBLAS User's and Reference Guide.
 !    info    -  integer, output.
 !               Error code.
 !    ilev    -  integer, optional, input.
@@ -777,7 +777,7 @@ end subroutine amg_ccprecsetc
 !               is set at all the appropriate levels.
 !
 !  NOTE: currently, the use of the argument ilev is not "safe" and is reserved to
-!  MLD2P4 developers. Indeed, by using ilev it is possible to set different values
+!  AMG4PSBLAS developers. Indeed, by using ilev it is possible to set different values
 !  of the same parameter at different levels 1,...,nlev-1, even in cases where
 !  the parameter must have the same value at all the levels but the coarsest one.
 !  For this reason, the interface amg_precset to this routine has been built in

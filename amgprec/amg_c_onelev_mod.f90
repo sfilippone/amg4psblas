@@ -2,9 +2,9 @@
 !   
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !    
-!    (C) Copyright 2020 
+!    (C) Copyright 2021 
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
@@ -82,7 +82,7 @@ module amg_c_onelev_mod
   !  end type amg_conelev_type
   !
   !  Note that s denotes the kind of the real data type to be chosen
-  !  according to single/double precision version of MLD2P4.
+  !  according to single/double precision version of AMG4PSBLAS.
   !
   !   sm,sm2a      -  class(amg_c_base_smoother_type), allocatable
   !                   The current level pre- and post-smooother.
