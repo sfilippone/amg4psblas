@@ -14,7 +14,7 @@ For backward compatibility,  methods are also accessible as
 stand-alone subroutines.
 
 For each method, the same user interface is overloaded with
-respect to the real/complex  and single/double precision data;
+respect to the real/\-com\-plex  and single/double precision data;
 arguments with appropriate data types must be passed to the method, i.e.,
 \begin{itemize}
 \item the sparse matrix data structure, containing the matrix to be
@@ -498,9 +498,9 @@ level (continued).\label{tab:p_coarse_1}}
 		\textsc{comments} \\ \hline
 		\fortinline|'BJAC_STOP'|    & \fortinline|character(len=*)| & \fortinline|'FALSE'| \par \fortinline|'TRUE'| & \fortinline|'FALSE'| & Select whether to use a stopping criterion for the Block-Jacobi method used as a coarse solver.  \\ \hline
 		\fortinline|'BJAC_TRACE'|   & \fortinline|character(len=*)| & \fortinline|'FALSE'| \par \fortinline|'TRUE'| & \fortinline|'FALSE'| & Select whether to print a trace for the calculated residual for the Block-Jacobi method used as a coarse solver. \\ \hline 
-		\fortinline|'BJAC_ITRACE'|  & \fortinline|integer| & Any integer $>0$ & -1 & Number of iterations after which a trace is to be printed. \\ \hline 
-		\fortinline|'BJAC_RESCHECK'|& \fortinline|integer| & Any integer $>0$ & -1 & Number of iterations after which a residual is to be calculated. \\ \hline
-		\fortinline|'BJAC_STOPTOL'| & \fortinline|real(kind_parameter)| & Any real $<1$ & 0 & Tolerance for the stopping criterion on the residual.  \\ \hline
+		\fortinline|'BJAC_ITRACE'|  & \fortinline|integer| & Any integer\par $>0$ & -1 & Number of iterations after which a trace is to be printed. \\ \hline 
+		\fortinline|'BJAC_RESCHECK'|& \fortinline|integer| & Any integer\par $>0$ & -1 & Number of iterations after which a residual is to be calculated. \\ \hline
+		\fortinline|'BJAC_STOPTOL'| & \fortinline|real(kind_parameter)| & Any real\par $<1$ & 0 & Tolerance for the stopping criterion on the residual.  \\ \hline
 		\fortinline|'KRM_METHOD'| & \fortinline|character(len=*)| & \fortinline|'CG'| \par \fortinline|'FCG'| \par \fortinline|'CGS'| \par \fortinline|'CGR'| \par \fortinline|'BICG'| \par \fortinline|'BICGSTAB'| \par \fortinline|'BICGSTABL'| \par \fortinline|'RGMRES'| & \fortinline|'FCG'| & A string that defines the iterative method to be
 		used. \texttt{CG} the Conjugate Gradient method;
 		\texttt{CGS} the Conjugate Gradient Stabilized method;
@@ -510,7 +510,7 @@ level (continued).\label{tab:p_coarse_1}}
 		\texttt{BICGSTAB} the Bi-Conjugate Gradient Stabilized method;
 		\texttt{BICGSTABL} the Bi-Conjugate Gradient Stabilized method with restarting;
 		\texttt{RGMRES} the Generalized Minimal Residual method with restarting. Refer to the PSBLAS guide~\cite{PSBLASGUIDE} for further information. \\ \hline
-		\fortinline|'KRM_KPREC'|  & \fortinline|character(len=*)| & Table~\ref{tab:precinit} & \fortinline|'BJAC'| & The one-level preconditioners from the Table~\ref{tab:precinit} can be used for the coarse Krylov solver.  \\ \hline
+		\fortinline|'KRM_KPREC'|  & \fortinline|character(len=*)| & Table~\ref{tab:precinit} & \fortinline|'BJAC'| & The one-level preconditioners from the Table~\ref{tab:precinit} can be used for the coarse Krylov solver.\\ \hline
 \ifpdf
 \phantomcaption
 \end{tabular}
