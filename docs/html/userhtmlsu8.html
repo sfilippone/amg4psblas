@@ -454,13 +454,13 @@ class="cmr-12">).</span>
 class="newline" />
 <!--l. 178--><p class="indent" >   <span 
 class="cmbx-12">Remark 3. </span><span 
-class="cmr-12">Many of the coarsest-level solvers cannot be used with both the</span>
+class="cmr-12">Many of the coarsest-level solvers cannot be used with both replicated</span>
 <span 
-class="cmr-12">replicated and distributed coarsest-matrix layout; therefore, setting the solver after the</span>
+class="cmr-12">and distributed coarsest-matrix layouts; therefore, setting the solver after the layout</span>
 <span 
-class="cmr-12">layout may change the layout. Similarly, setting the layout after the solver may change</span>
+class="cmr-12">may change the layout. Similarly, setting the layout after the solver may change the</span>
 <span 
-class="cmr-12">the solver.</span>
+class="cmr-12">solver.</span>
 <!--l. 183--><p class="indent" >   <span 
 class="cmr-12">More precisely, UMFPACK and SuperLU require the coarsest-level matrix to be</span>
 <span 
@@ -1652,10 +1652,15 @@ class="cmtt-10x-x-109">&#8217;</span><span
 class="cmtt-10x-x-109">FCG</span><span 
 class="cmtt-10x-x-109">&#8217;</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-8-7-5"  
 class="td11"><!--l. 504--><p class="noindent" >A string that defines the iterative method to
-be used. <span 
-class="cmtt-10x-x-109">CG </span>the Conjugate Gradient method;
-<span 
-class="cmtt-10x-x-109">CGS  </span>the   Conjugate   Gradient   Stabilized
+be  used  when  employing  a  Krylov  method
+<span class="lstinline"></span><span 
+class="cmtt-10x-x-109">&#8217;</span><span 
+class="cmtt-10x-x-109">KRM</span><span 
+class="cmtt-10x-x-109">&#8217;</span> as  a  coarse  solver.  <span 
+class="cmtt-10x-x-109">CG </span>the  Conjugate
+Gradient method; <span 
+class="cmtt-10x-x-109">CGS </span>the Conjugate Gradient
+Stabilized
 method;   <span 
 class="cmtt-10x-x-109">GCR  </span>the   Generalized   Conjugate
 Residual method; <span 

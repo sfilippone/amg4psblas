@@ -176,7 +176,7 @@ coarsest-level solvers, and shortcuts are available
 in this case too (see Table~\ref{tab:p_coarse_1}). \\
 
 \textbf{Remark 3.} Many of the coarsest-level solvers cannot be used
-with both the replicated and distributed coarsest-matrix layout; 
+with both  replicated and distributed coarsest-matrix layouts; 
 therefore, setting the solver after the layout may change the layout.
 Similarly, setting the layout after the solver may change the solver.
 
@@ -502,7 +502,7 @@ level (continued).\label{tab:p_coarse_1}}
 		\fortinline|'BJAC_RESCHECK'|& \fortinline|integer| & Any integer\par $>0$ & -1 & Number of iterations after which a residual is to be calculated. \\ \hline
 		\fortinline|'BJAC_STOPTOL'| & \fortinline|real(kind_parameter)| & Any real\par $<1$ & 0 & Tolerance for the stopping criterion on the residual.  \\ \hline
 		\fortinline|'KRM_METHOD'| & \fortinline|character(len=*)| & \fortinline|'CG'| \par \fortinline|'FCG'| \par \fortinline|'CGS'| \par \fortinline|'CGR'| \par \fortinline|'BICG'| \par \fortinline|'BICGSTAB'| \par \fortinline|'BICGSTABL'| \par \fortinline|'RGMRES'| & \fortinline|'FCG'| & A string that defines the iterative method to be
-		used. \texttt{CG} the Conjugate Gradient method;
+		used when employing a Krylov method \fortinline|'KRM'| as a coarse solver. \texttt{CG} the Conjugate Gradient method;
 		\texttt{CGS} the Conjugate Gradient Stabilized method;
 		\texttt{GCR} the Generalized Conjugate Residual method;
 		\texttt{FCG} the Flexible Conjugate Gradient method;
@@ -940,7 +940,7 @@ Create a (deep) copy of the preconditioner object.
 \begin{tabular}{p{1.2cm}p{12cm}}
 \fortinline|global|  & \fortinline|logical, optional|.\\
               & Whether the global or local preconditioner memory
-                occupatio  is
+                occupation  is
                 desired. Default:  \fortinline|.false.|.\\
 \end{tabular}
 \noindent
@@ -951,7 +951,7 @@ Return memory footprint in bytes.
 \begin{center}
 \fortinline|call p%allocate_wrk(info[, vmold])|\\
 \end{center}
-n
+
 \noindent
 Allocate internal work vectors. Each application of the preconditioner
 uses a number of  work vectors which are allocated internally as
