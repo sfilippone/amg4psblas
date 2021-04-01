@@ -63,7 +63,7 @@ div.obeylines-v p { margin-top:0; margin-bottom:0; }
 td.displaylines {text-align:center; white-space:nowrap;}
 .centerline {text-align:center;}
 .rightline {text-align:right;}
-div.verbatim {font-family: monospace,monospace; white-space: nowrap; text-align:left; clear:both; }
+pre.verbatim {font-family: monospace,monospace; text-align:left; clear:both; }
 .fbox {padding-left:3.0pt; padding-right:3.0pt; text-indent:0pt; border:solid black 0.4pt; }
 div.fbox {display:table}
 div.center div.fbox {text-align:center; clear:both; padding-left:3.0pt; padding-right:3.0pt; text-indent:0pt; border:solid black 0.4pt; }
@@ -149,7 +149,6 @@ div.abstract {width:100%;}
 .shadowbox { padding-left:3pt; padding-right:3pt; border:solid thin; border-right:solid thick; border-bottom:solid thick; }
 .doublebox { padding-left:3pt; padding-right:3pt; border-style:double; border:solid thick; }
 .rotatebox{display: inline-block;}
-.figure img.graphics {margin-left:10%;}
 .lstlisting .label{margin-right:0.5em; }
 div.lstlisting{font-family: monospace,monospace; white-space: nowrap; margin-top:0.5em; margin-bottom:0.5em; }
 div.lstinputlisting{ font-family: monospace,monospace; white-space: nowrap; }
@@ -186,9 +185,9 @@ div.lstinputlisting{ font-family: monospace,monospace; white-space: nowrap; }
 #TBL-5{border-collapse:collapse;}
 #TBL-5 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-5{border-collapse:collapse;}
-td#TBL-5-10-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
-td#TBL-5-11-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
-td#TBL-5-12-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-5-10-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-5-11-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-5-12-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-6 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-6{border-collapse:collapse;}
 #TBL-6 colgroup{border-left: 1px solid black;border-right:1px solid black;}
@@ -201,8 +200,8 @@ td#TBL-5-12-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-6{border-collapse:collapse;}
 #TBL-6 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-6{border-collapse:collapse;}
-td#TBL-6-5-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
-td#TBL-6-6-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-6-5-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-6-6-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-7 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-7{border-collapse:collapse;}
 #TBL-7 colgroup{border-left: 1px solid black;border-right:1px solid black;}
@@ -215,11 +214,11 @@ td#TBL-6-6-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-7{border-collapse:collapse;}
 #TBL-7 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-7{border-collapse:collapse;}
-td#TBL-7-5-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
-td#TBL-7-6-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
-td#TBL-7-7-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
-td#TBL-7-12-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
-td#TBL-7-13-1{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-7-5-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-7-6-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-7-7-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-7-12-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
+td#TBL-7-13-5{border-left:solid black 0.4pt;border-right:solid black 0.4pt;}
 #TBL-8 colgroup{border-left: 1px solid black;border-right:1px solid black;}
 #TBL-8{border-collapse:collapse;}
 #TBL-8 colgroup{border-left: 1px solid black;border-right:1px solid black;}
