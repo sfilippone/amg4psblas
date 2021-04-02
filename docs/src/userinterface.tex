@@ -200,8 +200,8 @@ On the other hand, the distributed layout can be used with any solver
 but UMFPACK and SuperLU; therefore, if any of these two solvers has already
 been selected, the coarsest-level solver is changed to block-Jacobi,
 with the previously chosen solver applied to the local blocks.
-Likewise, the replicated layout can be used with any solver but SuperLu\_Dist;
-therefore, if SuperLu\_Dist has been previously set, the coarsest-level
+Likewise, the replicated layout can be used with any solver but SuperLu\_Dist and KRM;
+therefore, if SuperLu\_Dist or KRM have been previously set, the coarsest-level
 solver is changed to the default sequential solver.
 
 \textbf{Remark 4.}  The argument \fortinline|idx| can be used to allow finer
