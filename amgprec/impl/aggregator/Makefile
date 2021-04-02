@@ -1,12 +1,13 @@
 include ../../../Make.inc
 LIBDIR=../../../lib
 INCDIR=../../../include
-MODDIR=../../../modules 
+MODDIR=../../../modules
 HERE=../..
 
 FINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(PSBLAS_INCLUDES)
+CXXINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(INCDIR) $(FMFLAG)/.
 
-#CINCLUDES= -I${SUPERLU_INCDIR} -I${HSL_INCDIR}  -I${SPRAL_INCDIR} -I/home/users/pasqua/Ambra/BootCMatch/include -lBCM -L/home/users/pasqua/Ambra/BootCMatch/lib  -lm 
+#CINCLUDES= -I${SUPERLU_INCDIR} -I${HSL_INCDIR}  -I${SPRAL_INCDIR} -I/home/users/pasqua/Ambra/BootCMatch/include -lBCM -L/home/users/pasqua/Ambra/BootCMatch/lib  -lm
 
 OBJS= \
 amg_s_dec_aggregator_mat_asb.o \
@@ -40,16 +41,37 @@ amg_z_symdec_aggregator_tprol.o  \
 amg_z_map_to_tprol.o amg_z_soc1_map_bld.o amg_z_soc2_map_bld.o\
 amg_z_rap.o amg_z_ptap_bld.o \
 amg_zaggrmat_minnrg_bld.o\
-amg_zaggrmat_nosmth_bld.o amg_zaggrmat_smth_bld.o 
+amg_zaggrmat_nosmth_bld.o amg_zaggrmat_smth_bld.o \
+amg_d_parmatch_aggregator_mat_bld.o \
+amg_d_parmatch_aggregator_mat_asb.o \
+amg_d_parmatch_aggregator_inner_mat_asb.o \
+amg_d_parmatch_aggregator_tprol.o \
+amg_d_parmatch_spmm_bld.o \
+amg_d_parmatch_spmm_bld_ov.o \
+amg_d_parmatch_unsmth_bld.o \
+amg_d_parmatch_smth_bld.o \
+amg_d_parmatch_spmm_bld_inner.o \
+amg_s_parmatch_aggregator_mat_bld.o \
+amg_s_parmatch_aggregator_mat_asb.o \
+amg_s_parmatch_aggregator_inner_mat_asb.o \
+amg_s_parmatch_aggregator_tprol.o \
+amg_s_parmatch_spmm_bld.o \
+amg_s_parmatch_spmm_bld_ov.o \
+amg_s_parmatch_unsmth_bld.o \
+amg_s_parmatch_smth_bld.o \
+amg_s_parmatch_spmm_bld_inner.o
+
+MPCOBJS=MatchBoxPC.o \
+algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o
 
 
 LIBNAME=libamg_prec.a
 
-lib:  $(OBJS)  	
+lib:  $(OBJS) $(MPCOBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
-mpobjs: 
+mpobjs:
 	(make $(MPFOBJS) F90="$(MPF90)" F90COPT="$(F90COPT)")
 	(make $(MPCOBJS) CC="$(MPCC)" CCOPT="$(CCOPT)")
 

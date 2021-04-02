@@ -2,7 +2,7 @@
 .mod=@MODEXT@
 .fh=.fh
 .SUFFIXES: 
-.SUFFIXES: .f90 .F90 .f .F .c .o
+.SUFFIXES: .f90 .F90 .f .F .c .cpp .o
 ##########################################################
 #                                                        #
 #  Note: directories external to the MLD2P4 subtree      #
