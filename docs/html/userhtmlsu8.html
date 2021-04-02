@@ -3,8 +3,8 @@
 <html > 
 <head><title>Method set</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
@@ -344,16 +344,14 @@ class="cmr-12">the coarsening algorithm;</span>
      </li>
      <li 
   class="enumerate" id="x18-17006x3"><span 
-class="cmr-12">the   coarse-space   correction   at   the   coarsest   level   (for   multilevel</span>
-     <span 
-class="cmr-12">preconditioners only);</span>
+class="cmr-12">the solver at the coarsest level (for multilevel preconditioners only);</span>
      </li>
-                                                                               
-
-                                                                               
      <li 
   class="enumerate" id="x18-17008x4"><span 
 class="cmr-12">the   smoother   of   the   multilevel   preconditioners,   or   the   one-level</span>
+                                                                               
+
+                                                                               
      <span 
 class="cmr-12">preconditioner.</span></li></ol>
 <!--l. 145--><p class="noindent" ><span 
@@ -405,7 +403,12 @@ class="cmr-12">the Gauss-Seidel solver object, while the point-Jacobi smoother i
 <span 
 class="cmr-12">of combining the block-Jacobi smoother object with a single sweep of the</span>
 <span 
-class="cmr-12">point-Jacobi solver object. However, for simplicity, shortcuts are provided to set</span>
+class="cmr-12">point-Jacobi solver object. In the same way are obtained the </span><span 
+class="cmmi-12">&#x2113;</span><sub><span 
+class="cmr-8">1</span></sub><span 
+class="cmr-12">-versions of the</span>
+<span 
+class="cmr-12">smoothers. However, for simplicity, shortcuts are provided to set all versions of</span>
 <span 
 class="cmr-12">point-Jacobi, hybrid (forward) Gauss-Seidel, and hybrid backward Gauss-Seidel, i.e.,</span>
 <span 
@@ -426,7 +429,7 @@ class="cmtt-12">&#8217;</span> <span
 class="cmr-12">as</span>
 <span 
 class="cmr-12">well.</span>
-<!--l. 165--><p class="indent" >   <span 
+<!--l. 166--><p class="indent" >   <span 
 class="cmr-12">The smoother and solver objects are arranged in a hierarchical manner. When</span>
 <span 
 class="cmr-12">specifying a smoother object, its parameters, including the local solver, are set to</span>
@@ -442,7 +445,7 @@ class="cmti-12">after </span><span
 class="cmr-12">the call to set the</span>
 <span 
 class="cmr-12">smoother.</span>
-<!--l. 174--><p class="indent" >   <span 
+<!--l. 175--><p class="indent" >   <span 
 class="cmr-12">Similar considerations apply to the point-Jacobi, Gauss-Seidel and block-Jacobi</span>
 <span 
 class="cmr-12">coarsest-level solvers, and shortcuts are available in this case too (see Table</span><span 
@@ -452,7 +455,7 @@ class="cmr-12">5</span><!--tex4ht:ref: tab:p_coarse_1 --></a><span
 class="cmr-12">).</span>
 <br 
 class="newline" />
-<!--l. 178--><p class="indent" >   <span 
+<!--l. 179--><p class="indent" >   <span 
 class="cmbx-12">Remark 3. </span><span 
 class="cmr-12">Many of the coarsest-level solvers cannot be used with both replicated</span>
 <span 
@@ -461,26 +464,30 @@ class="cmr-12">and distributed coarsest-matrix layouts; therefore, setting the s
 class="cmr-12">may change the layout. Similarly, setting the layout after the solver may change the</span>
 <span 
 class="cmr-12">solver.</span>
-<!--l. 183--><p class="indent" >   <span 
+<!--l. 184--><p class="indent" >   <span 
 class="cmr-12">More precisely, UMFPACK and SuperLU require the coarsest-level matrix to be</span>
 <span 
 class="cmr-12">replicated, while SuperLU</span><span 
-class="cmr-12">_Dist requires it to be distributed. In these cases, setting the</span>
+class="cmr-12">_Dist and KRM requires it to be distributed. In these cases,</span>
 <span 
-class="cmr-12">coarsest-level solver implies that the layout is redefined according to the solver,</span>
+class="cmr-12">setting the coarsest-level solver implies that the layout is redefined according to the</span>
 <span 
-class="cmr-12">ovverriding any previous settings. MUMPS, point-Jacobi, hybrid Gauss-Seidel and</span>
+class="cmr-12">solver, ovverriding any previous settings. MUMPS, point-Jacobi, hybrid Gauss-Seidel</span>
 <span 
-class="cmr-12">block-Jacobi can be applied to replicated and distributed matrices, thus their choice</span>
+class="cmr-12">and block-Jacobi can be applied to replicated and distributed matrices, thus their</span>
 <span 
-class="cmr-12">does not modify any previously specified layout. It is worth noting that, when the</span>
+class="cmr-12">choice does not modify any previously specified layout. It is worth noting that, when</span>
 <span 
-class="cmr-12">matrix is replicated, the point-Jacobi, hybrid Gauss-Seidel and block-Jacobi</span>
+class="cmr-12">the matrix is replicated, the point-Jacobi, hybrid Gauss-Seidel and block-Jacobi solvers</span>
 <span 
-class="cmr-12">solvers reduce to the corresponding local solver objects (see Remark</span><span 
-class="cmr-12">&#x00A0;2). For the</span>
+class="cmr-12">and their </span><span 
+class="cmmi-12">&#x2113;</span><sub><span 
+class="cmr-8">1</span></sub><span 
+class="cmsy-10x-x-120">- </span><span 
+class="cmr-12">versions reduce to the corresponding local solver objects (see Remark</span><span 
+class="cmr-12">&#x00A0;2).</span>
 <span 
-class="cmr-12">point-Jacobi and Gauss-Seidel solvers, these objects correspond to a </span><span 
+class="cmr-12">For the point-Jacobi and Gauss-Seidel solvers, these objects correspond to a </span><span 
 class="cmti-12">single</span>
                                                                                
 
@@ -491,7 +498,7 @@ class="cmti-12">single </span><span
 class="cmr-12">Gauss-Seidel sweep, respectively, which are very poor</span>
 <span 
 class="cmr-12">solvers.</span>
-<!--l. 198--><p class="indent" >   <span 
+<!--l. 199--><p class="indent" >   <span 
 class="cmr-12">On the other hand, the distributed layout can be used with any solver but</span>
 <span 
 class="cmr-12">UMFPACK and SuperLU; therefore, if any of these two solvers has already been</span>
@@ -507,7 +514,7 @@ class="cmr-12">_Dist has been</span>
 class="cmr-12">previously set, the coarsest-level solver is changed to the default sequential</span>
 <span 
 class="cmr-12">solver.</span>
-<!--l. 206--><p class="indent" >   <span 
+<!--l. 207--><p class="indent" >   <span 
 class="cmbx-12">Remark 4. </span><span 
 class="cmr-12">The argument </span><span class="lstinline"></span><span 
 class="cmtt-12">idx</span> <span 
@@ -532,7 +539,7 @@ class="cmr-12">.</span>
                                                                                
 
                                                                                
-<!--l. 217--><p class="indent" >   <a 
+<!--l. 218--><p class="indent" >   <a 
  id="x18-17009r2"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -540,7 +547,7 @@ class="cmr-12">.</span>
                                                                                
 <div class="center" 
 >
-<!--l. 217--><p class="noindent" >
+<!--l. 218--><p class="noindent" >
 <div class="tabular"> <table id="TBL-4" class="tabular" 
 cellspacing="0" cellpadding="0"  
 ><colgroup id="TBL-4-1g"><col 
@@ -551,7 +558,7 @@ id="TBL-4-4"></colgroup><colgroup id="TBL-4-5g"><col
 id="TBL-4-5"></colgroup><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-4-1-"><td  style="white-space:normal; text-align:left;" id="TBL-4-1-1"  
-class="td11"><!--l. 221--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 222--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">what</span>              </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-1-2"  
 class="td11"><span 
 class="cmcsc-10x-x-109"><span 
@@ -563,9 +570,9 @@ class="small-caps">t</span><span
 class="small-caps">y</span><span 
 class="small-caps">p</span><span 
 class="small-caps">e</span>         </span></td><td  style="white-space:normal; text-align:left;" id="TBL-4-1-3"  
-class="td11"><!--l. 221--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 222--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">val</span>         </td><td  style="white-space:normal; text-align:left;" id="TBL-4-1-4"  
-class="td11"><!--l. 221--><p class="noindent" ><span 
+class="td11"><!--l. 222--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">d</span><span 
 class="small-caps">e</span><span 
@@ -574,7 +581,7 @@ class="small-caps">a</span><span
 class="small-caps">u</span><span 
 class="small-caps">l</span><span 
 class="small-caps">t</span></span>      </td><td  style="white-space:normal; text-align:left;" id="TBL-4-1-5"  
-class="td11"><!--l. 222--><p class="noindent" ><span 
+class="td11"><!--l. 223--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">c</span><span 
 class="small-caps">o</span><span 
@@ -586,51 +593,51 @@ class="small-caps">t</span><span
 class="small-caps">s</span></span>                                    </td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-4-2-"><td  style="white-space:normal; text-align:left;" id="TBL-4-2-1"  
-class="td11"><!--l. 223--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 224--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">ML_CYCLE</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-2-2"  
-class="td11"><span class="lstinline"></span><!--l. 223--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 224--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-4-2-3"  
-class="td11"><!--l. 224--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-10x-x-109">&#8217;</span><span 
-class="cmtt-10x-x-109">VCYCLE</span><span 
-class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 224--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-10x-x-109">&#8217;</span><span 
-class="cmtt-10x-x-109">WCYCLE</span><span 
-class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 224--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-10x-x-109">&#8217;</span><span 
-class="cmtt-10x-x-109">KCYCLE</span><span 
-class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 224--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-10x-x-109">&#8217;</span><span 
-class="cmtt-10x-x-109">ADD</span><span 
-class="cmtt-10x-x-109">&#8217;</span>       </td><td  style="white-space:normal; text-align:left;" id="TBL-4-2-4"  
 class="td11"><!--l. 225--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">VCYCLE</span><span 
+class="cmtt-10x-x-109">&#8217;</span>
+<!--l. 225--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-10x-x-109">&#8217;</span><span 
+class="cmtt-10x-x-109">WCYCLE</span><span 
+class="cmtt-10x-x-109">&#8217;</span>
+<!--l. 225--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-10x-x-109">&#8217;</span><span 
+class="cmtt-10x-x-109">KCYCLE</span><span 
+class="cmtt-10x-x-109">&#8217;</span>
+<!--l. 225--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-10x-x-109">&#8217;</span><span 
+class="cmtt-10x-x-109">ADD</span><span 
+class="cmtt-10x-x-109">&#8217;</span>       </td><td  style="white-space:normal; text-align:left;" id="TBL-4-2-4"  
+class="td11"><!--l. 226--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-10x-x-109">&#8217;</span><span 
+class="cmtt-10x-x-109">VCYCLE</span><span 
 class="cmtt-10x-x-109">&#8217;</span>    </td><td  style="white-space:normal; text-align:left;" id="TBL-4-2-5"  
-class="td11"><!--l. 226--><p class="noindent" >Multilevel cycle: V-cycle, W-cycle, K-cycle,
+class="td11"><!--l. 227--><p class="noindent" >Multilevel cycle: V-cycle, W-cycle, K-cycle,
 and additive composition.                      </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-4-3-"><td  style="white-space:normal; text-align:left;" id="TBL-4-3-1"  
-class="td11"><!--l. 227--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 228--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">CYCLE_SWEEPS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>    </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-3-2"  
-class="td11"><span class="lstinline"></span><!--l. 227--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 228--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-4-3-3"  
-class="td11"><!--l. 228--><p class="noindent" >Any integer
-<!--l. 228--><p class="noindent" >number <span 
+class="td11"><!--l. 229--><p class="noindent" >Any integer
+<!--l. 229--><p class="noindent" >number <span 
 class="cmsy-10x-x-109">&#x2265; </span>1   </td><td  style="white-space:normal; text-align:left;" id="TBL-4-3-4"  
-class="td11"><!--l. 228--><p class="noindent" >1                 </td><td  style="white-space:normal; text-align:left;" id="TBL-4-3-5"  
-class="td11"><!--l. 229--><p class="noindent" >Number of multilevel cycles.                   </td>
+class="td11"><!--l. 229--><p class="noindent" >1                 </td><td  style="white-space:normal; text-align:left;" id="TBL-4-3-5"  
+class="td11"><!--l. 230--><p class="noindent" >Number of multilevel cycles.                   </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-4-4-"><td  style="white-space:normal; text-align:left;" id="TBL-4-4-1"  
@@ -648,7 +655,7 @@ applied. </span></div><!--tex4ht:label?: x18-17009r2 -->
                                                                                
 
                                                                                
-<!--l. 239--><p class="indent" >   <a 
+<!--l. 240--><p class="indent" >   <a 
  id="x18-17010r3"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -656,7 +663,7 @@ applied. </span></div><!--tex4ht:label?: x18-17009r2 -->
                                                                                
 <div class="center" 
 >
-<!--l. 239--><p class="noindent" >
+<!--l. 240--><p class="noindent" >
                                                                                
 
                                                                                
@@ -670,7 +677,7 @@ id="TBL-5-4"></colgroup><colgroup id="TBL-5-5g"><col
 id="TBL-5-5"></colgroup><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-5-1-"><td  style="white-space:normal; text-align:left;" id="TBL-5-1-1"  
-class="td11"><!--l. 243--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 244--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">what</span>                        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-1-2"  
 class="td11"><span 
 class="cmcsc-10x-x-109"><span 
@@ -682,9 +689,9 @@ class="small-caps">t</span><span
 class="small-caps">y</span><span 
 class="small-caps">p</span><span 
 class="small-caps">e</span>        </span></td><td  style="white-space:normal; text-align:left;" id="TBL-5-1-3"  
-class="td11"><!--l. 243--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 244--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">val</span>        </td><td  style="white-space:normal; text-align:left;" id="TBL-5-1-4"  
-class="td11"><!--l. 243--><p class="noindent" ><span 
+class="td11"><!--l. 244--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">d</span><span 
 class="small-caps">e</span><span 
@@ -693,7 +700,7 @@ class="small-caps">a</span><span
 class="small-caps">u</span><span 
 class="small-caps">l</span><span 
 class="small-caps">t</span></span>       </td><td  style="white-space:normal; text-align:left;" id="TBL-5-1-5"  
-class="td11"><!--l. 244--><p class="noindent" ><span 
+class="td11"><!--l. 245--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">c</span><span 
 class="small-caps">o</span><span 
@@ -705,17 +712,17 @@ class="small-caps">t</span><span
 class="small-caps">s</span></span>                                  </td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-5-2-"><td  style="white-space:normal; text-align:left;" id="TBL-5-2-1"  
-class="td11"><!--l. 245--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 246--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">MIN_COARSE_SIZE_PER_PROCESS</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-2-2"  
-class="td11"><span class="lstinline"></span><!--l. 245--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 246--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-5-2-3"  
-class="td11"><!--l. 246--><p class="noindent" >Any number
-<!--l. 246--><p class="noindent" ><span 
+class="td11"><!--l. 247--><p class="noindent" >Any number
+<!--l. 247--><p class="noindent" ><span 
 class="cmmi-10x-x-109">&#x003E; </span>0             </td><td  style="white-space:normal; text-align:left;" id="TBL-5-2-4"  
-class="td11"><!--l. 247--><p class="noindent" >200               </td><td  style="white-space:normal; text-align:left;" id="TBL-5-2-5"  
-class="td11"><!--l. 248--><p class="noindent" >Coarse  size  threshold  per  process.  The
+class="td11"><!--l. 248--><p class="noindent" >200               </td><td  style="white-space:normal; text-align:left;" id="TBL-5-2-5"  
+class="td11"><!--l. 249--><p class="noindent" >Coarse  size  threshold  per  process.  The
 aggregation stops if the global number of
 variables of the computed coarsest matrix
 is lower than or equal to this threshold
@@ -724,17 +731,17 @@ multiplied  by  the  number  of  processes
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-5-3-"><td  style="white-space:normal; text-align:left;" id="TBL-5-3-1"  
-class="td11"><!--l. 254--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 255--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">MIN_COARSE_SIZE</span><span 
 class="cmtt-10x-x-109">&#8217;</span>            </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-3-2"  
-class="td11"><span class="lstinline"></span><!--l. 254--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 255--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-5-3-3"  
-class="td11"><!--l. 255--><p class="noindent" >Any number
-<!--l. 255--><p class="noindent" ><span 
+class="td11"><!--l. 256--><p class="noindent" >Any number
+<!--l. 256--><p class="noindent" ><span 
 class="cmmi-10x-x-109">&#x003E; </span>0             </td><td  style="white-space:normal; text-align:left;" id="TBL-5-3-4"  
-class="td11"><!--l. 256--><p class="noindent" >-1                 </td><td  style="white-space:normal; text-align:left;" id="TBL-5-3-5"  
-class="td11"><!--l. 257--><p class="noindent" >Coarse  size  threshold.  The  aggregation
+class="td11"><!--l. 257--><p class="noindent" >-1                 </td><td  style="white-space:normal; text-align:left;" id="TBL-5-3-5"  
+class="td11"><!--l. 258--><p class="noindent" >Coarse  size  threshold.  The  aggregation
 stops  if  the  global  number  of  variables
 of the computed coarsest matrix is lower
 than                   or                   equal
@@ -747,17 +754,17 @@ class="cmtt-10x-x-109">&#8217;</span>.       </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-5-4-"><td  style="white-space:normal; text-align:left;" id="TBL-5-4-1"  
-class="td11"><!--l. 266--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 267--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">MIN_CR_RATIO</span><span 
 class="cmtt-10x-x-109">&#8217;</span>               </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-4-2"  
-class="td11"><span class="lstinline"></span><!--l. 266--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 267--><p class="noindent" ><span 
 class="cmtt-10x-x-109">real</span>                                                                     </td><td  style="white-space:normal; text-align:left;" id="TBL-5-4-3"  
-class="td11"><!--l. 267--><p class="noindent" >Any number
-<!--l. 267--><p class="noindent" ><span 
+class="td11"><!--l. 268--><p class="noindent" >Any number
+<!--l. 268--><p class="noindent" ><span 
 class="cmmi-10x-x-109">&#x003E; </span>1             </td><td  style="white-space:normal; text-align:left;" id="TBL-5-4-4"  
-class="td11"><!--l. 268--><p class="noindent" >1.5                </td><td  style="white-space:normal; text-align:left;" id="TBL-5-4-5"  
-class="td11"><!--l. 269--><p class="noindent" >Minimum                           coarsening
+class="td11"><!--l. 269--><p class="noindent" >1.5                </td><td  style="white-space:normal; text-align:left;" id="TBL-5-4-5"  
+class="td11"><!--l. 270--><p class="noindent" >Minimum                           coarsening
 ratio. The aggregation stops if the ratio
 between the global matrix dimensions at
 two  consecutive  levels  is  lower  than  or
@@ -765,41 +772,41 @@ equal to this threshold (see Note).         </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-5-5-"><td  style="white-space:normal; text-align:left;" id="TBL-5-5-1"  
-class="td11"><!--l. 274--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 275--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">MAX_LEVS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>                   </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-5-2"  
-class="td11"><span class="lstinline"></span><!--l. 274--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 275--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-5-5-3"  
-class="td11"><!--l. 275--><p class="noindent" >Any integer
-<!--l. 275--><p class="noindent" >number <span 
+class="td11"><!--l. 276--><p class="noindent" >Any integer
+<!--l. 276--><p class="noindent" >number <span 
 class="cmmi-10x-x-109">&#x003E; </span>1  </td><td  style="white-space:normal; text-align:left;" id="TBL-5-5-4"  
-class="td11"><!--l. 276--><p class="noindent" >20                </td><td  style="white-space:normal; text-align:left;" id="TBL-5-5-5"  
-class="td11"><!--l. 277--><p class="noindent" >Maximum    number    of    levels.    The
+class="td11"><!--l. 277--><p class="noindent" >20                </td><td  style="white-space:normal; text-align:left;" id="TBL-5-5-5"  
+class="td11"><!--l. 278--><p class="noindent" >Maximum    number    of    levels.    The
 aggregation stops if the number of levels
 reaches this value (see Note).               </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-5-6-"><td  style="white-space:normal; text-align:left;" id="TBL-5-6-1"  
-class="td11"><!--l. 279--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 280--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">PAR_AGGR_ALG</span><span 
 class="cmtt-10x-x-109">&#8217;</span>               </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-6-2"  
-class="td11"><span class="lstinline"></span><!--l. 279--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 280--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-5-6-3"  
-class="td11"><!--l. 280--><p class="noindent" ><span 
+class="td11"><!--l. 281--><p class="noindent" ><span 
 class="cmtt-10x-x-109">&#8217;DEC&#8217;</span>,
 <span 
 class="cmtt-10x-x-109">&#8217;SYMDEC&#8217;</span>,
 <span 
 class="cmtt-10x-x-109">&#8217;COUPLED&#8217;</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-5-6-4"  
-class="td11"><!--l. 281--><p class="noindent" ><span 
+class="td11"><!--l. 282--><p class="noindent" ><span 
 class="cmtt-10x-x-109">&#8217;DEC&#8217;</span>       </td><td  style="white-space:normal; text-align:left;" id="TBL-5-6-5"  
-class="td11"><!--l. 282--><p class="noindent" >Parallel aggregation algorithm.
-<!--l. 282--><p class="noindent" >the  <span class="lstinline"></span><span 
+class="td11"><!--l. 283--><p class="noindent" >Parallel aggregation algorithm.
+<!--l. 283--><p class="noindent" >the  <span class="lstinline"></span><span 
 class="cmtt-10x-x-109">SYMDEC</span>  option  applies  decoupled
 aggregation  to  the  sparsity  pattern  of
 <span 
@@ -809,16 +816,16 @@ class="cmmi-8">T</span> </sup>.                                           </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-5-7-"><td  style="white-space:normal; text-align:left;" id="TBL-5-7-1"  
-class="td11"><!--l. 299--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 300--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">AGGR_TYPE</span><span 
 class="cmtt-10x-x-109">&#8217;</span>                  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-7-2"  
-class="td11"><span class="lstinline"></span><!--l. 299--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 300--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-5-7-3"  
-class="td11"><!--l. 300--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 301--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">SOC1</span><span 
 class="cmtt-10x-x-109">&#8217;</span>,
@@ -830,11 +837,11 @@ class="cmtt-10x-x-109">&#8217;</span>,
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">MATCHBOXP</span><span 
 class="cmtt-10x-x-109">&#8217;</span></td><td  style="white-space:normal; text-align:left;" id="TBL-5-7-4"  
-class="td11"><!--l. 303--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 304--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">SOC1</span><span 
 class="cmtt-10x-x-109">&#8217;</span>      </td><td  style="white-space:normal; text-align:left;" id="TBL-5-7-5"  
-class="td11"><!--l. 304--><p class="noindent" >Type of aggregation algorithm: currently,
+class="td11"><!--l. 305--><p class="noindent" >Type of aggregation algorithm: currently,
 for                                              the
 decoupled aggregation we implement two
 measures of strength of connection, the
@@ -850,22 +857,22 @@ href="userhtmlli5.html#XMatchBoxP">9</a>]</span>.                               
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-5-8-"><td  style="white-space:normal; text-align:left;" id="TBL-5-8-1"  
-class="td11"><!--l. 312--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 313--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">AGGR_SIZE</span><span 
 class="cmtt-10x-x-109">&#8217;</span>                  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-8-2"  
-class="td11"><span class="lstinline"></span><!--l. 312--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 313--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-5-8-3"  
-class="td11"><!--l. 313--><p class="noindent" >Any integer
-<!--l. 313--><p class="noindent" >power   of   2,
+class="td11"><!--l. 314--><p class="noindent" >Any integer
+<!--l. 314--><p class="noindent" >power   of   2,
 with
 <span 
 class="cmtt-10x-x-109">aggr</span><span 
 class="cmtt-10x-x-109">_size</span> <span 
 class="cmsy-10x-x-109">&#x2265;</span>
 2                </td><td  style="white-space:normal; text-align:left;" id="TBL-5-8-4"  
-class="td11"><!--l. 314--><p class="noindent" >4                  </td><td  style="white-space:normal; text-align:left;" id="TBL-5-8-5"  
-class="td11"><!--l. 315--><p class="noindent" >Maximum  size  of  aggregates  when  the
+class="td11"><!--l. 315--><p class="noindent" >4                  </td><td  style="white-space:normal; text-align:left;" id="TBL-5-8-5"  
+class="td11"><!--l. 316--><p class="noindent" >Maximum  size  of  aggregates  when  the
 coupled  aggregation  based  on  matching
 is   applied.   For   aggressive   coarsening
 with  size  of  aggregate  larger  than  8
@@ -877,16 +884,16 @@ class="cmtt-10x-x-109">&#8217;MATCHBOXP&#8217;</span>                   </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-5-9-"><td  style="white-space:normal; text-align:left;" id="TBL-5-9-1"  
-class="td11"><!--l. 320--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 321--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">AGGR_PROL</span><span 
 class="cmtt-10x-x-109">&#8217;</span>                  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-9-2"  
-class="td11"><span class="lstinline"></span><!--l. 320--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 321--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-5-9-3"  
-class="td11"><!--l. 321--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 322--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">SMOOTHED</span><span 
 class="cmtt-10x-x-109">&#8217;</span>,
@@ -894,25 +901,25 @@ class="cmtt-10x-x-109">&#8217;</span>,
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">UNSMOOTHED</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-5-9-4"  
-class="td11"><!--l. 321--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 322--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">SMOOTHED</span><span 
 class="cmtt-10x-x-109">&#8217;</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-5-9-5"  
-class="td11"><!--l. 322--><p class="noindent" >Prolongator  used  by  the  aggregation
+class="td11"><!--l. 323--><p class="noindent" >Prolongator  used  by  the  aggregation
 algorithm: smoothed or unsmoothed (i.e.,
 tentative prolongator).                        </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
- style="vertical-align:baseline;" id="TBL-5-10-"><td colspan="3" style="white-space:normal; text-align:left;" id="TBL-5-10-1"  
-class="td11"></td><div class="multicolumn"  style="white-space:nowrap; text-align:left;"><span 
+ style="vertical-align:baseline;" id="TBL-5-10-"><td colspan="5" style="white-space:nowrap; text-align:left;" id="TBL-5-10-1"  
+class="td11"><div class="multicolumn"  style="white-space:nowrap; text-align:left;"><span 
 class="cmbx-10x-x-109">Note. </span>The aggregation algorithm stops when at least one of the following criteria is met: the coarse size threshold, </div>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-5-11-"><td colspan="3" style="white-space:normal; text-align:left;" id="TBL-5-11-1"  
-class="td11"></td><div class="multicolumn"  style="white-space:nowrap; text-align:left;">the minimum coarsening ratio, or the maximum number of levels is reached.</div>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-5-12-"><td colspan="3" style="white-space:normal; text-align:left;" id="TBL-5-12-1"  
-class="td11"></td><div class="multicolumn"  style="white-space:nowrap; text-align:left;">Therefore, the actual number of levels may be smaller than the specified maximum number of levels. </div>
-</tr><tr 
+</td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-11-"><td colspan="5" style="white-space:nowrap; text-align:left;" id="TBL-5-11-1"  
+class="td11"><div class="multicolumn"  style="white-space:nowrap; text-align:left;">the minimum coarsening ratio, or the maximum number of levels is reached.</div>
+</td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-12-"><td colspan="5" style="white-space:nowrap; text-align:left;" id="TBL-5-12-1"  
+class="td11"><div class="multicolumn"  style="white-space:nowrap; text-align:left;">Therefore, the actual number of levels may be smaller than the specified maximum number of levels. </div>
+</td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-5-13-"><td  style="white-space:normal; text-align:left;" id="TBL-5-13-1"  
 class="td11">                             </td></tr></table>
@@ -933,7 +940,7 @@ class="content">Parameters defining the aggregation algorithm. </span></div><!--
                                                                                
 
                                                                                
-<!--l. 340--><p class="indent" >   <a 
+<!--l. 341--><p class="indent" >   <a 
  id="x18-17011r4"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -941,7 +948,7 @@ class="content">Parameters defining the aggregation algorithm. </span></div><!--
                                                                                
 <div class="center" 
 >
-<!--l. 340--><p class="noindent" >
+<!--l. 341--><p class="noindent" >
 <div class="tabular"> <table id="TBL-6" class="tabular" 
 cellspacing="0" cellpadding="0"  
 ><colgroup id="TBL-6-1g"><col 
@@ -952,7 +959,7 @@ id="TBL-6-4"></colgroup><colgroup id="TBL-6-5g"><col
 id="TBL-6-5"></colgroup><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-6-1-"><td  style="white-space:normal; text-align:left;" id="TBL-6-1-1"  
-class="td11"><!--l. 344--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 345--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">what</span>               </td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-1-2"  
 class="td11"><span 
 class="cmcsc-10x-x-109"><span 
@@ -964,9 +971,9 @@ class="small-caps">t</span><span
 class="small-caps">y</span><span 
 class="small-caps">p</span><span 
 class="small-caps">e</span>               </span></td><td  style="white-space:normal; text-align:left;" id="TBL-6-1-3"  
-class="td11"><!--l. 344--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 345--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">val</span>         </td><td  style="white-space:normal; text-align:left;" id="TBL-6-1-4"  
-class="td11"><!--l. 344--><p class="noindent" ><span 
+class="td11"><!--l. 345--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">d</span><span 
 class="small-caps">e</span><span 
@@ -975,7 +982,7 @@ class="small-caps">a</span><span
 class="small-caps">u</span><span 
 class="small-caps">l</span><span 
 class="small-caps">t</span></span>      </td><td  style="white-space:normal; text-align:left;" id="TBL-6-1-5"  
-class="td11"><!--l. 345--><p class="noindent" ><span 
+class="td11"><!--l. 346--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">c</span><span 
 class="small-caps">o</span><span 
@@ -987,22 +994,22 @@ class="small-caps">t</span><span
 class="small-caps">s</span></span>                                </td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-6-2-"><td  style="white-space:normal; text-align:left;" id="TBL-6-2-1"  
-class="td11"><!--l. 347--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 348--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">AGGR_ORD</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-2-2"  
-class="td11"><span class="lstinline"></span><!--l. 347--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 348--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-6-2-3"  
-class="td11"><!--l. 348--><p class="noindent" ><span 
-class="cmtt-10x-x-109">&#8217;NATURAL&#8217;</span>
-<!--l. 348--><p class="noindent" ><span 
-class="cmtt-10x-x-109">&#8217;DEGREE&#8217;</span>    </td><td  style="white-space:normal; text-align:left;" id="TBL-6-2-4"  
 class="td11"><!--l. 349--><p class="noindent" ><span 
+class="cmtt-10x-x-109">&#8217;NATURAL&#8217;</span>
+<!--l. 349--><p class="noindent" ><span 
+class="cmtt-10x-x-109">&#8217;DEGREE&#8217;</span>    </td><td  style="white-space:normal; text-align:left;" id="TBL-6-2-4"  
+class="td11"><!--l. 350--><p class="noindent" ><span 
 class="cmtt-10x-x-109">&#8217;NATURAL&#8217;</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-6-2-5"  
-class="td11"><!--l. 350--><p class="noindent" >Initial    ordering    of    indices    for
+class="td11"><!--l. 351--><p class="noindent" >Initial    ordering    of    indices    for
 the  decoupled  aggregation  algorithm:
 either  natural  ordering  or  sorted  by
 descending degrees of the nodes in the
@@ -1010,57 +1017,57 @@ matrix graph.                                 </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-6-3-"><td  style="white-space:normal; text-align:left;" id="TBL-6-3-1"  
-class="td11"><!--l. 357--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 358--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">AGGR_THRESH</span><span 
 class="cmtt-10x-x-109">&#8217;</span>      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-3-2"  
-class="td11"><span class="lstinline"></span><!--l. 357--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 358--><p class="noindent" ><span 
 class="cmtt-10x-x-109">real</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">kind_parameter</span><span 
 class="cmtt-10x-x-109">)</span>                                                     </td><td  style="white-space:normal; text-align:left;" id="TBL-6-3-3"  
-class="td11"><!--l. 358--><p class="noindent" >Any&#x00A0;real
-<!--l. 358--><p class="noindent" >number&#x00A0;<span 
+class="td11"><!--l. 359--><p class="noindent" >Any&#x00A0;real
+<!--l. 359--><p class="noindent" >number&#x00A0;<span 
 class="cmsy-10x-x-109">&#x2208;</span>
 [0<span 
 class="cmmi-10x-x-109">,</span>1]             </td><td  style="white-space:normal; text-align:left;" id="TBL-6-3-4"  
-class="td11"><!--l. 359--><p class="noindent" >0.01             </td><td  style="white-space:normal; text-align:left;" id="TBL-6-3-5"  
-class="td11"><!--l. 360--><p class="noindent" >The  threshold  <span 
+class="td11"><!--l. 360--><p class="noindent" >0.01             </td><td  style="white-space:normal; text-align:left;" id="TBL-6-3-5"  
+class="td11"><!--l. 361--><p class="noindent" >The  threshold  <span 
 class="cmmi-10x-x-109">&#x03B8;  </span>in  the  strength  of
 connection algorithm. See also the note
 at the bottom of this table.               </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-6-4-"><td  style="white-space:normal; text-align:left;" id="TBL-6-4-1"  
-class="td11"><!--l. 363--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 364--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">AGGR_FILTER</span><span 
 class="cmtt-10x-x-109">&#8217;</span>      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-4-2"  
-class="td11"><span class="lstinline"></span><!--l. 364--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 365--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-6-4-3"  
-class="td11"><!--l. 365--><p class="noindent" ><span 
-class="cmtt-10x-x-109">&#8217;FILTER&#8217;</span>
-<!--l. 365--><p class="noindent" ><span 
-class="cmtt-10x-x-109">&#8217;NOFILTER&#8217;</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-6-4-4"  
 class="td11"><!--l. 366--><p class="noindent" ><span 
+class="cmtt-10x-x-109">&#8217;FILTER&#8217;</span>
+<!--l. 366--><p class="noindent" ><span 
+class="cmtt-10x-x-109">&#8217;NOFILTER&#8217;</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-6-4-4"  
+class="td11"><!--l. 367--><p class="noindent" ><span 
 class="cmtt-10x-x-109">&#8217;NOFILTER&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-6-4-5"  
-class="td11"><!--l. 367--><p class="noindent" >Matrix used in computing the smoothed
+class="td11"><!--l. 368--><p class="noindent" >Matrix used in computing the smoothed
 prolongator: filtered or unfiltered.       </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
- style="vertical-align:baseline;" id="TBL-6-5-"><td colspan="3" style="white-space:normal; text-align:left;" id="TBL-6-5-1"  
-class="td11"></td><div class="multicolumn"  style="white-space:nowrap; text-align:left;"><span 
+ style="vertical-align:baseline;" id="TBL-6-5-"><td colspan="5" style="white-space:nowrap; text-align:left;" id="TBL-6-5-1"  
+class="td11"><div class="multicolumn"  style="white-space:nowrap; text-align:left;"><span 
 class="cmbx-10x-x-109">Note. </span>Different thresholds at different levels, such as those used in <span class="cite">[<a 
 href="userhtmlli5.html#XVANEK_MANDEL_BREZINA">33</a>, Section&#x00A0;5.1]</span>, can be easily set by invoking the rou-</div>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-6-6-"><td colspan="3" style="white-space:normal; text-align:left;" id="TBL-6-6-1"  
-class="td11"></td><div class="multicolumn"  style="white-space:nowrap; text-align:left;">tine <span 
+</td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-6-"><td colspan="5" style="white-space:nowrap; text-align:left;" id="TBL-6-6-1"  
+class="td11"><div class="multicolumn"  style="white-space:nowrap; text-align:left;">tine <span 
 class="cmtt-10x-x-109">set </span>with the parameter <span 
 class="cmtt-10x-x-109">ilev</span>.</div>
-</tr><tr 
+</td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-6-7-"><td  style="white-space:normal; text-align:left;" id="TBL-6-7-1"  
 class="td11">                   </td></tr></table></div></div>
@@ -1076,7 +1083,7 @@ class="content">Parameters defining the aggregation algorithm (continued). </spa
                                                                                
 
                                                                                
-<!--l. 384--><p class="indent" >   <a 
+<!--l. 385--><p class="indent" >   <a 
  id="x18-17012r5"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -1084,7 +1091,7 @@ class="content">Parameters defining the aggregation algorithm (continued). </spa
                                                                                
 <div class="center" 
 >
-<!--l. 384--><p class="noindent" >
+<!--l. 385--><p class="noindent" >
                                                                                
 
                                                                                
@@ -1098,7 +1105,7 @@ id="TBL-7-4"></colgroup><colgroup id="TBL-7-5g"><col
 id="TBL-7-5"></colgroup><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-7-1-"><td  style="white-space:normal; text-align:left;" id="TBL-7-1-1"  
-class="td11"><!--l. 387--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 388--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">what</span>               </td><td  style="white-space:nowrap; text-align:left;" id="TBL-7-1-2"  
 class="td11"><span 
 class="cmcsc-10x-x-109"><span 
@@ -1110,9 +1117,9 @@ class="small-caps">t</span><span
 class="small-caps">y</span><span 
 class="small-caps">p</span><span 
 class="small-caps">e</span>               </span></td><td  style="white-space:normal; text-align:left;" id="TBL-7-1-3"  
-class="td11"><!--l. 387--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 388--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">val</span>     </td><td  style="white-space:normal; text-align:left;" id="TBL-7-1-4"  
-class="td11"><!--l. 387--><p class="noindent" ><span 
+class="td11"><!--l. 388--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">d</span><span 
 class="small-caps">e</span><span 
@@ -1121,7 +1128,7 @@ class="small-caps">a</span><span
 class="small-caps">u</span><span 
 class="small-caps">l</span><span 
 class="small-caps">t</span></span> </td><td  style="white-space:normal; text-align:left;" id="TBL-7-1-5"  
-class="td11"><!--l. 388--><p class="noindent" ><span 
+class="td11"><!--l. 389--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">c</span><span 
 class="small-caps">o</span><span 
@@ -1133,75 +1140,75 @@ class="small-caps">t</span><span
 class="small-caps">s</span></span>                                              </td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-7-2-"><td  style="white-space:normal; text-align:left;" id="TBL-7-2-1"  
-class="td11"><!--l. 389--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 390--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">COARSE_MAT</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:nowrap; text-align:left;" id="TBL-7-2-2"  
-class="td11"><span class="lstinline"></span><!--l. 389--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 390--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-7-2-3"  
-class="td11"><!--l. 390--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 391--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">DIST</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 390--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 391--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">REPL</span><span 
 class="cmtt-10x-x-109">&#8217;</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-7-2-4"  
-class="td11"><!--l. 391--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 392--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">REPL</span><span 
 class="cmtt-10x-x-109">&#8217;</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-7-2-5"  
-class="td11"><!--l. 392--><p class="noindent" >Coarsest  matrix  layout:  distributed  among  the
+class="td11"><!--l. 393--><p class="noindent" >Coarsest  matrix  layout:  distributed  among  the
 processes or replicated on each of them.               </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-7-3-"><td  style="white-space:normal; text-align:left;" id="TBL-7-3-1"  
-class="td11"><!--l. 394--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 395--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">COARSE_SOLVE</span><span 
 class="cmtt-10x-x-109">&#8217;</span>      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-7-3-2"  
-class="td11"><span class="lstinline"></span><!--l. 394--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 395--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-7-3-3"  
-class="td11"><!--l. 395--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 396--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">MUMPS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 395--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 396--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">UMF</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 396--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 397--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">SLU</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 396--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 397--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">SLUDIST</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 397--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 398--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">JACOBI</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 397--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 398--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">GS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 397--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 398--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">BJAC</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 397--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 398--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">KRM</span><span 
 class="cmtt-10x-x-109">&#8217;</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-7-3-4"  
-class="td11"><!--l. 398--><p class="noindent" >See&#x00A0;Note.</td><td  style="white-space:normal; text-align:left;" id="TBL-7-3-5"  
-class="td11"><!--l. 399--><p class="noindent" >Solver   used   at   the   coarsest   level:   sequential
+class="td11"><!--l. 399--><p class="noindent" >See&#x00A0;Note.</td><td  style="white-space:normal; text-align:left;" id="TBL-7-3-5"  
+class="td11"><!--l. 400--><p class="noindent" >Solver   used   at   the   coarsest   level:   sequential
 LU   from   MUMPS,   UMFPACK,   or   SuperLU
 (plus   triangular   solve);   distributed   LU   from
 MUMPS or SuperLU_Dist (plus triangular solve);
@@ -1231,53 +1238,53 @@ double precision.                                             </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-7-4-"><td  style="white-space:normal; text-align:left;" id="TBL-7-4-1"  
-class="td11"><!--l. 429--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 430--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">COARSE_SUBSOLVE</span><span 
 class="cmtt-10x-x-109">&#8217;</span>   </td><td  style="white-space:nowrap; text-align:left;" id="TBL-7-4-2"  
-class="td11"><span class="lstinline"></span><!--l. 429--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 430--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-7-4-3"  
-class="td11"><!--l. 430--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 431--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">ILU</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 430--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 431--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">ILUT</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 430--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 431--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">MILU</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 431--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 432--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">MUMPS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 431--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 432--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">SLU</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 431--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 432--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">UMF</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 432--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 433--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">INVT</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 432--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 433--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">INVK</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 432--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 433--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">AINV</span><span 
 class="cmtt-10x-x-109">&#8217;</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-7-4-4"  
-class="td11"><!--l. 433--><p class="noindent" >See&#x00A0;Note.</td><td  style="white-space:normal; text-align:left;" id="TBL-7-4-5"  
-class="td11"><!--l. 434--><p class="noindent" >Solver  for  the  diagonal  blocks  of  the  coarsest
+class="td11"><!--l. 434--><p class="noindent" >See&#x00A0;Note.</td><td  style="white-space:normal; text-align:left;" id="TBL-7-4-5"  
+class="td11"><!--l. 435--><p class="noindent" >Solver  for  the  diagonal  blocks  of  the  coarsest
 matrix, in case the block Jacobi solver is chosen
 as coarsest-level solver: ILU(<span 
 class="cmmi-10x-x-109">p</span>), ILU(<span 
@@ -1303,30 +1310,30 @@ and  SuperLU_Dist  are  available  only  in  double
 precision.                                                       </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
- style="vertical-align:baseline;" id="TBL-7-5-"><td colspan="3" style="white-space:normal; text-align:left;" id="TBL-7-5-1"  
-class="td11"></td><div class="multicolumn"  style="white-space:nowrap; text-align:left;"><span 
+ style="vertical-align:baseline;" id="TBL-7-5-"><td colspan="5" style="white-space:nowrap; text-align:left;" id="TBL-7-5-1"  
+class="td11"><div class="multicolumn"  style="white-space:nowrap; text-align:left;"><span 
 class="cmbx-10x-x-109">Note. </span>Defaults for <span 
 class="cmtt-10x-x-109">COARSE</span><span 
 class="cmtt-10x-x-109">_SOLVE </span>and <span 
 class="cmtt-10x-x-109">COARSE</span><span 
 class="cmtt-10x-x-109">_SUBSOLVE </span>are chosen in the following order:</div>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-7-6-"><td colspan="3" style="white-space:normal; text-align:left;" id="TBL-7-6-1"  
-class="td11"></td><div class="multicolumn"  style="white-space:nowrap; text-align:left;">single precision version &#8211; <span 
+</td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-7-6-"><td colspan="5" style="white-space:nowrap; text-align:left;" id="TBL-7-6-1"  
+class="td11"><div class="multicolumn"  style="white-space:nowrap; text-align:left;">single precision version &#8211; <span 
 class="cmtt-10x-x-109">MUMPS </span>if installed, then <span 
 class="cmtt-10x-x-109">SLU </span>if installed, <span 
 class="cmtt-10x-x-109">ILU </span>otherwise;</div>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-7-7-"><td colspan="3" style="white-space:normal; text-align:left;" id="TBL-7-7-1"  
-class="td11"></td><div class="multicolumn"  style="white-space:nowrap; text-align:left;">double precision version &#8211; <span 
+</td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-7-7-"><td colspan="5" style="white-space:nowrap; text-align:left;" id="TBL-7-7-1"  
+class="td11"><div class="multicolumn"  style="white-space:nowrap; text-align:left;">double precision version &#8211; <span 
 class="cmtt-10x-x-109">UMF </span>if installed, then <span 
 class="cmtt-10x-x-109">MUMPS </span>if installed, then <span 
 class="cmtt-10x-x-109">SLU </span>if installed, <span 
 class="cmtt-10x-x-109">ILU </span>otherwise.</div>
-</tr><tr 
+</td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-7-8-"><td  style="white-space:normal; text-align:left;" id="TBL-7-8-1"  
-class="td11"><!--l. 465--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 466--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">what</span>                </td><td  style="white-space:nowrap; text-align:left;" id="TBL-7-8-2"  
 class="td11"><span 
 class="cmcsc-10x-x-109"><span 
@@ -1338,9 +1345,9 @@ class="small-caps">t</span><span
 class="small-caps">y</span><span 
 class="small-caps">p</span><span 
 class="small-caps">e</span>               </span></td><td  style="white-space:normal; text-align:left;" id="TBL-7-8-3"  
-class="td11"><!--l. 465--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 466--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">val</span>     </td><td  style="white-space:normal; text-align:left;" id="TBL-7-8-4"  
-class="td11"><!--l. 465--><p class="noindent" ><span 
+class="td11"><!--l. 466--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">d</span><span 
 class="small-caps">e</span><span 
@@ -1349,7 +1356,7 @@ class="small-caps">a</span><span
 class="small-caps">u</span><span 
 class="small-caps">l</span><span 
 class="small-caps">t</span></span> </td><td  style="white-space:normal; text-align:left;" id="TBL-7-8-5"  
-class="td11"><!--l. 466--><p class="noindent" ><span 
+class="td11"><!--l. 467--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">c</span><span 
 class="small-caps">o</span><span 
@@ -1362,19 +1369,19 @@ class="small-caps">s</span></span>                                              
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-7-9-"><td  style="white-space:normal; text-align:left;" id="TBL-7-9-1"  
-class="td11"><!--l. 467--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 468--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">COARSE_SWEEPS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-7-9-2"  
-class="td11"><span class="lstinline"></span><!--l. 467--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 468--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-7-9-3"  
-class="td11"><!--l. 468--><p class="noindent" >Any
+class="td11"><!--l. 469--><p class="noindent" >Any
 integer
-<!--l. 468--><p class="noindent" >number <span 
+<!--l. 469--><p class="noindent" >number <span 
 class="cmmi-10x-x-109">&#x003E;</span>
 0            </td><td  style="white-space:normal; text-align:left;" id="TBL-7-9-4"  
-class="td11"><!--l. 469--><p class="noindent" >10          </td><td  style="white-space:normal; text-align:left;" id="TBL-7-9-5"  
-class="td11"><!--l. 470--><p class="noindent" >Number  of  sweeps  when  <span class="lstinline"></span><span 
+class="td11"><!--l. 470--><p class="noindent" >10          </td><td  style="white-space:normal; text-align:left;" id="TBL-7-9-5"  
+class="td11"><!--l. 471--><p class="noindent" >Number  of  sweeps  when  <span class="lstinline"></span><span 
 class="cmtt-10x-x-109">JACOBI</span>,  <span class="lstinline"></span><span 
 class="cmtt-10x-x-109">GS</span> or  <span class="lstinline"></span><span 
 class="cmtt-10x-x-109">BJAC</span> is
@@ -1382,52 +1389,52 @@ chosen as coarsest-level solver.                           </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-7-10-"><td  style="white-space:normal; text-align:left;" id="TBL-7-10-1"  
-class="td11"><!--l. 472--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 473--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">COARSE_FILLIN</span><span 
 class="cmtt-10x-x-109">&#8217;</span>     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-7-10-2"  
-class="td11"><span class="lstinline"></span><!--l. 472--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 473--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-7-10-3"  
-class="td11"><!--l. 473--><p class="noindent" >Any
+class="td11"><!--l. 474--><p class="noindent" >Any
 integer
-<!--l. 473--><p class="noindent" >number <span 
+<!--l. 474--><p class="noindent" >number <span 
 class="cmsy-10x-x-109">&#x2265;</span>
 0            </td><td  style="white-space:normal; text-align:left;" id="TBL-7-10-4"  
-class="td11"><!--l. 474--><p class="noindent" >0            </td><td  style="white-space:normal; text-align:left;" id="TBL-7-10-5"  
-class="td11"><!--l. 475--><p class="noindent" >Fill-in  level  <span 
+class="td11"><!--l. 475--><p class="noindent" >0            </td><td  style="white-space:normal; text-align:left;" id="TBL-7-10-5"  
+class="td11"><!--l. 476--><p class="noindent" >Fill-in  level  <span 
 class="cmmi-10x-x-109">p </span>of  the  ILU  factorizations  and  first
 fill-in for the approximate inverses.                     </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-7-11-"><td  style="white-space:normal; text-align:left;" id="TBL-7-11-1"  
-class="td11"><!--l. 477--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 478--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">COARSE_ILUTHRS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>    </td><td  style="white-space:nowrap; text-align:left;" id="TBL-7-11-2"  
-class="td11"><span class="lstinline"></span><!--l. 478--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 479--><p class="noindent" ><span 
 class="cmtt-10x-x-109">real</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">kind_parameter</span><span 
 class="cmtt-10x-x-109">)</span>                                                     </td><td  style="white-space:normal; text-align:left;" id="TBL-7-11-3"  
-class="td11"><!--l. 479--><p class="noindent" >Any real
-<!--l. 479--><p class="noindent" >number <span 
+class="td11"><!--l. 480--><p class="noindent" >Any real
+<!--l. 480--><p class="noindent" >number <span 
 class="cmsy-10x-x-109">&#x2265;</span>
 0            </td><td  style="white-space:normal; text-align:left;" id="TBL-7-11-4"  
-class="td11"><!--l. 480--><p class="noindent" >0            </td><td  style="white-space:normal; text-align:left;" id="TBL-7-11-5"  
-class="td11"><!--l. 481--><p class="noindent" >Drop tolerance <span 
+class="td11"><!--l. 481--><p class="noindent" >0            </td><td  style="white-space:normal; text-align:left;" id="TBL-7-11-5"  
+class="td11"><!--l. 482--><p class="noindent" >Drop tolerance <span 
 class="cmmi-10x-x-109">t </span>in the ILU(<span 
 class="cmmi-10x-x-109">p,t</span>) factorization and
 first drop-tolerance for the approximate inverses.   </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
- style="vertical-align:baseline;" id="TBL-7-12-"><td colspan="3" style="white-space:normal; text-align:left;" id="TBL-7-12-1"  
-class="td11"></td><div class="multicolumn"  style="white-space:nowrap; text-align:left;"><span 
+ style="vertical-align:baseline;" id="TBL-7-12-"><td colspan="5" style="white-space:nowrap; text-align:left;" id="TBL-7-12-1"  
+class="td11"><div class="multicolumn"  style="white-space:nowrap; text-align:left;"><span 
 class="cmbx-10x-x-109">Note. </span>Further options for coarse solvers are contained in Table&#x00A0;<a 
 href="#x18-17013r6">6<!--tex4ht:ref: tab:p_coarse_2 --></a>.</div>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-7-13-"><td colspan="3" style="white-space:normal; text-align:left;" id="TBL-7-13-1"  
-class="td11"></td><div class="multicolumn"  style="white-space:nowrap; text-align:left;">For a first use it is suggested to use the default options obtained by simply selecting the solver type.</div>
-</tr><tr 
+</td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-7-13-"><td colspan="5" style="white-space:nowrap; text-align:left;" id="TBL-7-13-1"  
+class="td11"><div class="multicolumn"  style="white-space:nowrap; text-align:left;">For a first use it is suggested to use the default options obtained by simply selecting the solver type.</div>
+</td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-7-14-"><td  style="white-space:normal; text-align:left;" id="TBL-7-14-1"  
 class="td11">                    </td></tr></table>
@@ -1447,7 +1454,7 @@ class="content">Parameters defining the solver at the coarsest level (continued)
                                                                                
 
                                                                                
-<!--l. 494--><p class="indent" >   <a 
+<!--l. 495--><p class="indent" >   <a 
  id="x18-17013r6"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -1455,7 +1462,7 @@ class="content">Parameters defining the solver at the coarsest level (continued)
                                                                                
 <div class="center" 
 >
-<!--l. 494--><p class="noindent" >
+<!--l. 495--><p class="noindent" >
                                                                                
 
                                                                                
@@ -1469,7 +1476,7 @@ id="TBL-8-4"></colgroup><colgroup id="TBL-8-5g"><col
 id="TBL-8-5"></colgroup><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-1-"><td  style="white-space:normal; text-align:left;" id="TBL-8-1-1"  
-class="td11"><!--l. 497--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 498--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">what</span>               </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-1-2"  
 class="td11"><span 
 class="cmcsc-10x-x-109"><span 
@@ -1481,9 +1488,9 @@ class="small-caps">t</span><span
 class="small-caps">y</span><span 
 class="small-caps">p</span><span 
 class="small-caps">e</span>               </span></td><td  style="white-space:normal; text-align:left;" id="TBL-8-1-3"  
-class="td11"><!--l. 497--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 498--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">val</span>       </td><td  style="white-space:normal; text-align:left;" id="TBL-8-1-4"  
-class="td11"><!--l. 497--><p class="noindent" ><span 
+class="td11"><!--l. 498--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">d</span><span 
 class="small-caps">e</span><span 
@@ -1492,7 +1499,7 @@ class="small-caps">a</span><span
 class="small-caps">u</span><span 
 class="small-caps">l</span><span 
 class="small-caps">t</span></span> </td><td  style="white-space:normal; text-align:left;" id="TBL-8-1-5"  
-class="td11"><!--l. 498--><p class="noindent" ><span 
+class="td11"><!--l. 499--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">c</span><span 
 class="small-caps">o</span><span 
@@ -1504,42 +1511,15 @@ class="small-caps">t</span><span
 class="small-caps">s</span></span>                                        </td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-2-"><td  style="white-space:normal; text-align:left;" id="TBL-8-2-1"  
-class="td11"><!--l. 499--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 500--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">BJAC_STOP</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-2-2"  
-class="td11"><span class="lstinline"></span><!--l. 499--><p class="noindent" ><span 
-class="cmtt-10x-x-109">character</span><span 
-class="cmtt-10x-x-109">(</span><span 
-class="cmtt-10x-x-109">len</span><span 
-class="cmtt-10x-x-109">=*)</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-8-2-3"  
-class="td11"><!--l. 499--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-10x-x-109">&#8217;</span><span 
-class="cmtt-10x-x-109">FALSE</span><span 
-class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 499--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-10x-x-109">&#8217;</span><span 
-class="cmtt-10x-x-109">TRUE</span><span 
-class="cmtt-10x-x-109">&#8217;</span>    </td><td  style="white-space:normal; text-align:left;" id="TBL-8-2-4"  
-class="td11"><!--l. 499--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-10x-x-109">&#8217;</span><span 
-class="cmtt-10x-x-109">FALSE</span><span 
-class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-8-2-5"  
-class="td11"><!--l. 499--><p class="noindent" >Select whether to use a stopping criterion for
-the  Block-Jacobi  method  used  as  a  coarse
-solver.                                                    </td>
-</tr><tr 
-class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
- style="vertical-align:baseline;" id="TBL-8-3-"><td  style="white-space:normal; text-align:left;" id="TBL-8-3-1"  
-class="td11"><!--l. 500--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-10x-x-109">&#8217;</span><span 
-class="cmtt-10x-x-109">BJAC_TRACE</span><span 
-class="cmtt-10x-x-109">&#8217;</span>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-3-2"  
 class="td11"><span class="lstinline"></span><!--l. 500--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
-class="cmtt-10x-x-109">=*)</span>                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-8-3-3"  
+class="cmtt-10x-x-109">=*)</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-8-2-3"  
 class="td11"><!--l. 500--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">FALSE</span><span 
@@ -1547,111 +1527,138 @@ class="cmtt-10x-x-109">&#8217;</span>
 <!--l. 500--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">TRUE</span><span 
-class="cmtt-10x-x-109">&#8217;</span>    </td><td  style="white-space:normal; text-align:left;" id="TBL-8-3-4"  
+class="cmtt-10x-x-109">&#8217;</span>    </td><td  style="white-space:normal; text-align:left;" id="TBL-8-2-4"  
 class="td11"><!--l. 500--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">FALSE</span><span 
+class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-8-2-5"  
+class="td11"><!--l. 500--><p class="noindent" >Select whether to use a stopping criterion for
+the  Block-Jacobi  method  used  as  a  coarse
+solver.                                                    </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-8-3-"><td  style="white-space:normal; text-align:left;" id="TBL-8-3-1"  
+class="td11"><!--l. 501--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-10x-x-109">&#8217;</span><span 
+class="cmtt-10x-x-109">BJAC_TRACE</span><span 
+class="cmtt-10x-x-109">&#8217;</span>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-3-2"  
+class="td11"><span class="lstinline"></span><!--l. 501--><p class="noindent" ><span 
+class="cmtt-10x-x-109">character</span><span 
+class="cmtt-10x-x-109">(</span><span 
+class="cmtt-10x-x-109">len</span><span 
+class="cmtt-10x-x-109">=*)</span>                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-8-3-3"  
+class="td11"><!--l. 501--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-10x-x-109">&#8217;</span><span 
+class="cmtt-10x-x-109">FALSE</span><span 
+class="cmtt-10x-x-109">&#8217;</span>
+<!--l. 501--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-10x-x-109">&#8217;</span><span 
+class="cmtt-10x-x-109">TRUE</span><span 
+class="cmtt-10x-x-109">&#8217;</span>    </td><td  style="white-space:normal; text-align:left;" id="TBL-8-3-4"  
+class="td11"><!--l. 501--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-10x-x-109">&#8217;</span><span 
+class="cmtt-10x-x-109">FALSE</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-8-3-5"  
-class="td11"><!--l. 500--><p class="noindent" >Select  whether  to  print  a  trace  for  the
+class="td11"><!--l. 501--><p class="noindent" >Select  whether  to  print  a  trace  for  the
 calculated   residual   for   the   Block-Jacobi
 method used as a coarse solver.                   </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-4-"><td  style="white-space:normal; text-align:left;" id="TBL-8-4-1"  
-class="td11"><!--l. 501--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 502--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">BJAC_ITRACE</span><span 
 class="cmtt-10x-x-109">&#8217;</span>       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-4-2"  
-class="td11"><span class="lstinline"></span><!--l. 501--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 502--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-8-4-3"  
-class="td11"><!--l. 501--><p class="noindent" >Any integer
-<!--l. 501--><p class="noindent" ><span 
+class="td11"><!--l. 502--><p class="noindent" >Any integer
+<!--l. 502--><p class="noindent" ><span 
 class="cmmi-10x-x-109">&#x003E; </span>0           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-4-4"  
-class="td11"><!--l. 501--><p class="noindent" >-1           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-4-5"  
-class="td11"><!--l. 501--><p class="noindent" >Number of iterations after which a trace is to
+class="td11"><!--l. 502--><p class="noindent" >-1           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-4-5"  
+class="td11"><!--l. 502--><p class="noindent" >Number of iterations after which a trace is to
 be printed.                                              </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-5-"><td  style="white-space:normal; text-align:left;" id="TBL-8-5-1"  
-class="td11"><!--l. 502--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 503--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">BJAC_RESCHECK</span><span 
 class="cmtt-10x-x-109">&#8217;</span>     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-5-2"  
-class="td11"><span class="lstinline"></span><!--l. 502--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 503--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-8-5-3"  
-class="td11"><!--l. 502--><p class="noindent" >Any integer
-<!--l. 502--><p class="noindent" ><span 
+class="td11"><!--l. 503--><p class="noindent" >Any integer
+<!--l. 503--><p class="noindent" ><span 
 class="cmmi-10x-x-109">&#x003E; </span>0           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-5-4"  
-class="td11"><!--l. 502--><p class="noindent" >-1           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-5-5"  
-class="td11"><!--l. 502--><p class="noindent" >Number of iterations after which a residual is
+class="td11"><!--l. 503--><p class="noindent" >-1           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-5-5"  
+class="td11"><!--l. 503--><p class="noindent" >Number of iterations after which a residual is
 to be calculated.                                      </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-6-"><td  style="white-space:normal; text-align:left;" id="TBL-8-6-1"  
-class="td11"><!--l. 503--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 504--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">BJAC_STOPTOL</span><span 
 class="cmtt-10x-x-109">&#8217;</span>      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-6-2"  
-class="td11"><span class="lstinline"></span><!--l. 503--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 504--><p class="noindent" ><span 
 class="cmtt-10x-x-109">real</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">kind_parameter</span><span 
 class="cmtt-10x-x-109">)</span>                                                     </td><td  style="white-space:normal; text-align:left;" id="TBL-8-6-3"  
-class="td11"><!--l. 503--><p class="noindent" >Any real
-<!--l. 503--><p class="noindent" ><span 
+class="td11"><!--l. 504--><p class="noindent" >Any real
+<!--l. 504--><p class="noindent" ><span 
 class="cmmi-10x-x-109">&#x003C; </span>1           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-6-4"  
-class="td11"><!--l. 503--><p class="noindent" >0            </td><td  style="white-space:normal; text-align:left;" id="TBL-8-6-5"  
-class="td11"><!--l. 503--><p class="noindent" >Tolerance  for  the  stopping  criterion  on  the
+class="td11"><!--l. 504--><p class="noindent" >0            </td><td  style="white-space:normal; text-align:left;" id="TBL-8-6-5"  
+class="td11"><!--l. 504--><p class="noindent" >Tolerance  for  the  stopping  criterion  on  the
 residual.                                                 </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-7-"><td  style="white-space:normal; text-align:left;" id="TBL-8-7-1"  
-class="td11"><!--l. 504--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 505--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">KRM_METHOD</span><span 
 class="cmtt-10x-x-109">&#8217;</span>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-7-2"  
-class="td11"><span class="lstinline"></span><!--l. 504--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 505--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-8-7-3"  
-class="td11"><!--l. 504--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 505--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">CG</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 504--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 505--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">FCG</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 504--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 505--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">CGS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 504--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 505--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">CGR</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 504--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 505--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">BICG</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 504--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 505--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">BICGSTAB</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 504--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 505--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">BICGSTABL</span><span 
 class="cmtt-10x-x-109">&#8217;</span>
-<!--l. 504--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 505--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">RGMRES</span><span 
 class="cmtt-10x-x-109">&#8217;</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-8-7-4"  
-class="td11"><!--l. 504--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 505--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">FCG</span><span 
 class="cmtt-10x-x-109">&#8217;</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-8-7-5"  
-class="td11"><!--l. 504--><p class="noindent" >A string that defines the iterative method to
+class="td11"><!--l. 505--><p class="noindent" >A string that defines the iterative method to
 be  used  when  employing  a  Krylov  method
 <span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
@@ -1681,44 +1688,44 @@ information.                                            </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-8-"><td  style="white-space:normal; text-align:left;" id="TBL-8-8-1"  
-class="td11"><!--l. 513--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 514--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">KRM_KPREC</span><span 
 class="cmtt-10x-x-109">&#8217;</span>         </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-8-2"  
-class="td11"><span class="lstinline"></span><!--l. 513--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 514--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-8-8-3"  
-class="td11"><!--l. 513--><p class="noindent" >Table&#x00A0;<a 
+class="td11"><!--l. 514--><p class="noindent" >Table&#x00A0;<a 
 href="userhtmlse4.html#x14-13015r1">1<!--tex4ht:ref: tab:precinit --></a> </td><td  style="white-space:normal; text-align:left;" id="TBL-8-8-4"  
-class="td11"><!--l. 513--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 514--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">BJAC</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-8-8-5"  
-class="td11"><!--l. 513--><p class="noindent" >The     one-level
+class="td11"><!--l. 514--><p class="noindent" >The     one-level
 preconditioners from the Table&#x00A0;<a 
 href="userhtmlse4.html#x14-13015r1">1<!--tex4ht:ref: tab:precinit --></a> can be used
 for the coarse Krylov solver.                       </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-9-"><td  style="white-space:normal; text-align:left;" id="TBL-8-9-1"  
-class="td11"><!--l. 525--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 526--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">KRM_SUB_SOLVE</span><span 
 class="cmtt-10x-x-109">&#8217;</span>     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-9-2"  
-class="td11"><span class="lstinline"></span><!--l. 525--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 526--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-8-9-3"  
-class="td11"><!--l. 525--><p class="noindent" >Table&#x00A0;<a 
+class="td11"><!--l. 526--><p class="noindent" >Table&#x00A0;<a 
 href="#x18-17012r5">5<!--tex4ht:ref: tab:p_coarse_1 --></a> </td><td  style="white-space:normal; text-align:left;" id="TBL-8-9-4"  
-class="td11"><!--l. 525--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 526--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">ILU</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-8-9-5"  
-class="td11"><!--l. 525--><p class="noindent" >Solver for the diagonal blocks of the coarsest
+class="td11"><!--l. 526--><p class="noindent" >Solver for the diagonal blocks of the coarsest
 matrix preconditioner, in case the block Jacobi
 solver                     is                     chosen
 as <span class="lstinline"></span><span 
@@ -1745,16 +1752,16 @@ href="#x18-17012r5">5<!--tex4ht:ref: tab:p_coarse_1 --></a> applies here.  </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-10-"><td  style="white-space:normal; text-align:left;" id="TBL-8-10-1"  
-class="td11"><!--l. 532--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 533--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">KRM_GLOBAL</span><span 
 class="cmtt-10x-x-109">&#8217;</span>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-10-2"  
-class="td11"><span class="lstinline"></span><!--l. 532--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 533--><p class="noindent" ><span 
 class="cmtt-10x-x-109">character</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">len</span><span 
 class="cmtt-10x-x-109">=*)</span>                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-8-10-3"  
-class="td11"><!--l. 532--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 533--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">TRUE</span><span 
 class="cmtt-10x-x-109">&#8217;</span>,
@@ -1762,46 +1769,46 @@ class="cmtt-10x-x-109">&#8217;</span>,
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">FALSE</span><span 
 class="cmtt-10x-x-109">&#8217;</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-8-10-4"  
-class="td11"><!--l. 532--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 533--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">FALSE</span><span 
 class="cmtt-10x-x-109">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-8-10-5"  
-class="td11"><!--l. 532--><p class="noindent" >Choose  between  a  global  Krylov  solver,  all
+class="td11"><!--l. 533--><p class="noindent" >Choose  between  a  global  Krylov  solver,  all
 unknowns on a single node, or a distributed
 one.  The  default  choice  is  the  distributed
 solver.                                                    </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-11-"><td  style="white-space:normal; text-align:left;" id="TBL-8-11-1"  
-class="td11"><!--l. 533--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 534--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">KRM_EPS</span><span 
 class="cmtt-10x-x-109">&#8217;</span>           </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-11-2"  
-class="td11"><span class="lstinline"></span><!--l. 533--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 534--><p class="noindent" ><span 
 class="cmtt-10x-x-109">real</span><span 
 class="cmtt-10x-x-109">(</span><span 
 class="cmtt-10x-x-109">kind_parameter</span><span 
 class="cmtt-10x-x-109">)</span>                                                     </td><td  style="white-space:normal; text-align:left;" id="TBL-8-11-3"  
-class="td11"><!--l. 533--><p class="noindent" >Real <span 
+class="td11"><!--l. 534--><p class="noindent" >Real <span 
 class="cmmi-10x-x-109">&#x003C; </span>1 </td><td  style="white-space:normal; text-align:left;" id="TBL-8-11-4"  
-class="td11"><!--l. 533--><p class="noindent" >10<sup><span 
+class="td11"><!--l. 534--><p class="noindent" >10<sup><span 
 class="cmsy-8">-</span><span 
 class="cmr-8">6</span> </sup> </td><td  style="white-space:normal; text-align:left;" id="TBL-8-11-5"  
-class="td11"><!--l. 533--><p class="noindent" >The stopping tolerance.                </td>
+class="td11"><!--l. 534--><p class="noindent" >The stopping tolerance.                </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-12-"><td  style="white-space:normal; text-align:left;" id="TBL-8-12-1"  
-class="td11"><!--l. 534--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 535--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">KRM_IRST</span><span 
 class="cmtt-10x-x-109">&#8217;</span>          </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-12-2"  
-class="td11"><span class="lstinline"></span><!--l. 534--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 535--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-8-12-3"  
-class="td11"><!--l. 534--><p class="noindent" >Integer
-<!--l. 534--><p class="noindent" ><span 
+class="td11"><!--l. 535--><p class="noindent" >Integer
+<!--l. 535--><p class="noindent" ><span 
 class="cmsy-10x-x-109">&#x2265; </span>1           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-12-4"  
-class="td11"><!--l. 534--><p class="noindent" >30          </td><td  style="white-space:normal; text-align:left;" id="TBL-8-12-5"  
-class="td11"><!--l. 534--><p class="noindent" >An integer specifying the restart parameter.
+class="td11"><!--l. 535--><p class="noindent" >30          </td><td  style="white-space:normal; text-align:left;" id="TBL-8-12-5"  
+class="td11"><!--l. 535--><p class="noindent" >An integer specifying the restart parameter.
 This is employed for the <span 
 class="cmtt-10x-x-109">BiCGSTABL </span>or <span 
 class="cmtt-10x-x-109">RGMRES</span>
@@ -1809,16 +1816,16 @@ methods, otherwise it is ignored.                 </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-13-"><td  style="white-space:normal; text-align:left;" id="TBL-8-13-1"  
-class="td11"><!--l. 535--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 536--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">KRM_ISTOPC</span><span 
 class="cmtt-10x-x-109">&#8217;</span>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-13-2"  
-class="td11"><span class="lstinline"></span><!--l. 535--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 536--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-8-13-3"  
-class="td11"><!--l. 535--><p class="noindent" >Integers
+class="td11"><!--l. 536--><p class="noindent" >Integers
 1,2,3         </td><td  style="white-space:normal; text-align:left;" id="TBL-8-13-4"  
-class="td11"><!--l. 535--><p class="noindent" >2            </td><td  style="white-space:normal; text-align:left;" id="TBL-8-13-5"  
-class="td11"><!--l. 535--><p class="noindent" >If  <span 
+class="td11"><!--l. 536--><p class="noindent" >2            </td><td  style="white-space:normal; text-align:left;" id="TBL-8-13-5"  
+class="td11"><!--l. 536--><p class="noindent" >If  <span 
 class="cmtt-10x-x-109">1 </span>then  the  method  uses  the  normwise
 backward error in the infinity norm; if <span 
 class="cmtt-10x-x-109">2</span>, the
@@ -1831,32 +1838,32 @@ for the details.                                         </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-14-"><td  style="white-space:normal; text-align:left;" id="TBL-8-14-1"  
-class="td11"><!--l. 537--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 538--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">KRM_ITMAX</span><span 
 class="cmtt-10x-x-109">&#8217;</span>         </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-14-2"  
-class="td11"><span class="lstinline"></span><!--l. 537--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 538--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-8-14-3"  
-class="td11"><!--l. 537--><p class="noindent" >Integer
-<!--l. 537--><p class="noindent" ><span 
+class="td11"><!--l. 538--><p class="noindent" >Integer
+<!--l. 538--><p class="noindent" ><span 
 class="cmsy-10x-x-109">&#x2265; </span>1           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-14-4"  
-class="td11"><!--l. 537--><p class="noindent" >40          </td><td  style="white-space:normal; text-align:left;" id="TBL-8-14-5"  
-class="td11"><!--l. 537--><p class="noindent" >The   maximum   number   of   iterations   to
+class="td11"><!--l. 538--><p class="noindent" >40          </td><td  style="white-space:normal; text-align:left;" id="TBL-8-14-5"  
+class="td11"><!--l. 538--><p class="noindent" >The   maximum   number   of   iterations   to
 perform.                                                 </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-15-"><td  style="white-space:normal; text-align:left;" id="TBL-8-15-1"  
-class="td11"><!--l. 538--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 539--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">KRM_ITRACE</span><span 
 class="cmtt-10x-x-109">&#8217;</span>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-15-2"  
-class="td11"><span class="lstinline"></span><!--l. 538--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 539--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-8-15-3"  
-class="td11"><!--l. 538--><p class="noindent" >Integer
-<!--l. 538--><p class="noindent" ><span 
+class="td11"><!--l. 539--><p class="noindent" >Integer
+<!--l. 539--><p class="noindent" ><span 
 class="cmsy-10x-x-109">&#x2265; </span>0           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-15-4"  
-class="td11"><!--l. 538--><p class="noindent" >-1           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-15-5"  
-class="td11"><!--l. 538--><p class="noindent" >If         <span 
+class="td11"><!--l. 539--><p class="noindent" >-1           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-15-5"  
+class="td11"><!--l. 539--><p class="noindent" >If         <span 
 class="cmmi-10x-x-109">&#x003E;             </span>0         print         out
 an informational message about convergence
 every <span class="lstinline"></span><span 
@@ -1867,17 +1874,17 @@ message in case of convergence failure.          </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-8-16-"><td  style="white-space:normal; text-align:left;" id="TBL-8-16-1"  
-class="td11"><!--l. 542--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 543--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10x-x-109">&#8217;</span><span 
 class="cmtt-10x-x-109">KRM_FILLIN</span><span 
 class="cmtt-10x-x-109">&#8217;</span>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-8-16-2"  
-class="td11"><span class="lstinline"></span><!--l. 542--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 543--><p class="noindent" ><span 
 class="cmtt-10x-x-109">integer</span>                                                                  </td><td  style="white-space:normal; text-align:left;" id="TBL-8-16-3"  
-class="td11"><!--l. 542--><p class="noindent" >Integer
-<!--l. 542--><p class="noindent" ><span 
+class="td11"><!--l. 543--><p class="noindent" >Integer
+<!--l. 543--><p class="noindent" ><span 
 class="cmsy-10x-x-109">&#x2265; </span>0           </td><td  style="white-space:normal; text-align:left;" id="TBL-8-16-4"  
-class="td11"><!--l. 543--><p class="noindent" >0            </td><td  style="white-space:normal; text-align:left;" id="TBL-8-16-5"  
-class="td11"><!--l. 544--><p class="noindent" >Fill-in level <span 
+class="td11"><!--l. 544--><p class="noindent" >0            </td><td  style="white-space:normal; text-align:left;" id="TBL-8-16-5"  
+class="td11"><!--l. 545--><p class="noindent" >Fill-in level <span 
 class="cmmi-10x-x-109">p </span>of the ILU factorizations and
 first fill-in for the approximate inverses.        </td>
 </tr><tr 
@@ -1899,7 +1906,7 @@ class="content">Additional parameters defining the solver at the coarsest level.
                                                                                
 
                                                                                
-<!--l. 553--><p class="indent" >   <a 
+<!--l. 554--><p class="indent" >   <a 
  id="x18-17014r7"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -1907,7 +1914,7 @@ class="content">Additional parameters defining the solver at the coarsest level.
                                                                                
 <div class="center" 
 >
-<!--l. 553--><p class="noindent" >
+<!--l. 554--><p class="noindent" >
 <div class="tabular"> <table id="TBL-9" class="tabular" 
 cellspacing="0" cellpadding="0"  
 ><colgroup id="TBL-9-1g"><col 
@@ -1918,7 +1925,7 @@ id="TBL-9-4"></colgroup><colgroup id="TBL-9-5g"><col
 id="TBL-9-5"></colgroup><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-9-1-"><td  style="white-space:normal; text-align:left;" id="TBL-9-1-1"  
-class="td11"><!--l. 557--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 558--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">what</span>                </td><td  style="white-space:nowrap; text-align:left;" id="TBL-9-1-2"  
 class="td11"><span 
 class="cmcsc-10"><span 
@@ -1930,9 +1937,9 @@ class="small-caps">t</span><span
 class="small-caps">y</span><span 
 class="small-caps">p</span><span 
 class="small-caps">e</span>         </span></td><td  style="white-space:normal; text-align:left;" id="TBL-9-1-3"  
-class="td11"><!--l. 557--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 558--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">val</span>       </td><td  style="white-space:normal; text-align:left;" id="TBL-9-1-4"  
-class="td11"><!--l. 557--><p class="noindent" ><span 
+class="td11"><!--l. 558--><p class="noindent" ><span 
 class="cmcsc-10"><span 
 class="small-caps">d</span><span 
 class="small-caps">e</span><span 
@@ -1941,7 +1948,7 @@ class="small-caps">a</span><span
 class="small-caps">u</span><span 
 class="small-caps">l</span><span 
 class="small-caps">t</span></span>                 </td><td  style="white-space:normal; text-align:left;" id="TBL-9-1-5"  
-class="td11"><!--l. 558--><p class="noindent" ><span 
+class="td11"><!--l. 559--><p class="noindent" ><span 
 class="cmcsc-10"><span 
 class="small-caps">c</span><span 
 class="small-caps">o</span><span 
@@ -1953,58 +1960,58 @@ class="small-caps">t</span><span
 class="small-caps">s</span></span>                                    </td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-9-2-"><td  style="white-space:normal; text-align:left;" id="TBL-9-2-1"  
-class="td11"><!--l. 560--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 561--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">SMOOTHER_TYPE</span><span 
 class="cmtt-10">&#8217;</span> </td><td  style="white-space:nowrap; text-align:left;" id="TBL-9-2-2"  
-class="td11"><span class="lstinline"></span><!--l. 560--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 561--><p class="noindent" ><span 
 class="cmtt-10">character</span><span 
 class="cmtt-10">(</span><span 
 class="cmtt-10">len</span><span 
 class="cmtt-10">=*)</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-9-2-3"  
-class="td11"><!--l. 561--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 562--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">JACOBI</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 561--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 562--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">GS</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 561--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 562--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">BGS</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 561--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 562--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">BJAC</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 562--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 563--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">AS</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 562--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 563--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">L1</span><span 
 class="cmtt-10">-</span><span 
 class="cmtt-10">JACOBI</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 562--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 563--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">L1</span><span 
 class="cmtt-10">-</span><span 
 class="cmtt-10">BJAC</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 562--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 563--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">L1</span><span 
 class="cmtt-10">-</span><span 
 class="cmtt-10">FBGS</span><span 
 class="cmtt-10">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-9-2-4"  
-class="td11"><!--l. 563--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 564--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">FBGS</span><span 
 class="cmtt-10">&#8217;</span>              </td><td  style="white-space:normal; text-align:left;" id="TBL-9-2-5"  
-class="td11"><!--l. 564--><p class="noindent" ><span 
+class="td11"><!--l. 565--><p class="noindent" ><span 
 class="cmr-10">Type of smoother used in the multilevel</span>
 <span 
 class="cmr-10">preconditioner:     point-Jacobi,     hybrid</span>
@@ -2023,21 +2030,21 @@ class="cmr-10">&#8211;hybrid       (forward)       Gauss-Seidel,</span>
 class="cmmi-10">&#x2113;</span><sub><span 
 class="cmr-7">1</span></sub><span 
 class="cmr-10">-point-Jacobi and Additive Schwarz.</span>
-<!--l. 568--><p class="noindent" ><span 
+<!--l. 569--><p class="noindent" ><span 
 class="cmr-10">It is ignored by one-level preconditioners.</span> </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-9-3-"><td  style="white-space:normal; text-align:left;" id="TBL-9-3-1"  
-class="td11"><!--l. 569--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 570--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">SUB_SOLVE</span><span 
 class="cmtt-10">&#8217;</span>         </td><td  style="white-space:nowrap; text-align:left;" id="TBL-9-3-2"  
-class="td11"><span class="lstinline"></span><!--l. 569--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 570--><p class="noindent" ><span 
 class="cmtt-10">character</span><span 
 class="cmtt-10">(</span><span 
 class="cmtt-10">len</span><span 
 class="cmtt-10">=*)</span>                                                                </td><td  style="white-space:normal; text-align:left;" id="TBL-9-3-3"  
-class="td11"><!--l. 570--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 571--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">JACOBI</span><span 
 class="cmtt-10">&#8217;</span>
@@ -2045,47 +2052,47 @@ class="cmtt-10">&#8217;</span>
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">GS</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 571--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 572--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">BGS</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 571--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 572--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">ILU</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 572--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 573--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">ILUT</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 572--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 573--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">MILU</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 573--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 574--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">MUMPS</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 574--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 575--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">SLU</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 574--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 575--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">UMF</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 575--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 576--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">INVT</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 575--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 576--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">INVK</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 575--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 576--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">AINV</span><span 
 class="cmtt-10">&#8217;</span>    </td><td  style="white-space:normal; text-align:left;" id="TBL-9-3-4"  
-class="td11"><!--l. 576--><p class="noindent" ><span 
+class="td11"><!--l. 577--><p class="noindent" ><span 
 class="cmtt-10">GS </span><span 
 class="cmr-10">and  </span><span 
 class="cmtt-10">BGS </span><span 
@@ -2098,7 +2105,7 @@ class="cmr-10">multilevel</span>
 class="cmr-10">preconditioners,</span>
 <span 
 class="cmr-10">respectively</span>
-<!--l. 578--><p class="noindent" ><span 
+<!--l. 579--><p class="noindent" ><span 
 class="cmtt-10">ILU  </span><span 
 class="cmr-10">for   block-Jacobi</span>
 <span 
@@ -2107,7 +2114,7 @@ class="cmr-10">and  Additive  Schwarz</span>
 class="cmr-10">one-level</span>
 <span 
 class="cmr-10">preconditioners</span>           </td><td  style="white-space:normal; text-align:left;" id="TBL-9-3-5"  
-class="td11"><!--l. 580--><p class="noindent" ><span 
+class="td11"><!--l. 581--><p class="noindent" ><span 
 class="cmr-10">The  local  solver  to  be  used  with  the</span>
 <span 
 class="cmr-10">smoother or one-level preconditioner (see</span>
@@ -2163,22 +2170,22 @@ class="cmr-10">Note for details on hybrid Gauss-Seidel.</span>   </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-9-4-"><td  style="white-space:normal; text-align:left;" id="TBL-9-4-1"  
-class="td11"><!--l. 594--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 595--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">SMOOTHER_SWEEPS</span><span 
 class="cmtt-10">&#8217;</span>   </td><td  style="white-space:nowrap; text-align:left;" id="TBL-9-4-2"  
-class="td11"><span class="lstinline"></span><!--l. 594--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 595--><p class="noindent" ><span 
 class="cmtt-10">integer</span>                                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-9-4-3"  
-class="td11"><!--l. 595--><p class="noindent" ><span 
+class="td11"><!--l. 596--><p class="noindent" ><span 
 class="cmr-10">Any integer</span>
-<!--l. 595--><p class="noindent" ><span 
+<!--l. 596--><p class="noindent" ><span 
 class="cmr-10">number</span><span 
 class="cmr-10">&#x00A0;</span><span 
 class="cmsy-10">&#x2265; </span><span 
 class="cmr-10">0</span></td><td  style="white-space:normal; text-align:left;" id="TBL-9-4-4"  
-class="td11"><!--l. 596--><p class="noindent" ><span 
-class="cmr-10">1</span>                             </td><td  style="white-space:normal; text-align:left;" id="TBL-9-4-5"  
 class="td11"><!--l. 597--><p class="noindent" ><span 
+class="cmr-10">1</span>                             </td><td  style="white-space:normal; text-align:left;" id="TBL-9-4-5"  
+class="td11"><!--l. 598--><p class="noindent" ><span 
 class="cmr-10">Number  of  sweeps  of  the  smoother  or</span>
 <span 
 class="cmr-10">one-level preconditioner. In the multilevel</span>
@@ -2205,22 +2212,22 @@ class="cmr-10">respectively.</span>                                        </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-9-5-"><td  style="white-space:normal; text-align:left;" id="TBL-9-5-1"  
-class="td11"><!--l. 602--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 603--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">SUB_OVR</span><span 
 class="cmtt-10">&#8217;</span>           </td><td  style="white-space:nowrap; text-align:left;" id="TBL-9-5-2"  
-class="td11"><span class="lstinline"></span><!--l. 602--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 603--><p class="noindent" ><span 
 class="cmtt-10">integer</span>                                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-9-5-3"  
-class="td11"><!--l. 603--><p class="noindent" ><span 
+class="td11"><!--l. 604--><p class="noindent" ><span 
 class="cmr-10">Any integer</span>
-<!--l. 603--><p class="noindent" ><span 
+<!--l. 604--><p class="noindent" ><span 
 class="cmr-10">number</span><span 
 class="cmr-10">&#x00A0;</span><span 
 class="cmsy-10">&#x2265; </span><span 
 class="cmr-10">0</span></td><td  style="white-space:normal; text-align:left;" id="TBL-9-5-4"  
-class="td11"><!--l. 604--><p class="noindent" ><span 
-class="cmr-10">1</span>                             </td><td  style="white-space:normal; text-align:left;" id="TBL-9-5-5"  
 class="td11"><!--l. 605--><p class="noindent" ><span 
+class="cmr-10">1</span>                             </td><td  style="white-space:normal; text-align:left;" id="TBL-9-5-5"  
+class="td11"><!--l. 606--><p class="noindent" ><span 
 class="cmr-10">Number  of  overlap  layers,  for  Additive</span>
 <span 
 class="cmr-10">Schwarz only.</span>                                      </td>
@@ -2241,7 +2248,7 @@ preconditioner. </span></div><!--tex4ht:label?: x18-17014r7 -->
                                                                                
 
                                                                                
-<!--l. 614--><p class="indent" >   <a 
+<!--l. 615--><p class="indent" >   <a 
  id="x18-17015r8"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -2249,7 +2256,7 @@ preconditioner. </span></div><!--tex4ht:label?: x18-17014r7 -->
                                                                                
 <div class="center" 
 >
-<!--l. 614--><p class="noindent" >
+<!--l. 615--><p class="noindent" >
 <div class="tabular"> <table id="TBL-10" class="tabular" 
 cellspacing="0" cellpadding="0"  
 ><colgroup id="TBL-10-1g"><col 
@@ -2260,7 +2267,7 @@ id="TBL-10-4"></colgroup><colgroup id="TBL-10-5g"><col
 id="TBL-10-5"></colgroup><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-10-1-"><td  style="white-space:normal; text-align:left;" id="TBL-10-1-1"  
-class="td11"><!--l. 618--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 619--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">what</span>             </td><td  style="white-space:nowrap; text-align:left;" id="TBL-10-1-2"  
 class="td11"><span 
 class="cmcsc-10"><span 
@@ -2272,9 +2279,9 @@ class="small-caps">t</span><span
 class="small-caps">y</span><span 
 class="small-caps">p</span><span 
 class="small-caps">e</span>               </span></td><td  style="white-space:normal; text-align:left;" id="TBL-10-1-3"  
-class="td11"><!--l. 618--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 619--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">val</span>           </td><td  style="white-space:normal; text-align:left;" id="TBL-10-1-4"  
-class="td11"><!--l. 618--><p class="noindent" ><span 
+class="td11"><!--l. 619--><p class="noindent" ><span 
 class="cmcsc-10"><span 
 class="small-caps">d</span><span 
 class="small-caps">e</span><span 
@@ -2283,7 +2290,7 @@ class="small-caps">a</span><span
 class="small-caps">u</span><span 
 class="small-caps">l</span><span 
 class="small-caps">t</span></span>         </td><td  style="white-space:normal; text-align:left;" id="TBL-10-1-5"  
-class="td11"><!--l. 619--><p class="noindent" ><span 
+class="td11"><!--l. 620--><p class="noindent" ><span 
 class="cmcsc-10"><span 
 class="small-caps">c</span><span 
 class="small-caps">o</span><span 
@@ -2295,28 +2302,28 @@ class="small-caps">t</span><span
 class="small-caps">s</span></span>                                     </td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-10-2-"><td  style="white-space:normal; text-align:left;" id="TBL-10-2-1"  
-class="td11"><!--l. 620--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 621--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">SUB_RESTR</span><span 
 class="cmtt-10">&#8217;</span> </td><td  style="white-space:nowrap; text-align:left;" id="TBL-10-2-2"  
-class="td11"><span class="lstinline"></span><!--l. 620--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 621--><p class="noindent" ><span 
 class="cmtt-10">character</span><span 
 class="cmtt-10">(</span><span 
 class="cmtt-10">len</span><span 
 class="cmtt-10">=*)</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-10-2-3"  
-class="td11"><!--l. 621--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-10">&#8217;</span><span 
-class="cmtt-10">HALO</span><span 
-class="cmtt-10">&#8217;</span>
-<!--l. 621--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-10">&#8217;</span><span 
-class="cmtt-10">NONE</span><span 
-class="cmtt-10">&#8217;</span>        </td><td  style="white-space:normal; text-align:left;" id="TBL-10-2-4"  
 class="td11"><!--l. 622--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">HALO</span><span 
+class="cmtt-10">&#8217;</span>
+<!--l. 622--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-10">&#8217;</span><span 
+class="cmtt-10">NONE</span><span 
+class="cmtt-10">&#8217;</span>        </td><td  style="white-space:normal; text-align:left;" id="TBL-10-2-4"  
+class="td11"><!--l. 623--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-10">&#8217;</span><span 
+class="cmtt-10">HALO</span><span 
 class="cmtt-10">&#8217;</span>        </td><td  style="white-space:normal; text-align:left;" id="TBL-10-2-5"  
-class="td11"><!--l. 623--><p class="noindent" ><span 
+class="td11"><!--l. 624--><p class="noindent" ><span 
 class="cmr-10">Type  of  restriction  operator,  for  Additive</span>
 <span 
 class="cmr-10">Schwarz only: </span><span 
@@ -2328,7 +2335,7 @@ class="cmtt-10">&#8217;</span><span
 class="cmtt-10">NONE</span><span 
 class="cmtt-10">&#8217;</span> <span 
 class="cmr-10">for neglecting it.</span>
-<!--l. 626--><p class="noindent" ><span 
+<!--l. 627--><p class="noindent" ><span 
 class="cmr-10">Note  that  </span><span 
 class="cmtt-10">HALO </span><span 
 class="cmr-10">must  be  chosen  for  the</span>
@@ -2339,28 +2346,28 @@ class="cmr-10">its RAS variant.</span>                                    </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-10-3-"><td  style="white-space:normal; text-align:left;" id="TBL-10-3-1"  
-class="td11"><!--l. 628--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 629--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">SUB_PROL</span><span 
 class="cmtt-10">&#8217;</span>        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-10-3-2"  
-class="td11"><span class="lstinline"></span><!--l. 628--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 629--><p class="noindent" ><span 
 class="cmtt-10">character</span><span 
 class="cmtt-10">(</span><span 
 class="cmtt-10">len</span><span 
 class="cmtt-10">=*)</span>                                                                </td><td  style="white-space:normal; text-align:left;" id="TBL-10-3-3"  
-class="td11"><!--l. 629--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 630--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">SUM</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 629--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 630--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">NONE</span><span 
 class="cmtt-10">&#8217;</span>        </td><td  style="white-space:normal; text-align:left;" id="TBL-10-3-4"  
-class="td11"><!--l. 630--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 631--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">NONE</span><span 
 class="cmtt-10">&#8217;</span>        </td><td  style="white-space:normal; text-align:left;" id="TBL-10-3-5"  
-class="td11"><!--l. 631--><p class="noindent" ><span 
+class="td11"><!--l. 632--><p class="noindent" ><span 
 class="cmr-10">Type of prolongation operator, for Additive</span>
 <span 
 class="cmr-10">Schwarz   only:   </span><span class="lstinline"></span><span 
@@ -2376,7 +2383,7 @@ class="cmtt-10">&#8217;</span> <span
 class="cmr-10">for</span>
 <span 
 class="cmr-10">neglecting them.</span>
-<!--l. 634--><p class="noindent" ><span 
+<!--l. 635--><p class="noindent" ><span 
 class="cmr-10">Note  that  </span><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">SUM</span><span 
@@ -2392,22 +2399,22 @@ class="cmr-10">for its RAS variant.</span>                     </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-10-4-"><td  style="white-space:normal; text-align:left;" id="TBL-10-4-1"  
-class="td11"><!--l. 636--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 637--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">SUB_FILLIN</span><span 
 class="cmtt-10">&#8217;</span>      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-10-4-2"  
-class="td11"><span class="lstinline"></span><!--l. 636--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 637--><p class="noindent" ><span 
 class="cmtt-10">integer</span>                                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-10-4-3"  
-class="td11"><!--l. 637--><p class="noindent" ><span 
+class="td11"><!--l. 638--><p class="noindent" ><span 
 class="cmr-10">Any integer</span>
-<!--l. 637--><p class="noindent" ><span 
+<!--l. 638--><p class="noindent" ><span 
 class="cmr-10">number</span><span 
 class="cmr-10">&#x00A0;</span><span 
 class="cmsy-10">&#x2265; </span><span 
 class="cmr-10">0</span>      </td><td  style="white-space:normal; text-align:left;" id="TBL-10-4-4"  
-class="td11"><!--l. 638--><p class="noindent" ><span 
-class="cmr-10">0</span>                     </td><td  style="white-space:normal; text-align:left;" id="TBL-10-4-5"  
 class="td11"><!--l. 639--><p class="noindent" ><span 
+class="cmr-10">0</span>                     </td><td  style="white-space:normal; text-align:left;" id="TBL-10-4-5"  
+class="td11"><!--l. 640--><p class="noindent" ><span 
 class="cmr-10">Fill-in   level   </span><span 
 class="cmmi-10">p  </span><span 
 class="cmr-10">of   the   incomplete   LU</span>
@@ -2416,25 +2423,25 @@ class="cmr-10">factorizations.</span>                                       </td
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-10-5-"><td  style="white-space:normal; text-align:left;" id="TBL-10-5-1"  
-class="td11"><!--l. 640--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 641--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">SUB_ILUTHRS</span><span 
 class="cmtt-10">&#8217;</span>     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-10-5-2"  
-class="td11"><span class="lstinline"></span><!--l. 640--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 641--><p class="noindent" ><span 
 class="cmtt-10">real</span><span 
 class="cmtt-10">(</span><span 
 class="cmtt-10">kind_parameter</span><span 
 class="cmtt-10">)</span>                                                            </td><td  style="white-space:normal; text-align:left;" id="TBL-10-5-3"  
-class="td11"><!--l. 641--><p class="noindent" ><span 
+class="td11"><!--l. 642--><p class="noindent" ><span 
 class="cmr-10">Any real</span>
 <span 
 class="cmr-10">number</span><span 
 class="cmr-10">&#x00A0;</span><span 
 class="cmsy-10">&#x2265; </span><span 
 class="cmr-10">0</span>      </td><td  style="white-space:normal; text-align:left;" id="TBL-10-5-4"  
-class="td11"><!--l. 642--><p class="noindent" ><span 
-class="cmr-10">0</span>                     </td><td  style="white-space:normal; text-align:left;" id="TBL-10-5-5"  
 class="td11"><!--l. 643--><p class="noindent" ><span 
+class="cmr-10">0</span>                     </td><td  style="white-space:normal; text-align:left;" id="TBL-10-5-5"  
+class="td11"><!--l. 644--><p class="noindent" ><span 
 class="cmr-10">Drop    tolerance    </span><span 
 class="cmmi-10">t   </span><span 
 class="cmr-10">in    the    ILU(</span><span 
@@ -2445,28 +2452,28 @@ class="cmr-10">factorization.</span>                                        </td
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-10-6-"><td  style="white-space:normal; text-align:left;" id="TBL-10-6-1"  
-class="td11"><!--l. 644--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 645--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">MUMPS_LOC_GLOB</span><span 
 class="cmtt-10">&#8217;</span>  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-10-6-2"  
-class="td11"><span class="lstinline"></span><!--l. 644--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 645--><p class="noindent" ><span 
 class="cmtt-10">character</span><span 
 class="cmtt-10">(</span><span 
 class="cmtt-10">len</span><span 
 class="cmtt-10">=*)</span>                                                                </td><td  style="white-space:normal; text-align:left;" id="TBL-10-6-3"  
-class="td11"><!--l. 645--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 646--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">LOCAL_SOLVER</span><span 
 class="cmtt-10">&#8217;</span>
-<!--l. 645--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 646--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">GLOBAL_SOLVER</span><span 
 class="cmtt-10">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-10-6-4"  
-class="td11"><!--l. 646--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 647--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">GLOBAL_SOLVER</span><span 
 class="cmtt-10">&#8217;</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-10-6-5"  
-class="td11"><!--l. 647--><p class="noindent" ><span 
+class="td11"><!--l. 648--><p class="noindent" ><span 
 class="cmr-10">Whether  MUMPS  should  be  used  as  a</span>
 <span 
 class="cmr-10">distributed solver, or as a serial solver acting</span>
@@ -2477,19 +2484,19 @@ class="cmr-10">process.</span>                                               </t
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-10-7-"><td  style="white-space:normal; text-align:left;" id="TBL-10-7-1"  
-class="td11"><!--l. 651--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 652--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">MUMPS_IPAR_ENTRY</span><span 
 class="cmtt-10">&#8217;</span> </td><td  style="white-space:nowrap; text-align:left;" id="TBL-10-7-2"  
-class="td11"><span class="lstinline"></span><!--l. 651--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 652--><p class="noindent" ><span 
 class="cmtt-10">integer</span>                                                                         </td><td  style="white-space:normal; text-align:left;" id="TBL-10-7-3"  
-class="td11"><!--l. 652--><p class="noindent" ><span 
+class="td11"><!--l. 653--><p class="noindent" ><span 
 class="cmr-10">Any integer</span>
 <span 
 class="cmr-10">number</span>            </td><td  style="white-space:normal; text-align:left;" id="TBL-10-7-4"  
-class="td11"><!--l. 653--><p class="noindent" ><span 
-class="cmr-10">0</span>                     </td><td  style="white-space:normal; text-align:left;" id="TBL-10-7-5"  
 class="td11"><!--l. 654--><p class="noindent" ><span 
+class="cmr-10">0</span>                     </td><td  style="white-space:normal; text-align:left;" id="TBL-10-7-5"  
+class="td11"><!--l. 655--><p class="noindent" ><span 
 class="cmr-10">Set an entry in the MUMPS integer control</span>
 <span 
 class="cmr-10">array,  as  chosen  via  the  </span><span class="lstinline"></span><span 
@@ -2500,17 +2507,17 @@ class="cmr-10">argument.</span>                                            </td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-10-8-"><td  style="white-space:normal; text-align:left;" id="TBL-10-8-1"  
-class="td11"><!--l. 656--><p class="noindent" ><span class="lstinline"></span><span 
+class="td11"><!--l. 657--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-10">&#8217;</span><span 
 class="cmtt-10">MUMPS_RPAR_ENTRY</span><span 
 class="cmtt-10">&#8217;</span> </td><td  style="white-space:nowrap; text-align:left;" id="TBL-10-8-2"  
-class="td11"><span class="lstinline"></span><!--l. 656--><p class="noindent" ><span 
+class="td11"><span class="lstinline"></span><!--l. 657--><p class="noindent" ><span 
 class="cmtt-10">real</span>                                                                            </td><td  style="white-space:normal; text-align:left;" id="TBL-10-8-3"  
-class="td11"><!--l. 657--><p class="noindent" ><span 
-class="cmr-10">Any real number</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-10-8-4"  
 class="td11"><!--l. 658--><p class="noindent" ><span 
-class="cmr-10">0</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-10-8-5"  
+class="cmr-10">Any real number</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-10-8-4"  
 class="td11"><!--l. 659--><p class="noindent" ><span 
+class="cmr-10">0</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-10-8-5"  
+class="td11"><!--l. 660--><p class="noindent" ><span 
 class="cmr-10">Set an entry in the MUMPS  real  control</span>
 <span 
 class="cmr-10">array,  as  chosen  via  the  </span><span class="lstinline"></span><span 
@@ -2537,7 +2544,7 @@ class="content">Parameters defining the smoother or the details of the one-level
                                                                                
 
                                                                                
-   <!--l. 671--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 672--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu9.html" ><span 
 class="cmr-12">next</span></a><span 
@@ -2554,6 +2561,6 @@ class="cmr-12">] [</span><a
 href="userhtmlse5.html#userhtmlsu8.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
-<!--l. 671--><p class="indent" >   <a 
+<!--l. 672--><p class="indent" >   <a 
  id="tailuserhtmlsu8.html"></a>  
 </body></html> 

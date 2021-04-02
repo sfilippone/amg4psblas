@@ -137,7 +137,7 @@ logically divided into four groups, i.e., parameters defining
 \begin{enumerate}
 	\item the type of multilevel cycle and how many cycles must be applied;
         \item the coarsening algorithm;
-        \item the coarse-space correction at the coarsest level (for multilevel
+        \item the solver at the coarsest level (for multilevel
                  preconditioners only);
 	\item the smoother of the multilevel preconditioners, or the one-level
                   preconditioner.	
@@ -155,8 +155,9 @@ the hybrid Gauss-Seidel smoother (see Note in Table~\ref{tab:p_smoother})
 is obtained by combining the block-Jacobi smoother object with a single sweep
 of the Gauss-Seidel solver object, while the point-Jacobi smoother is the
 result of combining the block-Jacobi smoother object with a single sweep
-of the point-Jacobi solver object. However, for simplicity, shortcuts are
-provided to set point-Jacobi, hybrid (forward) Gauss-Seidel, and
+of the point-Jacobi solver object. In the same way are obtained the $\ell_1$-versions of
+the smoothers. However, for simplicity, shortcuts are
+provided to set all versions of point-Jacobi, hybrid (forward) Gauss-Seidel, and
 hybrid backward Gauss-Seidel, i.e., the previous smoothers can be defined
 just by setting \fortinline|'SMOOTHER_TYPE'| to certain specific
 values (see Tables~\ref{tab:p_smoother}), without the need to set
@@ -176,12 +177,12 @@ coarsest-level solvers, and shortcuts are available
 in this case too (see Table~\ref{tab:p_coarse_1}). \\
 
 \textbf{Remark 3.} Many of the coarsest-level solvers cannot be used
-with both  replicated and distributed coarsest-matrix layouts; 
+with both replicated and distributed coarsest-matrix layouts; 
 therefore, setting the solver after the layout may change the layout.
 Similarly, setting the layout after the solver may change the solver.
 
 More precisely, UMFPACK and SuperLU require the coarsest-level
-matrix to be replicated, while SuperLU\_Dist requires it to be distributed.
+matrix to be replicated, while SuperLU\_Dist and KRM requires it to be distributed.
 In these cases, setting the coarsest-level solver implies that
 the layout is redefined according to the solver, ovverriding any
 previous settings. MUMPS,  point-Jacobi,
@@ -189,7 +190,7 @@ hybrid Gauss-Seidel and block-Jacobi can be applied to
 replicated and distributed matrices, thus their choice
 does not modify any previously specified layout.
 It is worth noting that, when the matrix is replicated,
-the point-Jacobi, hybrid Gauss-Seidel and block-Jacobi solvers
+the point-Jacobi, hybrid Gauss-Seidel and block-Jacobi solvers and their $\ell_1-$ versions
 reduce to the corresponding local solver objects (see Remark~2).
 For the point-Jacobi and Gauss-Seidel solvers, these objects
 correspond to a \emph{single} point-Jacobi sweep and a \emph{single}
