@@ -182,7 +182,7 @@ therefore, setting the solver after the layout may change the layout.
 Similarly, setting the layout after the solver may change the solver.
 
 More precisely, UMFPACK and SuperLU require the coarsest-level
-matrix to be replicated, while SuperLU\_Dist and KRM requires it to be distributed.
+matrix to be replicated, while SuperLU\_Dist and KRM require it to be distributed.
 In these cases, setting the coarsest-level solver implies that
 the layout is redefined according to the solver, ovverriding any
 previous settings. MUMPS,  point-Jacobi,
@@ -396,6 +396,7 @@ the parameter \texttt{ilev}.} \\
                           & \fortinline|'MUMPS'| \par \fortinline|'UMF'| \par
                            \fortinline|'SLU'| \par \fortinline|'SLUDIST'| \par
 			   \fortinline|'JACOBI'| \par \fortinline|'GS'| \par \fortinline|'BJAC'| \par \fortinline|'KRM'| 
+			   \fortinline|'L1-JACOBI'| \par \fortinline|'L1-BJAC'| \par \fortinline|'L1-FBGS'|
                          & See~Note.
                          & Solver used at the coarsest level: sequential
                            LU from MUMPS, UMFPACK, or SuperLU
@@ -504,6 +505,7 @@ level (continued).\label{tab:p_coarse_1}}
 		\fortinline|'BJAC_STOPTOL'| & \fortinline|real(kind_parameter)| & Any real\par $<1$ & 0 & Tolerance for the stopping criterion on the residual.  \\ \hline
 		\fortinline|'KRM_METHOD'| & \fortinline|character(len=*)| & \fortinline|'CG'| \par \fortinline|'FCG'| \par \fortinline|'CGS'| \par \fortinline|'CGR'| \par \fortinline|'BICG'| \par \fortinline|'BICGSTAB'| \par \fortinline|'BICGSTABL'| \par \fortinline|'RGMRES'| & \fortinline|'FCG'| & A string that defines the iterative method to be
 		used when employing a Krylov method \fortinline|'KRM'| as a coarse solver. \texttt{CG} the Conjugate Gradient method;
+		\texttt{FCG} the Flexible Conjugate Gradient method;
 		\texttt{CGS} the Conjugate Gradient Stabilized method;
 		\texttt{GCR} the Generalized Conjugate Residual method;
 		\texttt{FCG} the Flexible Conjugate Gradient method;
