@@ -509,7 +509,11 @@ contains
       val = amg_soc2_
     case('SOC1')
       val = amg_soc1_
-    case('DEC')
+    case('MATCHBOXP','PARMATCH')
+      val = amg_matchboxp_
+    case('COUPLED','COUP')
+      val = amg_coupled_aggr_
+    case('DEC','DECOUPLED')
       val = amg_dec_aggr_
     case('SYMDEC')
       val = amg_sym_dec_aggr_

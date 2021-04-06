@@ -9,7 +9,7 @@ CXXINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(INCDIR) $(FMFLAG)/.
 
 #CINCLUDES= -I${SUPERLU_INCDIR} -I${HSL_INCDIR}  -I${SPRAL_INCDIR} -I/home/users/pasqua/Ambra/BootCMatch/include -lBCM -L/home/users/pasqua/Ambra/BootCMatch/lib  -lm
 
-OBJS= \
+FOBJS= \
 amg_s_dec_aggregator_mat_asb.o \
 amg_s_dec_aggregator_mat_bld.o \
 amg_s_dec_aggregator_tprol.o \
@@ -64,11 +64,12 @@ amg_s_parmatch_spmm_bld_inner.o
 MPCOBJS=MatchBoxPC.o \
 algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o
 
+OBJS = $(FOBJS) $(MPCOBJS)
 
 LIBNAME=libamg_prec.a
 
-lib:  $(OBJS) $(MPCOBJS)
-	$(AR) $(HERE)/$(LIBNAME) $(OBJS) $(MPCOBJS)
+lib:  $(OBJS)
+	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
 mpobjs:
