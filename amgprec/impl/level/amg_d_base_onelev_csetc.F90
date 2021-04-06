@@ -42,6 +42,7 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_d_base_aggregator_mod
   use amg_d_dec_aggregator_mod
   use amg_d_symdec_aggregator_mod
+  use amg_d_parmatch_aggregator_mod
   use amg_d_jac_smoother
   use amg_d_as_smoother
   use amg_d_diag_solver
@@ -267,6 +268,8 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
       allocate(amg_d_dec_aggregator_type :: lv%aggr, stat=info)
     case('SYMDEC')
       allocate(amg_d_symdec_aggregator_type :: lv%aggr, stat=info)
+    case('COUP','COUPLED')
+      allocate(amg_d_parmatch_aggregator_type :: lv%aggr, stat=info)
     case default
       info =  psb_err_internal_error_
     end select

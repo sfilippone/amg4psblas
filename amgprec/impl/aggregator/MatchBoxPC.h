@@ -172,6 +172,24 @@ MilanLongInt* msgIndSent, MilanLongInt* msgActualSent, MilanReal* msgPercent,
 MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
 MilanLongInt* ph1_card, MilanLongInt* ph2_card );
 
+void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
+		MilanLongInt* verLocPtr, MilanLongInt* verLocInd, MilanReal* edgeLocWeight,
+		MilanLongInt* verDistance,
+		MilanLongInt* Mate,
+		MilanInt myRank, MilanInt numProcs, MilanInt icomm,
+		MilanLongInt* msgIndSent, MilanLongInt* msgActualSent, MilanReal* msgPercent,
+		MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
+		MilanLongInt* ph1_card, MilanLongInt* ph2_card );
+
+void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
+		MilanLongInt* verLocPtr, MilanLongInt* verLocInd, MilanFloat* edgeLocWeight,
+		MilanLongInt* verDistance,
+		MilanLongInt* Mate,
+		MilanInt myRank, MilanInt numProcs, MilanInt icomm,
+		MilanLongInt* msgIndSent, MilanLongInt* msgActualSent, MilanReal* msgPercent,
+		MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
+		MilanLongInt* ph1_card, MilanLongInt* ph2_card );
+
 #ifdef __cplusplus
 }
 #endif

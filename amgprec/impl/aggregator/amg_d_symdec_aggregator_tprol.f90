@@ -1,15 +1,15 @@
-!  
-!   
+!  is_legal_decoupled_par_aggr_alg
+!
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.7)
-!    
-!    (C) Copyright 2021 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Fabio Durastante        
-!   
+!
+!    (C) Copyright 2021
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,28 +33,28 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
+!
+!
 ! File: amg_d_symdec_aggregator_tprol.f90
 !
 ! Subroutine: amg_d_symdec_aggregator_tprol
 ! Version:    real
 !
 !
-!  This routine is mainly an interface to soc_map_bld where the real work is performed. 
+!  This routine is mainly an interface to soc_map_bld where the real work is performed.
 !  It takes care of some consistency checking, and calls map_to_tprol, which is
 !  refactored and shared among all the aggregation methods that produce a simple
-!  integer mapping. It also symmetrizes the pattern of the local matrix A. 
+!  integer mapping. It also symmetrizes the pattern of the local matrix A.
 !
 !
-! 
+!
 ! Arguments:
 ! Arguments:
 !    ag      -  type(amg_d_dec_aggregator_type), input/output.
 !               The aggregator object, carrying with itself the mapping algorithm.
 !    parms   -  The auxiliary parameters object
 !    ag_data -  Auxiliary global aggregation parameters object
-!    
+!
 !    a       -  type(psb_dspmat_type).
 !               The sparse matrix structure containing the local part of the
 !               fine-level matrix.
@@ -72,10 +72,10 @@
 !                  nlaggr(i) contains the aggregates held by process i.
 !    op_prol    -  type(psb_dspmat_type), output
 !               The tentative prolongator, based on ilaggr.
-!               
+!
 !    info    -  integer, output.
-!               Error code.         
-!  
+!               Error code.
+!
 subroutine  amg_d_symdec_aggregator_build_tprol(ag,parms,ag_data,&
      & a,desc_a,ilaggr,nlaggr,op_prol,info)
   use psb_base_mod
@@ -84,7 +84,7 @@ subroutine  amg_d_symdec_aggregator_build_tprol(ag,parms,ag_data,&
   use amg_d_inner_mod
   implicit none
   class(amg_d_symdec_aggregator_type), target, intent(inout) :: ag
-  type(amg_dml_parms), intent(inout)  :: parms 
+  type(amg_dml_parms), intent(inout)  :: parms
   type(amg_daggr_data), intent(in)    :: ag_data
   type(psb_dspmat_type), intent(in)   :: a
   type(psb_desc_type), intent(in)     :: desc_a
@@ -117,7 +117,7 @@ subroutine  amg_d_symdec_aggregator_build_tprol(ag,parms,ag_data,&
   call amg_check_def(parms%ml_cycle,'Multilevel cycle',&
        &   amg_mult_ml_,is_legal_ml_cycle)
   call amg_check_def(parms%par_aggr_alg,'Aggregation',&
-       &   amg_dec_aggr_,is_legal_ml_par_aggr_alg)
+       &   amg_dec_aggr_,is_legal_decoupled_par_aggr_alg)
   call amg_check_def(parms%aggr_ord,'Ordering',&
        &   amg_aggr_ord_nat_,is_legal_ml_aggr_ord)
   call amg_check_def(parms%aggr_thresh,'Aggr_Thresh',dzero,is_legal_d_aggr_thrs)
@@ -129,7 +129,7 @@ subroutine  amg_d_symdec_aggregator_build_tprol(ag,parms,ag_data,&
   call atmp%set_ncols(nr)
   if (info == psb_success_) call atmp%transp(atrans)
   if (info == psb_success_) call atrans%cscnv(info,type='COO')
-  if (info == psb_success_) call psb_rwextd(nr,atmp,info,b=atrans,rowscale=.false.) 
+  if (info == psb_success_) call psb_rwextd(nr,atmp,info,b=atrans,rowscale=.false.)
   call atmp%set_nrows(nr)
   call atmp%set_ncols(nr)
   if (info == psb_success_) call atrans%free()
@@ -145,7 +145,7 @@ subroutine  amg_d_symdec_aggregator_build_tprol(ag,parms,ag_data,&
        &  desc_a,nlaggr,ilaggr,info)
   if (info == psb_success_) call atmp%free()
 
-  if (info == psb_success_) call amg_map_to_tprol(desc_a,ilaggr,nlaggr,op_prol,info)    
+  if (info == psb_success_) call amg_map_to_tprol(desc_a,ilaggr,nlaggr,op_prol,info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='soc_map_bld/map_to_tprol')

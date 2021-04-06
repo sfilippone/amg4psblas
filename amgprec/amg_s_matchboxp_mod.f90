@@ -80,7 +80,7 @@ module smatchboxp_mod
     subroutine sMatchBoxPC(nlver,nledge,verlocptr,verlocind,edgelocweight,&
          & verdistance, mate, myrank, numprocs, icomm,&
          & msgindsent,msgactualsent,msgpercent,&
-         & ph0_time, ph1_time, ph2_time, ph1_card, ph2_card) bind(c,name='MatchBoxPC')
+         & ph0_time, ph1_time, ph2_time, ph1_card, ph2_card) bind(c,name='sMatchBoxPC')
       use iso_c_binding
       import :: psb_c_ipk_, psb_c_lpk_, psb_c_mpk_, psb_c_epk_
       implicit none

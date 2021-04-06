@@ -1,15 +1,15 @@
-!  
-!   
+!
+!
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.7)
-!    
-!    (C) Copyright 2020 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Fabio Durastante        
-!   
+!
+!    (C) Copyright 2020
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,8 +33,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
+!
+!
 ! File: amg_base_prec_type.F90
 !
 ! Module: amg_base_prec_type
@@ -50,16 +50,16 @@
 !
 !  It contains routines for
 !  - converting character constants defining the preconditioner into integer
-!    constants; 
+!    constants;
 !  - checking if the preconditioner is correctly defined;
 !  - printing a	description of the preconditioner;
-!  - deallocating the preconditioner data structure.  
+!  - deallocating the preconditioner data structure.
 !
 
 module amg_base_prec_type
 
   !
-  ! This reduces the size of .mod file. Without the ONLY clause compilation 
+  ! This reduces the size of .mod file. Without the ONLY clause compilation
   ! blows up on some systems.
   !
   use psb_const_mod
@@ -78,7 +78,7 @@ module amg_base_prec_type
        & psb_err_from_subroutine_, psb_err_missing_override_method_, &
        & psb_error_handler, psb_out_unit, psb_err_unit
 
-  ! 
+  !
   ! Version numbers
   !
   character(len=*), parameter   :: amg_version_string_ = "1.0.0"
@@ -120,7 +120,7 @@ module amg_base_prec_type
     procedure, pass(pm) :: printout => d_ml_parms_printout
   end type amg_dml_parms
 
-  
+
 
   type amg_iaggr_data
     !
@@ -134,32 +134,32 @@ module amg_base_prec_type
     integer(psb_ipk_)                  :: min_coarse_size = -ione
     integer(psb_ipk_)                  :: min_coarse_size_per_process = -ione
     integer(psb_lpk_)                  :: target_coarse_size
-    ! 2. maximum number of levels.   Defaults to  20 
+    ! 2. maximum number of levels.   Defaults to  20
     integer(psb_ipk_)                  :: max_levs    = 20_psb_ipk_
   end type amg_iaggr_data
-  
+
   type, extends(amg_iaggr_data) :: amg_saggr_data
-    ! 3. min_cr_ratio   = 1.5     
+    ! 3. min_cr_ratio   = 1.5
     real(psb_spk_)                     :: min_cr_ratio   = 1.5_psb_spk_
     real(psb_spk_)                     :: op_complexity  = szero
     real(psb_spk_)                     :: avg_cr         = szero
   end type amg_saggr_data
 
   type, extends(amg_iaggr_data) :: amg_daggr_data
-    ! 3. min_cr_ratio   = 1.5     
+    ! 3. min_cr_ratio   = 1.5
     real(psb_dpk_)                     :: min_cr_ratio   = 1.5_psb_dpk_
     real(psb_dpk_)                     :: op_complexity  = dzero
     real(psb_dpk_)                     :: avg_cr         = dzero
   end type amg_daggr_data
 
-  
+
 
   !
   ! Entries in iprcparm
   !
   ! These are in baseprec
-  ! 
-  integer(psb_ipk_), parameter :: amg_smoother_type_   =  1         
+  !
+  integer(psb_ipk_), parameter :: amg_smoother_type_   =  1
   integer(psb_ipk_), parameter :: amg_sub_solve_       =  2
   integer(psb_ipk_), parameter :: amg_sub_restr_       =  3
   integer(psb_ipk_), parameter :: amg_sub_prol_        =  4
@@ -169,7 +169,7 @@ module amg_base_prec_type
 
   !
   ! These are in onelev
-  ! 
+  !
   integer(psb_ipk_), parameter :: amg_ml_cycle_             = 20
   integer(psb_ipk_), parameter :: amg_smoother_sweeps_pre_  = 21
   integer(psb_ipk_), parameter :: amg_smoother_sweeps_post_ = 22
@@ -181,7 +181,7 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_aggr_eig_             = 28
   integer(psb_ipk_), parameter :: amg_aggr_filter_          = 29
   integer(psb_ipk_), parameter :: amg_coarse_mat_           = 30
-  integer(psb_ipk_), parameter :: amg_coarse_solve_         = 31 
+  integer(psb_ipk_), parameter :: amg_coarse_solve_         = 31
   integer(psb_ipk_), parameter :: amg_coarse_sweeps_        = 32
   integer(psb_ipk_), parameter :: amg_coarse_fillin_        = 33
   integer(psb_ipk_), parameter :: amg_coarse_subsolve_      = 34
@@ -196,7 +196,7 @@ module amg_base_prec_type
 
   !
   ! Legal values for entry: amg_smoother_type_
-  ! 
+  !
   integer(psb_ipk_), parameter :: amg_min_prec_ = 0
   integer(psb_ipk_), parameter :: amg_noprec_   = 0
   integer(psb_ipk_), parameter :: amg_base_smooth_ = 0
@@ -243,7 +243,7 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_ilu_scale_none_    = 0
   integer(psb_ipk_), parameter :: amg_ilu_scale_maxval_  = 1
   integer(psb_ipk_), parameter :: amg_ilu_scale_diag_    = 2
-  integer(psb_ipk_), parameter :: amg_ilu_scale_arwsum_  = 3 
+  integer(psb_ipk_), parameter :: amg_ilu_scale_arwsum_  = 3
   integer(psb_ipk_), parameter :: amg_ilu_scale_aclsum_  = 4
   integer(psb_ipk_), parameter :: amg_ilu_scale_arcsum_  = 5
   ! For the time being enable only maxval scale
@@ -261,19 +261,21 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_new_ml_prec_  = 7
   integer(psb_ipk_), parameter :: amg_mult_dev_ml_  = 7
   integer(psb_ipk_), parameter :: amg_max_ml_cycle_  = 8
-  !  
+  !
   ! Legal values for entry: amg_par_aggr_alg_
   !
   integer(psb_ipk_), parameter :: amg_dec_aggr_      = 0
   integer(psb_ipk_), parameter :: amg_sym_dec_aggr_  = 1
-  integer(psb_ipk_), parameter :: amg_ext_aggr_      = 2 
-  integer(psb_ipk_), parameter :: amg_max_par_aggr_alg_  = amg_ext_aggr_     
+  integer(psb_ipk_), parameter :: amg_ext_aggr_      = 2
+  integer(psb_ipk_), parameter :: amg_coupled_aggr_  = 3
+  integer(psb_ipk_), parameter :: amg_max_par_aggr_alg_  = amg_coupled_aggr_
   !
   ! Legal values for entry: amg_aggr_type_
   !
   integer(psb_ipk_), parameter :: amg_noalg_       = 0
   integer(psb_ipk_), parameter :: amg_soc1_        = 1
   integer(psb_ipk_), parameter :: amg_soc2_        = 2
+  integer(psb_ipk_), parameter :: amg_matchboxp_   = 3
   !
   ! Legal values for entry: amg_aggr_prol_
   !
@@ -288,7 +290,7 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_no_filter_mat_  = 0
   integer(psb_ipk_), parameter :: amg_filter_mat_     = 1
   integer(psb_ipk_), parameter :: amg_max_filter_mat_ = amg_filter_mat_
-  !  
+  !
   ! Legal values for entry: amg_aggr_ord_
   !
   integer(psb_ipk_), parameter :: amg_aggr_ord_nat_      = 0
@@ -308,7 +310,7 @@ module amg_base_prec_type
   !
   integer(psb_ipk_), parameter :: amg_distr_mat_      = 0
   integer(psb_ipk_), parameter :: amg_repl_mat_       = 1
-  integer(psb_ipk_), parameter :: amg_max_coarse_mat_ = amg_repl_mat_  
+  integer(psb_ipk_), parameter :: amg_max_coarse_mat_ = amg_repl_mat_
   !
   ! Legal values for entry: amg_prec_status_
   !
@@ -338,7 +340,7 @@ module amg_base_prec_type
 
   !
   ! Fields for sparse matrices ensembles stored in av()
-  ! 
+  !
   integer(psb_ipk_), parameter :: amg_l_pr_        = 1
   integer(psb_ipk_), parameter :: amg_u_pr_        = 2
   integer(psb_ipk_), parameter :: amg_bp_ilu_avsz_ = 2
@@ -347,7 +349,7 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_sm_pr_t_     = 5
   integer(psb_ipk_), parameter :: amg_sm_pr_       = 6
   integer(psb_ipk_), parameter :: amg_smth_avsz_   = 6
-  integer(psb_ipk_), parameter :: amg_max_avsz_    = amg_smth_avsz_ 
+  integer(psb_ipk_), parameter :: amg_max_avsz_    = amg_smth_avsz_
 
   !
   ! Character constants used by amg_file_prec_descr
@@ -362,12 +364,13 @@ module amg_base_prec_type
   character(len=15), parameter, private :: &
        &  matrix_names(0:1)=(/'distributed   ','replicated    '/)
   character(len=18), parameter, private :: &
-       &  aggr_type_names(0:2)=(/'None              ',&
-       &  'SOC measure 1     ', 'SOC Measure 2     '/)
+       &  aggr_type_names(0:3)=(/'None              ',&
+       &  'SOC measure 1     ', 'SOC Measure 2     ',&
+       &  'Parallel Matching '/)
   character(len=18), parameter, private :: &
-       &  par_aggr_alg_names(0:2)=(/&
+       &  par_aggr_alg_names(0:3)=(/&
        & 'decoupled aggr.   ', 'sym. dec. aggr.   ',&
-       & 'user defined aggr.'/)
+       & 'user defined aggr.', 'coupled aggr.     '/)
   character(len=18), parameter, private :: &
        &  ord_names(0:1)=(/'Natural ordering  ','Desc. degree ord. '/)
   character(len=6), parameter, private :: &
@@ -395,7 +398,7 @@ module amg_base_prec_type
     module procedure amg_icheck_def, amg_scheck_def, amg_dcheck_def
   end interface
 
-  interface psb_bcast 
+  interface psb_bcast
     module procedure amg_ml_bcast, amg_sml_bcast, amg_dml_bcast
   end interface psb_bcast
 
@@ -408,9 +411,9 @@ module amg_base_prec_type
   ! Will need a more sophisticated strategy.
   !
   logical, private, save :: do_remap=.false.
-  
+
 contains
-  
+
   function amg_get_do_remap() result(res)
     implicit none
     logical :: res
@@ -424,7 +427,7 @@ contains
 
     do_remap = val
   end subroutine amg_set_do_remap
-  
+
   !
   ! Function: amg_stringval
   !
@@ -439,10 +442,10 @@ contains
   !
   function amg_stringval(string) result(val)
     use psb_prec_const_mod
-    implicit none 
+    implicit none
   ! Arguments
     character(len=*), intent(in) :: string
-    integer(psb_ipk_) :: val 
+    integer(psb_ipk_) :: val
     character(len=*), parameter :: name='amg_stringval'
   ! Local variable
     integer :: index_tab
@@ -450,14 +453,14 @@ contains
     index_tab=index(string,char(9))
     if (index_tab.NE.0)  then
        string2=string(1:index_tab-1)
-    else 
+    else
        string2=string
     endif
     select case(psb_toupper(trim(string2)))
     case('NONE')
       val = 0
     case('HALO')
-      val = psb_halo_ 
+      val = psb_halo_
     case('SUM')
       val = psb_sum_
     case('AVG')
@@ -553,56 +556,56 @@ contains
     case('OUTER_SWEEPS')
       val = amg_outer_sweeps_
     case('LOCAL_SOLVER')
-      val = amg_local_solver_  
+      val = amg_local_solver_
     case('GLOBAL_SOLVER')
-      val = amg_global_solver_  
+      val = amg_global_solver_
     case default
       val  = -1
     end select
   end function amg_stringval
 
   subroutine  ml_parms_get_coarse(pm,pmin)
-    implicit none 
+    implicit none
     class(amg_ml_parms), intent(inout) :: pm
     class(amg_ml_parms), intent(in)    :: pmin
     pm%coarse_mat   = pmin%coarse_mat
     pm%coarse_solve = pmin%coarse_solve
   end subroutine ml_parms_get_coarse
-    
-    
-  
+
+
+
   subroutine ml_parms_printout(pm,iout)
-    implicit none 
+    implicit none
     class(amg_ml_parms), intent(in) :: pm
     integer(psb_ipk_), intent(in)             :: iout
-    
+
     write(iout,*) 'ML    : ',pm%ml_cycle
     write(iout,*) 'Sweeps: ',pm%sweeps_pre,pm%sweeps_post
     write(iout,*) 'AGGR  : ',pm%par_aggr_alg,pm%aggr_prol, pm%aggr_ord
     write(iout,*) '      : ',pm%aggr_omega_alg,pm%aggr_eig,pm%aggr_filter
     write(iout,*) 'COARSE: ',pm%coarse_mat,pm%coarse_solve
   end subroutine ml_parms_printout
-    
-  
+
+
   subroutine s_ml_parms_printout(pm,iout)
-    implicit none 
+    implicit none
     class(amg_sml_parms), intent(in) :: pm
     integer(psb_ipk_), intent(in)             :: iout
-    
+
     call pm%amg_ml_parms%printout(iout)
     write(iout,*) 'REAL  : ',pm%aggr_omega_val,pm%aggr_thresh
   end subroutine s_ml_parms_printout
-    
-  
+
+
   subroutine d_ml_parms_printout(pm,iout)
-    implicit none 
+    implicit none
     class(amg_dml_parms), intent(in) :: pm
     integer(psb_ipk_), intent(in)             :: iout
-    
+
     call pm%amg_ml_parms%printout(iout)
     write(iout,*) 'REAL  : ',pm%aggr_omega_val,pm%aggr_thresh
   end subroutine d_ml_parms_printout
-    
+
 
   !
   ! Routines printing out a description of the preconditioner
@@ -618,7 +621,7 @@ contains
     info = psb_success_
     if ((pm%ml_cycle>=amg_no_ml_).and.(pm%ml_cycle<=amg_max_ml_cycle_)) then
 
-      
+
       write(iout,*) '  Multilevel cycle: ',&
            &   ml_names(pm%ml_cycle)
       select case (pm%ml_cycle)
@@ -644,7 +647,7 @@ contains
     info = psb_success_
     if ((pm%ml_cycle>=amg_no_ml_).and.(pm%ml_cycle<=amg_max_ml_cycle_)) then
 
-      
+
       write(iout,*) '  Parallel aggregation algorithm: ',&
            &   par_aggr_alg_names(pm%par_aggr_alg)
       if (pm%aggr_type>0) write(iout,*) '  Aggregation type: ',&
@@ -656,23 +659,23 @@ contains
         write(iout,*) '  Aggregation prolongator: ', &
              &  aggr_prols(pm%aggr_prol)
         if (pm%aggr_prol /= amg_no_smooth_) then
-          write(iout,*) '              with: ', aggr_filters(pm%aggr_filter)                  
-          if (pm%aggr_omega_alg == amg_eig_est_) then 
+          write(iout,*) '              with: ', aggr_filters(pm%aggr_filter)
+          if (pm%aggr_omega_alg == amg_eig_est_) then
             write(iout,*) '  Damping omega computation: spectral radius estimate'
             write(iout,*) '  Spectral radius estimate: ', &
                  & eigen_estimates(pm%aggr_eig)
-          else if (pm%aggr_omega_alg == amg_user_choice_) then 
+          else if (pm%aggr_omega_alg == amg_user_choice_) then
             write(iout,*) '  Damping omega computation: user defined value.'
-          else 
+          else
             write(iout,*) '  Damping omega computation: unknown value in iprcparm!!'
           end if
         end if
       !end if
     else
       write(iout,*) '  Multilevel type: Unkonwn value. Something is amiss....',&
-           & pm%ml_cycle           
+           & pm%ml_cycle
     end if
-    
+
     return
 
   end subroutine ml_parms_mldescr
@@ -689,13 +692,13 @@ contains
     logical :: coarse_
 
     info = psb_success_
-    if (present(coarse)) then 
+    if (present(coarse)) then
       coarse_ = coarse
     else
       coarse_ = .false.
     end if
 
-    if (coarse_) then 
+    if (coarse_) then
       call pm%coarsedescr(iout,info)
     end if
 
@@ -718,12 +721,12 @@ contains
     write(iout,*) '  Coarse matrix: ',&
          & matrix_names(pm%coarse_mat)
     select case(pm%coarse_solve)
-    case (amg_bjac_,amg_as_) 
+    case (amg_bjac_,amg_as_)
       write(iout,*) '  Number of sweeps : ',&
            & pm%sweeps_pre
       write(iout,*) '  Coarse solver: ',&
            & 'Block Jacobi'
-    case (amg_l1_bjac_) 
+    case (amg_l1_bjac_)
       write(iout,*) '  Number of sweeps : ',&
            & pm%sweeps_pre
       write(iout,*) '  Coarse solver: ',&
@@ -790,7 +793,7 @@ contains
   !
 
   function is_legal_base_prec(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_base_prec
 
@@ -798,60 +801,68 @@ contains
     return
   end function is_legal_base_prec
   function is_int_non_negative(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_int_non_negative
 
-    is_int_non_negative = (ip >= 0) 
+    is_int_non_negative = (ip >= 0)
     return
   end function is_int_non_negative
   function is_legal_ilu_scale(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ilu_scale
     is_legal_ilu_scale = ((ip >= amg_ilu_scale_none_).and.(ip <= amg_max_ilu_scale_))
     return
   end function is_legal_ilu_scale
   function is_int_positive(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_int_positive
 
-    is_int_positive = (ip >= 1) 
+    is_int_positive = (ip >= 1)
     return
   end function is_int_positive
   function is_legal_prolong(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_prolong
     is_legal_prolong = ((ip>=psb_none_).and.(ip<=psb_square_root_))
     return
   end function is_legal_prolong
   function is_legal_restrict(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_restrict
     is_legal_restrict = ((ip == psb_nohalo_).or.(ip==psb_halo_))
     return
   end function is_legal_restrict
   function is_legal_ml_cycle(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ml_cycle
 
     is_legal_ml_cycle = ((ip>=amg_no_ml_).and.(ip<=amg_max_ml_cycle_))
     return
   end function is_legal_ml_cycle
-  function is_legal_ml_par_aggr_alg(ip)
-    implicit none 
+  function is_legal_coupled_par_aggr_alg(ip)
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
-    logical             :: is_legal_ml_par_aggr_alg
+    logical             :: is_legal_coupled_par_aggr_alg
 
-    is_legal_ml_par_aggr_alg = ((ip>=amg_dec_aggr_).and.(ip<=amg_max_par_aggr_alg_))
+    is_legal_coupled_par_aggr_alg = (ip == amg_coupled_aggr_)
     return
-  end function is_legal_ml_par_aggr_alg
+  end function is_legal_coupled_par_aggr_alg
+  function is_legal_decoupled_par_aggr_alg(ip)
+    implicit none
+    integer(psb_ipk_), intent(in) :: ip
+    logical             :: is_legal_decoupled_par_aggr_alg
+
+    is_legal_decoupled_par_aggr_alg = ((ip>=amg_dec_aggr_).and.(ip<=amg_max_par_aggr_alg_))
+    return
+  end function is_legal_decoupled_par_aggr_alg
   function is_legal_ml_aggr_type(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ml_aggr_type
 
@@ -859,7 +870,7 @@ contains
     return
   end function is_legal_ml_aggr_type
   function is_legal_ml_aggr_ord(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ml_aggr_ord
 
@@ -867,7 +878,7 @@ contains
     return
   end function is_legal_ml_aggr_ord
   function is_legal_ml_aggr_omega_alg(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ml_aggr_omega_alg
 
@@ -875,7 +886,7 @@ contains
     return
   end function is_legal_ml_aggr_omega_alg
   function is_legal_ml_aggr_eig(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ml_aggr_eig
 
@@ -883,7 +894,7 @@ contains
     return
   end function is_legal_ml_aggr_eig
   function is_legal_ml_aggr_prol(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ml_aggr_prol
 
@@ -891,7 +902,7 @@ contains
     return
   end function is_legal_ml_aggr_prol
   function is_legal_ml_coarse_mat(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ml_coarse_mat
 
@@ -899,7 +910,7 @@ contains
     return
   end function is_legal_ml_coarse_mat
   function is_legal_aggr_filter(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_aggr_filter
 
@@ -907,7 +918,7 @@ contains
     return
   end function is_legal_aggr_filter
   function is_distr_ml_coarse_mat(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_distr_ml_coarse_mat
 
@@ -915,7 +926,7 @@ contains
     return
   end function is_distr_ml_coarse_mat
   function is_legal_ml_fact(ip)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ml_fact
     ! Here the minimum is really 1, amg_fact_none_ is not acceptable.
@@ -925,7 +936,7 @@ contains
   end function is_legal_ml_fact
   function is_legal_ilu_fact(ip)
     use psb_prec_const_mod
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ilu_fact
 
@@ -934,14 +945,14 @@ contains
     return
   end function is_legal_ilu_fact
   function is_legal_d_omega(ip)
-    implicit none 
+    implicit none
     real(psb_dpk_), intent(in) :: ip
     logical             :: is_legal_d_omega
     is_legal_d_omega = ((ip>=0.0d0).and.(ip<=2.0d0))
     return
   end function is_legal_d_omega
   function is_legal_d_fact_thrs(ip)
-    implicit none 
+    implicit none
     real(psb_dpk_), intent(in) :: ip
     logical             :: is_legal_d_fact_thrs
 
@@ -949,7 +960,7 @@ contains
     return
   end function is_legal_d_fact_thrs
   function is_legal_d_aggr_thrs(ip)
-    implicit none 
+    implicit none
     real(psb_dpk_), intent(in) :: ip
     logical             :: is_legal_d_aggr_thrs
 
@@ -958,14 +969,14 @@ contains
   end function is_legal_d_aggr_thrs
 
   function is_legal_s_omega(ip)
-    implicit none 
+    implicit none
     real(psb_spk_), intent(in) :: ip
     logical             :: is_legal_s_omega
     is_legal_s_omega = ((ip>=0.0).and.(ip<=2.0))
     return
   end function is_legal_s_omega
   function is_legal_s_fact_thrs(ip)
-    implicit none 
+    implicit none
     real(psb_spk_), intent(in) :: ip
     logical             :: is_legal_s_fact_thrs
 
@@ -973,7 +984,7 @@ contains
     return
   end function is_legal_s_fact_thrs
   function is_legal_s_aggr_thrs(ip)
-    implicit none 
+    implicit none
     real(psb_spk_), intent(in) :: ip
     logical             :: is_legal_s_aggr_thrs
 
@@ -983,11 +994,11 @@ contains
 
 
   subroutine amg_icheck_def(ip,name,id,is_legal)
-    implicit none 
+    implicit none
     integer(psb_ipk_), intent(inout) :: ip
     integer(psb_ipk_), intent(in)    :: id
     character(len=*), intent(in) :: name
-    interface 
+    interface
       function is_legal(i)
         import :: psb_ipk_
         integer(psb_ipk_), intent(in) :: i
@@ -996,7 +1007,7 @@ contains
     end interface
     character(len=20), parameter :: rname='amg_check_def'
 
-    if (.not.is_legal(ip)) then     
+    if (.not.is_legal(ip)) then
       write(0,*)trim(rname),': Error: Illegal value for ',&
            & name,' :',ip, '. defaulting to ',id
       ip = id
@@ -1004,11 +1015,11 @@ contains
   end subroutine amg_icheck_def
 
   subroutine amg_scheck_def(ip,name,id,is_legal)
-    implicit none 
+    implicit none
     real(psb_spk_), intent(inout) :: ip
     real(psb_spk_), intent(in)    :: id
     character(len=*), intent(in) :: name
-    interface 
+    interface
       function is_legal(i)
         use psb_base_mod, only : psb_spk_
         real(psb_spk_), intent(in) :: i
@@ -1017,7 +1028,7 @@ contains
     end interface
     character(len=20), parameter :: rname='amg_check_def'
 
-    if (.not.is_legal(ip)) then     
+    if (.not.is_legal(ip)) then
       write(0,*)trim(rname),': Error: Illegal value for ',&
            & name,' :',ip, '. defaulting to ',id
       ip = id
@@ -1025,11 +1036,11 @@ contains
   end subroutine amg_scheck_def
 
   subroutine amg_dcheck_def(ip,name,id,is_legal)
-    implicit none 
+    implicit none
     real(psb_dpk_), intent(inout) :: ip
     real(psb_dpk_), intent(in)    :: id
     character(len=*), intent(in) :: name
-    interface 
+    interface
       function is_legal(i)
         use psb_base_mod, only : psb_dpk_
         real(psb_dpk_), intent(in) :: i
@@ -1038,7 +1049,7 @@ contains
     end interface
     character(len=20), parameter :: rname='amg_check_def'
 
-    if (.not.is_legal(ip)) then     
+    if (.not.is_legal(ip)) then
       write(0,*)trim(rname),': Error: Illegal value for ',&
            & name,' :',ip, '. defaulting to ',id
       ip = id
@@ -1047,7 +1058,7 @@ contains
 
 
   function pr_to_str(iprec)
-    implicit none 
+    implicit none
 
     integer(psb_ipk_), intent(in)  :: iprec
     character(len=10)     :: pr_to_str
@@ -1055,11 +1066,11 @@ contains
     select case(iprec)
     case(amg_noprec_)
       pr_to_str='NOPREC'
-    case(amg_jac_)         
+    case(amg_jac_)
       pr_to_str='JAC'
-    case(amg_bjac_)         
+    case(amg_bjac_)
       pr_to_str='BJAC'
-    case(amg_as_)      
+    case(amg_as_)
       pr_to_str='AS'
     end select
 
@@ -1067,7 +1078,7 @@ contains
 
   subroutine amg_ml_bcast(ctxt,dat,root)
 
-    implicit none 
+    implicit none
     type(psb_ctxt_type), intent(in) :: ctxt
     type(amg_ml_parms), intent(inout)   :: dat
     integer(psb_ipk_), intent(in), optional :: root
@@ -1089,7 +1100,7 @@ contains
 
   subroutine amg_sml_bcast(ctxt,dat,root)
 
-    implicit none 
+    implicit none
     type(psb_ctxt_type), intent(in) :: ctxt
     type(amg_sml_parms), intent(inout)   :: dat
     integer(psb_ipk_), intent(in), optional :: root
@@ -1100,7 +1111,7 @@ contains
   end subroutine amg_sml_bcast
 
   subroutine amg_dml_bcast(ctxt,dat,root)
-    implicit none 
+    implicit none
     type(psb_ctxt_type), intent(in) :: ctxt
     type(amg_dml_parms), intent(inout)   :: dat
     integer(psb_ipk_), intent(in), optional :: root
@@ -1112,7 +1123,7 @@ contains
 
   subroutine ml_parms_clone(pm,pmout,info)
 
-    implicit none 
+    implicit none
     class(amg_ml_parms), intent(inout) :: pm
     class(amg_ml_parms), intent(out)   :: pmout
     integer(psb_ipk_), intent(out)     :: info
@@ -1132,19 +1143,19 @@ contains
     pmout%coarse_solve   = pm%coarse_solve
 
   end subroutine ml_parms_clone
-  
+
   subroutine s_ml_parms_clone(pm,pmout,info)
 
-    implicit none 
+    implicit none
     class(amg_sml_parms), intent(inout) :: pm
     class(amg_ml_parms), intent(out)   :: pmout
     integer(psb_ipk_), intent(out)     :: info
 
-      
+
     integer(psb_ipk_) :: err_act
     integer(psb_ipk_) :: ierr(5)
     character(len=20)  :: name='clone'
-  
+
     info = 0
     select type(pout => pmout)
     class is (amg_sml_parms)
@@ -1159,21 +1170,21 @@ contains
       call psb_get_erraction(err_act)
       call psb_error_handler(err_act)
     end select
-      
+
   end subroutine s_ml_parms_clone
 
   subroutine d_ml_parms_clone(pm,pmout,info)
 
-    implicit none 
+    implicit none
     class(amg_dml_parms), intent(inout) :: pm
     class(amg_ml_parms), intent(out)   :: pmout
     integer(psb_ipk_), intent(out)     :: info
 
-      
+
     integer(psb_ipk_) :: err_act
     integer(psb_ipk_) :: ierr(5)
     character(len=20)  :: name='clone'
-  
+
     info = 0
     select type(pout => pmout)
     class is (amg_dml_parms)
@@ -1189,13 +1200,13 @@ contains
       call psb_error_handler(err_act)
       return
     end select
-      
+
   end subroutine d_ml_parms_clone
 
   function amg_s_equal_aggregation(parms1, parms2) result(val)
     type(amg_sml_parms), intent(in) :: parms1, parms2
     logical :: val
-    
+
     val  = (parms1%par_aggr_alg     == parms2%par_aggr_alg        ) .and. &
          & (parms1%aggr_type        == parms2%aggr_type       ) .and. &
          & (parms1%aggr_ord         == parms2%aggr_ord        ) .and. &
@@ -1210,7 +1221,7 @@ contains
   function amg_d_equal_aggregation(parms1, parms2) result(val)
     type(amg_dml_parms), intent(in) :: parms1, parms2
     logical :: val
-    
+
     val  = (parms1%par_aggr_alg     == parms2%par_aggr_alg        ) .and. &
          & (parms1%aggr_type        == parms2%aggr_type       ) .and. &
          & (parms1%aggr_ord         == parms2%aggr_ord        ) .and. &
@@ -1221,5 +1232,5 @@ contains
          & (parms1%aggr_omega_val   == parms2%aggr_omega_val  ) .and. &
          & (parms1%aggr_thresh      == parms2%aggr_thresh     )
   end function amg_d_equal_aggregation
-         
+
 end module amg_base_prec_type
