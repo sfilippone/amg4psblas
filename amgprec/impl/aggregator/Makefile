@@ -68,7 +68,7 @@ algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o
 LIBNAME=libamg_prec.a
 
 lib:  $(OBJS) $(MPCOBJS)
-	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
+	$(AR) $(HERE)/$(LIBNAME) $(OBJS) $(MPCOBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
 mpobjs:
