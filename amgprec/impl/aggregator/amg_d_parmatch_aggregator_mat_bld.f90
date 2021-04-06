@@ -167,7 +167,7 @@ subroutine  amg_d_parmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
      & ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
   use amg_d_inner_mod
-  use amg_d_prec_type
+  use amg_base_prec_type
   use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_aggregator_mat_bld
   implicit none
 
