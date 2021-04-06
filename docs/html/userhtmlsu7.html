@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
   "http://www.w3.org/TR/html4/loose.dtd">  
 <html > 
-<head><title>Method init</title> 
+<head><title>GPU example</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
 <meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
@@ -10,23 +10,44 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 42--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 420--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
-href="userhtmlsu8.html" ><span 
-class="cmr-12">next</span></a><span 
+href="userhtmlsu6.html" ><span 
+class="cmr-12">prev</span></a><span 
+class="cmr-12">] [</span><a 
+href="userhtmlsu6.html#tailuserhtmlsu6.html" ><span 
+class="cmr-12">prev-tail</span></a><span 
 class="cmr-12">] [</span><a 
 href="#tailuserhtmlsu7.html"><span 
 class="cmr-12">tail</span></a><span 
 class="cmr-12">] [</span><a 
-href="userhtmlse5.html#userhtmlsu7.html" ><span 
+href="userhtmlse4.html#userhtmlsu7.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
    <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmr-12">5.1   </span></span> <a 
- id="x17-160005.1"></a><span 
-class="cmr-12">Method init</span></h4>
+class="cmr-12">4.2   </span></span> <a 
+ id="x16-150004.2"></a><span 
+class="cmr-12">GPU example</span></h4>
+<!--l. 422--><p class="noindent" ><span 
+class="cmr-12">The code reported in Figure</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="#x16-15001r5"><span 
+class="cmr-12">5</span><!--tex4ht:ref: fig:gpu-ex1 --></a> <span 
+class="cmr-12">shows how to set up a program exploiting the combined</span>
+<span 
+class="cmr-12">GPU capabilities of PSBLAS and AMG4PSBLAS.</span>
+                                                                               
+
+                                                                               
+<!--l. 425--><p class="indent" >   <a 
+ id="x16-15001r5"></a><hr class="float"><div class="float" 
+>
+                                                                               
+
+                                                                               
 <div class="center" 
 >
+<<<<<<< HEAD
 <!--l. 44--><p class="noindent" >
 <!--l. 45--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">call</span><span 
@@ -126,23 +147,46 @@ class="cmr-12">for details.</span>     </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-2-8-"><td  style="white-space:normal; text-align:left;" id="TBL-2-8-1"  
 class="td11">      </td> </tr></table></div>
+=======
+<!--l. 437--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-10">
+!&#x00A0;build&#x00A0;a&#x00A0;one-level&#x00A0;RAS&#x00A0;with&#x00A0;overlap&#x00A0;2&#x00A0;and&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;local&#x00A0;blocks.
+call&#x00A0;P%init(&#8217;AS&#8217;,info)
+call&#x00A0;P%set(&#8217;SUB_OVR&#8217;,2,info)
+call&#x00A0;P%build(A,desc_A,info)
+...&#x00A0;...
+!&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;BiCGSTAB
+&#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;BICGSTAB&#8217;,A,P,b,x,tol,desc_A,info)
+</pre>
+<!--l. 448--><p class="nopar" ></div></div>
+<br /> <div class="caption" 
+><span class="id">Listing 5: </span><span  
+class="content">setup of a one-level Schwarz preconditioner.</span></div><!--tex4ht:label?: x16-15001r5 -->
+>>>>>>> development
+                                                                               
+
+                                                                               
+   </div><hr class="endfloat" />
                                                                                
 
                                                                                
                                                                                
 
                                                                                
-   <!--l. 72--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 1--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
-href="userhtmlsu8.html" ><span 
-class="cmr-12">next</span></a><span 
+href="userhtmlsu6.html" ><span 
+class="cmr-12">prev</span></a><span 
+class="cmr-12">] [</span><a 
+href="userhtmlsu6.html#tailuserhtmlsu6.html" ><span 
+class="cmr-12">prev-tail</span></a><span 
 class="cmr-12">] [</span><a 
 href="userhtmlsu7.html" ><span 
 class="cmr-12">front</span></a><span 
 class="cmr-12">] [</span><a 
-href="userhtmlse5.html#userhtmlsu7.html" ><span 
+href="userhtmlse4.html#userhtmlsu7.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
-<!--l. 72--><p class="indent" >   <a 
+<!--l. 1--><p class="indent" >   <a 
  id="tailuserhtmlsu7.html"></a>  
 </body></html> 

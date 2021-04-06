@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
   "http://www.w3.org/TR/html4/loose.dtd">  
 <html > 
-<head><title>Method set</title> 
+<head><title>Method init</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
 <meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
@@ -10,16 +10,10 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 72--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 42--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu9.html" ><span 
 class="cmr-12">next</span></a><span 
-class="cmr-12">] [</span><a 
-href="userhtmlsu7.html" ><span 
-class="cmr-12">prev</span></a><span 
-class="cmr-12">] [</span><a 
-href="userhtmlsu7.html#tailuserhtmlsu7.html" ><span 
-class="cmr-12">prev-tail</span></a><span 
 class="cmr-12">] [</span><a 
 href="#tailuserhtmlsu8.html"><span 
 class="cmr-12">tail</span></a><span 
@@ -28,54 +22,36 @@ href="userhtmlse5.html#userhtmlsu8.html" ><span
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
    <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmr-12">5.2   </span></span> <a 
- id="x18-170005.2"></a><span 
-class="cmr-12">Method set</span></h4>
+class="cmr-12">5.1   </span></span> <a 
+ id="x18-170005.1"></a><span 
+class="cmr-12">Method init</span></h4>
 <div class="center" 
 >
-<!--l. 74--><p class="noindent" >
-<!--l. 75--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 44--><p class="noindent" >
+<!--l. 45--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">call</span><span 
 class="cmtt-12">&#x00A0;</span><span 
 class="cmtt-12">p</span><span 
 class="cmtt-12">%</span><span 
-class="cmtt-12">set</span><span 
+class="cmtt-12">init</span><span 
 class="cmtt-12">(</span><span 
-class="cmtt-12">what</span><span 
+class="cmtt-12">contxt</span><span 
 class="cmtt-12">,</span><span 
-class="cmtt-12">val</span><span 
+class="cmtt-12">ptype</span><span 
 class="cmtt-12">,</span><span 
 class="cmtt-12">info</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">[,</span><span 
-class="cmtt-12">ilev</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">ilmax</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">pos</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">idx</span><span 
-class="cmtt-12">])</span></div>
-<!--l. 78--><p class="noindent" ><span 
-class="cmr-12">This method sets the parameters defining the preconditioner </span><span class="lstinline"></span><span 
+class="cmtt-12">)</span></div>
+<!--l. 48--><p class="noindent" ><span 
+class="cmr-12">This method allocates and initializes the preconditioner </span><span class="lstinline"></span><span 
 class="cmtt-12">p</span><span 
-class="cmr-12">. More precisely, the</span>
+class="cmr-12">, according to the</span>
 <span 
-class="cmr-12">parameter identified by </span><span class="lstinline"></span><span 
-class="cmtt-12">what</span> <span 
-class="cmr-12">is assigned the value contained in </span><span class="lstinline"></span><span 
-class="cmtt-12">val</span><span 
-class="cmr-12">.</span>
-<!--l. 83--><p class="noindent" ><span 
+class="cmr-12">preconditioner type chosen by the user.</span>
+<!--l. 52--><p class="noindent" ><span 
 class="cmbx-12">Arguments</span>
-                                                                               
-
-                                                                               
-   <div class="tabular"> <table id="TBL-3" class="tabular" 
+   <div class="tabular"> <table id="TBL-2" class="tabular" 
 cellspacing="0" cellpadding="0"  
+<<<<<<< HEAD
 ><colgroup id="TBL-3-1g"><col 
 id="TBL-3-1"><col 
 id="TBL-3-2"></colgroup><tr  
@@ -223,11 +199,25 @@ class="cmtt-12">,</span><span
 class="cmtt-12">&#x00A0;</span><span 
 class="cmtt-12">optional</span><span 
 class="cmtt-12">,</span><span 
+=======
+><colgroup id="TBL-2-1g"><col 
+id="TBL-2-1"><col 
+id="TBL-2-2"></colgroup><tr  
+ style="vertical-align:baseline;" id="TBL-2-1-"><td  style="white-space:normal; text-align:left;" id="TBL-2-1-1"  
+class="td11"><!--l. 56--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">contxt</span> </td> <td  style="white-space:normal; text-align:left;" id="TBL-2-1-2"  
+class="td11"><!--l. 56--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">type</span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">psb_ctxt_type</span><span 
+class="cmtt-12">),</span><span 
+>>>>>>> development
 class="cmtt-12">&#x00A0;</span><span 
 class="cmtt-12">intent</span><span 
 class="cmtt-12">(</span><span 
 class="cmtt-12">in</span><span 
 class="cmtt-12">)</span><span 
+<<<<<<< HEAD
 class="cmr-12">.</span>                                         </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-3-10-"><td  style="white-space:normal; text-align:left;" id="TBL-3-10-1"  
@@ -262,17 +252,27 @@ class="cmr-12">one, i.e., level 1 is the finest level.</span>                   
 class="td11"><!--l. 117--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">pos</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-3-11-2"  
 class="td11"><!--l. 117--><p class="noindent" ><span class="lstinline"></span><span 
+=======
+class="cmr-12">.</span>                                     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-2-"><td  style="white-space:normal; text-align:left;" id="TBL-2-2-1"  
+class="td11"><!--l. 57--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-2-2"  
+class="td11"><!--l. 57--><p class="noindent" ><span 
+class="cmr-12">The communication context.</span>                                                  </td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-3-"><td  style="white-space:normal; text-align:left;" id="TBL-2-3-1"  
+class="td11"><!--l. 58--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">ptype</span>  </td> <td  style="white-space:normal; text-align:left;" id="TBL-2-3-2"  
+class="td11"><!--l. 58--><p class="noindent" ><span class="lstinline"></span><span 
+>>>>>>> development
 class="cmtt-12">character</span><span 
 class="cmtt-12">(</span><span 
 class="cmtt-12">len</span><span 
 class="cmtt-12">=*),</span><span 
 class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">optional</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">&#x00A0;</span><span 
 class="cmtt-12">intent</span><span 
 class="cmtt-12">(</span><span 
 class="cmtt-12">in</span><span 
+<<<<<<< HEAD
 class="cmtt-12">)</span><span 
 class="cmr-12">.</span>                          </td>
 </tr><tr  
@@ -307,18 +307,39 @@ class="cmr-12">is ignored.</span>                               </td>
 class="td11"><!--l. 123--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">idx</span>   </td><td  style="white-space:normal; text-align:left;" id="TBL-3-13-2"  
 class="td11"><!--l. 123--><p class="noindent" ><span class="lstinline"></span><span 
+=======
+class="cmtt-12">)</span> <span 
+class="cmr-12">.</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-4-"><td  style="white-space:normal; text-align:left;" id="TBL-2-4-1"  
+class="td11"><!--l. 59--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-4-2"  
+class="td11"><!--l. 59--><p class="noindent" ><span 
+class="cmr-12">The type of preconditioner. Its values are specified in Table</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlse4.html#x14-13015r1"><span 
+class="cmr-12">1</span><!--tex4ht:ref: tab:precinit --></a><span 
+class="cmr-12">.</span>     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-5-"><td  style="white-space:normal; text-align:left;" id="TBL-2-5-1"  
+class="td11"><!--l. 61--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-5-2"  
+class="td11"><!--l. 61--><p class="noindent" ><span 
+class="cmr-12">Note that strings are case insensitive.</span>                                      </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-6-"><td  style="white-space:normal; text-align:left;" id="TBL-2-6-1"  
+class="td11"><!--l. 62--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">info</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-2-6-2"  
+class="td11"><!--l. 62--><p class="noindent" ><span class="lstinline"></span><span 
+>>>>>>> development
 class="cmtt-12">integer</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">optional</span><span 
 class="cmtt-12">,</span><span 
 class="cmtt-12">&#x00A0;</span><span 
 class="cmtt-12">intent</span><span 
 class="cmtt-12">(</span><span 
-class="cmtt-12">in</span><span 
+class="cmtt-12">out</span><span 
 class="cmtt-12">)</span><span 
-class="cmr-12">.</span>                                         </td>
+class="cmr-12">.</span>                                                       </td>
 </tr><tr  
+<<<<<<< HEAD
  style="vertical-align:baseline;" id="TBL-3-14-"><td  style="white-space:normal; text-align:left;" id="TBL-3-14-1"  
 class="td11"><!--l. 124--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-3-14-2"  
 class="td11"><!--l. 124--><p class="noindent" ><span 
@@ -1463,15 +1484,26 @@ class="td11">                    </td></tr></table>
 <br /> <div class="caption" 
 ><span class="id">Table&#x00A0;5: </span><span  
 class="content">Parameters defining the solver at the coarsest level (continued).</span></div><!--tex4ht:label?: x18-17012r5 -->
+=======
+ style="vertical-align:baseline;" id="TBL-2-7-"><td  style="white-space:normal; text-align:left;" id="TBL-2-7-1"  
+class="td11"><!--l. 63--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-7-2"  
+class="td11"><!--l. 63--><p class="noindent" ><span 
+class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlse7.html#x28-320007"><span 
+class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span 
+class="cmr-12">for details.</span>     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-8-"><td  style="white-space:normal; text-align:left;" id="TBL-2-8-1"  
+class="td11">      </td> </tr></table></div>
+>>>>>>> development
                                                                                
 
                                                                                
-   </div><hr class="endfloat" />
-   </div>
-   <div class="table">
                                                                                
 
                                                                                
+<<<<<<< HEAD
 <!--l. 496--><p class="indent" >   <a 
  id="x18-17013r6"></a><hr class="float"><div class="float" 
 >
@@ -2565,15 +2597,12 @@ class="content">Parameters defining the smoother or the details of the one-level
 
                                                                                
    <!--l. 674--><div class="crosslinks"><p class="noindent"><span 
+=======
+   <!--l. 72--><div class="crosslinks"><p class="noindent"><span 
+>>>>>>> development
 class="cmr-12">[</span><a 
 href="userhtmlsu9.html" ><span 
 class="cmr-12">next</span></a><span 
-class="cmr-12">] [</span><a 
-href="userhtmlsu7.html" ><span 
-class="cmr-12">prev</span></a><span 
-class="cmr-12">] [</span><a 
-href="userhtmlsu7.html#tailuserhtmlsu7.html" ><span 
-class="cmr-12">prev-tail</span></a><span 
 class="cmr-12">] [</span><a 
 href="userhtmlsu8.html" ><span 
 class="cmr-12">front</span></a><span 
@@ -2581,6 +2610,6 @@ class="cmr-12">] [</span><a
 href="userhtmlse5.html#userhtmlsu8.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
-<!--l. 674--><p class="indent" >   <a 
+<!--l. 72--><p class="indent" >   <a 
  id="tailuserhtmlsu8.html"></a>  
 </body></html> 

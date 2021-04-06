@@ -1,15 +1,15 @@
-!  
-!   
+!
+!
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.7)
-!    
-!    (C) Copyright 2021 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Fabio Durastante        
-!   
+!
+!    (C) Copyright 2021
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,26 +33,26 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
+!
+!
 ! File: amg_s_dec_aggregator_tprol.f90
 !
 ! Subroutine: amg_s_dec_aggregator_tprol
 ! Version:    real
 !
-!  This routine is mainly an interface to soc_map_bld where the real work is performed. 
+!  This routine is mainly an interface to soc_map_bld where the real work is performed.
 !  It takes care of some consistency checking, and calls map_to_tprol, which is
 !  refactored and shared among all the aggregation methods that produce a simple
 !  integer mapping.
 !
-! 
+!
 ! Arguments:
 !    ag      -  type(amg_s_dec_aggregator_type), input/output.
 !               The aggregator object, carrying with itself the mapping algorithm.
 !    parms   -  The auxiliary parameters object
 !    ag_data -  Auxiliary global aggregation parameters object
-!    
-!    
+!
+!
 !    a       -  type(psb_sspmat_type).
 !               The sparse matrix structure containing the local part of the
 !               fine-level matrix.
@@ -70,10 +70,10 @@
 !                  nlaggr(i) contains the aggregates held by process i.
 !    t_prol    -  type(psb_sspmat_type), output
 !               The tentative prolongator, based on ilaggr.
-!               
+!
 !    info    -  integer, output.
-!               Error code.         
-!  
+!               Error code.
+!
 subroutine  amg_s_dec_aggregator_build_tprol(ag,parms,ag_data,&
      & a,desc_a,ilaggr,nlaggr,t_prol,info)
   use psb_base_mod
@@ -81,7 +81,7 @@ subroutine  amg_s_dec_aggregator_build_tprol(ag,parms,ag_data,&
   use amg_s_inner_mod
   implicit none
   class(amg_s_dec_aggregator_type), target, intent(inout) :: ag
-  type(amg_sml_parms), intent(inout)  :: parms 
+  type(amg_sml_parms), intent(inout)  :: parms
   type(amg_saggr_data), intent(in)    :: ag_data
   type(psb_sspmat_type), intent(in)   :: a
   type(psb_desc_type), intent(in)     :: desc_a
@@ -112,7 +112,7 @@ subroutine  amg_s_dec_aggregator_build_tprol(ag,parms,ag_data,&
   call amg_check_def(parms%ml_cycle,'Multilevel cycle',&
        &   amg_mult_ml_,is_legal_ml_cycle)
   call amg_check_def(parms%par_aggr_alg,'Aggregation',&
-       &   amg_dec_aggr_,is_legal_ml_par_aggr_alg)
+       &   amg_dec_aggr_,is_legal_decoupled_par_aggr_alg)
   call amg_check_def(parms%aggr_ord,'Ordering',&
        &   amg_aggr_ord_nat_,is_legal_ml_aggr_ord)
   call amg_check_def(parms%aggr_thresh,'Aggr_Thresh',szero,is_legal_s_aggr_thrs)
@@ -130,11 +130,11 @@ subroutine  amg_s_dec_aggregator_build_tprol(ag,parms,ag_data,&
     call psb_errpush(info,name,a_err='soc_map_bld/map_to_tprol')
     goto 9999
   endif
-  
+
   call psb_erractionrestore(err_act)
   return
 
 9999 call psb_error_handler(err_act)
   return
-  
+
 end subroutine amg_s_dec_aggregator_build_tprol
