@@ -48,7 +48,7 @@ work in the expected way. Our advice is first to download the LAPACK tarfile fro
 \href{http://www.netlib.org/lapack}{www.netlib.org/lapack} and install it independently of ATLAS. In this case,
 you need to modify the OPTS and NOOPT definitions for including -fPIC compilation option
 in the make.inc file of the LAPACK library.
-\item[MPI] \cite{MPI2,MPI1} A version of MPI is available on most
+ \item[MPI] \cite{MPI2,MPI1} A version of MPI is available on most
   high-performance computing systems.
  \item[PSBLAS] \cite{PSBLASGUIDE,psblas_00} Parallel Sparse BLAS (PSBLAS) is
   available from
@@ -61,6 +61,18 @@ Please note that the four previous libraries must have Fortran
 interfaces compatible with AMG4PSBLAS; usually this means that they
 should all be built with the same compiler being used for  AMG4PSBLAS.
 
+If you want to use the PSBLAS support for NVIDIA GPUs, you will also
+need:
+\begin{description}
+ \item[PSBLAS-EXT] Parallel Sparse BLAS (PSBLAS) Extensions, 
+  available from
+  \href{https://psctoolkit.github.io/products/psblasext/}{psctoolkit.github.io/products/psblasext/}; version   1.3.0  (or later). 
+ \item[SPGPU] Sparse CUDA kernels for NVIDIA GPUs; available from
+   GitHub, see also
+   \href{https://psctoolkit.github.io/products/psblasext/}{psctoolkit.github.io/products/psblasext/}.
+ \end{description}
+ See also Sec~\ref{sec:gpu-example}.
+ 
 \subsection{Optional third party libraries\label{sec:third-party}}
 
 We provide interfaces to the following third-party software libraries;

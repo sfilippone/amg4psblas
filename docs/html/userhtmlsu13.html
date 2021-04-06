@@ -1,16 +1,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
   "http://www.w3.org/TR/html4/loose.dtd">  
 <html > 
-<head><title>Method free</title> 
+<head><title>Method apply</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 840--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 794--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu14.html" ><span 
 class="cmr-12">next</span></a><span 
@@ -28,39 +28,158 @@ href="userhtmlse5.html#userhtmlsu13.html" ><span
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
    <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmr-12">5.7   </span></span> <a 
- id="x23-220005.7"></a><span 
-class="cmr-12">Method free</span></h4>
+class="cmr-12">5.6   </span></span> <a 
+ id="x23-220005.6"></a><span 
+class="cmr-12">Method apply</span></h4>
 <div class="center" 
 >
-<!--l. 842--><p class="noindent" >
-<!--l. 843--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 796--><p class="noindent" >
+<!--l. 797--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">call</span><span 
 class="cmtt-12">&#x00A0;</span><span 
 class="cmtt-12">p</span><span 
 class="cmtt-12">%</span><span 
-class="cmtt-12">free</span><span 
+class="cmtt-12">apply</span><span 
 class="cmtt-12">(</span><span 
-class="cmtt-12">p</span><span 
+class="cmtt-12">x</span><span 
+class="cmtt-12">,</span><span 
+class="cmtt-12">y</span><span 
+class="cmtt-12">,</span><span 
+class="cmtt-12">desc_a</span><span 
 class="cmtt-12">,</span><span 
 class="cmtt-12">info</span><span 
-class="cmtt-12">)</span><br />
+class="cmtt-12">&#x00A0;</span><span 
+class="cmtt-12">[,</span><span 
+class="cmtt-12">trans</span><span 
+class="cmtt-12">,</span><span 
+class="cmtt-12">work</span><span 
+class="cmtt-12">])</span><br />
 </div>
-<!--l. 846--><p class="noindent" ><span 
-class="cmr-12">This method deallocates the preconditioner data structure </span><span class="lstinline"></span><span 
+<!--l. 800--><p class="noindent" ><span 
+class="cmr-12">This method computes </span><span 
+class="cmmi-12">y </span><span 
+class="cmr-12">= </span><span 
+class="cmmi-12">op</span><span 
+class="cmr-12">(</span><span 
+class="cmmi-12">B</span><sup><span 
+class="cmsy-8">-</span><span 
+class="cmr-8">1</span></sup><span 
+class="cmr-12">) </span><span 
+class="cmmi-12">x</span><span 
+class="cmr-12">, where </span><span 
+class="cmmi-12">B </span><span 
+class="cmr-12">is a previously built preconditioner,</span>
+<span 
+class="cmr-12">stored into </span><span class="lstinline"></span><span 
 class="cmtt-12">p</span><span 
-class="cmr-12">.</span>
-<!--l. 849--><p class="noindent" ><span 
+class="cmr-12">, and </span><span 
+class="cmmi-12">op </span><span 
+class="cmr-12">denotes the preconditioner itself or its transpose, according to the</span>
+<span 
+class="cmr-12">value of </span><span class="lstinline"></span><span 
+class="cmtt-12">trans</span><span 
+class="cmr-12">. Note that, when AMG4PSBLAS is used with a Krylov solver from</span>
+<span 
+class="cmr-12">PSBLAS, </span><span class="lstinline"></span><span 
+class="cmtt-12">p</span><span 
+class="cmtt-12">%</span><span 
+class="cmtt-12">apply</span> <span 
+class="cmr-12">is called within the PSBLAS method </span><span class="lstinline"></span><span 
+class="cmtt-12">psb_krylov</span> <span 
+class="cmr-12">and hence it is</span>
+<span 
+class="cmr-12">completely transparent to the user.</span>
+<!--l. 809--><p class="noindent" ><span 
 class="cmbx-12">Arguments</span>
-   <div class="tabular"> <table id="TBL-15" class="tabular" 
+   <div class="tabular"> <table id="TBL-14" class="tabular" 
 cellspacing="0" cellpadding="0"  
-><colgroup id="TBL-15-1g"><col 
-id="TBL-15-1"><col 
-id="TBL-15-2"></colgroup><tr  
- style="vertical-align:baseline;" id="TBL-15-1-"><td  style="white-space:wrap; text-align:left;" id="TBL-15-1-1"  
-class="td11"><!--l. 852--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">info</span>  </td><td  style="white-space:wrap; text-align:left;" id="TBL-15-1-2"  
-class="td11"><!--l. 852--><p class="noindent" ><span class="lstinline"></span><span 
+><colgroup id="TBL-14-1g"><col 
+id="TBL-14-1"><col 
+id="TBL-14-2"></colgroup><tr  
+ style="vertical-align:baseline;" id="TBL-14-1-"><td  style="white-space:normal; text-align:left;" id="TBL-14-1-1"  
+class="td11"><!--l. 812--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">x</span>     </td><td  style="white-space:normal; text-align:left;" id="TBL-14-1-2"  
+class="td11"><!--l. 812--><p class="noindent" ><span 
+class="cmti-12">type</span><span class="lstinline"></span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">kind_parameter</span><span 
+class="cmtt-12">)</span><span 
+class="cmr-12">, dimension(:), intent(in)&#8212;.</span>                    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-2-"><td  style="white-space:normal; text-align:left;" id="TBL-14-2-1"  
+class="td11"><!--l. 813--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-14-2-2"  
+class="td11"><!--l. 813--><p class="noindent" ><span 
+class="cmr-12">The local part of the vector </span><span 
+class="cmmi-12">x</span><span 
+class="cmr-12">. Note that </span><span 
+class="cmti-12">type </span><span 
+class="cmr-12">and </span><span 
+class="cmti-12">kind</span><span 
+class="cmti-12">_parameter</span>
+<span 
+class="cmr-12">must  be  chosen  according  to  the  </span><span class="lstinline"></span><span 
+class="cmtt-12">real</span><span 
+class="cmr-12">/</span><span class="lstinline"></span><span 
+class="cmtt-12">complex</span><span 
+class="cmr-12">,  single/double</span>
+<span 
+class="cmr-12">precision version of AMG4PSBLAS under use.</span>                          </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-3-"><td  style="white-space:normal; text-align:left;" id="TBL-14-3-1"  
+class="td11"><!--l. 816--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">y</span>     </td><td  style="white-space:normal; text-align:left;" id="TBL-14-3-2"  
+class="td11"><!--l. 816--><p class="noindent" ><span 
+class="cmti-12">type</span><span class="lstinline"></span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">kind_parameter</span><span 
+class="cmtt-12">)</span><span 
+class="cmr-12">, dimension(:), intent(out)&#8212;.</span>                  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-4-"><td  style="white-space:normal; text-align:left;" id="TBL-14-4-1"  
+class="td11"><!--l. 817--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-14-4-2"  
+class="td11"><!--l. 817--><p class="noindent" ><span 
+class="cmr-12">The local part of the vector </span><span 
+class="cmmi-12">y</span><span 
+class="cmr-12">. Note that </span><span 
+class="cmti-12">type </span><span 
+class="cmr-12">and </span><span 
+class="cmti-12">kind</span><span 
+class="cmti-12">_parameter</span>
+<span 
+class="cmr-12">must  be  chosen  according  to  the  </span><span class="lstinline"></span><span 
+class="cmtt-12">real</span><span 
+class="cmr-12">/</span><span class="lstinline"></span><span 
+class="cmtt-12">complex</span><span 
+class="cmr-12">,  single/double</span>
+<span 
+class="cmr-12">precision version of AMG4PSBLAS under use.</span>                          </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-5-"><td  style="white-space:normal; text-align:left;" id="TBL-14-5-1"  
+class="td11"><!--l. 820--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">desc_a</span></td><td  style="white-space:normal; text-align:left;" id="TBL-14-5-2"  
+class="td11"><!--l. 820--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">type</span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">psb_desc_type</span><span 
+class="cmtt-12">),</span><span 
+class="cmtt-12">&#x00A0;</span><span 
+class="cmtt-12">intent</span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">in</span><span 
+class="cmtt-12">)</span><span 
+class="cmr-12">.</span>                                     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-6-"><td  style="white-space:normal; text-align:left;" id="TBL-14-6-1"  
+class="td11"><!--l. 821--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-14-6-2"  
+class="td11"><!--l. 821--><p class="noindent" ><span 
+class="cmr-12">The  communication  descriptor  associated  to  the  matrix  to  be</span>
+<span 
+class="cmr-12">preconditioned.</span>                                                                   </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-7-"><td  style="white-space:normal; text-align:left;" id="TBL-14-7-1"  
+class="td11"><!--l. 823--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">info</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-14-7-2"  
+class="td11"><!--l. 823--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">integer</span><span 
 class="cmtt-12">,</span><span 
 class="cmtt-12">&#x00A0;</span><span 
@@ -68,20 +187,148 @@ class="cmtt-12">intent</span><span
 class="cmtt-12">(</span><span 
 class="cmtt-12">out</span><span 
 class="cmtt-12">)</span><span 
-class="cmr-12">.</span>                                            </td>
+class="cmr-12">.</span>                                                       </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-15-2-"><td  style="white-space:wrap; text-align:left;" id="TBL-15-2-1"  
-class="td11"><!--l. 853--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-15-2-2"  
-class="td11"><!--l. 853--><p class="noindent" ><span 
+ style="vertical-align:baseline;" id="TBL-14-8-"><td  style="white-space:normal; text-align:left;" id="TBL-14-8-1"  
+class="td11"><!--l. 824--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-14-8-2"  
+class="td11"><!--l. 824--><p class="noindent" ><span 
 class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="userhtmlse7.html#x27-310007"><span 
+href="userhtmlse7.html#x28-320007"><span 
 class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span 
-class="cmr-12">for</span>
-<span 
-class="cmr-12">details.</span>                                                                   </td>
+class="cmr-12">for details.</span>     </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-15-3-"><td  style="white-space:wrap; text-align:left;" id="TBL-15-3-1"  
+ style="vertical-align:baseline;" id="TBL-14-9-"><td  style="white-space:normal; text-align:left;" id="TBL-14-9-1"  
+class="td11"><!--l. 825--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">trans</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-14-9-2"  
+class="td11"><!--l. 825--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">character</span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">len</span><span 
+class="cmtt-12">=1),</span><span 
+class="cmtt-12">&#x00A0;</span><span 
+class="cmtt-12">optional</span><span 
+class="cmtt-12">,</span><span 
+class="cmtt-12">&#x00A0;</span><span 
+class="cmtt-12">intent</span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">in</span><span 
+class="cmtt-12">).</span>                </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-10-"><td  style="white-space:normal; text-align:left;" id="TBL-14-10-1"  
+class="td11"><!--l. 826--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-14-10-2"  
+class="td11"><!--l. 826--><p class="noindent" ><span 
+class="cmr-12">If </span><span class="lstinline"></span><span 
+class="cmtt-12">trans</span> <span 
+class="cmr-12">= </span><span class="lstinline"></span><span 
+class="cmtt-12">&#8217;</span><span 
+class="cmtt-12">N</span><span 
+class="cmtt-12">&#8217;</span><span 
+class="cmtt-12">,</span><span 
+class="cmtt-12">&#8217;</span><span 
+class="cmtt-12">n</span><span 
+class="cmtt-12">&#8217;</span> <span 
+class="cmr-12">then </span><span 
+class="cmmi-12">op</span><span 
+class="cmr-12">(</span><span 
+class="cmmi-12">B</span><sup><span 
+class="cmsy-8">-</span><span 
+class="cmr-8">1</span></sup><span 
+class="cmr-12">)  =  </span><span 
+class="cmmi-12">B</span><sup><span 
+class="cmsy-8">-</span><span 
+class="cmr-8">1</span></sup><span 
+class="cmr-12">; if </span><span class="lstinline"></span><span 
+class="cmtt-12">trans</span> <span 
+class="cmr-12">= </span><span class="lstinline"></span><span 
+class="cmtt-12">&#8217;</span><span 
+class="cmtt-12">T</span><span 
+class="cmtt-12">&#8217;</span><span 
+class="cmtt-12">,</span><span 
+class="cmtt-12">&#8217;</span><span 
+class="cmtt-12">t</span><span 
+class="cmtt-12">&#8217;</span>
+<span 
+class="cmr-12">then </span><span 
+class="cmmi-12">op</span><span 
+class="cmr-12">(</span><span 
+class="cmmi-12">B</span><sup><span 
+class="cmsy-8">-</span><span 
+class="cmr-8">1</span></sup><span 
+class="cmr-12">) = </span><span 
+class="cmmi-12">B</span><sup><span 
+class="cmsy-8">-</span><span 
+class="cmmi-8">T</span> </sup> <span 
+class="cmr-12">(transpose of </span><span 
+class="cmmi-12">B</span><sup><span 
+class="cmsy-8">-</span><span 
+class="cmr-8">1</span></sup><span 
+class="cmr-12">); if </span><span class="lstinline"></span><span 
+class="cmtt-12">trans</span> <span 
+class="cmr-12">= </span><span class="lstinline"></span><span 
+class="cmtt-12">&#8217;</span><span 
+class="cmtt-12">C</span><span 
+class="cmtt-12">&#8217;</span><span 
+class="cmtt-12">,</span><span 
+class="cmtt-12">&#8217;</span><span 
+class="cmtt-12">c</span><span 
+class="cmtt-12">&#8217;</span> <span 
+class="cmr-12">then</span>
+<span 
+class="cmmi-12">op</span><span 
+class="cmr-12">(</span><span 
+class="cmmi-12">B</span><sup><span 
+class="cmsy-8">-</span><span 
+class="cmr-8">1</span></sup><span 
+class="cmr-12">) = </span><span 
+class="cmmi-12">B</span><sup><span 
+class="cmsy-8">-</span><span 
+class="cmmi-8">C</span></sup> <span 
+class="cmr-12">(conjugate transpose of </span><span 
+class="cmmi-12">B</span><sup><span 
+class="cmsy-8">-</span><span 
+class="cmr-8">1</span></sup><span 
+class="cmr-12">).</span>                           </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-11-"><td  style="white-space:normal; text-align:left;" id="TBL-14-11-1"  
+class="td11"><!--l. 830--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">work</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-14-11-2"  
+class="td11"><!--l. 830--><p class="noindent" ><span 
+class="cmti-12">type</span><span class="lstinline"></span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">kind_parameter</span><span 
+class="cmtt-12">)</span><span 
+class="cmr-12">, dimension(:), optional, target&#8212;.</span>            </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-12-"><td  style="white-space:normal; text-align:left;" id="TBL-14-12-1"  
+class="td11"><!--l. 831--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-14-12-2"  
+class="td11"><!--l. 831--><p class="noindent" ><span 
+class="cmr-12">Workspace.  Its  size  should  be  at  least  </span><span class="lstinline"></span><span 
+class="cmtt-12">4</span><span 
+class="cmtt-12">&#x00A0;</span><span 
+class="cmtt-12">*</span><span 
+class="cmtt-12">&#x00A0;</span><span 
+class="cmtt-12">psb_cd_get_local_</span>
+<span class="lstinline"></span><span 
+class="cmtt-12">cols</span><span 
+class="cmtt-12">(</span><span 
+class="cmtt-12">desc_a</span><span 
+class="cmtt-12">)</span> <span 
+class="cmr-12">(see the PSBLAS User&#8217;s Guide). Note that </span><span 
+class="cmti-12">type </span><span 
+class="cmr-12">and</span>
+<span 
+class="cmti-12">kind</span><span 
+class="cmti-12">_parameter  </span><span 
+class="cmr-12">must be chosen according to the </span><span class="lstinline"></span><span 
+class="cmtt-12">real</span><span 
+class="cmr-12">/</span><span class="lstinline"></span><span 
+class="cmtt-12">complex</span><span 
+class="cmr-12">,</span>
+<span 
+class="cmr-12">single/double precision version of AMG4PSBLAS under use.</span>        </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-14-13-"><td  style="white-space:normal; text-align:left;" id="TBL-14-13-1"  
 class="td11">      </td> </tr></table></div>
                                                                                
 
@@ -89,7 +336,10 @@ class="td11">      </td> </tr></table></div>
                                                                                
 
                                                                                
-   <!--l. 859--><div class="crosslinks"><p class="noindent"><span 
+                                                                               
+
+                                                                               
+   <!--l. 840--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu14.html" ><span 
 class="cmr-12">next</span></a><span 
@@ -106,6 +356,6 @@ class="cmr-12">] [</span><a
 href="userhtmlse5.html#userhtmlsu13.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
-<!--l. 859--><p class="indent" >   <a 
+<!--l. 840--><p class="indent" >   <a 
  id="tailuserhtmlsu13.html"></a>  
 </body></html> 

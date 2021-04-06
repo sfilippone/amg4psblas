@@ -1,16 +1,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
   "http://www.w3.org/TR/html4/loose.dtd">  
 <html > 
-<head><title>Method build</title> 
+<head><title>Method smoothers_build</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 746--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 704--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu12.html" ><span 
 class="cmr-12">next</span></a><span 
@@ -28,22 +28,25 @@ href="userhtmlse5.html#userhtmlsu11.html" ><span
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
    <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmr-12">5.5   </span></span> <a 
- id="x21-200005.5"></a><span 
-class="cmr-12">Method build</span></h4>
+class="cmr-12">5.4   </span></span> <a 
+ id="x21-200005.4"></a><span 
+class="cmr-12">Method smoothers</span><span 
+class="cmr-12">_build</span></h4>
 <div class="center" 
 >
-<!--l. 748--><p class="noindent" >
-<!--l. 749--><p class="noindent" ><span class="lstinline"></span><span 
+<!--l. 707--><p class="noindent" >
+<!--l. 708--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">call</span><span 
 class="cmtt-12">&#x00A0;</span><span 
 class="cmtt-12">p</span><span 
 class="cmtt-12">%</span><span 
-class="cmtt-12">build</span><span 
+class="cmtt-12">smoothers_build</span><span 
 class="cmtt-12">(</span><span 
 class="cmtt-12">a</span><span 
 class="cmtt-12">,</span><span 
 class="cmtt-12">desc_a</span><span 
+class="cmtt-12">,</span><span 
+class="cmtt-12">p</span><span 
 class="cmtt-12">,</span><span 
 class="cmtt-12">info</span><span 
 class="cmtt-12">[,</span><span 
@@ -54,46 +57,35 @@ class="cmtt-12">,</span><span
 class="cmtt-12">imold</span><span 
 class="cmtt-12">])</span><br />
 </div>
-<!--l. 752--><p class="noindent" ><span 
-class="cmr-12">This method builds the preconditioner </span><span class="lstinline"></span><span 
-class="cmtt-12">p</span> <span 
-class="cmr-12">according to the requirements made by the</span>
+<!--l. 711--><p class="noindent" ><span 
+class="cmr-12">This method builds the smoothers and the coarsest-level solvers for the multilevel</span>
 <span 
-class="cmr-12">user through the methods </span><span class="lstinline"></span><span 
+class="cmr-12">preconditioner </span><span class="lstinline"></span><span 
+class="cmtt-12">p</span><span 
+class="cmr-12">, according to the requirements made by the user through the methods</span>
+<span class="lstinline"></span><span 
 class="cmtt-12">init</span> <span 
 class="cmr-12">and </span><span class="lstinline"></span><span 
-class="cmtt-12">set</span> <span 
-class="cmr-12">(see Sections</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlsu9.html#x19-180005.3"><span 
-class="cmr-12">5.3</span><!--tex4ht:ref: sec:hier_bld --></a> <span 
-class="cmr-12">and</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlsu10.html#x20-190005.4"><span 
-class="cmr-12">5.4</span><!--tex4ht:ref: sec:smooth_bld --></a> <span 
-class="cmr-12">for multilevel</span>
-<span 
-class="cmr-12">preconditioners). It is mostly provided for backward compatibility; indeed, it is</span>
-<span 
-class="cmr-12">internally implemented by invoking the two previous methods </span><span class="lstinline"></span><span 
-class="cmtt-12">hierarchy_build</span> <span 
-class="cmr-12">and</span>
+class="cmtt-12">set</span><span 
+class="cmr-12">, and based on the aggregation hierarchy produced by a previous call to</span>
 <span class="lstinline"></span><span 
-class="cmtt-12">smoothers_build</span><span 
-class="cmr-12">, whose nomenclature would however be somewhat unnatural when</span>
-<span 
-class="cmr-12">dealing with simple one-level preconditioners.</span>
-<!--l. 762--><p class="noindent" ><span 
+class="cmtt-12">hierarchy_build</span> <span 
+class="cmr-12">(see Section</span><span 
+class="cmr-12">&#x00A0;</span><a 
+href="userhtmlsu10.html#x20-190005.3"><span 
+class="cmr-12">5.3</span><!--tex4ht:ref: sec:hier_bld --></a><span 
+class="cmr-12">).</span>
+<!--l. 718--><p class="noindent" ><span 
 class="cmbx-12">Arguments</span>
-   <div class="tabular"> <table id="TBL-13" class="tabular" 
+   <div class="tabular"> <table id="TBL-12" class="tabular" 
 cellspacing="0" cellpadding="0"  
-><colgroup id="TBL-13-1g"><col 
-id="TBL-13-1"><col 
-id="TBL-13-2"></colgroup><tr  
- style="vertical-align:baseline;" id="TBL-13-1-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-1-1"  
-class="td11"><!--l. 765--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">a</span>     </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-1-2"  
-class="td11"><!--l. 765--><p class="noindent" ><span class="lstinline"></span><span 
+><colgroup id="TBL-12-1g"><col 
+id="TBL-12-1"><col 
+id="TBL-12-2"></colgroup><tr  
+ style="vertical-align:baseline;" id="TBL-12-1-"><td  style="white-space:normal; text-align:left;" id="TBL-12-1-1"  
+class="td11"><!--l. 721--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">a</span>     </td><td  style="white-space:normal; text-align:left;" id="TBL-12-1-2"  
+class="td11"><!--l. 721--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">type</span><span 
 class="cmtt-12">(</span><span 
 class="cmtt-12">psb_</span><span 
@@ -107,9 +99,9 @@ class="cmtt-12">in</span><span
 class="cmtt-12">)</span><span 
 class="cmr-12">.</span>                                  </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-13-2-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-2-1"  
-class="td11"><!--l. 766--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-2-2"  
-class="td11"><!--l. 766--><p class="noindent" ><span 
+ style="vertical-align:baseline;" id="TBL-12-2-"><td  style="white-space:normal; text-align:left;" id="TBL-12-2-1"  
+class="td11"><!--l. 722--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-12-2-2"  
+class="td11"><!--l. 722--><p class="noindent" ><span 
 class="cmr-12">The sparse matrix structure containing the local part of the matrix</span>
 <span 
 class="cmr-12">to be preconditioned. Note that </span><span 
@@ -128,10 +120,10 @@ class="cmr-12">20</span></a><span
 class="cmr-12">]</span></span><span 
 class="cmr-12">.</span>            </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-13-3-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-3-1"  
-class="td11"><!--l. 770--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">desc_a</span></td><td  style="white-space:wrap; text-align:left;" id="TBL-13-3-2"  
-class="td11"><!--l. 770--><p class="noindent" ><span class="lstinline"></span><span 
+ style="vertical-align:baseline;" id="TBL-12-3-"><td  style="white-space:normal; text-align:left;" id="TBL-12-3-1"  
+class="td11"><!--l. 726--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">desc_a</span></td><td  style="white-space:normal; text-align:left;" id="TBL-12-3-2"  
+class="td11"><!--l. 726--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">type</span><span 
 class="cmtt-12">(</span><span 
 class="cmtt-12">psb_desc_type</span><span 
@@ -143,9 +135,9 @@ class="cmtt-12">in</span><span
 class="cmtt-12">)</span><span 
 class="cmr-12">.</span>                                     </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-13-4-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-4-1"  
-class="td11"><!--l. 771--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-4-2"  
-class="td11"><!--l. 771--><p class="noindent" ><span 
+ style="vertical-align:baseline;" id="TBL-12-4-"><td  style="white-space:normal; text-align:left;" id="TBL-12-4-1"  
+class="td11"><!--l. 727--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-12-4-2"  
+class="td11"><!--l. 727--><p class="noindent" ><span 
 class="cmr-12">The communication descriptor of </span><span class="lstinline"></span><span 
 class="cmtt-12">a</span><span 
 class="cmr-12">. See the PSBLAS User&#8217;s Guide</span>
@@ -157,10 +149,10 @@ class="cmr-12">20</span></a><span
 class="cmr-12">]</span></span><span 
 class="cmr-12">.</span>                                                                    </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-13-5-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-5-1"  
-class="td11"><!--l. 773--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">info</span>  </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-5-2"  
-class="td11"><!--l. 773--><p class="noindent" ><span class="lstinline"></span><span 
+ style="vertical-align:baseline;" id="TBL-12-5-"><td  style="white-space:normal; text-align:left;" id="TBL-12-5-1"  
+class="td11"><!--l. 729--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">info</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-12-5-2"  
+class="td11"><!--l. 729--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">integer</span><span 
 class="cmtt-12">,</span><span 
 class="cmtt-12">&#x00A0;</span><span 
@@ -170,19 +162,19 @@ class="cmtt-12">out</span><span
 class="cmtt-12">)</span><span 
 class="cmr-12">.</span>                                                       </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-13-6-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-6-1"  
-class="td11"><!--l. 774--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-6-2"  
-class="td11"><!--l. 774--><p class="noindent" ><span 
+ style="vertical-align:baseline;" id="TBL-12-6-"><td  style="white-space:normal; text-align:left;" id="TBL-12-6-1"  
+class="td11"><!--l. 730--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-12-6-2"  
+class="td11"><!--l. 730--><p class="noindent" ><span 
 class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="userhtmlse7.html#x27-310007"><span 
+href="userhtmlse7.html#x28-320007"><span 
 class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span 
 class="cmr-12">for details.</span>     </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-13-7-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-7-1"  
-class="td11"><!--l. 775--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">amold</span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-7-2"  
-class="td11"><!--l. 775--><p class="noindent" ><span class="lstinline"></span><span 
+ style="vertical-align:baseline;" id="TBL-12-7-"><td  style="white-space:normal; text-align:left;" id="TBL-12-7-1"  
+class="td11"><!--l. 731--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">amold</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-12-7-2"  
+class="td11"><!--l. 731--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">class</span><span 
 class="cmtt-12">(</span><span 
 class="cmtt-12">psb_</span><span 
@@ -198,9 +190,9 @@ class="cmtt-12">&#x00A0;</span><span
 class="cmtt-12">optional</span><span 
 class="cmr-12">.</span>       </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-13-8-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-8-1"  
-class="td11"><!--l. 776--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-8-2"  
-class="td11"><!--l. 776--><p class="noindent" ><span 
+ style="vertical-align:baseline;" id="TBL-12-8-"><td  style="white-space:normal; text-align:left;" id="TBL-12-8-1"  
+class="td11"><!--l. 732--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-12-8-2"  
+class="td11"><!--l. 732--><p class="noindent" ><span 
 class="cmr-12">The  desired  dynamic  type  for  internal  matrix  components;  this</span>
 <span 
 class="cmr-12">allows  e.g.  running  on  GPUs;  it  needs  not  be  the  same  on  all</span>
@@ -212,10 +204,10 @@ class="cmr-12">20</span></a><span
 class="cmr-12">]</span></span><span 
 class="cmr-12">.</span>             </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-13-9-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-9-1"  
-class="td11"><!--l. 780--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">vmold</span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-9-2"  
-class="td11"><!--l. 780--><p class="noindent" ><span class="lstinline"></span><span 
+ style="vertical-align:baseline;" id="TBL-12-9-"><td  style="white-space:normal; text-align:left;" id="TBL-12-9-1"  
+class="td11"><!--l. 736--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">vmold</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-12-9-2"  
+class="td11"><!--l. 736--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">class</span><span 
 class="cmtt-12">(</span><span 
 class="cmtt-12">psb_</span><span 
@@ -231,17 +223,17 @@ class="cmtt-12">&#x00A0;</span><span
 class="cmtt-12">optional</span><span 
 class="cmr-12">.</span>         </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-13-10-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-10-1"  
-class="td11"><!--l. 781--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-10-2"  
-class="td11"><!--l. 781--><p class="noindent" ><span 
+ style="vertical-align:baseline;" id="TBL-12-10-"><td  style="white-space:normal; text-align:left;" id="TBL-12-10-1"  
+class="td11"><!--l. 737--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-12-10-2"  
+class="td11"><!--l. 737--><p class="noindent" ><span 
 class="cmr-12">The  desired  dynamic  type  for  internal  vector  components;  this</span>
 <span 
 class="cmr-12">allows e.g. running on GPUs.</span>                                                 </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-13-11-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-11-1"  
-class="td11"><!--l. 783--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">imold</span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-11-2"  
-class="td11"><!--l. 783--><p class="noindent" ><span class="lstinline"></span><span 
+ style="vertical-align:baseline;" id="TBL-12-11-"><td  style="white-space:normal; text-align:left;" id="TBL-12-11-1"  
+class="td11"><!--l. 739--><p class="noindent" ><span class="lstinline"></span><span 
+class="cmtt-12">imold</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-12-11-2"  
+class="td11"><!--l. 739--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">class</span><span 
 class="cmtt-12">(</span><span 
 class="cmtt-12">psb_i_base_vect_type</span><span 
@@ -255,24 +247,22 @@ class="cmtt-12">&#x00A0;</span><span
 class="cmtt-12">optional</span><span 
 class="cmr-12">.</span>         </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-13-12-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-12-1"  
-class="td11"><!--l. 784--><p class="noindent" >      </td><td  style="white-space:wrap; text-align:left;" id="TBL-13-12-2"  
-class="td11"><!--l. 784--><p class="noindent" ><span 
+ style="vertical-align:baseline;" id="TBL-12-12-"><td  style="white-space:normal; text-align:left;" id="TBL-12-12-1"  
+class="td11"><!--l. 740--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-12-12-2"  
+class="td11"><!--l. 740--><p class="noindent" ><span 
 class="cmr-12">The desired dynamic type for internal integer vector components;</span>
 <span 
 class="cmr-12">this allows e.g. running on GPUs.</span>                                           </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-13-13-"><td  style="white-space:wrap; text-align:left;" id="TBL-13-13-1"  
+ style="vertical-align:baseline;" id="TBL-12-13-"><td  style="white-space:normal; text-align:left;" id="TBL-12-13-1"  
 class="td11">      </td> </tr></table></div>
-<!--l. 789--><p class="noindent" ><span 
-class="cmr-12">The method can be used to build multilevel preconditioners too.</span>
                                                                                
 
                                                                                
                                                                                
 
                                                                                
-   <!--l. 794--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 746--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu12.html" ><span 
 class="cmr-12">next</span></a><span 
@@ -289,6 +279,6 @@ class="cmr-12">] [</span><a
 href="userhtmlse5.html#userhtmlsu11.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
-<!--l. 794--><p class="indent" >   <a 
+<!--l. 746--><p class="indent" >   <a 
  id="tailuserhtmlsu11.html"></a>  
 </body></html> 
