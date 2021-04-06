@@ -266,15 +266,18 @@ module amg_base_prec_type
   !
   integer(psb_ipk_), parameter :: amg_dec_aggr_      = 0
   integer(psb_ipk_), parameter :: amg_sym_dec_aggr_  = 1
-  integer(psb_ipk_), parameter :: amg_ext_aggr_      = 2 
-  integer(psb_ipk_), parameter :: amg_max_par_aggr_alg_  = amg_ext_aggr_     
+  integer(psb_ipk_), parameter :: amg_ext_aggr_      = 2
+  integer(psb_ipk_), parameter :: amg_coupled_aggr_  = 3
+  integer(psb_ipk_), parameter :: amg_max_par_aggr_alg_  = amg_coupled_aggr_     
   !
   ! Legal values for entry: amg_aggr_type_
   !
   integer(psb_ipk_), parameter :: amg_noalg_       = 0
   integer(psb_ipk_), parameter :: amg_soc1_        = 1
   integer(psb_ipk_), parameter :: amg_soc2_        = 2
+  integer(psb_ipk_), parameter :: amg_matchboxp_   = 3
   !
+
   ! Legal values for entry: amg_aggr_prol_
   !
   integer(psb_ipk_), parameter :: amg_no_smooth_   = 0
@@ -506,7 +509,7 @@ contains
       val = amg_soc2_
     case('SOC1')
       val = amg_soc1_
-    case('DEC')
+    case('DEC', 'DECOUPLED')
       val = amg_dec_aggr_
     case('SYMDEC')
       val = amg_sym_dec_aggr_

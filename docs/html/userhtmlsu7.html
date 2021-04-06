@@ -29,17 +29,21 @@ class="cmr-12">4.2   </span></span> <a
  id="x16-150004.2"></a><span 
 class="cmr-12">GPU example</span></h4>
 <!--l. 422--><p class="noindent" ><span 
-class="cmr-12">The code reported in Figure</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="#x16-15001r5"><span 
-class="cmr-12">5</span><!--tex4ht:ref: fig:gpu-ex1 --></a> <span 
-class="cmr-12">shows how to set up a program exploiting the combined</span>
+class="cmr-12">The code discussed here shows how to set up a program exploiting the combined GPU</span>
 <span 
-class="cmr-12">GPU capabilities of PSBLAS and AMG4PSBLAS.</span>
+class="cmr-12">capabilities of PSBLAS and AMG4PSBLAS. The code example is availabile in the</span>
+<span 
+class="cmr-12">source distribution directory </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">amg4psblas/tests/gpu</span></span></span><span 
+class="cmr-12">.</span>
+<!--l. 427--><p class="indent" >   <span 
+class="cmr-12">First of all, we need to include the appropriate modules and declare some auxiliary</span>
+<span 
+class="cmr-12">variables:</span>
                                                                                
 
                                                                                
-<!--l. 425--><p class="indent" >   <a 
+<!--l. 429--><p class="indent" >   <a 
  id="x16-15001r5"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -47,24 +51,143 @@ class="cmr-12">GPU capabilities of PSBLAS and AMG4PSBLAS.</span>
                                                                                
 <div class="center" 
 >
-<!--l. 437--><p class="noindent" >
+<!--l. 451--><p class="noindent" >
 <div class="minipage"><pre class="verbatim" id="verbatim-10">
-!&#x00A0;build&#x00A0;a&#x00A0;one-level&#x00A0;RAS&#x00A0;with&#x00A0;overlap&#x00A0;2&#x00A0;and&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;local&#x00A0;blocks.
-call&#x00A0;P%init(&#8217;AS&#8217;,info)
-call&#x00A0;P%set(&#8217;SUB_OVR&#8217;,2,info)
-call&#x00A0;P%build(A,desc_A,info)
-...&#x00A0;...
-!&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;BiCGSTAB
-&#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;BICGSTAB&#8217;,A,P,b,x,tol,desc_A,info)
+program&#x00A0;amg_d_pde3d
+&#x00A0;&#x00A0;use&#x00A0;psb_base_mod
+&#x00A0;&#x00A0;use&#x00A0;amg_prec_mod
+&#x00A0;&#x00A0;use&#x00A0;psb_krylov_mod
+&#x00A0;&#x00A0;use&#x00A0;psb_util_mod
+&#x00A0;&#x00A0;use&#x00A0;psb_gpu_mod
+&#x00A0;&#x00A0;use&#x00A0;data_input
+&#x00A0;&#x00A0;use&#x00A0;amg_d_pde3d_base_mod
+&#x00A0;&#x00A0;use&#x00A0;amg_d_pde3d_exp_mod
+&#x00A0;&#x00A0;use&#x00A0;amg_d_pde3d_gauss_mod
+&#x00A0;&#x00A0;use&#x00A0;amg_d_genpde_mod
+&#x00A0;&#x00A0;implicit&#x00A0;none
+&#x00A0;&#x00A0;.......
+&#x00A0;&#x00A0;!&#x00A0;GPU&#x00A0;variables
+&#x00A0;&#x00A0;type(psb_d_hlg_sparse_mat)&#x00A0;::&#x00A0;agmold
+&#x00A0;&#x00A0;type(psb_d_vect_gpu)&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;::&#x00A0;vgmold
+&#x00A0;&#x00A0;type(psb_i_vect_gpu)&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;::&#x00A0;igmold
+&#x00A0;
 </pre>
-<!--l. 448--><p class="nopar" ></div></div>
+<!--l. 473--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 5: </span><span  
-class="content">setup of a one-level Schwarz preconditioner.</span></div><!--tex4ht:label?: x16-15001r5 -->
+class="content">setup of a GPU-enabled test program part one.</span></div><!--tex4ht:label?: x16-15001r5 -->
                                                                                
 
                                                                                
    </div><hr class="endfloat" />
+<!--l. 481--><p class="indent" >   <span 
+class="cmr-12">We then have to initialize the GPU environment, and pass the appropriate MOLD</span>
+<span 
+class="cmr-12">variables to the build methods</span>
+                                                                               
+
+                                                                               
+<!--l. 483--><p class="indent" >   <a 
+ id="x16-15002r6"></a><hr class="float"><div class="float" 
+>
+                                                                               
+
+                                                                               
+<div class="center" 
+>
+<!--l. 499--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-11">
+&#x00A0;&#x00A0;call&#x00A0;psb_init(ctxt)
+&#x00A0;&#x00A0;call&#x00A0;psb_info(ctxt,iam,np)
+&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;!&#x00A0;BEWARE:&#x00A0;if&#x00A0;you&#x00A0;have&#x00A0;NGPUS&#x00A0;&#x00A0;per&#x00A0;node,&#x00A0;the&#x00A0;default&#x00A0;is&#x00A0;to
+&#x00A0;&#x00A0;!&#x00A0;attach&#x00A0;to&#x00A0;mod(IAM,NGPUS)
+&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;call&#x00A0;psb_gpu_init(ictxt)
+&#x00A0;&#x00A0;......
+&#x00A0;&#x00A0;t1&#x00A0;=&#x00A0;psb_wtime()
+&#x00A0;&#x00A0;call&#x00A0;prec%smoothers_build(a,desc_a,info,&#x00A0;amold=agmold,&#x00A0;vmold=vgmold,&#x00A0;imold=igmold)
+&#x00A0;
+</pre>
+<!--l. 514--><p class="nopar" ></div></div>
+<br /> <div class="caption" 
+><span class="id">Listing 6: </span><span  
+class="content">setup of a GPU-enabled test program part two.</span></div><!--tex4ht:label?: x16-15002r6 -->
+                                                                               
+
+                                                                               
+   </div><hr class="endfloat" />
+<!--l. 521--><p class="indent" >   <span 
+class="cmr-12">Finally, we convert the input matrix, the descriptor and the vectors, then</span>
+<span 
+class="cmr-12">preallocate the preconditioner workspace before entering the Krylov method. At the</span>
+<span 
+class="cmr-12">end of the code, we close the GPU environment</span>
+                                                                               
+
+                                                                               
+<!--l. 524--><p class="indent" >   <a 
+ id="x16-15003r7"></a><hr class="float"><div class="float" 
+>
+                                                                               
+
+                                                                               
+<div class="center" 
+>
+<!--l. 553--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-12">
+&#x00A0;&#x00A0;call&#x00A0;desc_a%cnv(mold=igmold)
+&#x00A0;&#x00A0;call&#x00A0;a%cscnv(info,mold=agmold)
+&#x00A0;&#x00A0;call&#x00A0;psb_geasb(x,desc_a,info,mold=vgmold)
+&#x00A0;&#x00A0;call&#x00A0;psb_geasb(b,desc_a,info,mold=vgmold)
+&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;!&#x00A0;iterative&#x00A0;method&#x00A0;parameters
+&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;call&#x00A0;psb_barrier(ctxt)
+&#x00A0;&#x00A0;call&#x00A0;prec%allocate_wrk(info)
+&#x00A0;&#x00A0;t1&#x00A0;=&#x00A0;psb_wtime()
+&#x00A0;&#x00A0;call&#x00A0;psb_krylov(s_choice%kmethd,a,prec,b,x,s_choice%eps,&amp;
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,itrace=s_choice%itrace,&amp;
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;istop=s_choice%istopc,irst=s_choice%irst)
+&#x00A0;&#x00A0;call&#x00A0;prec%deallocate_wrk(info)
+&#x00A0;&#x00A0;call&#x00A0;psb_barrier(ctxt)
+&#x00A0;&#x00A0;tslv&#x00A0;=&#x00A0;psb_wtime()&#x00A0;-&#x00A0;t1
+&#x00A0;&#x00A0;......
+&#x00A0;&#x00A0;call&#x00A0;psb_gpu_exit()
+&#x00A0;&#x00A0;call&#x00A0;psb_exit(ctxt)
+&#x00A0;&#x00A0;stop
+&#x00A0;
+</pre>
+<!--l. 580--><p class="nopar" ></div></div>
+<br /> <div class="caption" 
+><span class="id">Listing 7: </span><span  
+class="content">setup of a GPU-enabled test program part three.</span></div><!--tex4ht:label?: x16-15003r7 -->
+                                                                               
+
+                                                                               
+   </div><hr class="endfloat" />
+<!--l. 588--><p class="indent" >   <span 
+class="cmr-12">It is very important to employ solvers that are suited to the GPU, i.e. solvers that</span>
+<span 
+class="cmr-12">do NOT employ triangular system solve kernels. Solvers that satisfy this constraint</span>
+<span 
+class="cmr-12">include:</span>
+     <ul class="itemize1">
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">JACOBI</span></span></span>
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">INVK</span></span></span>
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">INVT</span></span></span>
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">AINV</span></span></span></li></ul>
+<!--l. 597--><p class="noindent" ><span 
+class="cmr-12">and their </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">L1</span></span></span> <span 
+class="cmr-12">variants.</span>
                                                                                
 
                                                                                
