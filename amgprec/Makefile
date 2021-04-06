@@ -119,19 +119,19 @@ amg_c_onelev_mod.o: amg_c_base_smoother_mod.o amg_c_dec_aggregator_mod.o
 amg_z_onelev_mod.o: amg_z_base_smoother_mod.o amg_z_dec_aggregator_mod.o
 
 amg_s_base_aggregator_mod.o: amg_base_prec_type.o
-amg_s_dec_aggregator_mod.o: amg_s_base_aggregator_mod.o
+amg_s_parmatch_aggregator_mod.o amg_s_dec_aggregator_mod.o: amg_s_base_aggregator_mod.o
 amg_s_hybrid_aggregator_mod.o amg_s_symdec_aggregator_mod.o: amg_s_dec_aggregator_mod.o
 
 amg_d_base_aggregator_mod.o: amg_base_prec_type.o
-amg_d_dec_aggregator_mod.o: amg_d_base_aggregator_mod.o
+amg_d_parmatch_aggregator_mod.o amg_d_dec_aggregator_mod.o: amg_d_base_aggregator_mod.o
 amg_d_hybrid_aggregator_mod.o amg_d_symdec_aggregator_mod.o: amg_d_dec_aggregator_mod.o
 
 amg_c_base_aggregator_mod.o: amg_base_prec_type.o
-amg_c_dec_aggregator_mod.o: amg_c_base_aggregator_mod.o
+amg_c_parmatch_aggregator_mod.o amg_c_dec_aggregator_mod.o: amg_c_base_aggregator_mod.o
 amg_c_hybrid_aggregator_mod.o amg_c_symdec_aggregator_mod.o: amg_c_dec_aggregator_mod.o
 
 amg_z_base_aggregator_mod.o: amg_base_prec_type.o
-amg_z_dec_aggregator_mod.o: amg_z_base_aggregator_mod.o
+amg_z_parmatch_aggregator_mod.o amg_z_dec_aggregator_mod.o: amg_z_base_aggregator_mod.o
 amg_z_hybrid_aggregator_mod.o amg_z_symdec_aggregator_mod.o: amg_z_dec_aggregator_mod.o
 
 amg_s_base_smoother_mod.o: amg_s_base_solver_mod.o
