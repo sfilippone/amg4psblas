@@ -262,10 +262,10 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
       end if
     end if
 
-    select case(ival)
-    case(amg_dec_aggr_)
+    select case(val)
+    case('DEC')
       allocate(amg_z_dec_aggregator_type :: lv%aggr, stat=info)
-    case(amg_sym_dec_aggr_)
+    case('SYMDEC')
       allocate(amg_z_symdec_aggregator_type :: lv%aggr, stat=info)
     case default
       info =  psb_err_internal_error_
