@@ -1,4 +1,4 @@
-!   !
+!
 !
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
@@ -112,7 +112,7 @@
 subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
      & a,desc_a,ilaggr,nlaggr,t_prol,info)
   use psb_base_mod
-  use amg_s_prec_type
+  use amg_base_prec_type
   use amg_s_inner_mod
   use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_aggregator_build_tprol
   use iso_c_binding

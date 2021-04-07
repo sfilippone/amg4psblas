@@ -1,4 +1,4 @@
-!   !
+!
 !
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
