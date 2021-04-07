@@ -202,7 +202,11 @@ been selected, the coarsest-level solver is changed to block-Jacobi,
 with the previously chosen solver applied to the local blocks.
 Likewise, the replicated layout can be used with any solver but SuperLu\_Dist and KRM;
 therefore, if SuperLu\_Dist or KRM have been previously set, the coarsest-level
-solver is changed to the default sequential solver.
+solver is changed to the default sequential solver. 
+
+In a parallel setting with many cores, we suggest to the users to change the default
+coarsest solver for using the KRM choice, i.e. a parallel distributed iterative solution of the
+coarsest system based on Krylov methods.
 
 \textbf{Remark 4.}  The argument \fortinline|idx| can be used to allow finer
 control for those solvers; for instance, by specifying the keyword
