@@ -421,7 +421,7 @@ call P%build(A,desc_A,info)
 
 The code discussed here  shows how to set  up a
 program exploiting the combined GPU capabilities of PSBLAS and
-AMG4PSBLAS. The code example is availabile in the source distribution
+AMG4PSBLAS. The code example is available in the source distribution
 directory \verb|amg4psblas/tests/gpu|. 
 
 First of all, we need to include the appropriate modules and
@@ -479,7 +479,8 @@ program amg_d_pde3d
 \end{listing}
 
 We then have to initialize the GPU environment, and pass the
-appropriate MOLD variables to the build methods
+appropriate MOLD variables to the build methods (see also the PSBLAS
+and PSBLAS-EXT users' guides).
 \begin{listing}[h!]
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
@@ -518,8 +519,9 @@ appropriate MOLD variables to the build methods
 \fi
 \caption{setup of a GPU-enabled test program part two.\label{fig:gpu-ex2}}
 \end{listing}
-Finally, we convert the input matrix, the descriptor and the vectors,
-then preallocate the preconditioner workspace before entering the
+Finally, we convert the input matrix, the descriptor and the vectors
+to use a GPU-enabled internal storage format. 
+We then preallocate the preconditioner workspace before entering the
 Krylov method. At the end of the code, we close the GPU environment 
 \begin{listing}[h!]
 \ifpdf

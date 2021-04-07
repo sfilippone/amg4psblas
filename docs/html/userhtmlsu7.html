@@ -31,7 +31,7 @@ class="cmr-12">GPU example</span></h4>
 <!--l. 422--><p class="noindent" ><span 
 class="cmr-12">The code discussed here shows how to set up a program exploiting the combined GPU</span>
 <span 
-class="cmr-12">capabilities of PSBLAS and AMG4PSBLAS. The code example is availabile in the</span>
+class="cmr-12">capabilities of PSBLAS and AMG4PSBLAS. The code example is available in the</span>
 <span 
 class="cmr-12">source distribution directory </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">amg4psblas/tests/gpu</span></span></span><span 
@@ -83,11 +83,13 @@ class="content">setup of a GPU-enabled test program part one.</span></div><!--te
 <!--l. 481--><p class="indent" >   <span 
 class="cmr-12">We then have to initialize the GPU environment, and pass the appropriate MOLD</span>
 <span 
-class="cmr-12">variables to the build methods</span>
+class="cmr-12">variables to the build methods (see also the PSBLAS and PSBLAS-EXT users&#8217;</span>
+<span 
+class="cmr-12">guides).</span>
                                                                                
 
                                                                                
-<!--l. 483--><p class="indent" >   <a 
+<!--l. 484--><p class="indent" >   <a 
  id="x16-15002r6"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -95,7 +97,7 @@ class="cmr-12">variables to the build methods</span>
                                                                                
 <div class="center" 
 >
-<!--l. 499--><p class="noindent" >
+<!--l. 500--><p class="noindent" >
 <div class="minipage"><pre class="verbatim" id="verbatim-11">
 &#x00A0;&#x00A0;call&#x00A0;psb_init(ctxt)
 &#x00A0;&#x00A0;call&#x00A0;psb_info(ctxt,iam,np)
@@ -109,7 +111,7 @@ class="cmr-12">variables to the build methods</span>
 &#x00A0;&#x00A0;call&#x00A0;prec%smoothers_build(a,desc_a,info,&#x00A0;amold=agmold,&#x00A0;vmold=vgmold,&#x00A0;imold=igmold)
 &#x00A0;
 </pre>
-<!--l. 514--><p class="nopar" ></div></div>
+<!--l. 515--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 6: </span><span  
 class="content">setup of a GPU-enabled test program part two.</span></div><!--tex4ht:label?: x16-15002r6 -->
@@ -117,16 +119,18 @@ class="content">setup of a GPU-enabled test program part two.</span></div><!--te
 
                                                                                
    </div><hr class="endfloat" />
-<!--l. 521--><p class="indent" >   <span 
-class="cmr-12">Finally, we convert the input matrix, the descriptor and the vectors, then</span>
+<!--l. 522--><p class="indent" >   <span 
+class="cmr-12">Finally, we convert the input matrix, the descriptor and the vectors to use a</span>
 <span 
-class="cmr-12">preallocate the preconditioner workspace before entering the Krylov method. At the</span>
+class="cmr-12">GPU-enabled internal storage format. We then preallocate the preconditioner</span>
 <span 
-class="cmr-12">end of the code, we close the GPU environment</span>
+class="cmr-12">workspace before entering the Krylov method. At the end of the code, we close the</span>
+<span 
+class="cmr-12">GPU environment</span>
                                                                                
 
                                                                                
-<!--l. 524--><p class="indent" >   <a 
+<!--l. 526--><p class="indent" >   <a 
  id="x16-15003r7"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -134,7 +138,7 @@ class="cmr-12">end of the code, we close the GPU environment</span>
                                                                                
 <div class="center" 
 >
-<!--l. 553--><p class="noindent" >
+<!--l. 555--><p class="noindent" >
 <div class="minipage"><pre class="verbatim" id="verbatim-12">
 &#x00A0;&#x00A0;call&#x00A0;desc_a%cnv(mold=igmold)
 &#x00A0;&#x00A0;call&#x00A0;a%cscnv(info,mold=agmold)
@@ -158,7 +162,7 @@ class="cmr-12">end of the code, we close the GPU environment</span>
 &#x00A0;&#x00A0;stop
 &#x00A0;
 </pre>
-<!--l. 580--><p class="nopar" ></div></div>
+<!--l. 582--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 7: </span><span  
 class="content">setup of a GPU-enabled test program part three.</span></div><!--tex4ht:label?: x16-15003r7 -->
@@ -166,7 +170,7 @@ class="content">setup of a GPU-enabled test program part three.</span></div><!--
 
                                                                                
    </div><hr class="endfloat" />
-<!--l. 588--><p class="indent" >   <span 
+<!--l. 590--><p class="indent" >   <span 
 class="cmr-12">It is very important to employ solvers that are suited to the GPU, i.e. solvers that</span>
 <span 
 class="cmr-12">do NOT employ triangular system solve kernels. Solvers that satisfy this constraint</span>
@@ -184,7 +188,7 @@ class="cmtt-12">INVT</span></span></span>
      </li>
      <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">AINV</span></span></span></li></ul>
-<!--l. 597--><p class="noindent" ><span 
+<!--l. 599--><p class="noindent" ><span 
 class="cmr-12">and their </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">L1</span></span></span> <span 
 class="cmr-12">variants.</span>
