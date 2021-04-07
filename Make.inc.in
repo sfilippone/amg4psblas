@@ -5,7 +5,7 @@
 .SUFFIXES: .f90 .F90 .f .F .c .cpp .o
 ##########################################################
 #                                                        #
-#  Note: directories external to the MLD2P4 subtree      #
+#  Note: directories external to the AMG4PSBLAS subtree  #
 #  must be specified here with absolute pathnames        #
 #                                                        #
 ##########################################################
@@ -69,15 +69,16 @@ EXTRALIBS=@EXTRA_LIBS@
 
 
 #
-MLDCDEFINES=$(MUMPSFLAGS) $(SLUFLAGS) $(UMFFLAGS) $(SLUDISTFLAGS) $(PSBCDEFINES)
-MLDFDEFINES=@FDEFINES@ $(PSBFDEFINES)
+AMGCDEFINES=$(MUMPSFLAGS) $(SLUFLAGS) $(UMFFLAGS) $(SLUDISTFLAGS) $(PSBCDEFINES)
+CDEFINES=$(AMGCDEFINES)
+AMGFDEFINES=@AMGFDEFINES@ $(PSBFDEFINES)
+FDEFINES=$(AMGFDEFINES)
 
-CDEFINES=$(MLDCDEFINES)
-FDEFINES=$(MLDFDEFINES)
+CXXDEFINES=@AMGCXXDEFINES@
 
 @COMPILERULES@
 
 
-MLDLDLIBS=$(MUMPSLIBS) $(SLULIBS) $(SLUDISTLIBS) $(UMFLIBS) $(EXTRALIBS) $(PSBLDLIBS)
-LDLIBS=$(MLDLDLIBS)
+AMGLDLIBS=$(MUMPSLIBS) $(SLULIBS) $(SLUDISTLIBS) $(UMFLIBS) $(EXTRALIBS) $(PSBLDLIBS)
+LDLIBS=$(AMGLDLIBS)
 

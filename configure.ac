@@ -497,6 +497,10 @@ else
 fi
 PAC_FORTRAN_PSBLAS_INTEGER_SIZES()
 AC_MSG_NOTICE([PSBLAS size of LPK "$pac_cv_psblas_lpk".])
+if test x"$pac_cv_psblas_lpk" == x8"" ; then
+  CXXDEFINES="-DBIT_64 $CXXDEFINES";
+fi
+
 ###############################################################################
 #	Parachute rules for ar and ranlib ... (could cause problems)
 ###############################################################################
@@ -706,50 +710,9 @@ else
    PSBLAS_INSTALL_MAKEINC="";
 fi
 
-if test "x$pac_cv_status_file" != "xNONE"; then
-  COMPILERULES='';
-else
-COMPILERULES='
-FLINK=$(MPFC)
-
-# These should be portable rules, arent they?
-.c.o:
-	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $< -o $@
-.f90.o:
-	$(FC) $(FCOPT) $(FINCLUDES) -c $< -o $@
-.F90.o:
-	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@'
-
-COMPILERULES="
-# The following ones are the variables used by the PSBLAS make scripts.
-
-FC=$FC
-CC=$CC
-FCOPT=$FCOPT
-CCOPT=$CCOPT
-FMFLAG=$FMFLAG
-FIFLAG=$FIFLAG
-EXTRA_OPT=$EXTRA_OPT
-
-BASEMODNAME=$BASEMODNAME
-PRECMODNAME=$PRECMODNAME
-METHDMODNAME=$METHDMODNAME
-UTILMODNAME=$UTILMODNAME
-
-LIBS=$LIBS
-BLAS=$BLAS_LIBS
-
-# These three should be always set!
-MPFC=$MPFC
-MPCC=$MPCC
-
-AR=$AR
-RANLIB=$RANLIB
-PSBLDLIBS=$LAPACK $BLAS_LIBS $METIS_LIB $LIBS
-
-$COMPILERULES"
-fi 
-
+AMGFDEFINES="$FDEFINES"
+AMGCDEFINES="$CDEFINES"
+AMGCXXDEFINES="$CXXDEFINES"
 
 ###############################################################################
 # Variable substitutions : the Make.inc.in will have these @VARIABLES@
@@ -781,7 +744,9 @@ AC_SUBST(UMF_FLAGS)
 AC_SUBST(UMF_LIBS)
 AC_SUBST(SLUDIST_FLAGS)
 AC_SUBST(SLUDIST_LIBS)
-AC_SUBST(FDEFINES)
+AC_SUBST(AMGFDEFINES)
+AC_SUBST(AMGCDEFINES)
+AC_SUBST(AMGCXXDEFINES)
 AC_SUBST(MODEXT)
 AC_SUBST(COMPILERULES)
 ###############################################################################
