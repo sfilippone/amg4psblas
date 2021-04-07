@@ -188,7 +188,7 @@ subroutine  amg_s_parmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
   integer(psb_ipk_)     :: err_act
   integer(psb_ipk_)     :: debug_level, debug_unit
 
-  name='d_parmatch_mat_bld'
+  name='s_parmatch_mat_bld'
   if (psb_get_errstatus().ne.0) return
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()

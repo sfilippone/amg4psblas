@@ -150,7 +150,7 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
   type(psb_ldspmat_type)              :: tmp_prol, tmp_pg, tmp_restr
   type(psb_desc_type)                 :: tmp_desc_ac, tmp_desc_ax, tmp_desc_p
   integer(psb_ipk_), save             :: idx_mboxp=-1, idx_spmmbld=-1, idx_sweeps_mult=-1
-  logical, parameter :: dump=.false., do_timings=.true., debug=.false., &
+  logical, parameter :: dump=.false., do_timings=.true., debug=.true., &
        & dump_prol_restr=.false.
 
   name='d_parmatch_tprol'

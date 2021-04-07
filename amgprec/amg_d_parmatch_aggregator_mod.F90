@@ -591,6 +591,7 @@ contains
     ! Arguments
     class(amg_d_parmatch_aggregator_type), intent(inout) :: ag
     character(len=20)  :: name='d_parmatch_aggr_set_default'
+    call ag%amg_d_base_aggregator_type%default()
     ag%matching_alg  = 0
     ag%n_sweeps      = 1
     ag%jacobi_sweeps = 0
