@@ -29,17 +29,21 @@ class="cmr-12">4.2   </span></span> <a
  id="x16-150004.2"></a><span 
 class="cmr-12">GPU example</span></h4>
 <!--l. 422--><p class="noindent" ><span 
-class="cmr-12">The code reported in Figure</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="#x16-15001r5"><span 
-class="cmr-12">5</span><!--tex4ht:ref: fig:gpu-ex1 --></a> <span 
-class="cmr-12">shows how to set up a program exploiting the combined</span>
+class="cmr-12">The code discussed here shows how to set up a program exploiting the combined GPU</span>
 <span 
-class="cmr-12">GPU capabilities of PSBLAS and AMG4PSBLAS.</span>
+class="cmr-12">capabilities of PSBLAS and AMG4PSBLAS. The code example is available in the</span>
+<span 
+class="cmr-12">source distribution directory </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">amg4psblas/examples/gpu</span></span></span><span 
+class="cmr-12">.</span>
+<!--l. 427--><p class="indent" >   <span 
+class="cmr-12">First of all, we need to include the appropriate modules and declare some auxiliary</span>
+<span 
+class="cmr-12">variables:</span>
                                                                                
 
                                                                                
-<!--l. 425--><p class="indent" >   <a 
+<!--l. 429--><p class="indent" >   <a 
  id="x16-15001r5"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -47,126 +51,153 @@ class="cmr-12">GPU capabilities of PSBLAS and AMG4PSBLAS.</span>
                                                                                
 <div class="center" 
 >
-<<<<<<< HEAD
-<!--l. 44--><p class="noindent" >
-<!--l. 45--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">call</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">p</span><span 
-class="cmtt-12">%</span><span 
-class="cmtt-12">init</span><span 
-class="cmtt-12">(</span><span 
-class="cmtt-12">contxt</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">ptype</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">info</span><span 
-class="cmtt-12">)</span></div>
-<!--l. 48--><p class="noindent" ><span 
-class="cmr-12">This method allocates and initializes the preconditioner </span><span class="lstinline"></span><span 
-class="cmtt-12">p</span><span 
-class="cmr-12">, according to the</span>
-<span 
-class="cmr-12">preconditioner type chosen by the user.</span>
-<!--l. 52--><p class="noindent" ><span 
-class="cmbx-12">Arguments</span>
-   <div class="tabular"> <table id="TBL-2" class="tabular" 
-cellspacing="0" cellpadding="0"  
-><colgroup id="TBL-2-1g"><col 
-id="TBL-2-1"><col 
-id="TBL-2-2"></colgroup><tr  
- style="vertical-align:baseline;" id="TBL-2-1-"><td  style="white-space:normal; text-align:left;" id="TBL-2-1-1"  
-class="td11"><!--l. 56--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">contxt</span> </td> <td  style="white-space:normal; text-align:left;" id="TBL-2-1-2"  
-class="td11"><!--l. 56--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">type</span><span 
-class="cmtt-12">(</span><span 
-class="cmtt-12">psb_ctxt_type</span><span 
-class="cmtt-12">),</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">intent</span><span 
-class="cmtt-12">(</span><span 
-class="cmtt-12">in</span><span 
-class="cmtt-12">)</span><span 
-class="cmr-12">.</span>                                     </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-2-2-"><td  style="white-space:normal; text-align:left;" id="TBL-2-2-1"  
-class="td11"><!--l. 57--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-2-2"  
-class="td11"><!--l. 57--><p class="noindent" ><span 
-class="cmr-12">The communication context.</span>                                                  </td></tr><tr  
- style="vertical-align:baseline;" id="TBL-2-3-"><td  style="white-space:normal; text-align:left;" id="TBL-2-3-1"  
-class="td11"><!--l. 58--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">ptype</span>  </td> <td  style="white-space:normal; text-align:left;" id="TBL-2-3-2"  
-class="td11"><!--l. 58--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">character</span><span 
-class="cmtt-12">(</span><span 
-class="cmtt-12">len</span><span 
-class="cmtt-12">=*),</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">intent</span><span 
-class="cmtt-12">(</span><span 
-class="cmtt-12">in</span><span 
-class="cmtt-12">)</span> <span 
-class="cmr-12">.</span></td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-2-4-"><td  style="white-space:normal; text-align:left;" id="TBL-2-4-1"  
-class="td11"><!--l. 59--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-4-2"  
-class="td11"><!--l. 59--><p class="noindent" ><span 
-class="cmr-12">The type of preconditioner. Its values are specified in Table</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlse4.html#x14-13015r1"><span 
-class="cmr-12">1</span><!--tex4ht:ref: tab:precinit --></a><span 
-class="cmr-12">.</span>     </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-2-5-"><td  style="white-space:normal; text-align:left;" id="TBL-2-5-1"  
-class="td11"><!--l. 61--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-5-2"  
-class="td11"><!--l. 61--><p class="noindent" ><span 
-class="cmr-12">Note that strings are case insensitive.</span>                                      </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-2-6-"><td  style="white-space:normal; text-align:left;" id="TBL-2-6-1"  
-class="td11"><!--l. 62--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">info</span>  </td><td  style="white-space:normal; text-align:left;" id="TBL-2-6-2"  
-class="td11"><!--l. 62--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">integer</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">intent</span><span 
-class="cmtt-12">(</span><span 
-class="cmtt-12">out</span><span 
-class="cmtt-12">)</span><span 
-class="cmr-12">.</span>                                                       </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-2-7-"><td  style="white-space:normal; text-align:left;" id="TBL-2-7-1"  
-class="td11"><!--l. 63--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-2-7-2"  
-class="td11"><!--l. 63--><p class="noindent" ><span 
-class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlse7.html#x27-310007"><span 
-class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span 
-class="cmr-12">for details.</span>     </td>
-</tr><tr  
- style="vertical-align:baseline;" id="TBL-2-8-"><td  style="white-space:normal; text-align:left;" id="TBL-2-8-1"  
-class="td11">      </td> </tr></table></div>
-=======
-<!--l. 437--><p class="noindent" >
+<!--l. 448--><p class="noindent" >
 <div class="minipage"><pre class="verbatim" id="verbatim-10">
-!&#x00A0;build&#x00A0;a&#x00A0;one-level&#x00A0;RAS&#x00A0;with&#x00A0;overlap&#x00A0;2&#x00A0;and&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;local&#x00A0;blocks.
-call&#x00A0;P%init(&#8217;AS&#8217;,info)
-call&#x00A0;P%set(&#8217;SUB_OVR&#8217;,2,info)
-call&#x00A0;P%build(A,desc_A,info)
-...&#x00A0;...
-!&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;BiCGSTAB
-&#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;BICGSTAB&#8217;,A,P,b,x,tol,desc_A,info)
+program&#x00A0;amg_dexample_gpu
+&#x00A0;&#x00A0;use&#x00A0;psb_base_mod
+&#x00A0;&#x00A0;use&#x00A0;amg_prec_mod
+&#x00A0;&#x00A0;use&#x00A0;psb_krylov_mod
+&#x00A0;&#x00A0;use&#x00A0;psb_util_mod
+&#x00A0;&#x00A0;use&#x00A0;psb_gpu_mod
+&#x00A0;&#x00A0;use&#x00A0;data_input
+&#x00A0;&#x00A0;use&#x00A0;amg_d_pde_mod
+&#x00A0;&#x00A0;implicit&#x00A0;none
+&#x00A0;&#x00A0;.......
+&#x00A0;&#x00A0;!&#x00A0;GPU&#x00A0;variables
+&#x00A0;&#x00A0;type(psb_d_hlg_sparse_mat)&#x00A0;::&#x00A0;agmold
+&#x00A0;&#x00A0;type(psb_d_vect_gpu)&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;::&#x00A0;vgmold
+&#x00A0;&#x00A0;type(psb_i_vect_gpu)&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;::&#x00A0;igmold
+&#x00A0;
 </pre>
-<!--l. 448--><p class="nopar" ></div></div>
+<!--l. 467--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 5: </span><span  
-class="content">setup of a one-level Schwarz preconditioner.</span></div><!--tex4ht:label?: x16-15001r5 -->
->>>>>>> development
+class="content">setup of a GPU-enabled test program part one.</span></div><!--tex4ht:label?: x16-15001r5 -->
                                                                                
 
                                                                                
    </div><hr class="endfloat" />
+<!--l. 474--><p class="indent" >   <span 
+class="cmr-12">In this particular example we are choosing to employ a </span><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">HLG</span></span></span> <span 
+class="cmr-12">data structure for</span>
+<span 
+class="cmr-12">sparse matrices on GPUs; for more information please refer to the PSBLAS-EXT users&#8217;</span>
+<span 
+class="cmr-12">guide.</span>
+<!--l. 478--><p class="indent" >   <span 
+class="cmr-12">We then have to initialize the GPU environment, and pass the appropriate MOLD</span>
+<span 
+class="cmr-12">variables to the build methods (see also the PSBLAS and PSBLAS-EXT users&#8217;</span>
+<span 
+class="cmr-12">guides).</span>
+                                                                               
+
+                                                                               
+<!--l. 481--><p class="indent" >   <a 
+ id="x16-15002r6"></a><hr class="float"><div class="float" 
+>
+                                                                               
+
+                                                                               
+<div class="center" 
+>
+<!--l. 497--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-11">
+&#x00A0;&#x00A0;call&#x00A0;psb_init(ctxt)
+&#x00A0;&#x00A0;call&#x00A0;psb_info(ctxt,iam,np)
+&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;!&#x00A0;BEWARE:&#x00A0;if&#x00A0;you&#x00A0;have&#x00A0;NGPUS&#x00A0;&#x00A0;per&#x00A0;node,&#x00A0;the&#x00A0;default&#x00A0;is&#x00A0;to
+&#x00A0;&#x00A0;!&#x00A0;attach&#x00A0;to&#x00A0;mod(IAM,NGPUS)
+&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;call&#x00A0;psb_gpu_init(ictxt)
+&#x00A0;&#x00A0;......
+&#x00A0;&#x00A0;t1&#x00A0;=&#x00A0;psb_wtime()
+&#x00A0;&#x00A0;call&#x00A0;prec%smoothers_build(a,desc_a,info,&#x00A0;amold=agmold,&#x00A0;vmold=vgmold,&#x00A0;imold=igmold)
+&#x00A0;
+</pre>
+<!--l. 512--><p class="nopar" ></div></div>
+<br /> <div class="caption" 
+><span class="id">Listing 6: </span><span  
+class="content">setup of a GPU-enabled test program part two.</span></div><!--tex4ht:label?: x16-15002r6 -->
+                                                                               
+
+                                                                               
+   </div><hr class="endfloat" />
+<!--l. 519--><p class="indent" >   <span 
+class="cmr-12">Finally, we convert the input matrix, the descriptor and the vectors to use a</span>
+<span 
+class="cmr-12">GPU-enabled internal storage format. We then preallocate the preconditioner</span>
+<span 
+class="cmr-12">workspace before entering the Krylov method. At the end of the code, we close the</span>
+<span 
+class="cmr-12">GPU environment</span>
+                                                                               
+
+                                                                               
+<!--l. 523--><p class="indent" >   <a 
+ id="x16-15003r7"></a><hr class="float"><div class="float" 
+>
+                                                                               
+
+                                                                               
+<div class="center" 
+>
+<!--l. 552--><p class="noindent" >
+<div class="minipage"><pre class="verbatim" id="verbatim-12">
+&#x00A0;&#x00A0;call&#x00A0;desc_a%cnv(mold=igmold)
+&#x00A0;&#x00A0;call&#x00A0;a%cscnv(info,mold=agmold)
+&#x00A0;&#x00A0;call&#x00A0;psb_geasb(x,desc_a,info,mold=vgmold)
+&#x00A0;&#x00A0;call&#x00A0;psb_geasb(b,desc_a,info,mold=vgmold)
+&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;!&#x00A0;iterative&#x00A0;method&#x00A0;parameters
+&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;call&#x00A0;psb_barrier(ctxt)
+&#x00A0;&#x00A0;call&#x00A0;prec%allocate_wrk(info)
+&#x00A0;&#x00A0;t1&#x00A0;=&#x00A0;psb_wtime()
+&#x00A0;&#x00A0;call&#x00A0;psb_krylov(s_choice%kmethd,a,prec,b,x,s_choice%eps,&amp;
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,itrace=s_choice%itrace,&amp;
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;istop=s_choice%istopc,irst=s_choice%irst)
+&#x00A0;&#x00A0;call&#x00A0;prec%deallocate_wrk(info)
+&#x00A0;&#x00A0;call&#x00A0;psb_barrier(ctxt)
+&#x00A0;&#x00A0;tslv&#x00A0;=&#x00A0;psb_wtime()&#x00A0;-&#x00A0;t1
+&#x00A0;&#x00A0;......
+&#x00A0;&#x00A0;call&#x00A0;psb_gpu_exit()
+&#x00A0;&#x00A0;call&#x00A0;psb_exit(ctxt)
+&#x00A0;&#x00A0;stop
+&#x00A0;
+</pre>
+<!--l. 579--><p class="nopar" ></div></div>
+<br /> <div class="caption" 
+><span class="id">Listing 7: </span><span  
+class="content">setup of a GPU-enabled test program part three.</span></div><!--tex4ht:label?: x16-15003r7 -->
+                                                                               
+
+                                                                               
+   </div><hr class="endfloat" />
+<!--l. 587--><p class="indent" >   <span 
+class="cmr-12">It is very important to employ solvers that are suited to the GPU, i.e. solvers that</span>
+<span 
+class="cmr-12">do NOT employ triangular system solve kernels. Solvers that satisfy this constraint</span>
+<span 
+class="cmr-12">include:</span>
+     <ul class="itemize1">
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">JACOBI</span></span></span>
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">INVK</span></span></span>
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">INVT</span></span></span>
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">AINV</span></span></span></li></ul>
+<!--l. 596--><p class="noindent" ><span 
+class="cmr-12">and their </span><span 
+class="cmmi-12">&#x2113;</span><sub><span 
+class="cmr-8">1</span></sub> <span 
+class="cmr-12">variants.</span>
                                                                                
 
                                                                                
