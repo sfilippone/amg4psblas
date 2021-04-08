@@ -187,6 +187,7 @@ subroutine  amg_s_parmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
   integer(psb_ipk_)     :: np, me
   integer(psb_ipk_)     :: err_act
   integer(psb_ipk_)     :: debug_level, debug_unit
+  type(psb_sspmat_type) :: atmp
 
   name='s_parmatch_mat_bld'
   if (psb_get_errstatus().ne.0) return
