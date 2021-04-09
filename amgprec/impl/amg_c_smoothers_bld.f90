@@ -1,15 +1,15 @@
-!   
-!   
+!
+!
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.7)
-!    
-!    (C) Copyright 2021 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Fabio Durastante        
-!   
+!
+!    (C) Copyright 2021
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,8 +33,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
+!
+!
 ! File: amg_c_smoothers_bld.f90
 !
 ! Subroutine: amg_c_smoothers_bld
@@ -43,7 +43,7 @@
 !  This routine performs the final phase of the multilevel preconditioner
 !  build process: builds the "smoother" objects at each level,
 !  based on the matrix hierarchy prepared by amg_c_hierarchy_bld.
-!  
+!
 !  A multilevel preconditioner is regarded as an array of 'one-level'
 !  data structures, each containing the part of the
 !  preconditioner associated to a certain level,
@@ -52,8 +52,8 @@
 !  level 1 is the finest level. No transfer operators are associated to level 1.
 !  Each level provides a "build" method; for the base type, the "one-level"
 !  build procedure simply invokes the build method of the first smoother object,
-!  and also on the second object if allocated. 
-! 
+!  and also on the second object if allocated.
+!
 !
 ! Arguments:
 !    a       -  type(psb_cspmat_type).
@@ -65,7 +65,7 @@
 !               The preconditioner data structure containing the local part
 !               of the preconditioner to be built.
 !    info    -  integer, output.
-!               Error code.              
+!               Error code.
 !
 !    amold   -  class(psb_c_base_sparse_mat), input, optional
 !               Mold for the inner format of matrices contained in the
@@ -77,7 +77,7 @@
 !               preconditioner
 !
 !
-!  
+!
 subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
 
   use psb_base_mod
@@ -126,7 +126,7 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Entering '
   !
-  if (.not.allocated(prec%precv)) then 
+  if (.not.allocated(prec%precv)) then
     !! Error: should have called amg_cprecinit
     info=3111
     call psb_errpush(info,name)
@@ -134,11 +134,11 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
   end if
 
   !
-  ! Check to ensure all procs have the same 
-  !   
+  ! Check to ensure all procs have the same
+  !
   iszv       = size(prec%precv)
   call psb_bcast(ctxt,iszv)
-  if (iszv /= size(prec%precv)) then 
+  if (iszv /= size(prec%precv)) then
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Inconsistent size of precv')
     goto 9999
@@ -151,12 +151,12 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   endif
-  
+
   !
   ! Issue a warning for inconsistent changes to COARSE_SOLVE
   ! but only if it really is a multilevel
   !
-  if ((me == psb_root_).and.(iszv>1)) then 
+  if ((me == psb_root_).and.(iszv>1)) then
     coarse_solve_id = prec%precv(iszv)%parms%coarse_solve
     select case (coarse_solve_id)
     case(amg_umf_,amg_slu_)
@@ -185,7 +185,7 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
              & 'AMG4PSBLAS: Warning: original coarse matrix was requested as replicated', &
              & ' but it has been changed to distributed.'
       end if
-            
+
     case(psb_ilu_n_, psb_ilu_t_,psb_milu_n_)
       if (prec%precv(iszv)%sm%sv%get_id() /= psb_ilu_n_) then
         write(psb_err_unit,*) &
@@ -210,7 +210,7 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
              & amg_fact_names(coarse_solve_id),&
              & ' but the coarse matrix has been changed to distributed'
       end if
-      
+
     case(amg_mumps_)
       if (prec%precv(iszv)%sm%sv%get_id() /= amg_mumps_) then
         write(psb_err_unit,*) &
@@ -232,7 +232,7 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
              & ' was not configured at AMG4PSBLAS build time, or'
         write(psb_err_unit,*) '  3. an unsupported solver setup was specified.'
       end if
-      
+
     case(amg_sludist_)
       if (prec%precv(iszv)%sm%sv%get_id() /= coarse_solve_id) then
         write(psb_err_unit,*) &
@@ -260,29 +260,29 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
              & amg_fact_names(coarse_solve_id),&
              & ' but the coarse matrix has been changed to replicated'
       end if
-        
-    case(amg_bjac_,amg_l1_bjac_,amg_jac_, amg_l1_jac_, amg_gs_, amg_fbgs_, amg_l1_gs_,amg_l1_fbgs_)
+
+    case(amg_bjac_,amg_l1_bjac_,amg_jac_, amg_l1_jac_, amg_gs_, amg_fbgs_, amg_l1_gs_,amg_l1_fbgs_,amg_krm_)
       if (prec%precv(iszv)%parms%coarse_mat /= amg_distr_mat_) then
         write(psb_err_unit,*) &
              & 'AMG4PSBLAS: Warning: original coarse solver was requested as ',&
              & amg_fact_names(coarse_solve_id),&
              & ' but the coarse matrix has been changed to replicated'
       end if
-      
+
     case default
       ! We should never get here.
       info=psb_err_from_subroutine_
       ch_err='unkn coarse_solve'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
-      
+
     end select
   end if
 
   ! Sanity check: need to ensure that the MUMPS local/global NZ
   ! are handled correctly; this is controlled by local vs global solver.
   ! From this point of view, REPL is LOCAL because it owns everyting.
-  ! Should really find a better way of handling this. 
+  ! Should really find a better way of handling this.
   if (prec%precv(iszv)%parms%coarse_mat == amg_repl_mat_) &
        &  call prec%precv(iszv)%sm%sv%set('MUMPS_LOC_GLOB', amg_local_solver_,info)
   !
@@ -295,8 +295,8 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
     !
 !!$    write(0,*) me,' Building at level ',i
     call prec%precv(i)%bld(info,amold=amold,vmold=vmold,imold=imold,ilv=i)
-    
-    if (info /= psb_success_) then 
+
+    if (info /= psb_success_) then
       write(ch_err,'(a,i7)') 'Error @ level',i
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err=ch_err)
