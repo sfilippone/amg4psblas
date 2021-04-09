@@ -561,7 +561,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
           case('KRM')
             block
               type(amg_c_krm_solver_type)          :: krm_slv
-              call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
+              call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_krm_,info,pos=pos)
               call p%precv(nlev_)%set(krm_slv,info)
               call p%precv(nlev_)%default()
               call p%precv(nlev_)%set('COARSE_MAT',amg_distr_mat_,info,pos=pos)
@@ -711,7 +711,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
           case('KRM')
             block
               type(amg_c_krm_solver_type)          :: krm_slv
-              call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
+              call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_krm_,info,pos=pos)
               call p%precv(nlev_)%set(krm_slv,info)
               call p%precv(nlev_)%default()
               call p%precv(nlev_)%set('COARSE_MAT',amg_distr_mat_,info,pos=pos)
