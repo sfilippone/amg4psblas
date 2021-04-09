@@ -498,7 +498,7 @@ fi
 PAC_FORTRAN_PSBLAS_INTEGER_SIZES()
 AC_MSG_NOTICE([PSBLAS size of LPK "$pac_cv_psblas_lpk".])
 if test x"$pac_cv_psblas_lpk" == x8"" ; then
-  CXXDEFINES="-DBIT_64 $CXXDEFINES";
+  CXXDEFINES="-DBIT64 $CXXDEFINES";
 fi
 
 ###############################################################################
