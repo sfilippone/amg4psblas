@@ -9,9 +9,6 @@
 !        Salvatore Filippone
 !        Pasqua D'Ambra
 !        Fabio Durastante
-!        Salvatore Filippone
-!        Pasqua D'Ambra
-!        Fabio Durastante
 !
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -71,7 +68,7 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-module smatchboxp_mod
+module amg_s_matchboxp_mod
 
   use iso_c_binding
   use psb_base_cbind_mod
@@ -97,17 +94,21 @@ module smatchboxp_mod
     end subroutine sMatchBoxPC
   end interface MatchBoxPC
 
-  interface i_aggr_assign
-    module procedure i_saggr_assign
-  end interface i_aggr_assign
+  interface amg_i_aggr_assign
+    module procedure amg_i_saggr_assign
+  end interface amg_i_aggr_assign
 
-  interface build_matching
-    module procedure sbuild_matching
-  end interface build_matching
+  interface amg_matchboxp_build_prol
+    module procedure amg_s_matchboxp_build_prol
+  end interface amg_matchboxp_build_prol
 
-  interface build_ahat
-    module procedure sbuild_ahat
-  end interface build_ahat
+  interface amg_build_matching
+    module procedure amg_s_build_matching
+  end interface amg_build_matching
+
+  interface amg_build_ahat
+    module procedure amg_s_build_ahat
+  end interface amg_build_ahat
 
   interface psb_gtranspose
     module procedure psb_sgtranspose
@@ -123,7 +124,7 @@ module smatchboxp_mod
 
 contains
 
-  subroutine smatchboxp_build_prol(w,a,desc_a,ilaggr,nlaggr,prol,info,&
+  subroutine amg_s_matchboxp_build_prol(w,a,desc_a,ilaggr,nlaggr,prol,info,&
        & symmetrize,reproducible,display_inp, display_out, print_out)
     use psb_base_mod
     use psb_util_mod
@@ -221,7 +222,7 @@ contains
     end if
     if (do_timings) call psb_toc(idx_phase1)
     if (do_timings) call psb_tic(idx_bldmtc)
-    call build_matching(w,a,desc_a,mate,info,display_inp=display_inp,symmetrize=symmetrize)
+    call amg_build_matching(w,a,desc_a,mate,info,display_inp=display_inp,symmetrize=symmetrize)
     if (do_timings) call psb_toc(idx_bldmtc)
     if (debug) write(0,*) iam,' buildprol from buildmatching:',&
          & info
@@ -315,11 +316,11 @@ contains
                 else
                   ! Use a statistically unbiased tie-breaking rule,
                   ! this will give an even spread.
-                  ! Delegate to i_aggr_assign.
+                  ! Delegate to amg_i_aggr_assign.
                   ! Should be a symmetric function.
                   !
                   call desc_a%indxmap%qry_halo_owner(idx,iown,info)
-                  ip    = i_aggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg)
+                  ip    = amg_i_aggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg)
                   if (iam == ip) then
                     nlaggr(iam) = nlaggr(iam) + 1
                     ilaggr(k)   = nlaggr(iam)
@@ -524,9 +525,9 @@ contains
       write(0,*) iam,' :  error from Matching: ',info
     end if
 
-  end subroutine smatchboxp_build_prol
+  end subroutine amg_s_matchboxp_build_prol
 
-  function i_saggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg) &
+  function amg_i_saggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg) &
        & result(iproc)
     !
     ! How to break ties? This
@@ -568,10 +569,10 @@ contains
         iproc = iown
       end if
     end if
-  end function i_saggr_assign
+  end function amg_i_saggr_assign
 
 
-  subroutine sbuild_matching(w,a,desc_a,mate,info,display_inp, symmetrize)
+  subroutine amg_s_build_matching(w,a,desc_a,mate,info,display_inp, symmetrize)
     use psb_base_mod
     use psb_util_mod
     use iso_c_binding
@@ -620,7 +621,7 @@ contains
       if (iam == 0) write(0,*)' Into build_ahat:'
     end if
     if (do_timings) call psb_tic(idx_bldahat)
-    call build_ahat(w,a,ahatnd,desc_a,info,symmetrize=symmetrize)
+    call amg_build_ahat(w,a,ahatnd,desc_a,info,symmetrize=symmetrize)
     if (do_timings) call psb_toc(idx_bldahat)
     if (info /= 0) then
       write(0,*) 'Error from build_ahat ', info
@@ -775,9 +776,9 @@ contains
       val(1:n) = tmp(1:n)
     end subroutine fix_order
 
-  end subroutine sbuild_matching
+  end subroutine amg_s_build_matching
 
-  subroutine sbuild_ahat(w,a,ahat,desc_a,info,symmetrize)
+  subroutine amg_s_build_ahat(w,a,ahat,desc_a,info,symmetrize)
     use psb_base_mod
     implicit none
     real(psb_spk_), intent(in)           :: w(:)
@@ -1015,319 +1016,8 @@ contains
       end block
     end if
 
-  end subroutine sbuild_ahat
+  end subroutine amg_s_build_ahat
 
-
-!   subroutine build_ahat_old(w,a,ahat,desc_a,info,symmetrize)
-!     use psb_base_mod
-!     implicit none
-!     real(psb_dpk_)                        :: w(:)
-!     type(psb_ldspmat_type), intent(inout) :: a
-!     type(psb_ldspmat_type), intent(out)   :: ahat
-!     type(psb_desc_type)                   :: desc_a
-!     integer(psb_ipk_), intent(out)        :: info
-!     logical, optional                     :: symmetrize
-!
-!     type(psb_ldspmat_type)      :: atnd
-!     type(psb_ld_coo_sparse_mat) :: tcoo1, tcoo2, tcoo3
-!     real(psb_dpk_), allocatable :: diag(:)
-!     integer(psb_lpk_), allocatable :: ilv(:)
-!     logical, parameter :: debug=.false., dump=.false., dump_ahat=.false.
-!     logical :: symmetrize_
-!     logical, parameter :: half_ahat=.true.
-!     real(psb_dpk_)    :: aii, ajj, aij, wii, wjj, tmp1, tmp2, minabs, edgnrm
-!     integer(psb_lpk_) :: nr, nc, nz, i, nz2, nrg, ii, jj, k, k2
-!     type(psb_ctxt_type) :: ictxt
-!     integer(psb_ipk_) :: me, np
-!     character(len=80) :: aname
-!     real(psb_dpk_), parameter :: eps=epsilon(1.d0)
-!
-!     ictxt = desc_a%get_ctxt()
-!     call psb_info(ictxt,me,np)
-!     if (present(symmetrize)) then
-!       symmetrize_ = symmetrize
-!     else
-!       symmetrize_ = .false.
-!     end if
-!
-!     !
-!     !  Extract off-diagonal part of A into ahat
-!     !  Extract diagonal of A
-!     !
-!     call a%clip_diag(ahat,info)
-!     call ahat%mv_to(tcoo1)
-!     nr = tcoo1%get_nrows()
-!     nc = tcoo1%get_ncols()
-!     nz = tcoo1%get_nzeros()
-!     diag = a%get_diag(info)
-!     call psb_realloc(nc,diag,info)
-!     call psb_halo(diag,desc_a,info)
-!
-!     if (half_ahat) then
-! !!$      write(0,*) me,' Temp placeholder '
-!       ilv = [(i,i=1,desc_a%get_local_cols())]
-!       call desc_a%l2gip(ilv,info,owned=.false.)
-!       !
-!       ! At this point the matrix is symmetric, hence we will encounter
-!       ! all entries as appropriate.
-!       !
-!       nr = tcoo1%get_nrows()
-!       nc = tcoo1%get_ncols()
-!       nz = tcoo1%get_nzeros()
-!       call tcoo2%allocate(nr,nc,nz)
-!       k2 = 0
-!       do k = 1, nz
-!         ii  = tcoo1%ia(k)
-!         jj  = tcoo1%ja(k)
-!         !
-!         ! Run over only one strict triangle
-!         !
-!         if (ilv(ii)<ilv(jj))  then
-!           aij = tcoo1%val(k)
-!           !if ((ii<= nr).and.(jj<=nc).and.(ii/=jj)) then
-!           ! This is already guaranteed by construction
-!           !
-!           aii = diag(ii)
-!           ajj = diag(jj)
-!           wii = w(ii)
-!           wjj = w(jj)
-!           edgnrm = aii*(wii**2) + ajj*(wjj**2)
-!           k2 = k2 + 1
-!           tcoo2%ia(k2) = ii
-!           tcoo2%ja(k2) = jj
-!           if (edgnrm > eps) then
-!             tcoo2%val(k2) = done - (2*done*aij*wii*wjj)/(aii*(wii**2) + ajj*(wjj**2))
-!           else
-!             tcoo2%val(k2) = eps
-!           end if
-!
-!         end if
-!         !else
-!         !  write(0,*) 'build_ahat: index error :',ii,jj,' : boundaries :',nr,nc
-!         !end if
-!       end do
-!       call tcoo2%set_nzeros(k2)
-!       if (dump) then
-!         block
-!           type(psb_ldspmat_type) :: amglob
-!           call ahat%cp_from(tcoo2)
-!           call psb_gather(amglob,ahat,desc_a,info)
-!           if (me==psb_root_) then
-!             write(aname,'(a,i0,a)') 'ahat-gu-',amglob%get_nrows(),'.mtx'
-!             call amglob%print(fname=aname,head='Test ')
-!           end if
-!           write(0,*) 'Done build_ahat'
-!         end block
-!       end if
-!
-!       call psb_glob_transpose(tcoo2,desc_a,info,atrans=tcoo1)
-!
-!       if (dump) then
-!         block
-!           type(psb_ldspmat_type) :: amglob
-!           call atnd%cp_from(tcoo1)
-!           call psb_gather(amglob,atnd,desc_a,info)
-!           if (me==psb_root_) then
-!             write(aname,'(a,i0,a)') 'ahat-gl-',amglob%get_nrows(),'.mtx'
-!             call amglob%print(fname=aname,head='Test ')
-!           end if
-!           write(0,*) 'Done build_ahat'
-!         end block
-!       end if
-!
-!       nz  = tcoo1%get_nzeros()
-!       nz2 = tcoo2%get_nzeros()
-!       call tcoo2%reallocate(nz+nz2)
-!       tcoo2%ia(nz2+1:nz2+nz) = tcoo1%ia(1:nz)
-!       tcoo2%ja(nz2+1:nz2+nz) = tcoo1%ja(1:nz)
-!       tcoo2%val(nz2+1:nz2+nz) = tcoo1%val(1:nz)
-!       call tcoo2%set_nzeros(nz+nz2)
-!       call tcoo2%fix(info)
-!       call tcoo1%free()
-!       nz = tcoo2%get_nzeros()
-!       minabs = minval(abs(tcoo2%val(1:nz)))
-!       call psb_min(ictxt,minabs)
-!       if (minabs == dzero) then
-!         if (me == 0) write(0,*) me, 'Min value for log correction is zero! '
-!         minabs = done
-!       end if
-!       tcoo2%val(1:nz) = log(abs(tcoo2%val(1:nz))/(0.999*minabs))
-!       if (any(tcoo2%val(1:nz)<0))  write(0,*) me, 'Warning: negative log output!'
-!       call ahat%mv_from(tcoo2)
-!       if (dump_ahat) then
-!         block
-!           character(len=40) :: fname
-!           integer(psb_ipk_) :: k, nr
-!           integer(psb_lpk_), allocatable :: ilv(:)
-!           nr  = desc_a%get_local_rows()
-!           ilv = desc_a%get_global_indices(owned=.false.)
-!           write(fname,'(a,i3.3,a,i3.3,a)') 'aa-i',me,'-p',np,'.mtx'
-! !!$        call a%print(fname=fname,head='Original matrix  ',iv=ilv)
-!           write(fname,'(a,i3.3,a,i3.3,a)') 'ah2-inp-i',me,'-p',np,'.mtx'
-!           call ahat%print(fname=fname,head='ahat ',iv=ilv)
-!         end block
-!       end if
-!
-!       if (dump) then
-!         write(aname,'(a,i3.3,a)') 'ahat-hfa-l-',me,'.mtx'
-!         call ahat%print(fname=aname,head='Test ',iv=ilv)
-!       end if
-!
-!       if (dump) then
-!         block
-!           type(psb_ldspmat_type) :: amglob
-! !!$        call psb_gather(amglob,a,desc_a,info)
-! !!$        if (me==psb_root_) then
-! !!$          write(aname,'(a,i3.3,a)') 'a-g-',amglob%get_nrows(),'.mtx'
-! !!$          call amglob%print(fname=aname,head='Test ')
-! !!$        end if
-!           call psb_gather(amglob,ahat,desc_a,info)
-!           if (me==psb_root_) then
-!             write(aname,'(a,i0,a)') 'ahat-hfa-g-',amglob%get_nrows(),'.mtx'
-!             call amglob%print(fname=aname,head='Test ')
-!           end if
-!           write(0,*) 'Done build_ahat'
-!         end block
-!       end if
-!
-!
-!     else
-!
-!       if (debug) then
-!         ilv = [(i,i=1,desc_a%get_local_cols())]
-!         call desc_a%l2gip(ilv,info,owned=.false.)
-!       end if
-!       if (symmetrize_) then
-!         ! Is this faster than storing by CSR, going over the
-!         ! upper triangle, searching for lower triangle entry and
-!         ! then duplicating the output? Probably yes.
-!         if (debug) write(0,*) me,' Build_ahat: symmetrize :',nr,nc,nz
-!         call ahat%cp_from(tcoo1)
-!         call psb_htranspose(ahat,atnd,desc_a,info)
-!         if (debug) write(0,*) me,' Build_ahat: done transpose'
-!
-!         if (dump) then
-!           write(aname,'(a,i3.3,a)') 'ainp-',me,'.mtx'
-!           call ahat%print(fname=aname,head='Test ',iv=ilv)
-!           write(aname,'(a,i3.3,a)') 'atnd-',me,'.mtx'
-!           call atnd%print(fname=aname,head='Test ',iv=ilv)
-!         end if
-!         call ahat%free()
-!         call atnd%mv_to(tcoo2)
-!         nz2 = tcoo2%get_nzeros()
-!
-!         if (debug) then
-!           write(0,*) me,':',tcoo1%get_nrows(),tcoo1%get_ncols(),tcoo1%get_nzeros(),&
-!                & tcoo2%get_nrows(),tcoo2%get_ncols(),tcoo2%get_nzeros()
-!           flush(0)
-!         end if
-!
-!         call tcoo3%allocate(nr, nc, max(2*nz,nz+nz2))
-!         tcoo3%ia(1:nz)   = tcoo1%ia(1:nz)
-!         tcoo3%ja(1:nz)   = tcoo1%ja(1:nz)
-!         tcoo3%val(1:nz)  = tcoo1%val(1:nz)
-!         tcoo3%ia(nz+1:nz+nz2)  = tcoo2%ia(1:nz2)
-!         tcoo3%ja(nz+1:nz+nz2)  = tcoo2%ja(1:nz2)
-!         tcoo3%val(nz+1:nz+nz2)  = tcoo2%val(1:nz2)
-!         call tcoo3%set_nzeros(nz+nz2)
-!         call tcoo3%set_dupl(psb_dupl_add_)
-!         call tcoo3%fix(info)
-!         nz = tcoo3%get_nzeros()
-!         tcoo3%val(1:nz) = 0.5d0 * tcoo3%val(1:nz)
-!         call tcoo3%mv_to_coo(tcoo1,info)
-!       end if
-!
-!       if (dump_ahat) then
-!         block
-!           character(len=40) :: fname
-!           integer(psb_ipk_) :: k, nr
-!           integer(psb_lpk_), allocatable :: ilv(:)
-!           nr  = desc_a%get_local_rows()
-!           ilv = desc_a%get_global_indices(owned=.false.)
-!           write(fname,'(a,i3.3,a,i3.3,a)') 'aa-i',me,'-p',np,'.mtx'
-! !!$        call a%print(fname=fname,head='Original matrix  ',iv=ilv)
-!           write(fname,'(a,i3.3,a,i3.3,a)') 'ahat-inp-i',me,'-p',np,'.mtx'
-!           call ahat%print(fname=fname,head='Before building_ahat ',iv=ilv)
-!         end block
-!       end if
-!
-!
-!       !
-!       ! At this point the matrix is symmetric, hence we will encounter
-!       ! all entries as appropriate.
-!       !
-!       call tcoo1%cp_to_coo(tcoo2,info)
-!       nz = tcoo1%get_nzeros()
-!       do k = 1, nz
-!         ii  = tcoo1%ia(k)
-!         jj  = tcoo1%ja(k)
-!         aij = tcoo1%val(k)
-!         !if ((ii<= nr).and.(jj<=nc).and.(ii/=jj)) then
-!         ! This is already guaranteed by construction
-!         !
-!         aii = diag(ii)
-!         ajj = diag(jj)
-!         wii = w(ii)
-!         wjj = w(jj)
-!         edgnrm = aii*(wii**2) + ajj*(wjj**2)
-!         if (edgnrm > eps) then
-!           tcoo2%val(k) = done - (2*done*aij*wii*wjj)/(aii*(wii**2) + ajj*(wjj**2))
-!         else
-!           tcoo2%val(k)=eps
-!         end if
-!         if (debug) then
-!           block
-!             integer(psb_ipk_), parameter  :: nr1=329, nc1=393
-!             integer(psb_ipk_), parameter  :: nr2=13,  nc2=77
-!             integer(psb_ipk_), parameter  :: nr3=313, nc3=249
-!             if ( ((ilv(ii)==nr1).and.(ilv(jj)==nc1)).or.((ilv(ii)==nc1).and.(ilv(jj)==nr1))&
-!                  &.or.((ilv(ii)==nr2).and.(ilv(jj)==nc2)).or.((ilv(ii)==nc2).and.(ilv(jj)==nr2)) &
-!                  &.or.((ilv(ii)==nr3).and.(ilv(jj)==nc3)).or.((ilv(ii)==nc3).and.(ilv(jj)==nr3)) &
-!                  &)   then
-!               write(0,*)me, 'Check on ahat:',ii,jj,ilv(ii),ilv(jj),aij,aii,ajj,wii,wjj,tcoo2%val(k)
-!             end if
-!           end block
-!         end if
-!
-!         !else
-!         !  write(0,*) 'build_ahat: index error :',ii,jj,' : boundaries :',nr,nc
-!         !end if
-!       end do
-!       nz = tcoo2%get_nzeros()
-!       minabs = minval(abs(tcoo2%val(1:nz)))
-!       call psb_min(ictxt,minabs)
-!       if (minabs == dzero) then
-!         if (me == 0) write(0,*) me, 'Min value for log correction is zero! '
-!         minabs = done
-!       end if
-!       tcoo2%val(1:nz) = log(abs(tcoo2%val(1:nz))/(0.999*minabs))
-!       if (any(tcoo2%val(1:nz)<0))  write(0,*) me, 'Warning: negative log output!'
-!       call ahat%mv_from(tcoo2)
-!
-!       if (dump) then
-!         write(aname,'(a,i3.3,a)') 'ahat-l-',me,'.mtx'
-!         call ahat%print(fname=aname,head='Test ',iv=ilv)
-!       end if
-!
-!       if (dump) then
-!         block
-!           type(psb_ldspmat_type) :: amglob
-! !!$        call psb_gather(amglob,a,desc_a,info)
-! !!$        if (me==psb_root_) then
-! !!$          write(aname,'(a,i3.3,a)') 'a-g-',amglob%get_nrows(),'.mtx'
-! !!$          call amglob%print(fname=aname,head='Test ')
-! !!$        end if
-!           call psb_gather(amglob,ahat,desc_a,info)
-!           if (me==psb_root_) then
-!             write(aname,'(a,i0,a)') 'ahat-g-',amglob%get_nrows(),'.mtx'
-!             call amglob%print(fname=aname,head='Test ')
-!           end if
-!           write(0,*) 'Done build_ahat'
-!         end block
-!       end if
-!     end if
-!
-!   end subroutine build_ahat_old
 
   subroutine psb_sgtranspose(ain,aout,desc_a,info)
     use psb_base_mod
@@ -1765,4 +1455,4 @@ contains
 
   end subroutine sPMatchBox
 
-end module smatchboxp_mod
+end module amg_s_matchboxp_mod

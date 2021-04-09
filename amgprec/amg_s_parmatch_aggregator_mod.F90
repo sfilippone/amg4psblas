@@ -9,9 +9,6 @@
 !        Salvatore Filippone
 !        Pasqua D'Ambra
 !        Fabio Durastante
-!        Salvatore Filippone
-!        Pasqua D'Ambra
-!        Fabio Durastante
 !
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -121,7 +118,7 @@
 
 module amg_s_parmatch_aggregator_mod
   use amg_s_base_aggregator_mod
-  use smatchboxp_mod
+  use amg_s_matchboxp_mod
 
   type, extends(amg_s_base_aggregator_type) :: amg_s_parmatch_aggregator_type
     integer(psb_ipk_) :: matching_alg
