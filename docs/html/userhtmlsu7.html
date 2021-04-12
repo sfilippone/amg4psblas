@@ -3,8 +3,8 @@
 <html > 
 <head><title>GPU example</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
@@ -52,23 +52,24 @@ class="cmr-12">variables:</span>
 <div class="center" 
 >
 <!--l. 448--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-10">
+<div class="minipage"><div class="verbatim" id="verbatim-10">
 program&#x00A0;amg_dexample_gpu
-&#x00A0;&#x00A0;use&#x00A0;psb_base_mod
-&#x00A0;&#x00A0;use&#x00A0;amg_prec_mod
-&#x00A0;&#x00A0;use&#x00A0;psb_krylov_mod
-&#x00A0;&#x00A0;use&#x00A0;psb_util_mod
-&#x00A0;&#x00A0;use&#x00A0;psb_gpu_mod
-&#x00A0;&#x00A0;use&#x00A0;data_input
-&#x00A0;&#x00A0;use&#x00A0;amg_d_pde_mod
-&#x00A0;&#x00A0;implicit&#x00A0;none
-&#x00A0;&#x00A0;.......
-&#x00A0;&#x00A0;!&#x00A0;GPU&#x00A0;variables
-&#x00A0;&#x00A0;type(psb_d_hlg_sparse_mat)&#x00A0;::&#x00A0;agmold
-&#x00A0;&#x00A0;type(psb_d_vect_gpu)&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;::&#x00A0;vgmold
-&#x00A0;&#x00A0;type(psb_i_vect_gpu)&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;::&#x00A0;igmold
-&#x00A0;
-</pre>
+&#x00A0;<br />&#x00A0;&#x00A0;use&#x00A0;psb_base_mod
+&#x00A0;<br />&#x00A0;&#x00A0;use&#x00A0;amg_prec_mod
+&#x00A0;<br />&#x00A0;&#x00A0;use&#x00A0;psb_krylov_mod
+&#x00A0;<br />&#x00A0;&#x00A0;use&#x00A0;psb_util_mod
+&#x00A0;<br />&#x00A0;&#x00A0;use&#x00A0;psb_gpu_mod
+&#x00A0;<br />&#x00A0;&#x00A0;use&#x00A0;data_input
+&#x00A0;<br />&#x00A0;&#x00A0;use&#x00A0;amg_d_pde_mod
+&#x00A0;<br />&#x00A0;&#x00A0;implicit&#x00A0;none
+&#x00A0;<br />&#x00A0;&#x00A0;.......
+&#x00A0;<br />&#x00A0;&#x00A0;!&#x00A0;GPU&#x00A0;variables
+&#x00A0;<br />&#x00A0;&#x00A0;type(psb_d_hlg_sparse_mat)&#x00A0;::&#x00A0;agmold
+&#x00A0;<br />&#x00A0;&#x00A0;type(psb_d_vect_gpu)&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;::&#x00A0;vgmold
+&#x00A0;<br />&#x00A0;&#x00A0;type(psb_i_vect_gpu)&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;::&#x00A0;igmold
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;
+</div>
 <!--l. 467--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 5: </span><span  
@@ -103,19 +104,20 @@ class="cmr-12">guides).</span>
 <div class="center" 
 >
 <!--l. 497--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-11">
+<div class="minipage"><div class="verbatim" id="verbatim-11">
 &#x00A0;&#x00A0;call&#x00A0;psb_init(ctxt)
-&#x00A0;&#x00A0;call&#x00A0;psb_info(ctxt,iam,np)
-&#x00A0;&#x00A0;!
-&#x00A0;&#x00A0;!&#x00A0;BEWARE:&#x00A0;if&#x00A0;you&#x00A0;have&#x00A0;NGPUS&#x00A0;&#x00A0;per&#x00A0;node,&#x00A0;the&#x00A0;default&#x00A0;is&#x00A0;to
-&#x00A0;&#x00A0;!&#x00A0;attach&#x00A0;to&#x00A0;mod(IAM,NGPUS)
-&#x00A0;&#x00A0;!
-&#x00A0;&#x00A0;call&#x00A0;psb_gpu_init(ictxt)
-&#x00A0;&#x00A0;......
-&#x00A0;&#x00A0;t1&#x00A0;=&#x00A0;psb_wtime()
-&#x00A0;&#x00A0;call&#x00A0;prec%smoothers_build(a,desc_a,info,&#x00A0;amold=agmold,&#x00A0;vmold=vgmold,&#x00A0;imold=igmold)
-&#x00A0;
-</pre>
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_info(ctxt,iam,np)
+&#x00A0;<br />&#x00A0;&#x00A0;!
+&#x00A0;<br />&#x00A0;&#x00A0;!&#x00A0;BEWARE:&#x00A0;if&#x00A0;you&#x00A0;have&#x00A0;NGPUS&#x00A0;&#x00A0;per&#x00A0;node,&#x00A0;the&#x00A0;default&#x00A0;is&#x00A0;to
+&#x00A0;<br />&#x00A0;&#x00A0;!&#x00A0;attach&#x00A0;to&#x00A0;mod(IAM,NGPUS)
+&#x00A0;<br />&#x00A0;&#x00A0;!
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_gpu_init(ictxt)
+&#x00A0;<br />&#x00A0;&#x00A0;......
+&#x00A0;<br />&#x00A0;&#x00A0;t1&#x00A0;=&#x00A0;psb_wtime()
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;prec%smoothers_build(a,desc_a,info,&#x00A0;amold=agmold,&#x00A0;vmold=vgmold,&#x00A0;imold=igmold)
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;
+</div>
 <!--l. 512--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 6: </span><span  
@@ -144,29 +146,32 @@ class="cmr-12">GPU environment</span>
 <div class="center" 
 >
 <!--l. 552--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-12">
+<div class="minipage"><div class="verbatim" id="verbatim-12">
 &#x00A0;&#x00A0;call&#x00A0;desc_a%cnv(mold=igmold)
-&#x00A0;&#x00A0;call&#x00A0;a%cscnv(info,mold=agmold)
-&#x00A0;&#x00A0;call&#x00A0;psb_geasb(x,desc_a,info,mold=vgmold)
-&#x00A0;&#x00A0;call&#x00A0;psb_geasb(b,desc_a,info,mold=vgmold)
-&#x00A0;&#x00A0;!
-&#x00A0;&#x00A0;!&#x00A0;iterative&#x00A0;method&#x00A0;parameters
-&#x00A0;&#x00A0;!
-&#x00A0;&#x00A0;call&#x00A0;psb_barrier(ctxt)
-&#x00A0;&#x00A0;call&#x00A0;prec%allocate_wrk(info)
-&#x00A0;&#x00A0;t1&#x00A0;=&#x00A0;psb_wtime()
-&#x00A0;&#x00A0;call&#x00A0;psb_krylov(s_choice%kmethd,a,prec,b,x,s_choice%eps,&amp;
-&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,itrace=s_choice%itrace,&amp;
-&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;istop=s_choice%istopc,irst=s_choice%irst)
-&#x00A0;&#x00A0;call&#x00A0;prec%deallocate_wrk(info)
-&#x00A0;&#x00A0;call&#x00A0;psb_barrier(ctxt)
-&#x00A0;&#x00A0;tslv&#x00A0;=&#x00A0;psb_wtime()&#x00A0;-&#x00A0;t1
-&#x00A0;&#x00A0;......
-&#x00A0;&#x00A0;call&#x00A0;psb_gpu_exit()
-&#x00A0;&#x00A0;call&#x00A0;psb_exit(ctxt)
-&#x00A0;&#x00A0;stop
-&#x00A0;
-</pre>
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;a%cscnv(info,mold=agmold)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_geasb(x,desc_a,info,mold=vgmold)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_geasb(b,desc_a,info,mold=vgmold)
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;!
+&#x00A0;<br />&#x00A0;&#x00A0;!&#x00A0;iterative&#x00A0;method&#x00A0;parameters
+&#x00A0;<br />&#x00A0;&#x00A0;!
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_barrier(ctxt)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;prec%allocate_wrk(info)
+&#x00A0;<br />&#x00A0;&#x00A0;t1&#x00A0;=&#x00A0;psb_wtime()
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_krylov(s_choice%kmethd,a,prec,b,x,s_choice%eps,&amp;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,itrace=s_choice%itrace,&amp;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;istop=s_choice%istopc,irst=s_choice%irst)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;prec%deallocate_wrk(info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_barrier(ctxt)
+&#x00A0;<br />&#x00A0;&#x00A0;tslv&#x00A0;=&#x00A0;psb_wtime()&#x00A0;-&#x00A0;t1
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;......
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_gpu_exit()
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_exit(ctxt)
+&#x00A0;<br />&#x00A0;&#x00A0;stop
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;
+</div>
 <!--l. 579--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 7: </span><span  

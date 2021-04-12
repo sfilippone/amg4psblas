@@ -3,14 +3,14 @@
 <html > 
 <head><title>Configuration options</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 113--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 116--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu4.html" ><span 
 class="cmr-12">next</span></a><span 
@@ -31,21 +31,21 @@ class="cmr-12">] </span></p></div>
 class="cmr-12">3.3   </span></span> <a 
  id="x11-100003.3"></a><span 
 class="cmr-12">Configuration options</span></h4>
-<!--l. 115--><p class="noindent" ><span 
+<!--l. 118--><p class="noindent" ><span 
 class="cmr-12">In order to build AMG4PSBLAS, the first step is to use the </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">configure</span></span></span> <span 
 class="cmr-12">script in the</span>
 <span 
 class="cmr-12">main directory to generate the necessary makefile.</span>
-<!--l. 119--><p class="indent" >   <span 
+<!--l. 122--><p class="indent" >   <span 
 class="cmr-12">As a minimal example consider the following:</span>
                                                                                
 
                                                                                
-   <pre class="verbatim" id="verbatim-2">
+   <div class="verbatim" id="verbatim-2">
 ./configure&#x00A0;--with-psblas=PSB-INSTALL-DIR
-</pre>
-<!--l. 127--><p class="nopar" > <span 
+</div>
+<!--l. 130--><p class="nopar" > <span 
 class="cmr-12">which assumes that the various MPI compilers and support libraries are available in</span>
 <span 
 class="cmr-12">the standard directories on the system, and specifies only the PSBLAS install directory</span>
@@ -59,7 +59,7 @@ class="cmtt-12">./configure</span><span
 class="cmtt-12">&#x00A0;--help</span></span></span><span 
 class="cmr-12">, which</span>
 <span 
-class="cmr-12">produces: </span><!--l. 138--><div class="lstinputlisting">
+class="cmr-12">produces: </span><!--l. 141--><div class="lstinputlisting">
 <a 
  id="x11-10001"></a>
    <span 
@@ -685,8 +685,7 @@ class="cmtt-12">&#x00A0;</span><span
 class="cmtt-12">&#8216;--</span><span 
 class="cmtt-12">prefix</span><span 
 class="cmtt-12">=</span><span 
-class="tctt-1200">$</span><span 
-class="cmtt-12">HOME</span><span 
+class="cmtt-12">$HOME</span><span 
 class="cmtt-12">&#8217;.</span><span 
 class="cmtt-12">&#x00A0;</span><br /><span class="label"><a 
  id="x11-10032r31"></a></span><span 
@@ -4236,7 +4235,7 @@ class="cmtt-12">issues</span><span
 class="cmtt-12">&#x003E;.</span>
    
    </div>
-<!--l. 140--><p class="noindent" ><span 
+<!--l. 143--><p class="noindent" ><span 
 class="cmr-12">For instance, if a user has built and installed PSBLAS 3.7 under the </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">/opt</span></span></span> <span 
 class="cmr-12">directory and is</span>
@@ -4247,11 +4246,11 @@ class="cmr-12">might be configured with:</span>
                                                                                
 
                                                                                
-   <pre class="verbatim" id="verbatim-3">
+   <div class="verbatim" id="verbatim-3">
 ./configure&#x00A0;--with-psblas=/opt/psblas-3.7/&#x00A0;\
---with-umfpackincdir=/usr/include/suitesparse/
-</pre>
-<!--l. 152--><p class="nopar" > <span 
+&#x00A0;<br />--with-umfpackincdir=/usr/include/suitesparse/
+</div>
+<!--l. 155--><p class="nopar" > <span 
 class="cmr-12">Once the configure script has completed execution, it will have generated the file</span>
 <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">Make.inc</span></span></span> <span 
@@ -4260,7 +4259,7 @@ class="cmr-12">which will then be used by all Makefiles in the directory tree; t
 class="cmr-12">copied in the install directory under the name </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">Make.inc.AMG4PSBLAS</span></span></span><span 
 class="cmr-12">.</span>
-<!--l. 159--><p class="indent" >   <span 
+<!--l. 162--><p class="indent" >   <span 
 class="cmr-12">To use the MUMPS solver package, the user has to add the appropriate options to</span>
 <span 
 class="cmr-12">the configure script; by default we are looking for the libraries </span><span class="obeylines-h"><span class="verb"><span 
@@ -4280,27 +4279,27 @@ class="cmtt-12">--with-extra-libs</span></span></span> <span
 class="cmr-12">configure</span>
 <span 
 class="cmr-12">option.</span>
-<!--l. 167--><p class="indent" >   <span 
+<!--l. 170--><p class="indent" >   <span 
 class="cmr-12">To build the library the user will now enter</span>
                                                                                
 
                                                                                
-   <pre class="verbatim" id="verbatim-4">
+   <div class="verbatim" id="verbatim-4">
 make
-</pre>
-<!--l. 175--><p class="nopar" > <span 
+</div>
+<!--l. 178--><p class="nopar" > <span 
 class="cmr-12">followed (optionally) by</span>
                                                                                
 
                                                                                
-   <pre class="verbatim" id="verbatim-5">
+   <div class="verbatim" id="verbatim-5">
 make&#x00A0;install
-</pre>
-<!--l. 185--><p class="nopar" >
+</div>
+<!--l. 188--><p class="nopar" >
                                                                                
 
                                                                                
-   <!--l. 187--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 190--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu4.html" ><span 
 class="cmr-12">next</span></a><span 
@@ -4317,6 +4316,6 @@ class="cmr-12">] [</span><a
 href="userhtmlse3.html#userhtmlsu3.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
-<!--l. 187--><p class="indent" >   <a 
+<!--l. 190--><p class="indent" >   <a 
  id="tailuserhtmlsu3.html"></a>  
 </body></html> 

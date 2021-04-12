@@ -3,8 +3,8 @@
 <html > 
 <head><title>Examples</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
@@ -131,58 +131,59 @@ class="cmr-12">.</span>
                                                                                
 
                                                                                
-<div class="minipage"><pre class="verbatim" id="verbatim-6">
+<div class="minipage"><div class="verbatim" id="verbatim-6">
 &#x00A0;&#x00A0;use&#x00A0;psb_base_mod
-&#x00A0;&#x00A0;use&#x00A0;amg_prec_mod
-&#x00A0;&#x00A0;use&#x00A0;psb_krylov_mod
-...&#x00A0;...
-!
-!&#x00A0;sparse&#x00A0;matrix
-&#x00A0;&#x00A0;type(psb_dspmat_type)&#x00A0;::&#x00A0;A
-!&#x00A0;sparse&#x00A0;matrix&#x00A0;descriptor
-&#x00A0;&#x00A0;type(psb_desc_type)&#x00A0;&#x00A0;&#x00A0;::&#x00A0;desc_A
-!&#x00A0;preconditioner
-&#x00A0;&#x00A0;type(amg_dprec_type)&#x00A0;&#x00A0;::&#x00A0;P
-!&#x00A0;right-hand&#x00A0;side&#x00A0;and&#x00A0;solution&#x00A0;vectors
-&#x00A0;&#x00A0;type(psb_d_vect_type)&#x00A0;::&#x00A0;b,&#x00A0;x
-...&#x00A0;...
-!
-!&#x00A0;initialize&#x00A0;the&#x00A0;parallel&#x00A0;environment
-&#x00A0;&#x00A0;call&#x00A0;psb_init(ctxt)
-&#x00A0;&#x00A0;call&#x00A0;psb_info(ctxt,iam,np)
-...&#x00A0;...
-!
-!&#x00A0;read&#x00A0;and&#x00A0;assemble&#x00A0;the&#x00A0;spd&#x00A0;matrix&#x00A0;A&#x00A0;and&#x00A0;the&#x00A0;right-hand&#x00A0;side&#x00A0;b
-!&#x00A0;using&#x00A0;PSBLAS&#x00A0;routines&#x00A0;for&#x00A0;sparse&#x00A0;matrix&#x00A0;/&#x00A0;vector&#x00A0;management
-...&#x00A0;...
-!
-!&#x00A0;initialize&#x00A0;the&#x00A0;default&#x00A0;multilevel&#x00A0;preconditioner,&#x00A0;i.e.&#x00A0;V-cycle
-!&#x00A0;with&#x00A0;basic&#x00A0;smoothed&#x00A0;aggregation,&#x00A0;1&#x00A0;hybrid&#x00A0;forward/backward
-!&#x00A0;GS&#x00A0;sweep&#x00A0;as&#x00A0;pre/post-smoother&#x00A0;and&#x00A0;UMFPACK&#x00A0;as&#x00A0;coarsest-level
-!&#x00A0;solver
-&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;ML&#8217;,info)
-!
-!&#x00A0;build&#x00A0;the&#x00A0;preconditioner
-&#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
-&#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
-!
-!&#x00A0;set&#x00A0;the&#x00A0;solver&#x00A0;parameters&#x00A0;and&#x00A0;the&#x00A0;initial&#x00A0;guess
-&#x00A0;&#x00A0;...&#x00A0;...
-!
-!&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;CG
-&#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;CG&#8217;,A,P,b,x,tol,desc_A,info)
-&#x00A0;&#x00A0;...&#x00A0;...
-!
-!&#x00A0;deallocate&#x00A0;the&#x00A0;preconditioner
-&#x00A0;&#x00A0;call&#x00A0;P%free(info)
-!
-!&#x00A0;deallocate&#x00A0;other&#x00A0;data&#x00A0;structures
-&#x00A0;&#x00A0;...&#x00A0;...
-!
-!&#x00A0;exit&#x00A0;the&#x00A0;parallel&#x00A0;environment
-&#x00A0;&#x00A0;call&#x00A0;psb_exit(ctxt)
-&#x00A0;&#x00A0;stop
-</pre>
+&#x00A0;<br />&#x00A0;&#x00A0;use&#x00A0;amg_prec_mod
+&#x00A0;<br />&#x00A0;&#x00A0;use&#x00A0;psb_krylov_mod
+&#x00A0;<br />...&#x00A0;...
+&#x00A0;<br />!
+&#x00A0;<br />!&#x00A0;sparse&#x00A0;matrix
+&#x00A0;<br />&#x00A0;&#x00A0;type(psb_dspmat_type)&#x00A0;::&#x00A0;A
+&#x00A0;<br />!&#x00A0;sparse&#x00A0;matrix&#x00A0;descriptor
+&#x00A0;<br />&#x00A0;&#x00A0;type(psb_desc_type)&#x00A0;&#x00A0;&#x00A0;::&#x00A0;desc_A
+&#x00A0;<br />!&#x00A0;preconditioner
+&#x00A0;<br />&#x00A0;&#x00A0;type(amg_dprec_type)&#x00A0;&#x00A0;::&#x00A0;P
+&#x00A0;<br />!&#x00A0;right-hand&#x00A0;side&#x00A0;and&#x00A0;solution&#x00A0;vectors
+&#x00A0;<br />&#x00A0;&#x00A0;type(psb_d_vect_type)&#x00A0;::&#x00A0;b,&#x00A0;x
+&#x00A0;<br />...&#x00A0;...
+&#x00A0;<br />!
+&#x00A0;<br />!&#x00A0;initialize&#x00A0;the&#x00A0;parallel&#x00A0;environment
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_init(ctxt)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_info(ctxt,iam,np)
+&#x00A0;<br />...&#x00A0;...
+&#x00A0;<br />!
+&#x00A0;<br />!&#x00A0;read&#x00A0;and&#x00A0;assemble&#x00A0;the&#x00A0;spd&#x00A0;matrix&#x00A0;A&#x00A0;and&#x00A0;the&#x00A0;right-hand&#x00A0;side&#x00A0;b
+&#x00A0;<br />!&#x00A0;using&#x00A0;PSBLAS&#x00A0;routines&#x00A0;for&#x00A0;sparse&#x00A0;matrix&#x00A0;/&#x00A0;vector&#x00A0;management
+&#x00A0;<br />...&#x00A0;...
+&#x00A0;<br />!
+&#x00A0;<br />!&#x00A0;initialize&#x00A0;the&#x00A0;default&#x00A0;multilevel&#x00A0;preconditioner,&#x00A0;i.e.&#x00A0;V-cycle
+&#x00A0;<br />!&#x00A0;with&#x00A0;basic&#x00A0;smoothed&#x00A0;aggregation,&#x00A0;1&#x00A0;hybrid&#x00A0;forward/backward
+&#x00A0;<br />!&#x00A0;GS&#x00A0;sweep&#x00A0;as&#x00A0;pre/post-smoother&#x00A0;and&#x00A0;UMFPACK&#x00A0;as&#x00A0;coarsest-level
+&#x00A0;<br />!&#x00A0;solver
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;ML&#8217;,info)
+&#x00A0;<br />!
+&#x00A0;<br />!&#x00A0;build&#x00A0;the&#x00A0;preconditioner
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
+&#x00A0;<br />
+&#x00A0;<br />!
+&#x00A0;<br />!&#x00A0;set&#x00A0;the&#x00A0;solver&#x00A0;parameters&#x00A0;and&#x00A0;the&#x00A0;initial&#x00A0;guess
+&#x00A0;<br />&#x00A0;&#x00A0;...&#x00A0;...
+&#x00A0;<br />!
+&#x00A0;<br />!&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;CG
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;CG&#8217;,A,P,b,x,tol,desc_A,info)
+&#x00A0;<br />&#x00A0;&#x00A0;...&#x00A0;...
+&#x00A0;<br />!
+&#x00A0;<br />!&#x00A0;deallocate&#x00A0;the&#x00A0;preconditioner
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%free(info)
+&#x00A0;<br />!
+&#x00A0;<br />!&#x00A0;deallocate&#x00A0;other&#x00A0;data&#x00A0;structures
+&#x00A0;<br />&#x00A0;&#x00A0;...&#x00A0;...
+&#x00A0;<br />!
+&#x00A0;<br />!&#x00A0;exit&#x00A0;the&#x00A0;parallel&#x00A0;environment
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_exit(ctxt)
+&#x00A0;<br />&#x00A0;&#x00A0;stop
+</div>
 <!--l. 255--><p class="nopar" >                                                                               
 
                                                                                
@@ -291,19 +292,19 @@ class="cmr-12">.</span>
 <div class="center" 
 >
 <!--l. 318--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-7">
+<div class="minipage"><div class="verbatim" id="verbatim-7">
 ...&#x00A0;...
-!&#x00A0;build&#x00A0;a&#x00A0;V-cycle&#x00A0;preconditioner&#x00A0;with&#x00A0;1&#x00A0;block-Jacobi&#x00A0;sweep&#x00A0;(with
-!&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;blocks)&#x00A0;as&#x00A0;pre-&#x00A0;and&#x00A0;post-smoother,&#x00A0;and&#x00A0;8&#x00A0;&#x00A0;block-Jacobi
-!&#x00A0;sweeps&#x00A0;(with&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;blocks)&#x00A0;as&#x00A0;coarsest-level&#x00A0;solver
-&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;ML&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_TYPE&#8217;,&#8217;BJAC&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SOLVE&#8217;,&#8217;BJAC&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SWEEPS&#8217;,8,info)
-&#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
-&#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
-...&#x00A0;...
-</pre>
+&#x00A0;<br />!&#x00A0;build&#x00A0;a&#x00A0;V-cycle&#x00A0;preconditioner&#x00A0;with&#x00A0;1&#x00A0;block-Jacobi&#x00A0;sweep&#x00A0;(with
+&#x00A0;<br />!&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;blocks)&#x00A0;as&#x00A0;pre-&#x00A0;and&#x00A0;post-smoother,&#x00A0;and&#x00A0;8&#x00A0;&#x00A0;block-Jacobi
+&#x00A0;<br />!&#x00A0;sweeps&#x00A0;(with&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;blocks)&#x00A0;as&#x00A0;coarsest-level&#x00A0;solver
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;ML&#8217;,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_TYPE&#8217;,&#8217;BJAC&#8217;,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SOLVE&#8217;,&#8217;BJAC&#8217;,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SWEEPS&#8217;,8,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
+&#x00A0;<br />...&#x00A0;...
+</div>
 <!--l. 333--><p class="nopar" ></div></div>
 <br /><div class="caption" 
 ><span class="id">Listing 2: </span><span  
@@ -324,23 +325,23 @@ class="content">setup of a multilevel preconditioner based on the default decoup
 <div class="center" 
 >
 <!--l. 360--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-8">
+<div class="minipage"><div class="verbatim" id="verbatim-8">
 ...&#x00A0;...
-!&#x00A0;build&#x00A0;a&#x00A0;W-cycle&#x00A0;preconditioner&#x00A0;with&#x00A0;2&#x00A0;hybrid&#x00A0;Gauss-Seidel&#x00A0;sweeps
-!&#x00A0;as&#x00A0;pre-&#x00A0;and&#x00A0;post-smoother,&#x00A0;a&#x00A0;distributed&#x00A0;coarsest
-!&#x00A0;matrix,&#x00A0;and&#x00A0;MUMPS&#x00A0;as&#x00A0;coarsest-level&#x00A0;solver
-&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;ML&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;PAR_AGGR_ALG&#8217;,&#8217;COUPLED&#8217;,info)
-call&#x00A0;P%set(&#8217;AGGR_TYPE&#8217;,&#8217;MATCHBOXP&#8217;,info)
-call&#x00A0;P%set(&#8217;AGGR_SIZE&#8217;,8,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;ML_CYCLE&#8217;,&#8217;WCYCLE&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_TYPE&#8217;,&#8217;FBGS&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_SWEEPS&#8217;,2,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SOLVE&#8217;,&#8217;KRM&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
-&#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
-...&#x00A0;...
-</pre>
+&#x00A0;<br />!&#x00A0;build&#x00A0;a&#x00A0;W-cycle&#x00A0;preconditioner&#x00A0;with&#x00A0;2&#x00A0;hybrid&#x00A0;Gauss-Seidel&#x00A0;sweeps
+&#x00A0;<br />!&#x00A0;as&#x00A0;pre-&#x00A0;and&#x00A0;post-smoother,&#x00A0;a&#x00A0;distributed&#x00A0;coarsest
+&#x00A0;<br />!&#x00A0;matrix,&#x00A0;and&#x00A0;MUMPS&#x00A0;as&#x00A0;coarsest-level&#x00A0;solver
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;ML&#8217;,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;PAR_AGGR_ALG&#8217;,&#8217;COUPLED&#8217;,info)
+&#x00A0;<br />call&#x00A0;P%set(&#8217;AGGR_TYPE&#8217;,&#8217;MATCHBOXP&#8217;,info)
+&#x00A0;<br />call&#x00A0;P%set(&#8217;AGGR_SIZE&#8217;,8,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;ML_CYCLE&#8217;,&#8217;WCYCLE&#8217;,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_TYPE&#8217;,&#8217;FBGS&#8217;,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_SWEEPS&#8217;,2,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SOLVE&#8217;,&#8217;KRM&#8217;,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
+&#x00A0;<br />...&#x00A0;...
+</div>
 <!--l. 379--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 3: </span><span  
@@ -362,16 +363,16 @@ weighted matching</span></div><!--tex4ht:label?: x15-14003r3 -->
 <div class="center" 
 >
 <!--l. 398--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-9">
+<div class="minipage"><div class="verbatim" id="verbatim-9">
 ...&#x00A0;...
-!&#x00A0;set&#x00A0;RAS&#x00A0;with&#x00A0;overlap&#x00A0;2&#x00A0;and&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;local&#x00A0;blocks
-&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;AS&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SUB_OVR&#8217;,2,info)
-&#x00A0;&#x00A0;call&#x00A0;P%bld(A,desc_A,info)
-...&#x00A0;...
-!&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;BiCGSTAB
-&#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;BICGSTAB&#8217;,A,P,b,x,tol,desc_A,info)
-</pre>
+&#x00A0;<br />!&#x00A0;set&#x00A0;RAS&#x00A0;with&#x00A0;overlap&#x00A0;2&#x00A0;and&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;local&#x00A0;blocks
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;AS&#8217;,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SUB_OVR&#8217;,2,info)
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;P%bld(A,desc_A,info)
+&#x00A0;<br />...&#x00A0;...
+&#x00A0;<br />!&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;BiCGSTAB
+&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;BICGSTAB&#8217;,A,P,b,x,tol,desc_A,info)
+</div>
 <!--l. 410--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 4: </span><span  
