@@ -140,26 +140,6 @@ subroutine amg_d_parmatch_spmm_bld_ov(a,desc_a,ilaggr,nlaggr,parms,&
        & ac,desc_ac,op_prol,op_restr,t_prol,info)
   if (psb_errstatus_fatal())  write(0,*)me,trim(name),'Error fatal on exit from bld_inner',info
 
-!!$  else
-!!$    naggr   = nlaggr(me+1)
-!!$    ntaggr  = sum(nlaggr)
-!!$    naggrm1 = sum(nlaggr(1:me))
-!!$    naggrp1 = sum(nlaggr(1:me+1))
-!!$    call op_prol%mv_to(coo_prol)
-!!$    inaggr = naggr
-!!$    call psb_cdall(ictxt,desc_ac,info,nl=inaggr)
-!!$    nzlp = coo_prol%get_nzeros()
-!!$    call desc_ac%indxmap%g2lip_ins(coo_prol%ja(1:nzlp),info)
-!!$    call coo_prol%set_ncols(desc_ac%get_local_cols())
-!!$    call amg_spmm_bld_inner(acsr,desc_a,nlaggr,parms,ac,&
-!!$         & coo_prol,desc_ac,coo_restr,info)
-!!$    call psb_cdasb(desc_ac,info)
-!!$    !call desc_ac%free(info)
-!!$    !write(0,*) me, 'Size of nlaggr',size(nlaggr),nlaggr(1)
-!!$    call op_prol%mv_from(coo_prol)
-!!$    call op_restr%mv_from(coo_restr)
-!!$
-!!$  end if
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err="SPMM_BLD_INNER")

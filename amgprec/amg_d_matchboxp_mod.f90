@@ -68,7 +68,7 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-module amg_d_matchboxp_mod
+module dmatchboxp_mod
 
   use iso_c_binding
   use psb_base_cbind_mod
@@ -94,21 +94,17 @@ module amg_d_matchboxp_mod
     end subroutine dMatchBoxPC
   end interface MatchBoxPC
 
-  interface amg_i_aggr_assign
-    module procedure amg_i_daggr_assign
-  end interface amg_i_aggr_assign
+  interface i_aggr_assign
+    module procedure i_daggr_assign
+  end interface i_aggr_assign
 
-  interface amg_build_matching
-    module procedure amg_d_build_matching
-  end interface amg_build_matching
+  interface build_matching
+    module procedure dbuild_matching
+  end interface build_matching
 
-  interface amg_matchboxp_build_prol
-    module procedure amg_d_matchboxp_build_prol
-  end interface amg_matchboxp_build_prol
-
-  interface amg_build_ahat
-    module procedure amg_d_build_ahat
-  end interface amg_build_ahat
+  interface build_ahat
+    module procedure dbuild_ahat
+  end interface build_ahat
 
   interface psb_gtranspose
     module procedure psb_dgtranspose
@@ -124,7 +120,7 @@ module amg_d_matchboxp_mod
 
 contains
 
-  subroutine amg_d_matchboxp_build_prol(w,a,desc_a,ilaggr,nlaggr,prol,info,&
+  subroutine dmatchboxp_build_prol(w,a,desc_a,ilaggr,nlaggr,prol,info,&
        & symmetrize,reproducible,display_inp, display_out, print_out)
     use psb_base_mod
     use psb_util_mod
@@ -198,11 +194,6 @@ contains
     ilv    = [(i,i=1,desc_a%get_local_cols())]
     call desc_a%l2gip(ilv,info,owned=.false.)
 
-!!$    if (dump) then
-!!$      write(aname,'(a,i3.3,a)') 'amat',iam,'.mtx'
-!!$      call a%print(fname=aname,head='Test ',iv=ilv)
-!!$    end if
-
     call psb_geall(ilaggr,desc_a,info)
     ilaggr = -1
     call psb_geasb(ilaggr,desc_a,info)
@@ -222,7 +213,7 @@ contains
     end if
     if (do_timings) call psb_toc(idx_phase1)
     if (do_timings) call psb_tic(idx_bldmtc)
-    call amg_build_matching(w,a,desc_a,mate,info,display_inp=display_inp,symmetrize=symmetrize)
+    call build_matching(w,a,desc_a,mate,info,display_inp=display_inp,symmetrize=symmetrize)
     if (do_timings) call psb_toc(idx_bldmtc)
     if (debug) write(0,*) iam,' buildprol from buildmatching:',&
          & info
@@ -316,11 +307,11 @@ contains
                 else
                   ! Use a statistically unbiased tie-breaking rule,
                   ! this will give an even spread.
-                  ! Delegate to amg_i_aggr_assign.
+                  ! Delegate to i_aggr_assign.
                   ! Should be a symmetric function.
                   !
                   call desc_a%indxmap%qry_halo_owner(idx,iown,info)
-                  ip    = amg_i_aggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg)
+                  ip    = i_aggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg)
                   if (iam == ip) then
                     nlaggr(iam) = nlaggr(iam) + 1
                     ilaggr(k)   = nlaggr(iam)
@@ -429,9 +420,6 @@ contains
         nlsingl    = v(2)
         nlpairs    = v(3)
 
-!!$        call psb_sum(ictxt,nunmatched)
-!!$        call psb_sum(ictxt,nlsingl)
-!!$        call psb_sum(ictxt,nlpairs)
       end block
       if (iam == 0) then
         write(0,*) 'Matching statistics: Unmatched nodes ',&
@@ -525,9 +513,9 @@ contains
       write(0,*) iam,' :  error from Matching: ',info
     end if
 
-  end subroutine amg_d_matchboxp_build_prol
+  end subroutine dmatchboxp_build_prol
 
-  function amg_i_daggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg) &
+  function i_daggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg) &
        & result(iproc)
     !
     ! How to break ties? This
@@ -569,10 +557,10 @@ contains
         iproc = iown
       end if
     end if
-  end function amg_i_daggr_assign
+  end function i_daggr_assign
 
 
-  subroutine amg_d_build_matching(w,a,desc_a,mate,info,display_inp, symmetrize)
+  subroutine dbuild_matching(w,a,desc_a,mate,info,display_inp, symmetrize)
     use psb_base_mod
     use psb_util_mod
     use iso_c_binding
@@ -598,7 +586,7 @@ contains
     integer(psb_ipk_), save :: cnt=2
     logical, parameter :: debug=.false., dump_ahat=.false., debug_sync=.false.
     logical, parameter :: old_style=.false., sort_minp=.true.
-    character(len=40) :: name='amg_build_matching', fname
+    character(len=40) :: name='build_matching', fname
     integer(psb_ipk_), save :: idx_cmboxp=-1, idx_bldahat=-1, idx_phase2=-1, idx_phase3=-1
     logical, parameter :: do_timings=.true.
 
@@ -621,7 +609,7 @@ contains
       if (iam == 0) write(0,*)' Into build_ahat:'
     end if
     if (do_timings) call psb_tic(idx_bldahat)
-    call amg_build_ahat(w,a,ahatnd,desc_a,info,symmetrize=symmetrize)
+    call build_ahat(w,a,ahatnd,desc_a,info,symmetrize=symmetrize)
     if (do_timings) call psb_toc(idx_bldahat)
     if (info /= 0) then
       write(0,*) 'Error from build_ahat ', info
@@ -776,9 +764,9 @@ contains
       val(1:n) = tmp(1:n)
     end subroutine fix_order
 
-  end subroutine amg_d_build_matching
+  end subroutine dbuild_matching
 
-  subroutine amg_d_build_ahat(w,a,ahat,desc_a,info,symmetrize)
+  subroutine dbuild_ahat(w,a,ahat,desc_a,info,symmetrize)
     use psb_base_mod
     implicit none
     real(psb_dpk_), intent(in)           :: w(:)
@@ -885,8 +873,6 @@ contains
         else
           tcoo2%val(k2) = eps
         end if
-!!$        tcoo2%val(k2) = abs( tcoo2%val(k2) )
-!!$        minabs = min(minabs, tcoo2%val(k2) )
       end if
       !else
       !  write(0,*) 'build_ahat: index error :',ii,jj,' : boundaries :',nr,nc
@@ -1016,8 +1002,7 @@ contains
       end block
     end if
 
-  end subroutine amg_d_build_ahat
-
+  end subroutine dbuild_ahat
 
   subroutine psb_dgtranspose(ain,aout,desc_a,info)
     use psb_base_mod
@@ -1080,10 +1065,7 @@ contains
     ! FIXME THIS NEEDS REWORKING
     if (debug) write(0,*) me,' Gtranspose into sphalo :',atmp%get_nrows(),atmp%get_ncols()
     call psb_sphalo(atmp,desc_a,ahalo,info,rowscale=.true.)
-!!$    call psb_sphalo(atmp,desc_a,ahalo,info,&
-!!$         & colcnv=.false.,rowscale=.true.)
     if (debug) write(0,*) me,' Gtranspose from sphalo :',ahalo%get_nrows(),ahalo%get_ncols()
-!!$    call psb_set_debug_level(0)
     if (info == psb_success_) call psb_rwextd(ncol,atmp,info,b=ahalo)
 
     if (debug) then
@@ -1248,10 +1230,7 @@ contains
 
     else
       call psb_sphalo(atmp,desc_a,ahalo,info, rowscale=.true.)
-!!$    call psb_sphalo(atmp,desc_a,ahalo,info,&
-!!$         & colcnv=.false.,rowscale=.true.)
       if (debug) write(0,*) me,' Htranspose from sphalo :',ahalo%get_nrows(),ahalo%get_ncols()
-!!$    call psb_set_debug_level(0)
       if (info == psb_success_) call psb_rwextd(ncol,atmp,info,b=ahalo)
 
       if (debug) then
@@ -1265,7 +1244,6 @@ contains
 
       call atmp%cp_to(tmpcoo)
       call tmpcoo%transp()
-      !call psb_glob_to_loc(tmpcoo%ia,desc_a,info,iact='I')
       if (debug) write(0,*) 'Before cleanup:',tmpcoo%get_nzeros()
       if (.true.) then
         call tmpcoo%clean_negidx(info)
@@ -1455,4 +1433,4 @@ contains
 
   end subroutine dPMatchBox
 
-end module amg_d_matchboxp_mod
+end module dmatchboxp_mod

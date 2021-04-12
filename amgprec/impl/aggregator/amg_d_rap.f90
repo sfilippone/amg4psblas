@@ -93,7 +93,6 @@ subroutine amg_d_rap(a_csr,desc_a,nlaggr,parms,ac,&
   ntaggr  = sum(nlaggr)
   naggrm1 = sum(nlaggr(1:me))
   naggrp1 = sum(nlaggr(1:me+1)) 
-  !write(0,*)me,' ',name,' input sizes',nlaggr(:),':',naggr
 
   !
   ! COO_PROL should arrive here with local numbering
@@ -125,8 +124,6 @@ subroutine amg_d_rap(a_csr,desc_a,nlaggr,parms,ac,&
 
   call csr_restr%cp_from_coo(coo_restr,info)
 
-!!$      write(0,*)me,' ',name,' after transposition ',coo_restr%get_nrows(),coo_restr%get_ncols(),coo_restr%get_nzeros()
-
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='spcnv coo_restr')
     goto 9999
@@ -150,7 +147,6 @@ subroutine amg_d_rap(a_csr,desc_a,nlaggr,parms,ac,&
 
   if (debug) write(0,*)  me,' ',trim(name),' After  mv_from',psb_get_errstatus()
   if (debug) write(0,*)  me,' ',trim(name),' ',ac%get_fmt(),ac%get_nrows(),ac%get_ncols(),ac%get_nzeros(),naggr,ntaggr
-  ! write(0,*)  me,' ',trim(name),' Final AC newstyle ',ac%get_fmt(),ac%get_nrows(),ac%get_ncols(),ac%get_nzeros()
 
   call coo_prol%set_ncols(desc_ac%get_local_cols())
   if (debug) call check_coo(me,trim(name)//' Check 3 on coo_restr:',coo_restr)

@@ -135,15 +135,8 @@ subroutine amg_c_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
       call psb_c_coo_glob_transpose(coo_restr,desc_a,info,desc_c=desc_ac,desc_rx=desc_ax)
       call coo_restr%set_nrows(desc_ac%get_local_rows())
       call coo_restr%set_ncols(desc_ax%get_local_cols())
-! !$      write(0,*) me,' ',trim(name),' check on glob_transpose 1: ',&
-! !$           & desc_a%get_local_cols(),desc_ax%get_local_cols(),coo_restr%get_nzeros()
-! !$      if (desc_a%get_local_cols()<desc_ax%get_local_cols()) then
-! !$        write(0,*) me,' ',trim(name),' WARNING: GLOB_TRANSPOSE NEW INDICES '
-! !$      end if
     end block
     call csr_restr%cp_from_coo(coo_restr,info)
-
-!!$      write(0,*)me,' ',name,' after transposition ',coo_restr%get_nrows(),coo_restr%get_ncols(),coo_restr%get_nzeros()
 
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='spcnv coo_restr')
@@ -170,8 +163,6 @@ subroutine amg_c_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
     if (debug) write(0,*)me,' ',name,' No inp_restr, transposing prol ',&
          & csr_prol%get_nrows(),csr_prol%get_ncols(),csr_prol%get_nzeros()
     call csr_prol%mv_to_coo(coo_restr,info)
-!!$      write(0,*)me,' ',name,' new into transposition ',coo_restr%get_nrows(),&
-!!$           & coo_restr%get_ncols(),coo_restr%get_nzeros()
     if (debug) call check_coo(me,trim(name)//' Check 1 (before transp) on coo_restr:',coo_restr)
 
     call coo_restr%transp()
@@ -196,8 +187,6 @@ subroutine amg_c_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
     call coo_restr%set_ncols(desc_a%get_local_cols())
     if (debug) call check_coo(me,trim(name)//' Check 2 on coo_restr:',coo_restr)
     call csr_restr%cp_from_coo(coo_restr,info)
-
-!!$      write(0,*)me,' ',name,' after transposition ',coo_restr%get_nrows(),coo_restr%get_ncols(),coo_restr%get_nzeros()
 
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='spcnv coo_restr')
@@ -226,7 +215,6 @@ subroutine amg_c_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
 
   if (debug) write(0,*)  me,' ',trim(name),' After  mv_from',psb_get_errstatus()
   if (debug) write(0,*)  me,' ',trim(name),' ',ac%get_fmt(),ac%get_nrows(),ac%get_ncols(),ac%get_nzeros(),naggr,ntaggr
-  ! write(0,*)  me,' ',trim(name),' Final AC newstyle ',ac%get_fmt(),ac%get_nrows(),ac%get_ncols(),ac%get_nzeros()
 
   call coo_prol%set_ncols(desc_ac%get_local_cols())
   if (debug) call check_coo(me,trim(name)//' Check 3 on coo_restr:',coo_restr)
@@ -312,7 +300,6 @@ subroutine amg_c_lc_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
   ntaggr  = sum(nlaggr)
   naggrm1 = sum(nlaggr(1:me))
   naggrp1 = sum(nlaggr(1:me+1)) 
-  !write(0,*)me,' ',name,' input sizes',nlaggr(:),':',naggr
 
   !
   ! COO_PROL should arrive here with local numbering
@@ -350,16 +337,10 @@ subroutine amg_c_lc_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
       call psb_c_coo_glob_transpose(icoo_restr,desc_a,info,desc_c=desc_ac,desc_rx=desc_ax)
       call icoo_restr%set_nrows(desc_ac%get_local_rows())
       call icoo_restr%set_ncols(desc_ax%get_local_cols())
-! !$      write(0,*) me,' ',trim(name),' check on glob_transpose 1: ',&
-! !$           & desc_a%get_local_cols(),desc_ax%get_local_cols(),icoo_restr%get_nzeros()
-! !$      if (desc_a%get_local_cols()<desc_ax%get_local_cols()) then
-! !$        write(0,*) me,' ',trim(name),' WARNING: GLOB_TRANSPOSE NEW INDICES '
-! !$      end if
       call coo_restr%cp_from_icoo(icoo_restr,info)
     end block
     call csr_restr%cp_from_lcoo(coo_restr,info)
 
-!!$      write(0,*)me,' ',name,' after transposition ',coo_restr%get_nrows(),coo_restr%get_ncols(),coo_restr%get_nzeros()
 
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='spcnv coo_restr')
@@ -386,8 +367,6 @@ subroutine amg_c_lc_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
     if (debug) write(0,*)me,' ',name,' No inp_restr, transposing prol ',&
          & csr_prol%get_nrows(),csr_prol%get_ncols(),csr_prol%get_nzeros()
     call csr_prol%mv_to_lcoo(coo_restr,info)
-!!$      write(0,*)me,' ',name,' new into transposition ',coo_restr%get_nrows(),&
-!!$           & coo_restr%get_ncols(),coo_restr%get_nzeros()
     if (debug) call check_coo(me,trim(name)//' Check 1 (before transp) on coo_restr:',coo_restr)
 
     call coo_restr%transp()
@@ -412,8 +391,6 @@ subroutine amg_c_lc_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
     call coo_restr%set_ncols(desc_a%get_local_cols())
     if (debug) call check_coo(me,trim(name)//' Check 2 on coo_restr:',coo_restr)
     call csr_restr%cp_from_lcoo(coo_restr,info)
-
-!!$      write(0,*)me,' ',name,' after transposition ',coo_restr%get_nrows(),coo_restr%get_ncols(),coo_restr%get_nzeros()
 
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='spcnv coo_restr')
@@ -442,7 +419,6 @@ subroutine amg_c_lc_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
 
   if (debug) write(0,*)  me,' ',trim(name),' After  mv_from',psb_get_errstatus()
   if (debug) write(0,*)  me,' ',trim(name),' ',ac%get_fmt(),ac%get_nrows(),ac%get_ncols(),ac%get_nzeros(),naggr,ntaggr
-  ! write(0,*)  me,' ',trim(name),' Final AC newstyle ',ac%get_fmt(),ac%get_nrows(),ac%get_ncols(),ac%get_nzeros()
 
   call coo_prol%set_ncols(desc_ac%get_local_cols())
   if (debug) call check_coo(me,trim(name)//' Check 3 on coo_restr:',coo_restr)
@@ -575,8 +551,6 @@ subroutine amg_lc_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
     end block
     call csr_restr%cp_from_coo(coo_restr,info)
 
-!!$      write(0,*)me,' ',name,' after transposition ',coo_restr%get_nrows(),coo_restr%get_ncols(),coo_restr%get_nzeros()
-
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='spcnv coo_restr')
       goto 9999
@@ -602,8 +576,6 @@ subroutine amg_lc_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
     if (debug) write(0,*)me,' ',name,' No inp_restr, transposing prol ',&
          & csr_prol%get_nrows(),csr_prol%get_ncols(),csr_prol%get_nzeros()
     call csr_prol%mv_to_coo(coo_restr,info)
-!!$      write(0,*)me,' ',name,' new into transposition ',coo_restr%get_nrows(),&
-!!$           & coo_restr%get_ncols(),coo_restr%get_nzeros()
     if (debug) call check_coo(me,trim(name)//' Check 1 (before transp) on coo_restr:',coo_restr)
 
     call coo_restr%transp()
@@ -628,8 +600,6 @@ subroutine amg_lc_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
     call coo_restr%set_ncols(desc_a%get_local_cols())
     if (debug) call check_coo(me,trim(name)//' Check 2 on coo_restr:',coo_restr)
     call csr_restr%cp_from_coo(coo_restr,info)
-
-!!$      write(0,*)me,' ',name,' after transposition ',coo_restr%get_nrows(),coo_restr%get_ncols(),coo_restr%get_nzeros()
 
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='spcnv coo_restr')
@@ -658,12 +628,8 @@ subroutine amg_lc_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
 
   if (debug) write(0,*)  me,' ',trim(name),' After  mv_from',psb_get_errstatus()
   if (debug) write(0,*)  me,' ',trim(name),' ',ac%get_fmt(),ac%get_nrows(),ac%get_ncols(),ac%get_nzeros(),naggr,ntaggr
-  ! write(0,*)  me,' ',trim(name),' Final AC newstyle ',ac%get_fmt(),ac%get_nrows(),ac%get_ncols(),ac%get_nzeros()
 
   call coo_prol%set_ncols(desc_ac%get_local_cols())
-  !call coo_restr%mv_from_ifmt(csr_restr,info)
-!!$    call coo_restr%set_nrows(desc_ac%get_local_rows())
-!!$    call coo_restr%set_ncols(desc_a%get_local_cols())
   if (debug) call check_coo(me,trim(name)//' Check 3 on coo_restr:',coo_restr)
 
 

@@ -118,7 +118,7 @@
 
 module amg_s_parmatch_aggregator_mod
   use amg_s_base_aggregator_mod
-  use amg_s_matchboxp_mod
+  use smatchboxp_mod
 
   type, extends(amg_s_base_aggregator_type) :: amg_s_parmatch_aggregator_type
     integer(psb_ipk_) :: matching_alg
@@ -154,18 +154,6 @@ module amg_s_parmatch_aggregator_mod
     procedure, nopass   :: fmt          => s_parmatch_aggregator_fmt
     procedure, nopass   :: xt_desc      => amg_s_parmatch_aggregator_xt_desc
   end type amg_s_parmatch_aggregator_type
-
-!!$  interface
-!!$    subroutine glob_transpose(ain,desc_r,desc_c,atrans,desc_rx,info)
-!!$      import :: psb_desc_type, psb_ld_coo_sparse_mat, psb_ipk_
-!!$      implicit none
-!!$      type(psb_ld_coo_sparse_mat), intent(in)  :: ain
-!!$      type(psb_ld_coo_sparse_mat), intent(out) :: atrans
-!!$      type(psb_desc_type), intent(inout)      :: desc_r, desc_c
-!!$      type(psb_desc_type), intent(out)        :: desc_rx
-!!$      integer(psb_ipk_), intent(out)          :: info
-!!$    end subroutine glob_transpose
-!!$  end interface
 
   interface
     subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
@@ -324,20 +312,6 @@ module amg_s_parmatch_aggregator_mod
       integer(psb_ipk_), intent(out)            :: info
     end subroutine amg_s_parmatch_spmm_bld_inner
   end interface
-
-!!$  interface
-!!$    Subroutine amg_d_p_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
-!!$      import
-!!$      Implicit None
-!!$      type(psb_ld_csr_sparse_mat),intent(in)     :: acsr
-!!$      type(psb_ld_csr_sparse_mat),intent(inout)  :: bcsr
-!!$      type(psb_ld_csr_sparse_mat),intent(out)    :: ccsr
-!!$      type(psb_desc_type),intent(in)            :: desc_a
-!!$      type(psb_desc_type),intent(inout)         :: desc_c
-!!$      integer(psb_ipk_), intent(out)            :: info
-!!$      integer(psb_ipk_), intent(in), optional   :: data
-!!$    end Subroutine amg_d_p_csr_spspmm
-!!$  end interface
 
   private :: is_legal_malg, is_legal_csize, is_legal_nsweeps, is_legal_nlevels
 

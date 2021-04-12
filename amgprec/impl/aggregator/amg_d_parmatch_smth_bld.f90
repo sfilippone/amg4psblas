@@ -197,10 +197,6 @@ subroutine amg_d_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
       integer(psb_lpk_), allocatable :: ivr(:), ivc(:)
       integer(psb_lpk_) :: i
       character(len=132) :: aname
-      type(psb_ldspmat_type) :: aglob
-      type(psb_dspmat_type) :: atmp
-!!$      call a%cp_to(acsr)
-!!$      call atmp%cp_from(acsr)
       write(0,*) me,' ',trim(name),' Dumping inp_prol/restr'
       write(aname,'(a,i0,a,i0,a)') 'tprol-',desc_a%get_global_rows(),'-p',me,'.mtx'
       call t_prol%print(fname=aname,head='Test ')
@@ -351,7 +347,6 @@ subroutine amg_d_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
 
   if (debug) write(0,*)  me,' ',trim(name),' After  mv_from',psb_get_errstatus()
   if (debug) write(0,*)  me,' ',trim(name),' ',ac%get_fmt(),ac%get_nrows(),ac%get_ncols(),ac%get_nzeros(),naggr,ntaggr
-  ! write(0,*)  me,' ',trim(name),' Final AC newstyle ',ac%get_fmt(),ac%get_nrows(),ac%get_ncols(),ac%get_nzeros()
 
   if (dump_r) then
     block
@@ -369,13 +364,6 @@ subroutine amg_d_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
       write(aname,'(a,i0,a,i0,a)') 'restr-',desc_ac%get_global_rows(),'-p',me,'.mtx'
 
       call op_restr%print(fname=aname,head='Test ',ivc=ivc)
-!!$      write(aname,'(a,i0,a,i0,a)') 'prol-',desc_ac%get_global_rows(),'-p',me,'.mtx'
-!!$      call op_prol%print(fname=aname,head='Test ')
-!!$      call psb_gather(aglob,atmp,desc_a,info)
-!!$      if (me==psb_root_) then
-!!$        write(aname,'(a,i0,a)') 'a-inp-g-',aglob%get_nrows(),'.mtx'
-!!$        call aglob%print(fname=aname,head='Test ')
-!!$      end if
 
     end block
   end if

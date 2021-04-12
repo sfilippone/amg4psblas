@@ -324,7 +324,7 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     !
     if (debug) write(0,*) me,' Into matchbox_build_prol ',info
     if (do_timings) call psb_tic(idx_mboxp)
-    call amg_d_matchboxp_build_prol(tmpw,acv(i-1),desc_acv(i-1),ixaggr,nxaggr,tmp_prol,info,&
+    call dmatchboxp_build_prol(tmpw,acv(i-1),desc_acv(i-1),ixaggr,nxaggr,tmp_prol,info,&
          & symmetrize=ag%need_symmetrize,reproducible=ag%reproducible_matching)
     if (do_timings) call psb_toc(idx_mboxp)
     if (debug) write(0,*) me,' Out from matchbox_build_prol ',info
@@ -348,7 +348,6 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     if (psb_errstatus_fatal())  write(0,*)me,trim(name),'Error fatal on exit from bld_ov(i)',info
     if (debug) then
       call psb_barrier(ictxt)
-!!$      write(0,*) name,' Call spmm_bld sweep:',i,n_sweeps
       if (me==0) write(0,*) me,trim(name),' Done spmm_bld:',i
     end if
 
@@ -356,17 +355,11 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     ! Keep a copy of prolv(i) in global numbering for the time being, will
     ! need it to build the final
     ! if (i == n_sweeps) call prolv(i)%clone(tmp_prol,info)
-!!$      write(0,*) name,' Call mat_asb sweep:',i,n_sweeps
     call ag%inner_mat_asb(parms,acv(i-1),desc_acv(i-1),&
          & acv(i),desc_acv(i),prolv(i),restrv(1),info)
 
-!!$      write(0,*) me,' From in_mat_asb:',&
-!!$           & prolv(i)%get_nrows(),prolv(i)%get_ncols(),&
-!!$           & restrv(1)%get_nrows(),restrv(1)%get_ncols(),&
-!!$           & desc_acv(i)%get_local_rows(), desc_acv(i)%get_local_cols()
     if (debug) then
       call psb_barrier(ictxt)
-!!$      write(0,*) name,' Call spmm_bld sweep:',i,n_sweeps
       if (me==0) write(0,*) me,trim(name),' Done mat_asb:',i,sum(nxaggr),max_csize,info
       csz = sum(nxaggr)
       call psb_bcast(ictxt,csz)
@@ -413,13 +406,11 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     end if
     call acv(i-1)%free()
     if ((sum(nlaggr) <= max_csize).or.(any(nlaggr==0))) then
-      !if (me==0) write(0,*) 'Early exit ',any(nlaggr==0),sum(nlaggr),max_csize,i
       x_sweeps = i
       exit sweeps_loop
     end if
     if (debug) then
       call psb_barrier(ictxt)
-!!$      write(0,*) name,' Call spmm_bld sweep:',i,n_sweeps
       if (me==0) write(0,*) me,trim(name),' Done sweeps_loop iteration:',i,' of ',n_sweeps
     end if
 
@@ -427,11 +418,8 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
 
   if (debug) then
     call psb_barrier(ictxt)
-!!$      write(0,*) name,' Call spmm_bld sweep:',i,n_sweeps
     if (me==0) write(0,*) me,trim(name),' Done sweeps_loop:',x_sweeps
   end if
-!!$    write(0,*) me,name,' : End of aggregation sweeps ',&
-!!$         & n_sweeps,' Final size:',max_csize,desc_acv(n_sweeps)%get_local_rows(),t_prol%get_ncols(),tmp_prol%get_ncols()
   if (x_sweeps<=0) x_sweeps = n_sweeps
 
   if (do_timings) call psb_tic(idx_sweeps_mult)
@@ -450,11 +438,9 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     call desc_acv(x_sweeps)%clone(ag%desc_ac,info)
     call desc_acv(x_sweeps)%free(info)
     call acv(x_sweeps)%move_alloc(ag%ac,info)
-!!$        call acv(x_sweeps)%clone(ag%ac,info)
     if (.not.allocated(ag%prol)) allocate(ag%prol)
     if (.not.allocated(ag%restr)) allocate(ag%restr)
 
-    !call desc_acv(x_sweeps)%clone(ag%desc_ac,info)
     call psb_cd_reinit(ag%desc_ac,info)
     ncsave =  ag%desc_ac%get_global_rows()
     !
@@ -462,7 +448,6 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     ! because of the call to mat_asb in the loop above.
     !
     call prolv(x_sweeps)%mv_to(csr_prol)
-    !call csr_prol%set_ncols(ag%desc_ac%get_local_cols())
     if (debug) then
       call psb_barrier(ictxt)
       if (me == 0) write(0,*) 'Enter prolongator product loop ',x_sweeps
@@ -471,8 +456,6 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     do i=x_sweeps-1, 1, -1
       call prolv(i)%mv_to(csr_pvi)
       if (psb_errstatus_fatal()) write(0,*) me,' Fatal error in prolongator loop 1'
-!!$        write(0,*) me,' SPMM1 ',csr_pvi%get_nrows(),csr_pvi%get_ncols(),&
-!!$             & csr_prol%get_nrows(),csr_prol%get_ncols()
       call psb_par_spspmm(csr_pvi,desc_acv(i),csr_prol,csr_prod_res,ag%desc_ac,info)
       if ((info /=0).or.psb_errstatus_fatal()) write(0,*) me,' Fatal error in prolongator loop 2',info
       call csr_pvi%free()
@@ -547,8 +530,6 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_bootCMatch_if')
     goto 9999
   end if
-!!$  write(0,*)me,' ',name,' Getting out with info ',info,&
-!!$       & allocated(ilaggr),psb_size(ilaggr),allocated(nlaggr),psb_size(nlaggr)
   call psb_erractionrestore(err_act)
   return
 
