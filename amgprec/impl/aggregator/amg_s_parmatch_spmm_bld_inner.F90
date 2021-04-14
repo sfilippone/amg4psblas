@@ -1,11 +1,14 @@
 !
 !
-!                             AMG4PSBLAS  Extensions
+!                             AMG4PSBLAS version 1.0
+!    Algebraic Multigrid Package
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !
-!    (C) Copyright 2019
+!    (C) Copyright 2021
 !
-!                        Salvatore Filippone  Cranfield University
-!        Pasqua D'Ambra         IAC-CNR, Naples, IT
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
 !
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -32,9 +35,9 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-! File: amg_daggrmat_nosmth_bld.F90
+! File: amg_saggrmat_nosmth_bld.F90
 !
-! Subroutine: amg_daggrmat_nosmth_bld
+! Subroutine: amg_saggrmat_nosmth_bld
 ! Version:    real
 !
 !  This routine builds a coarse-level matrix A_C from a fine-level matrix A
@@ -47,7 +50,7 @@
 !
 !  The coarse-level matrix A_C is distributed among the parallel processes or
 !  replicated on each of them, according to the value of p%parms%coarse_mat
-!  specified by the user through amg_dprecinit and amg_zprecset.
+!  specified by the user through amg_sprecinit and amg_zprecset.
 !  On output from this routine the entries of AC, op_prol, op_restr
 !  are still in "global numbering" mode; this is fixed in the calling routine
 !
@@ -58,18 +61,18 @@
 !
 !
 ! Arguments:
-!    a          -  type(psb_dspmat_type), input.
+!    a          -  type(psb_sspmat_type), input.
 !                  The sparse matrix structure containing the local part of
 !                  the fine-level matrix.
 !    desc_a     -  type(psb_desc_type), input.
 !                  The communication descriptor of the fine-level matrix.
-!    p          -  type(amg_d_onelev_type), input/output.
+!    p          -  type(amg_s_onelev_type), input/output.
 !                  The 'one-level' data structure that will contain the local
 !                  part of the matrix to be built as well as the information
 !                  concerning the prolongator and its transpose.
-!    parms      -   type(amg_dml_parms), input
+!    parms      -   type(amg_sml_parms), input
 !                  Parameters controlling the choice of algorithm
-!    ac         -  type(psb_dspmat_type), output
+!    ac         -  type(psb_sspmat_type), output
 !                  The coarse matrix on output
 !
 !    ilaggr     -  integer, dimension(:), input
@@ -82,30 +85,34 @@
 !                  the various processes do not   overlap.
 !    nlaggr     -  integer, dimension(:) input
 !                  nlaggr(i) contains the aggregates held by process i.
-!    op_prol    -  type(psb_dspmat_type), input/output
+!    op_prol    -  type(psb_sspmat_type), input/output
 !                  The tentative prolongator on input, the computed prolongator on output
 !
-!    op_restr    -  type(psb_dspmat_type), output
+!    op_restr    -  type(psb_sspmat_type), output
 !                  The restrictor operator; normally, it is the transpose of the prolongator.
 !
 !    info       -  integer, output.
 !                  Error code.
 !
 !
-subroutine amg_d_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
+subroutine amg_s_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
      & ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
-  use amg_d_inner_mod
-  use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_spmm_bld_inner
+  use amg_s_inner_mod
+#if defined(SERIAL_MPI)
+    use amg_s_parmatch_aggregator_mod
+#else
+  use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_spmm_bld_inner
+#endif
   implicit none
 
   ! Arguments
-  type(psb_d_csr_sparse_mat), intent(inout) :: a_csr
+  type(psb_s_csr_sparse_mat), intent(inout) :: a_csr
   type(psb_desc_type), intent(in)           :: desc_a
   integer(psb_lpk_), intent(inout)          :: ilaggr(:), nlaggr(:)
-  type(amg_dml_parms), intent(inout)        :: parms
-  type(psb_ldspmat_type), intent(inout)     :: t_prol
-  type(psb_dspmat_type), intent(out)        :: ac, op_prol, op_restr
+  type(amg_sml_parms), intent(inout)        :: parms
+  type(psb_lsspmat_type), intent(inout)     :: t_prol
+  type(psb_sspmat_type), intent(out)        :: ac, op_prol, op_restr
   type(psb_desc_type), intent(out)          :: desc_ac
   integer(psb_ipk_), intent(out)            :: info
 
@@ -114,11 +121,11 @@ subroutine amg_d_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
   type(psb_ctxt_type) :: ictxt
   integer(psb_ipk_)   :: np, me, ndx
   character(len=40)   :: name
-  type(psb_ld_coo_sparse_mat) :: tmpcoo
-  type(psb_d_coo_sparse_mat)  :: coo_prol, coo_restr
-  type(psb_d_csr_sparse_mat)  :: ac_csr, csr_restr
+  type(psb_ls_coo_sparse_mat) :: tmpcoo
+  type(psb_s_coo_sparse_mat)  :: coo_prol, coo_restr
+  type(psb_s_csr_sparse_mat)  :: ac_csr, csr_restr
   type(psb_desc_type), target  :: tmp_desc
-  type(psb_ldspmat_type)     :: lac
+  type(psb_lsspmat_type)     :: lac
   integer(psb_ipk_) :: debug_level, debug_unit, naggr
   integer(psb_lpk_) :: nrow, nglob, ncol, ntaggr, nrl, nzl, ip, &
        &  nzt, naggrm1, naggrp1, i, k
@@ -156,6 +163,7 @@ subroutine amg_d_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
   naggrm1 = sum(nlaggr(1:me))
   naggrp1 = sum(nlaggr(1:me+1))
 
+#if !defined(SERIAL_MPI)
   !
   ! Here T_PROL should be arriving with GLOBAL indices on the cols
   ! and LOCAL indices on the rows.
@@ -199,7 +207,7 @@ subroutine amg_d_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Done smooth_aggregate '
-
+#endif
   call psb_erractionrestore(err_act)
   return
 
@@ -207,4 +215,4 @@ subroutine amg_d_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
 
   return
 
-end subroutine amg_d_parmatch_spmm_bld_inner
+end subroutine amg_s_parmatch_spmm_bld_inner

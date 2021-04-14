@@ -40,7 +40,9 @@
 // ************************************************************************
 #include <stdio.h>
 #include <stdlib.h>
+#if !defined(SERIAL_MPI)
 #include <mpi.h>
+#endif
 
 #include "MatchBoxPC.h"
 #ifdef __cplusplus
@@ -56,6 +58,7 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 		MilanLongInt* msgIndSent, MilanLongInt* msgActualSent, MilanReal* msgPercent,
 		MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
 		MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
+#if !defined(SERIAL_MPI)
   MPI_Comm C_comm=MPI_Comm_f2c(icomm);
 #ifdef DEBUG
   fprintf(stderr,"MatchBoxPC: rank %d nlver %ld nledge %ld [ %ld %ld ]\n",
@@ -68,6 +71,7 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 							   msgIndSent, msgActualSent, msgPercent,
 							   ph0_time, ph1_time, ph2_time,
 							   ph1_card, ph2_card );
+#endif
 }
 
 void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
@@ -78,6 +82,7 @@ void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 		MilanLongInt* msgIndSent, MilanLongInt* msgActualSent, MilanReal* msgPercent,
 		MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
 		MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
+#if !defined(SERIAL_MPI)
   MPI_Comm C_comm=MPI_Comm_f2c(icomm);
 #ifdef DEBUG
   fprintf(stderr,"MatchBoxPC: rank %d nlver %ld nledge %ld [ %ld %ld ]\n",
@@ -90,6 +95,7 @@ void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 							   msgIndSent, msgActualSent, msgPercent,
 							   ph0_time, ph1_time, ph2_time,
 							   ph1_card, ph2_card );
+#endif
 }
 
 #ifdef __cplusplus

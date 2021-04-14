@@ -1,14 +1,14 @@
 !
 !
-!                             AMG4PSBLAS  version 2.2
-!    MultiLevel Domain Decomposition Parallel Preconditioners Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
+!                             AMG4PSBLAS version 1.0
+!    Algebraic Multigrid Package
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !
-!    (C) Copyright 2008-2018
+!    (C) Copyright 2021
 !
 !        Salvatore Filippone
 !        Pasqua D'Ambra
-!        Daniela di Serafino
+!        Fabio Durastante
 !
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -35,9 +35,9 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-! File: amg_saggrmat_smth_bld.F90
+! File: amg_daggrmat_smth_bld.F90
 !
-! Subroutine: amg_saggrmat_smth_bld
+! Subroutine: amg_daggrmat_smth_bld
 ! Version:    real
 !
 !  This routine builds a coarse-level matrix A_C from a fine-level matrix A
@@ -58,29 +58,29 @@
 !  of A, and omega is a suitable smoothing parameter. An estimate of the spectral
 !  radius of D^(-1)A, to be used in the computation of omega, is provided,
 !  according to the value of p%parms%aggr_omega_alg, specified by the user
-!  through amg_sprecinit and amg_zprecset.
+!  through amg_dprecinit and amg_zprecset.
 !
 !  The coarse-level matrix A_C is distributed among the parallel processes or
 !  replicated on each of them, according to the value of p%parms%coarse_mat,
-!  specified by the user through amg_sprecinit and amg_zprecset.
+!  specified by the user through amg_dprecinit and amg_zprecset.
 !  On output from this routine the entries of AC, op_prol, op_restr
 !  are still in "global numbering" mode; this is fixed in the calling routine
 !  aggregator%mat_bld.
 !
 !
 ! Arguments:
-!    a          -  type(psb_sspmat_type), input.
+!    a          -  type(psb_dspmat_type), input.
 !                  The sparse matrix structure containing the local part of
 !                  the fine-level matrix.
 !    desc_a     -  type(psb_desc_type), input.
 !                  The communication descriptor of the fine-level matrix.
-!    p          -  type(amg_s_onelev_type), input/output.
+!    p          -  type(amg_d_onelev_type), input/output.
 !                  The 'one-level' data structure that will contain the local
 !                  part of the matrix to be built as well as the information
 !                  concerning the prolongator and its transpose.
-!    parms      -   type(amg_sml_parms), input
+!    parms      -   type(amg_dml_parms), input
 !                  Parameters controlling the choice of algorithm
-!    ac         -  type(psb_sspmat_type), output
+!    ac         -  type(psb_dspmat_type), output
 !                  The coarse matrix on output
 !
 !    ilaggr     -  integer, dimension(:), input
@@ -93,32 +93,36 @@
 !                  the various processes do not   overlap.
 !    nlaggr     -  integer, dimension(:) input
 !                  nlaggr(i) contains the aggregates held by process i.
-!    op_prol    -  type(psb_sspmat_type), input/output
+!    op_prol    -  type(psb_dspmat_type), input/output
 !                  The tentative prolongator on input, the computed prolongator on output
 !
-!    op_restr    -  type(psb_sspmat_type), output
+!    op_restr    -  type(psb_dspmat_type), output
 !                  The restrictor operator; normally, it is the transpose of the prolongator.
 !
 !    info       -  integer, output.
 !                  Error code.
 !
-subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
+subroutine amg_d_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
      & ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
   use amg_base_prec_type
-  use amg_s_inner_mod
-  use amg_s_base_aggregator_mod
-  use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_smth_bld
+  use amg_d_inner_mod
+  use amg_d_base_aggregator_mod
+#if defined(SERIAL_MPI)
+    use amg_d_parmatch_aggregator_mod
+#else
+  use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_smth_bld
+#endif
   implicit none
 
   ! Arguments
-  class(amg_s_parmatch_aggregator_type), target, intent(inout) :: ag
-  type(psb_sspmat_type), intent(in)      :: a
+  class(amg_d_parmatch_aggregator_type), target, intent(inout) :: ag
+  type(psb_dspmat_type), intent(in)      :: a
   type(psb_desc_type), intent(inout)     :: desc_a
   integer(psb_lpk_), intent(inout)         :: ilaggr(:), nlaggr(:)
-  type(amg_sml_parms), intent(inout)    :: parms
-  type(psb_lsspmat_type), intent(inout)  :: t_prol
-  type(psb_sspmat_type), intent(out)    :: op_prol,ac,op_restr
+  type(amg_dml_parms), intent(inout)    :: parms
+  type(psb_ldspmat_type), intent(inout)  :: t_prol
+  type(psb_dspmat_type), intent(out)    :: op_prol,ac,op_restr
   type(psb_desc_type), intent(inout)    :: desc_ac
   integer(psb_ipk_), intent(out)           :: info
 
@@ -129,15 +133,15 @@ subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
   type(psb_ctxt_type) :: ictxt
   integer(psb_ipk_)   :: np, me
   character(len=20)   :: name
-  type(psb_ls_coo_sparse_mat) :: tmpcoo, ac_coo, lcoo_restr
-  type(psb_s_coo_sparse_mat)  :: coo_prol, coo_restr
-  type(psb_s_csr_sparse_mat)  :: acsrf, csr_prol, acsr, tcsr
-  real(psb_spk_), allocatable :: adiag(:)
-  real(psb_spk_), allocatable :: arwsum(:)
+  type(psb_ld_coo_sparse_mat) :: tmpcoo, ac_coo, lcoo_restr
+  type(psb_d_coo_sparse_mat)  :: coo_prol, coo_restr
+  type(psb_d_csr_sparse_mat)  :: acsrf, csr_prol, acsr, tcsr
+  real(psb_dpk_), allocatable :: adiag(:)
+  real(psb_dpk_), allocatable :: arwsum(:)
   logical            :: filter_mat
   integer(psb_ipk_)            :: debug_level, debug_unit, err_act
   integer(psb_ipk_), parameter :: ncmax=16
-  real(psb_spk_)     :: anorm, omega, tmp, dg, theta
+  real(psb_dpk_)     :: anorm, omega, tmp, dg, theta
   logical, parameter :: debug_new=.false., dump_r=.false., dump_p=.false., debug=.false.
   character(len=80) :: filename
   logical, parameter :: do_timings=.false.
@@ -181,6 +185,8 @@ subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
        & idx_ptap = psb_get_timer_idx("PMC_SMTH_BLD: ptap_bld  ")
 
   if (do_timings) call psb_tic(idx_phase1)
+
+#if !defined(SERIAL_MPI)
 
   naggr  = nlaggr(me+1)
   ntaggr = sum(nlaggr)
@@ -353,8 +359,8 @@ subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
       integer(psb_lpk_), allocatable :: ivr(:), ivc(:)
       integer(psb_lpk_) :: i
       character(len=132) :: aname
-      type(psb_lsspmat_type) :: aglob
-      type(psb_sspmat_type) :: atmp
+      type(psb_ldspmat_type) :: aglob
+      type(psb_dspmat_type) :: atmp
       write(0,*) me,' ',trim(name),' Dumping prol/restr'
       ivc    = [(i,i=1,desc_a%get_local_cols())]
       call desc_a%l2gip(ivc,info)
@@ -372,6 +378,7 @@ subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Done smooth_aggregate '
+#endif
   call psb_erractionrestore(err_act)
   return
 
@@ -384,8 +391,8 @@ contains
 
   subroutine omega_smooth(omega,acsr)
     implicit none
-    real(psb_spk_),intent(in) :: omega
-    type(psb_s_csr_sparse_mat), intent(inout) :: acsr
+    real(psb_dpk_),intent(in) :: omega
+    type(psb_d_csr_sparse_mat), intent(inout) :: acsr
     !
     integer(psb_ipk_) :: i,j
     do i=1,acsr%get_nrows()
@@ -399,4 +406,4 @@ contains
     end do
   end subroutine omega_smooth
 
-end subroutine amg_s_parmatch_smth_bld
+end subroutine amg_d_parmatch_smth_bld

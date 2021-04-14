@@ -70,6 +70,8 @@
  Statistics: ph1_card, ph2_card : Size: |P| number of processes in the comm-world (number of matched edges in Phase 1 and Phase 2)
  */
 
+#ifdef SERIAL_MPI
+#else
 //MPI type map
 template<typename T> MPI_Datatype TypeMap();
 template<> inline MPI_Datatype TypeMap<int64_t>() { return MPI_LONG_LONG; }
@@ -90,6 +92,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
 							      MilanReal* msgPercent,
                                                               MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
                                                               MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
+  if !defined(SERIAL_MPI)
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")Within algoEdgeApproxDominatingEdgesLinearSearchMessageBundling()"; fflush(stdout);
 #endif
@@ -1300,7 +1303,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
     if (myRank == 0) cout<<"\n("<<myRank<<") Done" <<endl; fflush(stdout);
 #endif
     //MPI_Barrier(comm);
-} //End of algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMate
+}
+//End of algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMate
 
 // SINGLE PRECISION VERSION
 
@@ -1315,6 +1319,7 @@ void salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
 							      MilanReal* msgPercent,
                                                               MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
                                                               MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
+#if !defined(SERIAL_MPI)
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")Within algoEdgeApproxDominatingEdgesLinearSearchMessageBundling()"; fflush(stdout);
 #endif
@@ -2525,6 +2530,7 @@ void salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
     if (myRank == 0) cout<<"\n("<<myRank<<") Done" <<endl; fflush(stdout);
 #endif
     //MPI_Barrier(comm);
+#endif
 } //End of algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMate
 
 
@@ -2572,3 +2578,4 @@ inline MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistan
   } //End of else
   return (-1); //It should not reach here!
 } //End of findOwnerOfGhost()
+#endif

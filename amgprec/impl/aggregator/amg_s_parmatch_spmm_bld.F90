@@ -1,11 +1,14 @@
 !
 !
-!                             AMG4PSBLAS  Extensions
+!                             AMG4PSBLAS version 1.0
+!    Algebraic Multigrid Package
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
 !
-!    (C) Copyright 2019
+!    (C) Copyright 2021
 !
-!                        Salvatore Filippone  Cranfield University
-!        Pasqua D'Ambra         IAC-CNR, Naples, IT
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
 !
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -32,9 +35,9 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-! File: amg_saggrmat_nosmth_bld_ov.F90
+! File: amg_saggrmat_nosmth_bld.F90
 !
-! Subroutine: amg_saggrmat_nosmth_bld_ov
+! Subroutine: amg_saggrmat_nosmth_bld
 ! Version:    real
 !
 !  This routine builds a coarse-level matrix A_C from a fine-level matrix A
@@ -43,7 +46,7 @@
 !                               A_C = P_C^T A P_C,
 !
 !  where P_C is the piecewise constant interpolation operator corresponding
-!  the fine-to-coarse level mapping built by amg_aggrmap_bld_ov.
+!  the fine-to-coarse level mapping built by amg_aggrmap_bld.
 !
 !  The coarse-level matrix A_C is distributed among the parallel processes or
 !  replicated on each of them, according to the value of p%parms%coarse_mat
@@ -92,20 +95,24 @@
 !                  Error code.
 !
 !
-subroutine amg_s_parmatch_spmm_bld_ov(a,desc_a,ilaggr,nlaggr,parms,&
+subroutine amg_s_parmatch_spmm_bld(a,desc_a,ilaggr,nlaggr,parms,&
      & ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
   use amg_s_inner_mod
-  use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_spmm_bld_ov
+#if defined(SERIAL_MPI)
+    use amg_s_parmatch_aggregator_mod
+#else
+  use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_spmm_bld
+#endif
   implicit none
 
   ! Arguments
-  type(psb_sspmat_type), intent(inout)    :: a
+  type(psb_sspmat_type), intent(in)       :: a
   type(psb_desc_type), intent(in)         :: desc_a
   integer(psb_lpk_), intent(inout)        :: ilaggr(:), nlaggr(:)
   type(amg_sml_parms), intent(inout)      :: parms
   type(psb_lsspmat_type), intent(inout)   :: t_prol
-  type(psb_sspmat_type), intent(inout)      :: ac, op_prol, op_restr
+  type(psb_sspmat_type), intent(inout)    :: ac, op_prol, op_restr
   type(psb_desc_type), intent(out)        :: desc_ac
   integer(psb_ipk_), intent(out)          :: info
 
@@ -113,17 +120,16 @@ subroutine amg_s_parmatch_spmm_bld_ov(a,desc_a,ilaggr,nlaggr,parms,&
   integer(psb_ipk_)  :: err_act
 
   type(psb_ctxt_type) :: ictxt
-  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: np,me
   character(len=20)   :: name
   type(psb_s_csr_sparse_mat) :: acsr
-  type(psb_ls_coo_sparse_mat) :: coo_prol, coo_restr
   integer(psb_lpk_) :: nrow, nglob, ncol, ntaggr, nzl, ip, &
        & naggr, nzt, naggrm1, naggrp1, i, k
   integer(psb_ipk_) :: inaggr, nzlp
   integer(psb_ipk_) :: debug_level, debug_unit
-  logical, parameter :: debug=.false., new_version=.true.
+  logical, parameter :: debug=.false.
 
-  name='amg_parmatch_spmm_bld_ov'
+  name='amg_parmatch_spmm_bld'
   if(psb_get_errstatus().ne.0) return
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -134,12 +140,11 @@ subroutine amg_s_parmatch_spmm_bld_ov(a,desc_a,ilaggr,nlaggr,parms,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  call a%mv_to(acsr)
+#if !defined(SERIAL_MPI)
+  call a%cp_to(acsr)
 
   call  amg_s_parmatch_spmm_bld_inner(acsr,desc_a,ilaggr,nlaggr,parms,&
        & ac,desc_ac,op_prol,op_restr,t_prol,info)
-  if (psb_errstatus_fatal())  write(0,*)me,trim(name),'Error fatal on exit from bld_inner',info
-
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err="SPMM_BLD_INNER")
@@ -149,7 +154,7 @@ subroutine amg_s_parmatch_spmm_bld_ov(a,desc_a,ilaggr,nlaggr,parms,&
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Done spmm_bld '
-
+#endif
   call psb_erractionrestore(err_act)
   return
 
@@ -157,4 +162,4 @@ subroutine amg_s_parmatch_spmm_bld_ov(a,desc_a,ilaggr,nlaggr,parms,&
 
   return
 
-end subroutine amg_s_parmatch_spmm_bld_ov
+end subroutine amg_s_parmatch_spmm_bld

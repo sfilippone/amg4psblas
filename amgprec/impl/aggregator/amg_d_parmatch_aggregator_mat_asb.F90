@@ -1,4 +1,4 @@
-!   !
+!
 !
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
@@ -34,81 +34,9 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-!  moved here from
+! File: amg_d_parmatch_aggregator_mat_asb.f90
 !
-!                             AMG4PSBLAS  Extensions
-!
-!    (C) Copyright 2019
-!
-!                        Salvatore Filippone  Cranfield University
-!        Pasqua D'Ambra         IAC-CNR, Naples, IT
-!
-!    Redistribution and use in source and binary forms, with or without
-!    modification, are permitted provided that the following conditions
-!    are met:
-!      1. Redistributions of source code must retain the above copyright
-!         notice, this list of conditions and the following disclaimer.
-!      2. Redistributions in binary form must reproduce the above copyright
-!         notice, this list of conditions, and the following disclaimer in the
-!         documentation and/or other materials provided with the distribution.
-!      3. The name of the AMG4PSBLAS group or the names of its contributors may
-!         not be used to endorse or promote products derived from this
-!         software without specific written permission.
-!
-!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
-!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!    POSSIBILITY OF SUCH DAMAGE.
-!
-!
-! File: amg_s_base_aggregator_mat_bld.f90
-!
-!
-!                             AMG4PSBLAS  version 2.2
-!    MultiLevel Domain Decomposition Parallel Preconditioners Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
-!
-!    (C) Copyright 2008-2018
-!
-!        Salvatore Filippone
-!        Pasqua D'Ambra
-!        Daniela di Serafino
-!
-!    Redistribution and use in source and binary forms, with or without
-!    modification, are permitted provided that the following conditions
-!    are met:
-!      1. Redistributions of source code must retain the above copyright
-!         notice, this list of conditions and the following disclaimer.
-!      2. Redistributions in binary form must reproduce the above copyright
-!         notice, this list of conditions, and the following disclaimer in the
-!         documentation and/or other materials provided with the distribution.
-!      3. The name of the AMG4PSBLAS group or the names of its contributors may
-!         not be used to endorse or promote products derived from this
-!         software without specific written permission.
-!
-!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
-!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!    POSSIBILITY OF SUCH DAMAGE.
-!
-!
-! File: amg_s_parmatch_aggregator_mat_asb.f90
-!
-! Subroutine: amg_s_parmatch_aggregator_mat_asb
+! Subroutine: amg_d_parmatch_aggregator_mat_asb
 ! Version:    real
 !
 !
@@ -127,11 +55,11 @@
 !     perform the various needed steps.
 !
 ! Arguments:
-!    ag       -  type(amg_s_parmatch_aggregator_type), input/output.
+!    ag       -  type(amg_d_parmatch_aggregator_type), input/output.
 !               The aggregator object
-!    parms   -  type(amg_sml_parms), input
+!    parms   -  type(amg_dml_parms), input
 !               The aggregation parameters
-!    a          -  type(psb_sspmat_type), input.
+!    a          -  type(psb_dspmat_type), input.
 !                  The sparse matrix structure containing the local part of
 !                  the fine-level matrix.
 !    desc_a     -  type(psb_desc_type), input.
@@ -149,7 +77,7 @@
 !                  the various processes do not   overlap.
 !    nlaggr     -  integer, dimension(:) input
 !                  nlaggr(i) contains the aggregates held by process i.
-!    ac         -  type(psb_sspmat_type), inout
+!    ac         -  type(psb_dspmat_type), inout
 !                  The coarse matrix
 !    desc_ac    -  type(psb_desc_type), output.
 !                  The communication descriptor of the fine-level matrix.
@@ -157,33 +85,37 @@
 !                  part of the matrix to be built as well as the information
 !                  concerning the prolongator and its transpose.
 !
-!    op_prol    -  type(psb_sspmat_type), input/output
+!    op_prol    -  type(psb_dspmat_type), input/output
 !                  The tentative prolongator on input, the computed prolongator on output
 !
-!    op_restr    -  type(psb_sspmat_type), input/output
+!    op_restr    -  type(psb_dspmat_type), input/output
 !                  The restrictor operator; normally, it is the transpose of the prolongator.
 !
 !    info       -  integer, output.
 !                  Error code.
 !
-subroutine  amg_s_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
+subroutine  amg_d_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
      & ac,desc_ac, op_prol,op_restr,info)
   use psb_base_mod
   use amg_base_prec_type
-  use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_aggregator_mat_asb
+#if defined(SERIAL_MPI)
+    use amg_d_parmatch_aggregator_mod
+#else
+  use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_aggregator_mat_asb
+#endif
   implicit none
-  class(amg_s_parmatch_aggregator_type), target, intent(inout) :: ag
-  type(amg_sml_parms), intent(inout)    :: parms
-  type(psb_sspmat_type), intent(in)     :: a
+  class(amg_d_parmatch_aggregator_type), target, intent(inout) :: ag
+  type(amg_dml_parms), intent(inout)    :: parms
+  type(psb_dspmat_type), intent(in)     :: a
   type(psb_desc_type), intent(inout)    :: desc_a
-  type(psb_sspmat_type), intent(inout) :: op_prol,ac,op_restr
+  type(psb_dspmat_type), intent(inout) :: op_prol,ac,op_restr
   type(psb_desc_type), intent(inout)    :: desc_ac
   integer(psb_ipk_), intent(out)        :: info
   !
   type(psb_ctxt_type)         :: ictxt
   integer(psb_ipk_)           :: np, me
-  type(psb_ls_coo_sparse_mat) :: tmpcoo
-  type(psb_lsspmat_type)      :: tmp_ac
+  type(psb_ld_coo_sparse_mat) :: tmpcoo
+  type(psb_ldspmat_type)      :: tmp_ac
   integer(psb_ipk_)           :: i_nr, i_nc, i_nl, nzl
   integer(psb_lpk_)           :: ntaggr
   integer(psb_ipk_) :: err_act, debug_level, debug_unit
@@ -204,6 +136,7 @@ subroutine  amg_s_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
   end if
 
 
+#if !defined(SERIAL_MPI)
   if (debug) write(0,*) me,' ',trim(name),' Start:',&
        & allocated(ag%ac),allocated(ag%desc_ac), allocated(ag%prol),allocated(ag%restr)
 
@@ -266,7 +199,7 @@ subroutine  amg_s_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
     call psb_errpush(info,name,a_err='invalid amg_coarse_mat_')
     goto 9999
   end select
-
+#endif
   call psb_erractionrestore(err_act)
   return
 
@@ -274,4 +207,4 @@ subroutine  amg_s_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
   return
 
 
-end subroutine amg_s_parmatch_aggregator_mat_asb
+end subroutine amg_d_parmatch_aggregator_mat_asb
