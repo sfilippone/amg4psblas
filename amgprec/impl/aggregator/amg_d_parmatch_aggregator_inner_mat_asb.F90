@@ -1,4 +1,4 @@
-!   !
+!
 !
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
@@ -33,78 +33,6 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!
-!  moved here from
-!
-!                             AMG4PSBLAS  Extensions
-!
-!    (C) Copyright 2019
-!
-!                        Salvatore Filippone  Cranfield University
-!        Pasqua D'Ambra         IAC-CNR, Naples, IT
-!
-!    Redistribution and use in source and binary forms, with or without
-!    modification, are permitted provided that the following conditions
-!    are met:
-!      1. Redistributions of source code must retain the above copyright
-!         notice, this list of conditions and the following disclaimer.
-!      2. Redistributions in binary form must reproduce the above copyright
-!         notice, this list of conditions, and the following disclaimer in the
-!         documentation and/or other materials provided with the distribution.
-!      3. The name of the AMG4PSBLAS group or the names of its contributors may
-!         not be used to endorse or promote products derived from this
-!         software without specific written permission.
-!
-!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
-!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!    POSSIBILITY OF SUCH DAMAGE.
-!
-!
-! File: amg_d_base_aggregator_mat_bld.f90
-!
-!
-!                             AMG4PSBLAS  version 2.2
-!    MultiLevel Domain Decomposition Parallel Preconditioners Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
-!
-!    (C) Copyright 2008-2018
-!
-!        Salvatore Filippone
-!        Pasqua D'Ambra
-!        Daniela di Serafino
-!
-!    Redistribution and use in source and binary forms, with or without
-!    modification, are permitted provided that the following conditions
-!    are met:
-!      1. Redistributions of source code must retain the above copyright
-!         notice, this list of conditions and the following disclaimer.
-!      2. Redistributions in binary form must reproduce the above copyright
-!         notice, this list of conditions, and the following disclaimer in the
-!         documentation and/or other materials provided with the distribution.
-!      3. The name of the AMG4PSBLAS group or the names of its contributors may
-!         not be used to endorse or promote products derived from this
-!         software without specific written permission.
-!
-!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
-!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!    POSSIBILITY OF SUCH DAMAGE.
-!
 !
 ! File: amg_d_parmatch_aggregator_mat_asb.f90
 !
@@ -166,43 +94,46 @@
 !    info       -  integer, output.
 !                  Error code.
 !
-subroutine  amg_d_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
+subroutine  amg_d_parmatch_aggregator_inner_mat_asb(ag,parms,a,desc_a,&
      & ac,desc_ac, op_prol,op_restr,info)
   use psb_base_mod
   use amg_base_prec_type
-  use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_aggregator_mat_asb
+#if defined(SERIAL_MPI)
+    use amg_d_parmatch_aggregator_mod
+#else
+  use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_aggregator_inner_mat_asb
+#endif
   implicit none
   class(amg_d_parmatch_aggregator_type), target, intent(inout) :: ag
   type(amg_dml_parms), intent(inout)    :: parms
   type(psb_dspmat_type), intent(in)     :: a
-  type(psb_desc_type), intent(inout)    :: desc_a
-  type(psb_dspmat_type), intent(inout) :: op_prol,ac,op_restr
+  type(psb_desc_type), intent(in)       :: desc_a
+  type(psb_dspmat_type), intent(inout) :: op_prol,op_restr
+  type(psb_dspmat_type), intent(inout)  :: ac
   type(psb_desc_type), intent(inout)    :: desc_ac
   integer(psb_ipk_), intent(out)        :: info
   !
   type(psb_ctxt_type)         :: ictxt
   integer(psb_ipk_)           :: np, me
-  type(psb_ld_coo_sparse_mat) :: tmpcoo
-  type(psb_ldspmat_type)      :: tmp_ac
-  integer(psb_ipk_)           :: i_nr, i_nc, i_nl, nzl
+  type(psb_ld_coo_sparse_mat) :: acoo, bcoo
+  type(psb_ld_csr_sparse_mat) :: acsr1
+  integer(psb_ipk_)           :: nzl, inl
   integer(psb_lpk_)           :: ntaggr
   integer(psb_ipk_) :: err_act, debug_level, debug_unit
-  character(len=20) :: name='d_parmatch_mat_asb'
+  character(len=20) :: name='d_parmatch_inner_mat_asb'
   character(len=80) :: aname
-  logical, parameter :: debug=.false., dump_prol_restr=.false., dump_ac=.false.
+  logical, parameter :: debug=.false., dump_prol_restr=.false.
 
 
+  if (psb_get_errstatus().ne.0) return
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   info  = psb_success_
   ictxt = desc_a%get_context()
   call psb_info(ictxt,me,np)
-  if (psb_get_errstatus().ne.0) then
-    write(0,*) me,' From:',trim(name),':',psb_get_errstatus()
-    return
-  end if
 
+#if !defined(SERIAL_MPI)
 
   if (debug) write(0,*) me,' ',trim(name),' Start:',&
        & allocated(ag%ac),allocated(ag%desc_ac), allocated(ag%prol),allocated(ag%restr)
@@ -210,63 +141,21 @@ subroutine  amg_d_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
   select case(parms%coarse_mat)
 
   case(amg_distr_mat_)
-
-    call ac%cscnv(info,type='csr')
-    call op_prol%cscnv(info,type='csr')
-    call op_restr%cscnv(info,type='csr')
-
-    if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),&
-         & 'Done ac '
+    ! Do nothing, it has already been done in spmm_bld_ov.
 
   case(amg_repl_mat_)
     !
-    ! We are assuming here that an d matrix
-    ! can hold all entries
     !
-    if (desc_ac%get_global_rows() < huge(1_psb_ipk_) ) then
-      ntaggr = desc_ac%get_global_rows()
-      i_nr   = ntaggr
-    else
-      info = psb_err_internal_error_
-      call psb_errpush(info,name,a_err='invalid amg_coarse_mat_')
-      goto 9999
-    end if
-
-    call op_prol%mv_to(tmpcoo)
-    nzl = tmpcoo%get_nzeros()
-    call psb_loc_to_glob(tmpcoo%ja(1:nzl),desc_ac,info,'I')
-    call op_prol%mv_from(tmpcoo)
-
-    call op_restr%mv_to(tmpcoo)
-    nzl = tmpcoo%get_nzeros()
-    call psb_loc_to_glob(tmpcoo%ia(1:nzl),desc_ac,info,'I')
-    call op_restr%mv_from(tmpcoo)
-
-    call op_prol%set_ncols(i_nr)
-    call op_restr%set_nrows(i_nr)
-
-    call psb_gather(tmp_ac,ac,desc_ac,info,root=-ione,&
-         & dupl=psb_dupl_add_,keeploc=.false.)
-    call tmp_ac%mv_to(tmpcoo)
-    call ac%mv_from(tmpcoo)
-
-    call psb_cdall(ictxt,desc_ac,info,mg=ntaggr,repl=.true.)
-    if (info == psb_success_) call psb_cdasb(desc_ac,info)
-    !
-    ! Now that we have the descriptors and the restrictor, we should
-    ! update the W. But we don't, because REPL is only valid
-    ! at the coarsest level, so no need to carry over.
-    !
-
-    if (info /= psb_success_) goto 9999
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,a_err='no repl coarse_mat_ here')
+    goto 9999
 
   case default
     info = psb_err_internal_error_
     call psb_errpush(info,name,a_err='invalid amg_coarse_mat_')
     goto 9999
   end select
-
+#endif
   call psb_erractionrestore(err_act)
   return
 
@@ -274,4 +163,4 @@ subroutine  amg_d_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
   return
 
 
-end subroutine amg_d_parmatch_aggregator_mat_asb
+end subroutine amg_d_parmatch_aggregator_inner_mat_asb

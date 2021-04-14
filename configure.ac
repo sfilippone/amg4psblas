@@ -169,6 +169,8 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    FAKEMPI="fakempi.o";
    MPIFC="$FC";
    MPICC="$CC";
+   CXXDEFINES="-DSERIAL_MPI $CXXDEFINES";
+
 else 
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then
@@ -654,11 +656,12 @@ if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
    if test "x$pac_cv_psblas_lpk" == "x8" ; then
       AC_MSG_NOTICE([PSBLAS defines PSB_LPK_ as $pac_cv_psblas_lpk. MUMPS interfacing will fail when called in global mode on very large matrices. ])
    fi	
-   MUMPS_FLAGS="-DHave_MUMPS_ $MUMPS_INCLUDES"
    if test "x$pac_mumps_fmods_ok" == "xyes" ; then 
       FDEFINES="$amg_cv_define_prepend-DHAVE_MUMPS_ $amg_cv_define_prepend-DHAVE_MUMPS_MODULES_ $MUMPS_MODULES $FDEFINES"
+       MUMPS_FLAGS="-DHave_MUMPS_ $MUMPS_MODULES"
    elif test "x$pac_mumps_fincs_ok" == "xyes" ; then
       FDEFINES="$amg_cv_define_prepend-DHAVE_MUMPS_ $amg_cv_define_prepend-DHAVE_MUMPS_INCLUDES_ $MUMPS_FINCLUDES $FDEFINES"
+       MUMPS_FLAGS="-DHave_MUMPS_ $MUMPS_INCLUDES"
    else
       # This should not happen
       MUMPS_FLAGS=""

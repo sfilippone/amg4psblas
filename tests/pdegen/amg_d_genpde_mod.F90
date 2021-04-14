@@ -1,59 +1,95 @@
-module amg_s_genpde_mod
+!
+!
+!                             AMG4PSBLAS version 1.0
+!    Algebraic Multigrid Package
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
+!
+!    (C) Copyright 2021
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
+!
+!    Redistribution and use in source and binary forms, with or without
+!    modification, are permitted provided that the following conditions
+!    are met:
+!      1. Redistributions of source code must retain the above copyright
+!         notice, this list of conditions and the following disclaimer.
+!      2. Redistributions in binary form must reproduce the above copyright
+!         notice, this list of conditions, and the following disclaimer in the
+!         documentation and/or other materials provided with the distribution.
+!      3. The name of the AMG4PSBLAS group or the names of its contributors may
+!         not be used to endorse or promote products derived from this
+!         software without specific written permission.
+!
+!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
+!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!    POSSIBILITY OF SUCH DAMAGE.
+!
+module amg_d_genpde_mod
 
 
-  use psb_base_mod, only : psb_spk_, psb_ipk_, psb_desc_type,&
-       &  psb_sspmat_type, psb_s_vect_type, szero, sone,&
-       &  psb_s_base_sparse_mat, psb_s_base_vect_type, psb_i_base_vect_type
+  use psb_base_mod, only : psb_dpk_, psb_ipk_, psb_desc_type,&
+       &  psb_dspmat_type, psb_d_vect_type, dzero, done,&
+       &  psb_d_base_sparse_mat, psb_d_base_vect_type, psb_i_base_vect_type
 
   interface
-    function s_func_3d(x,y,z) result(val)
-      import :: psb_spk_
-      real(psb_spk_), intent(in) :: x,y,z
-      real(psb_spk_) :: val
-    end function s_func_3d
+    function d_func_3d(x,y,z) result(val)
+      import :: psb_dpk_
+      real(psb_dpk_), intent(in) :: x,y,z
+      real(psb_dpk_) :: val
+    end function d_func_3d
   end interface
 
   interface amg_gen_pde3d
-    module procedure  amg_s_gen_pde3d
+    module procedure  amg_d_gen_pde3d
   end interface amg_gen_pde3d
 
   interface
-    function s_func_2d(x,y) result(val)
-      import :: psb_spk_
-      real(psb_spk_), intent(in) :: x,y
-      real(psb_spk_) :: val
-    end function s_func_2d
+    function d_func_2d(x,y) result(val)
+      import :: psb_dpk_
+      real(psb_dpk_), intent(in) :: x,y
+      real(psb_dpk_) :: val
+    end function d_func_2d
   end interface
 
   interface amg_gen_pde2d
-    module procedure  amg_s_gen_pde2d
+    module procedure  amg_d_gen_pde2d
   end interface amg_gen_pde2d
 
 contains
 
-  function s_null_func_2d(x,y) result(val)
+  function d_null_func_2d(x,y) result(val)
 
-    real(psb_spk_), intent(in) :: x,y
-    real(psb_spk_) :: val
+    real(psb_dpk_), intent(in) :: x,y
+    real(psb_dpk_) :: val
 
-    val = szero
+    val = dzero
 
-  end function s_null_func_2d
+  end function d_null_func_2d
 
-  function s_null_func_3d(x,y,z) result(val)
+  function d_null_func_3d(x,y,z) result(val)
 
-    real(psb_spk_), intent(in) :: x,y,z
-    real(psb_spk_) :: val
+    real(psb_dpk_), intent(in) :: x,y,z
+    real(psb_dpk_) :: val
 
-    val = szero
+    val = dzero
 
-  end function s_null_func_3d
+  end function d_null_func_3d
 
   !
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs.
   !
-  subroutine amg_s_gen_pde3d(ctxt,idim,a,bv,xv,desc_a,afmt,&
+  subroutine amg_d_gen_pde3d(ctxt,idim,a,bv,xv,desc_a,afmt,&
        & a1,a2,a3,b1,b2,b3,c,g,info,f,amold,vmold,partition, nrl,iv)
     use psb_base_mod
     use psb_util_mod
@@ -73,26 +109,26 @@ contains
     ! Note that if b1=b2=b3=c=0., the PDE is the  Laplace equation.
     !
     implicit none
-    procedure(s_func_3d)  :: b1,b2,b3,c,a1,a2,a3,g
+    procedure(d_func_3d)  :: b1,b2,b3,c,a1,a2,a3,g
     integer(psb_ipk_)     :: idim
-    type(psb_sspmat_type) :: a
-    type(psb_s_vect_type) :: xv,bv
+    type(psb_dspmat_type) :: a
+    type(psb_d_vect_type) :: xv,bv
     type(psb_desc_type)   :: desc_a
     integer(psb_ipk_)     :: info
     type(psb_ctxt_type)   :: ctxt
     character             :: afmt*5
-    procedure(s_func_3d), optional :: f
-    class(psb_s_base_sparse_mat), optional :: amold
-    class(psb_s_base_vect_type), optional :: vmold
+    procedure(d_func_3d), optional :: f
+    class(psb_d_base_sparse_mat), optional :: amold
+    class(psb_d_base_vect_type), optional :: vmold
     integer(psb_ipk_), optional :: partition, nrl,iv(:)
 
     ! Local variables.
 
     integer(psb_ipk_), parameter :: nb=20
-    type(psb_s_csc_sparse_mat)  :: acsc
-    type(psb_s_coo_sparse_mat)  :: acoo
-    type(psb_s_csr_sparse_mat)  :: acsr
-    real(psb_spk_)           :: zt(nb),x,y,z,xph,xmh,yph,ymh,zph,zmh
+    type(psb_d_csc_sparse_mat)  :: acsc
+    type(psb_d_coo_sparse_mat)  :: acoo
+    type(psb_d_csr_sparse_mat)  :: acsr
+    real(psb_dpk_)           :: zt(nb),x,y,z,xph,xmh,yph,ymh,zph,zmh
     integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_
     integer(psb_lpk_) :: m,n,glob_row,nt
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
@@ -106,18 +142,18 @@ contains
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: icoeff
     integer(psb_lpk_), allocatable     :: irow(:),icol(:),myidx(:)
-    real(psb_spk_), allocatable :: val(:)
+    real(psb_dpk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
-    real(psb_spk_)            :: deltah, sqdeltah, deltah2
-    real(psb_spk_), parameter :: rhs=szero,one=sone,zero=szero
+    real(psb_dpk_)            :: deltah, sqdeltah, deltah2
+    real(psb_dpk_), parameter :: rhs=dzero,one=done,zero=dzero
     real(psb_dpk_)    :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcdasb
     integer(psb_ipk_) :: err_act
-    procedure(s_func_3d), pointer :: f_
+    procedure(d_func_3d), pointer :: f_
     character(len=20)  :: name, ch_err,tmpfmt
 
     info = psb_success_
-    name = 's_create_matrix'
+    name = 'd_create_matrix'
     call psb_erractionsave(err_act)
 
     call psb_info(ctxt, iam, np)
@@ -126,7 +162,7 @@ contains
     if (present(f)) then
       f_ => f
     else
-      f_ => s_null_func_3d
+      f_ => d_null_func_3d
     end if
 
     if (present(partition)) then
@@ -139,9 +175,9 @@ contains
     else
       partition_ = 3
     end if
-    deltah   = sone/(idim+2)
+    deltah   = done/(idim+2)
     sqdeltah = deltah*deltah
-    deltah2  = 2.0_psb_spk_* deltah
+    deltah2  = 2.0_psb_dpk_* deltah
 
     if (present(partition)) then
       if ((1<= partition).and.(partition <= 3)) then
@@ -225,7 +261,11 @@ contains
 
       ! A nifty MPI function will split the process list
       npdims = 0
+#if defined(SERIAL_MPI)
+      npdims = 1
+#else 
       call mpi_dims_create(np,3,npdims,info)
+#endif
       npx = npdims(1)
       npy = npdims(2)
       npz = npdims(3)
@@ -373,7 +413,7 @@ contains
         !
         val(icoeff) = -a1(x,y,z)/sqdeltah-b1(x,y,z)/deltah2
         if (ix == 1) then
-          zt(k) = g(szero,y,z)*(-val(icoeff)) + zt(k)
+          zt(k) = g(dzero,y,z)*(-val(icoeff)) + zt(k)
         else
           call ijk2idx(icol(icoeff),ix-1,iy,iz,idim,idim,idim)
           irow(icoeff) = glob_row
@@ -382,7 +422,7 @@ contains
         !  term depending on     (x,y-1,z)
         val(icoeff)  = -a2(x,y,z)/sqdeltah-b2(x,y,z)/deltah2
         if (iy == 1) then
-          zt(k) = g(x,szero,z)*(-val(icoeff))   + zt(k)
+          zt(k) = g(x,dzero,z)*(-val(icoeff))   + zt(k)
         else
           call ijk2idx(icol(icoeff),ix,iy-1,iz,idim,idim,idim)
           irow(icoeff) = glob_row
@@ -391,7 +431,7 @@ contains
         !  term depending on     (x,y,z-1)
         val(icoeff)=-a3(x,y,z)/sqdeltah-b3(x,y,z)/deltah2
         if (iz == 1) then
-          zt(k) = g(x,y,szero)*(-val(icoeff))   + zt(k)
+          zt(k) = g(x,y,dzero)*(-val(icoeff))   + zt(k)
         else
           call ijk2idx(icol(icoeff),ix,iy,iz-1,idim,idim,idim)
           irow(icoeff) = glob_row
@@ -399,7 +439,7 @@ contains
         endif
 
         !  term depending on     (x,y,z)
-        val(icoeff)=(2*sone)*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah &
+        val(icoeff)=(2*done)*(a1(x,y,z)+a2(x,y,z)+a3(x,y,z))/sqdeltah &
              & + c(x,y,z)
         call ijk2idx(icol(icoeff),ix,iy,iz,idim,idim,idim)
         irow(icoeff) = glob_row
@@ -407,7 +447,7 @@ contains
         !  term depending on     (x,y,z+1)
         val(icoeff)=-a3(x,y,z)/sqdeltah+b3(x,y,z)/deltah2
         if (iz == idim) then
-          zt(k) = g(x,y,sone)*(-val(icoeff))   + zt(k)
+          zt(k) = g(x,y,done)*(-val(icoeff))   + zt(k)
         else
           call ijk2idx(icol(icoeff),ix,iy,iz+1,idim,idim,idim)
           irow(icoeff) = glob_row
@@ -416,7 +456,7 @@ contains
         !  term depending on     (x,y+1,z)
         val(icoeff)=-a2(x,y,z)/sqdeltah+b2(x,y,z)/deltah2
         if (iy == idim) then
-          zt(k) = g(x,sone,z)*(-val(icoeff))   + zt(k)
+          zt(k) = g(x,done,z)*(-val(icoeff))   + zt(k)
         else
           call ijk2idx(icol(icoeff),ix,iy+1,iz,idim,idim,idim)
           irow(icoeff) = glob_row
@@ -425,7 +465,7 @@ contains
         !  term depending on     (x+1,y,z)
         val(icoeff)=-a1(x,y,z)/sqdeltah+b1(x,y,z)/deltah2
         if (ix==idim) then
-          zt(k) = g(sone,y,z)*(-val(icoeff))   + zt(k)
+          zt(k) = g(done,y,z)*(-val(icoeff))   + zt(k)
         else
           call ijk2idx(icol(icoeff),ix+1,iy,iz,idim,idim,idim)
           irow(icoeff) = glob_row
@@ -437,7 +477,7 @@ contains
       if(info /= psb_success_) exit
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
       if(info /= psb_success_) exit
-      zt(:)=szero
+      zt(:)=dzero
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
       if(info /= psb_success_) exit
     end do
@@ -505,7 +545,7 @@ contains
 9999 call psb_error_handler(ctxt,err_act)
 
     return
-  end subroutine amg_s_gen_pde3d
+  end subroutine amg_d_gen_pde3d
 
 
 
@@ -513,7 +553,7 @@ contains
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs.
   !
-  subroutine amg_s_gen_pde2d(ctxt,idim,a,bv,xv,desc_a,afmt,&
+  subroutine amg_d_gen_pde2d(ctxt,idim,a,bv,xv,desc_a,afmt,&
        & a1,a2,b1,b2,c,g,info,f,amold,vmold,partition, nrl,iv)
     use psb_base_mod
     use psb_util_mod
@@ -533,25 +573,25 @@ contains
     ! Note that if b1=b2=c=0., the PDE is the  Laplace equation.
     !
     implicit none
-    procedure(s_func_2d)  :: b1,b2,c,a1,a2,g
+    procedure(d_func_2d)  :: b1,b2,c,a1,a2,g
     integer(psb_ipk_)     :: idim
-    type(psb_sspmat_type) :: a
-    type(psb_s_vect_type) :: xv,bv
+    type(psb_dspmat_type) :: a
+    type(psb_d_vect_type) :: xv,bv
     type(psb_desc_type)   :: desc_a
     integer(psb_ipk_)     :: info
     type(psb_ctxt_type)   :: ctxt
     character             :: afmt*5
-    procedure(s_func_2d), optional :: f
-    class(psb_s_base_sparse_mat), optional :: amold
-    class(psb_s_base_vect_type), optional :: vmold
+    procedure(d_func_2d), optional :: f
+    class(psb_d_base_sparse_mat), optional :: amold
+    class(psb_d_base_vect_type), optional :: vmold
     integer(psb_ipk_), optional :: partition, nrl,iv(:)
     ! Local variables.
 
     integer(psb_ipk_), parameter :: nb=20
-    type(psb_s_csc_sparse_mat)  :: acsc
-    type(psb_s_coo_sparse_mat)  :: acoo
-    type(psb_s_csr_sparse_mat)  :: acsr
-    real(psb_spk_)           :: zt(nb),x,y,z,xph,xmh,yph,ymh,zph,zmh
+    type(psb_d_csc_sparse_mat)  :: acsc
+    type(psb_d_coo_sparse_mat)  :: acoo
+    type(psb_d_csr_sparse_mat)  :: acsr
+    real(psb_dpk_)           :: zt(nb),x,y,z,xph,xmh,yph,ymh,zph,zmh
     integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_
     integer(psb_lpk_) :: m,n,glob_row,nt
     integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
@@ -565,14 +605,14 @@ contains
     integer(psb_ipk_) :: np, iam
     integer(psb_ipk_) :: icoeff
     integer(psb_lpk_), allocatable     :: irow(:),icol(:),myidx(:)
-    real(psb_spk_), allocatable :: val(:)
+    real(psb_dpk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
-    real(psb_spk_)            :: deltah, sqdeltah, deltah2, dd
-    real(psb_spk_), parameter :: rhs=0.d0,one=sone,zero=0.d0
+    real(psb_dpk_)            :: deltah, sqdeltah, deltah2, dd
+    real(psb_dpk_), parameter :: rhs=0.d0,one=done,zero=0.d0
     real(psb_dpk_)    :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcdasb
     integer(psb_ipk_) :: err_act
-    procedure(s_func_2d), pointer :: f_
+    procedure(d_func_2d), pointer :: f_
     character(len=20)  :: name, ch_err,tmpfmt
 
     info = psb_success_
@@ -585,12 +625,12 @@ contains
     if (present(f)) then
       f_ => f
     else
-      f_ => s_null_func_2d
+      f_ => d_null_func_2d
     end if
 
-    deltah   = sone/(idim+2)
+    deltah   = done/(idim+2)
     sqdeltah = deltah*deltah
-    deltah2  = 2.0_psb_spk_* deltah
+    deltah2  = 2.0_psb_dpk_* deltah
 
 
     if (present(partition)) then
@@ -675,7 +715,11 @@ contains
 
       ! A nifty MPI function will split the process list
       npdims = 0
+#if defined(SERIAL_MPI)
+      npdims = 1
+#else 
       call mpi_dims_create(np,2,npdims,info)
+#endif
       npx = npdims(1)
       npy = npdims(2)
 
@@ -810,7 +854,7 @@ contains
         !
         val(icoeff) = -a1(x,y)/sqdeltah-b1(x,y)/deltah2
         if (ix == 1) then
-          zt(k) = g(szero,y)*(-val(icoeff)) + zt(k)
+          zt(k) = g(dzero,y)*(-val(icoeff)) + zt(k)
         else
           call ijk2idx(icol(icoeff),ix-1,iy,idim,idim)
           irow(icoeff) = glob_row
@@ -819,7 +863,7 @@ contains
         !  term depending on     (x,y-1)
         val(icoeff)  = -a2(x,y)/sqdeltah-b2(x,y)/deltah2
         if (iy == 1) then
-          zt(k) = g(x,szero)*(-val(icoeff))   + zt(k)
+          zt(k) = g(x,dzero)*(-val(icoeff))   + zt(k)
         else
           call ijk2idx(icol(icoeff),ix,iy-1,idim,idim)
           irow(icoeff) = glob_row
@@ -827,14 +871,14 @@ contains
         endif
 
         !  term depending on     (x,y)
-        val(icoeff)=(2*sone)*(a1(x,y) + a2(x,y))/sqdeltah + c(x,y)
+        val(icoeff)=(2*done)*(a1(x,y) + a2(x,y))/sqdeltah + c(x,y)
         call ijk2idx(icol(icoeff),ix,iy,idim,idim)
         irow(icoeff) = glob_row
         icoeff       = icoeff+1
         !  term depending on     (x,y+1)
         val(icoeff)=-a2(x,y)/sqdeltah+b2(x,y)/deltah2
         if (iy == idim) then
-          zt(k) = g(x,sone)*(-val(icoeff))   + zt(k)
+          zt(k) = g(x,done)*(-val(icoeff))   + zt(k)
         else
           call ijk2idx(icol(icoeff),ix,iy+1,idim,idim)
           irow(icoeff) = glob_row
@@ -843,7 +887,7 @@ contains
         !  term depending on     (x+1,y)
         val(icoeff)=-a1(x,y)/sqdeltah+b1(x,y)/deltah2
         if (ix==idim) then
-          zt(k) = g(sone,y)*(-val(icoeff))   + zt(k)
+          zt(k) = g(done,y)*(-val(icoeff))   + zt(k)
         else
           call ijk2idx(icol(icoeff),ix+1,iy,idim,idim)
           irow(icoeff) = glob_row
@@ -855,7 +899,7 @@ contains
       if(info /= psb_success_) exit
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
       if(info /= psb_success_) exit
-      zt(:)=szero
+      zt(:)=dzero
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
       if(info /= psb_success_) exit
     end do
@@ -927,5 +971,5 @@ contains
       return
     end if
     return
-  end subroutine amg_s_gen_pde2d
-end module amg_s_genpde_mod
+  end subroutine amg_d_gen_pde2d
+end module amg_d_genpde_mod

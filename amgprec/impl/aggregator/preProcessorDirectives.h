@@ -72,7 +72,9 @@
 #include <map>
 
 //MPI:
+#if !defined(SERIAL_MPI)
 #include "mpi.h"
+#endif
 
 
 

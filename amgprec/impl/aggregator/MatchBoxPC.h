@@ -69,6 +69,8 @@ using namespace std;
 extern "C" {
 #endif
 
+#if !defined(SERIAL_MPI)
+  
 #define MilanMpiLongInt  MPI_LONG_LONG
 
 #ifndef _primitiveDataType_Definition_
@@ -190,6 +192,7 @@ void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 		MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
 		MilanLongInt* ph1_card, MilanLongInt* ph2_card );
 
+#endif
 #ifdef __cplusplus
 }
 #endif
