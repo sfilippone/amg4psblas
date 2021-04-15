@@ -92,7 +92,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
 							      MilanReal* msgPercent,
                                                               MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
                                                               MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
-  if !defined(SERIAL_MPI)
+#if !defined(SERIAL_MPI)
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")Within algoEdgeApproxDominatingEdgesLinearSearchMessageBundling()"; fflush(stdout);
 #endif
@@ -2532,7 +2532,7 @@ void salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
     //MPI_Barrier(comm);
 #endif
 } //End of algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMate
-
+#endif
 
 ///Find the owner of a ghost node:
 inline MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
