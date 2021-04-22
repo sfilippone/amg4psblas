@@ -77,14 +77,16 @@ if test "X$PSBLAS_DIR" != "X" ; then
     AC_MSG_ERROR([Could not find PSBLAS build dir $PSBLAS_DIR!])	
   fi
   AC_MSG_RESULT([$PSBLAS_DIR])
+fi	
+if test "X$PSBLAS_INCDIR" != "X" ; then 
   pac_cv_status_file="$PSBLAS_INCDIR/Make.inc.psblas"
   if test ! -f "$pac_cv_status_file" ; then 
-    AC_MSG_NOTICE([Could not find an installation  in $PSBLAS_DIR.])
+    AC_MSG_NOTICE([Could not find the status file in $PSBLAS_INCDIR.])
     pac_cv_status_file="NONE";
   fi
 else
   pac_cv_status_file="NONE";
-fi	
+fi
 
 dnl. $pac_cv_status_file
 AC_MSG_NOTICE([Loaded $pac_cv_status_file $FC $MPIFC $BLACS_LIBS])

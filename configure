@@ -2655,10 +2655,12 @@ if test "X$PSBLAS_DIR" != "X" ; then
   fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PSBLAS_DIR" >&5
 $as_echo "$PSBLAS_DIR" >&6; }
+fi
+if test "X$PSBLAS_INCDIR" != "X" ; then
   pac_cv_status_file="$PSBLAS_INCDIR/Make.inc.psblas"
   if test ! -f "$pac_cv_status_file" ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: Could not find an installation  in $PSBLAS_DIR." >&5
-$as_echo "$as_me: Could not find an installation  in $PSBLAS_DIR." >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Could not find the status file in $PSBLAS_INCDIR." >&5
+$as_echo "$as_me: Could not find the status file in $PSBLAS_INCDIR." >&6;}
     pac_cv_status_file="NONE";
   fi
 else
