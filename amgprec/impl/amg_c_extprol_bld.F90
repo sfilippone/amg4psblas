@@ -311,7 +311,7 @@ subroutine amg_c_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
 
     
     if (i>2) then 
-      if (all(p%precv(i)%map%naggr == p%precv(i-1)%map%naggr)) then 
+      if (all(p%precv(i)%linmap%naggr == p%precv(i-1)%linmap%naggr)) then 
         newsz=i-1
       end if
       call psb_bcast(ctxt,newsz)
@@ -518,7 +518,7 @@ contains
     !  op_prol => PR     i.e. prolongation operator
     !  
     
-    p%map = psb_linmap(psb_map_aggr_,desc_a,&
+    p%linmap = psb_linmap(psb_map_aggr_,desc_a,&
          & p%desc_ac,op_restr,op_prol,ilaggr,nlaggr)
     if(info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_,name,a_err='sp_Free')
