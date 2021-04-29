@@ -75,7 +75,7 @@ lib: $(OBJS) impld
 	/bin/cp -p *$(.mod) $(MODDIR)
 
 
-$(MODOBJS): $(PSBLAS_MODDIR)/$(BASEMODNAME)$(.mod)
+$(MODOBJS): $(PSBLAS_MODDIR)/$(PSBBASEMODNAME)$(.mod)
 
 amg_base_prec_type.o: amg_const.h
 amg_s_prec_type.o amg_d_prec_type.o amg_c_prec_type.o amg_z_prec_type.o	: amg_base_prec_type.o
