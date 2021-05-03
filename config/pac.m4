@@ -2181,3 +2181,223 @@ else
 fi
 ])dnl PAC_LAPACK
 
+
+dnl @synopsis PAC_ARG_WITH_IPK
+dnl
+dnl Test for --with-ipk 
+dnl 
+dnl 
+dnl
+dnl Example use: --with-ipk=4
+dnl
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN([PAC_ARG_WITH_IPK],
+[
+AC_MSG_CHECKING([what size in bytes we want for local indices and data])
+AC_ARG_WITH(ipk,
+	    AC_HELP_STRING([--with-ipk=<bytes>], 
+			   [Specify the size in bytes for local indices and data, default 4 bytes. ]),
+	    [pac_cv_ipk_size=$withval;],
+	    [pac_cv_ipk_size=4;]
+	   )
+if test x"$pac_cv_ipk_size" == x"4"  || test  x"$pac_cv_ipk_size" == x"8" ; then
+   AC_MSG_RESULT([Size: $pac_cv_ipk_size.])
+else
+  AC_MSG_RESULT([Unsupported value for IPK: $pac_cv_ipk_size, defaulting to 4.])
+  pac_cv_ipk_size=4;
+fi
+]
+)
+
+dnl @synopsis PAC_ARG_WITH_LPK
+dnl
+dnl Test for --with-lpk 
+dnl 
+dnl 
+dnl
+dnl Example use: --with-lpk=8
+dnl
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN([PAC_ARG_WITH_LPK],
+[
+ AC_MSG_CHECKING([what size in bytes we want for global indices and data])
+ AC_ARG_WITH(lpk,
+	     AC_HELP_STRING([--with-lpk=<bytes>], 
+			    [Specify the size in bytes for global indices and data, default 8 bytes. ]),
+	     [pac_cv_lpk_size=$withval;],
+	     [pac_cv_lpk_size=8;]
+	    )
+if test x"$pac_cv_lpk_size" == x"4" || test x"$pac_cv_lpk_size" == x"8"; then
+  AC_MSG_RESULT([Size: $pac_cv_lpk_size.])
+else
+  AC_MSG_RESULT([Unsupported value for LPK: $pac_cv_lpk_size, defaulting to 8.])
+  pac_cv_lpk_size=8;
+fi
+]
+)
+
+
+dnl @synopsis PAC_CHECK_METIS
+dnl
+dnl Will try to find the METIS library and headers.
+dnl
+dnl Will use $CC
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN(PAC_CHECK_METIS,
+[AC_ARG_WITH(metis, AC_HELP_STRING([--with-metis=LIBNAME], [Specify the library name for METIS library. 
+Default: "-lmetis"]),
+        [psblas_cv_metis=$withval],
+        [psblas_cv_metis='-lmetis'])
+AC_ARG_WITH(metisincfile, AC_HELP_STRING([--with-metisincfile=DIR], [Specify the name  for METIS include file.]),
+        [psblas_cv_metisincfile=$withval],
+        [psblas_cv_metisincfile='metis.h'])
+AC_ARG_WITH(metisdir, AC_HELP_STRING([--with-metisdir=DIR], [Specify the directory for METIS library and includes.]),
+        [psblas_cv_metisdir=$withval],
+        [psblas_cv_metisdir=''])
+AC_ARG_WITH(metisincdir, AC_HELP_STRING([--with-metisincdir=DIR], [Specify the directory for METIS includes.]),
+        [psblas_cv_metisincdir=$withval],
+        [psblas_cv_metisincdir=''])
+AC_ARG_WITH(metislibdir, AC_HELP_STRING([--with-metislibdir=DIR], [Specify the directory for METIS library.]),
+        [psblas_cv_metislibdir=$withval],
+        [psblas_cv_metislibdir=''])
+
+AC_LANG([C])
+SAVE_LIBS="$LIBS"
+SAVE_CPPFLAGS="$CPPFLAGS"
+if test "x$psblas_cv_metisdir" != "x"; then 
+   METIS_LIBDIR="-L$psblas_cv_metisdir"
+   LIBS="-L$psblas_cv_metisdir $LIBS"
+   METIS_INCLUDES="-I$psblas_cv_metisdir"
+   CPPFLAGS="$METIS_INCLUDES $CPPFLAGS"
+fi
+if test "x$psblas_cv_metisincdir" != "x"; then 
+   METIS_INCLUDES="-I$psblas_cv_metisincdir"
+   CPPFLAGS="$METIS_INCLUDES $CPPFLAGS"
+fi
+if test "x$psblas_cv_metislibdir" != "x"; then 
+   LIBS="-L$psblas_cv_metislibdir $LIBS"
+   METIS_LIBDIR="-L$psblas_cv_metislibdir"
+fi
+
+AC_MSG_NOTICE([metis dir $psblas_cv_metisdir])
+AC_CHECK_HEADERS([limits.h $psblas_cv_metisincfile],
+ [pac_metis_header_ok=yes],
+ [pac_metis_header_ok=no; METIS_INCLUDES=""])
+if test "x$pac_metis_header_ok" == "xno" ; then
+dnl Maybe Include or include subdirs? 
+  unset ac_cv_header_metis_h
+  METIS_INCLUDES="-I$psblas_cv_metisdir/include -I$psblas_cv_metisdir/Include "
+  CPPFLAGS="$METIS_INCLUDES $SAVE_CPPFLAGS"
+
+ AC_MSG_CHECKING([for metis_h in $METIS_INCLUDES])
+ AC_CHECK_HEADERS([limits.h  $psblas_cv_metisincfile],
+    [pac_metis_header_ok=yes],
+    [pac_metis_header_ok=no; METIS_INCLUDES=""])
+fi
+if test "x$pac_metis_header_ok" == "xno" ; then
+dnl Maybe new structure with METIS UFconfig METIS? 
+   unset ac_cv_header_metis_h
+   METIS_INCLUDES="-I$psblas_cv_metisdir/UFconfig -I$psblas_cv_metisdir/METIS/Include -I$psblas_cv_metisdir/METIS/Include"
+   CPPFLAGS="$METIS_INCLUDES $SAVE_CPPFLAGS"
+   AC_CHECK_HEADERS([limits.h  $psblas_cv_metisincfile],
+     [pac_metis_header_ok=yes],
+     [pac_metis_header_ok=no; METIS_INCLUDES=""])
+fi
+
+if test "x$pac_metis_header_ok" == "xyes" ; then
+   AC_LANG_PUSH([C])
+   AC_MSG_CHECKING([for METIS integer size])
+   AC_LINK_IFELSE([AC_LANG_SOURCE(
+	#include <stdio.h>
+	#include "$psblas_cv_metisincfile"
+        void main(){
+		    printf("%d\n",IDXTYPEWIDTH);
+		    }
+	       )],
+	       [pac_cv_metis_idx=`./conftest${ac_exeext} | sed 's/^ *//'`],
+	       [pac_cv_metis_idx="unknown"])
+      AC_MSG_RESULT($pac_cv_metis_idx)
+
+   AC_LANG_POP()
+fi
+
+if test "x$pac_metis_header_ok" == "xyes" ; then
+   AC_LANG_PUSH([C])
+   AC_MSG_CHECKING([for METIS real size])
+   AC_LINK_IFELSE([AC_LANG_SOURCE(
+	#include <stdio.h>
+	#include "$psblas_cv_metisincfile"
+        void main(){
+		    printf("%d\n",REALTYPEWIDTH);
+		    }
+	       )],
+	       [pac_cv_metis_real=`./conftest${ac_exeext} | sed 's/^ *//'`],
+	       [pac_cv_metis_real="unknown"])
+      AC_MSG_RESULT($pac_cv_metis_real)
+
+   AC_LANG_POP()
+fi
+
+if test "x$pac_metis_header_ok" = "xyes" ; then 
+      psblas_cv_metis_includes="$METIS_INCLUDES"
+      METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+      LIBS="$METIS_LIBS -lm $LIBS";
+      AC_MSG_CHECKING([for METIS_PartGraphKway in $METIS_LIBS])
+      AC_TRY_LINK_FUNC(METIS_PartGraphKway, 
+       [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
+       [psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""])
+      AC_MSG_RESULT($pac_metis_lib_ok)
+     if test "x$pac_metis_lib_ok" = "xno" ; then 
+        dnl Maybe Lib or lib? 
+        METIS_LIBDIR="-L$psblas_cv_metisdir/Lib -L$psblas_cv_metisdir/lib"
+        METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+        LIBS="$METIS_LIBS -lm $SAVE_LIBS"
+        
+      AC_MSG_CHECKING([for METIS_PartGraphKway in $METIS_LIBS])
+      AC_TRY_LINK_FUNC(METIS_PartGraphKway, 
+       [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
+       [psblas_cv_have_metis=no;pac_metis_lib_ok=no; METIS_LIBS=""])
+      AC_MSG_RESULT($pac_metis_lib_ok)
+     fi
+
+     if test "x$pac_metis_lib_ok" = "xno" ; then 
+        dnl Maybe METIS/Lib? 
+        METIS_LIBDIR="-L$psblas_cv_metisdir/METIS/Lib -L$psblas_cv_metisdir/METIS/Lib"
+        METIS_LIBS="$psblas_cv_metis $METIS_LIBDIR"
+        LIBS="$METIS_LIBS -lm $SAVE_LIBS"
+      AC_MSG_CHECKING([for METIS_PartGraphKway in $METIS_LIBS])
+      AC_TRY_LINK_FUNC(METIS_PartGraphKway, 
+       [psblas_cv_have_metis=yes;pac_metis_lib_ok="yes"; ],
+       [psblas_cv_have_metis=no;pac_metis_lib_ok="no"; METIS_LIBS=""])
+      AC_MSG_RESULT($pac_metis_lib_ok)
+      fi
+ fi
+dnl AC_MSG_NOTICE([ metis lib ok $pac_metis_lib_ok])
+
+ if test "x$pac_metis_lib_ok" = "xyes" ; then 
+      AC_MSG_CHECKING([for METIS_SetDefaultOptions in $LIBS])
+      AC_TRY_LINK_FUNC(METIS_SetDefaultOptions, 
+        [psblas_cv_have_metis=yes;pac_metis_lib_ok=yes; ],
+        [psblas_cv_have_metis=no;pac_metis_lib_ok="no. Unusable METIS version, sorry."; METIS_LIBS=""
+      ])
+      AC_MSG_RESULT($pac_metis_lib_ok)
+
+fi
+
+LIBS="$SAVE_LIBS";
+CPPFLAGS="$SAVE_CPPFLAGS";
+])dnl 
+
+

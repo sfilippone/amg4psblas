@@ -127,7 +127,9 @@ program amg_s_pde3d
 
     ! AMG aggregation
     character(len=16)  :: aggr_prol    ! aggregation type: SMOOTHED, NONSMOOTHED
-    character(len=16)  :: par_aggr_alg    ! parallel aggregation algorithm: DEC, SYMDEC
+    character(len=16)  :: par_aggr_alg ! parallel aggregation algorithm: DEC, SYMDEC
+    character(len=16)  :: aggr_type   ! Type of aggregation SOC1, SOC2, MATCHBOXP
+    integer(psb_ipk_)  :: aggr_size   ! Requested size of the aggregates for MATCHBOXP
     character(len=16)  :: aggr_ord    ! ordering for aggregation: NATURAL, DEGREE
     character(len=16)  :: aggr_filter ! filtering: FILTER, NO_FILTER
     real(psb_spk_)     :: mncrratio  ! minimum aggregation ratio
@@ -294,6 +296,9 @@ program amg_s_pde3d
 
     call prec%set('aggr_prol',       p_choice%aggr_prol,   info)
     call prec%set('par_aggr_alg',    p_choice%par_aggr_alg,   info)
+    call prec%set('aggr_type',       p_choice%aggr_type, info)
+    call prec%set('aggr_size',       p_choice%aggr_size, info)
+
     call prec%set('aggr_ord',        p_choice%aggr_ord,   info)
     call prec%set('aggr_filter',     p_choice%aggr_filter,info)
 
@@ -559,6 +564,8 @@ contains
       ! aggregation
       call read_data(prec%aggr_prol,inp_unit)    ! aggregation type
       call read_data(prec%par_aggr_alg,inp_unit)    ! parallel aggregation alg
+      call read_data(prec%aggr_type,inp_unit)   ! type of aggregation
+      call read_data(prec%aggr_size,inp_unit) ! Requested size of the aggregates for MATCHBOXP
       call read_data(prec%aggr_ord,inp_unit)    ! ordering for aggregation
       call read_data(prec%aggr_filter,inp_unit) ! filtering
       call read_data(prec%mncrratio,inp_unit)  ! minimum aggregation ratio
@@ -626,6 +633,8 @@ contains
 
     call psb_bcast(ctxt,prec%aggr_prol)
     call psb_bcast(ctxt,prec%par_aggr_alg)
+    call psb_bcast(ctxt,prec%aggr_type)
+    call psb_bcast(ctxt,prec%aggr_size)
     call psb_bcast(ctxt,prec%aggr_ord)
     call psb_bcast(ctxt,prec%aggr_filter)
     call psb_bcast(ctxt,prec%mncrratio)

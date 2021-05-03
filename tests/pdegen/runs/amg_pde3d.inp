@@ -39,7 +39,9 @@ VCYCLE                      ! Type of multilevel CYCLE: VCYCLE WCYCLE KCYCLE MUL
 -3                          ! Max Number of levels in a multilevel preconditioner; if <0, lib default
 -3                          ! Target coarse matrix size per process; if <0, lib default
 SMOOTHED                    ! Type of aggregation: SMOOTHED UNSMOOTHED
-DEC                         ! Parallel aggregation: DEC, SYMDEC
+COUPLED                     ! Parallel aggregation: DEC, SYMDEC, COUPLED
+MATCHBOXP                   ! aggregation measure SOC1, MATCHBOXP
+4                           ! Requested size of the aggregates for MATCHBOXP
 NATURAL                     ! Ordering of aggregation NATURAL DEGREE
 NOFILTER                    ! Filtering of matrix:  FILTER NOFILTER
 -1.5                        ! Coarsening ratio, if < 0 use library default

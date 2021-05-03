@@ -113,7 +113,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
     const int ComputeTag = 7;  //Predefined tag
     const int BundleTag = 9;   //Predefined tag
     int error_codeC;
-    error_codeC = MPI_Errhandler_set(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
+    error_codeC = MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
     char error_message[MPI_MAX_ERROR_STRING];
     int message_length;
 
@@ -1340,7 +1340,7 @@ void salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
     const int ComputeTag = 7;  //Predefined tag
     const int BundleTag = 9;   //Predefined tag
     int error_codeC;
-    error_codeC = MPI_Errhandler_set(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
+    error_codeC = MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
     char error_message[MPI_MAX_ERROR_STRING];
     int message_length;
 
