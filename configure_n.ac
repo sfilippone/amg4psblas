@@ -583,6 +583,9 @@ fi
 FDEFINES="$psblas_cv_define_prepend-DIPK${pac_cv_ipk_size} $FDEFINES";
 FDEFINES="$psblas_cv_define_prepend-DLPK${pac_cv_lpk_size} $FDEFINES";	
 CDEFINES="-DIPK${pac_cv_ipk_size} -DLPK${pac_cv_lpk_size} $CDEFINES"; 
+if test x"$pac_cv_lpk_size" == x8"" ; then
+  CXXDEFINES="-DBIT64 $CXXDEFINES";
+fi
 
 ###############################################################################
 #	Parachute rules for ar and ranlib ... (could cause problems)
