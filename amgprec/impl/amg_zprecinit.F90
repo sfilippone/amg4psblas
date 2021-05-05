@@ -1,15 +1,15 @@
-!   
-!   
+!
+!
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.7)
-!    
-!    (C) Copyright 2021 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Fabio Durastante        
-!   
+!
+!    (C) Copyright 2021
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,8 +33,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
+!
+!
 ! File: amg_zprecinit.f90
 !
 ! Subroutine: amg_zprecinit
@@ -42,21 +42,21 @@
 !
 !  This routine allocates and initializes the preconditioner data structure,
 !  according to the preconditioner type chosen by the user.
-!  
+!
 !  A default preconditioner is set for each preconditioner type
 !  specified by the user:
 !
 !    'NOPREC'         - no preconditioner
 !
-!    'DIAG', 'JACOBI' - diagonal/Jacobi           
+!    'DIAG', 'JACOBI' - diagonal/Jacobi
 !
 !    'L1-DIAG', 'L1-JACOBI' - diagonal/Jacobi  with L1 norm correction
 !
 !    'GS', 'FBGS'     - Hybrid Gauss-Seidel, also symmetrized
-!                       
+!
 !    'BJAC'           - block Jacobi preconditioner, with ILU(0)
 !                       on the local blocks
-!                       
+!
 !    'L1-BJAC'        - block Jacobi preconditioner, with ILU(0)
 !                       on the local blocks and L1 correction for off-diag blocks
 !
@@ -70,12 +70,12 @@
 !                       applied as post-smoother at each level, but the
 !                       coarsest one; four sweeps of the block-Jacobi solver,
 !                       with LU from UMFPACK on the blocks, are applied at
-!                       the coarsest level, on the distributed coarse matrix. 
+!                       the coarsest level, on the distributed coarse matrix.
 !                       The smoothed aggregation algorithm with threshold 0
 !                       is used to build the coarse matrix.
 !
 !  For the multilevel preconditioners, the levels are numbered in increasing
-!  order starting from the finest one, i.e. level 1 is the finest level. 
+!  order starting from the finest one, i.e. level 1 is the finest level.
 !
 !
 ! Arguments:
@@ -87,7 +87,7 @@
 !               lowercase strings).
 !    info    -  integer, output.
 !               Error code.
-!  
+!
 subroutine amg_zprecinit(ctxt,prec,ptype,info)
 
   use psb_base_mod
@@ -116,98 +116,105 @@ subroutine amg_zprecinit(ctxt,prec,ptype,info)
 
   ! Local variables
   integer(psb_ipk_)            :: nlev_, ilev_
+  integer(psb_ipk_)            :: err_act
+  integer(psb_ipk_)            :: debug_level, debug_unit
   real(psb_dpk_)               :: thr
   character(len=*), parameter  :: name='amg_precinit'
   info = psb_success_
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_; goto 9999
+  end if
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
-  if (allocated(prec%precv)) then 
-    call prec%free(info) 
-    if (info /= psb_success_) then 
-      ! Do we want to do something? 
+  if (allocated(prec%precv)) then
+    call prec%free(info)
+    if (info /= psb_success_) then
+      ! Do we want to do something?
     endif
   endif
   prec%ctxt = ctxt
-  prec%ag_data%min_coarse_size             = -1
-  prec%ag_data%min_coarse_size_per_process = -1
+  call prec%ag_data%default()
 
   select case(psb_toupper(trim(ptype)))
-  case ('NOPREC','NONE') 
+  case ('NOPREC','NONE')
     nlev_ = 1
     ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info) 
-    allocate(amg_z_base_smoother_type :: prec%precv(ilev_)%sm, stat=info) 
+    allocate(prec%precv(nlev_),stat=info)
+    allocate(amg_z_base_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
-    allocate(amg_z_id_solver_type :: prec%precv(ilev_)%sm%sv, stat=info) 
+    allocate(amg_z_id_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
 
-  case ('JAC','DIAG','JACOBI') 
+  case ('JAC','DIAG','JACOBI')
     nlev_ = 1
     ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info) 
-    allocate(amg_z_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info) 
+    allocate(prec%precv(nlev_),stat=info)
+    allocate(amg_z_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
-    allocate(amg_z_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info) 
+    allocate(amg_z_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
 
-  case ('L1-DIAG','L1-JACOBI','L1_DIAG','L1_JACOBI') 
+  case ('L1-DIAG','L1-JACOBI','L1_DIAG','L1_JACOBI')
     nlev_ = 1
     ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info) 
-    allocate(amg_z_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info) 
+    allocate(prec%precv(nlev_),stat=info)
+    allocate(amg_z_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
-    allocate(amg_z_l1_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info) 
+    allocate(amg_z_l1_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
 
-  case ('GS','FWGS') 
+  case ('GS','FWGS')
     nlev_ = 1
     ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info) 
-    allocate(amg_z_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info) 
+    allocate(prec%precv(nlev_),stat=info)
+    allocate(amg_z_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
-    allocate(amg_z_gs_solver_type :: prec%precv(ilev_)%sm%sv, stat=info) 
+    allocate(amg_z_gs_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
 
-  case ('BWGS') 
+  case ('BWGS')
     nlev_ = 1
     ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info) 
-    allocate(amg_z_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info) 
+    allocate(prec%precv(nlev_),stat=info)
+    allocate(amg_z_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
-    allocate(amg_z_bwgs_solver_type :: prec%precv(ilev_)%sm%sv, stat=info) 
+    allocate(amg_z_bwgs_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
 
-  case ('FBGS') 
+  case ('FBGS')
     nlev_ = 1
     ilev_ = 1
     allocate(prec%precv(nlev_),stat=info)
     call prec%set('SMOOTHER_TYPE','FBGS',info)
     call prec%precv(ilev_)%default()
 
-  case ('BJAC') 
+  case ('BJAC')
     nlev_ = 1
     ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info) 
-    allocate(amg_z_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info) 
+    allocate(prec%precv(nlev_),stat=info)
+    allocate(amg_z_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
-    allocate(amg_z_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat=info) 
+    allocate(amg_z_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
 
-  case ('L1-BJAC','L1_BJAC') 
+  case ('L1-BJAC','L1_BJAC')
     nlev_ = 1
     ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info) 
-    allocate(amg_z_l1_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info) 
+    allocate(prec%precv(nlev_),stat=info)
+    allocate(amg_z_l1_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
-    allocate(amg_z_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat=info) 
+    allocate(amg_z_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
 
   case ('AS')
     nlev_ = 1
     ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info) 
-    allocate(amg_z_as_smoother_type :: prec%precv(ilev_)%sm, stat=info) 
+    allocate(prec%precv(nlev_),stat=info)
+    allocate(amg_z_as_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
-    allocate(amg_z_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat=info) 
+    allocate(amg_z_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
 
 
@@ -216,22 +223,26 @@ subroutine amg_zprecinit(ctxt,prec,ptype,info)
     nlev_ = prec%ag_data%max_levs
     ilev_ = 1
     allocate(prec%precv(nlev_),stat=info)
+    if (info /= psb_success_ ) then
+      call psb_errpush(info,name,a_err='Error from hierarchy init')
+      goto 9999
+    endif
 
-    do ilev_ = 1, nlev_  
+    do ilev_ = 1, nlev_
       call prec%precv(ilev_)%default()
     end do
     call prec%set('ML_CYCLE','VCYCLE',info)
     call prec%set('SMOOTHER_TYPE','FBGS',info)
-#if defined(HAVE_UMF_) 
+#if defined(HAVE_UMF_)
     call prec%set('COARSE_SOLVE','UMF',info)
 #elif defined(HAVE_MUMPS_)
-    call prec%set('COARSE_SOLVE','MUMPS',info)    
+    call prec%set('COARSE_SOLVE','MUMPS',info)
 #elif defined(HAVE_SLU_)
     call prec%set('COARSE_SOLVE','SLU',info)
 #else
     call prec%set('COARSE_SOLVE','ILU',info)
 #endif
-    
+
   case default
     write(psb_err_unit,*) name,&
          &': Warning: Unknown preconditioner type request "',ptype,'"'
@@ -239,5 +250,10 @@ subroutine amg_zprecinit(ctxt,prec,ptype,info)
 
   end select
 
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
 
 end subroutine amg_zprecinit

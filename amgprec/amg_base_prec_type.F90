@@ -136,6 +136,8 @@ module amg_base_prec_type
     integer(psb_lpk_)                  :: target_coarse_size
     ! 2. maximum number of levels.   Defaults to  20
     integer(psb_ipk_)                  :: max_levs    = 20_psb_ipk_
+  contains
+    procedure, pass(ag) :: default => i_ag_default
   end type amg_iaggr_data
 
   type, extends(amg_iaggr_data) :: amg_saggr_data
@@ -143,6 +145,8 @@ module amg_base_prec_type
     real(psb_spk_)                     :: min_cr_ratio   = 1.5_psb_spk_
     real(psb_spk_)                     :: op_complexity  = szero
     real(psb_spk_)                     :: avg_cr         = szero
+  contains
+    procedure, pass(ag) ::   default => s_ag_default
   end type amg_saggr_data
 
   type, extends(amg_iaggr_data) :: amg_daggr_data
@@ -150,6 +154,8 @@ module amg_base_prec_type
     real(psb_dpk_)                     :: min_cr_ratio   = 1.5_psb_dpk_
     real(psb_dpk_)                     :: op_complexity  = dzero
     real(psb_dpk_)                     :: avg_cr         = dzero
+  contains
+    procedure, pass(ag) ::   default => d_ag_default
   end type amg_daggr_data
 
 
@@ -1239,5 +1245,32 @@ contains
          & (parms1%aggr_omega_val   == parms2%aggr_omega_val  ) .and. &
          & (parms1%aggr_thresh      == parms2%aggr_thresh     )
   end function amg_d_equal_aggregation
+
+  subroutine i_ag_default(ag)
+    class(amg_iaggr_data), intent(inout) :: ag
+
+    ag%min_coarse_size = -ione
+    ag%min_coarse_size_per_process = -ione
+    ag%max_levs    = 20_psb_ipk_
+  end subroutine i_ag_default
+
+  subroutine s_ag_default(ag)
+    class(amg_saggr_data), intent(inout) :: ag
+
+    call ag%amg_iaggr_data%default()
+    ag%min_cr_ratio   = 1.5_psb_spk_
+    ag%op_complexity  = szero
+    ag%avg_cr         = szero
+  end subroutine s_ag_default
+
+  subroutine d_ag_default(ag)
+    class(amg_daggr_data), intent(inout) :: ag
+
+    call ag%amg_iaggr_data%default()
+    ag%min_cr_ratio   = 1.5_psb_dpk_
+    ag%op_complexity  = dzero
+    ag%avg_cr         = dzero
+  end subroutine d_ag_default
+
 
 end module amg_base_prec_type
