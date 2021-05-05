@@ -3,7 +3,7 @@ include Make.inc
 
 all:  library 
 
-library: libdir amgp
+library: libdir amgp cbnd
 #cbnd
 
 libdir:
