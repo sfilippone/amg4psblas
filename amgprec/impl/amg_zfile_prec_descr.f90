@@ -65,7 +65,7 @@
 !         0: normal
 !        >1: increased details 
 !
-subroutine amg_zfile_prec_descr(prec,iout,root, verbosity)
+subroutine amg_zfile_prec_descr(prec,info,iout,root, verbosity)
   use psb_base_mod
   use amg_z_prec_mod, amg_protect_name => amg_zfile_prec_descr
   use amg_z_inner_mod
@@ -74,13 +74,14 @@ subroutine amg_zfile_prec_descr(prec,iout,root, verbosity)
   implicit none 
   ! Arguments
   class(amg_zprec_type), intent(in)      :: prec
+  integer(psb_ipk_), intent(out) :: info
   integer(psb_ipk_), intent(in), optional :: iout
   integer(psb_ipk_), intent(in), optional :: root
   integer(psb_ipk_), intent(in), optional   :: verbosity
 
 
   ! Local variables
-  integer(psb_ipk_)   :: ilev, nlev, ilmin, info, nswps
+  integer(psb_ipk_)   :: ilev, nlev, ilmin, nswps
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: me, np
   logical             :: is_symgs

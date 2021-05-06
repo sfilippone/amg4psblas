@@ -432,7 +432,7 @@ program amg_s_pde2d
   call psb_sum(ctxt,amatsize)
   call psb_sum(ctxt,descsize)
   call psb_sum(ctxt,precsize)
-  call prec%descr(iout=psb_out_unit)
+  call prec%descr(info,iout=psb_out_unit)
   if (iam == psb_root_) then
     write(psb_out_unit,'("Computed solution on ",i8," processors")')   np
     write(psb_out_unit,'("Linear system size                 : ",i12)') system_size
