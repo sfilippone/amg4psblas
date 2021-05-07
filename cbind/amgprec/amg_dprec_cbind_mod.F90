@@ -384,7 +384,7 @@ contains
 
    integer(psb_c_ipk_) :: res
    type(psb_c_object_type) :: ph
-   integer               :: info
+   integer(psb_c_ipk_)     :: info
    type(amg_dprec_type), pointer :: precp
 
    res = -1
@@ -396,7 +396,7 @@ contains
    end if
 
 
-   call precp%descr()
+   call precp%descr(info)
    call flush(psb_out_unit)
 
    info = 0

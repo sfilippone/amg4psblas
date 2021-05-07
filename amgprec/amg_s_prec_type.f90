@@ -155,11 +155,12 @@ module amg_s_prec_type
 
 
   interface amg_precdescr
-    subroutine amg_sfile_prec_descr(prec,iout,root,verbosity)
+    subroutine amg_sfile_prec_descr(prec,info,iout,root,verbosity)
       import :: amg_sprec_type, psb_ipk_
       implicit none
       ! Arguments
       class(amg_sprec_type), intent(in)      :: prec
+      integer(psb_ipk_), intent(out) :: info
       integer(psb_ipk_), intent(in), optional :: iout
       integer(psb_ipk_), intent(in), optional :: root
       integer(psb_ipk_), intent(in), optional :: verbosity

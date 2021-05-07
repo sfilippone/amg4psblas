@@ -523,7 +523,7 @@ program amg_df_sample
   call psb_sum(ctxt,amatsize)
   call psb_sum(ctxt,descsize)
   call psb_sum(ctxt,precsize)
-  call prec%descr(iout=psb_out_unit)
+  call prec%descr(info,iout=psb_out_unit)
   if (iam == psb_root_) then 
     write(psb_out_unit,'("Matrix: ",a)')mtrx_file
     write(psb_out_unit,'("Computed solution on ",i8," processors")')np
