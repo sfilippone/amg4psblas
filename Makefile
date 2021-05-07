@@ -33,8 +33,8 @@ install: all
 	mkdir -p  $(INSTALL_SAMPLESDIR) && \
 		 mkdir -p  $(INSTALL_SAMPLESDIR)/simple &&\
 	 	 mkdir -p  $(INSTALL_SAMPLESDIR)/advanced && \
-		(cd examples; /bin/cp -fr pdegen fileread $(INSTALL_SAMPLESDIR)/simple ) && \
-		(cd tests; /bin/cp -fr pdegen fileread $(INSTALL_SAMPLESDIR)/advanced )
+		(cd samples/simple; /bin/cp -fr pdegen fileread $(INSTALL_SAMPLESDIR)/simple ) && \
+		(cd samples/advanced; /bin/cp -fr pdegen fileread $(INSTALL_SAMPLESDIR)/advanced )
 cleanlib:
 	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
 	(cd include; /bin/rm -f *.a *$(.mod) *$(.fh))
@@ -42,13 +42,13 @@ cleanlib:
 
 veryclean: cleanlib
 	(cd amgprec; make veryclean)
-	(cd examples/fileread; make clean)
-	(cd examples/pdegen; make clean)
-	(cd tests/fileread; make clean)
-	(cd tests/pdegen; make clean)
+	(cd samples/simple/fileread; make clean)
+	(cd samples/simple/pdegen; make clean)
+	(cd samples/advanced/fileread; make clean)
+	(cd samples/advanced/pdegen; make clean)
 
 check: all
-	make check -C tests/pdegen
+	make check -C samples/advanced/pdegen
 
 clean:
 	(cd amgprec; make clean)

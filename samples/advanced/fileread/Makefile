@@ -1,4 +1,4 @@
-AMGDIR=../..
+AMGDIR=../../..
 AMGINCDIR=$(AMGDIR)/include
 include $(AMGINCDIR)/Make.inc.amg4psblas
 AMGMODDIR=$(AMGDIR)/modules
