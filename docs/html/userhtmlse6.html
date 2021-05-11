@@ -3,8 +3,8 @@
 <html > 
 <head><title>Adding new smoother and solver objects to AMG4PSBLAS</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
-<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
-<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
 <!-- html,3 --> 
 <meta name="src" content="userhtml.tex"> 
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
@@ -170,33 +170,33 @@ cellspacing="0" cellpadding="0"
 ><colgroup id="TBL-22-1g"><col 
 id="TBL-22-1"><col 
 id="TBL-22-2"></colgroup><tr  
- style="vertical-align:baseline;" id="TBL-22-1-"><td  style="white-space:wrap; text-align:left;" id="TBL-22-1-1"  
+ style="vertical-align:baseline;" id="TBL-22-1-"><td  style="white-space:normal; text-align:left;" id="TBL-22-1-1"  
 class="td11"><!--l. 58--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">smoother</span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-22-1-2"  
+class="cmtt-12">smoother</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-22-1-2"  
 class="td11"><!--l. 58--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">class</span><span 
 class="cmtt-12">(</span><span 
 class="cmtt-12">amg_x_base_smoother_type</span><span 
 class="cmtt-12">)</span>                        </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-22-2-"><td  style="white-space:wrap; text-align:left;" id="TBL-22-2-1"  
-class="td11"><!--l. 59--><p class="noindent" >       </td><td  style="white-space:wrap; text-align:left;" id="TBL-22-2-2"  
+ style="vertical-align:baseline;" id="TBL-22-2-"><td  style="white-space:normal; text-align:left;" id="TBL-22-2-1"  
+class="td11"><!--l. 59--><p class="noindent" >       </td><td  style="white-space:normal; text-align:left;" id="TBL-22-2-2"  
 class="td11"><!--l. 59--><p class="noindent" ><span 
 class="cmr-12">The   user-defined   new   smoother   to   be   employed   in   the</span>
 <span 
 class="cmr-12">preconditioner.</span>                                                                    </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-22-3-"><td  style="white-space:wrap; text-align:left;" id="TBL-22-3-1"  
+ style="vertical-align:baseline;" id="TBL-22-3-"><td  style="white-space:normal; text-align:left;" id="TBL-22-3-1"  
 class="td11"><!--l. 61--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">solver</span> </td><td  style="white-space:wrap; text-align:left;" id="TBL-22-3-2"  
+class="cmtt-12">solver</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-22-3-2"  
 class="td11"><!--l. 61--><p class="noindent" ><span class="lstinline"></span><span 
 class="cmtt-12">class</span><span 
 class="cmtt-12">(</span><span 
 class="cmtt-12">amg_x_base_solver_type</span><span 
 class="cmtt-12">)</span>                          </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-22-4-"><td  style="white-space:wrap; text-align:left;" id="TBL-22-4-1"  
-class="td11"><!--l. 62--><p class="noindent" >       </td><td  style="white-space:wrap; text-align:left;" id="TBL-22-4-2"  
+ style="vertical-align:baseline;" id="TBL-22-4-"><td  style="white-space:normal; text-align:left;" id="TBL-22-4-1"  
+class="td11"><!--l. 62--><p class="noindent" >       </td><td  style="white-space:normal; text-align:left;" id="TBL-22-4-2"  
 class="td11"><!--l. 62--><p class="noindent" ><span 
 class="cmr-12">The user-defined new solver to be employed in the preconditioner.</span></td></tr></table></div></div>
 <!--l. 66--><p class="noindent" ><span 
@@ -215,24 +215,22 @@ class="cmr-12">pass it as follows:</span>
                                                                                
 
                                                                                
-   <div class="verbatim" id="verbatim-13">
-&#x00A0;<br />&#x00A0;&#x00A0;!&#x00A0;sparse&#x00A0;matrix&#x00A0;and&#x00A0;preconditioner
-&#x00A0;<br />&#x00A0;&#x00A0;type(psb_dspmat_type)&#x00A0;::&#x00A0;a
-&#x00A0;<br />&#x00A0;&#x00A0;type(amg_dprec_type)&#x00A0;&#x00A0;::&#x00A0;prec
-&#x00A0;<br />&#x00A0;&#x00A0;type(amg_d_tlu_solver_type)&#x00A0;::&#x00A0;tlusv
-&#x00A0;<br />
-&#x00A0;<br />......
-&#x00A0;<br />&#x00A0;&#x00A0;!
-&#x00A0;<br />&#x00A0;&#x00A0;!&#x00A0;&#x00A0;prepare&#x00A0;the&#x00A0;preconditioner:&#x00A0;an&#x00A0;ML&#x00A0;with&#x00A0;defaults,&#x00A0;but&#x00A0;with&#x00A0;TLU&#x00A0;solver&#x00A0;at
-&#x00A0;<br />&#x00A0;&#x00A0;!&#x00A0;&#x00A0;intermediate&#x00A0;levels.&#x00A0;All&#x00A0;other&#x00A0;parameters&#x00A0;are&#x00A0;at&#x00A0;default&#x00A0;values.
-&#x00A0;<br />&#x00A0;&#x00A0;!
-&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;prec%init(&#8217;ML&#8217;,&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;info)
-&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;prec%hierarchy_build(a,desc_a,info)
-&#x00A0;<br />&#x00A0;&#x00A0;nlv&#x00A0;=&#x00A0;prec%get_nlevs()
-&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;prec%set(tlusv,&#x00A0;&#x00A0;&#x00A0;info,ilev=1,ilmax=max(1,nlv-1))
-&#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;prec%smoothers_build(a,desc_a,info)
-&#x00A0;<br />
-</div>
+   <pre class="verbatim" id="verbatim-13">
+&#x00A0;&#x00A0;!&#x00A0;sparse&#x00A0;matrix&#x00A0;and&#x00A0;preconditioner
+&#x00A0;&#x00A0;type(psb_dspmat_type)&#x00A0;::&#x00A0;a
+&#x00A0;&#x00A0;type(amg_dprec_type)&#x00A0;&#x00A0;::&#x00A0;prec
+&#x00A0;&#x00A0;type(amg_d_tlu_solver_type)&#x00A0;::&#x00A0;tlusv
+......
+&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;!&#x00A0;&#x00A0;prepare&#x00A0;the&#x00A0;preconditioner:&#x00A0;an&#x00A0;ML&#x00A0;with&#x00A0;defaults,&#x00A0;but&#x00A0;with&#x00A0;TLU&#x00A0;solver&#x00A0;at
+&#x00A0;&#x00A0;!&#x00A0;&#x00A0;intermediate&#x00A0;levels.&#x00A0;All&#x00A0;other&#x00A0;parameters&#x00A0;are&#x00A0;at&#x00A0;default&#x00A0;values.
+&#x00A0;&#x00A0;!
+&#x00A0;&#x00A0;call&#x00A0;prec%init(&#8217;ML&#8217;,&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;info)
+&#x00A0;&#x00A0;call&#x00A0;prec%hierarchy_build(a,desc_a,info)
+&#x00A0;&#x00A0;nlv&#x00A0;=&#x00A0;prec%get_nlevs()
+&#x00A0;&#x00A0;call&#x00A0;prec%set(tlusv,&#x00A0;&#x00A0;&#x00A0;info,ilev=1,ilmax=max(1,nlv-1))
+&#x00A0;&#x00A0;call&#x00A0;prec%smoothers_build(a,desc_a,info)
+</pre>
 <!--l. 107--><p class="nopar" >
                                                                                
 
