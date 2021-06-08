@@ -129,7 +129,7 @@ relevant data structures, performed
 through the PSBLAS routines for sparse matrix and vector management, is not reported
 here for the sake of conciseness.
 The complete code can be found in the example program file \verb|amg_dexample_ml.f90|,
-in the directory \verb|samples/simple/fileread| of the AMG4PSBLAS implementation (see
+in the directory \verb|samples/simple/file|\-\verb|read| of the AMG4PSBLAS implementation (see
 Section~\ref{sec:ex_and_test}). A sample test problem along with the relevant
 input data is available in \verb|samples/simple/fileread/runs|.
 For details on the use of the PSBLAS routines, see the PSBLAS User's
@@ -139,7 +139,7 @@ The setup and application of the default multilevel preconditioner
 for the real single precision and the complex, single and double
 precision, versions are obtained with straightforward modifications of the previous
 example (see Section~\ref{sec:userinterface} for details). If these versions are installed,
-the corresponding codes are available in \verb|samples/simple/fileread/|.
+the corresponding codes are available in \verb|samples/simple/file|\-\verb|read|.
 
 \begin{listing}[tbp]
 \begin{center}
@@ -535,7 +535,8 @@ Krylov method. At the end of the code, we close the GPU environment
   call prec%allocate_wrk(info)
   t1 = psb_wtime()
   call psb_krylov(s_choice%kmethd,a,prec,b,x,s_choice%eps,&
-       & desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,itrace=s_choice%itrace,&
+       & desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,&
+       & itrace=s_choice%itrace,&
        & istop=s_choice%istopc,irst=s_choice%irst)
   call prec%deallocate_wrk(info)
   call psb_barrier(ctxt)
