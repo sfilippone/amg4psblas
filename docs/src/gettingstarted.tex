@@ -584,14 +584,17 @@ Krylov method. At the end of the code, we close the GPU environment
 \caption{setup of a GPU-enabled test program part three.\label{fig:gpu-ex3}}
 \end{listing}
 
-It is very important to employ solvers that are suited
-to the GPU, i.e.  solvers that do NOT  employ triangular
-system solve kernels.  Solvers that satisfy this constraint include:
+It is very important to employ smoothers and coarsest solvers that are suited
+to the GPU, i.e.  methods that do NOT employ triangular
+system solve kernels. Methods that satisfy this constraint include:
 \begin{itemize}
 \item \verb|JACOBI|
+\item \verb|BJAC| with the following methods on the local blocks:
+\begin{itemize}
 \item \verb|INVK|
 \item \verb|INVT|
 \item \verb|AINV|
+\end{itemize}
 \end{itemize}
 and their $\ell_1$ variants. 
 
