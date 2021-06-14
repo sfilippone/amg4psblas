@@ -190,22 +190,23 @@ make install
 \subsection{Bug reporting}
 If you find any bugs in our codes, please report them through our
 issues page on \\[2mm]
-\url{https://github.com/psctoolkit/amg4psblas/issues}\\
+\url{https://github.com/psctoolkit/psctoolkit/issues}\\
 
 To enable us to track the bug, please provide a log from the failing
 application, the test conditions, and ideally a self-contained test
 program reproducing the issue.
 
 \subsection{Example and test programs\label{sec:ex_and_test}}
-The package contains the \verb|examples| and \verb|tests| directories;
+The package contains a \verb|samples| directory, divided in two
+subdirs  \verb|simple| and \verb|advanced|;
 both of them are further divided into \verb|fileread| and
 \verb|pdegen| subdirectories. Their purpose is as follows:
 \begin{description}
-\item[\tt examples] contains a set of simple example programs with a
+\item[\tt simple] contains a set of simple example programs with a
   predefined choice of preconditioners, selectable via integer
   values. These are intended to get  acquainted with the
   multilevel preconditioners available in AMG4PSBLAS.
-\item[\tt tests] contains a set of more sophisticated examples that
+\item[\tt advanced] contains a set of more sophisticated examples that
   will allow the user, via the input files in the \verb|runs|
   subdirectories, to experiment with the full range of preconditioners
   implemented in the package.

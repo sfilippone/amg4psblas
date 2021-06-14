@@ -149,6 +149,7 @@ div.abstract {width:100%;}
 .Ovalbox-thick { padding-left:3pt; padding-right:3pt; border:solid thick; }
 .shadowbox { padding-left:3pt; padding-right:3pt; border:solid thin; border-right:solid thick; border-bottom:solid thick; }
 .doublebox { padding-left:3pt; padding-right:3pt; border-style:double; border:solid thick; }
+.rotatebox{display: inline-block;}
 .figure img.graphics {margin-left:10%;}
 .lstlisting .label{margin-right:0.5em; }
 div.lstlisting{font-family: monospace; white-space: nowrap; margin-top:0.5em; margin-bottom:0.5em; }

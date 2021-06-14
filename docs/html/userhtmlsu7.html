@@ -145,7 +145,7 @@ class="cmr-12">GPU environment</span>
                                                                                
 <div class="center" 
 >
-<!--l. 552--><p class="noindent" >
+<!--l. 553--><p class="noindent" >
 <div class="minipage"><div class="verbatim" id="verbatim-12">
 &#x00A0;&#x00A0;call&#x00A0;desc_a%cnv(mold=igmold)
 &#x00A0;<br />&#x00A0;&#x00A0;call&#x00A0;a%cscnv(info,mold=agmold)
@@ -172,7 +172,7 @@ class="cmr-12">GPU environment</span>
 &#x00A0;<br />
 &#x00A0;<br />&#x00A0;
 </div>
-<!--l. 579--><p class="nopar" ></div></div>
+<!--l. 580--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 7: </span><span  
 class="content">setup of a GPU-enabled test program part three.</span></div><!--tex4ht:label?: x16-15003r7 -->
@@ -180,25 +180,30 @@ class="content">setup of a GPU-enabled test program part three.</span></div><!--
 
                                                                                
    </div><hr class="endfloat" />
-<!--l. 587--><p class="indent" >   <span 
-class="cmr-12">It is very important to employ solvers that are suited to the GPU, i.e. solvers that</span>
+<!--l. 588--><p class="indent" >   <span 
+class="cmr-12">It is very important to employ smoothers and coarsest solvers that are suited to the</span>
 <span 
-class="cmr-12">do NOT employ triangular system solve kernels. Solvers that satisfy this constraint</span>
+class="cmr-12">GPU, i.e. methods that do NOT employ triangular system solve kernels. Methods that</span>
 <span 
-class="cmr-12">include:</span>
+class="cmr-12">satisfy this constraint include:</span>
      <ul class="itemize1">
      <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">JACOBI</span></span></span>
      </li>
      <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-12">BJAC</span></span></span> <span 
+class="cmr-12">with the following methods on the local blocks:</span>
+          <ul class="itemize2">
+          <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">INVK</span></span></span>
-     </li>
-     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+          </li>
+          <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">INVT</span></span></span>
-     </li>
-     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+          </li>
+          <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">AINV</span></span></span></li></ul>
-<!--l. 596--><p class="noindent" ><span 
+     </li></ul>
+<!--l. 600--><p class="noindent" ><span 
 class="cmr-12">and their </span><span 
 class="cmmi-12">&#x2113;</span><sub><span 
 class="cmr-8">1</span></sub> <span 
