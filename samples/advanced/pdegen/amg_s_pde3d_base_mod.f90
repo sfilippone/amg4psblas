@@ -64,7 +64,7 @@ contains
     b3=sone/sqrt(3.0_psb_spk_)
   end function b3
   function c(x,y,z)
-    use psb_base_mod, only : psb_spk_, sone
+    use psb_base_mod, only : psb_spk_, szero, sone
     real(psb_spk_) ::  c
     real(psb_spk_), intent(in) :: x,y,z
     c=szero
