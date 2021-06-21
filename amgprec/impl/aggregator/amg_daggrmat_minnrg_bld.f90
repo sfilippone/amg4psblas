@@ -154,6 +154,9 @@ subroutine amg_daggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
 
   ctxt = desc_a%get_context()
   icomm = desc_a%get_mpic()
+  info=psb_err_internal_error_
+  call psb_errpush(info,name)
+  goto 9999      
 
   call psb_info(ctxt, me, np)
 
