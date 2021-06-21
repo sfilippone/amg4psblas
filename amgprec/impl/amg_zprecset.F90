@@ -45,7 +45,7 @@ subroutine amg_zprecsetsm(p,val,info,ilev,ilmax,pos)
   implicit none
 
   ! Arguments
-  class(amg_zprec_type), intent(inout)         :: p
+  class(amg_zprec_type), target, intent(inout):: p
   class(amg_z_base_smoother_type), intent(in) :: val
   integer(psb_ipk_), intent(out)              :: info
   integer(psb_ipk_), optional, intent(in)     :: ilev,ilmax

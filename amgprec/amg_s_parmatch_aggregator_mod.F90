@@ -168,7 +168,7 @@ module amg_s_parmatch_aggregator_mod
       type(amg_sml_parms), intent(inout)   :: parms
       type(amg_saggr_data), intent(in)     :: ag_data
       type(psb_sspmat_type), intent(inout) :: a
-      type(psb_desc_type), intent(inout)   :: desc_a
+      type(psb_desc_type), intent(inout)     :: desc_a
       integer(psb_lpk_), allocatable, intent(out) :: ilaggr(:),nlaggr(:)
       type(psb_lsspmat_type), intent(out)  :: t_prol
       integer(psb_ipk_), intent(out)      :: info
@@ -235,7 +235,7 @@ module amg_s_parmatch_aggregator_mod
            & psb_lsspmat_type, psb_dpk_, psb_ipk_, psb_lpk_, amg_sml_parms, amg_saggr_data
       implicit none
       type(psb_sspmat_type), intent(in)       :: a
-      type(psb_desc_type), intent(in)         :: desc_a
+      type(psb_desc_type), intent(inout)       :: desc_a
       integer(psb_lpk_), intent(inout)        :: ilaggr(:), nlaggr(:)
       type(amg_sml_parms), intent(inout)      :: parms
       type(psb_lsspmat_type), intent(inout)   :: t_prol
@@ -257,7 +257,7 @@ module amg_s_parmatch_aggregator_mod
       integer(psb_lpk_), intent(inout)        :: ilaggr(:), nlaggr(:)
       type(amg_sml_parms), intent(inout)      :: parms
       type(psb_lsspmat_type), intent(inout)   :: t_prol
-      type(psb_sspmat_type), intent(out)      :: op_prol,ac, op_restr
+      type(psb_sspmat_type), intent(inout)      :: op_prol,ac, op_restr
       type(psb_desc_type), intent(inout)    :: desc_ac
       integer(psb_ipk_), intent(out)          :: info
     end subroutine amg_s_parmatch_unsmth_bld
@@ -275,7 +275,7 @@ module amg_s_parmatch_aggregator_mod
       integer(psb_lpk_), intent(inout)        :: ilaggr(:), nlaggr(:)
       type(amg_sml_parms), intent(inout)      :: parms
       type(psb_lsspmat_type), intent(inout)   :: t_prol
-      type(psb_sspmat_type), intent(out)      :: op_prol,ac, op_restr
+      type(psb_sspmat_type), intent(inout)    :: op_prol,ac, op_restr
       type(psb_desc_type), intent(inout)    :: desc_ac
       integer(psb_ipk_), intent(out)          :: info
     end subroutine amg_s_parmatch_smth_bld
@@ -288,11 +288,11 @@ module amg_s_parmatch_aggregator_mod
            & psb_lsspmat_type, psb_dpk_, psb_ipk_, psb_lpk_, amg_sml_parms, amg_saggr_data
       implicit none
       type(psb_sspmat_type), intent(inout)    :: a
-      type(psb_desc_type), intent(in)         :: desc_a
+      type(psb_desc_type), intent(inout)       :: desc_a
       integer(psb_lpk_), intent(inout)        :: ilaggr(:), nlaggr(:)
       type(amg_sml_parms), intent(inout)      :: parms
       type(psb_lsspmat_type), intent(inout)   :: t_prol
-      type(psb_sspmat_type), intent(out)      :: op_prol,ac, op_restr
+      type(psb_sspmat_type), intent(inout)    :: op_prol,ac, op_restr
       type(psb_desc_type), intent(out)          :: desc_ac
       integer(psb_ipk_), intent(out)          :: info
     end subroutine amg_s_parmatch_spmm_bld_ov
@@ -306,11 +306,11 @@ module amg_s_parmatch_aggregator_mod
            & psb_s_csr_sparse_mat, psb_ls_csr_sparse_mat
       implicit none
       type(psb_s_csr_sparse_mat), intent(inout) :: a
-      type(psb_desc_type), intent(in)           :: desc_a
+      type(psb_desc_type), intent(inout)          :: desc_a
       integer(psb_lpk_), intent(inout)          :: ilaggr(:), nlaggr(:)
       type(amg_sml_parms), intent(inout)        :: parms
       type(psb_lsspmat_type), intent(inout)     :: t_prol
-      type(psb_sspmat_type), intent(out)        :: op_prol,ac, op_restr
+      type(psb_sspmat_type), intent(inout)      :: op_prol,ac, op_restr
       type(psb_desc_type), intent(out)          :: desc_ac
       integer(psb_ipk_), intent(out)            :: info
     end subroutine amg_s_parmatch_spmm_bld_inner

@@ -108,11 +108,11 @@ subroutine amg_s_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
 
   ! Arguments
   type(psb_s_csr_sparse_mat), intent(inout) :: a_csr
-  type(psb_desc_type), intent(in)           :: desc_a
+  type(psb_desc_type), intent(inout)          :: desc_a
   integer(psb_lpk_), intent(inout)          :: ilaggr(:), nlaggr(:)
   type(amg_sml_parms), intent(inout)        :: parms
   type(psb_lsspmat_type), intent(inout)     :: t_prol
-  type(psb_sspmat_type), intent(out)        :: ac, op_prol, op_restr
+  type(psb_sspmat_type), intent(inout)      :: ac, op_prol, op_restr
   type(psb_desc_type), intent(out)          :: desc_ac
   integer(psb_ipk_), intent(out)            :: info
 

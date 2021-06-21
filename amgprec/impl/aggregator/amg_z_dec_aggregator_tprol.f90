@@ -83,8 +83,8 @@ subroutine  amg_z_dec_aggregator_build_tprol(ag,parms,ag_data,&
   class(amg_z_dec_aggregator_type), target, intent(inout) :: ag
   type(amg_dml_parms), intent(inout)  :: parms
   type(amg_daggr_data), intent(in)    :: ag_data
-  type(psb_zspmat_type), intent(in)   :: a
-  type(psb_desc_type), intent(in)     :: desc_a
+  type(psb_zspmat_type), intent(inout) :: a
+  type(psb_desc_type), intent(inout)    :: desc_a
   integer(psb_lpk_), allocatable, intent(out) :: ilaggr(:),nlaggr(:)
   type(psb_lzspmat_type), intent(out)  :: t_prol
   integer(psb_ipk_), intent(out)      :: info

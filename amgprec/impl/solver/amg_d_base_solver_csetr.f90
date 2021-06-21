@@ -42,7 +42,7 @@ subroutine amg_d_base_solver_csetr(sv,what,val,info,idx)
   Implicit None
   ! Arguments
   class(amg_d_base_solver_type), intent(inout) :: sv 
-  integer(psb_ipk_), intent(in)                  :: what 
+  character(len=*), intent(in)                   :: what 
   real(psb_dpk_), intent(in)                      :: val
   integer(psb_ipk_), intent(out)                 :: info
   integer(psb_ipk_), intent(in), optional        :: idx

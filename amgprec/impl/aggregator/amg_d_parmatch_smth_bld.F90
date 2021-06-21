@@ -122,7 +122,7 @@ subroutine amg_d_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
   integer(psb_lpk_), intent(inout)         :: ilaggr(:), nlaggr(:)
   type(amg_dml_parms), intent(inout)    :: parms
   type(psb_ldspmat_type), intent(inout)  :: t_prol
-  type(psb_dspmat_type), intent(out)    :: op_prol,ac,op_restr
+  type(psb_dspmat_type), intent(inout)   :: op_prol,ac,op_restr
   type(psb_desc_type), intent(inout)    :: desc_ac
   integer(psb_ipk_), intent(out)           :: info
 

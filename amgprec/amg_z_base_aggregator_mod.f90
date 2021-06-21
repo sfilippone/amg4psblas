@@ -126,7 +126,7 @@ module amg_z_base_aggregator_mod
            & psb_z_coo_sparse_mat, amg_dml_parms, psb_dpk_, psb_ipk_, psb_lpk_
       implicit none
       type(psb_z_csr_sparse_mat), intent(inout) :: a_csr
-      type(psb_desc_type), intent(in)            :: desc_a
+      type(psb_desc_type), intent(inout)         :: desc_a
       integer(psb_lpk_), intent(inout)           :: nlaggr(:)
       type(amg_dml_parms), intent(inout)         :: parms 
       type(psb_z_coo_sparse_mat), intent(inout) :: coo_prol, coo_restr
@@ -144,7 +144,7 @@ module amg_z_base_aggregator_mod
            & psb_z_coo_sparse_mat, amg_dml_parms, psb_dpk_, psb_ipk_, psb_lpk_
       implicit none
       type(psb_z_csr_sparse_mat), intent(inout) :: a_csr
-      type(psb_desc_type), intent(in)            :: desc_a
+      type(psb_desc_type), intent(inout)         :: desc_a
       integer(psb_lpk_), intent(inout)           :: nlaggr(:)
       type(amg_dml_parms), intent(inout)         :: parms 
       type(psb_z_coo_sparse_mat), intent(inout) :: coo_prol, coo_restr

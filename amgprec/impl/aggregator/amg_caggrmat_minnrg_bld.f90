@@ -105,7 +105,7 @@
 !
 !
 subroutine amg_caggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
-     & ac,desc_ac,op_prol,op_restr,info)
+     & ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
   use amg_base_prec_type
   use amg_c_inner_mod, amg_protect_name => amg_caggrmat_minnrg_bld
@@ -117,8 +117,8 @@ subroutine amg_caggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
   type(psb_desc_type), intent(inout)            :: desc_a
   integer(psb_lpk_), intent(inout)              :: ilaggr(:), nlaggr(:)
   type(amg_sml_parms), intent(inout)         :: parms 
-  type(psb_lcspmat_type), intent(inout)       :: op_prol
-  type(psb_lcspmat_type), intent(out)         :: ac,op_restr
+  type(psb_lcspmat_type), intent(inout)       :: t_prol
+  type(psb_cspmat_type), intent(inout)       :: op_prol, ac,op_restr
   type(psb_desc_type), intent(inout)            :: desc_ac
   integer(psb_ipk_), intent(out)                :: info
 
@@ -171,6 +171,8 @@ subroutine amg_caggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
 
   filter_mat = (parms%aggr_filter == amg_filter_mat_)
 
+  !NEEDS TO BE REWORKED !!
+  
   ! naggr: number of local aggregates
   ! nrow: local rows. 
   ! 
@@ -183,361 +185,361 @@ subroutine amg_caggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
     goto 9999      
   end if
 
-  ! Get the diagonal D
-  adiag =  a%get_diag(info)
-  if (info == psb_success_) &
-       & call psb_realloc(ncol,adiag,info)    
-  if (info == psb_success_) &
-       & call psb_halo(adiag,desc_a,info)
-  if (info == psb_success_) call a%cp_to_l(la)
-  if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='sp_getdiag')
-    goto 9999
-  end if
-
-  do i=1,size(adiag)
-    if (adiag(i) /= czero) then
-      adinv(i) = cone / adiag(i)
-    else
-      adinv(i) = cone
-    end if
-  end do
-
-
-
-  ! 1. Allocate Ptilde in sparse matrix form 
-  call op_prol%mv_to(tmpcoo)
-  call ptilde%mv_from(tmpcoo)
-  call ptilde%cscnv(info,type='csr')
-
-  if (info == psb_success_) call la%cscnv(am3,info,type='csr',dupl=psb_dupl_add_)
-  if (info == psb_success_) call la%cscnv(da,info,type='csr',dupl=psb_dupl_add_)
-  if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='spcnv')
-    goto 9999
-  end if
-  if (debug_level >= psb_debug_outer_) &
-       & write(debug_unit,*) me,' ',trim(name),&
-       & ' Initial copies done.'
-
-  call da%scal(adinv,info)
-
-  call psb_spspmm(da,ptilde,dap,info)
-
-  if(info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='spspmm 1')
-    goto 9999
-  end if
-
-  call dap%clone(atmp,info)
-
-  call psb_sphalo(atmp,desc_a,am4,info,&
-       & colcnv=.false.,rowscale=.true.,outfmt='CSR  ')
-  if (info == psb_success_) call psb_rwextd(ncol,atmp,info,b=am4)      
-  if (info == psb_success_) call am4%free()
-
-  call psb_spspmm(da,atmp,dadap,info)
-  call atmp%free()
-
-  !  !$  write(0,*) 'Columns of AP',psb_sp_get_ncols(ap)
-  !  !$  write(0,*) 'Columns of ADAP',psb_sp_get_ncols(adap)
-  call dap%mv_to(csc_dap)
-  call dadap%mv_to(csc_dadap)
-
-  call csc_mat_col_prod(csc_dap,csc_dadap,omp,info)
-  call csc_mat_col_prod(csc_dadap,csc_dadap,oden,info)
-  call psb_sum(ctxt,omp)
-  call psb_sum(ctxt,oden)
-  ! !$  write(0,*) trim(name),' OMP :',omp
-  ! !$  write(0,*) trim(name),' ODEN:',oden
-
-  omp = omp/oden
-
-  ! !$  write(0,*) 'Check on output prolongator ',omp(1:min(size(omp),10))
-  if (debug_level >= psb_debug_outer_) &
-       & write(debug_unit,*) me,' ',trim(name),&
-       & 'Done NUMBMM 1'
-
-  call am3%mv_to(acsr3)
-  ! Compute omega_int
-  ommx = czero
-  do i=1, ncol
-    if (ilaggr(i) >0) then 
-      omi(i) = omp(ilaggr(i))
-    else
-      omi(i) = czero
-    end if
-    if(abs(omi(i)) .gt. abs(ommx)) ommx = omi(i)
-  end do
-  ! Compute omega_fine
-  do i=1, nrow
-    omf(i) = ommx
-    do j=acsr3%irp(i),acsr3%irp(i+1)-1
-      if(abs(omi(acsr3%ja(j))) .lt. abs(omf(i))) omf(i)=omi(acsr3%ja(j))
-    end do
-!!$    if(min(real(omf(i)),aimag(omf(i))) < szero) omf(i) = czero
-    if(psb_minreal(omf(i)) < szero) omf(i) = czero
-  end do
-
-  omf(1:nrow) = omf(1:nrow) * adinv(1:nrow)
-
-  if (filter_mat) then
-    !
-    ! Build the filtered matrix Af from A
-    ! 
-    call la%cscnv(acsrf,info,dupl=psb_dupl_add_)
-
-    do i=1,nrow
-      tmp = czero
-      jd  = -1 
-      do j=acsrf%irp(i),acsrf%irp(i+1)-1
-        if (acsrf%ja(j) == i) jd = j 
-        if (abs(acsrf%val(j)) < theta*sqrt(abs(adiag(i)*adiag(acsrf%ja(j))))) then
-          tmp=tmp+acsrf%val(j)
-          acsrf%val(j)=czero
-        endif
-      enddo
-      if (jd == -1) then 
-        write(0,*) 'Wrong input: we need the diagonal!!!!', i
-      else
-        acsrf%val(jd)=acsrf%val(jd)-tmp
-      end if
-    enddo
-    ! Take out zeroed terms 
-    call acsrf%clean_zeros(info)
-
-    !
-    ! Build the smoothed prolongator using the filtered matrix
-    ! 
-    do i=1,acsrf%get_nrows()
-      do j=acsrf%irp(i),acsrf%irp(i+1)-1
-        if (acsrf%ja(j) == i) then 
-          acsrf%val(j) = cone - omf(i)*acsrf%val(j) 
-        else
-          acsrf%val(j) = - omf(i)*acsrf%val(j) 
-        end if
-      end do
-    end do
-
-    if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),&
-         & 'Done gather, going for SYMBMM 1'
-
-    call af%mv_from(acsrf)
-    !
-    ! op_prol = (I-w*D*Af)Ptilde
-    ! Doing it this way means to consider diag(Af_i)
-    ! 
-    !
-    call psb_spspmm(af,ptilde,op_prol,info)
-    if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),&
-         & 'Done SPSPMM 1'
-  else
-    !
-    ! Build the smoothed prolongator using the original matrix
-    !
-    do i=1,acsr3%get_nrows()
-      do j=acsr3%irp(i),acsr3%irp(i+1)-1
-        if (acsr3%ja(j) == i) then 
-          acsr3%val(j) = cone - omf(i)*acsr3%val(j) 
-        else
-          acsr3%val(j) = - omf(i)*acsr3%val(j) 
-        end if
-      end do
-    end do
-
-    call am3%mv_from(acsr3)
-    if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),&
-         & 'Done gather, going for SYMBMM 1'
-    !
-    ! 
-    ! op_prol = (I-w*D*A)Ptilde
-    ! 
-    !
-    call psb_spspmm(am3,ptilde,op_prol,info)
-    if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),&
-         & 'Done NUMBMM 1'
-
-  end if
-
-
-  !
-  ! Ok, let's start over with the restrictor
-  ! 
-  call ptilde%transc(rtilde)
-  call la%cscnv(atmp,info,type='csr')
-  call psb_sphalo(atmp,desc_a,am4,info,&
-       & colcnv=.true.,rowscale=.true.)
-  nrt  = am4%get_nrows() 
-  call am4%csclip(atmp2,info,lone,nrt,lone,ncol)
-  call atmp2%cscnv(info,type='CSR')
-  if (info == psb_success_) call psb_rwextd(ncol,atmp,info,b=atmp2)      
-  call am4%free()
-  call atmp2%free()
-
-  ! This is to compute the transpose. It ONLY works if the
-  ! original A has a symmetric pattern.
-  call atmp%transc(atmp2) 
-  call atmp2%csclip(dat,info,lone,nrow,lone,ncol)
-  call dat%cscnv(info,type='csr')
-  call dat%scal(adinv,info)
-
-  ! Now for the product. 
-  call psb_spspmm(dat,ptilde,datp,info)
-
-  call datp%clone(atmp2,info)
-  call psb_sphalo(atmp2,desc_a,am4,info,&
-       & colcnv=.false.,rowscale=.true.,outfmt='CSR  ')
-  if (info == psb_success_) call psb_rwextd(ncol,atmp2,info,b=am4)      
-  if (info == psb_success_) call am4%free()
-
-
-  call psb_symbmm(dat,atmp2,datdatp,info)
-  call psb_numbmm(dat,atmp2,datdatp)
-  call atmp2%free()
-
-  call datp%mv_to(csc_datp)    
-  call datdatp%mv_to(csc_datdatp)    
-
-  call csc_mat_col_prod(csc_datp,csc_datdatp,omp,info)
-  call csc_mat_col_prod(csc_datdatp,csc_datdatp,oden,info)
-  call psb_sum(ctxt,omp)
-  call psb_sum(ctxt,oden)
-
-
-  ! !$  write(debug_unit,*) trim(name),' OMP_R :',omp
-  ! ! $  write(debug_unit,*) trim(name),' ODEN_R:',oden
-  omp = omp/oden
-  ! !$  write(0,*) 'Check on output restrictor',omp(1:min(size(omp),10))
-  ! Compute omega_int
-  ommx = czero
-  do i=1, ncol
-    if (ilaggr(i) >0) then 
-      omi(i) = omp(ilaggr(i))
-    else
-      omi(i) = czero
-    end if
-    if(abs(omi(i)) .gt. abs(ommx)) ommx = omi(i)
-  end do
-  ! Compute omega_fine
-  ! Going over the columns of atmp means going over the rows
-  ! of A^T. Hopefully ;-) 
-  call atmp%cp_to(acsc)
-
-  do i=1, nrow
-    omf(i) = ommx
-    do j= acsc%icp(i),acsc%icp(i+1)-1
-      if(abs(omi(acsc%ia(j))) .lt. abs(omf(i))) omf(i)=omi(acsc%ia(j))
-    end do
-!!$    if(min(real(omf(i)),aimag(omf(i))) < szero) omf(i) = czero
-    if(psb_minreal(omf(i)) < szero) omf(i) = czero
-  end do
-  omf(1:nrow) = omf(1:nrow)*adinv(1:nrow)
-  call psb_halo(omf,desc_a,info)
-  call acsc%free() 
-
-
-  call atmp%mv_to(acsr1)
-
-  do i=1,acsr1%get_nrows()
-    do j=acsr1%irp(i),acsr1%irp(i+1)-1
-      if (acsr1%ja(j) == i) then 
-        acsr1%val(j) = cone - acsr1%val(j)*omf(acsr1%ja(j))
-      else
-        acsr1%val(j) =      - acsr1%val(j)*omf(acsr1%ja(j))
-      end if
-    end do
-  end do
-  call atmp%mv_from(acsr1)
-
-  call rtilde%mv_to(tmpcoo)
-  nzl = tmpcoo%get_nzeros()
-  i=0
-  do k=1, nzl
-    if ((naggrm1 < tmpcoo%ia(k)) .and. (tmpcoo%ia(k) <= naggrp1)) then
-      i = i+1
-      tmpcoo%val(i) = tmpcoo%val(k)
-      tmpcoo%ia(i)  = tmpcoo%ia(k)
-      tmpcoo%ja(i)  = tmpcoo%ja(k)
-    end if
-  end do
-  call tmpcoo%set_nzeros(i)
-  call rtilde%mv_from(tmpcoo)
-  call rtilde%cscnv(info,type='csr')
-
-  call psb_spspmm(rtilde,atmp,op_restr,info)
-
-  !
-  ! Now we have to gather the halo of op_prol, and add it to itself
-  ! to multiply it by A,
-  !
-  call op_prol%clone(tmp_prol,info) 
-  if (info == psb_success_) call psb_sphalo(tmp_prol,desc_a,am4,info,&
-       & colcnv=.false.,rowscale=.true.)
-  if (info == psb_success_) call psb_rwextd(ncol,tmp_prol,info,b=am4)      
-  if (info == psb_success_) call am4%free()
-
-  if(info /= psb_success_) then
-    call psb_errpush(psb_err_internal_error_,name,a_err='Halo of op_prol')
-    goto 9999
-  end if
-
-  !
-  ! Now we have to fix this.  The only rows of B that are correct 
-  ! are those corresponding to "local" aggregates, i.e. indices in ilaggr(:)
-  !
-  call op_restr%mv_to(tmpcoo)
-
-  nzl = tmpcoo%get_nzeros()
-  i=0
-  do k=1, nzl
-    if ((naggrm1 < tmpcoo%ia(k)) .and. (tmpcoo%ia(k) <= naggrp1)) then
-      i = i+1
-      tmpcoo%val(i) = tmpcoo%val(k)
-      tmpcoo%ia(i)  = tmpcoo%ia(k)
-      tmpcoo%ja(i)  = tmpcoo%ja(k)
-    end if
-  end do
-  call tmpcoo%set_nzeros(i)
-  call op_restr%mv_from(tmpcoo)
-  call op_restr%cscnv(info,type='csr')
-
-
-  if (debug_level >= psb_debug_outer_) &
-       & write(debug_unit,*) me,' ',trim(name),&
-       & 'starting sphalo/ rwxtd'
-
-  call psb_spspmm(la,tmp_prol,am3,info)
-  if (debug_level >= psb_debug_outer_) &
-       & write(debug_unit,*) me,' ',trim(name),&
-       & 'Done SPSPMM 2'
-
-  call psb_sphalo(am3,desc_a,am4,info,&
-       & colcnv=.false.,rowscale=.true.)
-  if (info == psb_success_) call psb_rwextd(ncol,am3,info,b=am4)      
-  if (info == psb_success_) call am4%free()
-
-  if(info /= psb_success_) then
-    call psb_errpush(psb_err_internal_error_,name,&
-         & a_err='Extend am3')
-    goto 9999
-  end if
-  if (debug_level >= psb_debug_outer_) &
-       & write(debug_unit,*) me,' ',trim(name),&
-       & 'Done sphalo/ rwxtd'
-
-  call psb_spspmm(op_restr,am3,ac,info)
-  if (info == psb_success_) call am3%free()
-  if (info == psb_success_) call ac%cscnv(info,type='coo',dupl=psb_dupl_add_)
-
-  if (info /= psb_success_) then
-    call psb_errpush(psb_err_internal_error_,name,&
-         &a_err='Build ac = op_restr x am3')
-    goto 9999
-  end if
+!!$  ! Get the diagonal D
+!!$  adiag =  a%get_diag(info)
+!!$  if (info == psb_success_) &
+!!$       & call psb_realloc(ncol,adiag,info)    
+!!$  if (info == psb_success_) &
+!!$       & call psb_halo(adiag,desc_a,info)
+!!$  if (info == psb_success_) call a%cp_to_l(la)
+!!$  if (info /= psb_success_) then
+!!$    call psb_errpush(psb_err_from_subroutine_,name,a_err='sp_getdiag')
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  do i=1,size(adiag)
+!!$    if (adiag(i) /= czero) then
+!!$      adinv(i) = cone / adiag(i)
+!!$    else
+!!$      adinv(i) = cone
+!!$    end if
+!!$  end do
+!!$
+!!$
+!!$
+!!$  ! 1. Allocate Ptilde in sparse matrix form 
+!!$  call op_prol%mv_to(tmpcoo)
+!!$  call ptilde%mv_from(tmpcoo)
+!!$  call ptilde%cscnv(info,type='csr')
+!!$
+!!$  if (info == psb_success_) call la%cscnv(am3,info,type='csr',dupl=psb_dupl_add_)
+!!$  if (info == psb_success_) call la%cscnv(da,info,type='csr',dupl=psb_dupl_add_)
+!!$  if (info /= psb_success_) then
+!!$    call psb_errpush(psb_err_from_subroutine_,name,a_err='spcnv')
+!!$    goto 9999
+!!$  end if
+!!$  if (debug_level >= psb_debug_outer_) &
+!!$       & write(debug_unit,*) me,' ',trim(name),&
+!!$       & ' Initial copies done.'
+!!$
+!!$  call da%scal(adinv,info)
+!!$
+!!$  call psb_spspmm(da,ptilde,dap,info)
+!!$
+!!$  if(info /= psb_success_) then
+!!$    call psb_errpush(psb_err_from_subroutine_,name,a_err='spspmm 1')
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  call dap%clone(atmp,info)
+!!$
+!!$  call psb_sphalo(atmp,desc_a,am4,info,&
+!!$       & colcnv=.false.,rowscale=.true.,outfmt='CSR  ')
+!!$  if (info == psb_success_) call psb_rwextd(ncol,atmp,info,b=am4)      
+!!$  if (info == psb_success_) call am4%free()
+!!$
+!!$  call psb_spspmm(da,atmp,dadap,info)
+!!$  call atmp%free()
+!!$
+!!$  !  !$  write(0,*) 'Columns of AP',psb_sp_get_ncols(ap)
+!!$  !  !$  write(0,*) 'Columns of ADAP',psb_sp_get_ncols(adap)
+!!$  call dap%mv_to(csc_dap)
+!!$  call dadap%mv_to(csc_dadap)
+!!$
+!!$  call csc_mat_col_prod(csc_dap,csc_dadap,omp,info)
+!!$  call csc_mat_col_prod(csc_dadap,csc_dadap,oden,info)
+!!$  call psb_sum(ctxt,omp)
+!!$  call psb_sum(ctxt,oden)
+!!$  ! !$  write(0,*) trim(name),' OMP :',omp
+!!$  ! !$  write(0,*) trim(name),' ODEN:',oden
+!!$
+!!$  omp = omp/oden
+!!$
+!!$  ! !$  write(0,*) 'Check on output prolongator ',omp(1:min(size(omp),10))
+!!$  if (debug_level >= psb_debug_outer_) &
+!!$       & write(debug_unit,*) me,' ',trim(name),&
+!!$       & 'Done NUMBMM 1'
+!!$
+!!$  call am3%mv_to(acsr3)
+!!$  ! Compute omega_int
+!!$  ommx = czero
+!!$  do i=1, ncol
+!!$    if (ilaggr(i) >0) then 
+!!$      omi(i) = omp(ilaggr(i))
+!!$    else
+!!$      omi(i) = czero
+!!$    end if
+!!$    if(abs(omi(i)) .gt. abs(ommx)) ommx = omi(i)
+!!$  end do
+!!$  ! Compute omega_fine
+!!$  do i=1, nrow
+!!$    omf(i) = ommx
+!!$    do j=acsr3%irp(i),acsr3%irp(i+1)-1
+!!$      if(abs(omi(acsr3%ja(j))) .lt. abs(omf(i))) omf(i)=omi(acsr3%ja(j))
+!!$    end do
+!!$ ! !     if(min(real(omf(i)),aimag(omf(i))) < szero) omf(i) = czero
+!!$    if(psb_minreal(omf(i)) < szero) omf(i) = czero
+!!$  end do
+!!$
+!!$  omf(1:nrow) = omf(1:nrow) * adinv(1:nrow)
+!!$
+!!$  if (filter_mat) then
+!!$    !
+!!$    ! Build the filtered matrix Af from A
+!!$    ! 
+!!$    call la%cscnv(acsrf,info,dupl=psb_dupl_add_)
+!!$
+!!$    do i=1,nrow
+!!$      tmp = czero
+!!$      jd  = -1 
+!!$      do j=acsrf%irp(i),acsrf%irp(i+1)-1
+!!$        if (acsrf%ja(j) == i) jd = j 
+!!$        if (abs(acsrf%val(j)) < theta*sqrt(abs(adiag(i)*adiag(acsrf%ja(j))))) then
+!!$          tmp=tmp+acsrf%val(j)
+!!$          acsrf%val(j)=czero
+!!$        endif
+!!$      enddo
+!!$      if (jd == -1) then 
+!!$        write(0,*) 'Wrong input: we need the diagonal!!!!', i
+!!$      else
+!!$        acsrf%val(jd)=acsrf%val(jd)-tmp
+!!$      end if
+!!$    enddo
+!!$    ! Take out zeroed terms 
+!!$    call acsrf%clean_zeros(info)
+!!$
+!!$    !
+!!$    ! Build the smoothed prolongator using the filtered matrix
+!!$    ! 
+!!$    do i=1,acsrf%get_nrows()
+!!$      do j=acsrf%irp(i),acsrf%irp(i+1)-1
+!!$        if (acsrf%ja(j) == i) then 
+!!$          acsrf%val(j) = cone - omf(i)*acsrf%val(j) 
+!!$        else
+!!$          acsrf%val(j) = - omf(i)*acsrf%val(j) 
+!!$        end if
+!!$      end do
+!!$    end do
+!!$
+!!$    if (debug_level >= psb_debug_outer_) &
+!!$         & write(debug_unit,*) me,' ',trim(name),&
+!!$         & 'Done gather, going for SYMBMM 1'
+!!$
+!!$    call af%mv_from(acsrf)
+!!$    !
+!!$    ! op_prol = (I-w*D*Af)Ptilde
+!!$    ! Doing it this way means to consider diag(Af_i)
+!!$    ! 
+!!$    !
+!!$    call psb_spspmm(af,ptilde,op_prol,info)
+!!$    if (debug_level >= psb_debug_outer_) &
+!!$         & write(debug_unit,*) me,' ',trim(name),&
+!!$         & 'Done SPSPMM 1'
+!!$  else
+!!$    !
+!!$    ! Build the smoothed prolongator using the original matrix
+!!$    !
+!!$    do i=1,acsr3%get_nrows()
+!!$      do j=acsr3%irp(i),acsr3%irp(i+1)-1
+!!$        if (acsr3%ja(j) == i) then 
+!!$          acsr3%val(j) = cone - omf(i)*acsr3%val(j) 
+!!$        else
+!!$          acsr3%val(j) = - omf(i)*acsr3%val(j) 
+!!$        end if
+!!$      end do
+!!$    end do
+!!$
+!!$    call am3%mv_from(acsr3)
+!!$    if (debug_level >= psb_debug_outer_) &
+!!$         & write(debug_unit,*) me,' ',trim(name),&
+!!$         & 'Done gather, going for SYMBMM 1'
+!!$    !
+!!$    ! 
+!!$    ! op_prol = (I-w*D*A)Ptilde
+!!$    ! 
+!!$    !
+!!$    call psb_spspmm(am3,ptilde,op_prol,info)
+!!$    if (debug_level >= psb_debug_outer_) &
+!!$         & write(debug_unit,*) me,' ',trim(name),&
+!!$         & 'Done NUMBMM 1'
+!!$
+!!$  end if
+!!$
+!!$
+!!$  !
+!!$  ! Ok, let's start over with the restrictor
+!!$  ! 
+!!$  call ptilde%transc(rtilde)
+!!$  call la%cscnv(atmp,info,type='csr')
+!!$  call psb_sphalo(atmp,desc_a,am4,info,&
+!!$       & colcnv=.true.,rowscale=.true.)
+!!$  nrt  = am4%get_nrows() 
+!!$  call am4%csclip(atmp2,info,lone,nrt,lone,ncol)
+!!$  call atmp2%cscnv(info,type='CSR')
+!!$  if (info == psb_success_) call psb_rwextd(ncol,atmp,info,b=atmp2)      
+!!$  call am4%free()
+!!$  call atmp2%free()
+!!$
+!!$  ! This is to compute the transpose. It ONLY works if the
+!!$  ! original A has a symmetric pattern.
+!!$  call atmp%transc(atmp2) 
+!!$  call atmp2%csclip(dat,info,lone,nrow,lone,ncol)
+!!$  call dat%cscnv(info,type='csr')
+!!$  call dat%scal(adinv,info)
+!!$
+!!$  ! Now for the product. 
+!!$  call psb_spspmm(dat,ptilde,datp,info)
+!!$
+!!$  call datp%clone(atmp2,info)
+!!$  call psb_sphalo(atmp2,desc_a,am4,info,&
+!!$       & colcnv=.false.,rowscale=.true.,outfmt='CSR  ')
+!!$  if (info == psb_success_) call psb_rwextd(ncol,atmp2,info,b=am4)      
+!!$  if (info == psb_success_) call am4%free()
+!!$
+!!$
+!!$  call psb_symbmm(dat,atmp2,datdatp,info)
+!!$  call psb_numbmm(dat,atmp2,datdatp)
+!!$  call atmp2%free()
+!!$
+!!$  call datp%mv_to(csc_datp)    
+!!$  call datdatp%mv_to(csc_datdatp)    
+!!$
+!!$  call csc_mat_col_prod(csc_datp,csc_datdatp,omp,info)
+!!$  call csc_mat_col_prod(csc_datdatp,csc_datdatp,oden,info)
+!!$  call psb_sum(ctxt,omp)
+!!$  call psb_sum(ctxt,oden)
+!!$
+!!$
+!!$  ! !$  write(debug_unit,*) trim(name),' OMP_R :',omp
+!!$  ! ! $  write(debug_unit,*) trim(name),' ODEN_R:',oden
+!!$  omp = omp/oden
+!!$  ! !$  write(0,*) 'Check on output restrictor',omp(1:min(size(omp),10))
+!!$  ! Compute omega_int
+!!$  ommx = czero
+!!$  do i=1, ncol
+!!$    if (ilaggr(i) >0) then 
+!!$      omi(i) = omp(ilaggr(i))
+!!$    else
+!!$      omi(i) = czero
+!!$    end if
+!!$    if(abs(omi(i)) .gt. abs(ommx)) ommx = omi(i)
+!!$  end do
+!!$  ! Compute omega_fine
+!!$  ! Going over the columns of atmp means going over the rows
+!!$  ! of A^T. Hopefully ;-) 
+!!$  call atmp%cp_to(acsc)
+!!$
+!!$  do i=1, nrow
+!!$    omf(i) = ommx
+!!$    do j= acsc%icp(i),acsc%icp(i+1)-1
+!!$      if(abs(omi(acsc%ia(j))) .lt. abs(omf(i))) omf(i)=omi(acsc%ia(j))
+!!$    end do
+!!$ ! !    if(min(real(omf(i)),aimag(omf(i))) < szero) omf(i) = czero
+!!$    if(psb_minreal(omf(i)) < szero) omf(i) = czero
+!!$  end do
+!!$  omf(1:nrow) = omf(1:nrow)*adinv(1:nrow)
+!!$  call psb_halo(omf,desc_a,info)
+!!$  call acsc%free() 
+!!$
+!!$
+!!$  call atmp%mv_to(acsr1)
+!!$
+!!$  do i=1,acsr1%get_nrows()
+!!$    do j=acsr1%irp(i),acsr1%irp(i+1)-1
+!!$      if (acsr1%ja(j) == i) then 
+!!$        acsr1%val(j) = cone - acsr1%val(j)*omf(acsr1%ja(j))
+!!$      else
+!!$        acsr1%val(j) =      - acsr1%val(j)*omf(acsr1%ja(j))
+!!$      end if
+!!$    end do
+!!$  end do
+!!$  call atmp%mv_from(acsr1)
+!!$
+!!$  call rtilde%mv_to(tmpcoo)
+!!$  nzl = tmpcoo%get_nzeros()
+!!$  i=0
+!!$  do k=1, nzl
+!!$    if ((naggrm1 < tmpcoo%ia(k)) .and. (tmpcoo%ia(k) <= naggrp1)) then
+!!$      i = i+1
+!!$      tmpcoo%val(i) = tmpcoo%val(k)
+!!$      tmpcoo%ia(i)  = tmpcoo%ia(k)
+!!$      tmpcoo%ja(i)  = tmpcoo%ja(k)
+!!$    end if
+!!$  end do
+!!$  call tmpcoo%set_nzeros(i)
+!!$  call rtilde%mv_from(tmpcoo)
+!!$  call rtilde%cscnv(info,type='csr')
+!!$
+!!$  call psb_spspmm(rtilde,atmp,op_restr,info)
+!!$
+!!$  !
+!!$  ! Now we have to gather the halo of op_prol, and add it to itself
+!!$  ! to multiply it by A,
+!!$  !
+!!$  call op_prol%clone(tmp_prol,info) 
+!!$  if (info == psb_success_) call psb_sphalo(tmp_prol,desc_a,am4,info,&
+!!$       & colcnv=.false.,rowscale=.true.)
+!!$  if (info == psb_success_) call psb_rwextd(ncol,tmp_prol,info,b=am4)      
+!!$  if (info == psb_success_) call am4%free()
+!!$
+!!$  if(info /= psb_success_) then
+!!$    call psb_errpush(psb_err_internal_error_,name,a_err='Halo of op_prol')
+!!$    goto 9999
+!!$  end if
+!!$
+!!$  !
+!!$  ! Now we have to fix this.  The only rows of B that are correct 
+!!$  ! are those corresponding to "local" aggregates, i.e. indices in ilaggr(:)
+!!$  !
+!!$  call op_restr%mv_to(tmpcoo)
+!!$
+!!$  nzl = tmpcoo%get_nzeros()
+!!$  i=0
+!!$  do k=1, nzl
+!!$    if ((naggrm1 < tmpcoo%ia(k)) .and. (tmpcoo%ia(k) <= naggrp1)) then
+!!$      i = i+1
+!!$      tmpcoo%val(i) = tmpcoo%val(k)
+!!$      tmpcoo%ia(i)  = tmpcoo%ia(k)
+!!$      tmpcoo%ja(i)  = tmpcoo%ja(k)
+!!$    end if
+!!$  end do
+!!$  call tmpcoo%set_nzeros(i)
+!!$  call op_restr%mv_from(tmpcoo)
+!!$  call op_restr%cscnv(info,type='csr')
+!!$
+!!$
+!!$  if (debug_level >= psb_debug_outer_) &
+!!$       & write(debug_unit,*) me,' ',trim(name),&
+!!$       & 'starting sphalo/ rwxtd'
+!!$
+!!$  call psb_spspmm(la,tmp_prol,am3,info)
+!!$  if (debug_level >= psb_debug_outer_) &
+!!$       & write(debug_unit,*) me,' ',trim(name),&
+!!$       & 'Done SPSPMM 2'
+!!$
+!!$  call psb_sphalo(am3,desc_a,am4,info,&
+!!$       & colcnv=.false.,rowscale=.true.)
+!!$  if (info == psb_success_) call psb_rwextd(ncol,am3,info,b=am4)      
+!!$  if (info == psb_success_) call am4%free()
+!!$
+!!$  if(info /= psb_success_) then
+!!$    call psb_errpush(psb_err_internal_error_,name,&
+!!$         & a_err='Extend am3')
+!!$    goto 9999
+!!$  end if
+!!$  if (debug_level >= psb_debug_outer_) &
+!!$       & write(debug_unit,*) me,' ',trim(name),&
+!!$       & 'Done sphalo/ rwxtd'
+!!$
+!!$  call psb_spspmm(op_restr,am3,ac,info)
+!!$  if (info == psb_success_) call am3%free()
+!!$  if (info == psb_success_) call ac%cscnv(info,type='coo',dupl=psb_dupl_add_)
+!!$
+!!$  if (info /= psb_success_) then
+!!$    call psb_errpush(psb_err_internal_error_,name,&
+!!$         &a_err='Build ac = op_restr x am3')
+!!$    goto 9999
+!!$  end if
 
 
 
