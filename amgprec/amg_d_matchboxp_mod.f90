@@ -118,6 +118,7 @@ module dmatchboxp_mod
     module procedure dPMatchBox
   end interface PMatchBox
 
+  logical, parameter, private :: print_statistics=.false.
 contains
 
   subroutine dmatchboxp_build_prol(w,a,desc_a,ilaggr,nlaggr,prol,info,&
@@ -421,11 +422,13 @@ contains
         nlpairs    = v(3)
 
       end block
-      if (iam == 0) then
-        write(0,*) 'Matching statistics: Unmatched nodes ',&
-             & nunmatched,' Singletons:',nlsingl,' Pairs:',nlpairs
+      if (print_statistics) then
+        if (iam == 0) then
+          write(0,*) 'Matching statistics: Unmatched nodes ',&
+               & nunmatched,' Singletons:',nlsingl,' Pairs:',nlpairs
+        end if
       end if
-
+      
       if (display_out_) then
         block
           integer(psb_ipk_) :: idx
