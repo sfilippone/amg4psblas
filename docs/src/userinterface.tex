@@ -176,9 +176,10 @@ Similar considerations apply to the point-Jacobi, Gauss-Seidel and block-Jacobi
 coarsest-level solvers, and shortcuts are available
 in this case too (see Table~\ref{tab:p_coarse_1}). \\
 
-\textbf{Remark 3.} Many of the coarsest-level solvers cannot be used
-with both replicated and distributed coarsest-matrix layouts; 
-therefore, setting the solver after the layout may change the layout.
+\textbf{Remark 3.} Many of the coarsest-level solvers apply to a
+specific coarsest-matrix layout; 
+therefore, setting the solver after the layout may change the layout
+to either distributed or replicated.
 Similarly, setting the layout after the solver may change the solver.
 
 More precisely, UMFPACK and SuperLU require the coarsest-level
@@ -399,8 +400,14 @@ the parameter \texttt{ilev}.} \\
 \fortinline|'COARSE_SOLVE'| & \fortinline|character(len=*)|
                           & \fortinline|'MUMPS'| \par \fortinline|'UMF'| \par
                            \fortinline|'SLU'| \par \fortinline|'SLUDIST'| \par
-			   \fortinline|'JACOBI'| \par \fortinline|'GS'| \par \fortinline|'BJAC'| \par \fortinline|'KRM'| 
-			   \fortinline|'L1-JACOBI'| \par \fortinline|'L1-BJAC'| \par \fortinline|'L1-FBGS'|
+                            \fortinline|'ILU'| \par
+                            \fortinline|'JACOBI'| \par
+                            \fortinline|'GS'| \par
+                            \fortinline|'BJAC'| \par
+                            \fortinline|'KRM'|  \par
+			   \fortinline|'L1-JACOBI'| \par
+                            \fortinline|'L1-BJAC'| \par
+                            \fortinline|'L1-FBGS'| 
                          & See~Note.
                          & Solver used at the coarsest level: sequential
                            LU from MUMPS, UMFPACK, or SuperLU
