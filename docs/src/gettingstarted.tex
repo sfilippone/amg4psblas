@@ -174,7 +174,7 @@ the corresponding codes are available in \verb|samples/simple/fileread/|.
 ! with basic smoothed aggregation, 1 hybrid forward/backward
 ! GS sweep as pre/post-smoother and UMFPACK as coarsest-level
 ! solver
-  call P%init('ML',info)
+  call P%init(ctxt,'ML',info)
 !
 ! build the preconditioner
   call P%hierarchy_build(A,desc_A,info)
@@ -184,8 +184,8 @@ the corresponding codes are available in \verb|samples/simple/fileread/|.
 ! set the solver parameters and the initial guess
 ... ...
 !
-! solve Ax=b with preconditioned CG
-  call psb_krylov('CG',A,P,b,x,tol,desc_A,info)
+! solve Ax=b with preconditioned FCG
+  call psb_krylov('FCG',A,P,b,x,tol,desc_A,info)
 ... ...
 !
 ! deallocate the preconditioner
@@ -229,7 +229,7 @@ stop
 ! with basic smoothed aggregation, 1 hybrid forward/backward
 ! GS sweep as pre/post-smoother and UMFPACK as coarsest-level
 ! solver
-  call P%init('ML',info)
+  call P%init(ctxt,'ML',info)
 !
 ! build the preconditioner
   call P%hierarchy_build(A,desc_A,info)
@@ -239,8 +239,8 @@ stop
 ! set the solver parameters and the initial guess
   ... ...
 !
-! solve Ax=b with preconditioned CG
-  call psb_krylov('CG',A,P,b,x,tol,desc_A,info)
+! solve Ax=b with preconditioned FCG
+  call psb_krylov('FCG',A,P,b,x,tol,desc_A,info)
   ... ...
 !
 ! deallocate the preconditioner
@@ -307,7 +307,7 @@ boundary conditions are also available in the directory \verb|samples/simple/pde
 ! build a V-cycle preconditioner with 1 block-Jacobi sweep (with
 ! ILU(0) on the blocks) as pre- and post-smoother, and 8  block-Jacobi
 ! sweeps (with ILU(0) on the blocks) as coarsest-level solver
-call P%init('ML',info)
+call P%init(ctxt,'ML',info)
 call P%set('SMOOTHER_TYPE','BJAC',info)
 call P%set('COARSE_SOLVE','BJAC',info)
 call P%set('COARSE_SWEEPS',8,info)
@@ -323,7 +323,7 @@ call P%smoothers_build(A,desc_A,info)
 ! build a V-cycle preconditioner with 1 block-Jacobi sweep (with
 ! ILU(0) on the blocks) as pre- and post-smoother, and 8  block-Jacobi
 ! sweeps (with ILU(0) on the blocks) as coarsest-level solver
-  call P%init('ML',info)
+  call P%init(ctxt,'ML',info)
   call P%set('SMOOTHER_TYPE','BJAC',info)
   call P%set('COARSE_SOLVE','BJAC',info)
   call P%set('COARSE_SWEEPS',8,info)
@@ -345,7 +345,7 @@ call P%smoothers_build(A,desc_A,info)
 !2 hybrid Gauss-Seidel sweeps as pre- and post-smoother,
 !and parallel flexible Conjugate Gradient coupled with the block-Jacobi 
 !preconditioner having ILU(0) on the blocks as coarsest solver. 
-call P%init('ML',info)
+call P%init(ctxt,'ML',info)
 call P%set('PAR_AGGR_ALG','COUPLED',info)
 call P%set('AGGR_TYPE','MATCHBOXP',info)
 call P%set('AGGR_SIZE',8,info)
@@ -353,6 +353,8 @@ call P%set('ML_CYCLE','WCYCLE',info)
 call P%set('SMOOTHER_TYPE','FBGS',info)
 call P%set('SMOOTHER_SWEEPS',2,info)
 call P%set('COARSE_SOLVE','KRM',info)
+call P%set('COARSE_MAT','DIST',info)
+call P%set('KRM_METHOD','FCG',info)
 call P%hierarchy_build(A,desc_A,info)
 call P%smoothers_build(A,desc_A,info)
 \end{minted}
@@ -365,14 +367,16 @@ call P%smoothers_build(A,desc_A,info)
 ! build a W-cycle preconditioner with 2 hybrid Gauss-Seidel sweeps
 ! as pre- and post-smoother, a distributed coarsest
 ! matrix, and MUMPS as coarsest-level solver
-  call P%init('ML',info)
+  call P%init(ctxt,'ML',info)
   call P%set('PAR_AGGR_ALG','COUPLED',info)
-call P%set('AGGR_TYPE','MATCHBOXP',info)
-call P%set('AGGR_SIZE',8,info)
+  call P%set('AGGR_TYPE','MATCHBOXP',info)
+  call P%set('AGGR_SIZE',8,info)
   call P%set('ML_CYCLE','WCYCLE',info)
   call P%set('SMOOTHER_TYPE','FBGS',info)
   call P%set('SMOOTHER_SWEEPS',2,info)
   call P%set('COARSE_SOLVE','KRM',info)
+  call P%set('COARSE_MAT','DIST',info)
+  call P%set('KRM_METHOD','FCG',info)
   call P%hierarchy_build(A,desc_A,info)
   call P%smoothers_build(A,desc_A,info)
 ... ...
@@ -387,7 +391,7 @@ call P%set('AGGR_SIZE',8,info)
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
 ! build a one-level RAS with overlap 2 and ILU(0) on the local blocks.
-call P%init('AS',info)
+call P%init(ctxt,'AS',info)
 call P%set('SUB_OVR',2,info)
 call P%build(A,desc_A,info)
 ... ...
@@ -401,7 +405,7 @@ call P%build(A,desc_A,info)
 \begin{verbatim}
 ... ...
 ! set RAS with overlap 2 and ILU(0) on the local blocks
-  call P%init('AS',info)
+  call P%init(ctxt,'AS',info)
   call P%set('SUB_OVR',2,info)
   call P%bld(A,desc_A,info)
 ... ...

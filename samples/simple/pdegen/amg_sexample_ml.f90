@@ -38,7 +38,7 @@
 ! File: amg_sexample_ml.f90
 !
 ! This sample program solves a linear system obtained by discretizing a
-! PDE with Dirichlet BCs. The solver is CG, coupled with one of the
+! PDE with Dirichlet BCs. The solver is FCG, coupled with one of the
 ! following multi-level preconditioner, as explained in Section 4.1 of
 ! the AMG4PSBLAS User's and Reference Guide:
 !
@@ -121,7 +121,8 @@ program amg_sexample_ml
   real(psb_spk_)     :: resmx, resmxp
   real(psb_dpk_)     :: t1, t2, tprec
   character(len=5)   :: afmt='CSR'
-  character(len=20)  :: name, kmethod
+  character(len=20)  :: name
+  character(len=20), parameter :: kmethod='FCG'
 
   ! initialize the parallel environment
 
@@ -177,7 +178,6 @@ program amg_sexample_ml
     ! solver
 
     call P%init(ctxt,'ML',info)
-    kmethod = 'CG'
 
   case(2)
 
@@ -188,15 +188,16 @@ program amg_sexample_ml
     call P%init(ctxt,'ML',info)
     call P%set('SMOOTHER_TYPE','BJAC',info)
     call P%set('COARSE_SOLVE','BJAC',info)
+    call P%set('COARSE_SUBSOLVE','ILU',info)
     call P%set('COARSE_SWEEPS',8,info)
-    kmethod = 'CG'
 
   case(3)
 
-   ! initialize a W-cycle preconditioner based on the coupled aggregation relying on matching,
-   ! with maximum size of aggregates equal to 8 and smoothed prolongators,
-   ! 2 hybrid forward/backward GS sweeps as pre/post-smoother, a distributed coarsest
-   ! matrix, and preconditioned Flexible Conjugate Gradient as coarsest-level solver
+   ! initialize a W-cycle preconditioner based on the coupled aggregation
+   ! relying on matching, with maximum size of aggregates equal to 8
+   ! and smoothed prolongators,  2 hybrid forward/backward GS sweeps
+   ! as pre/post-smoother, a distributed coarsest  matrix,
+   ! and preconditioned Flexible Conjugate Gradient as coarsest-level solver
 
     call P%init(ctxt,'ML',info)
     call P%set('PAR_AGGR_ALG','COUPLED',info)
@@ -206,7 +207,7 @@ program amg_sexample_ml
     call P%set('SMOOTHER_SWEEPS',2,info)
     call P%set('COARSE_SOLVE','KRM',info)
     call P%set('COARSE_MAT','DIST',info)
-    kmethod = 'CG'
+    call P%set('KRM_METHOD','FCG',info)
 
   end select
 

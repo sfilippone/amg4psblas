@@ -160,7 +160,7 @@ class="cmr-12">.</span>
 !&#x00A0;with&#x00A0;basic&#x00A0;smoothed&#x00A0;aggregation,&#x00A0;1&#x00A0;hybrid&#x00A0;forward/backward
 !&#x00A0;GS&#x00A0;sweep&#x00A0;as&#x00A0;pre/post-smoother&#x00A0;and&#x00A0;UMFPACK&#x00A0;as&#x00A0;coarsest-level
 !&#x00A0;solver
-&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;ML&#8217;,info)
+&#x00A0;&#x00A0;call&#x00A0;P%init(ctxt,&#8217;ML&#8217;,info)
 !
 !&#x00A0;build&#x00A0;the&#x00A0;preconditioner
 &#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
@@ -169,8 +169,8 @@ class="cmr-12">.</span>
 !&#x00A0;set&#x00A0;the&#x00A0;solver&#x00A0;parameters&#x00A0;and&#x00A0;the&#x00A0;initial&#x00A0;guess
 &#x00A0;&#x00A0;...&#x00A0;...
 !
-!&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;CG
-&#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;CG&#8217;,A,P,b,x,tol,desc_A,info)
+!&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;FCG
+&#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;FCG&#8217;,A,P,b,x,tol,desc_A,info)
 &#x00A0;&#x00A0;...&#x00A0;...
 !
 !&#x00A0;deallocate&#x00A0;the&#x00A0;preconditioner
@@ -296,7 +296,7 @@ class="cmr-12">.</span>
 !&#x00A0;build&#x00A0;a&#x00A0;V-cycle&#x00A0;preconditioner&#x00A0;with&#x00A0;1&#x00A0;block-Jacobi&#x00A0;sweep&#x00A0;(with
 !&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;blocks)&#x00A0;as&#x00A0;pre-&#x00A0;and&#x00A0;post-smoother,&#x00A0;and&#x00A0;8&#x00A0;&#x00A0;block-Jacobi
 !&#x00A0;sweeps&#x00A0;(with&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;blocks)&#x00A0;as&#x00A0;coarsest-level&#x00A0;solver
-&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;ML&#8217;,info)
+&#x00A0;&#x00A0;call&#x00A0;P%init(ctxt,&#8217;ML&#8217;,info)
 &#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_TYPE&#8217;,&#8217;BJAC&#8217;,info)
 &#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SOLVE&#8217;,&#8217;BJAC&#8217;,info)
 &#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SWEEPS&#8217;,8,info)
@@ -323,25 +323,27 @@ class="content">setup of a multilevel preconditioner based on the default decoup
                                                                                
 <div class="center" 
 >
-<!--l. 360--><p class="noindent" >
+<!--l. 362--><p class="noindent" >
 <div class="minipage"><pre class="verbatim" id="verbatim-8">
 ...&#x00A0;...
 !&#x00A0;build&#x00A0;a&#x00A0;W-cycle&#x00A0;preconditioner&#x00A0;with&#x00A0;2&#x00A0;hybrid&#x00A0;Gauss-Seidel&#x00A0;sweeps
 !&#x00A0;as&#x00A0;pre-&#x00A0;and&#x00A0;post-smoother,&#x00A0;a&#x00A0;distributed&#x00A0;coarsest
 !&#x00A0;matrix,&#x00A0;and&#x00A0;MUMPS&#x00A0;as&#x00A0;coarsest-level&#x00A0;solver
-&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;ML&#8217;,info)
+&#x00A0;&#x00A0;call&#x00A0;P%init(ctxt,&#8217;ML&#8217;,info)
 &#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;PAR_AGGR_ALG&#8217;,&#8217;COUPLED&#8217;,info)
-call&#x00A0;P%set(&#8217;AGGR_TYPE&#8217;,&#8217;MATCHBOXP&#8217;,info)
-call&#x00A0;P%set(&#8217;AGGR_SIZE&#8217;,8,info)
+&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;AGGR_TYPE&#8217;,&#8217;MATCHBOXP&#8217;,info)
+&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;AGGR_SIZE&#8217;,8,info)
 &#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;ML_CYCLE&#8217;,&#8217;WCYCLE&#8217;,info)
 &#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_TYPE&#8217;,&#8217;FBGS&#8217;,info)
 &#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_SWEEPS&#8217;,2,info)
 &#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SOLVE&#8217;,&#8217;KRM&#8217;,info)
+&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_MAT&#8217;,&#8217;DIST&#8217;,info)
+&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;KRM_METHOD&#8217;,&#8217;FCG&#8217;,info)
 &#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
 &#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
 ...&#x00A0;...
 </pre>
-<!--l. 379--><p class="nopar" ></div></div>
+<!--l. 383--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 3: </span><span  
 class="content">setup of a multilevel preconditioner based on the coupled coarsening using
@@ -353,7 +355,7 @@ weighted matching</span></div><!--tex4ht:label?: x15-14003r3 -->
                                                                                
 
                                                                                
-<!--l. 386--><p class="indent" >   <a 
+<!--l. 390--><p class="indent" >   <a 
  id="x15-14004r4"></a><hr class="float"><div class="float" 
 >
                                                                                
@@ -361,18 +363,18 @@ weighted matching</span></div><!--tex4ht:label?: x15-14003r3 -->
                                                                                
 <div class="center" 
 >
-<!--l. 398--><p class="noindent" >
+<!--l. 402--><p class="noindent" >
 <div class="minipage"><pre class="verbatim" id="verbatim-9">
 ...&#x00A0;...
 !&#x00A0;set&#x00A0;RAS&#x00A0;with&#x00A0;overlap&#x00A0;2&#x00A0;and&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;local&#x00A0;blocks
-&#x00A0;&#x00A0;call&#x00A0;P%init(&#8217;AS&#8217;,info)
+&#x00A0;&#x00A0;call&#x00A0;P%init(ctxt,&#8217;AS&#8217;,info)
 &#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SUB_OVR&#8217;,2,info)
 &#x00A0;&#x00A0;call&#x00A0;P%bld(A,desc_A,info)
 ...&#x00A0;...
 !&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;BiCGSTAB
 &#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;BICGSTAB&#8217;,A,P,b,x,tol,desc_A,info)
 </pre>
-<!--l. 410--><p class="nopar" ></div></div>
+<!--l. 414--><p class="nopar" ></div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 4: </span><span  
 class="content">setup of a one-level Schwarz preconditioner.</span></div><!--tex4ht:label?: x15-14004r4 -->
@@ -383,7 +385,7 @@ class="content">setup of a one-level Schwarz preconditioner.</span></div><!--tex
                                                                                
 
                                                                                
-   <!--l. 420--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 424--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu7.html" ><span 
 class="cmr-12">next</span></a><span 
@@ -394,6 +396,6 @@ class="cmr-12">] [</span><a
 href="userhtmlse4.html#userhtmlsu6.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
-<!--l. 420--><p class="indent" >   <a 
+<!--l. 424--><p class="indent" >   <a 
  id="tailuserhtmlsu6.html"></a>  
 </body></html> 
