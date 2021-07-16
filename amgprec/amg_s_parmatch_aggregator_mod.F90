@@ -118,7 +118,7 @@
 
 module amg_s_parmatch_aggregator_mod
   use amg_s_base_aggregator_mod
-  use smatchboxp_mod
+  use amg_smatchboxp_mod
 #if defined(SERIAL_MPI)
   type, extends(amg_s_base_aggregator_type) :: amg_s_parmatch_aggregator_type
   end type amg_s_parmatch_aggregator_type
@@ -143,18 +143,18 @@ module amg_s_parmatch_aggregator_mod
     procedure, pass(ag) :: mat_asb      => amg_s_parmatch_aggregator_mat_asb
     procedure, pass(ag) :: inner_mat_asb      => amg_s_parmatch_aggregator_inner_mat_asb
     procedure, pass(ag) :: bld_map      => amg_s_parmatch_aggregator_bld_map
-    procedure, pass(ag) :: csetc        => s_parmatch_aggr_csetc
-    procedure, pass(ag) :: cseti        => s_parmatch_aggr_cseti
-    procedure, pass(ag) :: default      => s_parmatch_aggr_set_default
-    procedure, pass(ag) :: sizeof       => s_parmatch_aggregator_sizeof
-    procedure, pass(ag) :: update_next  => s_parmatch_aggregator_update_next
-    procedure, pass(ag) :: bld_wnxt     => s_parmatch_bld_wnxt
-    procedure, pass(ag) :: bld_default_w    => s_bld_default_w
-    procedure, pass(ag) :: set_c_default_w  => s_set_prm_c_default_w
-    procedure, pass(ag) :: descr        => s_parmatch_aggregator_descr
-    procedure, pass(ag) :: clone        => s_parmatch_aggregator_clone
-    procedure, pass(ag) :: free         => s_parmatch_aggregator_free
-    procedure, nopass   :: fmt          => s_parmatch_aggregator_fmt
+    procedure, pass(ag) :: csetc        => amg_s_parmatch_aggr_csetc
+    procedure, pass(ag) :: cseti        => amg_s_parmatch_aggr_cseti
+    procedure, pass(ag) :: default      => amg_s_parmatch_aggr_set_default
+    procedure, pass(ag) :: sizeof       => amg_s_parmatch_aggregator_sizeof
+    procedure, pass(ag) :: update_next  => amg_s_parmatch_aggregator_update_next
+    procedure, pass(ag) :: bld_wnxt     => amg_s_parmatch_bld_wnxt
+    procedure, pass(ag) :: bld_default_w    => amg_s_bld_default_w
+    procedure, pass(ag) :: set_c_default_w  => amg_s_set_prm_c_default_w
+    procedure, pass(ag) :: descr        => amg_s_parmatch_aggregator_descr
+    procedure, pass(ag) :: clone        => amg_s_parmatch_aggregator_clone
+    procedure, pass(ag) :: free         => amg_s_parmatch_aggregator_free
+    procedure, nopass   :: fmt          => amg_s_parmatch_aggregator_fmt
     procedure, nopass   :: xt_desc      => amg_s_parmatch_aggregator_xt_desc
   end type amg_s_parmatch_aggregator_type
 
@@ -320,7 +320,7 @@ module amg_s_parmatch_aggregator_mod
 
 contains
 
-  subroutine s_bld_default_w(ag,nr)
+  subroutine amg_s_bld_default_w(ag,nr)
     use psb_realloc_mod
     implicit none
     class(amg_s_parmatch_aggregator_type), target, intent(inout) :: ag
@@ -330,9 +330,9 @@ contains
     if (info /= psb_success_) return
     ag%w = done
     !call ag%set_c_default_w()
-  end subroutine s_bld_default_w
+  end subroutine amg_s_bld_default_w
 
-  subroutine s_set_prm_c_default_w(ag)
+  subroutine amg_s_set_prm_c_default_w(ag)
     use psb_realloc_mod
     use iso_c_binding
     implicit none
@@ -342,9 +342,9 @@ contains
     !write(0,*) 'prm_c_deafult_w '
     call psb_safe_ab_cpy(ag%w,ag%w_nxt,info)
 
-  end subroutine s_set_prm_c_default_w
+  end subroutine amg_s_set_prm_c_default_w
 
-  subroutine s_parmatch_bld_wnxt(ag,ilaggr,valaggr,nx)
+  subroutine amg_s_parmatch_bld_wnxt(ag,ilaggr,valaggr,nx)
     use psb_realloc_mod
     implicit none
     class(amg_s_parmatch_aggregator_type), target, intent(inout) :: ag
@@ -358,14 +358,14 @@ contains
     !write(0,*) 'Executing bld_wnxt ',nx
     call psb_realloc(nx,ag%w_nxt,info)
 
-  end subroutine s_parmatch_bld_wnxt
+  end subroutine amg_s_parmatch_bld_wnxt
 
-  function s_parmatch_aggregator_fmt() result(val)
+  function amg_s_parmatch_aggregator_fmt() result(val)
     implicit none
     character(len=32)  :: val
 
     val = "Parallel Matching aggregation"
-  end function s_parmatch_aggregator_fmt
+  end function amg_s_parmatch_aggregator_fmt
 
   function amg_s_parmatch_aggregator_xt_desc() result(val)
     implicit none
@@ -374,7 +374,7 @@ contains
     val = .true.
   end function amg_s_parmatch_aggregator_xt_desc
 
-  function s_parmatch_aggregator_sizeof(ag) result(val)
+  function amg_s_parmatch_aggregator_sizeof(ag) result(val)
     use psb_realloc_mod
     implicit none
     class(amg_s_parmatch_aggregator_type), intent(in)  :: ag
@@ -390,9 +390,9 @@ contains
     if (allocated(ag%base_desc)) val = val + ag%base_desc%sizeof()
     if (allocated(ag%desc_ax)) val = val + ag%desc_ax%sizeof()
 
-  end function s_parmatch_aggregator_sizeof
+  end function amg_s_parmatch_aggregator_sizeof
 
-  subroutine  s_parmatch_aggregator_descr(ag,parms,iout,info)
+  subroutine  amg_s_parmatch_aggregator_descr(ag,parms,iout,info)
     implicit none
     class(amg_s_parmatch_aggregator_type), intent(in) :: ag
     type(amg_sml_parms), intent(in)   :: parms
@@ -406,7 +406,7 @@ contains
     call parms%mldescr(iout,info)
 
     return
-  end subroutine s_parmatch_aggregator_descr
+  end subroutine amg_s_parmatch_aggregator_descr
 
   function is_legal_malg(alg) result(val)
     logical :: val
@@ -437,7 +437,7 @@ contains
   end function is_legal_nlevels
 
 
-  subroutine  s_parmatch_aggregator_update_next(ag,agnext,info)
+  subroutine  amg_s_parmatch_aggregator_update_next(ag,agnext,info)
     use psb_realloc_mod
     implicit none
     class(amg_s_parmatch_aggregator_type), target, intent(inout) :: ag
@@ -470,9 +470,9 @@ contains
       ! What should we do here?
     end select
     info = 0
-  end subroutine s_parmatch_aggregator_update_next
+  end subroutine amg_s_parmatch_aggregator_update_next
 
-  subroutine s_parmatch_aggr_csetc(ag,what,val,info,idx)
+  subroutine amg_s_parmatch_aggr_csetc(ag,what,val,info,idx)
 
     Implicit None
 
@@ -514,9 +514,9 @@ contains
       ! Do nothing
     end select
     return
-  end subroutine s_parmatch_aggr_csetc
+  end subroutine amg_s_parmatch_aggr_csetc
 
-  subroutine s_parmatch_aggr_cseti(ag,what,val,info,idx)
+  subroutine amg_s_parmatch_aggr_cseti(ag,what,val,info,idx)
 
     Implicit None
 
@@ -556,9 +556,9 @@ contains
       ! Do nothing
     end select
     return
-  end subroutine s_parmatch_aggr_cseti
+  end subroutine amg_s_parmatch_aggr_cseti
 
-  subroutine s_parmatch_aggr_set_default(ag)
+  subroutine amg_s_parmatch_aggr_set_default(ag)
 
     Implicit None
 
@@ -579,9 +579,9 @@ contains
 
     return
 
-  end subroutine s_parmatch_aggr_set_default
+  end subroutine amg_s_parmatch_aggr_set_default
 
-  subroutine  s_parmatch_aggregator_free(ag,info)
+  subroutine  amg_s_parmatch_aggregator_free(ag,info)
     use iso_c_binding
     implicit none
     class(amg_s_parmatch_aggregator_type), intent(inout) :: ag
@@ -618,9 +618,9 @@ contains
       call ag%rwdesc%free(info); deallocate(ag%rwdesc,stat=info)
     end if
 
-  end subroutine s_parmatch_aggregator_free
+  end subroutine amg_s_parmatch_aggregator_free
 
-  subroutine  s_parmatch_aggregator_clone(ag,agnext,info)
+  subroutine  amg_s_parmatch_aggregator_clone(ag,agnext,info)
     implicit none
     class(amg_s_parmatch_aggregator_type), intent(inout) :: ag
     class(amg_s_base_aggregator_type), allocatable, intent(inout) :: agnext
@@ -640,7 +640,7 @@ contains
       ! Should never ever get here
       info = -1
     end select
-  end subroutine s_parmatch_aggregator_clone
+  end subroutine amg_s_parmatch_aggregator_clone
 
   subroutine  amg_s_parmatch_aggregator_bld_map(ag,desc_a,desc_ac,ilaggr,nlaggr,&
        & op_restr,op_prol,map,info)

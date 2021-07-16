@@ -68,7 +68,7 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-module dmatchboxp_mod
+module amg_dmatchboxp_mod
 
   use iso_c_binding
   use psb_base_cbind_mod
@@ -94,34 +94,34 @@ module dmatchboxp_mod
     end subroutine dMatchBoxPC
   end interface MatchBoxPC
 
-  interface i_aggr_assign
-    module procedure i_daggr_assign
-  end interface i_aggr_assign
+  interface amg_i_aggr_assign
+    module procedure amg_i_daggr_assign
+  end interface amg_i_aggr_assign
 
-  interface build_matching
-    module procedure dbuild_matching
-  end interface build_matching
+  interface amg_build_matching
+    module procedure amg_dbuild_matching
+  end interface amg_build_matching
 
-  interface build_ahat
-    module procedure dbuild_ahat
-  end interface build_ahat
+  interface amg_build_ahat
+    module procedure amg_dbuild_ahat
+  end interface amg_build_ahat
 
-  interface psb_gtranspose
-    module procedure psb_dgtranspose
-  end interface psb_gtranspose
+  interface amg_gtranspose
+    module procedure amg_dgtranspose
+  end interface amg_gtranspose
 
-  interface psb_htranspose
-    module procedure psb_dhtranspose
-  end interface psb_htranspose
+  interface amg_htranspose
+    module procedure amg_dhtranspose
+  end interface amg_htranspose
 
-  interface PMatchBox
-    module procedure dPMatchBox
-  end interface PMatchBox
+  interface amg_PMatchBox
+    module procedure amg_dPMatchBox
+  end interface amg_PMatchBox
 
   logical, parameter, private :: print_statistics=.false.
 contains
 
-  subroutine dmatchboxp_build_prol(w,a,desc_a,ilaggr,nlaggr,prol,info,&
+  subroutine amg_dmatchboxp_build_prol(w,a,desc_a,ilaggr,nlaggr,prol,info,&
        & symmetrize,reproducible,display_inp, display_out, print_out)
     use psb_base_mod
     use psb_util_mod
@@ -214,7 +214,7 @@ contains
     end if
     if (do_timings) call psb_toc(idx_phase1)
     if (do_timings) call psb_tic(idx_bldmtc)
-    call build_matching(w,a,desc_a,mate,info,display_inp=display_inp,symmetrize=symmetrize)
+    call amg_build_matching(w,a,desc_a,mate,info,display_inp=display_inp,symmetrize=symmetrize)
     if (do_timings) call psb_toc(idx_bldmtc)
     if (debug) write(0,*) iam,' buildprol from buildmatching:',&
          & info
@@ -312,7 +312,7 @@ contains
                   ! Should be a symmetric function.
                   !
                   call desc_a%indxmap%qry_halo_owner(idx,iown,info)
-                  ip    = i_aggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg)
+                  ip    = amg_i_aggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg)
                   if (iam == ip) then
                     nlaggr(iam) = nlaggr(iam) + 1
                     ilaggr(k)   = nlaggr(iam)
@@ -516,9 +516,9 @@ contains
       write(0,*) iam,' :  error from Matching: ',info
     end if
 
-  end subroutine dmatchboxp_build_prol
+  end subroutine amg_dmatchboxp_build_prol
 
-  function i_daggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg) &
+  function amg_i_daggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg) &
        & result(iproc)
     !
     ! How to break ties? This
@@ -560,10 +560,10 @@ contains
         iproc = iown
       end if
     end if
-  end function i_daggr_assign
+  end function amg_i_daggr_assign
 
 
-  subroutine dbuild_matching(w,a,desc_a,mate,info,display_inp, symmetrize)
+  subroutine amg_dbuild_matching(w,a,desc_a,mate,info,display_inp, symmetrize)
     use psb_base_mod
     use psb_util_mod
     use iso_c_binding
@@ -612,7 +612,7 @@ contains
       if (iam == 0) write(0,*)' Into build_ahat:'
     end if
     if (do_timings) call psb_tic(idx_bldahat)
-    call build_ahat(w,a,ahatnd,desc_a,info,symmetrize=symmetrize)
+    call amg_build_ahat(w,a,ahatnd,desc_a,info,symmetrize=symmetrize)
     if (do_timings) call psb_toc(idx_bldahat)
     if (info /= 0) then
       write(0,*) 'Error from build_ahat ', info
@@ -703,7 +703,7 @@ contains
       !
       if (debug) write(0,*) iam,' buildmatching into PMatchBox:'
       if (do_timings) call psb_tic(idx_cmboxp)
-      call PMatchBox(nr,nz,vlptr,vlind,ewght,&
+      call amg_PMatchBox(nr,nz,vlptr,vlind,ewght,&
            & vnl, mate, iam, np,ictxt,&
            & msgis,msgas,msgprc,ph0t,ph1t,ph2t,ph1crd,ph2crd,info,display_inp)
       if (do_timings) call psb_toc(idx_cmboxp)
@@ -767,9 +767,9 @@ contains
       val(1:n) = tmp(1:n)
     end subroutine fix_order
 
-  end subroutine dbuild_matching
+  end subroutine amg_dbuild_matching
 
-  subroutine dbuild_ahat(w,a,ahat,desc_a,info,symmetrize)
+  subroutine amg_dbuild_ahat(w,a,ahat,desc_a,info,symmetrize)
     use psb_base_mod
     implicit none
     real(psb_dpk_), intent(in)           :: w(:)
@@ -1005,9 +1005,9 @@ contains
       end block
     end if
 
-  end subroutine dbuild_ahat
+  end subroutine amg_dbuild_ahat
 
-  subroutine psb_dgtranspose(ain,aout,desc_a,info)
+  subroutine amg_dgtranspose(ain,aout,desc_a,info)
     use psb_base_mod
     implicit none
     type(psb_ldspmat_type), intent(in)  :: ain
@@ -1128,9 +1128,9 @@ contains
       end if
     end if
 
-  end subroutine psb_dgtranspose
+  end subroutine amg_dgtranspose
 
-  subroutine psb_dhtranspose(ain,aout,desc_a,info)
+  subroutine amg_dhtranspose(ain,aout,desc_a,info)
     use psb_base_mod
     implicit none
     type(psb_ldspmat_type), intent(in)  :: ain
@@ -1297,9 +1297,9 @@ contains
       end if
     end if
 
-  end subroutine psb_dhtranspose
+  end subroutine amg_dhtranspose
 
-  subroutine dPMatchBox(nlver,nledge,verlocptr,verlocind,edgelocweight,&
+  subroutine amg_dPMatchBox(nlver,nledge,verlocptr,verlocind,edgelocweight,&
        & verdistance, mate, myrank, numprocs, ictxt,&
        & msgindsent,msgactualsent,msgpercent,&
        & ph0_time, ph1_time, ph2_time, ph1_card, ph2_card,info,display_inp)
@@ -1434,6 +1434,6 @@ contains
     end if
     where(mate>=0) mate = mate + 1
 
-  end subroutine dPMatchBox
+  end subroutine amg_dPMatchBox
 
-end module dmatchboxp_mod
+end module amg_dmatchboxp_mod
