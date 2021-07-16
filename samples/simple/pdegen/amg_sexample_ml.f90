@@ -173,7 +173,7 @@ program amg_sexample_ml
  case(1)
 
     ! initialize the default multi-level preconditioner, i.e. V-cycle
-    ! with basic smoothed aggregation, 1 hybrid forward/backward
+    ! with decoupled smoothed aggregation, 1 hybrid forward/backward
     ! GS sweep as pre/post-smoother and UMFPACK as coarsest-level
     ! solver
 
