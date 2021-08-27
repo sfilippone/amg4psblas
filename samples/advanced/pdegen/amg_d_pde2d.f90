@@ -338,12 +338,12 @@ program amg_d_pde2d
         call prec%set('sub_prol',        p_choice%prol2,     info,pos='post')
         select case(trim(psb_toupper(p_choice%solve2)))
         case('INVK')
-          call prec%set('sub_solve',       p_choice%solve,   info)
+          call prec%set('sub_solve',       p_choice%solve2,   info)
         case('INVT')
-          call prec%set('sub_solve',       p_choice%solve,   info)
+          call prec%set('sub_solve',       p_choice%solve2,   info)
         case('AINV')
-          call prec%set('sub_solve',       p_choice%solve,   info)
-          call prec%set('ainv_alg', p_choice%variant,   info)
+          call prec%set('sub_solve',       p_choice%solve2,   info)
+          call prec%set('ainv_alg', p_choice%variant2,   info)
         case default
           call prec%set('sub_solve',       p_choice%solve2,   info, pos='post')
         end select
