@@ -264,7 +264,7 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     !
     if (debug) write(0,*) me,' Into matchbox_build_prol ',info
     if (do_timings) call psb_tic(idx_mboxp)
-    call amg_dmatchboxp_build_prol(tmpw,acv(i-1),desc_acv(i-1),ixaggr,nxaggr,tmp_prol,info,&
+    call amg_d_matchboxp_build_prol(tmpw,acv(i-1),desc_acv(i-1),ixaggr,nxaggr,tmp_prol,info,&
          & symmetrize=ag%need_symmetrize,reproducible=ag%reproducible_matching)
     if (do_timings) call psb_toc(idx_mboxp)
     if (debug) write(0,*) me,' Out from matchbox_build_prol ',info
