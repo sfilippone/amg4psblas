@@ -49,13 +49,13 @@ module amg_d_newmatch_aggregator_mod
   use amg_d_base_aggregator_mod
   use iso_c_binding
   
-  type, bind(c)::  bcm_Vector
+  type, bind(c)::  nwm_Vector
     type(c_ptr) :: data
     integer(c_int) :: size
     integer(c_int) :: owns_data
-  end type bcm_Vector
+  end type nwm_Vector
   
-  type, bind(c)::  bcm_CSRMatrix
+  type, bind(c)::  nwm_CSRMatrix
     type(c_ptr) :: i
     type(c_ptr) :: j
     integer(c_int) :: num_rows
@@ -63,7 +63,7 @@ module amg_d_newmatch_aggregator_mod
     integer(c_int) :: num_nonzeros
     integer(c_int) :: owns_data
     type(c_ptr) :: data
-  end type bcm_CSRMatrix
+  end type nwm_CSRMatrix
   
   type, extends(amg_d_base_aggregator_type) :: amg_d_newmatch_aggregator_type
     integer(psb_ipk_) :: matching_alg
@@ -74,7 +74,7 @@ module amg_d_newmatch_aggregator_mod
     !  before passing it to the matching
     !
     real(psb_dpk_), allocatable :: w(:), w_nxt(:)
-    type(bcm_Vector)  :: w_c_nxt
+    type(nwm_Vector)  :: w_c_nxt
     integer(psb_ipk_) :: max_csize
     integer(psb_ipk_) :: max_nlevels
   contains
@@ -86,7 +86,7 @@ module amg_d_newmatch_aggregator_mod
     procedure, pass(ag) :: update_next  => d_newmatch_aggregator_update_next
     procedure, pass(ag) :: bld_wnxt     => d_newmatch_bld_wnxt
     procedure, pass(ag) :: bld_default_w    => d_bld_default_w
-    procedure, pass(ag) :: set_c_default_w  => d_set_default_bcm_w
+    procedure, pass(ag) :: set_c_default_w  => d_set_default_nwm_w
     procedure, pass(ag) :: descr        => d_newmatch_aggregator_descr
     procedure, pass(ag) :: clone        => d_newmatch_aggregator_clone
     procedure, pass(ag) :: free         => d_newmatch_aggregator_free
@@ -219,7 +219,7 @@ contains
     call ag%set_c_default_w()
   end subroutine d_bld_default_w
 
-  subroutine d_set_default_bcm_w(ag)
+  subroutine d_set_default_nwm_w(ag)
     use psb_realloc_mod
     use iso_c_binding
     implicit none 
@@ -231,12 +231,12 @@ contains
     ag%w_c_nxt%owns_data = 0
     if (ag%w_c_nxt%size > 0) call set_cloc(ag%w_nxt, ag%w_c_nxt)
 
-  end subroutine d_set_default_bcm_w
+  end subroutine d_set_default_nwm_w
 
   subroutine set_cloc(vect,w_c_nxt)
     use iso_c_binding
     real(psb_dpk_), target :: vect(:)
-    type(bcm_Vector) :: w_c_nxt
+    type(nwm_Vector) :: w_c_nxt
     
     w_c_nxt%data = c_loc(vect)
   end subroutine set_cloc
@@ -355,15 +355,15 @@ contains
     ! For now we ignore IDX
     
     select case(what)
-    case('BCM_MATCH_ALG')
+    case('NWM_MATCH_ALG')
       ag%matching_alg=val
-    case('BCM_SWEEPS')
+    case('NWM_SWEEPS')
       ag%n_sweeps=val
-    case('BCM_MAX_CSIZE')
+    case('NWM_MAX_CSIZE')
       ag%max_csize=val
-    case('BCM_MAX_NLEVELS')
+    case('NWM_MAX_NLEVELS')
       ag%max_nlevels=val
-    case('BCM_W_SIZE')
+    case('NWM_W_SIZE')
       call ag%bld_default_w(val)
     case default
       ! Do nothing

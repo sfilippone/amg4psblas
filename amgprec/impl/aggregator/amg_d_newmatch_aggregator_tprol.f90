@@ -1,55 +1,23 @@
 !   
-!   
-!                             MLD2P4  Extensions
-!    
-!    (C) Copyright 2019
 !  
-!                        Salvatore Filippone  Cranfield University
-!        Pasqua D'Ambra         IAC-CNR, Naples, IT
-!   
-!    Redistribution and use in source and binary forms, with or without
-!    modification, are permitted provided that the following conditions
-!    are met:
-!      1. Redistributions of source code must retain the above copyright
-!         notice, this list of conditions and the following disclaimer.
-!      2. Redistributions in binary form must reproduce the above copyright
-!         notice, this list of conditions, and the following disclaimer in the
-!         documentation and/or other materials provided with the distribution.
-!      3. The name of the MLD2P4 group or the names of its contributors may
-!         not be used to endorse or promote products derived from this
-!         software without specific written permission.
-!   
-!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MLD2P4 GROUP OR ITS CONTRIBUTORS
-!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
-! File: mld_d_bcmatch_aggregator_tprol.f90
+! File: amg_d_newmatch_aggregator_tprol.f90
 !
-! Subroutine: mld_d_bcmatch_aggregator_tprol
+! Subroutine: amg_d_newmatch_aggregator_tprol
 ! Version:    real
 !
 !
   
-subroutine  mld_d_bcmatch_aggregator_build_tprol(ag,parms,ag_data,&
+subroutine  amg_d_newmatch_aggregator_build_tprol(ag,parms,ag_data,&
      & a,desc_a,ilaggr,nlaggr,op_prol,info)
   use psb_base_mod
-  use mld_d_prec_type
-  use mld_d_bcmatch_aggregator_mod, mld_protect_name => mld_d_bcmatch_aggregator_build_tprol
-  use mld_d_inner_mod
+  use amg_d_prec_type
+  use amg_d_newmatch_aggregator_mod, amg_protect_name => amg_d_newmatch_aggregator_build_tprol
+  use amg_d_inner_mod
   use iso_c_binding      
   implicit none
-  class(mld_d_bcmatch_aggregator_type), target, intent(inout) :: ag
-  type(mld_dml_parms), intent(inout)    :: parms 
-  type(mld_daggr_data), intent(in)      :: ag_data
+  class(amg_d_newmatch_aggregator_type), target, intent(inout) :: ag
+  type(amg_dml_parms), intent(inout)    :: parms 
+  type(amg_daggr_data), intent(in)      :: ag_data
   type(psb_dspmat_type), intent(inout)  :: a
   type(psb_desc_type), intent(inout)    :: desc_a
   integer(psb_lpk_), allocatable, intent(out) :: ilaggr(:),nlaggr(:)
@@ -60,10 +28,11 @@ subroutine  mld_d_bcmatch_aggregator_build_tprol(ag,parms,ag_data,&
   ! Local variables
   real(psb_dpk_), allocatable:: valaggr(:)
   type(psb_dspmat_type)   :: a_tmp
-  type(bcm_CSRMatrix) :: C, P
+  type(nwm_CSRMatrix) :: C, P
   integer(c_int) :: match_algorithm, n_sweeps, max_csize, max_nlevels
   character(len=20)            :: name, ch_err
-  integer(psb_mpk_)            :: ictxt, np, me
+  type(psb_ctxt_type)          :: ctxt
+  integer(psb_mpk_)            :: np, me
   integer(psb_ipk_)            :: err_act, ierr
   integer(psb_ipk_)            :: debug_level, debug_unit
   integer(psb_ipk_)            :: i, j, k, nr, nc, isz, num_pcols
@@ -77,8 +46,8 @@ subroutine  mld_d_bcmatch_aggregator_build_tprol(ag,parms,ag_data,&
       use iso_c_binding  
       import
       implicit none
-      type(bcm_CSRMatrix) :: C, P
-      type(bcm_Vector) :: w
+      type(nwm_CSRMatrix) :: C, P
+      type(nwm_Vector) :: w
       integer(c_int) :: match_alg
       integer(c_int) :: n_sweeps
       integer(c_int) :: max_nlevels
@@ -87,14 +56,14 @@ subroutine  mld_d_bcmatch_aggregator_build_tprol(ag,parms,ag_data,&
   end interface
 
   interface
-    function mld_bootCMatch_if(C,match_alg,n_sweeps,max_nlevels,max_csize,&
+    function amg_bootCMatch_if(C,match_alg,n_sweeps,max_nlevels,max_csize,&
          & w,isz,ilaggr,valaggr, num_cols) &
-         & bind(c,name='mld_bootCMatch_if') result(iret)
+         & bind(c,name='amg_bootCMatch_if') result(iret)
       use iso_c_binding  
       import
       implicit none
-      type(bcm_CSRMatrix) :: C, P
-      type(bcm_Vector) :: w
+      type(nwm_CSRMatrix) :: C, P
+      type(nwm_Vector) :: w
       integer(c_int), value :: match_alg
       integer(c_int), value :: n_sweeps
       integer(c_int), value :: max_nlevels
@@ -104,12 +73,12 @@ subroutine  mld_d_bcmatch_aggregator_build_tprol(ag,parms,ag_data,&
       integer(c_int)        :: ilaggr(*)
       real(c_double)        :: valaggr(*)
       integer(c_int) :: iret
-    end function mld_bootCMatch_if
+    end function amg_bootCMatch_if
   end interface
 
-  name='mld_d_bcmatch_aggregator_tprol'
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt,me,np)
+  name='amg_d_newmatch_aggregator_tprol'
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt,me,np)
   if (psb_get_errstatus().ne.0) return 
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -117,13 +86,13 @@ subroutine  mld_d_bcmatch_aggregator_build_tprol(ag,parms,ag_data,&
   info  = psb_success_
 
 
-  call mld_check_def(parms%ml_cycle,'Multilevel cycle',&
-       &   mld_mult_ml_,is_legal_ml_cycle)
-  call mld_check_def(parms%par_aggr_alg,'Aggregation',&
-       &   mld_dec_aggr_,is_legal_ml_par_aggr_alg)
-  call mld_check_def(parms%aggr_ord,'Ordering',&
-       &   mld_aggr_ord_nat_,is_legal_ml_aggr_ord)
-  call mld_check_def(parms%aggr_thresh,'Aggr_Thresh',dzero,is_legal_d_aggr_thrs)
+  call amg_check_def(parms%ml_cycle,'Multilevel cycle',&
+       &   amg_mult_ml_,is_legal_ml_cycle)
+  call amg_check_def(parms%par_aggr_alg,'Aggregation',&
+       &   amg_dec_aggr_,is_legal_decoupled_par_aggr_alg)
+  call amg_check_def(parms%aggr_ord,'Ordering',&
+       &   amg_aggr_ord_nat_,is_legal_ml_aggr_ord)
+  call amg_check_def(parms%aggr_thresh,'Aggr_Thresh',dzero,is_legal_d_aggr_thrs)
 
   call a%csclip(b=a_tmp, info=info, jmax=a%get_nrows(), imax=a%get_nrows())
 
@@ -167,11 +136,11 @@ subroutine  mld_d_bcmatch_aggregator_build_tprol(ag,parms,ag_data,&
     max_nlevels = ag_data%max_levs
   end if
 
-  info = mld_bootCMatch_if(C,match_algorithm,n_sweeps,max_nlevels,max_csize,&
+  info = amg_bootCMatch_if(C,match_algorithm,n_sweeps,max_nlevels,max_csize,&
        & ag%w_c_nxt, isz, c_ilaggr, valaggr, num_pcols)
   if (info /= psb_success_) then
 !!$      write(0,*) 'On return from bootCMatch_if:',info
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='mld_bootCMatch_if')
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_bootCMatch_if')
     goto 9999
   end if
   ilaggr(1:nr) = c_ilaggr(1:nr)
@@ -191,12 +160,12 @@ subroutine  mld_d_bcmatch_aggregator_build_tprol(ag,parms,ag_data,&
 
   nlaggr(:)=0
   nlaggr(me+1) = num_pcols
-  call psb_sum(ictxt,nlaggr(1:np))
+  call psb_sum(ctxt,nlaggr(1:np))
 
 
-  call mld_d_bcmatch_map_to_tprol(desc_a,ilaggr,nlaggr,valaggr,op_prol,info)
+  call amg_d_newmatch_map_to_tprol(desc_a,ilaggr,nlaggr,valaggr,op_prol,info)
   if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='mld_bcmatch_map_to_tprol')
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_newmatch_map_to_tprol')
     goto 9999
   end if
 
@@ -206,4 +175,4 @@ subroutine  mld_d_bcmatch_aggregator_build_tprol(ag,parms,ag_data,&
 9999 call psb_error_handler(err_act)
   return
 
-end subroutine mld_d_bcmatch_aggregator_build_tprol
+end subroutine amg_d_newmatch_aggregator_build_tprol
