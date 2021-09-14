@@ -1,40 +1,8 @@
 !   
-!   
-!                             MLD2P4  Extensions
-!    
-!    (C) Copyright 2019
 !  
-!                        Salvatore Filippone  Cranfield University
-!        Pasqua D'Ambra         IAC-CNR, Naples, IT
-!   
-!    Redistribution and use in source and binary forms, with or without
-!    modification, are permitted provided that the following conditions
-!    are met:
-!      1. Redistributions of source code must retain the above copyright
-!         notice, this list of conditions and the following disclaimer.
-!      2. Redistributions in binary form must reproduce the above copyright
-!         notice, this list of conditions, and the following disclaimer in the
-!         documentation and/or other materials provided with the distribution.
-!      3. The name of the MLD2P4 group or the names of its contributors may
-!         not be used to endorse or promote products derived from this
-!         software without specific written permission.
-!   
-!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MLD2P4 GROUP OR ITS CONTRIBUTORS
-!    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
-! File: mld_d_base_aggregator_mat_bld.f90
+! File: amg_d_base_aggregator_mat_bld.f90
 !
-! Subroutine: mld_d_base_aggregator_mat_bld
+! Subroutine: amg_d_base_aggregator_mat_bld
 ! Version:    real
 !
 !  This routine builds the matrix associated to the current level of the
@@ -44,7 +12,7 @@
 !  previous one and vice versa). 
 !  The current level is regarded as the coarse one, while the previous as
 !  the fine one. This is in agreement with the fact that the routine is called,
-!  by mld_mlprec_bld, only on levels >=2.
+!  by amg_mlprec_bld, only on levels >=2.
 !  The coarse-level matrix A_C is built from a fine-level matrix A
 !  by using the Galerkin approach, i.e.
 !
@@ -53,13 +21,13 @@
 !  where P_C is a prolongator from the coarse level to the fine one.
 ! 
 !  A mapping from the nodes of the adjacency graph of A to the nodes of the
-!  adjacency graph of A_C has been computed by the mld_aggrmap_bld subroutine.
+!  adjacency graph of A_C has been computed by the amg_aggrmap_bld subroutine.
 !  The prolongator P_C is built here from this mapping, according to the
-!  value of p%iprcparm(mld_aggr_kind_), specified by the user through
-!  mld_dprecinit and mld_zprecset.
+!  value of p%iprcparm(amg_aggr_kind_), specified by the user through
+!  amg_dprecinit and amg_zprecset.
 !  On output from this routine the entries of AC, op_prol, op_restr
 !  are still in "global numbering" mode; this is fixed in the calling routine
-!  mld_d_lev_aggrmat_bld.
+!  amg_d_lev_aggrmat_bld.
 !
 !  Currently four  different prolongators are implemented, corresponding to
 !  four  aggregation algorithms:
@@ -93,9 +61,9 @@
 !
 ! 
 ! Arguments:
-!    ag       -  type(mld_d_base_aggregator_type), input/output.
+!    ag       -  type(amg_d_base_aggregator_type), input/output.
 !               The aggregator object
-!    parms   -  type(mld_dml_parms), input 
+!    parms   -  type(amg_dml_parms), input 
 !               The aggregation parameters
 !    a          -  type(psb_dspmat_type), input.     
 !                  The sparse matrix structure containing the local part of
@@ -127,16 +95,16 @@
 !    info       -  integer, output.
 !                  Error code.
 !  
-subroutine  mld_d_bcmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
+subroutine  amg_d_newmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
      & ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
-  use mld_d_inner_mod
-  use mld_d_prec_type
-  use mld_d_bcmatch_aggregator_mod, mld_protect_name => mld_d_bcmatch_aggregator_mat_bld
+  use amg_d_inner_mod
+  use amg_d_prec_type
+  use amg_d_newmatch_aggregator_mod, amg_protect_name => amg_d_newmatch_aggregator_mat_bld
   implicit none
   
-  class(mld_d_bcmatch_aggregator_type), target, intent(inout) :: ag
-  type(mld_dml_parms), intent(inout)    :: parms 
+  class(amg_d_newmatch_aggregator_type), target, intent(inout) :: ag
+  type(amg_dml_parms), intent(inout)    :: parms 
   type(psb_dspmat_type), intent(in)     :: a
   type(psb_desc_type), intent(inout)    :: desc_a
   integer(psb_lpk_), intent(inout)      :: ilaggr(:), nlaggr(:)
@@ -147,49 +115,50 @@ subroutine  mld_d_bcmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
 
   ! Local variables
   character(len=20)           :: name
-  integer(psb_mpk_)           :: ictxt, np, me
+  type(psb_ctxt_type)         :: ctxt
+  integer(psb_mpk_)           :: np, me
   type(psb_ld_coo_sparse_mat) :: acoo, bcoo
   type(psb_ld_csr_sparse_mat) :: acsr1
   integer(psb_lpk_)           :: nzl,ntaggr
   integer(psb_ipk_)           :: err_act
   integer(psb_ipk_)           :: debug_level, debug_unit
 
-  name='mld_d_bcmatch_aggregator_mat_bld'
+  name='amg_d_newmatch_aggregator_mat_bld'
   if (psb_get_errstatus().ne.0) return 
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   info  = psb_success_
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt,me,np)
 
   !
   ! Build the coarse-level matrix from the fine-level one, starting from 
-  ! the mapping defined by mld_aggrmap_bld and applying the aggregation
+  ! the mapping defined by amg_aggrmap_bld and applying the aggregation
   ! algorithm specified by 
   !
   select case (parms%aggr_prol)
-  case (mld_no_smooth_) 
+  case (amg_no_smooth_) 
 
-!!$    call mld_d_bcmatch_unsmth_spmm_bld(a,desc_a,ilaggr,nlaggr,&
+!!$    call amg_d_newmatch_unsmth_spmm_bld(a,desc_a,ilaggr,nlaggr,&
 !!$         & parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
-    call mld_daggrmat_nosmth_bld(a,desc_a,ilaggr,nlaggr, &
+    call amg_daggrmat_nosmth_bld(a,desc_a,ilaggr,nlaggr, &
          & parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
 
 
-  case(mld_smooth_prol_) 
+  case(amg_smooth_prol_) 
 
-    call mld_daggrmat_smth_bld(a,desc_a,ilaggr,nlaggr, &
+    call amg_daggrmat_smth_bld(a,desc_a,ilaggr,nlaggr, &
          & parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
 
-!!$  case(mld_biz_prol_) 
+!!$  case(amg_biz_prol_) 
 !!$
-!!$    call mld_daggrmat_biz_bld(a,desc_a,ilaggr,nlaggr, &
+!!$    call amg_daggrmat_biz_bld(a,desc_a,ilaggr,nlaggr, &
 !!$         & parms,ac,desc_ac,op_prol,op_restr,info)
 
-  case(mld_min_energy_) 
+  case(amg_min_energy_) 
 
-    call mld_daggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr, &
+    call amg_daggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr, &
          & parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
 
   case default
@@ -211,4 +180,4 @@ subroutine  mld_d_bcmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
   return
 
   
-end subroutine mld_d_bcmatch_aggregator_mat_bld
+end subroutine amg_d_newmatch_aggregator_mat_bld
