@@ -16,7 +16,8 @@ DMODOBJS=amg_d_prec_type.o \
 	amg_d_dec_aggregator_mod.o amg_d_symdec_aggregator_mod.o \
 	amg_d_ainv_solver.o amg_d_base_ainv_mod.o \
 	amg_d_invk_solver.o amg_d_invt_solver.o amg_d_krm_solver.o \
-	amg_d_matchboxp_mod.o amg_d_parmatch_aggregator_mod.o
+	amg_d_matchboxp_mod.o amg_d_parmatch_aggregator_mod.o \
+	amd_d_newmatch_aggregator_mod.o
 
 SMODOBJS=amg_s_prec_type.o amg_s_ilu_fact_mod.o \
 	amg_s_inner_mod.o amg_s_ilu_solver.o amg_s_diag_solver.o amg_s_jac_smoother.o amg_s_as_smoother.o \
