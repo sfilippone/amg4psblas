@@ -61,10 +61,13 @@ amg_s_parmatch_unsmth_bld.o \
 amg_s_parmatch_smth_bld.o \
 amg_s_parmatch_spmm_bld_inner.o
 
-MPCOBJS=MatchBoxPC.o \
+MPCOBJS=
+#MatchBoxPC.o \
+#algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o
+MPCXXOBJS=MatchBoxPC.o \
 algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o
 
-OBJS = $(FOBJS) $(MPCOBJS)
+OBJS = $(FOBJS) $(MPCOBJS) $(MPCXXOBJS)
 
 LIBNAME=libamg_prec.a
 
@@ -75,6 +78,7 @@ lib:  $(OBJS)
 mpobjs:
 	(make $(MPFOBJS) F90="$(MPF90)" F90COPT="$(F90COPT)")
 	(make $(MPCOBJS) CC="$(MPCC)" CCOPT="$(CCOPT)")
+	(make $(MPCXXOBJS) CXX="$(MPCXX)" CXXOPT="$(CCOPT) $(CXXOPT)")
 
 veryclean: clean
 	/bin/rm -f $(LIBNAME)
