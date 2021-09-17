@@ -1,72 +1,76 @@
-
 #include <string.h>
 #include <stdio.h>
+#include "psb_base_cbind.h"
+#include "MatchingAlgorithms.h"
 
-#include "bcm.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-bcm_CSRMatrix bootCMatch(bcm_CSRMatrix *C, int *match_algorithm, int *n_sweeps, int *max_nlevels, int *max_csize, bcm_Vector *w);
-bcm_CSRMatrix bootCMatch(bcm_CSRMatrix *C, int *match_algorithm, int *n_sweeps, int *max_nlevels, int *max_csize, bcm_Vector *w){
-   bcm_Vector *w_temp;
-   int info;
-   //double *w_inp;
-   //w_inp=bcm_VectorData(w); 
+psb_i_t dnew_Match_If(psb_i_t nr, psb_i_t irp[], psb_i_t ja[],
+		      psb_d_t val[], psb_d_t diag[],
+		      psb_d_t w[], psb_i_t mate[])
 
-   bcm_CSRMatrix *P;
-   bcm_CSRMatrix *Ac;
-   int ftcoarse=1;
-   int cr_it=0, cr_relax_type=0;
-   double cr_relax_weight=0.0;
-   // Here I am building Ac but I won't use it. 
-   Ac=bcm_CSRMatchingAgg(C, &w, &P, *match_algorithm, *n_sweeps,*max_csize,  *max_nlevels,  &ftcoarse,
-			 cr_it, cr_relax_type, cr_relax_weight);
-   //w_inp=bcm_VectorData(w);
-   bcm_CSRMatrixDestroy(Ac);
- return *P;
-}
+#ifdef __cplusplus
+  }
+#endif
+  
+psb_i_t dnew_Match_If(psb_i_t nr, psb_i_t irp[], psb_i_t ja[],
+		      psb_d_t val[], psb_d_t diag[], psb_d_t w[],
+		      psb_i_t mate[])
+{
+   psb_i_t info;
+   psb_i_t i,j;
+   psb_i_t ftcoarse=1;
+   psb_i_t cr_it=0, cr_relax_type=0;
+   psb_d_t cr_relax_weight=0.0;
 
-int mld_bootCMatch_if(bcm_CSRMatrix *C, int match_algorithm, int n_sweeps,
-		      int max_nlevels, int max_csize, bcm_Vector *w,
-		      int isz, int ilaggr[], double valaggr[], int *num_cols){
-   bcm_Vector *w_temp;
-   int info;
-   //double *w_inp;
-   //w_inp=bcm_VectorData(w); 
+   vector<NODE_T> s;
+   vector<NODE_T> t;
+   vector<VAL_T> weights;
+   vector<NODE_T> mateNode;
+   NODE_T u,v;
+   VAL_T weight;
+   psb_i_t preprocess = atoi(argv[2]);
+   psb_i_t romaInput = atoi(argv[3]);
+   VAL_T lambda = atof(argv[4]);  
+   psb_d_t aii, ajj, aij, wii, wjj, tmp1, tmp2, minabs, edgnrm;
+   psb_i_t nt;
+   psb_d_t timeDiff;
+   MatchStat pstat;
 
-   bcm_CSRMatrix *P;
-   bcm_CSRMatrix *Ac;
-   int *irp, *ja, nr, nz, nc,i,j;
-   double *val;
-   int ftcoarse=1;
-   int cr_it=0, cr_relax_type=0;
-   double cr_relax_weight=0.0;
 
-   // Sanity checks
-   nr = bcm_CSRMatrixNumRows(C);
-   nc = bcm_VectorSize(w);
-//   fprintf(stderr,"Sanity check:  %d   %d \n",nr,nc);
-
-   // Here I am building Ac but I won't use it. 
-   Ac=bcm_CSRMatchingAgg(C, &w, &P, match_algorithm, n_sweeps, max_csize, max_nlevels, &ftcoarse,
-			 cr_it, cr_relax_type, cr_relax_weight);
-   irp = bcm_CSRMatrixI(P);
-   ja  = bcm_CSRMatrixJ(P);
-   val = bcm_CSRMatrixData(P);
-   nr  = bcm_CSRMatrixNumRows(P);
-   nc  = bcm_CSRMatrixNumCols(P);
-   nz  = bcm_CSRMatrixNumNonzeros(P);
-
+   //   fprintf(stderr,"Sanity check:  %d   %d \n",nr,nc);
+   for (i=1; i<nr; i++) {
+     for (j=irp[i-1]; j<irp[i]; j++)  {
+       v = i-1;        // I 
+       u = ja[j-1];    // J 
+       if (v>u) {
+	 // Define Ahat entry
+	 aij = val[j-1];
+	 aii = diag[v];
+	 ajj = diag[u];
+	 wii = w[v];
+	 wjj = w[u];
+	 edgnrm = aii*(wii*wii) + ajj*(wjj*wjj);
+	 if (edgnrm > eps) {
+	   weight = 1.0 - (2*1.0*aij*wii*wjj)/(aii*(wii*wii) + ajj*(wjj*wjj));
+	 } else {
+	   weight = 1e-16;
+	 }
+	 //
+	 s.push_back(u);
+	 t.push_back(v);
+	 weights.push_back(weight); 	 
+       }
+     }
+   }
+   runRomaWrapper(s,t,weights, nr, mateNode,preprocess,romaInput,lambda ,nt, pstat, timeDiff);
    if (isz < nr) return(-1);
    if (nz != nr) return(-2);
    /* loop here only makes sense when nr==nz */
    for (i=0; i< nr; i++) {
-     for (j=irp[i]; j<irp[i+1]; j++) {
-       ilaggr[i]  = ja[j] + 1;
-       valaggr[i] = val[j];
-     }
+     mate[i] = mateNode[i]+1;
    }
-   *num_cols = nc;
-   //w_inp=bcm_VectorData(w);
-   bcm_CSRMatrixDestroy(Ac);
-   bcm_CSRMatrixDestroy(P);
    return(0);
 }

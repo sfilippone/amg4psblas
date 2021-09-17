@@ -73,16 +73,25 @@ module amg_d_newmatch_aggregator_mod
     !  the W argument with its update. Hence, copy it in w_nxt
     !  before passing it to the matching
     !
+    integer(psb_ipk_) :: orig_aggr_size
+    integer(psb_ipk_) :: jacobi_sweeps
     real(psb_dpk_), allocatable :: w(:), w_nxt(:)
+    type(psb_dspmat_type), allocatable  :: prol, restr
+    type(psb_dspmat_type), allocatable  :: ac, base_a, rwa
+    type(psb_desc_type), allocatable    :: desc_ac, desc_ax, base_desc, rwdesc
     type(nwm_Vector)  :: w_c_nxt
     integer(psb_ipk_) :: max_csize
     integer(psb_ipk_) :: max_nlevels
+    logical           :: reproducible_matching = .false.
+    logical           :: need_symmetrize       = .false.
+    logical           :: unsmoothed_hierarchy  = .true.
   contains
     procedure, pass(ag) :: bld_tprol    => amg_d_newmatch_aggregator_build_tprol
     procedure, pass(ag) :: cseti        => d_newmatch_aggr_cseti
     procedure, pass(ag) :: default      => d_newmatch_aggr_set_default
     procedure, pass(ag) :: mat_asb      => amg_d_newmatch_aggregator_mat_asb
     procedure, pass(ag) :: mat_bld      => amg_d_newmatch_aggregator_mat_bld
+    procedure, pass(ag) :: inner_mat_asb => amg_d_newmatch_aggregator_inner_mat_asb
     procedure, pass(ag) :: update_next  => d_newmatch_aggregator_update_next
     procedure, pass(ag) :: bld_wnxt     => d_newmatch_bld_wnxt
     procedure, pass(ag) :: bld_default_w    => d_bld_default_w
@@ -179,6 +188,24 @@ module amg_d_newmatch_aggregator_mod
       integer(psb_ipk_), intent(out)             :: info
     end subroutine amg_daggrmat_unsmth_spmm_asb
   end interface
+
+  interface
+    subroutine  amg_d_newmatch_aggregator_inner_mat_asb(ag,parms,a,desc_a,&
+         & ac,desc_ac, op_prol,op_restr,info)
+      import :: amg_d_newmatch_aggregator_type, psb_desc_type, psb_dspmat_type,&
+           & psb_ldspmat_type, psb_dpk_, psb_ipk_, psb_lpk_, amg_dml_parms, amg_daggr_data
+      implicit none
+      class(amg_d_newmatch_aggregator_type), target, intent(inout) :: ag
+      type(amg_dml_parms), intent(inout)    :: parms
+      type(psb_dspmat_type), intent(in)     :: a
+      type(psb_desc_type), intent(in)       :: desc_a
+      type(psb_dspmat_type), intent(inout) :: op_prol,op_restr
+      type(psb_dspmat_type), intent(inout)  :: ac
+      type(psb_desc_type), intent(inout)    :: desc_ac
+      integer(psb_ipk_), intent(out)        :: info
+    end subroutine amg_d_newmatch_aggregator_inner_mat_asb
+  end interface
+
   
 !!$  interface
 !!$    subroutine amg_d_newmatch_unsmth_spmm_bld(a,desc_a,ilaggr,nlaggr,parms,&

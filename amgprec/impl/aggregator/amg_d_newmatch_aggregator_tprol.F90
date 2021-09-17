@@ -12,6 +12,7 @@ subroutine  amg_d_newmatch_aggregator_build_tprol(ag,parms,ag_data,&
   use psb_base_mod
   use amg_base_prec_type
   use amg_d_inner_mod
+  use amg_d_decmatch_mod
 #if defined(SERIAL_MPI)
     use amg_d_newmatch_aggregator_mod
 #else
@@ -55,43 +56,6 @@ subroutine  amg_d_newmatch_aggregator_build_tprol(ag,parms,ag_data,&
   integer(psb_ipk_), save             :: idx_mboxp=-1, idx_spmmbld=-1, idx_sweeps_mult=-1
   logical, parameter :: dump=.false., do_timings=.true., debug=.false., &
        & dump_prol_restr=.false.
-  interface
-    function bootCMatch(C,match_alg,n_sweeps,max_nlevels,max_csize,w)&
-         & bind(c,name='bootCMatch') result(P)
-      use iso_c_binding  
-      import
-      implicit none
-      type(nwm_CSRMatrix) :: C, P
-      type(nwm_Vector) :: w
-      integer(c_int) :: match_alg
-      integer(c_int) :: n_sweeps
-      integer(c_int) :: max_nlevels
-      integer(c_int) :: max_csize
-    end function bootCMatch
-  end interface
-
-  interface
-    function amg_bootCMatch_if(C,match_alg,n_sweeps,max_nlevels,max_csize,&
-         & w,isz,ilaggr,valaggr, num_cols) &
-         & bind(c,name='amg_bootCMatch_if') result(iret)
-      use iso_c_binding  
-      import
-      implicit none
-      type(nwm_CSRMatrix) :: C, P
-      type(nwm_Vector) :: w
-      integer(c_int), value :: match_alg
-      integer(c_int), value :: n_sweeps
-      integer(c_int), value :: max_nlevels
-      integer(c_int), value :: max_csize
-      integer(c_int), value :: isz
-      integer(c_int)        :: num_cols
-      integer(c_int)        :: ilaggr(*)
-      real(c_double)        :: valaggr(*)
-      integer(c_int) :: iret
-    end function amg_bootCMatch_if
-  end interface
-
-
   name='d_newmatch_tprol'
   ictxt = desc_a%get_context()
   call psb_info(ictxt,me,np)
@@ -121,16 +85,6 @@ subroutine  amg_d_newmatch_aggregator_build_tprol(ag,parms,ag_data,&
        &   amg_aggr_ord_nat_,is_legal_ml_aggr_ord)
   call amg_check_def(parms%aggr_thresh,'Aggr_Thresh',dzero,is_legal_d_aggr_thrs)
 
-  !write(*,*) 'Build_tprol:',acsr%get_nrows(),acsr%get_ncols()
-  C%num_rows     = acsr%get_nrows()
-  C%num_cols     = acsr%get_ncols()
-  C%num_nonzeros = acsr%get_nzeros()
-  C%owns_data    = 0
-  acsr%irp = acsr%irp - 1
-  acsr%ja  = acsr%ja  - 1
-  C%i    = c_loc(acsr%irp)
-  C%j    = c_loc(acsr%ja)
-  C%data = c_loc(acsr%val)
 #if !defined(SERIAL_MPI)
 
   match_algorithm = ag%matching_alg
@@ -166,8 +120,9 @@ subroutine  amg_d_newmatch_aggregator_build_tprol(ag,parms,ag_data,&
   if (n_sweeps /= ag%n_sweeps) then
     write(0,*) me,' Inconsistent N_SWEEPS ',n_sweeps,ag%n_sweeps
   end if
-!!$  if (me==0) write(0,*) 'Matching sweeps: ',n_sweeps
   n_sweeps = max(1,n_sweeps)
+
+  
   if (debug) write(0,*) me,' Copies, with n_sweeps: ',n_sweeps,max_csize
   if (ag%unsmoothed_hierarchy.and.allocated(ag%base_a)) then
     call ag%base_a%cp_to(acsr)
@@ -276,8 +231,8 @@ subroutine  amg_d_newmatch_aggregator_build_tprol(ag,parms,ag_data,&
     !
     if (debug) write(0,*) me,' Into matchbox_build_prol ',info
     if (do_timings) call psb_tic(idx_mboxp)
-!!$    call amg_dmatchboxp_build_prol(tmpw,acv(i-1),desc_acv(i-1),ixaggr,nxaggr,tmp_prol,info,&
-!!$         & symmetrize=ag%need_symmetrize,reproducible=ag%reproducible_matching)
+    call amg_ddecmatch_build_prol(tmpw,acv(i-1),desc_acv(i-1),ixaggr,nxaggr,tmp_prol,info,&
+         & symmetrize=ag%need_symmetrize,reproducible=ag%reproducible_matching)
     if (do_timings) call psb_toc(idx_mboxp)
     if (debug) write(0,*) me,' Out from matchbox_build_prol ',info
     if (psb_errstatus_fatal())  write(0,*)me,trim(name),'Error fatal on exit bld_tprol',info
