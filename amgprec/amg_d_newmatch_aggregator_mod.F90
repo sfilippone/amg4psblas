@@ -392,6 +392,10 @@ contains
       ag%max_nlevels=val
     case('NWM_W_SIZE')
       call ag%bld_default_w(val)
+    case('AGGR_SIZE')
+      ag%orig_aggr_size = val
+      ag%n_sweeps=max(1,ceiling(log(val*1.0)/log(2.0)))
+      write(0,*) 'Check: ', val,ag%orig_aggr_size, ag%n_sweeps, 2**ag%n_sweeps
     case default
       ! Do nothing
     end select

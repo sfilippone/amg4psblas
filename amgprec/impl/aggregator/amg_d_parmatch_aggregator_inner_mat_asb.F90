@@ -99,7 +99,7 @@ subroutine  amg_d_parmatch_aggregator_inner_mat_asb(ag,parms,a,desc_a,&
   use psb_base_mod
   use amg_base_prec_type
 #if defined(SERIAL_MPI)
-    use amg_d_parmatch_aggregator_mod
+  use amg_d_parmatch_aggregator_mod
 #else
   use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_aggregator_inner_mat_asb
 #endif

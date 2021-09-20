@@ -80,7 +80,7 @@ subroutine  amg_d_newmatch_aggregator_build_tprol(ag,parms,ag_data,&
   call amg_check_def(parms%ml_cycle,'Multilevel cycle',&
        &   amg_mult_ml_,is_legal_ml_cycle)
   call amg_check_def(parms%par_aggr_alg,'Aggregation',&
-       &   amg_coupled_aggr_,is_legal_coupled_par_aggr_alg)
+       &   amg_coupled_aggr_,is_legal_decoupled_par_aggr_alg)
   call amg_check_def(parms%aggr_ord,'Ordering',&
        &   amg_aggr_ord_nat_,is_legal_ml_aggr_ord)
   call amg_check_def(parms%aggr_thresh,'Aggr_Thresh',dzero,is_legal_d_aggr_thrs)

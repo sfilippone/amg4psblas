@@ -40,7 +40,8 @@ module amg_d_decmatch_mod
   use psb_base_cbind_mod
 
   interface new_Match_If
-    function dnew_Match_If(nr, irp, ja, val, diag, w, mate) bind(c) result(res)
+    function dnew_Match_If(nr, irp, ja, val, diag, w, mate) &
+         & bind(c,name="dnew_Match_If") result(res)
       use iso_c_binding
       import :: psb_c_ipk_, psb_c_lpk_, psb_c_mpk_, psb_c_epk_
       implicit none

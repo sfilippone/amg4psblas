@@ -275,7 +275,8 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_sym_dec_aggr_  = 1
   integer(psb_ipk_), parameter :: amg_ext_aggr_      = 2
   integer(psb_ipk_), parameter :: amg_coupled_aggr_  = 3
-  integer(psb_ipk_), parameter :: amg_max_par_aggr_alg_  = amg_coupled_aggr_
+  integer(psb_ipk_), parameter :: amg_newmtc_aggr_   = 4
+  integer(psb_ipk_), parameter :: amg_max_par_aggr_alg_  = amg_newmtc_aggr_
   !
   ! Legal values for entry: amg_aggr_type_
   !
@@ -519,6 +520,8 @@ contains
       val = amg_soc1_
     case('NEWMATCH')
       val = amg_newmatch_
+    case('NEWMTC')
+      val = amg_newmtc_aggr_
     case('MATCHBOXP','PARMATCH')
       val = amg_matchboxp_
     case('COUPLED','COUP')

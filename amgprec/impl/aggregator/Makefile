@@ -61,6 +61,7 @@ amg_s_parmatch_unsmth_bld.o \
 amg_s_parmatch_smth_bld.o \
 amg_s_parmatch_spmm_bld_inner.o \
 amg_d_newmatch_aggregator_mat_asb.o \
+amg_d_newmatch_aggregator_inner_mat_asb.o \
 amg_d_newmatch_aggregator_mat_bld.o \
 amg_d_newmatch_aggregator_tprol.o \
 amg_d_newmatch_map_to_tprol.o
@@ -69,8 +70,10 @@ MPCOBJS=
 #MatchBoxPC.o \
 #algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o
 MPCXXOBJS=MatchBoxPC.o \
-algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o
-
+algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o \
+newmatch_interface.o
+CXXDEFINES=$(PSBCXXDEFINES)
+CXXINCLUDES=-I../../../../ParallelRomaF-main/include -I$(PSBLAS_INCDIR)
 OBJS = $(FOBJS) $(MPCOBJS) $(MPCXXOBJS)
 
 LIBNAME=libamg_prec.a
