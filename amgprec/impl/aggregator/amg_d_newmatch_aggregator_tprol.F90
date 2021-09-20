@@ -247,16 +247,16 @@ subroutine  amg_d_newmatch_aggregator_build_tprol(ag,parms,ag_data,&
     end if
     if (i == n_sweeps) call tmp_prol%clone(tmp_pg,info)
     if (do_timings) call psb_tic(idx_spmmbld)
-!!$    !
-!!$    !  On entry, prolv(i) is in global numbering,
-!!$    !
-!!$    call amg_d_newmatch_spmm_bld_ov(acv(i-1),desc_acv(i-1),ixaggr,nxaggr,parms,&
-!!$         & acv(i),desc_acv(i), prolv(i),restrv(1),tmp_prol,info)
-!!$    if (psb_errstatus_fatal())  write(0,*)me,trim(name),'Error fatal on exit from bld_ov(i)',info
-!!$    if (debug) then
-!!$      call psb_barrier(ictxt)
-!!$      if (me==0) write(0,*) me,trim(name),' Done spmm_bld:',i
-!!$    end if
+    !
+    !  On entry, prolv(i) is in global numbering,
+    !
+    call amg_d_newmatch_spmm_bld_ov(acv(i-1),desc_acv(i-1),ixaggr,nxaggr,parms,&
+         & acv(i),desc_acv(i), prolv(i),restrv(1),tmp_prol,info)
+    if (psb_errstatus_fatal())  write(0,*)me,trim(name),'Error fatal on exit from bld_ov(i)',info
+    if (debug) then
+      call psb_barrier(ictxt)
+      if (me==0) write(0,*) me,trim(name),' Done spmm_bld:',i
+    end if
 
     if (do_timings) call psb_toc(idx_spmmbld)
     ! Keep a copy of prolv(i) in global numbering for the time being, will

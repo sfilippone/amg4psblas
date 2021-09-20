@@ -64,7 +64,9 @@ amg_d_newmatch_aggregator_mat_asb.o \
 amg_d_newmatch_aggregator_inner_mat_asb.o \
 amg_d_newmatch_aggregator_mat_bld.o \
 amg_d_newmatch_aggregator_tprol.o \
-amg_d_newmatch_map_to_tprol.o
+amg_d_newmatch_map_to_tprol.o \
+amg_d_newmatch_spmm_bld_inner.o \
+amg_d_newmatch_spmm_bld_ov.o
 
 MPCOBJS=
 #MatchBoxPC.o \

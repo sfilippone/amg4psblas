@@ -228,6 +228,40 @@ module amg_d_newmatch_aggregator_mod
 !!$    end subroutine amg_d_newmatch_unsmth_spmm_bld
 !!$  end interface
 
+  interface
+    subroutine amg_d_newmatch_spmm_bld_ov(a,desc_a,ilaggr,nlaggr,parms,&
+         & ac,desc_ac,op_prol,op_restr,t_prol,info)
+      import :: amg_d_newmatch_aggregator_type, psb_desc_type, psb_dspmat_type,&
+           & psb_ldspmat_type, psb_dpk_, psb_ipk_, psb_lpk_, amg_dml_parms, amg_daggr_data
+      implicit none
+      type(psb_dspmat_type), intent(inout)    :: a
+      type(psb_desc_type), intent(inout)       :: desc_a
+      integer(psb_lpk_), intent(inout)        :: ilaggr(:), nlaggr(:)
+      type(amg_dml_parms), intent(inout)      :: parms
+      type(psb_ldspmat_type), intent(inout)   :: t_prol
+      type(psb_dspmat_type), intent(inout)    :: op_prol,ac, op_restr
+      type(psb_desc_type), intent(out)          :: desc_ac
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine amg_d_newmatch_spmm_bld_ov
+  end interface
+
+  interface
+    subroutine amg_d_newmatch_spmm_bld_inner(a,desc_a,ilaggr,nlaggr,parms,&
+         & ac,desc_ac,op_prol,op_restr,t_prol,info)
+      import :: amg_d_newmatch_aggregator_type, psb_desc_type, psb_dspmat_type,&
+           & psb_ldspmat_type, psb_dpk_, psb_ipk_, psb_lpk_, amg_dml_parms, amg_daggr_data,&
+           & psb_d_csr_sparse_mat, psb_ld_csr_sparse_mat
+      implicit none
+      type(psb_d_csr_sparse_mat), intent(inout) :: a
+      type(psb_desc_type), intent(inout)          :: desc_a
+      integer(psb_lpk_), intent(inout)          :: ilaggr(:), nlaggr(:)
+      type(amg_dml_parms), intent(inout)        :: parms
+      type(psb_ldspmat_type), intent(inout)     :: t_prol
+      type(psb_dspmat_type), intent(inout)      :: op_prol,ac, op_restr
+      type(psb_desc_type), intent(out)          :: desc_ac
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine amg_d_newmatch_spmm_bld_inner
+  end interface
   
   private :: is_legal_malg, is_legal_csize, is_legal_nsweeps, is_legal_nlevels
   
