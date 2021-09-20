@@ -381,7 +381,7 @@ contains
 
     ! For now we ignore IDX
     
-    select case(what)
+    select case(psb_toupper(trim(what)))
     case('NWM_MATCH_ALG')
       ag%matching_alg=val
     case('NWM_SWEEPS')
@@ -395,7 +395,6 @@ contains
     case('AGGR_SIZE')
       ag%orig_aggr_size = val
       ag%n_sweeps=max(1,ceiling(log(val*1.0)/log(2.0)))
-      write(0,*) 'Check: ', val,ag%orig_aggr_size, ag%n_sweeps, 2**ag%n_sweeps
     case default
       ! Do nothing
     end select

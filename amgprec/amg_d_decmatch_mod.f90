@@ -224,6 +224,7 @@ contains
             wtemp(k)    = w(k)/abs(w(k))
             nlsingl     = nlsingl + 1
           end if
+!!$          write(0,*) k,mate(k),ilaggr(k),' negative match ',abs(w(k)), epsilon(nrmagg)
         else  if (idx > nc) then
           write(0,*) 'Impossible: mate(k) > nc'
           cycle
@@ -313,7 +314,11 @@ contains
       ! Shift all indices already assigned (i.e. >0)
       !
       do k=1,nr
-        if (ilaggr(k) > 0) ilaggr(k) = ilaggr(k) + naggrm1
+        if (ilaggr(k) > 0) then
+          ilaggr(k) = ilaggr(k) + naggrm1
+!!$        else
+!!$          write(0,*) 'Leftover ILAGGR',k,ilaggr(k),mate(k),abs(w(k)),epsilon(nrmagg)
+        end if
       end do
       call psb_halo(ilaggr,desc_a,info)
       call psb_halo(wtemp,desc_a,info)

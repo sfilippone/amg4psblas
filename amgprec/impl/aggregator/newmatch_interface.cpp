@@ -69,7 +69,13 @@ psb_i_t dnew_Match_If(psb_i_t nr, psb_i_t irp[], psb_i_t ja[],
    runRomaWrapper(s,t,weights, nr, mateNode,preprocess,romaInput,lambda ,nt, pstat, timeDiff);
    /* loop here only makes sense when nr==nz */
    for (i=0; i< nr; i++) {
-     mate[i] = mateNode[i]+1;
+     //fprintf(stderr,"From runRomaWrapper: %d   %d\n",i,mateNode[i]);
+     if (mateNode[i]>=0) {
+       mate[i] = mateNode[i]+1;
+     } else {
+       mate[i] = mateNode[i];
+       //fprintf(stderr,"From runRomaWrapper: %d   %d\n",i,mateNode[i]);
+     }
    }
    return(0);
 }
