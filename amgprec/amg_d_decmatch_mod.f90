@@ -281,6 +281,8 @@ contains
 !!$                    ilaggr(k) = -2
 !!$                  end if
 !!$                end if
+              else
+                write(0,*) 'Really?  mate(k) > nr? ',mate(k),nr
               end if
             else
               if (abs(w(k))<epsilon(nrmagg)) then
@@ -584,23 +586,23 @@ contains
 
 9999 continue
     call psb_error(ictxt)
-  contains
-    subroutine fix_order(n,ja,val,iret)
-      use psb_base_mod
-      implicit none
-      integer(psb_ipk_), intent(in)    :: n
-      integer(psb_lpk_), intent(inout) :: ja(:)
-      real(psb_dpk_), intent(inout)    :: val(:)
-      integer(psb_ipk_),intent(out)    :: iret
-      integer(psb_lpk_), allocatable   :: ix(:)
-      real(psb_dpk_), allocatable      :: tmp(:)
-
-      allocate(ix(n), tmp(n),stat=iret)
-      if (iret /= 0) return
-      call psb_msort(ja(1:n),ix=ix,dir=psb_sort_up_)
-      tmp(1:n) = val(ix(1:n))
-      val(1:n) = tmp(1:n)
-    end subroutine fix_order
+!!$  contains
+!!$    subroutine fix_order(n,ja,val,iret)
+!!$      use psb_base_mod
+!!$      implicit none
+!!$      integer(psb_ipk_), intent(in)    :: n
+!!$      integer(psb_lpk_), intent(inout) :: ja(:)
+!!$      real(psb_dpk_), intent(inout)    :: val(:)
+!!$      integer(psb_ipk_),intent(out)    :: iret
+!!$      integer(psb_lpk_), allocatable   :: ix(:)
+!!$      real(psb_dpk_), allocatable      :: tmp(:)
+!!$
+!!$      allocate(ix(n), tmp(n),stat=iret)
+!!$      if (iret /= 0) return
+!!$      call psb_msort(ja(1:n),ix=ix,dir=psb_sort_up_)
+!!$      tmp(1:n) = val(ix(1:n))
+!!$      val(1:n) = tmp(1:n)
+!!$    end subroutine fix_order
 
   end subroutine amg_dbuild_decmatch
 

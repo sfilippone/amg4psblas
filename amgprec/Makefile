@@ -114,7 +114,7 @@ amg_c_prec_type.o: amg_c_onelev_mod.o
 amg_z_prec_type.o: amg_z_onelev_mod.o
 
 amg_s_onelev_mod.o: amg_s_base_smoother_mod.o amg_s_dec_aggregator_mod.o amg_s_parmatch_aggregator_mod.o 
-amg_d_onelev_mod.o: amg_d_base_smoother_mod.o amg_d_dec_aggregator_mod.o amg_d_parmatch_aggregator_mod.o 
+amg_d_onelev_mod.o: amg_d_base_smoother_mod.o amg_d_dec_aggregator_mod.o amg_d_parmatch_aggregator_mod.o amg_d_newmatch_aggregator_mod.o
 amg_c_onelev_mod.o: amg_c_base_smoother_mod.o amg_c_dec_aggregator_mod.o
 amg_z_onelev_mod.o: amg_z_base_smoother_mod.o amg_z_dec_aggregator_mod.o
 

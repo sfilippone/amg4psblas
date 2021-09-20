@@ -283,6 +283,7 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_soc1_        = 1
   integer(psb_ipk_), parameter :: amg_soc2_        = 2
   integer(psb_ipk_), parameter :: amg_matchboxp_   = 3
+  integer(psb_ipk_), parameter :: amg_newmatch_    = 4
   !
   ! Legal values for entry: amg_aggr_prol_
   !
@@ -371,9 +372,9 @@ module amg_base_prec_type
   character(len=15), parameter, private :: &
        &  matrix_names(0:1)=(/'distributed   ','replicated    '/)
   character(len=18), parameter, private :: &
-       &  aggr_type_names(0:3)=(/'None              ',&
+       &  aggr_type_names(0:4)=(/'None              ',&
        &  'SOC measure 1     ', 'SOC Measure 2     ',&
-       &  'Parallel Matching '/)
+       &  'Parallel Matching ','Decoupled Matching'/)
   character(len=18), parameter, private :: &
        &  par_aggr_alg_names(0:3)=(/&
        & 'decoupled aggr.   ', 'sym. dec. aggr.   ',&
@@ -516,6 +517,8 @@ contains
       val = amg_soc2_
     case('SOC1')
       val = amg_soc1_
+    case('NEWMATCH')
+      val = amg_newmatch_
     case('MATCHBOXP','PARMATCH')
       val = amg_matchboxp_
     case('COUPLED','COUP')
