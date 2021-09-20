@@ -322,7 +322,7 @@ contains
     implicit none 
     character(len=32)  :: val
 
-    val = "BootCMatch aggregation"
+    val = "new matching aggregation"
   end function d_newmatch_aggregator_fmt
 
   subroutine  d_newmatch_aggregator_descr(ag,parms,iout,info)
@@ -332,10 +332,10 @@ contains
     integer(psb_ipk_), intent(in)  :: iout
     integer(psb_ipk_), intent(out) :: info
 
-    write(iout,*) 'BootCMatch Aggregator'
-    write(iout,*) '   Number of BootCMatch sweeps: ',ag%n_sweeps
+    write(iout,*) 'NewMatch Aggregator'
+    write(iout,*) '   Number of Matching   sweeps: ',ag%n_sweeps
     write(iout,*) '   Matching algorithm         : ',ag%matching_alg
-    write(iout,*) '    0: Preis 1: MC64  2: SPRAL  '
+    !write(iout,*) '    0: Preis 1: MC64  2: SPRAL  '
     write(iout,*) 'Aggregator object type: ',ag%fmt()
     call parms%mldescr(iout,info)
     
@@ -447,7 +447,7 @@ contains
     ag%max_nlevels  = 36
     ag%max_csize    = -1
     !
-    ! Apparently BootCMatch works better
+    ! Apparently newMatch works better
     ! by keeping all entries
     ! 
     ag%do_clean_zeros = .false.
