@@ -133,6 +133,9 @@ program amg_d_pde3d
     character(len=16)  :: aggr_ord    ! ordering for aggregation: NATURAL, DEGREE
     character(len=16)  :: aggr_filter ! filtering: FILTER, NO_FILTER
     real(psb_dpk_)     :: mncrratio  ! minimum aggregation ratio
+    integer(psb_ipk_)  :: matching_alg ! For NEW matching 1 2 3 variant
+    real(psb_dpk_)     :: lambda       ! matching LAMBDA
+    
     real(psb_dpk_), allocatable :: athresv(:) ! smoothed aggregation threshold vector
     integer(psb_ipk_)  :: thrvsz      ! size of threshold vector
     real(psb_dpk_)     :: athres      ! smoothed aggregation threshold
@@ -298,6 +301,11 @@ program amg_d_pde3d
     call prec%set('par_aggr_alg',    p_choice%par_aggr_alg,   info)
     call prec%set('aggr_type',       p_choice%aggr_type, info)
     call prec%set('aggr_size',       p_choice%aggr_size, info)
+    write(0,*) 'match variant ',p_choice%matching_alg
+    if (p_choice%matching_alg>0)&
+         & call prec%set('nwm_matching_alg',   p_choice%matching_alg, info)
+    if (p_choice%lambda>0)&
+         & call prec%set('nwm_lambda',   p_choice%lambda, info)
 
     call prec%set('aggr_ord',        p_choice%aggr_ord,   info)
     call prec%set('aggr_filter',     p_choice%aggr_filter,info)
@@ -569,6 +577,8 @@ contains
       call read_data(prec%aggr_ord,inp_unit)    ! ordering for aggregation
       call read_data(prec%aggr_filter,inp_unit) ! filtering
       call read_data(prec%mncrratio,inp_unit)  ! minimum aggregation ratio
+      call read_data(prec%matching_alg,inp_unit)  ! matching variant
+      call read_data(prec%lambda,inp_unit)      ! lambda 
       call read_data(prec%thrvsz,inp_unit)      ! size of aggr thresh vector
       if (prec%thrvsz > 0) then
         call psb_realloc(prec%thrvsz,prec%athresv,info)
@@ -638,6 +648,10 @@ contains
     call psb_bcast(ctxt,prec%aggr_ord)
     call psb_bcast(ctxt,prec%aggr_filter)
     call psb_bcast(ctxt,prec%mncrratio)
+    call psb_bcast(ctxt,prec%matching_alg)
+    call psb_bcast(ctxt,prec%lambda)
+
+
     call psb_bcast(ctxt,prec%thrvsz)
     if (prec%thrvsz > 0) then
       if (iam /= psb_root_) call psb_realloc(prec%thrvsz,prec%athresv,info)

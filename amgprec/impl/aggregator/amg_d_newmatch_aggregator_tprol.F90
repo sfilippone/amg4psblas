@@ -122,7 +122,6 @@ subroutine  amg_d_newmatch_aggregator_build_tprol(ag,parms,ag_data,&
   end if
   n_sweeps = max(1,n_sweeps)
 
-  
   if (debug) write(0,*) me,' Copies, with n_sweeps: ',n_sweeps,max_csize
   if (ag%unsmoothed_hierarchy.and.allocated(ag%base_a)) then
     call ag%base_a%cp_to(acsr)
@@ -154,7 +153,7 @@ subroutine  amg_d_newmatch_aggregator_build_tprol(ag,parms,ag_data,&
     nr = acsr%get_nrows()
     if (psb_size(ag%w) < nr) call ag%bld_default_w(nr)
     isz = acsr%get_ncols()
-
+  
     call psb_realloc(isz,ixaggr,info)
     if (info == psb_success_) &
          & allocate(acv(0:n_sweeps), desc_acv(0:n_sweeps),&
@@ -172,7 +171,7 @@ subroutine  amg_d_newmatch_aggregator_build_tprol(ag,parms,ag_data,&
     call acv(0)%mv_from(acsr)
     call desc_a%clone(desc_acv(0),info)
   end if
-
+  
   nrac = desc_acv(0)%get_local_rows()
   ncac = desc_acv(0)%get_local_cols()
   if (debug) write(0,*) me,' On input to level: ',nrac, ncac
@@ -232,7 +231,8 @@ subroutine  amg_d_newmatch_aggregator_build_tprol(ag,parms,ag_data,&
     if (debug) write(0,*) me,' Into matchbox_build_prol ',info
     if (do_timings) call psb_tic(idx_mboxp)
     call amg_ddecmatch_build_prol(tmpw,acv(i-1),desc_acv(i-1),ixaggr,nxaggr,tmp_prol,info,&
-         & symmetrize=ag%need_symmetrize,reproducible=ag%reproducible_matching)
+         & symmetrize=ag%need_symmetrize,reproducible=ag%reproducible_matching,&
+         & parallel=ag%parallel_matching,matching=ag%matching_alg,lambda=ag%lambda)
     if (do_timings) call psb_toc(idx_mboxp)
     if (debug) write(0,*) me,' Out from matchbox_build_prol ',info
     if (psb_errstatus_fatal())  write(0,*)me,trim(name),'Error fatal on exit bld_tprol',info
