@@ -48,7 +48,7 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
   use amg_base_prec_type
   use amg_s_inner_mod
 #if defined(SERIAL_MPI)
-    use amg_s_parmatch_aggregator_mod
+  use amg_s_parmatch_aggregator_mod
 #else
   use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_aggregator_build_tprol
 #endif
