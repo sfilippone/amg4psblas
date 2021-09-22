@@ -82,11 +82,15 @@ module amg_d_newmatch_aggregator_mod
     type(nwm_Vector)  :: w_c_nxt
     integer(psb_ipk_) :: max_csize
     integer(psb_ipk_) :: max_nlevels
+    real(psb_dpk_)    :: lambda
     logical           :: reproducible_matching = .false.
     logical           :: need_symmetrize       = .false.
     logical           :: unsmoothed_hierarchy  = .true.
+    logical           :: parallel_matching     = .true. 
   contains
     procedure, pass(ag) :: bld_tprol    => amg_d_newmatch_aggregator_build_tprol
+    procedure, pass(ag) :: csetc        => amg_d_newmatch_aggr_csetc
+    procedure, pass(ag) :: csetr        => amg_d_newmatch_aggr_csetr
     procedure, pass(ag) :: cseti        => d_newmatch_aggr_cseti
     procedure, pass(ag) :: default      => d_newmatch_aggr_set_default
     procedure, pass(ag) :: mat_asb      => amg_d_newmatch_aggregator_mat_asb
@@ -335,7 +339,6 @@ contains
     write(iout,*) 'NewMatch Aggregator'
     write(iout,*) '   Number of Matching   sweeps: ',ag%n_sweeps
     write(iout,*) '   Matching algorithm         : ',ag%matching_alg
-    !write(iout,*) '    0: Preis 1: MC64  2: SPRAL  '
     write(iout,*) 'Aggregator object type: ',ag%fmt()
     call parms%mldescr(iout,info)
     
@@ -399,6 +402,83 @@ contains
     info = 0 
   end subroutine d_newmatch_aggregator_update_next
 
+  
+  subroutine amg_d_newmatch_aggr_csetr(ag,what,val,info,idx)
+
+    Implicit None
+
+    ! Arguments
+    class(amg_d_newmatch_aggregator_type), intent(inout) :: ag
+    character(len=*), intent(in)               :: what
+    real(psb_dpk_), intent(in)                 :: val
+    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_), intent(in), optional    :: idx
+    integer(psb_ipk_)  :: err_act, iwhat
+    character(len=20)  :: name='d_newmatch_aggr_csetr'
+    info = psb_success_
+
+    ! For now we ignore IDX
+
+    select case(psb_toupper(trim(what)))
+    case('NWM_LAMBDA')
+      ag%lambda = val
+    case default
+      ! Do nothing
+    end select
+    return
+  end subroutine amg_d_newmatch_aggr_csetr
+  
+  subroutine amg_d_newmatch_aggr_csetc(ag,what,val,info,idx)
+
+    Implicit None
+
+    ! Arguments
+    class(amg_d_newmatch_aggregator_type), intent(inout) :: ag
+    character(len=*), intent(in)                  :: what
+    character(len=*), intent(in)                 :: val
+    integer(psb_ipk_), intent(out)                :: info
+    integer(psb_ipk_), intent(in), optional       :: idx
+    integer(psb_ipk_)  :: err_act, iwhat
+    character(len=20)  :: name='d_newmatch_aggr_csetc'
+    info = psb_success_
+
+    ! For now we ignore IDX
+
+    select case(psb_toupper(trim(what)))
+    case('NWM_PARALLEL_MATCHING')
+      select case(psb_toupper(trim(val)))
+      case('SEQUENTIAL','F','FALSE')
+        ag%parallel_matching = .false.
+      case('PARALLEL','TRUE','T')
+        ag%parallel_matching =.true.
+      end select
+    case('NWM_REPRODUCIBLE_MATCHING')
+      select case(psb_toupper(trim(val)))
+      case('F','FALSE')
+        ag%reproducible_matching = .false.
+      case('REPRODUCIBLE','TRUE','T')
+        ag%reproducible_matching =.true.
+      end select
+    case('NWM_NEED_SYMMETRIZE')
+      select case(psb_toupper(trim(val)))
+      case('FALSE','F')
+        ag%need_symmetrize = .false.
+      case('SYMMETRIZE','TRUE','T')
+        ag%need_symmetrize =.true.
+      end select
+    case('NWM_UNSMOOTHED_HIERARCHY')
+      select case(psb_toupper(trim(val)))
+      case('F','FALSE')
+        ag%unsmoothed_hierarchy = .false.
+      case('T','TRUE')
+        ag%unsmoothed_hierarchy =.true.
+      end select
+    case default
+      ! Do nothing
+    end select
+    return
+  end subroutine amg_d_newmatch_aggr_csetc
+  
   subroutine d_newmatch_aggr_cseti(ag,what,val,info,idx)
 
     Implicit None
@@ -416,14 +496,14 @@ contains
     ! For now we ignore IDX
     
     select case(psb_toupper(trim(what)))
-    case('NWM_MATCH_ALG')
-      ag%matching_alg=val
+    case('NWM_MATCH_ALG','NWM_MATCHING_ALG')
+      ag%matching_alg = val
     case('NWM_SWEEPS')
       ag%n_sweeps=val
     case('NWM_MAX_CSIZE')
-      ag%max_csize=val
+      ag%max_csize = val
     case('NWM_MAX_NLEVELS')
-      ag%max_nlevels=val
+      ag%max_nlevels = val
     case('NWM_W_SIZE')
       call ag%bld_default_w(val)
     case('AGGR_SIZE')
@@ -442,7 +522,7 @@ contains
     ! Arguments
     class(amg_d_newmatch_aggregator_type), intent(inout) :: ag
     character(len=20)  :: name='d_newmatch_aggr_set_default'
-    ag%matching_alg = 0
+    ag%matching_alg = 1
     ag%n_sweeps     = 1
     ag%max_nlevels  = 36
     ag%max_csize    = -1
