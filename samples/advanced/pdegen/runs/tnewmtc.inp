@@ -46,7 +46,7 @@ NATURAL                     ! Ordering of aggregation NATURAL DEGREE
 NOFILTER                    ! Filtering of matrix:  FILTER NOFILTER
 -1.5                        ! Coarsening ratio, if < 0 use library default
 2                           ! MATCHING variant
--1                           ! LAMBDA
+8.0                          ! LAMBDA
 -2                           ! Number of thresholds in vector, next line ignored if <= 0
 0.05 0.025                  ! Thresholds
 -0.0100d0                    ! Smoothed aggregation threshold, ignored if < 0
