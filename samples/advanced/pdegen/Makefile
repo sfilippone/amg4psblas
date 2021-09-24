@@ -7,7 +7,7 @@ AMG_LIBS=-L$(AMGLIBDIR) -lpsb_krylov -lamg_prec -lpsb_prec
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(AMGMODDIR) $(FMFLAG)$(AMGINCDIR) $(PSBLAS_INCLUDES) $(FIFLAG).
 
 LINKOPT=
-XTRALINK=-lstdc++ -lroma -L../../../../ParallelRomaF-main/lib/ -fopenmp
+XTRALINK=-lstdc++ -lroma -L../../../../../ParallelRomaF-main/lib/ -fopenmp
 EXEDIR=./runs
 
 all: amg_s_pde3d amg_d_pde3d amg_s_pde2d amg_d_pde2d

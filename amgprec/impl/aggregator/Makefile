@@ -59,7 +59,14 @@ amg_s_parmatch_spmm_bld.o \
 amg_s_parmatch_spmm_bld_ov.o \
 amg_s_parmatch_unsmth_bld.o \
 amg_s_parmatch_smth_bld.o \
-amg_s_parmatch_spmm_bld_inner.o
+amg_s_parmatch_spmm_bld_inner.o \
+amg_d_newmatch_aggregator_inner_mat_asb.o\
+amg_d_newmatch_aggregator_mat_asb.o \
+amg_d_newmatch_aggregator_mat_bld.o \
+amg_d_newmatch_aggregator_tprol.o  \
+amg_d_newmatch_map_to_tprol.o \
+amg_d_newmatch_spmm_bld_inner.o \
+amg_d_newmatch_spmm_bld_ov.o
 
 MPCXXOBJS=MatchBoxPC.o \
 algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o \
