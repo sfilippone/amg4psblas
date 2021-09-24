@@ -5,7 +5,7 @@ MODDIR=../../../modules
 HERE=../..
 
 FINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(PSBLAS_INCLUDES)
-CXXINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(INCDIR) $(FMFLAG)/.
+CXXINCLUDES=$(FIFLAG)$(HERE) $(FIFLAG)$(INCDIR) $(FIFLAG)/. -I../../../../../ParallelRomaF-main/include -I$(PSBLAS_INCDIR)
 
 #CINCLUDES= -I${SUPERLU_INCDIR} -I${HSL_INCDIR}  -I${SPRAL_INCDIR} -I/home/users/pasqua/Ambra/BootCMatch/include -lBCM -L/home/users/pasqua/Ambra/BootCMatch/lib  -lm
 
@@ -68,26 +68,17 @@ amg_d_newmatch_map_to_tprol.o \
 amg_d_newmatch_spmm_bld_inner.o \
 amg_d_newmatch_spmm_bld_ov.o
 
-MPCOBJS=
-#MatchBoxPC.o \
-#algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o
 MPCXXOBJS=MatchBoxPC.o \
 algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o \
 newmatch_interface.o
-CXXDEFINES=$(PSBCXXDEFINES)
-CXXINCLUDES=-I../../../../ParallelRomaF-main/include -I$(PSBLAS_INCDIR)
-OBJS = $(FOBJS) $(MPCOBJS) $(MPCXXOBJS)
+
+OBJS = $(FOBJS) $(MPCOBJS) $(MPCXXOBJS) 
 
 LIBNAME=libamg_prec.a
 
 lib:  $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
-
-mpobjs:
-	(make $(MPFOBJS) F90="$(MPF90)" F90COPT="$(F90COPT)")
-	(make $(MPCOBJS) CC="$(MPCC)" CCOPT="$(CCOPT)")
-	(make $(MPCXXOBJS) CXX="$(MPCXX)" CXXOPT="$(CCOPT) $(CXXOPT)")
 
 veryclean: clean
 	/bin/rm -f $(LIBNAME)

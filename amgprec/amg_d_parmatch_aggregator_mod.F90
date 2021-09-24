@@ -118,7 +118,7 @@
 
 module amg_d_parmatch_aggregator_mod
   use amg_d_base_aggregator_mod
-  use amg_dmatchboxp_mod
+  use amg_d_matchboxp_mod
 #if defined(SERIAL_MPI)
   type, extends(amg_d_base_aggregator_type) :: amg_d_parmatch_aggregator_type
   end type amg_d_parmatch_aggregator_type
