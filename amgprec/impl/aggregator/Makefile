@@ -5,7 +5,7 @@ MODDIR=../../../modules
 HERE=../..
 
 FINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(PSBLAS_INCLUDES)
-CXXINCLUDES=$(FIFLAG)$(HERE) $(FIFLAG)$(INCDIR) $(FIFLAG)/. -I../../../../../ParallelRomaF-main/include -I$(PSBLAS_INCDIR)
+CXXINCLUDES=$(FIFLAG)$(HERE) $(FIFLAG)$(INCDIR) $(FIFLAG)/. -I../../../../ParallelRomaF-main/include -I$(PSBLAS_INCDIR)
 
 #CINCLUDES= -I${SUPERLU_INCDIR} -I${HSL_INCDIR}  -I${SPRAL_INCDIR} -I/home/users/pasqua/Ambra/BootCMatch/include -lBCM -L/home/users/pasqua/Ambra/BootCMatch/lib  -lm
 
