@@ -40,49 +40,30 @@ module amg_d_decmatch_mod
   use psb_base_cbind_mod
 
   interface new_Match_If
-    function dnew_Match_If(nr, irp, ja, val, diag, w, mate) &
+    function dnew_Match_If(ipar,matching,lambda,nr, irp, ja, val, diag, w, mate) &
          & bind(c,name="dnew_Match_If") result(res)
       use iso_c_binding
       import :: psb_c_ipk_, psb_c_lpk_, psb_c_mpk_, psb_c_epk_
       implicit none
 
       integer(psb_c_ipk_) :: res
-      integer(psb_c_ipk_), value :: nr
-      
+      integer(psb_c_ipk_), value :: nr,ipar,matching
+      real(c_double), value :: lambda      
       type(c_ptr), value :: irp, ja, mate
       type(c_ptr), value :: val, diag, w 
     end function dnew_Match_If
   end interface new_Match_If
 
-!!$  interface amg_i_aggr_assign
-!!$    module procedure amg_i_daggr_assign
-!!$  end interface amg_i_aggr_assign
-!!$
   interface amg_build_decmatch
     module procedure amg_dbuild_decmatch
   end interface amg_build_decmatch
-!!$
-!!$  interface amg_build_ahat
-!!$    module procedure amg_dbuild_ahat
-!!$  end interface amg_build_ahat
-!!$
-!!$  interface amg_gtranspose
-!!$    module procedure amg_dgtranspose
-!!$  end interface amg_gtranspose
-!!$
-!!$  interface amg_htranspose
-!!$    module procedure amg_dhtranspose
-!!$  end interface amg_htranspose
-!!$
-!!$  interface amg_PMatchBox
-!!$    module procedure amg_dPMatchBox
-!!$  end interface amg_PMatchBox
 
   logical, parameter, private :: print_statistics=.false.
 contains
 
   subroutine amg_ddecmatch_build_prol(w,a,desc_a,ilaggr,nlaggr,prol,info,&
-       & symmetrize,reproducible,display_inp, display_out, print_out)
+       & symmetrize,reproducible,display_inp, display_out, print_out, &
+       & parallel, matching,lambda)
     use psb_base_mod
     use psb_util_mod
     use iso_c_binding
@@ -95,7 +76,9 @@ contains
     type(psb_ldspmat_type), intent(out)         :: prol
     integer(psb_ipk_), intent(out)              :: info
     logical, optional, intent(in)               :: display_inp, display_out, reproducible
-    logical, optional, intent(in)               :: symmetrize, print_out
+    logical, optional, intent(in)               :: symmetrize, print_out, parallel
+    integer(psb_ipk_), optional, intent(in)     :: matching
+    real(psb_dpk_), optional, intent(in)        :: lambda
 
     !
     !
@@ -111,7 +94,9 @@ contains
     integer(psb_ipk_), save     :: cnt=1
     character(len=256)          :: aname
     type(psb_ld_coo_sparse_mat) :: tmpcoo
-    logical  :: display_out_, print_out_, reproducible_
+    logical  :: display_out_, print_out_, reproducible_, parallel_
+    integer(psb_ipk_) :: matching_
+    real(psb_dpk_)    :: lambda_    
     logical, parameter  :: dump=.false., debug=.false., dump_mate=.false., &
          & debug_ilaggr=.false., debug_sync=.false.
     integer(psb_ipk_), save :: idx_bldmtc=-1, idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
@@ -147,6 +132,24 @@ contains
       reproducible_ = .false.
     end if
 
+    if (present(parallel)) then
+      parallel_ = parallel
+    else
+      parallel_ = .true.
+    end if
+
+    if (present(matching)) then
+      matching_ = matching
+    else
+      matching_ = 2
+    end if
+
+    if (present(lambda)) then
+      lambda_ = lambda
+    else
+      lambda_ = 2.0
+    end if
+
     allocate(nlaggr(0:np-1),stat=info)
     if (info /= 0) then
       return
@@ -175,7 +178,7 @@ contains
     end if
     if (do_timings) call psb_toc(idx_phase1)
     if (do_timings) call psb_tic(idx_bldmtc)
-    call amg_dbuild_decmatch(w,a,desc_a,mate,info)
+    call amg_dbuild_decmatch(parallel_,matching_,lambda_,w,a,desc_a,mate,info)
     if (do_timings) call psb_toc(idx_bldmtc)
     if (debug) write(0,*) iam,' buildprol from buildmatching:',&
          & info
@@ -248,41 +251,6 @@ contains
                   wtemp(idx)  = w(idx)/nrmagg
                 end if
                 nlpairs = nlpairs+1
-!!$              else if (idx <= nc) then
-!!$                !
-!!$                ! This pair involves a non-local vertex.
-!!$                ! Set wtemp, then apply a tie-breaking algorithm
-!!$                wtemp(k)    = w(k)/nrmagg
-!!$                idxg  = ilv(idx)
-!!$                kg    = ilv(k)
-!!$                if (reproducible_) then
-!!$                  !
-!!$                  ! Tie-break by assigning to the lowest-index process
-!!$                  ! so that the numbering is the same as with NP=1
-!!$                  !
-!!$                  if (kg < idxg) then
-!!$                    nlaggr(iam) = nlaggr(iam) + 1
-!!$                    ilaggr(k)   = nlaggr(iam)
-!!$                    nlpairs = nlpairs+1
-!!$                  else
-!!$                    ilaggr(k) = -2
-!!$                  end if
-!!$                else
-!!$                  ! Use a statistically unbiased tie-breaking rule,
-!!$                  ! this will give an even spread.
-!!$                  ! Delegate to i_aggr_assign.
-!!$                  ! Should be a symmetric function.
-!!$                  !
-!!$                  call desc_a%indxmap%qry_halo_owner(idx,iown,info)
-!!$! !$                  ip    = amg_i_aggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg)
-!!$                  if (iam == ip) then
-!!$                    nlaggr(iam) = nlaggr(iam) + 1
-!!$                    ilaggr(k)   = nlaggr(iam)
-!!$                    nlpairs = nlpairs+1
-!!$                  else
-!!$                    ilaggr(k) = -2
-!!$                  end if
-!!$                end if
               else
                 write(0,*) 'Really?  mate(k) > nr? ',mate(k),nr
               end if
@@ -486,56 +454,14 @@ contains
 
   end subroutine amg_ddecmatch_build_prol
 
-!!$  function amg_i_daggr_assign(iam, iown, kg, idxg, wk, widx, nrmagg) &
-!!$       & result(iproc)
-!!$    !
-!!$    ! How to break ties? This
-!!$    ! must  be a symmetric function, i.e.
-!!$    ! the result value iproc MUST be the same upon
-!!$    ! swapping simultaneously all  pairs
-!!$    ! (iam,iown) (kg,idxg) (wk,widx)
-!!$    !
-!!$    implicit none
-!!$    integer(psb_ipk_)             :: iproc
-!!$    integer(psb_ipk_), intent(in) :: iam, iown
-!!$    integer(psb_lpk_), intent(in) :: kg, idxg
-!!$    real(psb_dpk_), intent(in)    :: wk, widx, nrmagg
-!!$    !
-!!$    integer(psb_lpk_) :: kg2, idxg2
-!!$
-!!$    idxg2 = mod(idxg,2)
-!!$    kg2   = mod(kg,2)
-!!$
-!!$    !
-!!$    ! In this particular tie-breaking rule we are ignoring WK, WIDX.
-!!$    ! This should statistically entail an even spread of aggregates.
-!!$    !
-!!$    if ((kg2/=0).and.(idxg2/=0)) then
-!!$      ! If both  global indices are  odd,
-!!$      !    assign to the higher number process
-!!$      iproc = max(iam,iown)
-!!$
-!!$    else if ((kg2==0).and.(idxg2==0)) then
-!!$      ! If both global indices are even,
-!!$      !    assign to the lower number process;
-!!$      iproc = min(iam,iown)
-!!$    else
-!!$      ! If the global indices  are mixed,
-!!$      !    then  assign to the owner of the odd index
-!!$      if (kg2 /= 0) then
-!!$        iproc = iam
-!!$      else
-!!$        iproc = iown
-!!$      end if
-!!$    end if
-!!$  end function amg_i_daggr_assign
-
-
-  subroutine amg_dbuild_decmatch(w,a,desc_a,mate,info)
+  subroutine amg_dbuild_decmatch(parallel,matching,lambda,w,a,desc_a,mate,info)
     use psb_base_mod
     use psb_util_mod
     use iso_c_binding
     implicit none
+    logical, intent(in)               :: parallel
+    integer(psb_ipk_), intent(in)     :: matching
+    real(psb_dpk_), intent(in)        :: lambda
     real(psb_dpk_), target                      :: w(:)
     type(psb_dspmat_type), intent(inout)        :: a
     type(psb_desc_type)                         :: desc_a
@@ -547,7 +473,7 @@ contains
     real(psb_dpk_) :: ph0t,ph1t,ph2t
     type(psb_ctxt_type) :: ictxt
     integer(psb_ipk_) :: iam, np
-    integer(psb_ipk_)  :: nr, nc, nz, i, nunmatch
+    integer(psb_ipk_)  :: nr, nc, nz, i, nunmatch, ipar 
     integer(psb_ipk_), save :: cnt=2
     logical, parameter :: debug=.false., dump_ahat=.false., debug_sync=.false.
     logical, parameter :: old_style=.false., sort_minp=.true.
@@ -562,12 +488,17 @@ contains
     call a%cp_to(tcsr)
     call psb_realloc(nr,mate,info)
     diag = a%get_diag(info)
+    if (parallel) then
+      ipar = 2
+    else
+      ipar = 1
+    end if
     !
     ! Now call matching!
     !
     if (debug) write(0,*) iam,' buildmatching into PMatchBox:'
     if (do_timings) call psb_tic(idx_cmboxp)
-    info = dnew_Match_If(nr,c_loc(tcsr%irp),c_loc(tcsr%ja),&
+    info = dnew_Match_If(ipar,matching,lambda,nr,c_loc(tcsr%irp),c_loc(tcsr%ja),&
          & c_loc(tcsr%val),c_loc(diag),c_loc(w),c_loc(mate))
     if (do_timings) call psb_toc(idx_cmboxp)
     if (debug) write(0,*) iam,' buildmatching from PMatchBox:', info
@@ -592,691 +523,7 @@ contains
 
 9999 continue
     call psb_error(ictxt)
-!!$  contains
-!!$    subroutine fix_order(n,ja,val,iret)
-!!$      use psb_base_mod
-!!$      implicit none
-!!$      integer(psb_ipk_), intent(in)    :: n
-!!$      integer(psb_lpk_), intent(inout) :: ja(:)
-!!$      real(psb_dpk_), intent(inout)    :: val(:)
-!!$      integer(psb_ipk_),intent(out)    :: iret
-!!$      integer(psb_lpk_), allocatable   :: ix(:)
-!!$      real(psb_dpk_), allocatable      :: tmp(:)
-!!$
-!!$      allocate(ix(n), tmp(n),stat=iret)
-!!$      if (iret /= 0) return
-!!$      call psb_msort(ja(1:n),ix=ix,dir=psb_sort_up_)
-!!$      tmp(1:n) = val(ix(1:n))
-!!$      val(1:n) = tmp(1:n)
-!!$    end subroutine fix_order
 
   end subroutine amg_dbuild_decmatch
-
-!!$  subroutine amg_dbuild_ahat(w,a,ahat,desc_a,info,symmetrize)
-!!$    use psb_base_mod
-!!$    implicit none
-!!$    real(psb_dpk_), intent(in)           :: w(:)
-!!$    type(psb_dspmat_type), intent(inout) :: a
-!!$    type(psb_dspmat_type), intent(out)   :: ahat
-!!$    type(psb_desc_type)                   :: desc_a
-!!$    integer(psb_ipk_), intent(out)        :: info
-!!$    logical, optional                     :: symmetrize
-!!$
-!!$    type(psb_dspmat_type)      :: atnd
-!!$    type(psb_d_coo_sparse_mat) :: tcoo1, tcoo2, tcoo3
-!!$    real(psb_dpk_), allocatable :: diag(:)
-!!$    integer(psb_lpk_), allocatable :: ilv(:)
-!!$    logical, parameter :: debug=.false., dump=.false., dump_ahat=.false., dump_inp=.false.
-!!$    logical :: symmetrize_
-!!$    real(psb_dpk_)    :: aii, ajj, aij, wii, wjj, tmp1, tmp2, minabs, edgnrm
-!!$    integer(psb_ipk_) :: nr, nc, nz, i, nz2, nrg, ii, jj, k, k2, ncols
-!!$    integer(psb_lpk_) :: nzglob
-!!$    type(psb_ctxt_type) :: ictxt
-!!$    integer(psb_ipk_) :: me, np
-!!$    character(len=80) :: aname
-!!$    real(psb_dpk_), parameter :: eps=epsilon(1.d0)
-!!$    integer(psb_ipk_), save   :: idx_glbt=-1, idx_phase1=-1, idx_phase2=-1
-!!$    logical, parameter :: do_timings=.true.
-!!$    logical, parameter :: debug_symmetry = .false., check_size=.false.
-!!$    logical, parameter :: unroll_logtrans=.false.
-!!$
-!!$    ictxt = desc_a%get_ctxt()
-!!$    call psb_info(ictxt,me,np)
-!!$    if (present(symmetrize)) then
-!!$      symmetrize_ = symmetrize
-!!$    else
-!!$      symmetrize_ = .false.
-!!$    end if
-!!$    if ((do_timings).and.(idx_phase1==-1))       &
-!!$         & idx_phase1 = psb_get_timer_idx("BLD_AHAT: phase1       ")
-!!$    if ((do_timings).and.(idx_glbt==-1))       &
-!!$         & idx_glbt = psb_get_timer_idx("BLD_AHAT: glob_transp")
-!!$    if ((do_timings).and.(idx_phase2==-1))       &
-!!$         & idx_phase2 = psb_get_timer_idx("BLD_AHAT: phase2       ")
-!!$    if (do_timings) call psb_tic(idx_phase1)
-!!$    if (dump_inp) then
-!!$      block
-!!$        type(psb_ldspmat_type) :: amglob
-!!$        write(aname,'(a,i3.3,a)') 'a-bld-inp-',me,'.mtx'
-!!$        call a%print(fname=aname,head='Test ')
-!!$        call psb_gather(amglob,a,desc_a,info)
-!!$        if (me==psb_root_) then
-!!$          write(aname,'(a,i0,a)') 'a-bld-inp-g-',amglob%get_nrows(),'.mtx'
-!!$          call amglob%print(fname=aname,head='Test ')
-!!$        end if
-!!$      end block
-!!$    end if
-!!$
-!!$    !
-!!$    !  Extract diagonal of A
-!!$    !
-!!$    call a%cp_to(tcoo1)
-!!$! !$    call a%triu(atnd,info)
-!!$! !$    call atnd%mv_to(tcoo1)
-!!$    nr = tcoo1%get_nrows()
-!!$    nc = tcoo1%get_ncols()
-!!$    nz = tcoo1%get_nzeros()
-!!$    diag = a%get_diag(info)
-!!$    call psb_realloc(nc,diag,info)
-!!$    call psb_halo(diag,desc_a,info)
-!!$
-!!$    ncols = desc_a%get_local_cols()
-!!$    call psb_realloc(ncols,ilv,info)
-!!$    do i=1, ncols
-!!$      ilv(i) = i
-!!$    end do
-!!$    call desc_a%l2gip(ilv,info,owned=.false.)
-!!$    nr = tcoo1%get_nrows()
-!!$    nc = tcoo1%get_ncols()
-!!$    nz = tcoo1%get_nzeros()
-!!$    call tcoo2%allocate(nr,nc,int(1.25*nz))
-!!$    k2 = 0
-!!$    !
-!!$    ! Build the entries of \^A for matching
-!!$    !
-!!$    minabs = huge(dzero)
-!!$    do k = 1, nz
-!!$      ii  = tcoo1%ia(k)
-!!$      jj  = tcoo1%ja(k)
-!!$      !
-!!$      ! Run over only the upper triangle, then transpose.
-!!$      ! In theory, A was SPD; in practice, since we
-!!$      ! are building the hierarchy with Galerkin products P^T A P,
-!!$      ! A will be affected by round-off
-!!$      !
-!!$      if (ilv(ii)<ilv(jj))  then
-!!$        aij = tcoo1%val(k)
-!!$        aii = diag(ii)
-!!$        ajj = diag(jj)
-!!$        wii = w(ii)
-!!$        wjj = w(jj)
-!!$        edgnrm = aii*(wii**2) + ajj*(wjj**2)
-!!$        k2 = k2 + 1
-!!$        tcoo2%ia(k2) = ii
-!!$        tcoo2%ja(k2) = jj
-!!$        if (edgnrm > eps) then
-!!$          tcoo2%val(k2) = done - (2*done*aij*wii*wjj)/(aii*(wii**2) + ajj*(wjj**2))
-!!$        else
-!!$          tcoo2%val(k2) = eps
-!!$        end if
-!!$      end if
-!!$      !else
-!!$      !  write(0,*) 'build_ahat: index error :',ii,jj,' : boundaries :',nr,nc
-!!$      !end if
-!!$    end do
-!!$    call tcoo2%set_nzeros(k2)
-!!$
-!!$    if (dump) then
-!!$      block
-!!$        type(psb_ldspmat_type) :: amglob
-!!$        call ahat%cp_from(tcoo2)
-!!$        call psb_gather(amglob,ahat,desc_a,info)
-!!$        if (me==psb_root_) then
-!!$          write(aname,'(a,i0,a)') 'ahat-gu-',desc_a%get_global_rows(),'.mtx'
-!!$          call amglob%print(fname=aname,head='Test ')
-!!$        end if
-!!$        write(aname,'(a,i0,a,i0,a)') 'ahat-gu-',desc_a%get_global_rows(),'-p',me,'.mtx'
-!!$        call ahat%print(fname=aname,head='Test ',iv=ilv)
-!!$        write(aname,'(a,i0,a,i0,a)') 'ainp-ahat-',desc_a%get_global_rows(),'-p',me,'.mtx'
-!!$        call a%print(fname=aname,head='Test ',iv=ilv)
-!!$        call psb_gather(amglob,a,desc_a,info)
-!!$        if (me==psb_root_) then
-!!$          write(aname,'(a,i0,a)') 'ainp-ahat-g-',desc_a%get_global_rows(),'.mtx'
-!!$          call amglob%print(fname=aname,head='Test ')
-!!$        end if
-!!$        write(0,*) 'Done build_ahat'
-!!$      end block
-!!$    end if
-!!$    if (do_timings) call psb_toc(idx_phase1)
-!!$    if (do_timings) call psb_tic(idx_glbt)
-!!$
-!!$    call psb_glob_transpose(tcoo2,desc_a,info,atrans=tcoo1)
-!!$    if (do_timings) call psb_toc(idx_glbt)
-!!$    if (do_timings) call psb_tic(idx_phase2)
-!!$    if (dump) then
-!!$      block
-!!$        type(psb_ldspmat_type) :: amglob
-!!$        call atnd%cp_from(tcoo1)
-!!$        call psb_gather(amglob,atnd,desc_a,info)
-!!$        if (me==psb_root_) then
-!!$          write(aname,'(a,i0,a)') 'ahat-gl-',desc_a%get_global_rows(),'.mtx'
-!!$          call amglob%print(fname=aname,head='Test ')
-!!$        end if
-!!$        write(aname,'(a,i0,a,i0,a)') 'ahat-gl-',desc_a%get_global_rows(),'-p',me,'.mtx'
-!!$        call ahat%print(fname=aname,head='Test ',iv=ilv)
-!!$        write(0,*) 'Done build_ahat'
-!!$      end block
-!!$    end if
-!!$
-!!$    nz  = tcoo1%get_nzeros()
-!!$    nz2 = tcoo2%get_nzeros()
-!!$    call tcoo2%ensure_size(nz+nz2)
-!!$    tcoo2%ia(nz2+1:nz2+nz) = tcoo1%ia(1:nz)
-!!$    tcoo2%ja(nz2+1:nz2+nz) = tcoo1%ja(1:nz)
-!!$    tcoo2%val(nz2+1:nz2+nz) = tcoo1%val(1:nz)
-!!$    call tcoo2%set_nzeros(nz+nz2)
-!!$    call tcoo2%fix(info)
-!!$    call tcoo1%free()
-!!$    nz = tcoo2%get_nzeros()
-!!$    if (unroll_logtrans) then
-!!$      minabs = huge(dzero)
-!!$      do k = 1, nz
-!!$        tcoo2%val(k) = abs(tcoo2%val(k))
-!!$        minabs = min(minabs,tcoo2%val(k))
-!!$      end do
-!!$    else
-!!$      minabs = minval(abs(tcoo2%val(1:nz)))
-!!$    end if
-!!$    call psb_min(ictxt,minabs)
-!!$    if (minabs <= dzero) then
-!!$      if (me == 0) write(0,*) me, 'Min value for log correction is <=zero! '
-!!$      minabs = done
-!!$    end if
-!!$    if (unroll_logtrans) then
-!!$      do k = 1, nz
-!!$        ! tcoo2%val has already been subject to abs() above.
-!!$        tcoo2%val(k) = log(tcoo2%val(k)/(0.999*minabs))
-!!$        if (tcoo2%val(k)<0)  write(0,*) me, 'Warning: negative log output!'
-!!$      end do
-!!$    else
-!!$      tcoo2%val(1:nz) = log(abs(tcoo2%val(1:nz))/(0.999*minabs))
-!!$      if (any(tcoo2%val(1:nz)<0))  write(0,*) me, 'Warning: negative log output!'
-!!$    end if
-!!$
-!!$    call ahat%mv_from(tcoo2)
-!!$
-!!$    if (do_timings) call psb_toc(idx_phase2)
-!!$
-!!$    if (check_size) then
-!!$      nzglob = ahat%get_nzeros()
-!!$      call psb_sum(ictxt,nzglob)
-!!$      if (me==0) write(0,*) 'From build_ahat: global nzeros ',desc_a%get_global_rows(),nzglob
-!!$    end if
-!!$    if (debug_symmetry) then
-!!$      block
-!!$        integer(psb_ipk_) :: nz1, nz2
-!!$        real(psb_dpk_)    :: mxv
-!!$        call ahat%cp_to(tcoo1)
-!!$        call psb_glob_transpose(tcoo1,desc_a,info,atrans=tcoo2)
-!!$        nz1 = tcoo1%get_nzeros()
-!!$        nz2 = tcoo2%get_nzeros()
-!!$        call tcoo1%reallocate(nz1+nz2)
-!!$        tcoo1%ia(nz1+1:nz1+nz2)  = tcoo2%ia(1:nz2)
-!!$        tcoo1%ja(nz1+1:nz1+nz2)  = tcoo2%ja(1:nz2)
-!!$        tcoo1%val(nz1+1:nz1+nz2) = -tcoo2%val(1:nz2)
-!!$        call tcoo1%set_nzeros(nz1+nz2)
-!!$        call tcoo1%set_dupl(psb_dupl_add_)
-!!$        call tcoo1%fix(info)
-!!$        nz1 = tcoo1%get_nzeros()
-!!$        mxv = maxval(abs(tcoo1%val(1:nz1)))
-!!$        call psb_max(ictxt,mxv)
-!!$        if (me==0) write(0,*) 'Maximum disp from symmetry:',mxv
-!!$      end block
-!!$    end if
-!!$
-!!$    if (dump_ahat) then
-!!$      block
-!!$        type(psb_ldspmat_type) :: amglob
-!!$        write(aname,'(a,i3.3,a)') 'ahat-hfa-l-',me,'.mtx'
-!!$        call ahat%print(fname=aname,head='Test ')
-!!$        call psb_gather(amglob,ahat,desc_a,info)
-!!$        if (me==psb_root_) then
-!!$          write(aname,'(a,i0,a)') 'ahat-hfa-g-',amglob%get_nrows(),'.mtx'
-!!$          call amglob%print(fname=aname,head='Test ')
-!!$        end if
-!!$        write(0,*) 'Done build_ahat'
-!!$      end block
-!!$    end if
-!!$
-!!$  end subroutine amg_dbuild_ahat
-!!$
-!!$  subroutine amg_dgtranspose(ain,aout,desc_a,info)
-!!$    use psb_base_mod
-!!$    implicit none
-!!$    type(psb_ldspmat_type), intent(in)  :: ain
-!!$    type(psb_ldspmat_type), intent(out) :: aout
-!!$    type(psb_desc_type)           :: desc_a
-!!$    integer(psb_ipk_), intent(out) :: info
-!!$
-!!$    !
-!!$    ! BEWARE: This routine works under the assumption
-!!$    ! that the same DESC_A works for both A and A^T, which
-!!$    ! essentially means that A has a symmetric pattern.
-!!$    !
-!!$    type(psb_ldspmat_type) :: atmp, ahalo, aglb
-!!$    type(psb_ld_coo_sparse_mat) :: tmpcoo
-!!$    type(psb_ld_csr_sparse_mat) :: tmpcsr
-!!$    type(psb_ctxt_type) :: ictxt
-!!$    integer(psb_ipk_) :: me, np
-!!$    integer(psb_lpk_) :: i, j, k, nrow, ncol
-!!$    integer(psb_lpk_), allocatable :: ilv(:)
-!!$    character(len=80) :: aname
-!!$    logical, parameter :: debug=.false., dump=.false., debug_sync=.false.
-!!$
-!!$    ictxt = desc_a%get_context()
-!!$    call psb_info(ictxt,me,np)
-!!$
-!!$    nrow = desc_a%get_local_rows()
-!!$    ncol = desc_a%get_local_cols()
-!!$    if (debug_sync) then
-!!$      call psb_barrier(ictxt)
-!!$      if (me == 0) write(0,*) 'Start gtranspose '
-!!$    end if
-!!$    call ain%cscnv(tmpcsr,info)
-!!$
-!!$    if (debug) then
-!!$      ilv = [(i,i=1,ncol)]
-!!$      call desc_a%l2gip(ilv,info,owned=.false.)
-!!$      write(aname,'(a,i3.3,a)') 'atmp-preh-',me,'.mtx'
-!!$      call ain%print(fname=aname,head='atmp before haloTest ',iv=ilv)
-!!$    end if
-!!$    if (dump) then
-!!$      call ain%cscnv(atmp,info)
-!!$      call psb_gather(aglb,atmp,desc_a,info)
-!!$      if (me==psb_root_) then
-!!$        write(aname,'(a,i3.3,a)') 'aglob-prehalo.mtx'
-!!$        call aglb%print(fname=aname,head='Test ')
-!!$      end if
-!!$    end if
-!!$
-!!$    !call psb_loc_to_glob(tmpcsr%ja,desc_a,info)
-!!$    call atmp%mv_from(tmpcsr)
-!!$
-!!$    if (debug) then
-!!$      write(aname,'(a,i3.3,a)') 'tmpcsr-',me,'.mtx'
-!!$      call atmp%print(fname=aname,head='tmpcsr ',iv=ilv)
-!!$      !call psb_set_debug_level(9999)
-!!$    end if
-!!$
-!!$    ! FIXME THIS NEEDS REWORKING
-!!$    if (debug) write(0,*) me,' Gtranspose into sphalo :',atmp%get_nrows(),atmp%get_ncols()
-!!$    call psb_sphalo(atmp,desc_a,ahalo,info,rowscale=.true.)
-!!$    if (debug) write(0,*) me,' Gtranspose from sphalo :',ahalo%get_nrows(),ahalo%get_ncols()
-!!$    if (info == psb_success_) call psb_rwextd(ncol,atmp,info,b=ahalo)
-!!$
-!!$    if (debug) then
-!!$      write(aname,'(a,i3.3,a)') 'ahalo-',me,'.mtx'
-!!$      call ahalo%print(fname=aname,head='ahalo after haloTest ',iv=ilv)
-!!$      write(aname,'(a,i3.3,a)') 'atmp-h-',me,'.mtx'
-!!$      call atmp%print(fname=aname,head='atmp after haloTest ',iv=ilv)
-!!$    end if
-!!$
-!!$    if (info == psb_success_) call ahalo%free()
-!!$
-!!$    call atmp%cp_to(tmpcoo)
-!!$    call tmpcoo%transp()
-!!$    !call psb_glob_to_loc(tmpcoo%ia,desc_a,info,iact='I')
-!!$    if (debug) write(0,*) 'Before cleanup:',tmpcoo%get_nzeros()
-!!$
-!!$    j = 0
-!!$    do k=1, tmpcoo%get_nzeros()
-!!$      if ((tmpcoo%ia(k) > 0).and.(tmpcoo%ja(k)>0)) then
-!!$        j = j+1
-!!$        tmpcoo%ia(j)  = tmpcoo%ia(k)
-!!$        tmpcoo%ja(j)  = tmpcoo%ja(k)
-!!$        tmpcoo%val(j) = tmpcoo%val(k)
-!!$      end if
-!!$    end do
-!!$    call tmpcoo%set_nzeros(j)
-!!$
-!!$    if (debug) write(0,*) 'After cleanup:',tmpcoo%get_nzeros()
-!!$
-!!$    call ahalo%mv_from(tmpcoo)
-!!$    if (dump) then
-!!$      call psb_gather(aglb,ahalo,desc_a,info)
-!!$      if (me==psb_root_) then
-!!$        write(aname,'(a,i3.3,a)') 'atran-preclip.mtx'
-!!$        call aglb%print(fname=aname,head='Test ')
-!!$      end if
-!!$    end if
-!!$
-!!$
-!!$    call ahalo%csclip(aout,info,imax=nrow)
-!!$
-!!$    if (debug) write(0,*) 'After clip:',aout%get_nzeros()
-!!$
-!!$    if (debug_sync) then
-!!$      call psb_barrier(ictxt)
-!!$      if (me == 0) write(0,*) 'End gtranspose '
-!!$    end if
-!!$    !call aout%cscnv(info,type='csr')
-!!$
-!!$    if (dump) then
-!!$      write(aname,'(a,i3.3,a)') 'atran-',me,'.mtx'
-!!$      call aout%print(fname=aname,head='atrans ',iv=ilv)
-!!$      call psb_gather(aglb,aout,desc_a,info)
-!!$      if (me==psb_root_) then
-!!$        write(aname,'(a,i3.3,a)') 'atran.mtx'
-!!$        call aglb%print(fname=aname,head='Test ')
-!!$      end if
-!!$    end if
-!!$
-!!$  end subroutine amg_dgtranspose
-!!$
-!!$  subroutine amg_dhtranspose(ain,aout,desc_a,info)
-!!$    use psb_base_mod
-!!$    implicit none
-!!$    type(psb_ldspmat_type), intent(in)  :: ain
-!!$    type(psb_ldspmat_type), intent(out) :: aout
-!!$    type(psb_desc_type)           :: desc_a
-!!$    integer(psb_ipk_), intent(out) :: info
-!!$
-!!$    !
-!!$    ! BEWARE: This routine works under the assumption
-!!$    ! that the same DESC_A works for both A and A^T, which
-!!$    ! essentially means that A has a symmetric pattern.
-!!$    !
-!!$    type(psb_ldspmat_type) :: atmp, ahalo, aglb
-!!$    type(psb_ld_coo_sparse_mat) :: tmpcoo, tmpc1, tmpc2, tmpch
-!!$    type(psb_ld_csr_sparse_mat) :: tmpcsr
-!!$    integer(psb_ipk_) :: nz1, nz2, nzh, nz
-!!$    type(psb_ctxt_type) :: ictxt
-!!$    integer(psb_ipk_) :: me, np
-!!$    integer(psb_lpk_) :: i, j, k, nrow, ncol, nlz
-!!$    integer(psb_lpk_), allocatable :: ilv(:)
-!!$    character(len=80) :: aname
-!!$    logical, parameter :: debug=.false., dump=.false., debug_sync=.false.
-!!$
-!!$    ictxt = desc_a%get_context()
-!!$    call psb_info(ictxt,me,np)
-!!$
-!!$    nrow = desc_a%get_local_rows()
-!!$    ncol = desc_a%get_local_cols()
-!!$    if (debug_sync) then
-!!$      call psb_barrier(ictxt)
-!!$      if (me == 0) write(0,*) 'Start htranspose '
-!!$    end if
-!!$    call ain%cscnv(tmpcsr,info)
-!!$
-!!$    if (debug) then
-!!$      ilv = [(i,i=1,ncol)]
-!!$      call desc_a%l2gip(ilv,info,owned=.false.)
-!!$      write(aname,'(a,i3.3,a)') 'atmp-preh-',me,'.mtx'
-!!$      call ain%print(fname=aname,head='atmp before haloTest ',iv=ilv)
-!!$    end if
-!!$    if (dump) then
-!!$      call ain%cscnv(atmp,info)
-!!$      call psb_gather(aglb,atmp,desc_a,info)
-!!$      if (me==psb_root_) then
-!!$        write(aname,'(a,i3.3,a)') 'aglob-prehalo.mtx'
-!!$        call aglb%print(fname=aname,head='Test ')
-!!$      end if
-!!$    end if
-!!$
-!!$    !call psb_loc_to_glob(tmpcsr%ja,desc_a,info)
-!!$    call atmp%mv_from(tmpcsr)
-!!$
-!!$    if (debug) then
-!!$      write(aname,'(a,i3.3,a)') 'tmpcsr-',me,'.mtx'
-!!$      call atmp%print(fname=aname,head='tmpcsr ',iv=ilv)
-!!$      !call psb_set_debug_level(9999)
-!!$    end if
-!!$
-!!$    ! FIXME THIS NEEDS REWORKING
-!!$    if (debug) write(0,*) me,' Htranspose into sphalo :',atmp%get_nrows(),atmp%get_ncols()
-!!$    if (.true.) then
-!!$      call psb_sphalo(atmp,desc_a,ahalo,info, outfmt='coo  ')
-!!$      call atmp%mv_to(tmpc1)
-!!$      call ahalo%mv_to(tmpch)
-!!$      nz1 = tmpc1%get_nzeros()
-!!$      call psb_loc_to_glob(tmpc1%ia(1:nz1),desc_a,info,iact='I')
-!!$      call psb_loc_to_glob(tmpc1%ja(1:nz1),desc_a,info,iact='I')
-!!$      nzh = tmpch%get_nzeros()
-!!$      call psb_loc_to_glob(tmpch%ia(1:nzh),desc_a,info,iact='I')
-!!$      call psb_loc_to_glob(tmpch%ja(1:nzh),desc_a,info,iact='I')
-!!$      nlz = nz1+nzh
-!!$      call tmpcoo%allocate(ncol,ncol,nlz)
-!!$      tmpcoo%ia(1:nz1) = tmpc1%ia(1:nz1)
-!!$      tmpcoo%ja(1:nz1) = tmpc1%ja(1:nz1)
-!!$      tmpcoo%val(1:nz1) = tmpc1%val(1:nz1)
-!!$      tmpcoo%ia(nz1+1:nz1+nzh) = tmpch%ia(1:nzh)
-!!$      tmpcoo%ja(nz1+1:nz1+nzh) = tmpch%ja(1:nzh)
-!!$      tmpcoo%val(nz1+1:nz1+nzh) = tmpch%val(1:nzh)
-!!$      call tmpcoo%set_nzeros(nlz)
-!!$      call tmpcoo%transp()
-!!$      nz = tmpcoo%get_nzeros()
-!!$      call psb_glob_to_loc(tmpcoo%ia(1:nz),desc_a,info,iact='I')
-!!$      call psb_glob_to_loc(tmpcoo%ja(1:nz),desc_a,info,iact='I')
-!!$      if (.true.) then
-!!$        call tmpcoo%clean_negidx(info)
-!!$      else
-!!$        j = 0
-!!$        do k=1, tmpcoo%get_nzeros()
-!!$          if ((tmpcoo%ia(k) > 0).and.(tmpcoo%ja(k)>0)) then
-!!$            j = j+1
-!!$            tmpcoo%ia(j)  = tmpcoo%ia(k)
-!!$            tmpcoo%ja(j)  = tmpcoo%ja(k)
-!!$            tmpcoo%val(j) = tmpcoo%val(k)
-!!$          end if
-!!$        end do
-!!$        call tmpcoo%set_nzeros(j)
-!!$      end if
-!!$      call ahalo%mv_from(tmpcoo)
-!!$      call ahalo%csclip(aout,info,imax=nrow)
-!!$
-!!$    else
-!!$      call psb_sphalo(atmp,desc_a,ahalo,info, rowscale=.true.)
-!!$      if (debug) write(0,*) me,' Htranspose from sphalo :',ahalo%get_nrows(),ahalo%get_ncols()
-!!$      if (info == psb_success_) call psb_rwextd(ncol,atmp,info,b=ahalo)
-!!$
-!!$      if (debug) then
-!!$        write(aname,'(a,i3.3,a)') 'ahalo-',me,'.mtx'
-!!$        call ahalo%print(fname=aname,head='ahalo after haloTest ',iv=ilv)
-!!$        write(aname,'(a,i3.3,a)') 'atmp-h-',me,'.mtx'
-!!$        call atmp%print(fname=aname,head='atmp after haloTest ',iv=ilv)
-!!$      end if
-!!$
-!!$      if (info == psb_success_) call ahalo%free()
-!!$
-!!$      call atmp%cp_to(tmpcoo)
-!!$      call tmpcoo%transp()
-!!$      if (debug) write(0,*) 'Before cleanup:',tmpcoo%get_nzeros()
-!!$      if (.true.) then
-!!$        call tmpcoo%clean_negidx(info)
-!!$      else
-!!$
-!!$        j = 0
-!!$        do k=1, tmpcoo%get_nzeros()
-!!$          if ((tmpcoo%ia(k) > 0).and.(tmpcoo%ja(k)>0)) then
-!!$            j = j+1
-!!$            tmpcoo%ia(j)  = tmpcoo%ia(k)
-!!$            tmpcoo%ja(j)  = tmpcoo%ja(k)
-!!$            tmpcoo%val(j) = tmpcoo%val(k)
-!!$          end if
-!!$        end do
-!!$        call tmpcoo%set_nzeros(j)
-!!$      end if
-!!$
-!!$      if (debug) write(0,*) 'After cleanup:',tmpcoo%get_nzeros()
-!!$
-!!$      call ahalo%mv_from(tmpcoo)
-!!$      if (dump) then
-!!$        call psb_gather(aglb,ahalo,desc_a,info)
-!!$        if (me==psb_root_) then
-!!$          write(aname,'(a,i3.3,a)') 'atran-preclip.mtx'
-!!$          call aglb%print(fname=aname,head='Test ')
-!!$        end if
-!!$      end if
-!!$
-!!$
-!!$      call ahalo%csclip(aout,info,imax=nrow)
-!!$    end if
-!!$
-!!$    if (debug) write(0,*) 'After clip:',aout%get_nzeros()
-!!$
-!!$    if (debug_sync) then
-!!$      call psb_barrier(ictxt)
-!!$      if (me == 0) write(0,*) 'End htranspose '
-!!$    end if
-!!$    !call aout%cscnv(info,type='csr')
-!!$
-!!$    if (dump) then
-!!$      write(aname,'(a,i3.3,a)') 'atran-',me,'.mtx'
-!!$      call aout%print(fname=aname,head='atrans ',iv=ilv)
-!!$      call psb_gather(aglb,aout,desc_a,info)
-!!$      if (me==psb_root_) then
-!!$        write(aname,'(a,i3.3,a)') 'atran.mtx'
-!!$        call aglb%print(fname=aname,head='Test ')
-!!$      end if
-!!$    end if
-!!$
-!!$  end subroutine amg_dhtranspose
-!!$
-!!$  subroutine amg_dPMatchBox(nlver,nledge,verlocptr,verlocind,edgelocweight,&
-!!$       & verdistance, mate, myrank, numprocs, ictxt,&
-!!$       & msgindsent,msgactualsent,msgpercent,&
-!!$       & ph0_time, ph1_time, ph2_time, ph1_card, ph2_card,info,display_inp)
-!!$    use psb_base_mod
-!!$    implicit none
-!!$    type(psb_ctxt_type) :: ictxt
-!!$    integer(psb_c_ipk_), value :: myrank, numprocs
-!!$    integer(psb_c_lpk_), value :: nlver,nledge
-!!$    integer(psb_c_lpk_) :: verlocptr(:),verlocind(:), verdistance(:)
-!!$    integer(psb_c_lpk_) :: mate(:)
-!!$    integer(psb_c_lpk_) :: msgindsent(*),msgactualsent(*)
-!!$    real(c_double)      :: ph0_time, ph1_time, ph2_time
-!!$    integer(psb_c_lpk_) :: ph1_card(*),ph2_card(*)
-!!$    real(c_double)  :: edgelocweight(:)
-!!$    real(c_double)      :: msgpercent(*)
-!!$    integer(psb_ipk_)   :: info, me, np
-!!$    integer(psb_c_mpk_) :: icomm, mrank, mnp
-!!$    logical, optional   :: display_inp
-!!$    !
-!!$    logical, parameter :: debug=.false., debug_out=.false., debug_sync=.false., dump_input=.false.
-!!$    logical            :: display_
-!!$    integer(psb_lpk_) :: i,k
-!!$    integer(psb_ipk_), save :: cnt=1
-!!$
-!!$    call psb_info(ictxt,me,np)
-!!$    icomm = psb_get_mpi_comm(ictxt)
-!!$    mrank = psb_get_mpi_rank(ictxt,me)
-!!$    mnp   = np
-!!$    if (present(display_inp)) then
-!!$      display_ = display_inp
-!!$    else
-!!$      display_ = .false.
-!!$    end if
-!!$
-!!$    verlocptr(:)   = verlocptr(:)  - 1
-!!$    verlocind(:)   = verlocind(:) - 1
-!!$    verdistance(:) = verdistance(:) -1
-!!$
-!!$    if (dump_input) then
-!!$      block
-!!$        integer(psb_ipk_) :: iout=20,info,i,j,k,nr
-!!$        character(len=80) :: fname
-!!$        write(fname,'(a,i4.4,a,i4.4,a)') 'verlocptr-l',cnt,'-i',me,'.mtx'
-!!$        open(iout,file=fname,iostat=info)
-!!$        if (info == 0) then
-!!$          write(iout,'(a)') '%verlocptr '
-!!$          write(iout,*) nlver
-!!$          do i=1, nlver+1
-!!$            write(iout,*) verlocptr(i)
-!!$          end do
-!!$          close(iout)
-!!$        else
-!!$          write(psb_err_unit,*) 'Error: could not open ',fname,' for output'
-!!$        end if
-!!$        write(fname,'(a,i4.4,a,i4.4,a)') 'edges-l',cnt,'-i',me,'.mtx'
-!!$        open(iout,file=fname,iostat=info)
-!!$        if (info == 0) then
-!!$          write(iout,'(a)') '%verlocind/edgeweight '
-!!$          write(iout,*) nlver
-!!$          do i=1, nlver
-!!$            do j=verlocptr(i)+1,verlocptr(i+1)
-!!$              write(iout,*) i-1, verlocind(j),edgelocweight(j)
-!!$            end do
-!!$          end do
-!!$          close(iout)
-!!$        else
-!!$          write(psb_err_unit,*) 'Error: could not open ',fname,' for output'
-!!$        end if
-!!$        if (me==0) then
-!!$          write(fname,'(a,i4.4,a,i4.4,a)') 'verdistance-l',cnt,'-i',me,'.mtx'
-!!$          open(iout,file=fname,iostat=info)
-!!$          if (info == 0) then
-!!$            write(iout,'(a)') '%verdistance'
-!!$            write(iout,*) np
-!!$            do i=1, np+1
-!!$              write(iout,*) verdistance(i)
-!!$            end do
-!!$            close(iout)
-!!$          else
-!!$            write(psb_err_unit,*) 'Error: could not open ',fname,' for output'
-!!$          end if
-!!$        end if
-!!$      end block
-!!$      cnt = cnt + 1
-!!$    end if
-!!$
-!!$    if (debug.or.display_) then
-!!$      do i=0,np-1
-!!$        if (me == i) then
-!!$          write(6,*) 'Process: ',me,' :  Input into matching: nlver ',nlver,' nledge ',nledge
-!!$          write(6,*) 'Process: ',me,' :  VERDISTANCE 0-base : ',verdistance(1:np+1)
-!!$          write(6,*) 'Process: ',me,' :  VERLOCPTR   0-base : ',verlocptr(1:nlver+1)
-!!$          write(6,*) 'Process: ',me,' :  VERLOCIND   0-base : ',verlocind(1:nledge)
-!!$          write(6,*) 'Process: ',me,' :  EDGELOCWEIGHT      : ',edgelocweight(1:nledge)
-!!$          write(6,*) 'Process: ',me,' :  Initial MATE       : ',mate(1:nlver)
-!!$          flush(6)
-!!$        end if
-!!$        call psb_barrier(ictxt)
-!!$      end do
-!!$    end if
-!!$    if (debug_sync) then
-!!$      call psb_barrier(ictxt)
-!!$      if (me == 0) write(0,*)' Calling Decmatch '
-!!$    end if
-!!$
-!!$    call DecmatchC(nlver,nledge,verlocptr,verlocind,edgelocweight,&
-!!$         & verdistance, mate, mrank, mnp, icomm,&
-!!$         & msgindsent,msgactualsent,msgpercent,&
-!!$         & ph0_time, ph1_time, ph2_time, ph1_card, ph2_card)
-!!$    verlocptr(:)   = verlocptr(:)  + 1
-!!$    verlocind(:)   = verlocind(:) + 1
-!!$    verdistance(:) = verdistance(:) + 1
-!!$
-!!$    if (debug_sync) then
-!!$      call psb_barrier(ictxt)
-!!$      if (me == 0) write(0,*)' Done Decmatch '
-!!$    end if
-!!$
-!!$    if (debug_out) then
-!!$      do k=0,np-1
-!!$        if (me == k) then
-!!$          write(6,*) 'Process: ',me,' :  from Matching (0-base): ',info
-!!$          do i=1,nlver
-!!$            write(6,*) '(',i,',',mate(i),')'
-!!$            !mate(i) = mate(i) +1
-!!$            !
-!!$          end do
-!!$          flush(6)
-!!$        end if
-!!$        call psb_barrier(ictxt)
-!!$      end do
-!!$    end if
-!!$    where(mate>=0) mate = mate + 1
-!!$
-!!$  end subroutine amg_dPMatchBox
 
 end module amg_d_decmatch_mod
