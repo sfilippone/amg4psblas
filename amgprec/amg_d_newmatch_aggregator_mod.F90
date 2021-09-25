@@ -526,6 +526,7 @@ contains
     ag%n_sweeps     = 1
     ag%max_nlevels  = 36
     ag%max_csize    = -1
+    ag%lambda       = -1
     !
     ! Apparently newMatch works better
     ! by keeping all entries
