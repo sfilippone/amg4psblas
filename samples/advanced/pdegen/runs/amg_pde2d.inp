@@ -55,3 +55,13 @@ DIST                        ! Coarsest-level matrix distribution: DIST  REPL
 1                           ! Coarsest-level fillin P for ILU(P) and ILU(T,P)
 1.d-4                       ! Coarsest-level threshold T for ILU(T,P)
 1                           ! Number of sweeps for JACOBI/GS/BJAC coarsest-level solver
+%%%%%%%%%%%  Dump parms %%%%%%%%%%%%%%%%%%%%%%%%%%
+F                           ! Dump preconditioner on file
+1                           ! Min level 
+20                          ! Max level 
+T                           ! Dump AC
+T                           ! Dump RP
+F                           ! Dump TPROL
+F                           ! Dump SMOOTHER
+F                           ! Dump SOLVER
+F                           ! Global numering ? 
