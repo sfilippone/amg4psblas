@@ -57,7 +57,6 @@ module amg_d_onelev_mod
   use amg_d_base_smoother_mod
   use amg_d_dec_aggregator_mod
   use amg_d_parmatch_aggregator_mod
-  use amg_d_newmatch_aggregator_mod
 
   use psb_base_mod, only : psb_dspmat_type, psb_d_vect_type, &
        & psb_d_base_vect_type, psb_ldspmat_type,  psb_dlinmap_type, psb_dpk_, &

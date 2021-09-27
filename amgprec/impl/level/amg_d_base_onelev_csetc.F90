@@ -43,7 +43,6 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_d_dec_aggregator_mod
   use amg_d_symdec_aggregator_mod
   use amg_d_parmatch_aggregator_mod
-  use amg_d_newmatch_aggregator_mod
   use amg_d_jac_smoother
   use amg_d_as_smoother
   use amg_d_diag_solver
@@ -253,6 +252,8 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
     lv%parms%ml_cycle      = amg_stringval(val)
 
   case ('PAR_AGGR_ALG')
+    ival = amg_stringval(val)
+    lv%parms%par_aggr_alg  = ival
     if (allocated(lv%aggr)) then
       call lv%aggr%free(info)
       if (info == 0) deallocate(lv%aggr,stat=info)
@@ -262,9 +263,6 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
       end if
     end if
 
-    ival = amg_stringval(val)
-    lv%parms%par_aggr_alg  = ival
-
     select case(val)
     case('DEC')
       allocate(amg_d_dec_aggregator_type :: lv%aggr, stat=info)
@@ -272,12 +270,9 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
       allocate(amg_d_symdec_aggregator_type :: lv%aggr, stat=info)
     case('COUP','COUPLED')
       allocate(amg_d_parmatch_aggregator_type :: lv%aggr, stat=info)
-    case('NEWMTC')
-      allocate(amg_d_newmatch_aggregator_type :: lv%aggr, stat=info)
     case default
       info =  psb_err_internal_error_
     end select
-
     if (info == psb_success_) call lv%aggr%default()
 
   case ('AGGR_ORD')
