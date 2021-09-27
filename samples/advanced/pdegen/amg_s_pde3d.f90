@@ -630,6 +630,7 @@ contains
     call psb_bcast(ctxt,prec%mlcycle)
     call psb_bcast(ctxt,prec%outer_sweeps)
     call psb_bcast(ctxt,prec%maxlevs)
+    call psb_bcast(ctxt,prec%csizepp)
 
     call psb_bcast(ctxt,prec%aggr_prol)
     call psb_bcast(ctxt,prec%par_aggr_alg)
@@ -645,7 +646,6 @@ contains
     end if
     call psb_bcast(ctxt,prec%athres)
 
-    call psb_bcast(ctxt,prec%csizepp)
     call psb_bcast(ctxt,prec%cmat)
     call psb_bcast(ctxt,prec%csolve)
     call psb_bcast(ctxt,prec%csbsolve)
