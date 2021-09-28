@@ -92,8 +92,13 @@ psb_i_t dnew_Match_If(psb_i_t ipar, psb_i_t matching, psb_d_t lambda,
      if (weights[i]>maxweight) maxweight=weights[i];
      if (weights[i]<minweight) minweight=weights[i];
    }
-   if (lambda<0.0) lambda=maxweight-2.0*minweight+eps;
-   if (lambda<0.0) lambda=eps;
+
+   if (lambda<0.0){
+     lambda = maxweight-2.0*minweight+eps;
+     if (lambda<0.0) lambda=eps;
+   } else if (lambda >= 0 && lambda <= 1.0){
+     lambda = lambda*eps + (1.0-lambda)*(fmax(maxweight-2.0*minweight,0.0) );
+   }
    fprintf(stderr,"Calling matching:  pre %d nt %d  lambda %g   %g  %g\n",
 	   preprocess,nt,lambda,maxweight,minweight);
    
