@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "psb_base_cbind.h"
 #include "MatchingAlgorithms.h"
 
@@ -23,7 +24,7 @@ psb_i_t dnew_Match_If(psb_i_t ipar, psb_i_t matching, psb_d_t lambda,
 		      psb_i_t mate[])
 {
    psb_i_t info;
-   psb_i_t i,j;
+   psb_i_t i,j,k;
    psb_i_t ftcoarse=1;
    psb_i_t cr_it=0, cr_relax_type=0;
    psb_d_t cr_relax_weight=0.0;
@@ -52,9 +53,9 @@ psb_i_t dnew_Match_If(psb_i_t ipar, psb_i_t matching, psb_d_t lambda,
      nt = 1;
    }
 
-   maxweight = eps;
-   minweight = 1e300;
+   minabs = 1e300;
    //   fprintf(stderr,"Sanity check:  %d   %d \n",nr,nc);
+   k=0;
    for (i=1; i<nr; i++) {
      for (j=irp[i-1]; j<irp[i]; j++)  {
        v = i-1;        // I 
@@ -68,7 +69,7 @@ psb_i_t dnew_Match_If(psb_i_t ipar, psb_i_t matching, psb_d_t lambda,
 	 wjj = w[u];
 	 edgnrm = aii*(wii*wii) + ajj*(wjj*wjj);
 	 if (edgnrm > eps) {
-	   weight = 1.0 - (2*1.0*aij*wii*wjj)/(aii*(wii*wii) + ajj*(wjj*wjj));
+	   weight = abs(1.0 - (2*1.0*aij*wii*wjj)/(aii*(wii*wii) + ajj*(wjj*wjj)));
 	 } else {
 	   weight = eps;
 	 }
@@ -76,11 +77,20 @@ psb_i_t dnew_Match_If(psb_i_t ipar, psb_i_t matching, psb_d_t lambda,
 	 s.push_back(u);
 	 t.push_back(v);
 	 weights.push_back(weight);
-	 if (weight>maxweight) maxweight=weight;
-	 if (weight<minweight) minweight=weight;
+	 k = k + 1 ;
+	 if (weight<minabs) minabs=weight;
 	 
        }
      }
+   }
+   
+   maxweight = eps;
+   minweight = 1e300;
+   //fprintf(stderr,"minabs %g\n",minabs);
+   for (i=0; i<k; i++) {
+     weights[i] = log(weights[i]/(0.999*minabs));
+     if (weights[i]>maxweight) maxweight=weights[i];
+     if (weights[i]<minweight) minweight=weights[i];
    }
    if (lambda<0.0) lambda=maxweight-2.0*minweight+eps;
    if (lambda<0.0) lambda=eps;
