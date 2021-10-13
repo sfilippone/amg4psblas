@@ -377,9 +377,10 @@ module amg_base_prec_type
        &  'SOC measure 1     ', 'SOC Measure 2     ',&
        &  'Parallel Matching ','Decoupled Matching'/)
   character(len=18), parameter, private :: &
-       &  par_aggr_alg_names(0:3)=(/&
+       &  par_aggr_alg_names(0:4)=(/&
        & 'decoupled aggr.   ', 'sym. dec. aggr.   ',&
-       & 'user defined aggr.', 'coupled aggr.     '/)
+       & 'user defined aggr.', 'coupled aggr.     ',&
+       & 'new matching aggr.'/)
   character(len=18), parameter, private :: &
        &  ord_names(0:1)=(/'Natural ordering  ','Desc. degree ord. '/)
   character(len=6), parameter, private :: &
