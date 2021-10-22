@@ -132,8 +132,6 @@ module amg_s_parmatch_aggregator_mod
     type(psb_sspmat_type), allocatable  :: prol, restr
     type(psb_sspmat_type), allocatable  :: ac, base_a, rwa
     type(psb_desc_type), allocatable    :: desc_ac, desc_ax, base_desc, rwdesc
-    integer(psb_ipk_) :: max_csize
-    integer(psb_ipk_) :: max_nlevels
     logical           :: reproducible_matching = .false.
     logical           :: need_symmetrize       = .false.
     logical           :: unsmoothed_hierarchy  = .true.
@@ -452,10 +450,10 @@ contains
            & agnext%matching_alg = ag%matching_alg
       if (.not.is_legal_nsweeps(agnext%n_sweeps))&
            & agnext%n_sweeps     = ag%n_sweeps
-      if (.not.is_legal_csize(agnext%max_csize))&
-           & agnext%max_csize    = ag%max_csize
-      if (.not.is_legal_nlevels(agnext%max_nlevels))&
-           & agnext%max_nlevels  = ag%max_nlevels
+!!$      if (.not.is_legal_csize(agnext%max_csize))&
+!!$           & agnext%max_csize    = ag%max_csize
+!!$      if (.not.is_legal_nlevels(agnext%max_nlevels))&
+!!$           & agnext%max_nlevels  = ag%max_nlevels
       ! Is this going to generate shallow copies/memory leaks/double frees?
       ! To be investigated further.
       call psb_safe_ab_cpy(ag%w_nxt,agnext%w,info)
@@ -540,10 +538,6 @@ contains
     case('AGGR_SIZE')
       ag%orig_aggr_size = val
       ag%n_sweeps=max(1,ceiling(log(val*1.0)/log(2.0)))
-    case('PRMC_MAX_CSIZE')
-      ag%max_csize=val
-    case('PRMC_MAX_NLEVELS')
-      ag%max_nlevels=val
     case('PRMC_W_SIZE')
       call ag%bld_default_w(val)
     case('PRMC_REPRODUCIBLE_MATCHING')
@@ -569,8 +563,8 @@ contains
     ag%matching_alg  = 0
     ag%n_sweeps      = 1
     ag%jacobi_sweeps = 0
-    ag%max_nlevels   = 36
-    ag%max_csize     = -1
+!!$    ag%max_nlevels   = 36
+!!$    ag%max_csize     = -1
     !
     ! Apparently BootCMatch works better
     ! by keeping all entries

@@ -68,7 +68,8 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
   real(psb_dpk_), allocatable    :: tmpw(:), tmpwnxt(:)
   integer(psb_lpk_), allocatable :: ixaggr(:), nxaggr(:), tlaggr(:), ivr(:)
   type(psb_dspmat_type)          :: a_tmp
-  integer(c_int) :: match_algorithm, n_sweeps, target_csize, max_nlevels
+  integer(psb_ipk_)    :: match_algorithm, n_sweeps
+  integer(psb_lpk_)    :: target_csize
   character(len=40)    :: name, ch_err
   character(len=80)    :: fname, prefix_
   type(psb_ctxt_type)  :: ictxt
@@ -132,11 +133,6 @@ subroutine  amg_d_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     target_csize       = ag_data%target_coarse_size
   else
     target_csize       = ag_data%min_coarse_size
-  end if
-  if (ag%max_nlevels > 0) then
-    max_nlevels     = ag%max_nlevels
-  else
-    max_nlevels = ag_data%max_levs
   end if
   if (.true.) then
     block
