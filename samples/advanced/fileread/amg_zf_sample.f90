@@ -676,8 +676,8 @@ contains
       call read_data(prec%aggr_prol,inp_unit)    ! aggregation type
       call read_data(prec%par_aggr_alg,inp_unit)    ! parallel aggregation alg
       call read_data(prec%aggr_ord,inp_unit)    ! ordering for aggregation
-      call read_data(prec%aggr_filter,inp_unit) ! filtering
       call read_data(prec%mncrratio,inp_unit)  ! minimum aggregation ratio
+      call read_data(prec%aggr_filter,inp_unit) ! filtering
       call read_data(prec%athres,inp_unit)      ! smoothed aggr thresh
       call read_data(prec%thrvsz,inp_unit)      ! size of aggr thresh vector
       if (prec%thrvsz > 0) then
