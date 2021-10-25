@@ -43,11 +43,11 @@ COUPLED                     ! Parallel aggregation: DEC, SYMDEC, COUPLED
 MATCHBOXP                   ! aggregation measure SOC1, MATCHBOXP
 8                           ! Requested size of the aggregates for MATCHBOXP
 NATURAL                     ! Ordering of aggregation NATURAL DEGREE
-FILTER                    ! Filtering of matrix:  FILTER NOFILTER
+FILTER                      ! Filtering of matrix:  FILTER NOFILTER
 -1.5                        ! Coarsening ratio, if < 0 use library default
+-0.0100d0                    ! Smoothed aggregation threshold, ignored if < 0
 -2                           ! Number of thresholds in vector, next line ignored if <= 0
 0.05 0.025                  ! Thresholds
--0.0100d0                    ! Smoothed aggregation threshold, ignored if < 0
 %%%%%%%%%%%  Coarse level solver  %%%%%%%%%%%%%%%%
 BJAC                        ! Coarsest-level solver: MUMPS UMF SLU SLUDIST JACOBI GS BJAC
 ILU                         ! Coarsest-level subsolver for BJAC: ILU ILUT MILU UMF MUMPS SLU

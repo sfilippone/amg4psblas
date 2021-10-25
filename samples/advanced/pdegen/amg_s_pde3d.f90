@@ -587,6 +587,7 @@ contains
       call read_data(prec%aggr_ord,inp_unit)    ! ordering for aggregation
       call read_data(prec%aggr_filter,inp_unit) ! filtering
       call read_data(prec%mncrratio,inp_unit)  ! minimum aggregation ratio
+      call read_data(prec%athres,inp_unit)      ! smoothed aggr thresh
       call read_data(prec%thrvsz,inp_unit)      ! size of aggr thresh vector
       if (prec%thrvsz > 0) then
         call psb_realloc(prec%thrvsz,prec%athresv,info)
@@ -594,7 +595,6 @@ contains
       else
         read(inp_unit,*)                        ! dummy read to skip a record
       end if
-      call read_data(prec%athres,inp_unit)      ! smoothed aggr thresh
       ! coasest-level solver
       call read_data(prec%csolve,inp_unit)      ! coarsest-lev solver
       call read_data(prec%csbsolve,inp_unit)    ! coarsest-lev subsolver

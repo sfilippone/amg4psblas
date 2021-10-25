@@ -1,8 +1,8 @@
 %%%%%%%%%%%  General  arguments % Lines starting with % are ignored.
-mld_mat.mtx                 ! Other matrices from: http://math.nist.gov/MatrixMarket/ or 
-mld_rhs.mtx                 ! rhs          ! http://www.cise.ufl.edu/research/sparse/matrices/index.html
+amg_mat.mtx                 ! Other matrices from: http://math.nist.gov/MatrixMarket/ or 
+amg_rhs.mtx                 ! rhs          ! http://www.cise.ufl.edu/research/sparse/matrices/index.html
 NONE                        ! Initial guess
-mld_sol.mtx                 ! Reference solution
+amg_sol.mtx                 ! Reference solution
 MM                          ! File format: MatrixMarket or Harwell-Boeing
 CSR                         ! Storage format: CSR COO JAD 
 GRAPH                       ! PART (partition method): BLOCK GRAPH
@@ -43,9 +43,9 @@ DEC                         ! Parallel aggregation: DEC, SYMDEC
 NATURAL                     ! Ordering of aggregation NATURAL DEGREE
 FILTER                    ! Filtering of matrix:  FILTER NOFILTER
 -1.5                        ! Coarsening ratio, if < 0 use library default
+-0.0100d0                    ! Smoothed aggregation threshold, ignored if < 0
 -2                           ! Number of thresholds in vector, next line ignored if <= 0
 0.05 0.025                  ! Thresholds 
--0.0100d0                    ! Smoothed aggregation threshold, ignored if < 0
 %%%%%%%%%%%  Coarse level solver  %%%%%%%%%%%%%%%%
 UMF                         ! Coarsest-level solver: MUMPS UMF SLU SLUDIST JACOBI GS BJAC 
 UMF                         ! Coarsest-level subsolver for BJAC: ILU ILUT MILU UMF MUMPS SLU
