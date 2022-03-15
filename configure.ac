@@ -231,7 +231,7 @@ PAC_ARG_WITH_FLAGS(module-path,MODULE_PATH)
 PAC_ARG_WITH_EXTRA_LIBS
 
 # Check if we need extra libs (e.g. for OpenMPI)
-xtrlibs=`mpicxx --showme:link`;
+xtrlibs=`mpicxx --showme:link 2>/dev/null`;
 if (( $? == 0 ))
 then
   EXTRA_LIBS="$EXTRA_LIBS $xtrlibs";
