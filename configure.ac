@@ -230,6 +230,16 @@ PAC_ARG_WITH_FLAGS(module-path,MODULE_PATH)
 # we just gave the user the chance to append values to these variables
 PAC_ARG_WITH_EXTRA_LIBS
 
+# Check if we need extra libs (e.g. for OpenMPI)
+xtrlibs=`mpicxx --showme:link`;
+if (( $? == 0 ))
+then
+  EXTRA_LIBS="$EXTRA_LIBS $xtrlibs";
+fi
+
+
+ 
+
 ###############################################################################
 # Sanity checks, although redundant (useful when debugging this configure.ac)!
 ###############################################################################
