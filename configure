@@ -5139,10 +5139,17 @@ fi
 
 
 # Check if we need extra libs (e.g. for OpenMPI)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking Extra mpicxx libs?" >&5
+$as_echo_n "checking Extra mpicxx libs?... " >&6; }
 xtrlibs=`mpicxx --showme:link 2>/dev/null`;
 if (( $? == 0 ))
 then
   EXTRA_LIBS="$EXTRA_LIBS $xtrlibs";
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $xtrlibs" >&5
+$as_echo "$xtrlibs" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: none" >&5
+$as_echo "none" >&6; }
 fi
 
 
