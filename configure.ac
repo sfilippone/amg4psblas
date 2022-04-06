@@ -707,14 +707,10 @@ fi
 PAC_CHECK_SUPERLUDIST()
 
 if test "x$amg4psblas_cv_have_superludist" == "xyes" ; then
-   pac_sludist_version="$amg4psblas_cv_superludist_major";      
-   if (($amg4psblas_cv_superludist_major==6)); then
-      if (($amg4psblas_cv_superludist_minor>=3)); then
-        pac_sludist_version="63";
-      fi
-   fi	
+   pac_sludist_version="$amg4psblas_cv_superludist_major$amg4psblas_cv_superludist_minor";      
+
    SLUDIST_FLAGS=""	       
-   SLUDIST_FLAGS="-DHave_SLUDist_ -DSLUD_VERSION_$pac_sludist_version $SLUDIST_INCLUDES"
+   SLUDIST_FLAGS="-DHave_SLUDist_ -DSLUD_VERSION_="$pac_sludist_version" $SLUDIST_INCLUDES"
    FDEFINES="$amg_cv_define_prepend-DHAVE_SLUDIST_ $FDEFINES"
 else
    SLUDIST_FLAGS=""
