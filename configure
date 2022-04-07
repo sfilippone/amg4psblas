@@ -9308,7 +9308,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 if test "x$amg4psblas_cv_have_superludist" == "xyes" ; then
    pac_sludist_version="$amg4psblas_cv_superludist_major$amg4psblas_cv_superludist_minor";
-
+   { $as_echo "$as_me:${as_lineno-$LINENO}: Configuring with SuperLU_DIST version flag $pac_sludist_version" >&5
+$as_echo "$as_me: Configuring with SuperLU_DIST version flag $pac_sludist_version" >&6;}
    SLUDIST_FLAGS=""
    SLUDIST_FLAGS="-DHave_SLUDist_ -DSLUD_VERSION_="$pac_sludist_version" $SLUDIST_INCLUDES"
    FDEFINES="$amg_cv_define_prepend-DHAVE_SLUDIST_ $FDEFINES"
