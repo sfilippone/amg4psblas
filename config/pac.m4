@@ -852,6 +852,7 @@ if test "x$pac_sludist_header_ok" == "xyes" ; then
      dnl Maybe lib?
      SLUDIST_LIBS="$amg4psblas_cv_superludist  -L$amg4psblas_cv_superludistdir/lib";
      LIBS="$SLUDIST_LIBS -lm $save_LIBS";
+     AC_MSG_CHECKING([for superlu_malloc_dist in $SLUDIST_LIBS])
      AC_TRY_LINK_FUNC(superlu_malloc_dist, 
 		     [amg4psblas_cv_have_superludist=yes;pac_sludist_lib_ok=yes;],
 		     [amg4psblas_cv_have_superludist=no;pac_sludist_lib_ok=no; 
@@ -861,12 +862,13 @@ if test "x$pac_sludist_header_ok" == "xyes" ; then
      dnl Maybe lib64?
      SLUDIST_LIBS="$amg4psblas_cv_superludist  -L$amg4psblas_cv_superludistdir/lib64";
      LIBS="$SLUDIST_LIBS -lm $save_LIBS";
+     AC_MSG_CHECKING([for superlu_malloc_dist in $SLUDIST_LIBS])
      AC_TRY_LINK_FUNC(superlu_malloc_dist, 
 		     [amg4psblas_cv_have_superludist=yes;pac_sludist_lib_ok=yes;],
 		     [amg4psblas_cv_have_superludist=no;pac_sludist_lib_ok=no; 
 		      SLUDIST_LIBS="";SLUDIST_INCLUDES=""])
   fi
-  AC_MSG_RESULT($pac_sludist_lib_ok)
+  AC_MSG_RESULT([$pac_sludist_lib_ok $SLUDIST_LIBS])
 fi
 
 if test "x$pac_sludist_lib_ok" == "xyes" ; then

@@ -9107,6 +9107,8 @@ rm -f core conftest.err conftest.$ac_objext \
   if test "x$pac_sludist_lib_ok" == "xno" ; then
           SLUDIST_LIBS="$amg4psblas_cv_superludist  -L$amg4psblas_cv_superludistdir/lib";
      LIBS="$SLUDIST_LIBS -lm $save_LIBS";
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for superlu_malloc_dist in $SLUDIST_LIBS" >&5
+$as_echo_n "checking for superlu_malloc_dist in $SLUDIST_LIBS... " >&6; }
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -9137,6 +9139,8 @@ rm -f core conftest.err conftest.$ac_objext \
   if test "x$pac_sludist_lib_ok" == "xno" ; then
           SLUDIST_LIBS="$amg4psblas_cv_superludist  -L$amg4psblas_cv_superludistdir/lib64";
      LIBS="$SLUDIST_LIBS -lm $save_LIBS";
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for superlu_malloc_dist in $SLUDIST_LIBS" >&5
+$as_echo_n "checking for superlu_malloc_dist in $SLUDIST_LIBS... " >&6; }
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -9164,8 +9168,8 @@ fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
   fi
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_sludist_lib_ok" >&5
-$as_echo "$pac_sludist_lib_ok" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_sludist_lib_ok $SLUDIST_LIBS" >&5
+$as_echo "$pac_sludist_lib_ok $SLUDIST_LIBS" >&6; }
 fi
 
 if test "x$pac_sludist_lib_ok" == "xyes" ; then
