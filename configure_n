@@ -753,6 +753,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -877,6 +878,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1129,6 +1131,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1266,7 +1277,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1419,6 +1430,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -8087,6 +8099,44 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking support for Fortran ISO_C_BINDING module" >&5
+$as_echo_n "checking support for Fortran ISO_C_BINDING module... " >&6; }
+ ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='f90'
+  ac_fc=${MPIFC-$FC};
+ cat > conftest.$ac_ext <<_ACEOF
+
+program conftest
+  use iso_c_binding
+end program conftest
+_ACEOF
+if ac_fn_fc_try_compile "$LINENO"; then :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		     :
+else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      as_fn_error $? "Sorry, cannot build PSBLAS without support for ISO_C_BINDING.
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking support for ISO_FORTRAN_ENV" >&5
 $as_echo_n "checking support for ISO_FORTRAN_ENV... " >&6; }
  ac_ext=${ac_fc_srcext-f}
@@ -10706,6 +10756,8 @@ rm -f core conftest.err conftest.$ac_objext \
   if test "x$pac_sludist_lib_ok" == "xno" ; then
           SLUDIST_LIBS="$amg4psblas_cv_superludist  -L$amg4psblas_cv_superludistdir/lib";
      LIBS="$SLUDIST_LIBS -lm $save_LIBS";
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for superlu_malloc_dist in $SLUDIST_LIBS" >&5
+$as_echo_n "checking for superlu_malloc_dist in $SLUDIST_LIBS... " >&6; }
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -10736,6 +10788,8 @@ rm -f core conftest.err conftest.$ac_objext \
   if test "x$pac_sludist_lib_ok" == "xno" ; then
           SLUDIST_LIBS="$amg4psblas_cv_superludist  -L$amg4psblas_cv_superludistdir/lib64";
      LIBS="$SLUDIST_LIBS -lm $save_LIBS";
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for superlu_malloc_dist in $SLUDIST_LIBS" >&5
+$as_echo_n "checking for superlu_malloc_dist in $SLUDIST_LIBS... " >&6; }
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -10763,8 +10817,8 @@ fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
   fi
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_sludist_lib_ok" >&5
-$as_echo "$pac_sludist_lib_ok" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pac_sludist_lib_ok $SLUDIST_LIBS" >&5
+$as_echo "$pac_sludist_lib_ok $SLUDIST_LIBS" >&6; }
 fi
 
 if test "x$pac_sludist_lib_ok" == "xyes" ; then
@@ -10906,14 +10960,11 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 if test "x$amg4psblas_cv_have_superludist" == "xyes" ; then
-   pac_sludist_version="$amg4psblas_cv_superludist_major";
-   if (($amg4psblas_cv_superludist_major==6)); then
-      if (($amg4psblas_cv_superludist_minor>=3)); then
-        pac_sludist_version="63";
-      fi
-   fi
+   pac_sludist_version="$amg4psblas_cv_superludist_major$amg4psblas_cv_superludist_minor";
+   { $as_echo "$as_me:${as_lineno-$LINENO}: Configuring with SuperLU_DIST version flag $pac_sludist_version" >&5
+$as_echo "$as_me: Configuring with SuperLU_DIST version flag $pac_sludist_version" >&6;}
    SLUDIST_FLAGS=""
-   SLUDIST_FLAGS="-DHave_SLUDist_ -DSLUD_VERSION_$pac_sludist_version $SLUDIST_INCLUDES"
+   SLUDIST_FLAGS="-DHave_SLUDist_ -DSLUD_VERSION_="$pac_sludist_version" $SLUDIST_INCLUDES"
    FDEFINES="$amg_cv_define_prepend-DHAVE_SLUDIST_ $FDEFINES"
 else
    SLUDIST_FLAGS=""
@@ -12275,7 +12326,9 @@ $as_echo X/"$am_mf" |
     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "Something went wrong bootstrapping makefile fragments
-    for automatic dependency tracking.  Try re-running configure with the
+    for automatic dependency tracking.  If GNU make was not used, consider
+    re-running the configure script with MAKE=\"gmake\" (or whatever is
+    necessary).  You can also try re-running configure with the
     '--disable-dependency-tracking' option to at least be able to build
     the package (albeit without support for automatic dependency tracking).
 See \`config.log' for more details" "$LINENO" 5; }

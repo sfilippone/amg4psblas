@@ -133,6 +133,9 @@ FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
 AC_PROG_CC([cc xlc pgcc icc gcc ])
 CFLAGS="$save_CFLAGS";
+save_CXXFLAGS="$CXXFLAGS";
+AC_PROG_CXX([CC xlc++  icpc g++])
+CXXFLAGS="$save_CXXFLAGS";
 dnl AC_PROG_CXX
 
 dnl AC_PROG_F90 doesn't exist, at the time of writing this !
@@ -158,6 +161,16 @@ if eval "$FC -qversion 2>&1 | grep XL 2>/dev/null" ; then
  # since (as far as it is known to us) -WF, is not used in earlier versions.
  # More problems could be undocumented yet.
 fi 
+
+if test "X$CC" == "X" ; then
+	AC_MSG_ERROR([Problem : No C compiler specified nor found!])
+fi
+AC_PROG_CC_STDC()
+if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
+   AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
+else
+   C99OPT="$ac_cv_prog_cc_stdc";
+fi	
 ###############################################################################
 #			Suitable MPI compilers detection
 ###############################################################################
@@ -171,6 +184,7 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    FAKEMPI="fakempi.o";
    MPIFC="$FC";
    MPICC="$CC";
+   MPICXX="$CXX";	
    CXXDEFINES="-DSERIAL_MPI $CXXDEFINES";
 
 else 
@@ -190,9 +204,17 @@ if test "X$MPIFC" = "X" ; then
 fi
 
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
+AC_LANG([C++])
+if test "X$MPICXX" = "X" ; then
+    # This is our MPICC compiler preference: it will override ACX_MPI's first try.
+    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpc  mpicxx])
+fi
+ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C++]])])
+AC_LANG([Fortran])
 
 FC="$MPIFC" ;
 CC="$MPICC";
+CXX="$MPICXX";
 fi
 
 AC_LANG([C])
@@ -217,10 +239,12 @@ fi
 
 dnl NOTE : no spaces before the comma, and no brackets before the second argument!
 PAC_ARG_WITH_FLAGS(ccopt,CCOPT)
+PAC_ARG_WITH_FLAGS(cxxopt,CXXOPT)
 PAC_ARG_WITH_FLAGS(fcopt,FCOPT)
 PAC_ARG_WITH_LIBS
 PAC_ARG_WITH_FLAGS(clibs,CLIBS)
 PAC_ARG_WITH_FLAGS(flibs,FLIBS)
+PAC_ARG_WITH_FLAGS(cxxlibs,CXXLIBS)
 
 dnl candidates for removal:
 PAC_ARG_WITH_FLAGS(library-path,LIBRARYPATH)
@@ -409,6 +433,36 @@ if test "X$CCOPT" == "X" ; then
  fi
 fi
 #CFLAGS="${CCOPT}"
+if test "X$CXXOPT" == "X" ; then
+  CXXOPT="$CXXFLAGS";
+fi	
+if test "X$CXXOPT" == "X" ; then
+ if test "X$psblas_cv_fc" == "Xgcc" ; then
+ # note that no space should be placed around the equality symbol in assignements
+ # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
+   CXXOPT="-g -O3  $CXXOPT"
+
+ elif test "X$psblas_cv_fc" == X"xlf" ; then
+   # XL compiler : consider using -qarch=auto
+     CXXOPT="-O3 -qarch=auto $CXXOPT"
+ elif test "X$psblas_cv_fc" == X"ifc" ; then
+   # other compilers ..
+     CXXOPT="-O3 $CXXOPT"
+ elif test "X$psblas_cv_fc" == X"pg" ; then
+   # other compilers ..
+     CXXCOPT="-fast $CXXOPT"
+  # NOTE : PG & Sun use -fast instead -O3
+ elif test "X$psblas_cv_fc" == X"sun" ; then
+   # other compilers ..
+     CXXOPT="-fast $CXXOPT"
+ elif test "X$psblas_cv_fc" == X"cray" ; then
+     CXXOPT="-O3 $CXXOPT"
+     MPICXX="CC"
+ else 
+     CXXOPT="-g -O3 $CXXOPT"
+ fi
+fi
+
 
 # Honor FCFLAGS if they were specified explicitly, but --with-fcopt take precedence
 if test "X$FCOPT" == "X" ; then
@@ -457,7 +511,8 @@ fi
 ##############################################################################
 FC=${FC}
 CC=${CC}
-MPCC=${MPICC}
+CXX=${CXX}
+CCOPT="$CCOPT $C99OPT"
 
 
 ##############################################################################
@@ -491,6 +546,30 @@ fi
 ##############################################################################
 if test "X$FLINK" == "X" ; then
    FLINK=${MPF90}
+fi
+# Custom test : do we have a module or include for MPI Fortran interface?
+if test x"$pac_cv_serial_mpi" == x"yes" ; then
+   FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+else 
+ PAC_FORTRAN_CHECK_HAVE_MPI_MOD_F08()
+ if test x"$pac_cv_mpi_f08" == x"yes" ; then
+dnl    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD_F08 $FDEFINES";
+    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+  else					     	     
+    PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
+ 	  [FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"],
+	  [FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"])	  
+ fi
+fi
+
+FLINK="$MPIFC"
+PAC_ARG_OPENMP()
+if test x"$pac_cv_openmp" == x"yes" ; then
+   FDEFINES="$psblas_cv_define_prepend-DOPENMP $FDEFINES";
+   CDEFINES="-DOPENMP $CDEFINES";	
+   FCOPT="$FCOPT $pac_cv_openmp_fcopt";
+   CCOPT="$CCOPT $pac_cv_openmp_ccopt";
+   FLINK="$FLINK $pac_cv_openmp_fcopt";
 fi
 
 PAC_FORTRAN_HAVE_PSBLAS([AC_MSG_RESULT([yes.])],
