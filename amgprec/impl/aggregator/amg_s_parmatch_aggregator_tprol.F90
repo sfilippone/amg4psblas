@@ -48,7 +48,7 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
   use amg_base_prec_type
   use amg_s_inner_mod
 #if defined(SERIAL_MPI)
-    use amg_s_parmatch_aggregator_mod
+  use amg_s_parmatch_aggregator_mod
 #else
   use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_aggregator_build_tprol
 #endif
@@ -58,7 +58,7 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
   type(amg_sml_parms), intent(inout)   :: parms
   type(amg_saggr_data), intent(in)     :: ag_data
   type(psb_sspmat_type), intent(inout) :: a
-  type(psb_desc_type), intent(inout)   :: desc_a
+  type(psb_desc_type), intent(inout)      :: desc_a
   integer(psb_lpk_), allocatable, intent(out) :: ilaggr(:),nlaggr(:)
   type(psb_lsspmat_type), intent(out)  :: t_prol
   integer(psb_ipk_), intent(out)      :: info
@@ -68,7 +68,8 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
   real(psb_spk_), allocatable    :: tmpw(:), tmpwnxt(:)
   integer(psb_lpk_), allocatable :: ixaggr(:), nxaggr(:), tlaggr(:), ivr(:)
   type(psb_sspmat_type)          :: a_tmp
-  integer(c_int) :: match_algorithm, n_sweeps, max_csize, max_nlevels
+  integer(psb_ipk_)    :: match_algorithm, n_sweeps
+  integer(psb_lpk_)    :: target_csize
   character(len=40)    :: name, ch_err
   character(len=80)    :: fname, prefix_
   type(psb_ctxt_type)  :: ictxt
@@ -128,27 +129,22 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
       write(debug_unit, *) 'Warning: AGGR_SIZE reset to value ',2**n_sweeps
     end if
   end if
-  if (ag%max_csize > 0) then
-    max_csize       = ag%max_csize
+  if (ag_data%target_coarse_size > 0) then
+    target_csize       = ag_data%target_coarse_size
   else
-    max_csize       = ag_data%min_coarse_size
-  end if
-  if (ag%max_nlevels > 0) then
-    max_nlevels     = ag%max_nlevels
-  else
-    max_nlevels = ag_data%max_levs
+    target_csize       = ag_data%min_coarse_size
   end if
   if (.true.) then
     block
       integer(psb_ipk_) :: ipv(2)
-      ipv(1) = max_csize
+      ipv(1) = target_csize
       ipv(2) = n_sweeps
       call psb_bcast(ictxt,ipv)
-      max_csize = ipv(1)
+      target_csize = ipv(1)
       n_sweeps  = ipv(2)
     end block
   else
-    call psb_bcast(ictxt,max_csize)
+    call psb_bcast(ictxt,target_csize)
     call psb_bcast(ictxt,n_sweeps)
   end if
   if (n_sweeps /= ag%n_sweeps) then
@@ -156,7 +152,7 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
   end if
 !!$  if (me==0) write(0,*) 'Matching sweeps: ',n_sweeps
   n_sweeps = max(1,n_sweeps)
-  if (debug) write(0,*) me,' Copies, with n_sweeps: ',n_sweeps,max_csize
+  if (debug) write(0,*) me,' Copies, with n_sweeps: ',n_sweeps,target_csize
   if (ag%unsmoothed_hierarchy.and.allocated(ag%base_a)) then
     call ag%base_a%cp_to(acsr)
     if (ag%do_clean_zeros) call acsr%clean_zeros(info)
@@ -242,7 +238,7 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
 
   if (debug) then
     call psb_barrier(ictxt)
-    if (me == 0) write(0,*) 'N_sweeps ',n_sweeps,nr,desc_acv(0)%is_ok(),max_csize
+    if (me == 0) write(0,*) 'N_sweeps ',n_sweeps,nr,desc_acv(0)%is_ok(),target_csize
   end if
 
   !
@@ -264,7 +260,7 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     !
     if (debug) write(0,*) me,' Into matchbox_build_prol ',info
     if (do_timings) call psb_tic(idx_mboxp)
-    call smatchboxp_build_prol(tmpw,acv(i-1),desc_acv(i-1),ixaggr,nxaggr,tmp_prol,info,&
+    call amg_s_matchboxp_build_prol(tmpw,acv(i-1),desc_acv(i-1),ixaggr,nxaggr,tmp_prol,info,&
          & symmetrize=ag%need_symmetrize,reproducible=ag%reproducible_matching)
     if (do_timings) call psb_toc(idx_mboxp)
     if (debug) write(0,*) me,' Out from matchbox_build_prol ',info
@@ -300,11 +296,11 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
 
     if (debug) then
       call psb_barrier(ictxt)
-      if (me==0) write(0,*) me,trim(name),' Done mat_asb:',i,sum(nxaggr),max_csize,info
+      if (me==0) write(0,*) me,trim(name),' Done mat_asb:',i,sum(nxaggr),target_csize,info
       csz = sum(nxaggr)
       call psb_bcast(ictxt,csz)
       if (csz /= sum(nxaggr)) write(0,*) me,trim(name),' Mismatch matasb',&
-           & csz,sum(nxaggr),max_csize
+           & csz,sum(nxaggr),target_csize
     end if
     if (psb_errstatus_fatal())  write(0,*)me,trim(name),'Error fatal on entry to tmpwnxt 2'
 
@@ -342,10 +338,10 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     call move_alloc(tmpwnxt,tmpw)
     if (debug) then
       if (csz /= sum(nlaggr)) write(0,*) me,trim(name),' Mismatch 2 matasb',&
-           & csz,sum(nlaggr),max_csize, info
+           & csz,sum(nlaggr),target_csize, info
     end if
     call acv(i-1)%free()
-    if ((sum(nlaggr) <= max_csize).or.(any(nlaggr==0))) then
+    if ((sum(nlaggr) <= target_csize).or.(any(nlaggr==0))) then
       x_sweeps = i
       exit sweeps_loop
     end if

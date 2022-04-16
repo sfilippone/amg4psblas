@@ -116,7 +116,7 @@ subroutine amg_saggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   type(psb_desc_type), intent(inout)       :: desc_a
   integer(psb_lpk_), intent(inout)         :: ilaggr(:), nlaggr(:)
   type(amg_sml_parms), intent(inout)      :: parms 
-  type(psb_sspmat_type), intent(out)      :: op_prol,ac,op_restr
+  type(psb_sspmat_type), intent(inout)      :: op_prol,ac,op_restr
   type(psb_lsspmat_type), intent(inout)    :: t_prol
   type(psb_desc_type), intent(inout)       :: desc_ac
   integer(psb_ipk_), intent(out)           :: info

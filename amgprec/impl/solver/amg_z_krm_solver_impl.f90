@@ -77,7 +77,7 @@
 !  This is the implementation file corresponding to amg_z_krm_solver_mod.
 !
 !
-subroutine amg_z_krm_solver_bld(a,desc_a,sv,info,b,amold,vmold)
+subroutine amg_z_krm_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
   use psb_base_mod
   use amg_z_krm_solver, amg_protect_name => amg_z_krm_solver_bld
@@ -85,13 +85,14 @@ subroutine amg_z_krm_solver_bld(a,desc_a,sv,info,b,amold,vmold)
   Implicit None
 
   ! Arguments
-  type(psb_zspmat_type), intent(inout), target        :: a
+  type(psb_zspmat_type), intent(in), target        :: a
   Type(psb_desc_type), Intent(inout)                  :: desc_a
   class(amg_z_krm_solver_type), intent(inout)         :: sv
   integer(psb_ipk_), intent(out)                      :: info
   type(psb_zspmat_type), intent(in), target, optional :: b
   class(psb_z_base_sparse_mat), intent(in), optional  :: amold
   class(psb_z_base_vect_type), intent(in), optional   :: vmold
+  class(psb_i_base_vect_type), intent(in), optional   :: imold
   ! Local variables
   integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota
   integer(psb_lpk_) :: lnr

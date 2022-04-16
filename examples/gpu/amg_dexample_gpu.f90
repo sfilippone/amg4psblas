@@ -39,23 +39,18 @@
 !
 ! This sample program solves a linear system obtained by discretizing a
 ! PDE with Dirichlet BCs. The solver is CG, coupled with one of the
-! following multi-level preconditioner, as explained in Section 4.1 of
+! following multi-level preconditioner, as explained in Section 4.2 of
 ! the AMG4PSBLAS User's and Reference Guide:
 !
-! - choice = 1, the default multi-level preconditioner solver, i.e., 
-! V-cycle with decoupled smoothed aggregation, 1 hybrid forward/backward
-! GS sweep as pre/post-smoother and UMFPACK as coarsest-level
-! solver (Sec. 4.1, Listing 1)
+! - choice = 1, a V-cycle with decoupled smoothed aggregation, 4 Jacobi
+! sweeps as pre/post-smoother and 8 Jacobi sweeps as coarsest-level
+! solver with replicated coarsest matrix
 !
-! - choice = 2, a V-cycle preconditioner with 1 block-Jacobi sweep
-! (with ILU(0) on the blocks) as pre- and post-smoother, and 8 block-Jacobi
-! sweeps (with ILU(0) on the blocks) as coarsest-level solver (Sec. 4.1, Listing 2)
-!
-! - choice = 3,  W-cycle preconditioner based on the coupled aggregation relying
-! on matching, with maximum size of aggregates equal to 8 and smoothed prolongators,
-! 2 hybrid forward/backward GS sweeps as pre/post-smoother, a distributed coarsest
-! matrix, and preconditioned Flexible Conjugate Gradient as coarsest-level solver
-! (Sec. 4.1, Listing 3)
+! - choice = 2, a W-cycle based on the coupled aggregation relying on matching,
+! with maximum size of aggregates equal to 8 and smoothed prolongators,
+! 2 sweeps of Block-Jacobi ipre/post-smoother using approximate inverse INVK and
+! 4 sweeps of Block-Jacobi with INVK as coarsest-level solver on distributed
+! coarsest matrix 
 !
 ! The matrix and the rhs are read from files (if an rhs is not available, the
 ! unit rhs is set).
@@ -183,8 +178,9 @@ program amg_dexample_gpu
 
  case(1)
 
-    ! initialize a V-cycle preconditioner with 4 Jacobi sweep 
-    ! and 8 Jacobi sweeps as coarsest-level solver
+    ! initialize a V-cycle preconditioner, relying on decoupled smoothed aggregation 
+    ! with 4 Jacobi sweeps as pre/post-smoother
+    ! and 8 Jacobi sweeps as coarsest-level solver on replicated coarsest matrix
 
     call P%init(ctxt,'ML',info)
     call P%set('SMOOTHER_TYPE','JACOBI',info)
@@ -195,19 +191,22 @@ program amg_dexample_gpu
 
   case(2)
 
-   ! initialize a V-cycle preconditioner based on the coupled aggregation relying on matching,
+   ! initialize a W-cycle preconditioner based on the coupled aggregation relying on matching,
    ! with maximum size of aggregates equal to 8 and smoothed prolongators,
-   ! Block-Jacobi smoother using approximate inverse INVK and
-   ! and 4 sweeps of INVK on he coarsest level 
+   ! 2 sweeps of Block-Jacobi pre/post-smoother using approximate inverse INVK and
+   ! 4 sweeps of Block-Jacobi with INVK on the coarsest level distributed matrix
 
     call P%init(ctxt,'ML',info)
     call P%set('PAR_AGGR_ALG','COUPLED',info)
     call P%set('AGGR_TYPE','MATCHBOXP',info)
     call P%set('AGGR_SIZE',8,info)
     call P%set('ML_CYCLE','WCYCLE',info)
+    call P%set('SMOOTHER_TYPE','BJAC',info)
     call P%set('SMOOTHER_SWEEPS',2,info)
     call P%set('SUB_SOLVE','INVK',info)  
-    call P%set('COARSE_SOLVE','INVK',info)
+    call P%set('COARSE_SOLVE','BJAC',info)
+    call P%set('COARSE_SUBSOLVE','INVK',info)
+    call P%set('COARSE_SWEEPS',4,info)
     call P%set('COARSE_MAT','DIST',info)
     kmethod = 'CG'
 

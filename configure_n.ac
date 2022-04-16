@@ -673,6 +673,12 @@ PAC_FORTRAN_TEST_VOLATILE(
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for	VOLATILE])]	
 )
 
+PAC_FORTRAN_TEST_ISO_C_BIND( 
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for ISO_C_BINDING. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+)
+
 PAC_FORTRAN_TEST_ISO_FORTRAN_ENV(
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for	ISO_FORTRAN_ENV])]	
@@ -856,14 +862,10 @@ fi
 PAC_CHECK_SUPERLUDIST()
 
 if test "x$amg4psblas_cv_have_superludist" == "xyes" ; then
-   pac_sludist_version="$amg4psblas_cv_superludist_major";      
-   if (($amg4psblas_cv_superludist_major==6)); then
-      if (($amg4psblas_cv_superludist_minor>=3)); then
-        pac_sludist_version="63";
-      fi
-   fi	
+   pac_sludist_version="$amg4psblas_cv_superludist_major$amg4psblas_cv_superludist_minor";  
+   AC_MSG_NOTICE([Configuring with SuperLU_DIST version flag $pac_sludist_version])
    SLUDIST_FLAGS=""	       
-   SLUDIST_FLAGS="-DHave_SLUDist_ -DSLUD_VERSION_$pac_sludist_version $SLUDIST_INCLUDES"
+   SLUDIST_FLAGS="-DHave_SLUDist_ -DSLUD_VERSION_="$pac_sludist_version" $SLUDIST_INCLUDES"
    FDEFINES="$amg_cv_define_prepend-DHAVE_SLUDIST_ $FDEFINES"
 else
    SLUDIST_FLAGS=""

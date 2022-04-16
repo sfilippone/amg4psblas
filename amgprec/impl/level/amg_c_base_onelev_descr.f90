@@ -83,6 +83,8 @@ subroutine amg_c_base_onelev_descr(lv,il,nl,ilmin,info,iout,verbosity)
   write(iout_,*) 
   if (il == ilmin) then 
     call lv%parms%mlcycledsc(iout_,info)
+  end if
+  if (((ilmin==1).and.(il==2)).or.((ilmin>1).and.(il==ilmin))) then 
     if (allocated(lv%aggr)) then
       call lv%aggr%descr(lv%parms,iout_,info)
     else

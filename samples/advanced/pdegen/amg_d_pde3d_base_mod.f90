@@ -64,7 +64,7 @@ contains
     b3=done/sqrt(3.0_psb_dpk_)
   end function b3
   function c(x,y,z)
-    use psb_base_mod, only : psb_dpk_, done
+    use psb_base_mod, only : psb_dpk_, dzero, done
     real(psb_dpk_) ::  c
     real(psb_dpk_), intent(in) :: x,y,z
     c=dzero

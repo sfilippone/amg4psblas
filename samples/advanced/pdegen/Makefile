@@ -44,7 +44,7 @@ check: all
 
 clean:
 	/bin/rm -f data_input.o *.o *$(.mod)\
-        $(EXEDIR)/mld_d_pde3d  $(EXEDIR)/mld_s_pde3d $(EXEDIR)/mld_d_pde2d  $(EXEDIR)/mld_s_pde2d
+        $(EXEDIR)/amg_d_pde3d  $(EXEDIR)/amg_s_pde3d $(EXEDIR)/amg_d_pde2d  $(EXEDIR)/amg_s_pde2d
 
 verycleanlib:
 	(cd ../..; make veryclean)

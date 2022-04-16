@@ -211,12 +211,12 @@ ps: $(PS)
 
 .PHONY: clean clean-tmp preview print gzip gunzip tar ci
 
-clean:
+clean: clean-tmp
 	rm -f $(PDF) $(PS)
-	cd tmp ; rm -r -f *
+	
 
 clean-tmp:
-	cd tmp ; rm -r -f *
+	(test -d tmp && cd tmp && rm -r -f *)
 
 #----------------------------------------------------------------------------
 

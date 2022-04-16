@@ -101,7 +101,13 @@ subroutine amg_c_base_onelev_dump(lv,level,info,prefix,head,ac,rp,&
   end if
 
   if (global_num_) then
-    if (level >= 2) then 
+    if (level == 1) then
+      if (ac_) then
+        ivr = lv%base_desc%get_global_indices(owned=.false.)
+        write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_ac.mtx'
+        call lv%base_a%print(fname,head=head,iv=ivr)
+      end if
+    else if (level >= 2) then 
       if (ac_) then
         ivr = lv%desc_ac%get_global_indices(owned=.false.)
         write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_ac.mtx'
@@ -126,7 +132,12 @@ subroutine amg_c_base_onelev_dump(lv,level,info,prefix,head,ac,rp,&
       end if
     end if
   else
-    if (level >= 2) then 
+    if (level == 1) then
+      if (ac_) then
+        write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_ac.mtx'
+        call lv%base_a%print(fname,head=head)
+      end if
+    else  if (level >= 2) then 
       if (ac_) then 
         write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_ac.mtx'
         call lv%ac%print(fname,head=head)
@@ -146,16 +157,7 @@ subroutine amg_c_base_onelev_dump(lv,level,info,prefix,head,ac,rp,&
     end if
   end if
   
-  if (level >= 2) then 
-    if (allocated(lv%sm)) then
-      call lv%sm%dump(lv%desc_ac,level,info,smoother=smoother, &
-           & solver=solver,prefix=trim(prefix_)//"_sm",global_num=global_num)
-    end if
-    if (allocated(lv%sm2a)) then
-      call lv%sm2a%dump(lv%desc_ac,level,info,smoother=smoother, &
-           & solver=solver,prefix=trim(prefix_)//"_sm2a",global_num=global_num)
-    end if
-  else
+  if (level >= 1) then 
     if (allocated(lv%sm)) then
       call lv%sm%dump(lv%base_desc,level,info,smoother=smoother, &
            & solver=solver,prefix=trim(prefix_)//"_sm",global_num=global_num)

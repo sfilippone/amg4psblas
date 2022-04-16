@@ -120,7 +120,7 @@ program amg_d_pde3d
     character(len=10)  :: ptype       ! preconditioner type
 
     integer(psb_ipk_)  :: outer_sweeps ! number of outer sweeps: sweeps for 1-level,
-                                       ! AMG cycles for ML
+    ! AMG cycles for ML
     ! general AMG data
     character(len=16)  :: mlcycle      ! AMG cycle type
     integer(psb_ipk_)  :: maxlevs     ! maximum number of levels in AMG preconditioner
@@ -174,6 +174,17 @@ program amg_d_pde3d
     integer(psb_ipk_)  :: cfill       ! fill-in for incomplete LU factorization
     real(psb_dpk_)     :: cthres      ! threshold for ILUT factorization
     integer(psb_ipk_)  :: cjswp       ! sweeps for GS or JAC coarsest-lev subsolver
+
+    ! Dump data
+    logical            :: dump = .false.
+    integer(psb_ipk_)  :: dlmin       ! Minimum level to dump 
+    integer(psb_ipk_)  :: dlmax       ! Maximum level to dump
+    logical            :: dump_ac         = .false.
+    logical            :: dump_rp         = .false.
+    logical            :: dump_tprol      = .false.
+    logical            :: dump_smoother   = .false.
+    logical            :: dump_solver     = .false.
+    logical            :: dump_global_num = .false.
 
   end type precdata
   type(precdata)       :: p_choice
@@ -342,12 +353,12 @@ program amg_d_pde3d
         call prec%set('sub_prol',        p_choice%prol2,     info,pos='post')
         select case(trim(psb_toupper(p_choice%solve2)))
         case('INVK')
-          call prec%set('sub_solve',       p_choice%solve,   info)
+          call prec%set('sub_solve',       p_choice%solve2,   info)
         case('INVT')
-          call prec%set('sub_solve',       p_choice%solve,   info)
+          call prec%set('sub_solve',       p_choice%solve2,   info)
         case('AINV')
-          call prec%set('sub_solve',       p_choice%solve,   info)
-          call prec%set('ainv_alg', p_choice%variant,   info)
+          call prec%set('sub_solve',       p_choice%solve2,   info)
+          call prec%set('ainv_alg', p_choice%variant2,   info)
         case default
           call prec%set('sub_solve',       p_choice%solve2,   info, pos='post')
         end select
@@ -388,7 +399,7 @@ program amg_d_pde3d
 
   call psb_amx(ctxt, thier)
   call psb_amx(ctxt, tprec)
-
+  
   if(iam == psb_root_) then
     write(psb_out_unit,'(" ")')
     write(psb_out_unit,'("Preconditioner: ",a)') trim(p_choice%descr)
@@ -396,6 +407,12 @@ program amg_d_pde3d
     write(psb_out_unit,'(" ")')
   end if
 
+  if (p_choice%dump) then
+    call prec%dump(info,istart=p_choice%dlmin,iend=p_choice%dlmax,&
+         & ac=p_choice%dump_ac,rp=p_choice%dump_rp,tprol=p_choice%dump_tprol,&
+         & smoother=p_choice%dump_smoother, solver=p_choice%dump_solver, &
+         & global_num=p_choice%dump_global_num)    
+  end if
   !
   ! iterative method parameters
   !
@@ -534,6 +551,7 @@ contains
       ! preconditioner type
       call read_data(prec%descr,inp_unit)      ! verbose description of the prec
       call read_data(prec%ptype,inp_unit)      ! preconditioner type
+      
       ! First smoother / 1-lev preconditioner
       call read_data(prec%smther,inp_unit)     ! smoother type
       call read_data(prec%jsweeps,inp_unit)    ! (pre-)smoother / 1-lev prec sweeps
@@ -567,8 +585,9 @@ contains
       call read_data(prec%aggr_type,inp_unit)   ! type of aggregation
       call read_data(prec%aggr_size,inp_unit) ! Requested size of the aggregates for MATCHBOXP
       call read_data(prec%aggr_ord,inp_unit)    ! ordering for aggregation
-      call read_data(prec%aggr_filter,inp_unit) ! filtering
       call read_data(prec%mncrratio,inp_unit)  ! minimum aggregation ratio
+      call read_data(prec%aggr_filter,inp_unit) ! filtering
+      call read_data(prec%athres,inp_unit)      ! smoothed aggr thresh
       call read_data(prec%thrvsz,inp_unit)      ! size of aggr thresh vector
       if (prec%thrvsz > 0) then
         call psb_realloc(prec%thrvsz,prec%athresv,info)
@@ -576,7 +595,6 @@ contains
       else
         read(inp_unit,*)                        ! dummy read to skip a record
       end if
-      call read_data(prec%athres,inp_unit)      ! smoothed aggr thresh
       ! coasest-level solver
       call read_data(prec%csolve,inp_unit)      ! coarsest-lev solver
       call read_data(prec%csbsolve,inp_unit)    ! coarsest-lev subsolver
@@ -584,6 +602,17 @@ contains
       call read_data(prec%cfill,inp_unit)       ! fill-in for incompl LU
       call read_data(prec%cthres,inp_unit)      ! Threshold for ILUT
       call read_data(prec%cjswp,inp_unit)       ! sweeps for GS/JAC subsolver
+      ! dump 
+      call read_data(prec%dump,inp_unit)       ! Dump on file?
+      call read_data(prec%dlmin,inp_unit)      ! Minimum level to dump
+      call read_data(prec%dlmax,inp_unit)      ! Maximum level to dump
+      call read_data(prec%dump_ac,inp_unit)       
+      call read_data(prec%dump_rp,inp_unit)       
+      call read_data(prec%dump_tprol,inp_unit)    
+      call read_data(prec%dump_smoother,inp_unit) 
+      call read_data(prec%dump_solver,inp_unit)   
+      call read_data(prec%dump_global_num,inp_unit)
+
       if (inp_unit /= psb_inp_unit) then
         close(inp_unit)
       end if
@@ -630,6 +659,7 @@ contains
     call psb_bcast(ctxt,prec%mlcycle)
     call psb_bcast(ctxt,prec%outer_sweeps)
     call psb_bcast(ctxt,prec%maxlevs)
+    call psb_bcast(ctxt,prec%csizepp)
 
     call psb_bcast(ctxt,prec%aggr_prol)
     call psb_bcast(ctxt,prec%par_aggr_alg)
@@ -645,15 +675,26 @@ contains
     end if
     call psb_bcast(ctxt,prec%athres)
 
-    call psb_bcast(ctxt,prec%csizepp)
     call psb_bcast(ctxt,prec%cmat)
     call psb_bcast(ctxt,prec%csolve)
     call psb_bcast(ctxt,prec%csbsolve)
     call psb_bcast(ctxt,prec%cfill)
     call psb_bcast(ctxt,prec%cthres)
     call psb_bcast(ctxt,prec%cjswp)
+    ! dump
+    call psb_bcast(ctxt,prec%dump)
+    call psb_bcast(ctxt,prec%dlmin)
+    call psb_bcast(ctxt,prec%dlmax)
+
+    call psb_bcast(ctxt,prec%dump_ac)       
+    call psb_bcast(ctxt,prec%dump_rp)       
+    call psb_bcast(ctxt,prec%dump_tprol)    
+    call psb_bcast(ctxt,prec%dump_smoother) 
+    call psb_bcast(ctxt,prec%dump_solver)   
+    call psb_bcast(ctxt,prec%dump_global_num)
 
 
+    
   end subroutine get_parms
 
 end program amg_d_pde3d

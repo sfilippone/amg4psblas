@@ -159,4 +159,4 @@ Some influential environment variables:
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
 
-Report bugs to <https://github.com/sfilippone/amg4psblas/issues>.
+Report bugs to <https://github.com/psctoolkit/psctoolkit/issues>.

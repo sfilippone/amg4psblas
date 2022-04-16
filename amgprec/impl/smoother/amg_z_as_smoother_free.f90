@@ -61,6 +61,7 @@ subroutine amg_z_as_smoother_free(sm,info)
     end if
   end if
   call sm%nd%free()
+  call sm%desc_data%free(info)
 
   call psb_erractionrestore(err_act)
   return
