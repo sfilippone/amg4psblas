@@ -92,6 +92,21 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
 							      MilanReal* msgPercent,
                                                               MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
                                                               MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
+
+    /*
+     * verDistance: it's a vector long as the number of processors.
+     *              verDistance[i] contains the first node index of the i-th processor
+     *              verDistance[i + 1] contains the last node index of the i-th processor
+     * NLVer: number of elements in the LocPtr
+     * NLEdge: number of edges assigned to the current processor
+     *
+     * Contains the portion of matrix assigned to the processor in
+     * Yale notation
+     * verLocInd: contains the positions on row of the matrix
+     * verLocPtr: i-th value is the position of the first element on the i-th row and
+     *            i+1-th value is the position of the first element on the i+1-th row
+     */
+
 #if !defined(SERIAL_MPI)
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")Within algoEdgeApproxDominatingEdgesLinearSearchMessageBundling()"; fflush(stdout);
@@ -152,6 +167,9 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
     if (myRank == 0)     cout<<"\n("<<myRank<<")About to compute Ghost Vertices..."; fflush(stdout);
 #endif
 
+#ifdef TIME_TRACKER
+    double Ghost2LocalInitialization = MPI_Wtime();
+#endif
     for ( i=0; i<NLEdge; i++ )  { //O(m) - Each edge stored twice
         insertMe = verLocInd[i];
         //cout<<"InsertMe on Process "<<myRank<<" is: "<<insertMe<<endl;
@@ -170,6 +188,12 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
             } //End of else()
         } //End of if ( (insertMe < StartIndex) || (insertMe > EndIndex) )
     } //End of for(ghost vertices)
+
+#ifdef TIME_TRACKER
+    Ghost2LocalInitialization = MPI_Wtime() - Ghost2LocalInitialization;
+    fprintf(stderr, "Ghost2LocalInitialization time: %f\n", Ghost2LocalInitialization);
+#endif
+
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")NGhosts:" << numGhostVertices << " GhostEdges: "<<numGhostEdges;
     if (!Ghost2LocalMap.empty()) {
@@ -218,6 +242,11 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
         cout<<verGhostPtr[numGhostVertices]<<"\n";
     fflush(stdout);
 #endif
+
+#ifdef TIME_TRACKER
+    double verGhostIndInitialization = MPI_Wtime();
+#endif
+
     for ( v=0; v < NLVer; v++ ) {
         adj1 = verLocPtr[v];   //Vertex Pointer
         adj2 = verLocPtr[v+1];
@@ -231,6 +260,12 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
         } //End of for(k)
     } //End of for (v)
     tempCounter.clear(); //Do not need this any more
+
+#ifdef TIME_TRACKER
+    verGhostIndInitialization = MPI_Wtime() - verGhostIndInitialization;
+    fprintf(stderr, "verGhostIndInitialization time: %f\n", verGhostIndInitialization);
+#endif
+
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")Ghost Vertex Index: ";
     for ( v=0; v < numGhostEdges; v++ )
