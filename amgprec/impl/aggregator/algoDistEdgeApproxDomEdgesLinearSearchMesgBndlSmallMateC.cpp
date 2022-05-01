@@ -248,12 +248,33 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")Ghost Vertex Pointer: "; fflush(stdout);
 #endif
+
+#define TIME_TRACKER
+#ifdef TIME_TRACKER
+    double verGhostPtrInitialization = MPI_Wtime();
+#endif
+
+    /*
+     * OMP verGhostPtrInitialization
+     * 
+     */
+
+#pragma omp parallel for default(shared)
     for ( i=0; i<numGhostVertices; i++ )  { //O(|Ghost Vertices|)
         verGhostPtr[i+1] = verGhostPtr[i] + Counter[i];
 #ifdef PRINT_DEBUG_INFO_
         cout<<verGhostPtr[i]<<"\t"; fflush(stdout);
 #endif
     }
+
+#ifdef TIME_TRACKER
+    verGhostPtrInitialization = MPI_Wtime() - verGhostPtrInitialization;
+    fprintf(stderr, "verGhostPtrInitialization time: %f\n", verGhostPtrInitialization);
+#endif
+
+#undef TIME_TRACKER
+
+
 #ifdef PRINT_DEBUG_INFO_
     if ( numGhostVertices > 0 )
         cout<<verGhostPtr[numGhostVertices]<<"\n";
