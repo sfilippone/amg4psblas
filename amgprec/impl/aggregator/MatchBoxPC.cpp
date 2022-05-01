@@ -60,12 +60,11 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 		MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
 #if !defined(SERIAL_MPI)
   MPI_Comm C_comm=MPI_Comm_f2c(icomm);
+
 #ifdef DEBUG
   fprintf(stderr,"MatchBoxPC: rank %d nlver %ld nledge %ld [ %ld %ld ]\n",
 	  myRank,NLVer, NLEdge,verDistance[0],verDistance[1]);
 #endif
-
-#ifdef #IE
 
     #ifdef TIME_TRACKER
         double tmr = MPI_Wtime();

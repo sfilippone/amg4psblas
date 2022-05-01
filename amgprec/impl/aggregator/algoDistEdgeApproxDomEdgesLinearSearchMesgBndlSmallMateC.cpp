@@ -1,4 +1,6 @@
 #include "MatchBoxPC.h"
+#include <omp.h>
+#include <stdio.h>
 // ***********************************************************************
 //
 //        MatchboxP: A C++ library for approximate weighted matching
@@ -167,25 +169,40 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
     if (myRank == 0)     cout<<"\n("<<myRank<<")About to compute Ghost Vertices..."; fflush(stdout);
 #endif
 
+    /*
+     * OMP Ghost2LocalInitialization
+     * The cycle analyzes all the edges and when finds a ghost edge
+     * puts it in the Ghost2LocalMap.
+     * A critical region is needed when inserting data in the map.
+     *
+     * Despite the critical region it is still productive to
+     * parallelize this for because the critical region is exeuted
+     * only when a ghost edge is found and ghost edges are a minority.
+     */
+
 #ifdef TIME_TRACKER
     double Ghost2LocalInitialization = MPI_Wtime();
 #endif
+
+#pragma omp parallel for private(insertMe) firstprivate(StartIndex, EndIndex) default(shared)
     for ( i=0; i<NLEdge; i++ )  { //O(m) - Each edge stored twice
         insertMe = verLocInd[i];
         //cout<<"InsertMe on Process "<<myRank<<" is: "<<insertMe<<endl;
         if ( (insertMe < StartIndex) || (insertMe > EndIndex) ) { //Find a ghost
-            storedAlready = Ghost2LocalMap.find( insertMe );
-            if ( storedAlready != Ghost2LocalMap.end() ) { //Has already been added
-                //cout<<"Process "<<myRank<<" found: "<<storedAlready->first<<" - "<<storedAlready->second<<endl;
-                Counter[storedAlready->second]++; //Increment the counter
+#pragma omp critical
+            {
                 numGhostEdges++;
-            } else { //Insert an entry for the ghost:
-                //cout<<"Process "<<myRank<<" * New insert:  Key="<<insertMe<< " : Value="<<numGhostVertices<<endl;
-                Ghost2LocalMap[insertMe] = numGhostVertices; //Add a map entry
-                Counter.push_back(1); //Initialize the counter
-                numGhostEdges++;
-                numGhostVertices++;  //Increment the number of ghost vertices
-            } //End of else()
+                storedAlready = Ghost2LocalMap.find(insertMe);
+                if (storedAlready != Ghost2LocalMap.end()) { //Has already been added
+                    //cout<<"Process "<<myRank<<" found: "<<storedAlready->first<<" - "<<storedAlready->second<<endl;
+                    Counter[storedAlready->second]++; //Increment the counter
+                } else { //Insert an entry for the ghost:
+                    //cout<<"Process "<<myRank<<" * New insert:  Key="<<insertMe<< " : Value="<<numGhostVertices<<endl;
+                    Ghost2LocalMap[insertMe] = numGhostVertices; //Add a map entry
+                    Counter.push_back(1); //Initialize the counter
+                    numGhostVertices++;  //Increment the number of ghost vertices
+                } //End of else()
+            }
         } //End of if ( (insertMe < StartIndex) || (insertMe > EndIndex) )
     } //End of for(ghost vertices)
 
@@ -243,19 +260,37 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
     fflush(stdout);
 #endif
 
+    /*
+     * OMP verGhostIndInitialization
+     *
+     * In this cycle the verGhostInd is initialized
+     * with the datas related to ghost edges.
+     * The check to see if a node is a ghost node is
+     * executed in paralle and when a ghost node
+     * is found a critical region is started.
+     *
+     * Despite the critical region it's still useful to
+     * parallelize the for cause the ghost nodes
+     * are a minority hence the critical region is executed
+     * few times.
+     */
+
 #ifdef TIME_TRACKER
     double verGhostIndInitialization = MPI_Wtime();
 #endif
-
+#pragma omp parallel for private(insertMe, k, adj1, adj2) firstprivate(StartIndex, EndIndex) default(shared)
     for ( v=0; v < NLVer; v++ ) {
         adj1 = verLocPtr[v];   //Vertex Pointer
         adj2 = verLocPtr[v+1];
         for( k = adj1; k < adj2; k++ ) {
             w = verLocInd[k]; //Get the adjacent vertex
             if ( (w < StartIndex) || (w > EndIndex) ) { //Find a ghost
-                insertMe = verGhostPtr[Ghost2LocalMap[w]] + tempCounter[Ghost2LocalMap[w]]; //Where to insert
-                verGhostInd[insertMe] = v+StartIndex; //Add the adjacency
-                tempCounter[Ghost2LocalMap[w]]++; //Increment the counter
+#pragma omp critical
+                {
+                    insertMe = verGhostPtr[Ghost2LocalMap[w]] + tempCounter[Ghost2LocalMap[w]]; //Where to insert
+                    verGhostInd[insertMe] = v + StartIndex; //Add the adjacency
+                    tempCounter[Ghost2LocalMap[w]]++; //Increment the counter
+                }
             } //End of if((w < StartIndex) || (w > EndIndex))
         } //End of for(k)
     } //End of for (v)
