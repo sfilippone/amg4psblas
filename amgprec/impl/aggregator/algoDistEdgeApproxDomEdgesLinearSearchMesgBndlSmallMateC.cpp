@@ -124,7 +124,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
     //inputSubGraph.getStartEndIndices(StartIndex, EndIndex);
     MilanLongInt StartIndex = verDistance[myRank]; //The starting vertex owned by the current rank
     //MilanLongInt EndIndex = verDistance[myRank+1]; //The ending vertex owned by the current rank
-    MilanLongInt EndIndex = verDistance[myRank+1]-1; //The ending vertex owned by the current rank
+    MilanLongInt EndIndex = verDistance[myRank + 1] - 1; //The ending vertex owned by the current rank
 
     MPI_Status computeStatus;
     const int ComputeTag = 7;  //Predefined tag
@@ -135,8 +135,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
     int message_length;
 
     //MilanLongInt NLVer=0, NLEdge=0, StartIndex=0, EndIndex=0;
-    MilanLongInt msgActual=0, msgInd=0;
-    MilanReal heaviestEdgeWt=0.0f; //Assumes positive weight
+    MilanLongInt msgActual = 0, msgInd = 0;
+    MilanReal heaviestEdgeWt = 0.0f; //Assumes positive weight
     MilanReal startTime, finishTime;
     //MilanReal Precision = MPI_Wtick(); //Get the precision of the MPI Timer
     startTime = MPI_Wtime();
@@ -150,18 +150,18 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
     cout<<"\n("<<myRank<<")StartIndex: "<<StartIndex<<"  EndIndex: "<<EndIndex; fflush(stdout);
 #endif
     //Other Variables:
-    MilanLongInt u=-1, v=-1, w=-1, i=0;
-    MilanLongInt k=-1, adj1=-1, adj2=-1;
-    MilanLongInt k1=-1, adj11=-1, adj12=-1;
+    MilanLongInt u = -1, v = -1, w = -1, i = 0;
+    MilanLongInt k = -1, adj1 = -1, adj2 = -1;
+    MilanLongInt k1 = -1, adj11 = -1, adj12 = -1;
     MilanLongInt myCard = 0;
-    MilanInt Sender=0; // This is the rank of the sending nodes, it has to be an integer! Fabio
+    MilanInt Sender = 0; // This is the rank of the sending nodes, it has to be an integer! Fabio
 
     //Build the Ghost Vertex Set: Vg
-    map<MilanLongInt, MilanLongInt> Ghost2LocalMap; //Map each ghost vertex to a local vertex
+    map <MilanLongInt, MilanLongInt> Ghost2LocalMap; //Map each ghost vertex to a local vertex
     // index that starts with zero to |Vg|  - 1
     map<MilanLongInt, MilanLongInt>::iterator storedAlready;
-    vector<MilanLongInt> Counter;  //Store the edge count for each ghost vertex
-    MilanLongInt numGhostVertices = 0, numGhostEdges = 0, insertMe=0; //Number of Ghost vertices
+    vector <MilanLongInt> Counter;  //Store the edge count for each ghost vertex
+    MilanLongInt numGhostVertices = 0, numGhostEdges = 0, insertMe = 0; //Number of Ghost vertices
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")About to compute Ghost Vertices..."; fflush(stdout);
 #endif
@@ -180,100 +180,122 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
      * only when a ghost edge is found and ghost edges are a minority.
      */
 
+    //Define Adjacency Lists for Ghost Vertices:
+    //cout<<"Building Ghost data structures ... \n\n";
+    vector <MilanLongInt> verGhostPtr, verGhostInd, tempCounter;
+    //Mate array for ghost vertices:
+    vector <MilanLongInt> GMate;  //Proportional to the number of ghost vertices
+
 #ifdef TIME_TRACKER
     double Ghost2LocalInitialization = MPI_Wtime();
 #endif
 
-#pragma omp parallel for private(insertMe) firstprivate(StartIndex, EndIndex) default(shared)
-    for ( i=0; i<NLEdge; i++ )  { //O(m) - Each edge stored twice
-        insertMe = verLocInd[i];
-        //cout<<"InsertMe on Process "<<myRank<<" is: "<<insertMe<<endl;
-        if ( (insertMe < StartIndex) || (insertMe > EndIndex) ) { //Find a ghost
+//#define OMP
+#ifdef OMP
+#pragma omp parallel private(insertMe, k, adj1, adj2) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
+    {
+#endif
+        //printf("Id %d\n", omp_get_thread_num());
+
+#ifdef OMP
+#pragma omp for
+#endif
+        for (i = 0; i < NLEdge; i++) { //O(m) - Each edge stored twice
+            insertMe = verLocInd[i];
+            //cout<<"InsertMe on Process "<<myRank<<" is: "<<insertMe<<endl;
+            if ((insertMe < StartIndex) || (insertMe > EndIndex)) { //Find a ghost
+#ifdef OMP
 #pragma omp critical
-            {
-                numGhostEdges++;
-                storedAlready = Ghost2LocalMap.find(insertMe);
-                if (storedAlready != Ghost2LocalMap.end()) { //Has already been added
-                    //cout<<"Process "<<myRank<<" found: "<<storedAlready->first<<" - "<<storedAlready->second<<endl;
-                    Counter[storedAlready->second]++; //Increment the counter
-                } else { //Insert an entry for the ghost:
-                    //cout<<"Process "<<myRank<<" * New insert:  Key="<<insertMe<< " : Value="<<numGhostVertices<<endl;
-                    Ghost2LocalMap[insertMe] = numGhostVertices; //Add a map entry
-                    Counter.push_back(1); //Initialize the counter
-                    numGhostVertices++;  //Increment the number of ghost vertices
-                } //End of else()
+                {
+#endif
+                    numGhostEdges++;
+                    storedAlready = Ghost2LocalMap.find(insertMe);
+                    if (storedAlready != Ghost2LocalMap.end()) { //Has already been added
+                        //cout<<"Process "<<myRank<<" found: "<<storedAlready->first<<" - "<<storedAlready->second<<endl;
+                        Counter[storedAlready->second]++; //Increment the counter
+                    } else { //Insert an entry for the ghost:
+                        //cout<<"Process "<<myRank<<" * New insert:  Key="<<insertMe<< " : Value="<<numGhostVertices<<endl;
+                        Ghost2LocalMap[insertMe] = numGhostVertices; //Add a map entry
+                        Counter.push_back(1); //Initialize the counter
+                        numGhostVertices++;  //Increment the number of ghost vertices
+                    } //End of else()
+#ifdef OMP
+                }
+#endif
+            } //End of if ( (insertMe < StartIndex) || (insertMe > EndIndex) )
+        } //End of for(ghost vertices)
+
+#ifdef OMP
+#pragma omp single
+        {
+#endif
+
+#ifdef TIME_TRACKER
+            Ghost2LocalInitialization = MPI_Wtime() - Ghost2LocalInitialization;
+            fprintf(stderr, "Ghost2LocalInitialization time: %f\n", Ghost2LocalInitialization);
+#endif
+
+#ifdef PRINT_DEBUG_INFO_
+            cout<<"\n("<<myRank<<")NGhosts:" << numGhostVertices << " GhostEdges: "<<numGhostEdges;
+            if (!Ghost2LocalMap.empty()) {
+                cout<<"\n("<<myRank<<")Final Map : on process ";
+                cout<<"\n("<<myRank<<")Key \t Value \t Counter \n"; fflush(stdout);
+                storedAlready = Ghost2LocalMap.begin();
+                do {
+                    cout<<storedAlready->second<<" - "<<storedAlready->first<<" : "<<Counter[storedAlready->second]<<endl;
+                    fflush(stdout);
+                    storedAlready++;
+                } while ( storedAlready != Ghost2LocalMap.end() );
             }
-        } //End of if ( (insertMe < StartIndex) || (insertMe > EndIndex) )
-    } //End of for(ghost vertices)
+#endif
+
+            //Initialize adjacency Lists for Ghost Vertices:
+            try {
+                verGhostPtr.reserve(numGhostVertices + 1); //Pointer Vector
+                tempCounter.reserve(numGhostVertices); //Pointer Vector
+                verGhostInd.reserve(numGhostEdges); //Index Vector
+                GMate.reserve(numGhostVertices); //Ghost Mate Vector
+            } catch (length_error) {
+                cout << "Error in function algoDistEdgeApproxDominatingEdgesLinearSearch: \n";
+                cout << "Not enough memory to allocate the internal variables \n";
+                exit(1);
+            }
+            //Initialize the Vectors:
+            verGhostPtr.resize(numGhostVertices + 1, 0); //Pointer Vector
+            tempCounter.resize(numGhostVertices, 0); //Temporary Counter
+            verGhostInd.resize(numGhostEdges, -1); //Index Vector
+            GMate.resize(numGhostVertices, -1); //Temporary Counter
+            verGhostPtr[0] = 0; //The first value
+#ifdef PRINT_DEBUG_INFO_
+            cout<<"\n("<<myRank<<")Ghost Vertex Pointer: "; fflush(stdout);
+#endif
 
 #ifdef TIME_TRACKER
-    Ghost2LocalInitialization = MPI_Wtime() - Ghost2LocalInitialization;
-    fprintf(stderr, "Ghost2LocalInitialization time: %f\n", Ghost2LocalInitialization);
+            double verGhostPtrInitialization = MPI_Wtime();
 #endif
 
+#ifdef OMP
+        }
+#endif
+        /*
+         * OMP verGhostPtrInitialization
+         *
+         */
+
+#ifdef OMP
+#pragma omp for nowait
+#endif
+        for (i = 0; i < numGhostVertices; i++) { //O(|Ghost Vertices|)
+            verGhostPtr[i + 1] = verGhostPtr[i] + Counter[i];
 #ifdef PRINT_DEBUG_INFO_
-    cout<<"\n("<<myRank<<")NGhosts:" << numGhostVertices << " GhostEdges: "<<numGhostEdges;
-    if (!Ghost2LocalMap.empty()) {
-        cout<<"\n("<<myRank<<")Final Map : on process ";
-        cout<<"\n("<<myRank<<")Key \t Value \t Counter \n"; fflush(stdout);
-        storedAlready = Ghost2LocalMap.begin();
-        do {
-            cout<<storedAlready->second<<" - "<<storedAlready->first<<" : "<<Counter[storedAlready->second]<<endl;
-            fflush(stdout);
-            storedAlready++;
-        } while ( storedAlready != Ghost2LocalMap.end() );
-    }
+            cout<<verGhostPtr[i]<<"\t"; fflush(stdout);
 #endif
-    //Build Adjacency Lists for Ghost Vertices:
-    //cout<<"Building Ghost data structures ... \n\n";
-    vector<MilanLongInt> verGhostPtr, verGhostInd, tempCounter;
-    //Mate array for ghost vertices:
-    vector<MilanLongInt> GMate;  //Proportional to the number of ghost vertices
-    try {
-        verGhostPtr.reserve(numGhostVertices+1); //Pointer Vector
-        tempCounter.reserve(numGhostVertices); //Pointer Vector
-        verGhostInd.reserve(numGhostEdges); //Index Vector
-        GMate.reserve(numGhostVertices); //Ghost Mate Vector
-    } catch ( length_error ) {
-        cout<<"Error in function algoDistEdgeApproxDominatingEdgesLinearSearch: \n";
-        cout<<"Not enough memory to allocate the internal variables \n";
-        exit(1);
-    }
-    //Initialize the Vectors:
-    verGhostPtr.resize(numGhostVertices+1, 0); //Pointer Vector
-    tempCounter.resize(numGhostVertices, 0); //Temporary Counter
-    verGhostInd.resize(numGhostEdges, -1); //Index Vector
-    GMate.resize(numGhostVertices, -1); //Temporary Counter
-    verGhostPtr[0] = 0; //The first value
-#ifdef PRINT_DEBUG_INFO_
-    cout<<"\n("<<myRank<<")Ghost Vertex Pointer: "; fflush(stdout);
-#endif
-
-#define TIME_TRACKER
-#ifdef TIME_TRACKER
-    double verGhostPtrInitialization = MPI_Wtime();
-#endif
-
-    /*
-     * OMP verGhostPtrInitialization
-     * 
-     */
-
-#pragma omp parallel for default(shared)
-    for ( i=0; i<numGhostVertices; i++ )  { //O(|Ghost Vertices|)
-        verGhostPtr[i+1] = verGhostPtr[i] + Counter[i];
-#ifdef PRINT_DEBUG_INFO_
-        cout<<verGhostPtr[i]<<"\t"; fflush(stdout);
-#endif
-    }
+        }
 
 #ifdef TIME_TRACKER
     verGhostPtrInitialization = MPI_Wtime() - verGhostPtrInitialization;
     fprintf(stderr, "verGhostPtrInitialization time: %f\n", verGhostPtrInitialization);
 #endif
-
-#undef TIME_TRACKER
-
 
 #ifdef PRINT_DEBUG_INFO_
     if ( numGhostVertices > 0 )
@@ -299,24 +321,33 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
 #ifdef TIME_TRACKER
     double verGhostIndInitialization = MPI_Wtime();
 #endif
-#pragma omp parallel for private(insertMe, k, adj1, adj2) firstprivate(StartIndex, EndIndex) default(shared)
+#ifdef OMP
+#pragma omp for
+#endif
     for ( v=0; v < NLVer; v++ ) {
         adj1 = verLocPtr[v];   //Vertex Pointer
         adj2 = verLocPtr[v+1];
         for( k = adj1; k < adj2; k++ ) {
             w = verLocInd[k]; //Get the adjacent vertex
             if ( (w < StartIndex) || (w > EndIndex) ) { //Find a ghost
+#ifdef OMP
 #pragma omp critical
                 {
+#endif
                     insertMe = verGhostPtr[Ghost2LocalMap[w]] + tempCounter[Ghost2LocalMap[w]]; //Where to insert
                     verGhostInd[insertMe] = v + StartIndex; //Add the adjacency
                     tempCounter[Ghost2LocalMap[w]]++; //Increment the counter
+#ifdef OMP
                 }
+#endif
             } //End of if((w < StartIndex) || (w > EndIndex))
         } //End of for(k)
     } //End of for (v)
     tempCounter.clear(); //Do not need this any more
 
+#ifdef OMP
+    } //end of parallel region
+#endif
 #ifdef TIME_TRACKER
     verGhostIndInitialization = MPI_Wtime() - verGhostIndInitialization;
     fprintf(stderr, "verGhostIndInitialization time: %f\n", verGhostIndInitialization);

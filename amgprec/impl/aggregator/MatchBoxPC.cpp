@@ -66,6 +66,7 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 	  myRank,NLVer, NLEdge,verDistance[0],verDistance[1]);
 #endif
 
+#define TIME_TRACKER
     #ifdef TIME_TRACKER
         double tmr = MPI_Wtime();
     #endif
@@ -80,7 +81,7 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 
   #ifdef TIME_TRACKER
     tmr = MPI_Wtime() - tmr;
-    fprintf(stderr, "Elaboration time: %f\n", tmr);
+    fprintf(stderr, "Elaboration time: %f for $ld\n", tmr, NLEdge);
   #endif
 
 #endif
