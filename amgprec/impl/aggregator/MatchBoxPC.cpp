@@ -66,22 +66,35 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 	  myRank,NLVer, NLEdge,verDistance[0],verDistance[1]);
 #endif
 
+
 #define TIME_TRACKER
     #ifdef TIME_TRACKER
         double tmr = MPI_Wtime();
     #endif
 
-  dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(NLVer, NLEdge,
+#define OMP
+#ifdef OMP
+        dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(NLVer, NLEdge,
 							   verLocPtr, verLocInd, edgeLocWeight,
 							   verDistance,  Mate,
 							   myRank, numProcs, C_comm,
 							   msgIndSent, msgActualSent, msgPercent,
 							   ph0_time, ph1_time, ph2_time,
 							   ph1_card, ph2_card );
+#else
+        dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(NLVer, NLEdge,
+							   verLocPtr, verLocInd, edgeLocWeight,
+							   verDistance,  Mate,
+							   myRank, numProcs, C_comm,
+							   msgIndSent, msgActualSent, msgPercent,
+							   ph0_time, ph1_time, ph2_time,
+							   ph1_card, ph2_card );
+#endif
+
 
   #ifdef TIME_TRACKER
     tmr = MPI_Wtime() - tmr;
-    fprintf(stderr, "Elaboration time: %f for $ld\n", tmr, NLEdge);
+    fprintf(stderr, "Elaboration time: %f for %ld nodes\n", tmr, NLVer);
   #endif
 
 #endif

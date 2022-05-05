@@ -62,7 +62,8 @@ amg_s_parmatch_smth_bld.o \
 amg_s_parmatch_spmm_bld_inner.o
 
 MPCOBJS=MatchBoxPC.o \
-algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o
+algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o \
+algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP.o
 
 OBJS = $(FOBJS) $(MPCOBJS)
 

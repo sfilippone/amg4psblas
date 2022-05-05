@@ -152,6 +152,17 @@ extern "C" {
 inline MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
                                      MilanInt myRank, MilanInt numProcs);
 
+void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP
+        (
+                MilanLongInt NLVer, MilanLongInt NLEdge,
+                MilanLongInt* verLocPtr, MilanLongInt* verLocInd, MilanReal* edgeLocWeight,
+                MilanLongInt* verDistance,
+                MilanLongInt* Mate,
+                MilanInt myRank, MilanInt numProcs, MPI_Comm comm,
+                MilanLongInt* msgIndSent, MilanLongInt* msgActualSent, MilanReal* msgPercent,
+                MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
+                MilanLongInt* ph1_card, MilanLongInt* ph2_card );
+
   void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC
 (
  MilanLongInt NLVer, MilanLongInt NLEdge,
