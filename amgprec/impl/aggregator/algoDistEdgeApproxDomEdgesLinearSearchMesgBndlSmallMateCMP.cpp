@@ -162,7 +162,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     vector<MilanLongInt> PCounter;
     MilanLongInt NumMessagesBundled;
     MilanInt ghostOwner; // Changed by Fabio to be an integer, addresses needs to be integers!
-    vector<MilanLongInt> candidateMate;
+    //vector<MilanLongInt> candidateMate;
+    MilanLongInt* candidateMate = new MilanLongInt[1];
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")NV: "<<NLVer<<"  Edges: "<<NLEdge; fflush(stdout);
     cout<<"\n("<<myRank<<")StartIndex: "<<StartIndex<<"  EndIndex: "<<EndIndex; fflush(stdout);
@@ -210,10 +211,10 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     double Ghost2LocalInitialization = MPI_Wtime();
 #endif
 
-#pragma omp parallel private(insertMe, k, adj1, adj2, heaviestEdgeWt) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
+#pragma omp parallel private(insertMe, k, adj1, adj2, heaviestEdgeWt, w) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
     {
 
-        // TODO comments about the fking reduction
+        // TODO comments about the reduction
 
 #pragma omp for reduction(+ : numGhostEdges)
         for (i = 0; i < NLEdge; i++) { //O(m) - Each edge stored twice
@@ -327,8 +328,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         double verGhostIndInitialization = MPI_Wtime();
 #endif
 
-        //TODO why the nowait here fails?
-
 #pragma omp for nowait
         for (v = 0; v < NLVer; v++) {
             adj1 = verLocPtr[v];   //Vertex Pointer
@@ -383,15 +382,13 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
             cout<<"\n("<<myRank<<")Allocating CandidateMate.. "; fflush(stdout);
 #endif
             //Allocate Data Structures:
-            try {
-                candidateMate.reserve(NLVer + numGhostVertices); //Dominating edge
-            } catch (length_error) {
-                cout << "Error in function algoDistEdgeApproxDominatingEdgesLinearSearch: \n";
-                cout << "Not enough memory to allocate the internal variables \n";
-                exit(1);
-            }
-            //Initialize the Vectors:
-            candidateMate.resize(NLVer + numGhostVertices, -1);
+            /*
+             * candidateMate was a vector and has been replaced with a raw array
+             * there is no point in using the vector (or maybe there is???)
+             * so I replaced it with an array wich is slightly faster
+             */
+            delete[] candidateMate;
+            candidateMate = new MilanLongInt[NLVer + numGhostVertices];
 
             /*
              * Create the Queue Data Structure for the Dominating Set
@@ -427,13 +424,22 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
             S = numGhostVertices; //Initialize S with number of Ghost Vertices
         } // end of single region
 
-    } // end of parallel region
-//#pragma omp for
+        /*
+         * OMP PARALLEL_COMPUTE_CANDIDATE_MATE_B
+         * The next portion of code has been splitted
+         * to make it 100% parallelized
+         *
+         * TODO: would it make any sense to parallelize also the
+         *       inner for?
+         *
+         * TODO: we have a false sharing on candidateMate
+         */
+
+#pragma omp for
     for ( v=0; v < NLVer; v++ ) {
 #ifdef PRINT_DEBUG_INFO_
         cout<<"\n("<<myRank<<")Processing: "<<v+StartIndex<<endl; fflush(stdout);
 #endif
-        //Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
         //Start: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
         adj1 = verLocPtr[v];
         adj2 = verLocPtr[v + 1];
@@ -452,25 +458,25 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                 ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k]))) {
                 heaviestEdgeWt = edgeLocWeight[k];
                 w = verLocInd[k];
+
             }
         } //End of for loop
         candidateMate[v] = w;
-  //  }
+        //End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
 
-    /*
+    }
+    } // end of parallel region
+
         for ( v=0; v < NLVer; v++ ) {
+
+            //Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
+
 #ifdef PRINT_DEBUG_INFO_
             cout<<"\n("<<myRank<<")Processing: "<<v+StartIndex<<endl; fflush(stdout);
 #endif
-            //Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-            //Start: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
-            adj1 = verLocPtr[v];
-            adj2 = verLocPtr[v + 1];
+
             w = candidateMate[v];
-*/
-//#pragma omp critical
-      //  {
-            //End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
+
 #ifdef PRINT_DEBUG_INFO_
             cout<<"\n("<<myRank<<")"<<v+StartIndex<<" Points to: "<<w; fflush(stdout);
 #endif
