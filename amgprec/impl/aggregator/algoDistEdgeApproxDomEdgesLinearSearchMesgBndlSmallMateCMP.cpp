@@ -159,7 +159,11 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     //one of: REQUEST/FAILURE/SUCCESS
     vector<MilanLongInt> QLocalVtx, QGhostVtx, QMsgType;
     vector<MilanInt> QOwner; // Changed by Fabio to be an integer, addresses needs to be integers!
-    vector<MilanLongInt> PCounter;
+
+    MilanLongInt* PCounter = new MilanLongInt [numProcs];
+    for (int i = 0; i < numProcs; i++)
+        PCounter[i] = 0;
+
     MilanLongInt NumMessagesBundled;
     MilanInt ghostOwner; // Changed by Fabio to be an integer, addresses needs to be integers!
     //vector<MilanLongInt> candidateMate;
@@ -211,7 +215,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     double Ghost2LocalInitialization = MPI_Wtime();
 #endif
 
-#pragma omp parallel private(insertMe, k, adj1, adj2, heaviestEdgeWt, w) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
+#pragma omp parallel private(insertMe, k, k1, adj1, adj2, adj11, adj12, heaviestEdgeWt, w, ghostOwner) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
     {
 
         // TODO comments about the reduction
@@ -370,13 +374,11 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                 QGhostVtx.reserve(numGhostEdges); //Ghost Vertex
                 QMsgType.reserve(numGhostEdges); //Message Type (Request/Failure)
                 QOwner.reserve(numGhostEdges); //Owner of the ghost: COmpute once and use later
-                PCounter.reserve(numProcs); //Store How many messages will be sent to each processor
             } catch (length_error) {
                 cout << "Error in function algoDistEdgeApproxDominatingEdgesMessageBundling: \n";
                 cout << "Not enough memory to allocate the internal variables \n";
                 exit(1);
             }
-            PCounter.resize(numProcs, 0); //Only initialize the counter variable
 
 #ifdef PRINT_DEBUG_INFO_
             cout<<"\n("<<myRank<<")Allocating CandidateMate.. "; fflush(stdout);
@@ -429,6 +431,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
          * The next portion of code has been splitted
          * to make it 100% parallelized
          *
+         * TODO: I think it diminish the cache update, does it?
+         *
          * TODO: would it make any sense to parallelize also the
          *       inner for?
          *
@@ -465,8 +469,19 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         //End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
 
     }
-    } // end of parallel region
 
+    /*
+        TODO this cycle has a lot of margin of improvement!!!!
+             This current version introduce some errors.
+             1 - ollback to the previous verison and check if it is
+                100% stable
+            2 - if the previous verison was stable all right, if not
+                that's a big deal
+            3 - reimplement step by step to check from where the instability
+                comes from
+    */
+
+#pragma omp for reduction(+: msgInd, NumMessagesBundled, myCard, PCounter[:numProcs])
         for ( v=0; v < NLVer; v++ ) {
 
             //Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
@@ -482,6 +497,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #endif
             //If found a dominating edge:
             if (w >= 0) {
+                myCard++;
                 if ((w < StartIndex) || (w > EndIndex)) { //w is a ghost vertex
                     //Build the Message Packet:
                     //Message[0] = v+StartIndex; //LOCAL
@@ -495,56 +511,65 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #endif
                     /* MPI_Bsend(&Message[0], 3, MPI_INT, inputSubGraph.findOwner(w),
                      ComputeTag, comm);*/
-                    QLocalVtx.push_back(v + StartIndex);
-                    QGhostVtx.push_back(w);
-                    QMsgType.push_back(REQUEST);
-                    //ghostOwner = inputSubGraph.findOwner(w);
-                    ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                    assert(ghostOwner != -1);
-                    assert(ghostOwner != myRank);
-                    QOwner.push_back(ghostOwner);
-                    PCounter[ghostOwner]++;
-                    NumMessagesBundled++;
                     msgInd++;
-                    if (candidateMate[NLVer + Ghost2LocalMap[w]] == v + StartIndex) {
-                        Mate[v] = w;
-                        GMate[Ghost2LocalMap[w]] = v + StartIndex; //w is a Ghost
-                        //Q.push_back(u);
-                        U.push_back(v + StartIndex);
-                        U.push_back(w);
-                        myCard++;
+                    NumMessagesBundled++;
+                    ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
+                    PCounter[ghostOwner]++; //TODO maybe reduction?
+#pragma omp critical
+                    {
+                        QLocalVtx.push_back(v + StartIndex);
+                        QGhostVtx.push_back(w);
+                        QMsgType.push_back(REQUEST);
+                        //ghostOwner = inputSubGraph.findOwner(w);
+                        assert(ghostOwner != -1);
+                        assert(ghostOwner != myRank);
+                        QOwner.push_back(ghostOwner);
+
+                        if (candidateMate[NLVer + Ghost2LocalMap[w]] == v + StartIndex) {
+
+                                Mate[v] = w;
+                                GMate[Ghost2LocalMap[w]] = v + StartIndex; //w is a Ghost
+                                U.push_back(v + StartIndex);
+                                U.push_back(w);
+
 #ifdef PRINT_DEBUG_INFO_
-                        cout<<"\n("<<myRank<<")MATCH: ("<<v+StartIndex<<","<<w<<")"; fflush(stdout);
+                            cout<<"\n("<<myRank<<")MATCH: ("<<v+StartIndex<<","<<w<<")"; fflush(stdout);
 #endif
-                        //Decrement the counter:
-                        //Start: PARALLEL_PROCESS_CROSS_EDGE_B(v)
-                        if (Counter[Ghost2LocalMap[w]] > 0) {
-                            Counter[Ghost2LocalMap[w]] = Counter[Ghost2LocalMap[w]] - 1; //Decrement
-                            if (Counter[Ghost2LocalMap[w]] == 0) {
-                                S--; //Decrement S
+                            //Decrement the counter:
+                            //Start: PARALLEL_PROCESS_CROSS_EDGE_B(v)
+                            if (Counter[Ghost2LocalMap[w]] > 0) {
+
+                                    Counter[Ghost2LocalMap[w]] = Counter[Ghost2LocalMap[w]] - 1; //Decrement
+                                    if (Counter[Ghost2LocalMap[w]] == 0) {
+                                        S--; //Decrement S
 #ifdef PRINT_DEBUG_INFO_
-                                cout<<"\n("<<myRank<<")Decrementing S: Ghost vertex "<<w<<" has received all its messages";
-                                fflush(stdout);
+                                        cout<<"\n("<<myRank<<")Decrementing S: Ghost vertex "<<w<<" has received all its messages";
+                                        fflush(stdout);
 #endif
-                            }
-                        } //End of if Counter[w] > 0
-                        //End: PARALLEL_PROCESS_CROSS_EDGE_B(v)
-                    } //End of if CandidateMate[w] = v
+                                    }
+                                } //End of if Counter[w] > 0
+                                //End: PARALLEL_PROCESS_CROSS_EDGE_B(v)
+                            } //End of if CandidateMate[w] = v
+                        } // end of critical region
                 } //End of if a Ghost Vertex
                 else { // w is a local vertex
-                    if (candidateMate[w - StartIndex] == (v + StartIndex)) {
-                        Mate[v] = w;  //v is local
-                        Mate[w - StartIndex] = v + StartIndex; //w is local
-                        //Q.push_back(u);
-                        U.push_back(v + StartIndex);
-                        U.push_back(w);
-                        myCard++;
+
+                        if (candidateMate[w - StartIndex] == (v + StartIndex)) {
+#pragma omp critical
+                            {
+                                Mate[v] = w;  //v is local
+                                Mate[w - StartIndex] = v + StartIndex; //w is local
+                                //Q.push_back(u);
+                                U.push_back(v + StartIndex);
+                                U.push_back(w);
+
 #ifdef PRINT_DEBUG_INFO_
-                        cout<<"\n("<<myRank<<")MATCH: ("<<v+StartIndex<<","<<w<<") "; fflush(stdout);
+                                cout<<"\n("<<myRank<<")MATCH: ("<<v+StartIndex<<","<<w<<") "; fflush(stdout);
 #endif
-                    } //End of if ( candidateMate[w-StartIndex] == (v+StartIndex) )
-                } //End of Else
-            } //End of if(w >=0)
+                            }
+                        } //End of if ( candidateMate[w-StartIndex] == (v+StartIndex) )
+                    } //End of Else
+                } //End of if(w >=0)
             else {
                 adj11 = verLocPtr[v];
                 adj12 = verLocPtr[v + 1];
@@ -563,23 +588,28 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #endif
                         /* MPI_Bsend(&Message[0], 3, MPI_INT, inputSubGraph.findOwner(w),
                          ComputeTag, comm); */
-                        QLocalVtx.push_back(v + StartIndex);
-                        QGhostVtx.push_back(w);
-                        QMsgType.push_back(FAILURE);
-                        //ghostOwner = inputSubGraph.findOwner(w);
-                        ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                        assert(ghostOwner != -1);
-                        assert(ghostOwner != myRank);
-                        QOwner.push_back(ghostOwner);
-                        PCounter[ghostOwner]++;
                         NumMessagesBundled++;
                         msgInd++;
+                        ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
+                        PCounter[ghostOwner]++;
+#pragma omp critical
+                        {
+                            QLocalVtx.push_back(v + StartIndex);
+                            QGhostVtx.push_back(w);
+                            QMsgType.push_back(FAILURE);
+                            //ghostOwner = inputSubGraph.findOwner(w);
+                            assert(ghostOwner != -1);
+                            assert(ghostOwner != myRank);
+                            QOwner.push_back(ghostOwner);
+                        }
+
                     } //End of if(GHOST)
                 } //End of for loop
             } // End of Else: w == -1
             //End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
         //} // end of critical
         } //End of for ( v=0; v < NLVer; v++ )
+    } // end of parallel region
 
             tempCounter.clear(); //Do not need this any more
     //} // end of parallel region
@@ -855,7 +885,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     QGhostVtx.clear();
     QMsgType.clear();
     QOwner.clear();
-    PCounter.clear();
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")Number of Ghost edges = "<<numGhostEdges;
     cout<<"\n("<<myRank<<")Total number of potential message X 2 = "<<numGhostEdges*2;
