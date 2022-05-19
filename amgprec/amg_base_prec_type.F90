@@ -735,25 +735,45 @@ contains
          & matrix_names(pm%coarse_mat)
     select case(pm%coarse_solve)
     case (amg_bjac_,amg_as_)
-      write(iout,*) '  Number of sweeps : ',&
-           & pm%sweeps_pre
       write(iout,*) '  Coarse solver: ',&
            & 'Block Jacobi'
-    case (amg_l1_bjac_)
       write(iout,*) '  Number of sweeps : ',&
            & pm%sweeps_pre
+    case (amg_l1_bjac_)
       write(iout,*) '  Coarse solver: ',&
            & 'L1-Block Jacobi'
-    case (amg_jac_)
       write(iout,*) '  Number of sweeps : ',&
            & pm%sweeps_pre
+    case (amg_jac_)
       write(iout,*) '  Coarse solver: ',&
            & 'Point Jacobi'
+      write(iout,*) '  Number of sweeps : ',&
+           & pm%sweeps_pre
+    case (amg_l1_jac_)
+      write(iout,*) '  Coarse solver: ',&
+           & 'L1-Jacobi'
+      write(iout,*) '  Number of sweeps : ',&
+           & pm%sweeps_pre
+    case (amg_l1_fbgs_)
+      write(iout,*) '  Coarse solver: ',&
+           & 'L1 Forward-Backward Gauss-Seidel (Hybrid)'
+      write(iout,*) '  Number of sweeps : ',&
+           & pm%sweeps_pre
+    case (amg_l1_gs_)
+      write(iout,*) '  Coarse solver: ',&
+           & 'L1 Gauss-Seidel (Hybrid)'
+      write(iout,*) '  Number of sweeps : ',&
+           & pm%sweeps_pre
+    case (amg_fbgs_)
+      write(iout,*) '  Coarse solver: ',&
+           & 'Forward-Backward Gauss-Seidel (Hybrid)'
+      write(iout,*) '  Number of sweeps : ',&
+           & pm%sweeps_pre
     case default
       write(iout,*) '  Coarse solver: ',&
            & amg_fact_names(pm%coarse_solve)
     end select
-
+    
   end subroutine ml_parms_coarsedescr
 
   subroutine s_ml_parms_descr(pm,iout,info,coarse)

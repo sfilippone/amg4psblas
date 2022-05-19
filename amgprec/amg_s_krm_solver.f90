@@ -466,15 +466,9 @@ contains
     end if
     write(iout_,*) '    method: ',sv%method
     write(iout_,*) '     kprec: ',sv%kprec
-    if (sv%i_sub_solve > 0) then
-      write(iout_,*) ' sub_solve: ',amg_fact_names(sv%i_sub_solve)
-    else
-      write(iout_,*) ' sub_solve: ',sv%sub_solve
-    end if
+    call sv%prec%descr(iout_,info)
     write(iout_,*) '     itmax: ',sv%itmax
     write(iout_,*) '       eps: ',sv%eps
-    write(iout_,*) '    fillin: ',sv%fillin
-
 
     call psb_erractionrestore(err_act)
     return
