@@ -424,38 +424,35 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
             //Compute the Initial Matching Set:
 
             S = numGhostVertices; //Initialize S with number of Ghost Vertices
+        } // end of single region
 
-            /*
-             * OMP PARALLEL_COMPUTE_CANDIDATE_MATE_B
-             * It is actually not possible to parallelize this cycle
-             * as it is.
-             *
-             * TODO think how it could be parallelizable
-             */
+        /*
+        * OMP PARALLEL_COMPUTE_CANDIDATE_MATE_B has been splitted from
+        * PARALLEL_PROCESS_EXPOSED_VERTEX_B in order to better parallelize
+        * the two.
+        * In particular PARALLEL_COMPUTE_CANDIDATE_MATE_B is now totally parallel.
+        */
 
+#pragma omp for
             for ( v=0; v < NLVer; v++ ) {
 #ifdef PRINT_DEBUG_INFO_
                 cout<<"\n("<<myRank<<")Processing: "<<v+StartIndex<<endl; fflush(stdout);
 #endif
                 //Start: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
-                adj1 = verLocPtr[v];
-                adj2 = verLocPtr[v + 1];
-                w = -1;
-                heaviestEdgeWt = MilanRealMin; //Assign the smallest Value possible first LDBL_MIN
-                for (k = adj1; k < adj2; k++) {
-                    if (isAlreadyMatched(k, verLocInd, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) continue;
-
-                    if ((edgeLocWeight[k] > heaviestEdgeWt) ||
-                        ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k]))) {
-                        heaviestEdgeWt = edgeLocWeight[k];
-                        w = verLocInd[k];
-                    }
-                } //End of for loop
-                //printf("Compare %ld, %ld\n", w, firstComputeCandidateMate(verLocPtr[v], verLocPtr[v + 1], verLocInd, edgeLocWeight));
-                candidateMate[v] = w;
+                candidateMate[v] = firstComputeCandidateMate(verLocPtr[v], verLocPtr[v + 1], verLocInd, edgeLocWeight);
                 //End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
+            }
 
+#pragma omp single
+        {
+
+
+    for ( v=0; v < NLVer; v++ )
+            {
                 //Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
+                k = candidateMate[v];
+                candidateMate[v] = verLocInd[k];
+                w = candidateMate[v];
 
 #ifdef PRINT_DEBUG_INFO_
                 cout<<"\n("<<myRank<<")Processing: "<<v+StartIndex<<endl; fflush(stdout);
@@ -464,6 +461,20 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #ifdef PRINT_DEBUG_INFO_
                 cout<<"\n("<<myRank<<")"<<v+StartIndex<<" Points to: "<<w; fflush(stdout);
 #endif
+                if (isAlreadyMatched(k, verLocInd, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap))
+                {
+                    w = computeCandidateMate(verLocPtr[v],
+                                             verLocPtr[v + 1],
+                                             edgeLocWeight, 0,
+                                             verLocInd,
+                                             StartIndex,
+                                             EndIndex,
+                                             GMate,
+                                             Mate,
+                                             Ghost2LocalMap);
+                    candidateMate[v] = w;
+                }
+
                 //If found a dominating edge:
                 if (w >= 0) {
                     myCard++;
@@ -1516,15 +1527,17 @@ inline MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
                                          {
     MilanInt w = -1;
     MilanReal heaviestEdgeWt = MilanRealMin; //Assign the smallest Value possible first LDBL_MIN
+    int finalK;
     for (int k = adj1; k < adj2; k++) {
 
         if ((edgeLocWeight[k] > heaviestEdgeWt) ||
             ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k]))) {
             heaviestEdgeWt = edgeLocWeight[k];
             w = verLocInd[k];
+            finalK = k;
         }
     } //End of for loop
-    return w;
+    return finalK;
 }
 
 /**
@@ -1579,9 +1592,9 @@ inline MilanLongInt computeCandidateMate(MilanLongInt adj1,
                                               MilanLongInt* verLocInd,
                                               MilanLongInt StartIndex,
                                               MilanLongInt EndIndex,
-                                              vector <MilanLongInt> &GMate,
+                                              vector <MilanLongInt>& GMate,
                                               MilanLongInt* Mate,
-                                              map <MilanLongInt, MilanLongInt> &Ghost2LocalMap)
+                                              map <MilanLongInt, MilanLongInt>& Ghost2LocalMap)
 {
     MilanInt w = -1;
     MilanReal heaviestEdgeWt = MilanRealMin; //Assign the smallest Value possible first LDBL_MIN
