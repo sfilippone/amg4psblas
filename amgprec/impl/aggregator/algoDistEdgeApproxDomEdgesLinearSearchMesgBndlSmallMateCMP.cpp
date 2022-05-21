@@ -443,13 +443,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                 w = -1;
                 heaviestEdgeWt = MilanRealMin; //Assign the smallest Value possible first LDBL_MIN
                 for (k = adj1; k < adj2; k++) {
-                    if ((verLocInd[k] < StartIndex) || (verLocInd[k] > EndIndex)) { //Is it a ghost vertex?
-                        if (GMate[Ghost2LocalMap[verLocInd[k]]] >= 0)// Already matched
-                            continue;
-                    } else { //A local vertex
-                        if (Mate[verLocInd[k] - StartIndex] >= 0) // Already matched
-                            continue;
-                    }
+                    if (isAlreadyMatched(k, verLocInd, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) continue;
 
                     if ((edgeLocWeight[k] > heaviestEdgeWt) ||
                         ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k]))) {
@@ -1533,22 +1527,66 @@ inline MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
     return w;
 }
 
-/*
-inline MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
+/**
+ * //TODO documentation
+ * @param k
+ * @param verLocInd
+ * @param StartIndex
+ * @param EndIndex
+ * @param GMate
+ * @param Mate
+ * @param Ghost2LocalMap
+ * @return
+ */
+inline bool isAlreadyMatched(MilanLongInt k,
+                                MilanLongInt* verLocInd,
+                                MilanLongInt StartIndex,
+                                MilanLongInt EndIndex,
+                                vector <MilanLongInt> &GMate,
+                                MilanLongInt* Mate,
+                                map <MilanLongInt, MilanLongInt> &Ghost2LocalMap
+                                ) {
+
+    if ((verLocInd[k] < StartIndex) || (verLocInd[k] > EndIndex)) { //Is it a ghost vertex?
+        if (GMate[Ghost2LocalMap[verLocInd[k]]] >= 0)// Already matched
+            return true;
+    } else { //A local vertex
+        if (Mate[verLocInd[k] - StartIndex] >= 0) // Already matched
+            return true;
+    }
+
+    return false;
+}
+
+/**
+ * //TODO documentation
+ * @param adj1
+ * @param adj2
+ * @param edgeLocWeight
+ * @param k
+ * @param verLocInd
+ * @param StartIndex
+ * @param EndIndex
+ * @param GMate
+ * @param Mate
+ * @param Ghost2LocalMap
+ * @return
+ */
+inline MilanLongInt computeCandidateMate(MilanLongInt adj1,
                                               MilanLongInt adj2,
+                                              MilanReal* edgeLocWeight,
+                                              MilanLongInt k,
                                               MilanLongInt* verLocInd,
-                                              MilanReal* edgeLocWeight)
+                                              MilanLongInt StartIndex,
+                                              MilanLongInt EndIndex,
+                                              vector <MilanLongInt> &GMate,
+                                              MilanLongInt* Mate,
+                                              map <MilanLongInt, MilanLongInt> &Ghost2LocalMap)
 {
     MilanInt w = -1;
     MilanReal heaviestEdgeWt = MilanRealMin; //Assign the smallest Value possible first LDBL_MIN
     for (k = adj1; k < adj2; k++) {
-        if ((verLocInd[k] < StartIndex) || (verLocInd[k] > EndIndex)) { //Is it a ghost vertex?
-            if (GMate[Ghost2LocalMap[verLocInd[k]]] >= 0)// Already matched
-                continue;
-        } else { //A local vertex
-            if (Mate[verLocInd[k] - StartIndex] >= 0) // Already matched
-                continue;
-        }
+        if (isAlreadyMatched(k, verLocInd, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) continue;
 
         if ((edgeLocWeight[k] > heaviestEdgeWt) ||
             ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k]))) {
@@ -1558,7 +1596,6 @@ inline MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
     } //End of for loop
     return w;
 }
- */
 #endif
 
 #endif
