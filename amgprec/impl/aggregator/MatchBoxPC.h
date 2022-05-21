@@ -152,6 +152,11 @@ extern "C" {
 inline MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
                                      MilanInt myRank, MilanInt numProcs);
 
+inline MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
+                                              MilanLongInt adj2,
+                                              MilanLongInt* verLocInd,
+                                              MilanReal* edgeLocWeight);
+
 void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP
         (
                 MilanLongInt NLVer, MilanLongInt NLEdge,

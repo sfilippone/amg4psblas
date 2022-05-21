@@ -455,9 +455,9 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k]))) {
                         heaviestEdgeWt = edgeLocWeight[k];
                         w = verLocInd[k];
-
                     }
                 } //End of for loop
+                //printf("Compare %ld, %ld\n", w, firstComputeCandidateMate(verLocPtr[v], verLocPtr[v + 1], verLocInd, edgeLocWeight));
                 candidateMate[v] = w;
                 //End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
 
@@ -594,8 +594,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     ///////////////////////////////////////////////////////////////////////////////////
     /////////////////////////// PROCESS MATCHED VERTICES //////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
-    while ( /*!Q.empty()*/ !U.empty() ) {
-        //Q.pop_front();
+    while ( !U.empty() ) {
         u = U.pop_front(); //Get an element from the queue
 #ifdef PRINT_DEBUG_INFO_
         cout<<"\n("<<myRank<<")u: "<<u; fflush(stdout);
@@ -1506,6 +1505,60 @@ inline MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistan
     } //End of else
     return (-1); //It should not reach here!
 } //End of findOwnerOfGhost()
+
+/**
+ * Execute the research fr the Candidate Mate without controlling if the vertices are already matched.
+ * Returns the vertices with the highest weight
+ * @param adj1
+ * @param adj2
+ * @param verLocInd
+ * @param edgeLocWeight
+ * @return
+ */
+inline MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
+                                         MilanLongInt adj2,
+                                         MilanLongInt* verLocInd,
+                                         MilanReal* edgeLocWeight)
+                                         {
+    MilanInt w = -1;
+    MilanReal heaviestEdgeWt = MilanRealMin; //Assign the smallest Value possible first LDBL_MIN
+    for (int k = adj1; k < adj2; k++) {
+
+        if ((edgeLocWeight[k] > heaviestEdgeWt) ||
+            ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k]))) {
+            heaviestEdgeWt = edgeLocWeight[k];
+            w = verLocInd[k];
+        }
+    } //End of for loop
+    return w;
+}
+
+/*
+inline MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
+                                              MilanLongInt adj2,
+                                              MilanLongInt* verLocInd,
+                                              MilanReal* edgeLocWeight)
+{
+    MilanInt w = -1;
+    MilanReal heaviestEdgeWt = MilanRealMin; //Assign the smallest Value possible first LDBL_MIN
+    for (k = adj1; k < adj2; k++) {
+        if ((verLocInd[k] < StartIndex) || (verLocInd[k] > EndIndex)) { //Is it a ghost vertex?
+            if (GMate[Ghost2LocalMap[verLocInd[k]]] >= 0)// Already matched
+                continue;
+        } else { //A local vertex
+            if (Mate[verLocInd[k] - StartIndex] >= 0) // Already matched
+                continue;
+        }
+
+        if ((edgeLocWeight[k] > heaviestEdgeWt) ||
+            ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k]))) {
+            heaviestEdgeWt = edgeLocWeight[k];
+            w = verLocInd[k];
+        }
+    } //End of for loop
+    return w;
+}
+ */
 #endif
 
 #endif
