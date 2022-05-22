@@ -443,9 +443,16 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                 //End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
             }
 
-#pragma omp single
-        {
+            /*
+             * PARALLEL_PROCESS_EXPOSED_VERTEX_B
+             * The sequential version could be a bit more
+             * efficient.
+             *
+             * TODO: Test when it's more efficient to execute this code
+             *       in parallel.
+             */
 
+#pragma omp for reduction(+: msgInd, NumMessagesBundled, myCard, PCounter[:numProcs])
     for ( v=0; v < NLVer; v++ )
             {
                 //Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
@@ -461,23 +468,24 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                 cout<<"\n("<<myRank<<")"<<v+StartIndex<<" Points to: "<<w; fflush(stdout);
 #endif
 
-
-
                 //If found a dominating edge:
                 if (w >= 0) {
 
                     //This piece of code is actually executed under 0.01% of the times
-                    if (isAlreadyMatched(k, verLocInd, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) {
-                        w = computeCandidateMate(verLocPtr[v],
-                                                 verLocPtr[v + 1],
-                                                 edgeLocWeight, 0,
-                                                 verLocInd,
-                                                 StartIndex,
-                                                 EndIndex,
-                                                 GMate,
-                                                 Mate,
-                                                 Ghost2LocalMap);
-                        candidateMate[v] = w;
+#pragma omp critical
+                    {
+                        if (isAlreadyMatched(k, verLocInd, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) {
+                            w = computeCandidateMate(verLocPtr[v],
+                                                     verLocPtr[v + 1],
+                                                     edgeLocWeight, 0,
+                                                     verLocInd,
+                                                     StartIndex,
+                                                     EndIndex,
+                                                     GMate,
+                                                     Mate,
+                                                     Ghost2LocalMap);
+                            candidateMate[v] = w;
+                        }
                     }
 
                     if (w >= 0) {
@@ -500,7 +508,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                             NumMessagesBundled++;
                             ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                             PCounter[ghostOwner]++;
-
+#pragma omp critical (QLocalPush)
+                            {
                             QLocalVtx.push_back(v + StartIndex);
                             QGhostVtx.push_back(w);
                             QMsgType.push_back(REQUEST);
@@ -534,11 +543,13 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                 } //End of if Counter[w] > 0
                                 //End: PARALLEL_PROCESS_CROSS_EDGE_B(v)
                             } //End of if CandidateMate[w] = v
+                            } // end of critical region
                         } //End of if a Ghost Vertex
                         else { // w is a local vertex
 
                             if (candidateMate[w - StartIndex] == (v + StartIndex)) {
-
+#pragma omp critical (UPush)
+                                {
                                 Mate[v] = w;  //v is local
                                 Mate[w - StartIndex] = v + StartIndex; //w is local
                                 //Q.push_back(u);
@@ -548,6 +559,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #ifdef PRINT_DEBUG_INFO_
                                 cout<<"\n("<<myRank<<")MATCH: ("<<v+StartIndex<<","<<w<<") "; fflush(stdout);
 #endif
+                                } //End of critical
 
                             } //End of if ( candidateMate[w-StartIndex] == (v+StartIndex) )
                         } //End of Else
@@ -578,7 +590,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                 msgInd++;
                                 ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                                 PCounter[ghostOwner]++;
-#pragma omp critical
+#pragma omp critical (QLocalPush)
                                 {
                                     QLocalVtx.push_back(v + StartIndex);
                                     QGhostVtx.push_back(w);
@@ -594,7 +606,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                     //} // End of Else: w == -1
                     //End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
             } //End of for ( v=0; v < NLVer; v++ )
-        } // end of single region
     } // end of parallel region
 
     tempCounter.clear(); //Do not need this any more
