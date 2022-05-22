@@ -293,8 +293,11 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         /*
          * OMP verGhostPtrInitialization
          *
+         * schedule(static) assign to each thread an huge chunk
+         * it is used in this case to reduce the overhead of chunk assignment
+         * and to reduce false sharing
          */
-#pragma omp for nowait
+#pragma omp for nowait schedule(static)
         for (i = 0; i < numGhostVertices; i++) { //O(|Ghost Vertices|)
             verGhostPtr[i + 1] = verGhostPtr[i] + Counter[i];
 #ifdef PRINT_DEBUG_INFO_
@@ -332,7 +335,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         double verGhostIndInitialization = MPI_Wtime();
 #endif
 
-#pragma omp for nowait
+#pragma omp for nowait schedule(static)
         for (v = 0; v < NLVer; v++) {
             adj1 = verLocPtr[v];   //Vertex Pointer
             adj2 = verLocPtr[v + 1];
@@ -433,7 +436,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         * In particular PARALLEL_COMPUTE_CANDIDATE_MATE_B is now totally parallel.
         */
 
-#pragma omp for
+#pragma omp for schedule(static)
             for ( v=0; v < NLVer; v++ ) {
 #ifdef PRINT_DEBUG_INFO_
                 cout<<"\n("<<myRank<<")Processing: "<<v+StartIndex<<endl; fflush(stdout);
@@ -452,7 +455,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
              *       in parallel.
              */
 
-#pragma omp for reduction(+: msgInd, NumMessagesBundled, myCard, PCounter[:numProcs])
+#pragma omp for reduction(+: msgInd, NumMessagesBundled, myCard, PCounter[:numProcs]) schedule(static)
     for ( v=0; v < NLVer; v++ )
             {
                 //Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
@@ -508,7 +511,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                             NumMessagesBundled++;
                             ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                             PCounter[ghostOwner]++;
-#pragma omp critical (QLocalPush)
+#pragma omp critical
                             {
                             QLocalVtx.push_back(v + StartIndex);
                             QGhostVtx.push_back(w);
@@ -548,7 +551,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         else { // w is a local vertex
 
                             if (candidateMate[w - StartIndex] == (v + StartIndex)) {
-#pragma omp critical (UPush)
+#pragma omp critical
                                 {
                                 Mate[v] = w;  //v is local
                                 Mate[w - StartIndex] = v + StartIndex; //w is local
@@ -590,7 +593,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                 msgInd++;
                                 ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                                 PCounter[ghostOwner]++;
-#pragma omp critical (QLocalPush)
+#pragma omp critical
                                 {
                                     QLocalVtx.push_back(v + StartIndex);
                                     QGhostVtx.push_back(w);
