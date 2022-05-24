@@ -34,11 +34,11 @@ dnl NOTE : odd configurations like ifc + gcc still await in the mist of the unkn
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([AMG4PSBLAS],1.0.0, [https://github.com/sfilippone/amg4psblas/issues])
+AC_INIT([AMG4PSBLAS],1.1.0, [https://github.com/sfilippone/amg4psblas/issues])
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-amg4psblas_cv_version="1.0.0"
+amg4psblas_cv_version="1.1.0"
 
 # A sample source file
 AC_CONFIG_SRCDIR([amgprec/amg_prec_type.f90])
@@ -587,8 +587,8 @@ if test "x$pac_cv_psblas_patchlevel" == "xunknown"; then
    AC_MSG_ERROR([PSBLAS patchlevel "$pac_cv_psblas_patchlevel".])
 fi
 if (( $pac_cv_psblas_major < 3 )) ||
-   (  (( $pac_cv_psblas_major == 3 )) && (( $pac_cv_psblas_minor < 7 ))) ; then
-  AC_MSG_ERROR([I need at least PSBLAS version 3.7.]) 
+   (  (( $pac_cv_psblas_major == 3 )) && (( $pac_cv_psblas_minor < 8 ))) ; then
+  AC_MSG_ERROR([I need at least PSBLAS version 3.8.0]) 
 else
   AC_MSG_NOTICE([Am configuring with PSBLAS version $pac_cv_psblas_major.$pac_cv_psblas_minor.$pac_cv_psblas_patchlevel.])
 fi

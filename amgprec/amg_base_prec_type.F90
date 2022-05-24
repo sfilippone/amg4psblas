@@ -81,10 +81,10 @@ module amg_base_prec_type
   !
   ! Version numbers
   !
-  character(len=*), parameter   :: amg_version_string_ = "1.0.1"
+  character(len=*), parameter   :: amg_version_string_ = "1.1.0"
   integer(psb_ipk_), parameter  :: amg_version_major_  = 1
-  integer(psb_ipk_), parameter  :: amg_version_minor_  = 0
-  integer(psb_ipk_), parameter  :: amg_patchlevel_     = 1
+  integer(psb_ipk_), parameter  :: amg_version_minor_  = 1
+  integer(psb_ipk_), parameter  :: amg_patchlevel_     = 0
 
   type amg_ml_parms
     integer(psb_ipk_) :: sweeps_pre, sweeps_post
