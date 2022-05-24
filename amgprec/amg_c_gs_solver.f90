@@ -433,20 +433,22 @@ contains
     return
   end subroutine c_gs_solver_free
 
-  subroutine c_gs_solver_descr(sv,info,iout,coarse)
+  subroutine c_gs_solver_descr(sv,info,iout,coarse,prefix)
 
     Implicit None
 
     ! Arguments
     class(amg_c_gs_solver_type), intent(in) :: sv
-    integer(psb_ipk_), intent(out)             :: info
-    integer(psb_ipk_), intent(in), optional    :: iout
-    logical, intent(in), optional       :: coarse
+    integer(psb_ipk_), intent(out)            :: info
+    integer(psb_ipk_), intent(in), optional   :: iout
+    logical, intent(in), optional             :: coarse
+    character(len=*), intent(in), optional    :: prefix
 
     ! Local variables
     integer(psb_ipk_)      :: err_act
     character(len=20), parameter :: name='amg_c_gs_solver_descr'
     integer(psb_ipk_) :: iout_
+    character(1024)    :: prefix_
 
     call psb_erractionsave(err_act)
     info = psb_success_
@@ -455,12 +457,17 @@ contains
     else
       iout_ = psb_out_unit
     endif
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
 
     if (sv%eps<=dzero) then 
-      write(iout_,*) '  Forward Gauss-Seidel iterative solver with  ',&
+      write(iout_,*) trim(prefix_), '  Forward Gauss-Seidel iterative solver with  ',&
            &  sv%sweeps,' sweeps'
     else
-      write(iout_,*) '  Forward Gauss-Seidel iterative solver with  tolerance',&
+      write(iout_,*) trim(prefix_), '  Forward Gauss-Seidel iterative solver with  tolerance',&
            &  sv%eps,' and maxit', sv%sweeps
     end if
     
@@ -526,20 +533,22 @@ contains
     val = .true.
   end function c_gs_solver_is_iterative
     
-  subroutine c_bwgs_solver_descr(sv,info,iout,coarse)
+  subroutine c_bwgs_solver_descr(sv,info,iout,coarse,prefix)
 
     Implicit None
 
     ! Arguments
     class(amg_c_bwgs_solver_type), intent(in) :: sv
-    integer(psb_ipk_), intent(out)             :: info
-    integer(psb_ipk_), intent(in), optional    :: iout
-    logical, intent(in), optional       :: coarse
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), intent(in), optional     :: iout
+    logical, intent(in), optional               :: coarse
+    character(len=*), intent(in), optional      :: prefix
 
     ! Local variables
     integer(psb_ipk_)      :: err_act
     character(len=20), parameter :: name='amg_c_bwgs_solver_descr'
     integer(psb_ipk_) :: iout_
+    character(1024)    :: prefix_
 
     call psb_erractionsave(err_act)
     info = psb_success_
@@ -548,12 +557,17 @@ contains
     else
       iout_ = psb_out_unit
     endif
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
 
     if (sv%eps<=dzero) then 
-      write(iout_,*) '  Backward Gauss-Seidel iterative solver with  ',&
+      write(iout_,*) trim(prefix_), '  Backward Gauss-Seidel iterative solver with  ',&
            &  sv%sweeps,' sweeps'
     else
-      write(iout_,*) '  Backward Gauss-Seidel iterative solver with  tolerance',&
+      write(iout_,*) trim(prefix_), '  Backward Gauss-Seidel iterative solver with  tolerance',&
            &  sv%eps,' and maxit', sv%sweeps
     end if
     

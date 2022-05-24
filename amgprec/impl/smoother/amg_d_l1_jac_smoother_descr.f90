@@ -35,7 +35,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine amg_d_l1_jac_smoother_descr(sm,info,iout,coarse)
+subroutine amg_d_l1_jac_smoother_descr(sm,info,iout,coarse,prefix)
 
   use psb_base_mod
   use amg_d_diag_solver
@@ -50,12 +50,14 @@ subroutine amg_d_l1_jac_smoother_descr(sm,info,iout,coarse)
   integer(psb_ipk_), intent(out)               :: info
   integer(psb_ipk_), intent(in), optional      :: iout
   logical, intent(in), optional              :: coarse
-
+  character(len=*), intent(in), optional  :: prefix
+      
   ! Local variables
   integer(psb_ipk_)      :: err_act
   character(len=20), parameter :: name='amg_d_l1_jac_smoother_descr'
   integer(psb_ipk_)      :: iout_
   logical      :: coarse_
+  character(1024)    :: prefix_
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -69,30 +71,35 @@ subroutine amg_d_l1_jac_smoother_descr(sm,info,iout,coarse)
   else
     iout_ = psb_out_unit
   endif
+  if (present(prefix)) then
+    prefix_ = prefix
+  else
+    prefix_ = ""
+  end if
 
   if (.not.coarse_) then
     if (allocated(sm%sv)) then
       select type(smv=>sm%sv)
       class is (amg_d_diag_solver_type)
-        write(iout_,*) '  Point Jacobi  '
-        write(iout_,*) '       Local diagonal:'
-        call smv%descr(info,iout_,coarse=coarse)        
+        write(iout_,*) trim(prefix_), '  Point Jacobi  '
+        write(iout_,*) trim(prefix_), '       Local diagonal:'
+        call smv%descr(info,iout_,coarse=coarse,prefix=prefix)        
       class is (amg_d_bwgs_solver_type)
-        write(iout_,*) '  L1-Hybrid Backward Gauss-Seidel  '
+        write(iout_,*) trim(prefix_), '  L1-Hybrid Backward Gauss-Seidel  '
       class is (amg_d_gs_solver_type)
-        write(iout_,*) '  L1-Hybrid Forward Gauss-Seidel  '
+        write(iout_,*) trim(prefix_), '  L1-Hybrid Forward Gauss-Seidel  '
       class default
-        write(iout_,*) '  L1-Block Jacobi  '
-        write(iout_,*) '       Local solver details:'
-        call smv%descr(info,iout_,coarse=coarse)
+        write(iout_,*) trim(prefix_), '  L1-Block Jacobi  '
+        write(iout_,*) trim(prefix_), '       Local solver details:'
+        call smv%descr(info,iout_,coarse=coarse,prefix=prefix)
       end select
       
     else
-      write(iout_,*) '  L1-Block Jacobi  '
+      write(iout_,*) trim(prefix_), '  L1-Block Jacobi  '
     end if
   else
     if (allocated(sm%sv)) then 
-      call sm%sv%descr(info,iout_,coarse=coarse)
+      call sm%sv%descr(info,iout_,coarse=coarse,prefix=prefix)
     end if
   end if
   call psb_erractionrestore(err_act)

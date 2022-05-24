@@ -385,20 +385,22 @@ contains
   
   end subroutine s_slu_solver_finalize
 
-  subroutine s_slu_solver_descr(sv,info,iout,coarse)
+  subroutine s_slu_solver_descr(sv,info,iout,coarse,prefix)
 
     Implicit None
 
     ! Arguments
     class(amg_s_slu_solver_type), intent(in) :: sv
-    integer, intent(out)                     :: info
-    integer, intent(in), optional            :: iout
-    logical, intent(in), optional       :: coarse
+    integer, intent(out)                       :: info
+    integer, intent(in), optional              :: iout
+    logical, intent(in), optional              :: coarse
+    character(len=*), intent(in), optional     :: prefix
 
     ! Local variables
     integer      :: err_act
     character(len=20), parameter :: name='amg_s_slu_solver_descr'
     integer :: iout_
+    character(1024)    :: prefix_
 
     call psb_erractionsave(err_act)
     info = psb_success_
@@ -407,8 +409,13 @@ contains
     else
       iout_ = psb_out_unit
     endif
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
     
-    write(iout_,*) '  SuperLU Sparse Factorization Solver. '
+    write(iout_,*) trim(prefix_), '  SuperLU Sparse Factorization Solver. '
 
     call psb_erractionrestore(err_act)
     return

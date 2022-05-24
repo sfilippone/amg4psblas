@@ -219,12 +219,13 @@ module amg_c_jac_smoother
   end interface
 
   interface
-    subroutine amg_c_jac_smoother_descr(sm,info,iout,coarse)
+    subroutine amg_c_jac_smoother_descr(sm,info,iout,coarse,prefix)
       import :: amg_c_jac_smoother_type, psb_ipk_
       class(amg_c_jac_smoother_type), intent(in) :: sm
       integer(psb_ipk_), intent(out)               :: info
       integer(psb_ipk_), intent(in), optional      :: iout
-      logical, intent(in), optional              :: coarse
+      logical, intent(in), optional                :: coarse
+      character(len=*), intent(in), optional       :: prefix
     end subroutine amg_c_jac_smoother_descr
   end interface
 
@@ -313,12 +314,13 @@ module amg_c_jac_smoother
   end interface
 
   interface
-    subroutine amg_c_l1_jac_smoother_descr(sm,info,iout,coarse)
+    subroutine amg_c_l1_jac_smoother_descr(sm,info,iout,coarse,prefix)
       import :: amg_c_l1_jac_smoother_type, psb_ipk_
       class(amg_c_l1_jac_smoother_type), intent(in) :: sm
-      integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), intent(in), optional      :: iout
-      logical, intent(in), optional              :: coarse
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), intent(in), optional         :: iout
+      logical, intent(in), optional                   :: coarse
+      character(len=*), intent(in), optional          :: prefix
     end subroutine amg_c_l1_jac_smoother_descr
   end interface
 

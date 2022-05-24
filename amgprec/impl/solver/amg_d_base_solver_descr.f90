@@ -35,7 +35,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine amg_d_base_solver_descr(sv,info,iout,coarse)
+subroutine amg_d_base_solver_descr(sv,info,iout,coarse,prefix)
   
   use psb_base_mod
   use amg_d_base_solver_mod, amg_protect_name =>  amg_d_base_solver_descr
@@ -45,6 +45,7 @@ subroutine amg_d_base_solver_descr(sv,info,iout,coarse)
   integer(psb_ipk_), intent(out)              :: info
   integer(psb_ipk_), intent(in), optional     :: iout
   logical, intent(in), optional               :: coarse
+  character(len=*), intent(in), optional  :: prefix
 
   ! Local variables
   integer(psb_ipk_)   :: err_act

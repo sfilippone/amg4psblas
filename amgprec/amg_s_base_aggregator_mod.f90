@@ -275,15 +275,22 @@ contains
     val = .false.
   end function amg_s_base_aggregator_xt_desc
 
-  subroutine  amg_s_base_aggregator_descr(ag,parms,iout,info)
+  subroutine  amg_s_base_aggregator_descr(ag,parms,iout,info,prefix)
     implicit none 
     class(amg_s_base_aggregator_type), intent(in) :: ag
     type(amg_sml_parms), intent(in)   :: parms
     integer(psb_ipk_), intent(in)  :: iout
     integer(psb_ipk_), intent(out) :: info
+    character(len=*), intent(in), optional  :: prefix
+    character(1024)    :: prefix_
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
 
-    write(iout,*) 'Aggregator object type: ',ag%fmt()
-    call parms%mldescr(iout,info)
+    write(iout,*) trim(prefix_),' ', 'Aggregator object type: ',ag%fmt()
+    call parms%mldescr(iout,info,prefix=prefix)
     
     return
   end subroutine amg_s_base_aggregator_descr

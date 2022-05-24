@@ -406,7 +406,7 @@ contains
     return
   end subroutine c_ilu_solver_free
 
-  subroutine c_ilu_solver_descr(sv,info,iout,coarse)
+  subroutine c_ilu_solver_descr(sv,info,iout,coarse,prefix)
 
     Implicit None
 
@@ -414,12 +414,14 @@ contains
     class(amg_c_ilu_solver_type), intent(in) :: sv
     integer(psb_ipk_), intent(out)             :: info
     integer(psb_ipk_), intent(in), optional    :: iout
-    logical, intent(in), optional       :: coarse
-
+    logical, intent(in), optional              :: coarse
+    character(len=*), intent(in), optional  :: prefix
+      
     ! Local variables
     integer(psb_ipk_) :: err_act
     character(len=20), parameter :: name='amg_c_ilu_solver_descr'
     integer(psb_ipk_) :: iout_
+    character(1024)    :: prefix_
 
     call psb_erractionsave(err_act)
     info = psb_success_
@@ -428,15 +430,20 @@ contains
     else
       iout_ = psb_out_unit
     endif
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
 
-    write(iout_,*) '  Incomplete factorization solver: ',&
+    write(iout_,*) trim(prefix_), '  Incomplete factorization solver: ',&
          &  amg_fact_names(sv%fact_type)
     select case(sv%fact_type)
     case(psb_ilu_n_,psb_milu_n_)      
-      write(iout_,*) '  Fill level:',sv%fill_in
+      write(iout_,*) trim(prefix_), '  Fill level:',sv%fill_in
     case(psb_ilu_t_)         
-      write(iout_,*) '  Fill level:',sv%fill_in
-      write(iout_,*) '  Fill threshold :',sv%thresh
+      write(iout_,*) trim(prefix_), '  Fill level:',sv%fill_in
+      write(iout_,*) trim(prefix_), '  Fill threshold :',sv%thresh
     end select
 
     call psb_erractionrestore(err_act)

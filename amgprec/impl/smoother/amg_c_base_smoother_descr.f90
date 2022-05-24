@@ -35,7 +35,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine amg_c_base_smoother_descr(sm,info,iout,coarse)
+subroutine amg_c_base_smoother_descr(sm,info,iout,coarse,prefix)
   
   use psb_base_mod
   use amg_c_base_smoother_mod, amg_protect_name =>  amg_c_base_smoother_descr
@@ -47,12 +47,14 @@ subroutine amg_c_base_smoother_descr(sm,info,iout,coarse)
   integer(psb_ipk_), intent(out)                :: info
   integer(psb_ipk_), intent(in), optional       :: iout
   logical, intent(in), optional                 :: coarse
+  character(len=*), intent(in), optional  :: prefix
 
   ! Local variables
   integer(psb_ipk_)   :: err_act
   character(len=20), parameter :: name='amg_c_base_smoother_descr'
   integer(psb_ipk_)   :: iout_
   logical      :: coarse_
+  character(1024)    :: prefix_
 
 
   call psb_erractionsave(err_act)
@@ -68,20 +70,25 @@ subroutine amg_c_base_smoother_descr(sm,info,iout,coarse)
   else 
     iout_ = psb_out_unit
   end if
+  if (present(prefix)) then
+    prefix_ = prefix
+  else
+    prefix_ = ""
+  end if
 
   if (coarse_) then 
-    if (allocated(sm%sv)) call sm%sv%descr(info,iout,coarse)
+    if (allocated(sm%sv)) call sm%sv%descr(info,iout,coarse,prefix=prefix)
   else
     if (allocated(sm%sv)) then
       select type (sv => sm%sv) 
       class is (amg_c_id_solver_type)
-        write(iout_,*) 'No preconditioner/smoother'
+        write(iout_,*) trim(prefix_), 'No preconditioner/smoother'
       class default
-        write(iout_,*) 'Decoupled preconditioner/smoother with local solver'
-        call sm%sv%descr(info,iout,coarse)
+        write(iout_,*) trim(prefix_), 'Decoupled preconditioner/smoother with local solver'
+        call sm%sv%descr(info,iout,coarse,prefix=prefix)
       end select
     else
-      write(iout_,*) 'No preconditioner/smoother'
+      write(iout_,*) trim(prefix_), 'No preconditioner/smoother'
     end if
   end if
   

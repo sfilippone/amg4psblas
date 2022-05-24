@@ -88,16 +88,25 @@ contains
     val = "Symmetric Decoupled aggregation"
   end function amg_z_symdec_aggregator_fmt
   
-  subroutine  amg_z_symdec_aggregator_descr(ag,parms,iout,info)
+  subroutine  amg_z_symdec_aggregator_descr(ag,parms,iout,info,prefix)
     implicit none 
     class(amg_z_symdec_aggregator_type), intent(in) :: ag
     type(amg_dml_parms), intent(in)   :: parms
     integer(psb_ipk_), intent(in)  :: iout
     integer(psb_ipk_), intent(out) :: info
+    character(len=*), intent(in), optional  :: prefix
 
-    write(iout,*) 'Decoupled Aggregator locally-symmetrized'
-    write(iout,*) 'Aggregator object type: ',ag%fmt()
-    call parms%mldescr(iout,info)
+    character(1024)    :: prefix_
+
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
+
+    write(iout,*) trim(prefix_),' ','Decoupled Aggregator locally-symmetrized'
+    write(iout,*) trim(prefix_),' ','Aggregator object type: ',ag%fmt()
+    call parms%mldescr(iout,info,prefix=prefix)
     
     return
   end subroutine amg_z_symdec_aggregator_descr
