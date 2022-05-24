@@ -396,21 +396,23 @@ contains
   end subroutine c_as_smoother_default
 
 
-  subroutine c_as_smoother_descr(sm,info,iout,coarse)
+  subroutine c_as_smoother_descr(sm,info,iout,coarse,prefix)
 
     Implicit None
 
     ! Arguments
     class(amg_c_as_smoother_type), intent(in) :: sm
-    integer(psb_ipk_), intent(out)                      :: info
-    integer(psb_ipk_), intent(in), optional             :: iout
-    logical, intent(in), optional             :: coarse
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), intent(in), optional     :: iout
+    logical, intent(in), optional              :: coarse
+      character(len=*), intent(in), optional   :: prefix
 
     ! Local variables
     integer(psb_ipk_)      :: err_act
     character(len=20), parameter :: name='amg_c_as_smoother_descr'
     integer(psb_ipk_) :: iout_
     logical      :: coarse_
+    character(1024)    :: prefix_
 
     call psb_erractionsave(err_act)
     info = psb_success_
@@ -424,16 +426,21 @@ contains
     else
       iout_ = psb_out_unit
     endif
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
 
     if (.not.coarse_) then 
-      write(iout_,*) '  Additive Schwarz with  ',&
+      write(iout_,*) trim(prefix_), '  Additive Schwarz with  ',&
            &  sm%novr, ' overlap layers.'
-      write(iout_,*) '  Restrictor:  ',restrict_names(sm%restr)
-      write(iout_,*) '  Prolongator: ',prolong_names(sm%prol)
-      write(iout_,*) '  Local solver:'
+      write(iout_,*) trim(prefix_), '  Restrictor:  ',restrict_names(sm%restr)
+      write(iout_,*) trim(prefix_), '  Prolongator: ',prolong_names(sm%prol)
+      write(iout_,*) trim(prefix_), '  Local solver:'
     endif
     if (allocated(sm%sv)) then 
-      call sm%sv%descr(info,iout_,coarse=coarse)
+      call sm%sv%descr(info,iout_,coarse=coarse,prefix=prefix)
     end if
 
     call psb_erractionrestore(err_act)

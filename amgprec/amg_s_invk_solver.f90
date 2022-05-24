@@ -123,7 +123,7 @@ module amg_s_invk_solver
   end interface
 
   interface
-    subroutine amg_s_invk_solver_descr(sv,info,iout,coarse)
+    subroutine amg_s_invk_solver_descr(sv,info,iout,coarse,prefix)
       import :: psb_spk_, amg_s_invk_solver_type, psb_ipk_
 
       Implicit None
@@ -133,7 +133,7 @@ module amg_s_invk_solver
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: iout
       logical, intent(in), optional             :: coarse
-
+      character(len=*), intent(in), optional  :: prefix
     end subroutine amg_s_invk_solver_descr
   end interface
 

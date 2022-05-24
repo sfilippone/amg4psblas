@@ -257,7 +257,7 @@ module amg_z_onelev_mod
   end interface
 
   interface
-    subroutine amg_z_base_onelev_descr(lv,il,nl,ilmin,info,iout, verbosity)
+    subroutine amg_z_base_onelev_descr(lv,il,nl,ilmin,info,iout, verbosity,prefix)
       import :: psb_zspmat_type, psb_z_vect_type, psb_z_base_vect_type, &
            & psb_zlinmap_type, psb_dpk_, amg_z_onelev_type, &
            & psb_ipk_, psb_epk_, psb_desc_type
@@ -268,6 +268,7 @@ module amg_z_onelev_mod
       integer(psb_ipk_), intent(out)          :: info
       integer(psb_ipk_), intent(in), optional :: iout
       integer(psb_ipk_), intent(in), optional :: verbosity
+      character(len=*), intent(in), optional  :: prefix
     end subroutine amg_z_base_onelev_descr
   end interface
 

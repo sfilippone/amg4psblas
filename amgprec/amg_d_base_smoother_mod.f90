@@ -272,7 +272,7 @@ module amg_d_base_smoother_mod
   end interface
   
   interface 
-    subroutine amg_d_base_smoother_descr(sm,info,iout,coarse)
+    subroutine amg_d_base_smoother_descr(sm,info,iout,coarse,prefix)
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
            & amg_d_base_smoother_type, psb_ipk_
@@ -281,6 +281,7 @@ module amg_d_base_smoother_mod
       integer(psb_ipk_), intent(out)                :: info
       integer(psb_ipk_), intent(in), optional       :: iout
       logical, intent(in), optional                 :: coarse
+      character(len=*), intent(in), optional        :: prefix
     end subroutine amg_d_base_smoother_descr
   end interface
   

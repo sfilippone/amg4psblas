@@ -65,7 +65,7 @@
 !         0: normal
 !        >1: increased details 
 !
-subroutine amg_zfile_prec_descr(prec,info,iout,root, verbosity)
+subroutine amg_zfile_prec_descr(prec,info,iout,root, verbosity,prefix)
   use psb_base_mod
   use amg_z_prec_mod, amg_protect_name => amg_zfile_prec_descr
   use amg_z_inner_mod
@@ -73,11 +73,12 @@ subroutine amg_zfile_prec_descr(prec,info,iout,root, verbosity)
 
   implicit none 
   ! Arguments
-  class(amg_zprec_type), intent(in)      :: prec
-  integer(psb_ipk_), intent(out) :: info
+  class(amg_zprec_type), intent(in)     :: prec
+  integer(psb_ipk_), intent(out)          :: info
   integer(psb_ipk_), intent(in), optional :: iout
   integer(psb_ipk_), intent(in), optional :: root
-  integer(psb_ipk_), intent(in), optional   :: verbosity
+  integer(psb_ipk_), intent(in), optional :: verbosity
+  character(len=*), intent(in), optional  :: prefix
 
 
   ! Local variables
@@ -87,6 +88,7 @@ subroutine amg_zfile_prec_descr(prec,info,iout,root, verbosity)
   logical             :: is_symgs
   character(len=20), parameter :: name='amg_file_prec_descr'
   integer(psb_ipk_)  :: iout_, root_, verbosity_
+  character(1024)    :: prefix_
 
   info = psb_success_
   if (present(iout)) then 
@@ -101,6 +103,11 @@ subroutine amg_zfile_prec_descr(prec,info,iout,root, verbosity)
     verbosity_ = 0
   end if
   if (verbosity_ < 0) goto 9998
+  if (present(prefix)) then
+    prefix_ = prefix
+  else
+    prefix_ = ""
+  end if
 
   ctxt = prec%ctxt
 
@@ -133,7 +140,7 @@ subroutine amg_zfile_prec_descr(prec,info,iout,root, verbosity)
         end do
 
         write(iout_,*) 
-        write(iout_,'(a)') 'Preconditioner description'
+        write(iout_,'(a,1x,a)') trim(prefix_),'Preconditioner description'
 
         if (nlev == 1) then
           !
@@ -150,53 +157,53 @@ subroutine amg_zfile_prec_descr(prec,info,iout,root, verbosity)
               end select
             end select
             if (is_symgs) then
-              write(iout_,*) ' Forward-Backward (symmetrized) Hybrid Gauss-Seidel'
+              write(iout_,*) trim(prefix_), ' Forward-Backward (symmetrized) Hybrid Gauss-Seidel'
             else
-              write(iout_,*) 'Pre Smoother: '
-              call prec%precv(1)%sm%descr(info,iout=iout_)
-              write(iout_,*) 'Post smoother:'
-              call prec%precv(1)%sm2a%descr(info,iout=iout_)
+              write(iout_,*) trim(prefix_), 'Pre Smoother: '
+              call prec%precv(1)%sm%descr(info,iout=iout_,prefix=prefix)
+              write(iout_,*) trim(prefix_), 'Post smoother:'
+              call prec%precv(1)%sm2a%descr(info,iout=iout_,prefix=prefix)
             end if
             nswps = max(prec%precv(1)%parms%sweeps_pre,prec%precv(1)%parms%sweeps_post)
 
           else
-            call prec%precv(1)%sm%descr(info,iout=iout_)
+            call prec%precv(1)%sm%descr(info,iout=iout_,prefix=prefix)
             nswps = prec%precv(1)%parms%sweeps_pre
           end if
-          if (nswps > 1)  write(iout_,*) '  Number of  sweeps : ',nswps
-          write(iout_,*) 
+          write(iout_,*) trim(prefix_), '  Number of  sweeps : ',nswps
+          write(iout_,*) trim(prefix_)
 
         else if (nlev > 1) then
           !
           ! Print description of base preconditioner
           !
-          write(iout_,*) 'Multilevel Preconditioner'
-          write(iout_,*) 'Outer sweeps:',prec%outer_sweeps
-          write(iout_,*) 
+          write(iout_,*) trim(prefix_),' ', 'Multilevel Preconditioner'
+          write(iout_,*) trim(prefix_),' ', 'Outer sweeps:',prec%outer_sweeps
+          write(iout_,*) trim(prefix_)
           if (allocated(prec%precv(1)%sm2a)) then
-            write(iout_,*) 'Pre Smoother: '
-            call prec%precv(1)%sm%descr(info,iout=iout_)
-            write(iout_,*) 'Post smoother:'
-            call prec%precv(1)%sm2a%descr(info,iout=iout_)
+            write(iout_,*) trim(prefix_),' ', 'Pre Smoother: '
+            call prec%precv(1)%sm%descr(info,iout=iout_,prefix=prefix)
+            write(iout_,*) trim(prefix_),' ', 'Post smoother:'
+            call prec%precv(1)%sm2a%descr(info,iout=iout_,prefix=prefix)
           else
-            write(iout_,*) 'Smoother: '
-            call prec%precv(1)%sm%descr(info,iout=iout_)
+            write(iout_,*) trim(prefix_),' ', 'Smoother: '
+            call prec%precv(1)%sm%descr(info,iout=iout_,prefix=prefix)
           end if
           !
           ! Print multilevel details
           !
-          write(iout_,*) 
-          write(iout_,*) 'Multilevel hierarchy: '
-          write(iout_,*) ' Number of levels   : ',nlev
-          write(iout_,*) ' Operator complexity: ',prec%get_complexity()
-          write(iout_,*) ' Average coarsening : ',prec%get_avg_cr()
+          write(iout_,*) trim(prefix_) 
+          write(iout_,*) trim(prefix_),' ', 'Multilevel hierarchy: '
+          write(iout_,*) trim(prefix_),' ', ' Number of levels   : ',nlev
+          write(iout_,*) trim(prefix_),' ', ' Operator complexity: ',prec%get_complexity()
+          write(iout_,*) trim(prefix_),' ', ' Average coarsening : ',prec%get_avg_cr()
           ilmin = 2
           if (nlev == 2) ilmin=1
           do ilev=ilmin,nlev
             call prec%precv(ilev)%descr(ilev,nlev,ilmin,info, &
-                 & iout=iout_,verbosity=verbosity)
+                 & iout=iout_,verbosity=verbosity,prefix=prefix)
           end do
-          write(iout_,*) 
+          write(iout_,*) trim(prefix_)
 
         else
           write(iout_,*) trim(name), &

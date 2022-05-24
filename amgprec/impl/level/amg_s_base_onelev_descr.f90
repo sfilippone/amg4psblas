@@ -42,7 +42,7 @@
 !         0: normal
 !        >1: increased details 
 !
-subroutine amg_s_base_onelev_descr(lv,il,nl,ilmin,info,iout,verbosity)
+subroutine amg_s_base_onelev_descr(lv,il,nl,ilmin,info,iout,verbosity,prefix)
   
   use psb_base_mod
   use amg_s_onelev_mod, amg_protect_name => amg_s_base_onelev_descr
@@ -53,6 +53,7 @@ subroutine amg_s_base_onelev_descr(lv,il,nl,ilmin,info,iout,verbosity)
   integer(psb_ipk_), intent(out)          :: info
   integer(psb_ipk_), intent(in), optional :: iout
   integer(psb_ipk_), intent(in), optional :: verbosity
+  character(len=*), intent(in), optional  :: prefix
 
 
   ! Local variables
@@ -60,6 +61,7 @@ subroutine amg_s_base_onelev_descr(lv,il,nl,ilmin,info,iout,verbosity)
   character(len=20), parameter :: name='amg_s_base_onelev_descr'
   integer(psb_ipk_)  :: iout_, verbosity_
   logical      :: coarse
+  character(1024)    :: prefix_
 
 
   call psb_erractionsave(err_act)
@@ -79,56 +81,62 @@ subroutine amg_s_base_onelev_descr(lv,il,nl,ilmin,info,iout,verbosity)
     verbosity_ = 0
   end if
   if (verbosity_ < 0) goto 9998
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
 
-  write(iout_,*) 
+  write(iout_,*) trim(prefix_)
   if (il == ilmin) then 
     call lv%parms%mlcycledsc(iout_,info)
   end if
   if (((ilmin==1).and.(il==2)).or.((ilmin>1).and.(il==ilmin))) then 
     if (allocated(lv%aggr)) then
-      call lv%aggr%descr(lv%parms,iout_,info)
+      call lv%aggr%descr(lv%parms,iout_,info,prefix=prefix)
     else
-      write(iout_,*) 'Internal error: unallocated aggregator object'
+      write(iout_,*) trim(prefix_),' ', 'Internal error: unallocated aggregator object'
       info = psb_err_internal_error_
       call psb_errpush(info,name)
       goto 9999
     end if
-    write(iout_,*) 
+    write(iout_,*) trim(prefix_)
   end if
   
   if (il > 1) then 
 
     if (coarse)  then 
-      write(iout_,*) ' Level ',il,' (coarse)'
+      write(iout_,*) trim(prefix_), ' Level ',il,' (coarse)'
     else
-      write(iout_,*) ' Level ',il
+      write(iout_,*) trim(prefix_), ' Level ',il
     end if
 
-    call lv%parms%descr(iout_,info,coarse=coarse)
+    call lv%parms%descr(iout_,info,coarse=coarse,prefix=prefix)
 
     if (nl > 1) then 
       if (allocated(lv%linmap%naggr)) then
-        write(iout_,*) '  Coarse Matrix: Global size: ', &
+        write(iout_,*) trim(prefix_), '  Coarse Matrix: Global size: ', &
              &  lv%linmap%nagtot
-        write(iout_,*) '                    Nonzeros: ',lv%ac_nz_tot
+        write(iout_,*) trim(prefix_), '                    Nonzeros: ',lv%ac_nz_tot
         if (verbosity_>0) then
-          write(iout_,*) '          Local matrix sizes: ', &
+          write(iout_,*) trim(prefix_), '          Local matrix sizes: ', &
                &  lv%linmap%naggr(:)
         else 
-          write(iout_,'(2(a,1x,i12))') &
+          write(iout_,'(a,1x,2(a,1x,i12))') trim(prefix_),&
                & '     Local  matrix sizes: min:', &
                & lv%linmap%nagmin,'         max:', lv%linmap%nagmax
-          write(iout_,'(a,1x,f14.1)') &
+          write(iout_,'(a,1x,a,1x,f14.1)') trim(prefix_),&
                & '                          avg:', &
                & lv%linmap%nagavg
         end if
-        write(iout_,'(a,1x,f14.2)') '          Aggregation   ratio: ', &
+        write(iout_,'(a,1xa,1x,f14.2)') trim(prefix_),&
+             & '          Aggregation   ratio: ', &
              &  lv%szratio
       end if
     end if
 
     if (coarse.and.allocated(lv%sm)) &
-         & call lv%sm%descr(info,iout=iout_,coarse=coarse)
+         & call lv%sm%descr(info,iout=iout_,coarse=coarse,prefix=prefix)
   end if
 
 9998 continue

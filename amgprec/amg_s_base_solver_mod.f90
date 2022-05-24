@@ -270,7 +270,7 @@ module amg_s_base_solver_mod
   end interface
   
   interface
-    subroutine amg_s_base_solver_descr(sv,info,iout,coarse)
+    subroutine amg_s_base_solver_descr(sv,info,iout,coarse,prefix)
       import :: psb_desc_type, psb_sspmat_type,  psb_s_base_sparse_mat, &
            & psb_s_vect_type, psb_s_base_vect_type, psb_spk_, &
            & amg_s_base_solver_type, psb_ipk_
@@ -281,7 +281,7 @@ module amg_s_base_solver_mod
       integer(psb_ipk_), intent(out)              :: info
       integer(psb_ipk_), intent(in), optional     :: iout
       logical, intent(in), optional               :: coarse
-
+      character(len=*), intent(in), optional      :: prefix
     end subroutine amg_s_base_solver_descr
   end interface 
   

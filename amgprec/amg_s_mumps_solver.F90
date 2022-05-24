@@ -313,22 +313,24 @@ subroutine s_mumps_solver_finalize(sv)
 
 end subroutine s_mumps_solver_finalize
 
-subroutine s_mumps_solver_descr(sv,info,iout,coarse)
+subroutine s_mumps_solver_descr(sv,info,iout,coarse,prefix)
 
   Implicit None
 
   ! Arguments
   class(amg_s_mumps_solver_type), intent(in) :: sv
-  integer(psb_ipk_), intent(out)                     :: info
-  integer(psb_ipk_), intent(in), optional            :: iout
-  logical, intent(in), optional       :: coarse
-
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), intent(in), optional      :: iout
+  logical, intent(in), optional                :: coarse
+  character(len=*), intent(in), optional       :: prefix
+      
   ! Local variables
   integer(psb_ipk_)   :: err_act
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: me, np
   character(len=20), parameter :: name='amg_z_mumps_solver_descr'
   integer(psb_ipk_) :: iout_
+  character(1024)    :: prefix_
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -337,8 +339,13 @@ subroutine s_mumps_solver_descr(sv,info,iout,coarse)
   else
     iout_ = psb_out_unit
   endif
+  if (present(prefix)) then
+    prefix_ = prefix
+  else
+    prefix_ = ""
+  end if
 
-  write(iout_,*) '  MUMPS  Solver. '
+  write(iout_,*) trim(prefix_), '  MUMPS  Solver. '
 
   call psb_erractionrestore(err_act)
   return

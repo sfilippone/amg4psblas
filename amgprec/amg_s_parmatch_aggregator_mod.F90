@@ -390,18 +390,25 @@ contains
 
   end function amg_s_parmatch_aggregator_sizeof
 
-  subroutine  amg_s_parmatch_aggregator_descr(ag,parms,iout,info)
+  subroutine  amg_s_parmatch_aggregator_descr(ag,parms,iout,info,prefix)
     implicit none
     class(amg_s_parmatch_aggregator_type), intent(in) :: ag
     type(amg_sml_parms), intent(in)   :: parms
     integer(psb_ipk_), intent(in)  :: iout
     integer(psb_ipk_), intent(out) :: info
+    character(len=*), intent(in), optional  :: prefix
+    character(1024)    :: prefix_
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
 
-    write(iout,*) 'Parallel Matching Aggregator'
-    write(iout,*) '   Number of matching  sweeps: ',ag%n_sweeps
-    write(iout,*) '   Matching algorithm         : MatchBoxP (PREIS)'
-    write(iout,*) 'Aggregator object type: ',ag%fmt()
-    call parms%mldescr(iout,info)
+    write(iout,*) trim(prefix_),' ','Parallel Matching Aggregator'
+    write(iout,*) trim(prefix_),' ','   Number of matching  sweeps: ',ag%n_sweeps
+    write(iout,*) trim(prefix_),' ','   Matching algorithm         : MatchBoxP (PREIS)'
+    write(iout,*) trim(prefix_),' ','Aggregator object type: ',ag%fmt()
+    call parms%mldescr(iout,info,prefix=prefix)
 
     return
   end subroutine amg_s_parmatch_aggregator_descr

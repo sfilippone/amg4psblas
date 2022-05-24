@@ -436,7 +436,7 @@ contains
     val = "KRM solver"
   end function c_krm_solver_get_fmt
 
-  subroutine c_krm_solver_descr(sv,info,iout,coarse)
+  subroutine c_krm_solver_descr(sv,info,iout,coarse,prefix)
 
     Implicit None
 
@@ -444,12 +444,14 @@ contains
     class(amg_c_krm_solver_type), intent(in) :: sv
     integer(psb_ipk_), intent(out)             :: info
     integer(psb_ipk_), intent(in), optional    :: iout
-    logical, intent(in), optional       :: coarse
+    logical, intent(in), optional              :: coarse
+    character(len=*), intent(in), optional  :: prefix
 
     ! Local variables
     integer(psb_ipk_)      :: err_act
     character(len=20), parameter :: name='amg_c_krm_solver_descr'
     integer(psb_ipk_) :: iout_
+    character(1024)    :: prefix_
 
     call psb_erractionsave(err_act)
     info = psb_success_
@@ -458,17 +460,22 @@ contains
     else
       iout_ = psb_out_unit
     endif
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
 
     if (sv%global) then
-      write(iout_,*) '  Krylov solver (global)'
+      write(iout_,*) trim(prefix_), '  Krylov solver (global)'
     else
-      write(iout_,*) '  Krylov solver (local) '
+      write(iout_,*) trim(prefix_), '  Krylov solver (local) '
     end if
-    write(iout_,*) '    method: ',sv%method
-    write(iout_,*) '     kprec: ',sv%kprec
-    call sv%prec%descr(iout_,info)
-    write(iout_,*) '     itmax: ',sv%itmax
-    write(iout_,*) '       eps: ',sv%eps
+    write(iout_,*) trim(prefix_), '    method: ',sv%method
+    write(iout_,*) trim(prefix_), '     kprec: ',sv%kprec
+    call sv%prec%descr(iout_,info,prefix='KRM : '//prefix_)
+    write(iout_,*) trim(prefix_), '     itmax: ',sv%itmax
+    write(iout_,*) trim(prefix_), '       eps: ',sv%eps
 
     call psb_erractionrestore(err_act)
     return
