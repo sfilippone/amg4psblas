@@ -52,7 +52,7 @@ module amg_z_sludist_solver
   use iso_c_binding
   use amg_z_base_solver_mod
 
-#if defined(LPK8) 
+#if (!defined(HAVE_SLUDIST_)) || defined(IPK8) 
 
   type, extends(amg_z_base_solver_type) :: amg_z_sludist_solver_type
 
@@ -270,10 +270,12 @@ contains
     ! Local variables
     type(psb_zspmat_type) :: atmp
     type(psb_z_csr_sparse_mat) :: acsr
-    integer :: n_row,n_col, nrow_a, nztota, nglob, nzt, npr, npc
-    integer :: ifrst, ibcheck
     type(psb_ctxt_type) :: ctxt
-    integer :: np,me,i, err_act, debug_unit, debug_level
+    integer(psb_lpk_), allocatable :: gia(:), gja(:)
+    integer(psb_lpk_) :: lfrst
+    integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota, nglob, nzt, npr, npc
+    integer(psb_ipk_) :: ifrst, ibcheck
+    integer(psb_ipk_) :: np,me,i, err_act, debug_unit, debug_level
     character(len=20)  :: name='z_sludist_solver_bld', ch_err
     
     info=psb_success_
@@ -293,19 +295,36 @@ contains
     n_col  = desc_a%get_local_cols()
     nglob  = desc_a%get_global_rows()
     
-    call a%cscnv(atmp,info,type='coo')
+    !
+    ! Strategy here is as follows: because a call to SLUDIST
+    ! as a gobal solver is mostly done  at the coarsest level,
+    ! even if we start from a problem requiring 8 bytes, chances
+    ! are that the global size will be suitable for 4 bytes
+    ! anyway, so we hope for the best, and throw an error
+    ! if something goes wrong.
+    !
+    if (nglob > huge(1_psb_ipk_)) then
+      write(0,*) me,' ',trim(name),': Error: overflow of local indices '
+      info=psb_err_internal_error_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    
+    call a%cscnv(atmp,info,type='csr')
+    ! This in case we are dealing with AS
     call psb_rwextd(n_row,atmp,info,b=b) 
-    call atmp%cscnv(info,type='csr',dupl=psb_dupl_add_)
     call atmp%mv_to(acsr)
     nrow_a = acsr%get_nrows()
     nztota = acsr%get_nzeros()
+    call psb_loc_to_glob(ione,lfrst,desc_a,info)
+    
     ! Fix the entries to call C-base SuperLU
-    call psb_loc_to_glob(1,ifrst,desc_a,info) 
-    call psb_loc_to_glob(nrow_a,ibcheck,desc_a,info) 
-    call psb_loc_to_glob(acsr%ja(1:nztota),desc_a,info,iact='I')
+    call psb_realloc(nztota,gja,info)
+    call psb_loc_to_glob(acsr%ja(1:nztota),gja(1:nztota), desc_a, info, iact='I')
+    acsr%ja(1:nztota) = gja(1:nztota)
     acsr%ja(:)  = acsr%ja(:)  - 1
     acsr%irp(:) = acsr%irp(:) - 1
-    ifrst = ifrst - 1
+    ifrst = lfrst - 1
     info = amg_zsludist_fact(nglob,nrow_a,nztota,ifrst,&
          & acsr%val,acsr%irp,acsr%ja,sv%lufactors,&
          & npr,npc)
@@ -318,7 +337,6 @@ contains
     end if
     
     call acsr%free()
-    call atmp%free()
 
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),' end'
