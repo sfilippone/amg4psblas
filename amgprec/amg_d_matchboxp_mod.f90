@@ -145,7 +145,6 @@ contains
     logical, parameter  :: dump=.false., debug=.false., dump_mate=.false., &
          & debug_ilaggr=.false., debug_sync=.false.
     integer(psb_ipk_), save :: idx_bldmtc=-1, idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
-    integer(psb_ipk_), save :: idx_phase21=-1, idx_phase31=-1
     logical, parameter :: do_timings=.true.
 
     ictxt = desc_a%get_ctxt()
@@ -159,11 +158,7 @@ contains
          & idx_phase2 = psb_get_timer_idx("MBP_BLDP: phase2       ")
     if ((do_timings).and.(idx_phase3==-1))       &
          & idx_phase3 = psb_get_timer_idx("MBP_BLDP: phase3       ")
-    if ((do_timings).and.(idx_phase21==-1))       &
-         & idx_phase21 = psb_get_timer_idx("MBP_BLDP: phase2_1    ")
-    if ((do_timings).and.(idx_phase31==-1))       &
-         & idx_phase31 = psb_get_timer_idx("MBP_BLDP: phase3_1    ")
-  
+
     if (do_timings) call psb_tic(idx_phase1)
 
     if (present(display_out)) then
@@ -335,7 +330,6 @@ contains
       end do
       if (do_timings) call psb_toc(idx_phase2)
       if (do_timings) call psb_tic(idx_phase3)
-      if (do_timings) call psb_tic(idx_phase31)
 
       ! Ok, now compute offsets, gather halo and fix non-local
       ! aggregates  (those where ilaggr == -2)
@@ -456,7 +450,7 @@ contains
           end do
         end block
       end if
-      if (do_timings) call psb_toc(idx_phase31)
+
       ! Dirty trick: allocate tmpcoo with local
       ! number of aggregates, then change to ntaggr.
       ! Just to make sure the allocation is not global
