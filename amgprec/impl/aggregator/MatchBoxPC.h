@@ -157,8 +157,7 @@ inline MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
                                               MilanLongInt* verLocInd,
                                               MilanReal* edgeLocWeight);
 
-inline bool isAlreadyMatched(MilanLongInt k,
-                                MilanLongInt* verLocInd,
+inline bool isAlreadyMatched(MilanLongInt node,
                                 MilanLongInt StartIndex,
                                 MilanLongInt EndIndex,
                                 vector <MilanLongInt> &GMate,
