@@ -215,7 +215,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     double Ghost2LocalInitialization = MPI_Wtime();
 #endif
 
-#pragma omp parallel private(insertMe, k, k1, adj1, adj2, adj11, adj12, heaviestEdgeWt, w, ghostOwner) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
+#pragma omp parallel private(insertMe, k, k1, adj1, adj2, adj11, adj12, heaviestEdgeWt, w, ghostOwner, u) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
     {
 
         // TODO comments about the reduction
@@ -475,9 +475,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                 if (w >= 0) {
 
                     //This piece of code is actually executed under 0.01% of the times
-#pragma omp critical
-                    {
-                        if (isAlreadyMatched(k, verLocInd, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) {
+
+                        if (isAlreadyMatched(verLocInd[k], StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) {
                             w = computeCandidateMate(verLocPtr[v],
                                                      verLocPtr[v + 1],
                                                      edgeLocWeight, 0,
@@ -489,7 +488,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                                      Ghost2LocalMap);
                             candidateMate[v] = w;
                         }
-                    }
 
                     if (w >= 0) {
 
@@ -511,7 +509,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                             NumMessagesBundled++;
                             ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                             PCounter[ghostOwner]++;
-#pragma omp critical
+#pragma omp critical(Mate)
                             {
                             QLocalVtx.push_back(v + StartIndex);
                             QGhostVtx.push_back(w);
@@ -551,7 +549,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         else { // w is a local vertex
 
                             if (candidateMate[w - StartIndex] == (v + StartIndex)) {
-#pragma omp critical
+#pragma omp critical(Mate)
                                 {
                                 Mate[v] = w;  //v is local
                                 Mate[w - StartIndex] = v + StartIndex; //w is local
@@ -632,41 +630,32 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
             adj2 = verLocPtr[u-StartIndex+1];
             for( k = adj1; k < adj2; k++ ) {
                 v = verLocInd[k];
+
                 if ( (v >= StartIndex) && (v <= EndIndex) ) { //If Local Vertex:
-                    if ( (v<StartIndex) || (v>EndIndex) ) { //Is it a ghost vertex?
-                        if(GMate[Ghost2LocalMap[v]] >= 0 )// Already matched
-                            continue;
-                    } else { //A local vertex
-                        if( Mate[v-StartIndex] >= 0 ) // Already matched
-                            continue;
-                    } //End of else
+
+                    if (isAlreadyMatched(v, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) continue;
 
 #ifdef PRINT_DEBUG_INFO_
                     cout<<"\n("<<myRank<<")v: "<<v<<" c(v)= "<<candidateMate[v-StartIndex]<<" Mate[v]: "<<Mate[v];
                     fflush(stdout);
 #endif
+
                     if ( candidateMate[v-StartIndex] == u ) { //Only if pointing to the matched vertex
                         //Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
                         //Start: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
-                        adj11 = verLocPtr[v-StartIndex];
-                        adj12 = verLocPtr[v-StartIndex+1];
-                        w = -1;
-                        heaviestEdgeWt = MilanRealMin; //Assign the smallest Value possible first LDBL_MIN
-                        for( k1 = adj11; k1 < adj12; k1++ ) {
-                            if ( (verLocInd[k1]<StartIndex) || (verLocInd[k1]>EndIndex) ) { //Is it a ghost vertex?
-                                if(GMate[Ghost2LocalMap[verLocInd[k1]]] >= 0 )// Already matched
-                                    continue;
-                            } else { //A local vertex
-                                if( Mate[verLocInd[k1]-StartIndex] >= 0 ) // Already matched
-                                    continue;
-                            }
-                            if( (edgeLocWeight[k1] > heaviestEdgeWt) ||
-                                ((edgeLocWeight[k1] == heaviestEdgeWt)&&(w < verLocInd[k1])) ) {
-                                heaviestEdgeWt = edgeLocWeight[k1];
-                                w = verLocInd[k1];
-                            }
-                        } //End of for loop
-                        candidateMate[v-StartIndex] = w;
+                        w = computeCandidateMate(verLocPtr[v - StartIndex],
+                                                 verLocPtr[v - StartIndex + 1],
+                                                 edgeLocWeight, 0,
+                                                 verLocInd,
+                                                 StartIndex,
+                                                 EndIndex,
+                                                 GMate,
+                                                 Mate,
+                                                 Ghost2LocalMap);
+#pragma omp critical
+                        {
+                        candidateMate[v - StartIndex] = w;
+                        }
                         //End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
 #ifdef PRINT_DEBUG_INFO_
                         cout<<"\n("<<myRank<<")"<<v<<" Points to: "<<w; fflush(stdout);
@@ -1573,8 +1562,7 @@ inline MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
  * @param Ghost2LocalMap
  * @return
  */
-inline bool isAlreadyMatched(MilanLongInt k,
-                                MilanLongInt* verLocInd,
+inline bool isAlreadyMatched(MilanLongInt node,
                                 MilanLongInt StartIndex,
                                 MilanLongInt EndIndex,
                                 vector <MilanLongInt> &GMate,
@@ -1582,15 +1570,20 @@ inline bool isAlreadyMatched(MilanLongInt k,
                                 map <MilanLongInt, MilanLongInt> &Ghost2LocalMap
                                 ) {
 
-    if ((verLocInd[k] < StartIndex) || (verLocInd[k] > EndIndex)) { //Is it a ghost vertex?
-        if (GMate[Ghost2LocalMap[verLocInd[k]]] >= 0)// Already matched
-            return true;
-    } else { //A local vertex
-        if (Mate[verLocInd[k] - StartIndex] >= 0) // Already matched
-            return true;
+    bool result = false;
+#pragma omp critical(Mate)
+    {
+        if ((node < StartIndex) || (node > EndIndex)) { //Is it a ghost vertex?
+            if (GMate[Ghost2LocalMap[node]] >= 0)// Already matched
+                result = true;
+        } else { //A local vertex
+            if (Mate[node - StartIndex] >= 0) // Already matched
+                result = true;
+        }
+
     }
 
-    return false;
+    return result;
 }
 
 /**
@@ -1621,7 +1614,7 @@ inline MilanLongInt computeCandidateMate(MilanLongInt adj1,
     MilanInt w = -1;
     MilanReal heaviestEdgeWt = MilanRealMin; //Assign the smallest Value possible first LDBL_MIN
     for (k = adj1; k < adj2; k++) {
-        if (isAlreadyMatched(k, verLocInd, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) continue;
+        if (isAlreadyMatched(verLocInd[k], StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) continue;
 
         if ((edgeLocWeight[k] > heaviestEdgeWt) ||
             ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k]))) {
