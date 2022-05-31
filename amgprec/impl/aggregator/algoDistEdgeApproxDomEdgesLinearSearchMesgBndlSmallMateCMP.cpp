@@ -211,13 +211,17 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     vector <MilanLongInt> GMate;  //Proportional to the number of ghost vertices
     MilanLongInt S;
     MilanLongInt privateMyCard = 0;
-    staticQueue U, privateU;
+    staticQueue U, privateU, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner;
+
+    /*
+    staticQueue privateReqQLocalVtx, privateReqQGhostVtx, privateReqQMsgType, privateReqQOwner;
+     */
     bool isEmpty;
 #ifdef TIME_TRACKER
     double Ghost2LocalInitialization = MPI_Wtime();
 #endif
 
-#pragma omp parallel private(insertMe, k, u, w, v, k1, adj1, adj2, adj11, adj12, heaviestEdgeWt, ghostOwner, privateU, privateMyCard, isEmpty) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
+#pragma omp parallel private(insertMe, k, u, w, v, k1, adj1, adj2, adj11, adj12, heaviestEdgeWt, ghostOwner, privateU, privateMyCard, isEmpty, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner /*, privateReqQLocalVtx, privateReqQGhostVtx, privateReqQMsgType, privateReqQOwner*/) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
     {
 
         // TODO comments about the reduction
@@ -291,21 +295,18 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
             double verGhostPtrInitialization = MPI_Wtime();
 #endif
 
-        }
+
         /*
-         * OMP verGhostPtrInitialization
-         *
-         * schedule(static) assign to each thread an huge chunk
-         * it is used in this case to reduce the overhead of chunk assignment
-         * and to reduce false sharing
+         * Not parallelizable
          */
-#pragma omp for nowait schedule(static)
+
         for (i = 0; i < numGhostVertices; i++) { //O(|Ghost Vertices|)
             verGhostPtr[i + 1] = verGhostPtr[i] + Counter[i];
 #ifdef PRINT_DEBUG_INFO_
             cout<<verGhostPtr[i]<<"\t"; fflush(stdout);
 #endif
         }
+    } // End of single region
 
 #ifdef TIME_TRACKER
         verGhostPtrInitialization = MPI_Wtime() - verGhostPtrInitialization;
@@ -461,6 +462,30 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
              *       in parallel.
              */
 
+            MilanLongInt size = numGhostEdges; //TODO how can I decide a meaningfull size?
+            //Fail messages
+            privateQLocalVtx.~staticQueue();
+            privateQGhostVtx.~staticQueue();
+            privateQMsgType.~staticQueue();
+            privateQOwner.~staticQueue();
+            //Request messages
+            /*
+            privateReqQLocalVtx.~staticQueue();
+            privateReqQGhostVtx.~staticQueue();
+            privateReqQMsgType.~staticQueue();
+            privateReqQOwner.~staticQueue();
+            */
+            new(&privateQLocalVtx) staticQueue(size);
+            new(&privateQGhostVtx) staticQueue(size);
+            new(&privateQMsgType) staticQueue(size);
+            new(&privateQOwner) staticQueue(size);
+            /*
+            new(&privateReqQLocalVtx) staticQueue(size);
+            new(&privateReqQGhostVtx) staticQueue(size);
+            new(&privateReqQMsgType) staticQueue(size);
+            new(&privateReqQOwner) staticQueue(size);
+            */
+
 #pragma omp for reduction(+: msgInd, NumMessagesBundled, myCard, PCounter[:numProcs]) schedule(static)
     for ( v=0; v < NLVer; v++ )
             {
@@ -499,18 +524,12 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 
                         myCard++;
                         if ((w < StartIndex) || (w > EndIndex)) { //w is a ghost vertex
-                            //Build the Message Packet:
-                            //Message[0] = v+StartIndex; //LOCAL
-                            //Message[1] = w;            //GHOST
-                            //Message[2] = REQUEST;      //TYPE
-                            //Send a Request (Asynchronous)
 #ifdef PRINT_DEBUG_INFO_
                             cout<<"\n("<<myRank<<")Sending a request message (291):";
                         cout<<"\n("<<myRank<<")Local is: "<<v+StartIndex<<" Ghost is "<<w<<" Owner is: "<< findOwnerOfGhost(w, verDistance, myRank, numProcs) <<endl;
                         fflush(stdout);
 #endif
-                            /* MPI_Bsend(&Message[0], 3, MPI_INT, inputSubGraph.findOwner(w),
-                             ComputeTag, comm);*/
+
                             msgInd++;
                             NumMessagesBundled++;
                             ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
@@ -519,13 +538,10 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                             PCounter[ghostOwner]++;
 #pragma omp critical(Mate)
                             {
-                            QLocalVtx.push_back(v + StartIndex);
-                            QGhostVtx.push_back(w);
-                            QMsgType.push_back(REQUEST);
-                            //ghostOwner = inputSubGraph.findOwner(w);
-                            assert(ghostOwner != -1);
-                            assert(ghostOwner != myRank);
-                            QOwner.push_back(ghostOwner);
+                                QLocalVtx.push_back(v + StartIndex);
+                                QGhostVtx.push_back(w);
+                                QMsgType.push_back(REQUEST);
+                                QOwner.push_back(ghostOwner);
 
                             if (candidateMate[NLVer + Ghost2LocalMap[w]] == v + StartIndex) {
 
@@ -601,19 +617,27 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                 assert(ghostOwner != -1);
                                 assert(ghostOwner != myRank);
                                 PCounter[ghostOwner]++;
-#pragma omp critical
-                                {
-                                    QLocalVtx.push_back(v + StartIndex);
-                                    QGhostVtx.push_back(w);
-                                    QMsgType.push_back(FAILURE);
-                                    QOwner.push_back(ghostOwner);
-                                }
+                                privateQLocalVtx.push_back(v + StartIndex);
+                                privateQGhostVtx.push_back(w);
+                                privateQMsgType.push_back(FAILURE);
+                                privateQOwner.push_back(ghostOwner);
 
                             } //End of if(GHOST)
                         } //End of for loop
                     //} // End of Else: w == -1
                     //End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
             } //End of for ( v=0; v < NLVer; v++ )
+
+#pragma omp critical(privateMsg)
+        {
+        while (!privateQLocalVtx.empty())
+        {
+            QLocalVtx.push_back(privateQLocalVtx.pop_front());
+            QGhostVtx.push_back(privateQGhostVtx.pop_front());
+            QMsgType.push_back(privateQMsgType.pop_front());
+            QOwner.push_back(privateQOwner.pop_front());
+        }
+    }
 
     tempCounter.clear(); //Do not need this any more
 
@@ -626,7 +650,9 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     /////////////////////////// PROCESS MATCHED VERTICES //////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
     privateU.~staticQueue();
+
     new(&privateU) staticQueue(1000); //TODO how can I put a meaningfull size?
+
     isEmpty = false;
 
 #ifdef COUNT_LOCAL_VERTEX
