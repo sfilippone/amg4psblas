@@ -530,7 +530,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         PCounter[ghostOwner]++;
 
 
-                        //TODO whyyyyy does it fail if I use a private data structure???
+                        //TODO why does it fail if I use a private data structure???
                         /*
                         privateQLocalVtx.push_back(v + StartIndex);
                         privateQGhostVtx.push_back(w);
@@ -632,19 +632,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
             //End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
         } //End of for ( v=0; v < NLVer; v++ )
 
-
-#pragma omp critical(privateMsg)
-        {
-            while (!privateQLocalVtx.empty())
-            {
-
-                    QLocalVtx.push_back(privateQLocalVtx.pop_back());
-                    QGhostVtx.push_back(privateQGhostVtx.pop_back());
-                    QMsgType.push_back(privateQMsgType.pop_back());
-                    QOwner.push_back(privateQOwner.pop_back());
-            }
-        }
-
 #pragma omp critical(U)
         {
             while (!privateU.empty())
@@ -653,8 +640,10 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
             }
         }
 
-    tempCounter.clear(); //Do not need this any more
-
+#pragma omp master
+        {
+            tempCounter.clear(); //Do not need this any more
+        }
 
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<"=========================************==============================="<<endl; fflush(stdout);
@@ -703,8 +692,11 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         fflush(stdout);
 #endif
 
+                        //If the current vertex is pointing to a matched vertex and is not matched
+                        //FIXME is there a way to make candidateMate private?
+                        //      for the moment it could generate an error.
                         if (not isAlreadyMatched(v, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap) and
-                            candidateMate[v - StartIndex] == u) { //Only if pointing to the matched vertex
+                            candidateMate[v - StartIndex] == u) {
                             //Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
                             //Start: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
                             w = computeCandidateMate(verLocPtr[v - StartIndex],
@@ -726,21 +718,14 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                             //If found a dominating edge:
                             if (w >= 0) {
                                 if ((w < StartIndex) || (w > EndIndex)) { //A ghost
-                                    //Build the Message Packet:
-                                    //Message[0] = v; //LOCAL
-                                    //Message[1] = w; //GHOST
-                                    //Message[2] = REQUEST;  //TYPE
-                                    //Send a Request (Asynchronous)
 #ifdef PRINT_DEBUG_INFO_
                                     cout<<"\n("<<myRank<<")Sending a request message:";
                                     cout<<"\n("<<myRank<<")Ghost is "<<w<<" Owner is: "<<findOwnerOfGhost(w, verDistance, myRank, numProcs);
 #endif
-                                    /*MPI_Bsend(&Message[0], 3, MPI_INT, inputSubGraph.findOwner(w),
-                                     ComputeTag, comm);*/
+
                                     QLocalVtx.push_back(v);
                                     QGhostVtx.push_back(w);
                                     QMsgType.push_back(REQUEST);
-                                    //ghostOwner = inputSubGraph.findOwner(w);
                                     ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                                     assert(ghostOwner != -1);
                                     assert(ghostOwner != myRank);
@@ -869,6 +854,19 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         } //End of critical U
 
     } //End of while ( /*!Q.empty()*/ !U.empty() )
+
+#pragma omp critical(privateMsg)
+        {
+            while (!privateQLocalVtx.empty()) {
+
+                QLocalVtx.push_back(privateQLocalVtx.pop_back());
+                QGhostVtx.push_back(privateQGhostVtx.pop_back());
+                QMsgType.push_back(privateQMsgType.pop_back());
+                QOwner.push_back(privateQOwner.pop_back());
+
+            }
+        }
+
 
 #ifdef COUNT_LOCAL_VERTEX
        printf("Count local vertexes: %ld for thread %d of processor %d\n",
