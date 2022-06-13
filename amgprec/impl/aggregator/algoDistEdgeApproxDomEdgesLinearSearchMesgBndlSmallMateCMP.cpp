@@ -841,9 +841,13 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         } //End of If( v != Mate[u] )
                     } //End of critical region
                 } //End of Else //A Ghost Vertex
+
             } //End of For Loop adj(u)
+
         } //End of if ( (u >= StartIndex) && (u <= EndIndex) ) //Process Only If a Local Vertex
 
+        //Avoid to ask for the critical section if there is nothing to add
+        if(privateU.empty()) continue;
 #pragma omp critical(U)
         {
             while(!privateU.empty()) {
@@ -852,7 +856,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 
             myCard += privateMyCard;
         } //End of critical U
-
     } //End of while ( /*!Q.empty()*/ !U.empty() )
 
 #pragma omp critical(privateMsg)
