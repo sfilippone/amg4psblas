@@ -72,6 +72,8 @@
  Statistics: ph1_card, ph2_card : Size: |P| number of processes in the comm-world (number of matched edges in Phase 1 and Phase 2)
  */
 
+#define UCHUNK 1000
+
 #ifdef SERIAL_MPI
 #else
 //MPI type map
@@ -658,23 +660,41 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     MilanLongInt localVertices = 0;
 #endif
 
-    while( true )
-    {
+    //TODO what would be the optimal UCHUNK
+    vector <MilanLongInt> Us;
+    Us.reserve(UCHUNK);
 
+    while( true ) {
+
+        Us.clear();
 #pragma omp critical(U)
         {
-            if (U.empty()) isEmpty = true;
-            else u = U.pop_front();
+            //If U is emptu and there are no new node to add to U
+            if (U.empty() && privateU.empty())
+                isEmpty = true;
+            else {
+                if (U.empty() && !privateU.empty()) // If U is empty but there are nodes in private U
+                    while (!privateU.empty()) {
+                        U.push_back(privateU.pop_front());
+                        myCard += privateMyCard;
+                    }
+                for (int i = 0; i < UCHUNK; i++) { // Pop the new nodes
+                    if (U.empty()) break;
+                    Us.push_back(U.pop_front());
+                }
+            }
         } // End of critical U
         if (isEmpty) break;
 
+        for (MilanLongInt u : Us)
+        {
 #ifdef PRINT_DEBUG_INFO_
         cout<<"\n("<<myRank<<")u: "<<u; fflush(stdout);
 #endif
-        if ( (u >= StartIndex) && (u <= EndIndex) ) { //Process Only the Local Vertices
+        if ((u >= StartIndex) && (u <= EndIndex)) { //Process Only the Local Vertices
 
 #ifdef COUNT_LOCAL_VERTEX
-    localVertices ++;
+            localVertices ++;
 #endif
 
             //Get the Adjacency list for u
@@ -847,15 +867,17 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         } //End of if ( (u >= StartIndex) && (u <= EndIndex) ) //Process Only If a Local Vertex
 
         //Avoid to ask for the critical section if there is nothing to add
-        if(privateU.empty()) continue;
+        if (privateU.size() < UCHUNK && !U.empty()) continue;
 #pragma omp critical(U)
         {
-            while(!privateU.empty()) {
+            while (!privateU.empty()) {
                 U.push_back(privateU.pop_front());
             }
 
             myCard += privateMyCard;
         } //End of critical U
+
+    }
     } //End of while ( /*!Q.empty()*/ !U.empty() )
 
 #pragma omp critical(privateMsg)
