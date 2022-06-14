@@ -73,6 +73,8 @@
  Statistics: ph1_card, ph2_card : Size: |P| number of processes in the comm-world (number of matched edges in Phase 1 and Phase 2)
  */
 
+#define UCHUNK 1000
+
 #ifdef SERIAL_MPI
 #else
 //MPI type map
@@ -224,6 +226,9 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     MilanInt BufferSize;
     MilanLongInt *Buffer;
     bool isEmpty;
+
+    //Declare the locks
+    omp_lock_t MateLock[NLVer];
 #ifdef TIME_TRACKER
     double Ghost2LocalInitialization = MPI_Wtime();
 #endif
@@ -231,8 +236,14 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #pragma omp parallel private(insertMe, k, u, w, v, k1, adj1, adj2, adj11, adj12, heaviestEdgeWt, ghostOwner, privateU, privateMyCard, isEmpty, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
     {
 
-        // TODO comments about the reduction
+        //Initialize the locks
+        //TODO this can be executed as task in parallel with other unparallelizable tasks
+        //TODO destroy the locks
+#pragma omp for schedule(static)
+        for(int i = 0; i < NLVer; i++)
+            omp_init_lock(&MateLock[i]);
 
+        // TODO comments about the reduction
 #pragma omp for reduction(+ : numGhostEdges)
         for (i = 0; i < NLEdge; i++) { //O(m) - Each edge stored twice
             insertMe = verLocInd[i];
@@ -669,22 +680,41 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     MilanLongInt localVertices = 0;
 #endif
 
-        while (true) {
+    //TODO what would be the optimal UCHUNK
+    vector <MilanLongInt> Us;
+    Us.reserve(UCHUNK);
 
+    while( true ) {
+
+        Us.clear();
 #pragma omp critical(U)
-            {
-                if (U.empty()) isEmpty = true;
-                else u = U.pop_front();
-            } // End of critical U
-            if (isEmpty) break;
+        {
+            //If U is emptu and there are no new node to add to U
+            if (U.empty() && privateU.empty())
+                isEmpty = true;
+            else {
+                if (U.empty() && !privateU.empty()) // If U is empty but there are nodes in private U
+                    while (!privateU.empty()) {
+                        U.push_back(privateU.pop_front());
+                        myCard += privateMyCard;
+                    }
+                for (int i = 0; i < UCHUNK; i++) { // Pop the new nodes
+                    if (U.empty()) break;
+                    Us.push_back(U.pop_front());
+                }
+            }
+        } // End of critical U
+        if (isEmpty) break;
 
+        for (MilanLongInt u : Us)
+        {
 #ifdef PRINT_DEBUG_INFO_
             cout<<"\n("<<myRank<<")u: "<<u; fflush(stdout);
 #endif
-            if ((u >= StartIndex) && (u <= EndIndex)) { //Process Only the Local Vertices
+        if ((u >= StartIndex) && (u <= EndIndex)) { //Process Only the Local Vertices
 
 #ifdef COUNT_LOCAL_VERTEX
-                localVertices ++;
+            localVertices ++;
 #endif
 
                 //Get the Adjacency list for u
@@ -693,12 +723,56 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                 for (k = adj1; k < adj2; k++) {
                     v = verLocInd[k];
 
-#pragma omp critical
+                if ((v >= StartIndex) && (v <= EndIndex)) { //If Local Vertex:
+#pragma omp critical(innerProcessMatched)
                     {
 
                         if ((v >= StartIndex) && (v <= EndIndex)) { //If Local Vertex:
 
 
+                        //If the current vertex is pointing to a matched vertex and is not matched
+                        //FIXME is there a way to make candidateMate private?
+                        //      for the moment it could generate an error.
+                        if (not isAlreadyMatched(v, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap) and
+                            candidateMate[v - StartIndex] == u) {
+
+
+                            //Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
+                            //Start: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
+                            w = computeCandidateMate(verLocPtr[v - StartIndex],
+                                                     verLocPtr[v - StartIndex + 1],
+                                                     edgeLocWeight, 0,
+                                                     verLocInd,
+                                                     StartIndex,
+                                                     EndIndex,
+                                                     GMate,
+                                                     Mate,
+                                                     Ghost2LocalMap);
+
+                            candidateMate[v - StartIndex] = w;
+
+                            //End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
+#ifdef PRINT_DEBUG_INFO_
+                            cout<<"\n("<<myRank<<")"<<v<<" Points to: "<<w; fflush(stdout);
+#endif
+                            //If found a dominating edge:
+                            if (w >= 0) {
+
+                                //TODO is it possible to lock without a critical region?
+                                //TODO there must be a more elegant and efficient way to do this
+                                while(true) {
+                                    if (omp_test_lock(&MateLock[v - StartIndex])) {
+                                        if (omp_test_lock(&MateLock[w - StartIndex])) break;
+                                        else omp_unset_lock(&MateLock[v - StartIndex]);
+                                    }
+                                }
+
+
+                                if ((w < StartIndex) || (w > EndIndex)) { //A ghost
+#ifdef PRINT_DEBUG_INFO_
+                                    cout<<"\n("<<myRank<<")Sending a request message:";
+                                    cout<<"\n("<<myRank<<")Ghost is "<<w<<" Owner is: "<<findOwnerOfGhost(w, verDistance, myRank, numProcs);
+#endif
 
 #ifdef PRINT_DEBUG_INFO_
                             cout<<"\n("<<myRank<<")v: "<<v<<" c(v)= "<<candidateMate[v-StartIndex]<<" Mate[v]: "<<Mate[v];
@@ -729,11 +803,20 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #ifdef PRINT_DEBUG_INFO_
                                 cout<<"\n("<<myRank<<")"<<v<<" Points to: "<<w; fflush(stdout);
 #endif
-                                //If found a dominating edge:
+                                    } //End of if(CandidateMate(w) = v
+                                } //End of Else
 
-                                if (w >= 0) {
+                                omp_unset_lock(&MateLock[v - StartIndex]);
+                                omp_unset_lock(&MateLock[w - StartIndex]);
 
+                            } //End of if(w >=0)
+                            else {
+                                adj11 = verLocPtr[v - StartIndex];
+                                adj12 = verLocPtr[v - StartIndex + 1];
+                                for (k1 = adj11; k1 < adj12; k1++) {
+                                    w = verLocInd[k1];
                                     if ((w < StartIndex) || (w > EndIndex)) { //A ghost
+
 #ifdef PRINT_DEBUG_INFO_
                                         cout<<"\n("<<myRank<<")Sending a request message:";
                                         cout<<"\n("<<myRank<<")Ghost is "<<w<<" Owner is: "<<findOwnerOfGhost(w, verDistance, myRank, numProcs);
@@ -750,6 +833,12 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                         PCounter[ghostOwner]++;
                                         NumMessagesBundled++;
                                         msgInd++;
+                                    } //End of if(GHOST)
+                                } //End of for loop
+                            } // End of Else: w == -1
+                            //End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
+
+                        } //End of If (candidateMate[v-StartIndex] == u
 
 
                                         if (candidateMate[NLVer + Ghost2LocalMap[w]] == v) {
@@ -775,11 +864,19 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                                 }
                                             } //End of if Counter[w] > 0
 
-                                            //End: PARALLEL_PROCESS_CROSS_EDGE_B(v,w)
-                                        } //End of if CandidateMate[w] = v
+#pragma omp critical(innerProcessMatched)
+                    {
 
-                                    } //End of if a Ghost Vertex
-                                    else { //w is a local vertex
+                        while(!omp_test_lock(&MateLock[u - StartIndex]));
+
+                        if (candidateMate[NLVer + Ghost2LocalMap[v]] == u)
+                            candidateMate[NLVer + Ghost2LocalMap[v]] = -1;
+                        if (v != Mate[u - StartIndex]) { //u is local
+                            //Build the Message Packet:
+                            //Message[0] = u; //LOCAL
+                            //Message[1] = v; //GHOST
+                            //Message[2] = SUCCESS;  //TYPE
+                            //Send a Request (Asynchronous)
 
                                         if (candidateMate[w - StartIndex] == v) {
                                             Mate[v - StartIndex] = w;  //v is a local vertex
@@ -792,82 +889,40 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #endif
                                         } //End of if(CandidateMate(w) = v
 
-                                    } //End of Else
+                            QLocalVtx.push_back(u);
+                            QGhostVtx.push_back(v);
+                            QMsgType.push_back(SUCCESS);
+                            ghostOwner = findOwnerOfGhost(v, verDistance, myRank, numProcs);
+                            assert(ghostOwner != -1);
+                            assert(ghostOwner != myRank);
+                            QOwner.push_back(ghostOwner);
+                            PCounter[ghostOwner]++;
+                            NumMessagesBundled++;
+                            msgInd++;
+                        } //End of If( v != Mate[u] )
 
-                                } //End of if(w >=0)
-                                else {
+                        omp_unset_lock(&MateLock[u - StartIndex]);
 
-                                    adj11 = verLocPtr[v - StartIndex];
-                                    adj12 = verLocPtr[v - StartIndex + 1];
-                                    for (k1 = adj11; k1 < adj12; k1++) {
-                                        w = verLocInd[k1];
-                                        if ((w < StartIndex) || (w > EndIndex)) { //A ghost
+                    } //End of critical region
+                } //End of Else //A Ghost Vertex
 
-#ifdef PRINT_DEBUG_INFO_
-                                            cout<<"\n("<<myRank<<")Sending a failure message: ";
-                                            cout<<"\n("<<myRank<<")Ghost is "<<w<<" Owner is: "<<findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                                            fflush(stdout);
-#endif
-                                            ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                                            privateQLocalVtx.push_back(v);
-                                            privateQGhostVtx.push_back(w);
-                                            privateQMsgType.push_back(FAILURE);
-                                            privateQOwner.push_back(ghostOwner);
-                                            assert(ghostOwner != -1);
-                                            assert(ghostOwner != myRank);
-                                            PCounter[ghostOwner]++;
-                                            NumMessagesBundled++;
-                                            msgInd++;
-                                        } //End of if(GHOST)
-                                    } //End of for loop
-                                } // End of Else: w == -1
-                                //End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
+            } //End of For Loop adj(u)
 
-                                //} //End of critical region if
+        } //End of if ( (u >= StartIndex) && (u <= EndIndex) ) //Process Only If a Local Vertex
 
-                            } //End of If (candidateMate[v-StartIndex] == u)
-
-                            //}//End of critical region
-
-                        } //End of if ( (v >= StartIndex) && (v <= EndIndex) ) //If Local Vertex:
-                        else { //Neighbor is a ghost vertex
-
-                            if (candidateMate[NLVer + Ghost2LocalMap[v]] == u)
-                                candidateMate[NLVer + Ghost2LocalMap[v]] = -1;
-
-                            if (v != Mate[u - StartIndex]) { //u is local
-
-#ifdef PRINT_DEBUG_INFO_
-                                cout<<"\n("<<myRank<<")Sending a success message: ";
-                                cout<<"\n("<<myRank<<")Ghost is "<<v<<" Owner is: "<<findOwnerOfGhost(v, verDistance, myRank, numProcs)<<"\n"; fflush(stdout);
-#endif
-                                ghostOwner = findOwnerOfGhost(v, verDistance, myRank, numProcs);
-                                QLocalVtx.push_back(u);
-                                QGhostVtx.push_back(v);
-                                QMsgType.push_back(SUCCESS);
-                                QOwner.push_back(ghostOwner);
-                                assert(ghostOwner != -1);
-                                assert(ghostOwner != myRank);
-                                PCounter[ghostOwner]++;
-                                NumMessagesBundled++;
-                                msgInd++;
-                            } //End of If( v != Mate[u] )
-
-                        } //End of Else //A Ghost Vertex
-                    }// end of critical section
-                } //End of For Loop adj(u)
-            } //End of if ( (u >= StartIndex) && (u <= EndIndex) ) //Process Only If a Local Vertex
-
+        //Avoid to ask for the critical section if there is nothing to add
+        if (privateU.size() < UCHUNK && !U.empty()) continue;
 #pragma omp critical(U)
-            {
-                while (!privateU.empty()) {
-                    U.push_back(privateU.pop_front());
-                }
+        {
+            while (!privateU.empty()) {
+                U.push_back(privateU.pop_front());
+            }
 
                 myCard += privateMyCard;
             } //End of critical U
 
-        } //End of while
+    }
+    } //End of while ( /*!Q.empty()*/ !U.empty() )
 
 #pragma omp critical(privateMsg)
         {
