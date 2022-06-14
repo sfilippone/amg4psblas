@@ -225,6 +225,9 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     MilanInt BufferSize;
     MilanLongInt *Buffer;
     bool isEmpty;
+
+    //Declare the locks
+    omp_lock_t MateLock[NLVer];
 #ifdef TIME_TRACKER
     double Ghost2LocalInitialization = MPI_Wtime();
 #endif
@@ -232,8 +235,14 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #pragma omp parallel private(insertMe, k, u, w, v, k1, adj1, adj2, adj11, adj12, heaviestEdgeWt, ghostOwner, privateU, privateMyCard, isEmpty, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
     {
 
-        // TODO comments about the reduction
+        //Initialize the locks
+        //TODO this can be executed as task in parallel with other unparallelizable tasks
+        //TODO destroy the locks
+#pragma omp for schedule(static)
+        for(int i = 0; i < NLVer; i++)
+            omp_init_lock(&MateLock[i]);
 
+        // TODO comments about the reduction
 #pragma omp for reduction(+ : numGhostEdges)
         for (i = 0; i < NLEdge; i++) { //O(m) - Each edge stored twice
             insertMe = verLocInd[i];
@@ -704,7 +713,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                 v = verLocInd[k];
 
                 if ((v >= StartIndex) && (v <= EndIndex)) { //If Local Vertex:
-#pragma omp critical
+#pragma omp critical(innerProcessMatched)
                     {
 
 #ifdef PRINT_DEBUG_INFO_
@@ -712,11 +721,14 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         fflush(stdout);
 #endif
 
+
                         //If the current vertex is pointing to a matched vertex and is not matched
                         //FIXME is there a way to make candidateMate private?
                         //      for the moment it could generate an error.
                         if (not isAlreadyMatched(v, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap) and
                             candidateMate[v - StartIndex] == u) {
+
+
                             //Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
                             //Start: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
                             w = computeCandidateMate(verLocPtr[v - StartIndex],
@@ -737,6 +749,17 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #endif
                             //If found a dominating edge:
                             if (w >= 0) {
+
+                                //TODO is it possible to lock without a critical region?
+                                //TODO there must be a more elegant and efficient way to do this
+                                while(true) {
+                                    if (omp_test_lock(&MateLock[v - StartIndex])) {
+                                        if (omp_test_lock(&MateLock[w - StartIndex])) break;
+                                        else omp_unset_lock(&MateLock[v - StartIndex]);
+                                    }
+                                }
+
+
                                 if ((w < StartIndex) || (w > EndIndex)) { //A ghost
 #ifdef PRINT_DEBUG_INFO_
                                     cout<<"\n("<<myRank<<")Sending a request message:";
@@ -791,6 +814,10 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #endif
                                     } //End of if(CandidateMate(w) = v
                                 } //End of Else
+
+                                omp_unset_lock(&MateLock[v - StartIndex]);
+                                omp_unset_lock(&MateLock[w - StartIndex]);
+
                             } //End of if(w >=0)
                             else {
                                 adj11 = verLocPtr[v - StartIndex];
@@ -798,11 +825,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                 for (k1 = adj11; k1 < adj12; k1++) {
                                     w = verLocInd[k1];
                                     if ((w < StartIndex) || (w > EndIndex)) { //A ghost
-                                        //Build the Message Packet:
-                                        //Message[0] = v;	     //LOCAL
-                                        //Message[1] = w;            //GHOST
-                                        //Message[2] = FAILURE;      //TYPE
-                                        //Send a Request (Asynchronous)
+
 #ifdef PRINT_DEBUG_INFO_
                                         cout<<"\n("<<myRank<<")Sending a failure message: ";
                                         cout<<"\n("<<myRank<<")Ghost is "<<w<<" Owner is: "<<findOwnerOfGhost(w, verDistance, myRank, numProcs);
@@ -825,15 +848,19 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                 } //End of for loop
                             } // End of Else: w == -1
                             //End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-                        } //End of If (candidateMate[v-StartIndex] == u)
+
+                        } //End of If (candidateMate[v-StartIndex] == u
 
                     } //End of critical region if
 
                 } //End of if ( (v >= StartIndex) && (v <= EndIndex) ) //If Local Vertex:
                 else { //Neighbor is a ghost vertex
 
-#pragma omp critical
+#pragma omp critical(innerProcessMatched)
                     {
+
+                        while(!omp_test_lock(&MateLock[u - StartIndex]));
+
                         if (candidateMate[NLVer + Ghost2LocalMap[v]] == u)
                             candidateMate[NLVer + Ghost2LocalMap[v]] = -1;
                         if (v != Mate[u - StartIndex]) { //u is local
@@ -859,6 +886,9 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                             NumMessagesBundled++;
                             msgInd++;
                         } //End of If( v != Mate[u] )
+
+                        omp_unset_lock(&MateLock[u - StartIndex]);
+
                     } //End of critical region
                 } //End of Else //A Ghost Vertex
 
