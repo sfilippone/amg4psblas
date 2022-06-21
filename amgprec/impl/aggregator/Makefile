@@ -68,7 +68,9 @@ OBJS = $(FOBJS) $(MPCOBJS)
 
 LIBNAME=libamg_prec.a
 
-lib:  $(OBJS)
+objs: $(OBJS)
+
+lib:  objs
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 

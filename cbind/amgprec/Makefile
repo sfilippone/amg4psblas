@@ -18,8 +18,9 @@ LIBMOD=amg_prec_cbind_mod$(.mod) amg_dprec_cbind_mod$(.mod) amg_zprec_cbind_mod$
 LOCAL_MODS=$(LIBMOD)
 #LIBNAME=$(CPRECLIBNAME)
 
+objs: $(OBJS)
 
-lib:  $(OBJS) $(CMOD)
+lib: objs $(CMOD)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(DEST)

@@ -1,10 +1,13 @@
 include Make.inc
 
 
-all:  library 
+all:  objs lib
 
-library: libdir amgp cbnd
-#cbnd
+objs: amgp cbnd
+
+lib: libdir objs
+	cd amgprec && $(MAKE) lib
+	cd cbind && $(MAKE)  lib
 
 libdir:
 	(if test ! -d lib ; then mkdir lib; fi)
@@ -14,9 +17,9 @@ libdir:
         
 
 amgp:
-	$(MAKE) -C amgprec all
+	cd amgprec && $(MAKE) objs
 cbnd: amgp
-	$(MAKE) -C cbind all
+	cd cbind && $(MAKE)  objs
 install: all
 	mkdir -p $(INSTALL_LIBDIR) &&\
 	   $(INSTALL_DATA) lib/*.a  $(INSTALL_LIBDIR)
@@ -41,14 +44,14 @@ cleanlib:
 	(cd modules; /bin/rm -f *.a *$(.mod) *$(.fh))
 
 veryclean: cleanlib
-	(cd amgprec; make veryclean)
-	(cd samples/simple/fileread; make clean)
-	(cd samples/simple/pdegen; make clean)
-	(cd samples/advanced/fileread; make clean)
-	(cd samples/advanced/pdegen; make clean)
+	(cd amgprec && $(MAKE) veryclean)
+	(cd samples/simple/fileread && $(MAKE) clean)
+	(cd samples/simple/pdegen && $(MAKE) clean)
+	(cd samples/advanced/fileread && $(MAKE) clean)
+	(cd samples/advanced/pdegen && $(MAKE) clean)
 
 check: all
 	make check -C samples/advanced/pdegen
 
 clean:
-	(cd amgprec; make clean)
+	(cd amgprec && $(MAKE) clean)

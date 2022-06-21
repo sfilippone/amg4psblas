@@ -8,19 +8,19 @@ MODDIR=../modules/
 LIBNAME=$(CBINDLIBNAME)
 LIBNAME=libamg_cbind.a	
 
-all: lib
-lib: amgprecd
+objs: amgprecd
+lib: objs
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
 	/bin/cp -p $(CPUPDFLAG) *.h $(INCDIR)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
 
 amgprecd:
-	$(MAKE) -C amgprec lib LIBNAME=$(LIBNAME)
+	cd amgprec && $(MAKE)  objs LIBNAME=$(LIBNAME)
 
 
 clean:
-	$(MAKE) -C amgprec clean
+	cd amgprec &&$(MAKE)  clean
 
 
 veryclean: clean

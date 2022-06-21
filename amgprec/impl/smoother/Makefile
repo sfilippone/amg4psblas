@@ -190,13 +190,11 @@ amg_z_l1_jac_smoother_clone.o \
 
 LIBNAME=libamg_prec.a
 
-lib:  $(OBJS)
+objs:  $(OBJS)
+
+lib: objs
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
-
-mpobjs:
-	(make $(MPFOBJS) FC="$(MPFC)" FCOPT="$(FCOPT)")
-	(make $(MPCOBJS) CC="$(MPCC)" CCOPT="$(CCOPT)")
 
 veryclean: clean
 	/bin/rm -f $(LIBNAME)
