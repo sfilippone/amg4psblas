@@ -20,7 +20,8 @@ amgp:
 	cd amgprec && $(MAKE) objs
 cbnd: amgp
 	cd cbind && $(MAKE)  objs
-install: all
+
+install: lib
 	mkdir -p $(INSTALL_LIBDIR) &&\
 	   $(INSTALL_DATA) lib/*.a  $(INSTALL_LIBDIR)
 	mkdir -p  $(INSTALL_INCLUDEDIR) &&\

@@ -12,11 +12,12 @@ objs: amgprecd
 	/bin/cp -p $(CPUPDFLAG) *.h $(INCDIR)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 lib: objs
+	cd amgprec && $(MAKE)  lib LIBNAME=$(LIBNAME)
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
 
 
 amgprecd:
-	cd amgprec && $(MAKE)  objs LIBNAME=$(LIBNAME)
+	cd amgprec && $(MAKE)  objs
 
 
 clean:
