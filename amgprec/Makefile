@@ -68,14 +68,14 @@ objs: $(OBJS)
 
 impld: objs
 	cd impl && $(MAKE) 
+	/bin/cp -p amg_const.h $(INCDIR)
+	/bin/cp -p *$(.mod) $(MODDIR)
 
 lib: $(OBJS) impld
 	cd impl && $(MAKE) lib
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p amg_const.h $(INCDIR)
-	/bin/cp -p *$(.mod) $(MODDIR)
 
 
 $(MODOBJS): $(PSBLAS_MODDIR)/$(PSBBASEMODNAME)$(.mod)

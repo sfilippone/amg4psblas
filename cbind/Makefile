@@ -9,10 +9,10 @@ LIBNAME=$(CBINDLIBNAME)
 LIBNAME=libamg_cbind.a	
 
 objs: amgprecd
-lib: objs
-	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
 	/bin/cp -p $(CPUPDFLAG) *.h $(INCDIR)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
+lib: objs
+	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
 
 
 amgprecd:
