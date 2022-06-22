@@ -6,7 +6,7 @@ MODDIR=$(TOP)/modules
 HERE=.
 DEST=../
 
-CINCLUDES=-I. -I$(LIBDIR) -I$(PSBLAS_INCDIR)
+CINCLUDES=-I. -I$(INCDIR) -I$(PSBLAS_INCDIR)
 FINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(INCDIR) $(FMFLAG)$(MODDIR) $(PSBLAS_INCLUDES)
 
 
@@ -19,12 +19,13 @@ LOCAL_MODS=$(LIBMOD)
 #LIBNAME=$(CPRECLIBNAME)
 
 objs: $(OBJS)
+	/bin/cp -p $(LIBMOD) $(MODDIR)
+	/bin/cp -p $(CMOD) $(INCDIR)
 
 lib: objs $(CMOD)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(DEST)
-	/bin/cp -p $(LIBMOD) $(CMOD) $(DEST)
 
 amg_prec_cbind_mod.o: amg_dprec_cbind_mod.o  amg_zprec_cbind_mod.o
 #amg_prec_cbind_mod.o: psb_prec_cbind_mod.o
