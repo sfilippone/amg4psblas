@@ -1,6 +1,10 @@
 #include "MatchBoxPC.h"
 #include <omp.h>
 #include <stdio.h>
+#include "isAlreadyMatched.cpp"
+#include "findOwnerOfGhost.cpp"
+#include "computeCandidateMate.cpp"
+
 // ***********************************************************************
 //
 //        MatchboxP: A C++ library for approximate weighted matching
@@ -238,9 +242,9 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         //Initialize the locks
         //TODO this can be executed as task in parallel with other unparallelizable tasks
         //TODO destroy the locks
-#pragma omp for schedule(static)
-        for(int i = 0; i < NLVer; i++)
-            omp_init_lock(&MateLock[i]);
+//#pragma omp for schedule(static)
+//        for(int i = 0; i < NLVer; i++)
+//            omp_init_lock(&MateLock[i]);
 
         // TODO comments about the reduction
 #pragma omp for reduction(+ : numGhostEdges)
@@ -752,12 +756,14 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 
                                         //TODO is it possible to lock without a critical region?
                                         //TODO there must be a more elegant and efficient way to do this
+                                        /*
                                         while(true) {
                                             if (omp_test_lock(&MateLock[v - StartIndex])) {
                                                 if (omp_test_lock(&MateLock[w - StartIndex])) break;
                                                 else omp_unset_lock(&MateLock[v - StartIndex]);
                                             }
                                         }
+                                        */
 
 
                                         if ((w < StartIndex) || (w > EndIndex)) { //A ghost
@@ -815,8 +821,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                             } //End of if(CandidateMate(w) = v
                                         } //End of Else
 
-                                        omp_unset_lock(&MateLock[v - StartIndex]);
-                                        omp_unset_lock(&MateLock[w - StartIndex]);
+                                        //omp_unset_lock(&MateLock[v - StartIndex]);
+                                        //omp_unset_lock(&MateLock[w - StartIndex]);
 
                                     } //End of if(w >=0)
                                     else {
@@ -859,7 +865,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #pragma omp critical(innerProcessMatched)
                             {
 
-                                while(!omp_test_lock(&MateLock[u - StartIndex]));
+                                //while(!omp_test_lock(&MateLock[u - StartIndex]));
 
                                 if (candidateMate[NLVer + Ghost2LocalMap[v]] == u)
                                     candidateMate[NLVer + Ghost2LocalMap[v]] = -1;
@@ -887,7 +893,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                     msgInd++;
                                 } //End of If( v != Mate[u] )
 
-                                omp_unset_lock(&MateLock[u - StartIndex]);
+                                //omp_unset_lock(&MateLock[u - StartIndex]);
 
                             } //End of critical region
                         } //End of Else //A Ghost Vertex
@@ -1637,154 +1643,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     //MPI_Barrier(comm);
 }
 //End of algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMate
-
-///Find the owner of a ghost node:
-inline MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
-                                 MilanInt myRank, MilanInt numProcs) {
-    //MilanLongInt Size = mVerDistance.size();
-    MilanLongInt mStartInd = mVerDistance[myRank];
-    MilanInt Start = 0;
-    MilanInt End = numProcs;
-    MilanInt Current = 0;
-
-#if 0
-    if ( vtxIndex < mStartInd )
-    End = myRank;
-  else
-    Start = myRank;
-#endif
-
-    while ( Start <= End ) {
-        Current = (End + Start)/2;
-        //CASE-1:
-        if ( mVerDistance[Current] == vtxIndex ) {
-            while ( mVerDistance[Current+1] == vtxIndex ) {
-                Current++;
-                if ( Current == numProcs )
-                    return (-1);
-            }
-            return (Current);
-        }
-        else { //CASE 2:
-            if ( mVerDistance[Current] > vtxIndex )
-                End = Current - 1;
-            else //CASE 3:
-                Start = Current + 1;
-        }
-    } //End of While()
-    if ( Current == 0 )
-        return (Current);
-    else {
-        if ( mVerDistance[Current] > vtxIndex )
-            return (Current-1);
-        else
-            return (Current);
-    } //End of else
-    return (-1); //It should not reach here!
-} //End of findOwnerOfGhost()
-
-/**
- * Execute the research fr the Candidate Mate without controlling if the vertices are already matched.
- * Returns the vertices with the highest weight
- * @param adj1
- * @param adj2
- * @param verLocInd
- * @param edgeLocWeight
- * @return
- */
-inline MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
-                                              MilanLongInt adj2,
-                                              MilanLongInt* verLocInd,
-                                              MilanReal* edgeLocWeight)
-{
-    MilanInt w = -1;
-    MilanReal heaviestEdgeWt = MilanRealMin; //Assign the smallest Value possible first LDBL_MIN
-    int finalK;
-    for (int k = adj1; k < adj2; k++) {
-
-        if ((edgeLocWeight[k] > heaviestEdgeWt) ||
-            ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k]))) {
-            heaviestEdgeWt = edgeLocWeight[k];
-            w = verLocInd[k];
-            finalK = k;
-        }
-    } //End of for loop
-    return finalK;
-}
-
-/**
- * //TODO documentation
- * @param k
- * @param verLocInd
- * @param StartIndex
- * @param EndIndex
- * @param GMate
- * @param Mate
- * @param Ghost2LocalMap
- * @return
- */
-inline bool isAlreadyMatched(MilanLongInt node,
-                             MilanLongInt StartIndex,
-                             MilanLongInt EndIndex,
-                             vector <MilanLongInt> &GMate,
-                             MilanLongInt* Mate,
-                             map <MilanLongInt, MilanLongInt> &Ghost2LocalMap
-) {
-
-    bool result = false;
-#pragma omp critical(Mate)
-    {
-        if ((node < StartIndex) || (node > EndIndex)) { //Is it a ghost vertex?
-            if (GMate[Ghost2LocalMap[node]] >= 0)// Already matched
-                result = true;
-        } else { //A local vertex
-            if (Mate[node - StartIndex] >= 0) // Already matched
-                result = true;
-        }
-
-    }
-
-    return result;
-}
-
-/**
- * //TODO documentation
- * @param adj1
- * @param adj2
- * @param edgeLocWeight
- * @param k
- * @param verLocInd
- * @param StartIndex
- * @param EndIndex
- * @param GMate
- * @param Mate
- * @param Ghost2LocalMap
- * @return
- */
-inline MilanLongInt computeCandidateMate(MilanLongInt adj1,
-                                         MilanLongInt adj2,
-                                         MilanReal* edgeLocWeight,
-                                         MilanLongInt k,
-                                         MilanLongInt* verLocInd,
-                                         MilanLongInt StartIndex,
-                                         MilanLongInt EndIndex,
-                                         vector <MilanLongInt>& GMate,
-                                         MilanLongInt* Mate,
-                                         map <MilanLongInt, MilanLongInt>& Ghost2LocalMap)
-{
-    MilanInt w = -1;
-    MilanReal heaviestEdgeWt = MilanRealMin; //Assign the smallest Value possible first LDBL_MIN
-    for (k = adj1; k < adj2; k++) {
-        if (isAlreadyMatched(verLocInd[k], StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) continue;
-
-        if ((edgeLocWeight[k] > heaviestEdgeWt) ||
-            ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k]))) {
-            heaviestEdgeWt = edgeLocWeight[k];
-            w = verLocInd[k];
-        }
-    } //End of for loop
-    return w;
-}
 #endif
 
 #endif
