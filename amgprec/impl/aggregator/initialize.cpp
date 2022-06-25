@@ -12,7 +12,6 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                         MilanLongInt StartIndex, MilanLongInt EndIndex,
                         MilanLongInt* numGhostEdgesPtr,
                         MilanLongInt* numGhostVerticesPtr,
-                        MilanLongInt* insertMePtr,
                         MilanLongInt* S,
                         MilanLongInt* verLocInd,
                         MilanLongInt* verLocPtr,
@@ -29,7 +28,12 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                         vector<MilanLongInt>& QMsgType,
                         vector<MilanInt>& QOwner,
                         MilanLongInt* &candidateMate,
-                        staticQueue& U
+                        staticQueue& U,
+                        staticQueue& privateU,
+                        staticQueue& privateQLocalVtx,
+                        staticQueue& privateQGhostVtx,
+                        staticQueue& privateQMsgType,
+                        staticQueue& privateQOwner
                         )
 {
 
@@ -37,7 +41,6 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
     MilanLongInt adj1, adj2;
     int i, v, k, w;
 
-    
     // index that starts with zero to |Vg|  - 1
     map<MilanLongInt, MilanLongInt>::iterator storedAlready;
 
@@ -64,10 +67,9 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
      *
      * Despite the critical region it is still productive to
      * parallelize this for because the critical region is exeuted
-     * only when a ghost edge is found and ghost edges are a minority.
+     * only when a ghost edge is found and ghost edges are a minority,
+     * circa 3.5% during the tests.
      */
-
-        // TODO comments about the reduction
 #pragma omp for reduction(+ : numGhostEdges)
         for (i = 0; i < NLEdge; i++) { //O(m) - Each edge stored twice
             insertMe = verLocInd[i];
@@ -89,8 +91,6 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                 }
             } //End of if ( (insertMe < StartIndex) || (insertMe > EndIndex) )
         } //End of for(ghost vertices)
-
-
 
         #pragma omp single
         {
@@ -143,7 +143,6 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
             /*
              * Not parallelizable
              */
-
             for (i = 0; i < numGhostVertices; i++) { //O(|Ghost Vertices|)
                 verGhostPtr[i + 1] = verGhostPtr[i] + Counter[i];
 #ifdef PRINT_DEBUG_INFO_
@@ -163,6 +162,10 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
         fflush(stdout);
 #endif
 
+#ifdef TIME_TRACKER
+        double verGhostIndInitialization = MPI_Wtime();
+#endif
+
         /*
          * OMP verGhostIndInitialization
          *
@@ -175,13 +178,8 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
          * Despite the critical region it's still useful to
          * parallelize the for cause the ghost nodes
          * are a minority hence the critical region is executed
-         * few times.
+         * few times, circa 3.5% of the times in the tests.
          */
-
-#ifdef TIME_TRACKER
-        double verGhostIndInitialization = MPI_Wtime();
-#endif
-
 #pragma omp for nowait schedule(static)
         for (v = 0; v < NLVer; v++) {
             adj1 = verLocPtr[v];   //Vertex Pointer
@@ -192,17 +190,14 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
 #pragma omp critical
                     {
                         insertMe = verGhostPtr[Ghost2LocalMap[w]] + tempCounter[Ghost2LocalMap[w]]; //Where to insert
-                        verGhostInd[insertMe] = v + StartIndex; //Add the adjacency
                         tempCounter[Ghost2LocalMap[w]]++; //Increment the counter
                     }
+                    verGhostInd[insertMe] = v + StartIndex; //Add the adjacency
                 } //End of if((w < StartIndex) || (w > EndIndex))
             } //End of for(k)
         } //End of for (v)
-    
-    }
 
-    #pragma omp single
-        {
+    } // End of parallel region
 
 #ifdef TIME_TRACKER
             verGhostIndInitialization = MPI_Wtime() - verGhostIndInitialization;
@@ -216,11 +211,6 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
             cout<<endl; fflush(stdout);
 #endif
 
-
-            Message.resize(3, -1);
-            //message_type = 0;
-            //NumMessagesBundled = 0;
-            //ghostOwner = 0;
             try {
                 QLocalVtx.reserve(numGhostEdges); //Local Vertex
                 QGhostVtx.reserve(numGhostEdges); //Ghost Vertex
@@ -232,23 +222,19 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                 exit(1);
             }
 
-        } // end of single region
-
 #ifdef PRINT_DEBUG_INFO_
 cout<<"\n("<<myRank<<")Allocating CandidateMate.. "; fflush(stdout);
 #endif
 
     *numGhostEdgesPtr = numGhostEdges;
     *numGhostVerticesPtr = numGhostVertices;  
-    *insertMePtr = insertMe; 
 
     //Allocate Data Structures:
     /*
      * candidateMate was a vector and has been replaced with a raw array
-     * there is no point in using the vector (or maybe there is???)
+     * there is no point in using the vector (or maybe there is (???))
      * so I replaced it with an array wich is slightly faster
      */
-    //candidateMate = new MilanLongInt[NLVer + numGhostVertices];
     candidateMate = new MilanLongInt[NLVer + numGhostVertices];
 
 
@@ -267,7 +253,6 @@ cout<<"\n("<<myRank<<")Allocating CandidateMate.. "; fflush(stdout);
 
     *S = numGhostVertices; //Initialize S with number of Ghost Vertices
 
-
     /*
      * Create the Queue Data Structure for the Dominating Set
      *
@@ -276,6 +261,14 @@ cout<<"\n("<<myRank<<")Allocating CandidateMate.. "; fflush(stdout);
      * of a staticQueue I had to destroy the previous object and instantiate
      * a new one of the correct size.
      */
-    U.~staticQueue();
     new(&U) staticQueue(NLVer + numGhostVertices);
+
+    //TODO how can I decide a more meaningfull size?
+    MilanLongInt size = numGhostVertices;
+
+    new(&privateU) staticQueue(NLVer + numGhostVertices); //TODO how can I put a meaningfull size?
+    new(&privateQLocalVtx) staticQueue(size);
+    new(&privateQGhostVtx) staticQueue(size);
+    new(&privateQMsgType) staticQueue(size);
+    new(&privateQOwner) staticQueue(size);
 }

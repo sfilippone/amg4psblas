@@ -179,7 +179,6 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                         MilanLongInt StartIndex, MilanLongInt EndIndex,
                         MilanLongInt* numGhostEdgesPtr,
                         MilanLongInt* numGhostVerticesPtr,
-                        MilanLongInt* insertMePtr,
                         MilanLongInt* S,
                         MilanLongInt* verLocInd,
                         MilanLongInt* verLocPtr,
@@ -196,7 +195,12 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                         vector<MilanLongInt>& QMsgType,
                         vector<MilanInt>& QOwner,
                         MilanLongInt* &candidateMate,
-                        staticQueue& U
+                        staticQueue& U,
+                        staticQueue& privateU,
+                        staticQueue& privateQLocalVtx,
+                        staticQueue& privateQGhostVtx,
+                        staticQueue& privateQMsgType,
+                        staticQueue& privateQOwner
                         );
 
 void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP

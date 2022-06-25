@@ -185,7 +185,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     //Build the Ghost Vertex Set: Vg
     map <MilanLongInt, MilanLongInt> Ghost2LocalMap; //Map each ghost vertex to a local vertex
     vector <MilanLongInt> Counter;  //Store the edge count for each ghost vertex
-    MilanLongInt numGhostVertices = 0, numGhostEdges = 0, insertMe = 0; //Number of Ghost vertices
+    MilanLongInt numGhostVertices = 0, numGhostEdges = 0; //Number of Ghost vertices
 
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")About to compute Ghost Vertices..."; fflush(stdout);
@@ -218,7 +218,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 
     initialize(NLVer, NLEdge, StartIndex, 
                 EndIndex, &numGhostEdges, 
-                &numGhostVertices, &insertMe, &S,
+                &numGhostVertices, &S,
                 verLocInd, verLocPtr,
                 MateLock, 
                 Ghost2LocalMap, Counter,
@@ -226,20 +226,27 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                 tempCounter, GMate,
                 Message, QLocalVtx,
                 QGhostVtx, QMsgType, QOwner, 
-                candidateMate, U);
+                candidateMate, U,
+                privateU,
+                privateQLocalVtx,
+                privateQGhostVtx,
+                privateQMsgType,
+                privateQOwner
+                );
                         
     finishTime = MPI_Wtime();
     *ph0_time = finishTime - startTime; //Time taken for Phase-0: Initialization      
 
                     
     startTime = MPI_Wtime();
+    
 
     /////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////// INITIALIZATION /////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////
     //Compute the Initial Matching Set:
 
-#pragma omp parallel private(insertMe, k, u, w, v, k1, adj1, adj2, adj11, adj12, heaviestEdgeWt, ghostOwner, privateU, privateMyCard, isEmpty, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
+#pragma omp parallel private(k, u, w, v, k1, adj1, adj2, adj11, adj12, heaviestEdgeWt, ghostOwner, privateMyCard, isEmpty) firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) default(shared) num_threads(4)
     {
         /*
         * OMP PARALLEL_COMPUTE_CANDIDATE_MATE_B has been splitted from
@@ -270,21 +277,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
          * TODO: Test when it's more efficient to execute this code
          *       in parallel.
          */
-
-
-        MilanLongInt size = numGhostVertices; //TODO how can I decide a more meaningfull size?
-        //Fail messages
-        privateQLocalVtx.~staticQueue();
-        privateQGhostVtx.~staticQueue();
-        privateQMsgType.~staticQueue();
-        privateQOwner.~staticQueue();
-        privateU.~staticQueue();
-
-        new(&privateU) staticQueue(NLVer + numGhostVertices); //TODO how can I put a meaningfull size?
-        new(&privateQLocalVtx) staticQueue(size);
-        new(&privateQGhostVtx) staticQueue(size);
-        new(&privateQMsgType) staticQueue(size);
-        new(&privateQOwner) staticQueue(size);
 
 
 #pragma omp for reduction(+: msgInd, NumMessagesBundled, myCard, PCounter[:numProcs]) schedule(static)
@@ -334,8 +326,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         assert(ghostOwner != myRank);
                         PCounter[ghostOwner]++;
 
-
                         //TODO why does it fail if I use a private data structure???
+                        
                         /*
                         privateQLocalVtx.push_back(v + StartIndex);
                         privateQGhostVtx.push_back(w);
@@ -351,6 +343,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                             QMsgType.push_back(REQUEST);
                             QOwner.push_back(ghostOwner);
                         } // end of critical region
+                      
 
                         if (candidateMate[NLVer + Ghost2LocalMap[w]] == v + StartIndex) {
 
