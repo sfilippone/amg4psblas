@@ -59,7 +59,7 @@
 #include <assert.h>
 #include <map>
 #include <vector>
-// #include "matchboxp.h"
+#include "omp.h"
 #include "primitiveDataTypeDefinitions.h"
 #include "dataStrStaticQueue.h"
 
@@ -174,6 +174,29 @@ inline MilanLongInt computeCandidateMate(MilanLongInt adj1,
                                          vector <MilanLongInt> &GMate,
                                          MilanLongInt* Mate,
                                          map <MilanLongInt, MilanLongInt> &Ghost2LocalMap);
+
+inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
+                        MilanLongInt StartIndex, MilanLongInt EndIndex,
+                        MilanLongInt* numGhostEdgesPtr,
+                        MilanLongInt* numGhostVerticesPtr,
+                        MilanLongInt* insertMePtr,
+                        MilanLongInt* verLocInd,
+                        MilanLongInt* verLocPtr,
+                        omp_lock_t* MateLock,
+                        map <MilanLongInt, MilanLongInt> &Ghost2LocalMap,
+                        vector <MilanLongInt>& Counter,
+                        vector <MilanLongInt>& verGhostPtr,
+                        vector <MilanLongInt>& verGhostInd,
+                        vector <MilanLongInt>& tempCounter,
+                        vector <MilanLongInt>& GMate,
+                        vector<MilanLongInt>& Message,
+                        vector<MilanLongInt>& QLocalVtx,
+                        vector<MilanLongInt>& QGhostVtx,
+                        vector<MilanLongInt>& QMsgType,
+                        vector<MilanInt>& QOwner,
+                        MilanLongInt* candidateMate,
+                        staticQueue& U
+                        );
 
 void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP
         (
