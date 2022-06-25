@@ -13,6 +13,7 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                         MilanLongInt* numGhostEdgesPtr,
                         MilanLongInt* numGhostVerticesPtr,
                         MilanLongInt* insertMePtr,
+                        MilanLongInt* S,
                         MilanLongInt* verLocInd,
                         MilanLongInt* verLocPtr,
                         omp_lock_t* MateLock,
@@ -27,7 +28,7 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                         vector<MilanLongInt>& QGhostVtx,
                         vector<MilanLongInt>& QMsgType,
                         vector<MilanInt>& QOwner,
-                        MilanLongInt* candidateMate,
+                        MilanLongInt* &candidateMate,
                         staticQueue& U
                         )
 {
@@ -233,7 +234,48 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
 
         } // end of single region
 
+#ifdef PRINT_DEBUG_INFO_
+cout<<"\n("<<myRank<<")Allocating CandidateMate.. "; fflush(stdout);
+#endif
+
     *numGhostEdgesPtr = numGhostEdges;
     *numGhostVerticesPtr = numGhostVertices;  
     *insertMePtr = insertMe; 
+
+    //Allocate Data Structures:
+    /*
+     * candidateMate was a vector and has been replaced with a raw array
+     * there is no point in using the vector (or maybe there is???)
+     * so I replaced it with an array wich is slightly faster
+     */
+    //candidateMate = new MilanLongInt[NLVer + numGhostVertices];
+    candidateMate = new MilanLongInt[NLVer + numGhostVertices];
+
+
+    #ifdef PRINT_DEBUG_INFO_
+            cout<<"\n("<<myRank<<"=========================************==============================="<<endl; fflush(stdout);
+            fflush(stdout);
+#endif
+
+#ifdef PRINT_DEBUG_INFO_
+            cout<<"\n("<<myRank<<") Setup Time :"<< *ph0_time <<endl; fflush(stdout);
+            fflush(stdout);
+#endif
+#ifdef DEBUG_HANG_
+            if (myRank == 0) cout<<"\n("<<myRank<<") Setup Time :"<< *ph0_time <<endl; fflush(stdout);
+#endif
+
+    *S = numGhostVertices; //Initialize S with number of Ghost Vertices
+
+
+    /*
+     * Create the Queue Data Structure for the Dominating Set
+     *
+     * I had to declare the staticuQueue U before the parallel region
+     * to have it in the correct scope. Since we can't change the dimension
+     * of a staticQueue I had to destroy the previous object and instantiate
+     * a new one of the correct size.
+     */
+    U.~staticQueue();
+    new(&U) staticQueue(NLVer + numGhostVertices);
 }

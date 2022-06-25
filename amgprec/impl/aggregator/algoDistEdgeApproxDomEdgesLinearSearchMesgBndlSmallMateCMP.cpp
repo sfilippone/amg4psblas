@@ -170,7 +170,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 
     MilanLongInt NumMessagesBundled = 0;
     MilanInt ghostOwner = 0; // Changed by Fabio to be an integer, addresses needs to be integers!
-    MilanLongInt* candidateMate = new MilanLongInt[1];
+    MilanLongInt* candidateMate = nullptr;
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")NV: "<<NLVer<<"  Edges: "<<NLEdge; fflush(stdout);
     cout<<"\n("<<myRank<<")StartIndex: "<<StartIndex<<"  EndIndex: "<<EndIndex; fflush(stdout);
@@ -218,7 +218,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 
     initialize(NLVer, NLEdge, StartIndex, 
                 EndIndex, &numGhostEdges, 
-                &numGhostVertices, &insertMe, 
+                &numGhostVertices, &insertMe, &S,
                 verLocInd, verLocPtr,
                 MateLock, 
                 Ghost2LocalMap, Counter,
@@ -239,68 +239,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     /////////////////////////////////////////////////////////////////////////////////////////
     //Compute the Initial Matching Set:
 
-
 #pragma omp parallel private(insertMe, k, u, w, v, k1, adj1, adj2, adj11, adj12, heaviestEdgeWt, ghostOwner, privateU, privateMyCard, isEmpty, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
     {
-
-#pragma omp single
-{
-            #ifdef PRINT_DEBUG_INFO_
-            cout<<"\n("<<myRank<<")Allocating CandidateMate.. "; fflush(stdout);
-#endif
-            //Allocate Data Structures:
-            /*
-             * candidateMate was a vector and has been replaced with a raw array
-             * there is no point in using the vector (or maybe there is???)
-             * so I replaced it with an array wich is slightly faster
-             */
-            delete[] candidateMate;
-            candidateMate = new MilanLongInt[NLVer + numGhostVertices];
-
-            /*
-             * Create the Queue Data Structure for the Dominating Set
-             *
-             * I had to declare the staticuQueue U before the parallel region
-             * to have it in the correct scope. Since we can't change the dimension
-             * of a staticQueue I had to destroy the previous object and instantiate
-             * a new one of the correct size.
-             */
-            U.~staticQueue();
-            new(&U) staticQueue(NLVer + numGhostVertices);
-
-#ifdef PRINT_DEBUG_INFO_
-            cout<<"\n("<<myRank<<"=========================************==============================="<<endl; fflush(stdout);
-            fflush(stdout);
-#endif
-
-#ifdef PRINT_DEBUG_INFO_
-            cout<<"\n("<<myRank<<") Setup Time :"<< *ph0_time <<endl; fflush(stdout);
-            fflush(stdout);
-#endif
-#ifdef DEBUG_HANG_
-            if (myRank == 0) cout<<"\n("<<myRank<<") Setup Time :"<< *ph0_time <<endl; fflush(stdout);
-#endif
-            /////////////////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////// INITIALIZATION /////////////////////////////////////
-            /////////////////////////////////////////////////////////////////////////////////////////
-            //Compute the Initial Matching Set:
-
-            S = numGhostVertices; //Initialize S with number of Ghost Vertices
-
-            /*
-             * Create the Queue Data Structure for the Dominating Set
-             *
-             * I had to declare the staticuQueue U before the parallel region
-             * to have it in the correct scope. Since we can't change the dimension
-             * of a staticQueue I had to destroy the previous object and instantiate
-             * a new one of the correct size.
-             */
-            U.~staticQueue();
-            new(&U) staticQueue(NLVer + numGhostVertices);
-
-                S = numGhostVertices; //Initialize S with number of Ghost Vertices
-
-}
         /*
         * OMP PARALLEL_COMPUTE_CANDIDATE_MATE_B has been splitted from
         * PARALLEL_PROCESS_EXPOSED_VERTEX_B in order to better parallelize
@@ -331,6 +271,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
          *       in parallel.
          */
 
+
         MilanLongInt size = numGhostVertices; //TODO how can I decide a more meaningfull size?
         //Fail messages
         privateQLocalVtx.~staticQueue();
@@ -344,6 +285,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         new(&privateQGhostVtx) staticQueue(size);
         new(&privateQMsgType) staticQueue(size);
         new(&privateQOwner) staticQueue(size);
+
 
 #pragma omp for reduction(+: msgInd, NumMessagesBundled, myCard, PCounter[:numProcs]) schedule(static)
         for (v = 0; v < NLVer; v++) {

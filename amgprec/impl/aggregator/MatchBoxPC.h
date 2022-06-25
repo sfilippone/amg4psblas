@@ -180,6 +180,7 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                         MilanLongInt* numGhostEdgesPtr,
                         MilanLongInt* numGhostVerticesPtr,
                         MilanLongInt* insertMePtr,
+                        MilanLongInt* S,
                         MilanLongInt* verLocInd,
                         MilanLongInt* verLocPtr,
                         omp_lock_t* MateLock,
@@ -194,7 +195,7 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                         vector<MilanLongInt>& QGhostVtx,
                         vector<MilanLongInt>& QMsgType,
                         vector<MilanInt>& QOwner,
-                        MilanLongInt* candidateMate,
+                        MilanLongInt* &candidateMate,
                         staticQueue& U
                         );
 
