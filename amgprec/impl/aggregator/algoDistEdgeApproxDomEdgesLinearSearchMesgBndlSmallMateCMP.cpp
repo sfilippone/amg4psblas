@@ -214,6 +214,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     bool isEmpty;
 
     //Declare the locks
+    // TODO destroy the locks
     omp_lock_t MateLock[NLVer];
 
     initialize(NLVer, NLEdge, StartIndex, 
