@@ -1,3 +1,4 @@
+rm amgprec/impl/aggregator/algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP.o
 make all
 cd samples/advanced/pdegen
 make amg_d_pde3d
