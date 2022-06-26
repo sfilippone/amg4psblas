@@ -8,6 +8,8 @@
 #include "dataStrStaticQueue.h"
 #include "omp.h"
 
+#define NUM_THREAD 4
+
 inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                         MilanLongInt StartIndex, MilanLongInt EndIndex,
                         MilanLongInt* numGhostEdgesPtr,
@@ -44,17 +46,19 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
     // index that starts with zero to |Vg|  - 1
     map<MilanLongInt, MilanLongInt>::iterator storedAlready;
 
-#pragma omp parallel private(insertMe, k, w, v, adj1, adj2) firstprivate(StartIndex, EndIndex) default(shared) num_threads(4)
+#pragma omp parallel private(insertMe, k, w, v, adj1, adj2) firstprivate(StartIndex, EndIndex) default(shared) num_threads(NUM_THREAD)
     {
         
+        #pragma omp single
+        {
+
         //Initialize the locks
         //TODO this can be executed as task in parallel with other unparallelizable tasks
         //TODO destroy the locks
-#pragma omp for schedule(static)
+#pragma omp taskloop num_tasks(NUM_THREAD)
         for(i = 0; i < NLVer; i++)
             omp_init_lock(&MateLock[i]);
-
-
+        
 #ifdef TIME_TRACKER
     double Ghost2LocalInitialization = MPI_Wtime();
 #endif
@@ -70,7 +74,7 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
      * only when a ghost edge is found and ghost edges are a minority,
      * circa 3.5% during the tests.
      */
-#pragma omp for reduction(+ : numGhostEdges)
+#pragma omp taskloop num_tasks(NUM_THREAD) reduction(+ : numGhostEdges) depend ( out : numGhostEdges, Counter, Ghost2LocalMap )
         for (i = 0; i < NLEdge; i++) { //O(m) - Each edge stored twice
             insertMe = verLocInd[i];
             //cout<<"InsertMe on Process "<<myRank<<" is: "<<insertMe<<endl;
@@ -92,9 +96,6 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
             } //End of if ( (insertMe < StartIndex) || (insertMe > EndIndex) )
         } //End of for(ghost vertices)
 
-        #pragma omp single
-        {
-            //numGhostEdges = atomicNumGhostEdges;
 #ifdef TIME_TRACKER
             Ghost2LocalInitialization = MPI_Wtime() - Ghost2LocalInitialization;
             fprintf(stderr, "Ghost2LocalInitialization time: %f\n", Ghost2LocalInitialization);
@@ -113,6 +114,9 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                 } while ( storedAlready != Ghost2LocalMap.end() );
             }
 #endif
+
+        #pragma omp task depend ( out : verGhostPtr, tempCounter, verGhostInd, GMate) depend ( in : numGhostVertices)
+        {
 
             //Initialize adjacency Lists for Ghost Vertices:
             try {
@@ -139,18 +143,17 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
             double verGhostPtrInitialization = MPI_Wtime();
 #endif
 
+        } // End of task
 
-            /*
-             * Not parallelizable
-             */
+#pragma omp task depent ( out : verGhostPtr ) depend ( in : Counter, numGhostVertices)
+        {
             for (i = 0; i < numGhostVertices; i++) { //O(|Ghost Vertices|)
                 verGhostPtr[i + 1] = verGhostPtr[i] + Counter[i];
 #ifdef PRINT_DEBUG_INFO_
                 cout<<verGhostPtr[i]<<"\t"; fflush(stdout);
 #endif
             }
-        } // End of single region
-
+        }//End of task
         #ifdef TIME_TRACKER
         verGhostPtrInitialization = MPI_Wtime() - verGhostPtrInitialization;
         fprintf(stderr, "verGhostPtrInitialization time: %f\n", verGhostPtrInitialization);
@@ -180,7 +183,7 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
          * are a minority hence the critical region is executed
          * few times, circa 3.5% of the times in the tests.
          */
-#pragma omp for nowait schedule(static)
+#pragma omp taskloop num_tasks(NUM_THREAD) depend ( in : insertMe, Ghost2LocalMap, tempCounter) depend ( out : verGhostInd)
         for (v = 0; v < NLVer; v++) {
             adj1 = verLocPtr[v];   //Vertex Pointer
             adj2 = verLocPtr[v + 1];
@@ -211,6 +214,8 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
             cout<<endl; fflush(stdout);
 #endif
 
+#pragma omp task depend ( in : numGhostEdges) depend ( out : QLocalVtx, QGhostVtx, QMsgType, QOwner )
+{
             try {
                 QLocalVtx.reserve(numGhostEdges); //Local Vertex
                 QGhostVtx.reserve(numGhostEdges); //Ghost Vertex
@@ -221,6 +226,10 @@ inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                 cout << "Not enough memory to allocate the internal variables \n";
                 exit(1);
             }
+}
+
+#pragma omp task depend( in : numGhostEdges, numGhostVertices ) depend ( out : candidateMate, S, U, privateU, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner)
+{
 
 #ifdef PRINT_DEBUG_INFO_
 cout<<"\n("<<myRank<<")Allocating CandidateMate.. "; fflush(stdout);
@@ -231,7 +240,7 @@ cout<<"\n("<<myRank<<")Allocating CandidateMate.. "; fflush(stdout);
 
     //Allocate Data Structures:
     /*
-     * candidateMate was a vector and has been replaced with a raw array
+     * candidateMate was a vector and has been replaced with an array
      * there is no point in using the vector (or maybe there is (???))
      * so I replaced it with an array wich is slightly faster
      */
@@ -271,4 +280,6 @@ cout<<"\n("<<myRank<<")Allocating CandidateMate.. "; fflush(stdout);
     new(&privateQGhostVtx) staticQueue(size);
     new(&privateQMsgType) staticQueue(size);
     new(&privateQOwner) staticQueue(size);
+}
+    } // End of single
 }

@@ -326,9 +326,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         assert(ghostOwner != myRank);
                         PCounter[ghostOwner]++;
 
-                        //TODO why does it fail if I use a private data structure???
-                        
                         /*
+                        //TODO why does it fail if I use a private data structure???
                         privateQLocalVtx.push_back(v + StartIndex);
                         privateQGhostVtx.push_back(w);
                         privateQMsgType.push_back(REQUEST);
@@ -343,7 +342,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                             QMsgType.push_back(REQUEST);
                             QOwner.push_back(ghostOwner);
                         } // end of critical region
-                      
+                    
 
                         if (candidateMate[NLVer + Ghost2LocalMap[w]] == v + StartIndex) {
 
@@ -429,6 +428,20 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
             } //End of for loop
             //End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
         } //End of for ( v=0; v < NLVer; v++ )
+
+
+        #pragma omp critical(privateMsg)
+        {
+            while (!privateQLocalVtx.empty()) {
+                
+                QLocalVtx.push_back(privateQLocalVtx.pop_front());
+                QGhostVtx.push_back(privateQGhostVtx.pop_front());
+                QMsgType.push_back(privateQMsgType.pop_front());
+                QOwner.push_back(privateQOwner.pop_front());
+
+            }
+
+        }
 
 #pragma omp critical(U)
         {
@@ -699,16 +712,17 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
             }
         } //End of while ( /*!Q.empty()*/ !U.empty() )
 
-#pragma omp critical(privateMsg)
+        #pragma omp critical(privateMsg)
         {
             while (!privateQLocalVtx.empty()) {
 
-                QLocalVtx.push_back(privateQLocalVtx.pop_back());
-                QGhostVtx.push_back(privateQGhostVtx.pop_back());
-                QMsgType.push_back(privateQMsgType.pop_back());
-                QOwner.push_back(privateQOwner.pop_back());
+                QLocalVtx.push_back(privateQLocalVtx.pop_front());
+                QGhostVtx.push_back(privateQGhostVtx.pop_front());
+                QMsgType.push_back(privateQMsgType.pop_front());
+                QOwner.push_back(privateQOwner.pop_front());
 
             }
+
         }
 
 
