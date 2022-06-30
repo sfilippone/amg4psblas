@@ -64,6 +64,7 @@
 #include "dataStrStaticQueue.h"
 
 using namespace std;
+#define NUM_THREAD 4
 
 #ifdef __cplusplus
 extern "C"
@@ -202,6 +203,13 @@ extern "C"
                            staticQueue &privateQGhostVtx,
                            staticQueue &privateQMsgType,
                            staticQueue &privateQOwner);
+
+    inline void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
+                    MilanLongInt *verLocPtr,
+                    MilanLongInt *verLocInd,
+                    MilanInt myRank, 
+                    MilanReal *edgeLocWeight,
+                    MilanLongInt *candidateMate);
 
     void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         MilanLongInt NLVer, MilanLongInt NLEdge,

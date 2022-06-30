@@ -5,6 +5,7 @@
 #include "findOwnerOfGhost.cpp"
 #include "computeCandidateMate.cpp"
 #include "initialize.cpp"
+#include "parallelComputeCandidateMateB.cpp"
 
 // ***********************************************************************
 //
@@ -258,26 +259,22 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     /////////////////////////////////////////////////////////////////////////////////////////
     // Compute the Initial Matching Set:
 
+    /*
+     * OMP PARALLEL_COMPUTE_CANDIDATE_MATE_B has been splitted from
+     * PARALLEL_PROCESS_EXPOSED_VERTEX_B in order to better parallelize
+     * the two.
+     * PARALLEL_COMPUTE_CANDIDATE_MATE_B is now totally parallel.
+     */
+
+    PARALLEL_COMPUTE_CANDIDATE_MATE_B(NLVer,
+                                      verLocPtr,
+                                      verLocInd,
+                                      myRank,
+                                      edgeLocWeight,
+                                      candidateMate);
+
 #pragma omp parallel private(k, u, w, v, k1, adj1, adj2, adj11, adj12, heaviestEdgeWt, ghostOwner, privateMyCard, isEmpty) firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) default(shared) num_threads(4)
     {
-        /*
-         * OMP PARALLEL_COMPUTE_CANDIDATE_MATE_B has been splitted from
-         * PARALLEL_PROCESS_EXPOSED_VERTEX_B in order to better parallelize
-         * the two.
-         * In particular PARALLEL_COMPUTE_CANDIDATE_MATE_B is now totally parallel.
-         */
-
-#pragma omp for schedule(static)
-        for (v = 0; v < NLVer; v++)
-        {
-#ifdef PRINT_DEBUG_INFO_
-            cout << "\n(" << myRank << ")Processing: " << v + StartIndex << endl;
-            fflush(stdout);
-#endif
-            // Start: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
-            candidateMate[v] = firstComputeCandidateMate(verLocPtr[v], verLocPtr[v + 1], verLocInd, edgeLocWeight);
-            // End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
-        }
 
         /*
          * PARALLEL_PROCESS_EXPOSED_VERTEX_B
@@ -476,7 +473,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
             }
         }
 
-#pragma omp master
+#pragma omp single
         {
             tempCounter.clear(); // Do not need this any more
         }
@@ -715,11 +712,11 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                     candidateMate[NLVer + Ghost2LocalMap[v]] = -1;
                                 if (v != Mate[u - StartIndex])
                                 { // u is local
-                                    // Build the Message Packet:
-                                    // Message[0] = u; //LOCAL
-                                    // Message[1] = v; //GHOST
-                                    // Message[2] = SUCCESS;  //TYPE
-                                    // Send a Request (Asynchronous)
+                                  // Build the Message Packet:
+                                  // Message[0] = u; //LOCAL
+                                  // Message[1] = v; //GHOST
+                                  // Message[2] = SUCCESS;  //TYPE
+                                  // Send a Request (Asynchronous)
 
 #ifdef PRINT_DEBUG_INFO_
                                     cout << "\n(" << myRank << ")Sending a success message: ";
