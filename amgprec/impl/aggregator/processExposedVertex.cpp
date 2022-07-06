@@ -11,14 +11,9 @@
 
 /*
  * PARALLEL_PROCESS_EXPOSED_VERTEX_B
- * The sequential version could be a bit more
- * efficient.
+ * TODO: write comment
  *
- * TODO: Maybe it is possible to append the values of QLocalVtx, QGhostVtx, QMsgType and QOwner
- *       first in a local variable and then, only at the end, append them to the real data structure
- *       to remove the critical sections.
- *
- * TODO: Test when it's more efficient to execute this code
+ * TODO: Test when it's actually more efficient to execute this code
  *       in parallel.
  */
 
@@ -119,22 +114,11 @@ inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                         assert(ghostOwner != myRank);
                         PCounter[ghostOwner]++;
 
-                        /*
-                        //TODO why does it fail if I use a private data structure???
                         privateQLocalVtx.push_back(v + StartIndex);
                         privateQGhostVtx.push_back(w);
                         privateQMsgType.push_back(REQUEST);
                         privateQOwner.push_back(ghostOwner);
-                        */
-
-#pragma omp critical(MSG)
-                        {
-
-                            QLocalVtx.push_back(v + StartIndex);
-                            QGhostVtx.push_back(w);
-                            QMsgType.push_back(REQUEST);
-                            QOwner.push_back(ghostOwner);
-                        } // end of critical region
+                        
 
                         if (candidateMate[NLVer + Ghost2LocalMap[w]] == v + StartIndex)
                         {
@@ -149,6 +133,8 @@ inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                             cout << "\n(" << myRank << ")MATCH: (" << v + StartIndex << "," << w << ")";
                             fflush(stdout);
 #endif
+
+                            //TODO refactor this!!
                             // Decrement the counter:
                             // Start: PARALLEL_PROCESS_CROSS_EDGE_B(v)
 #pragma omp critical
@@ -218,10 +204,11 @@ inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                     assert(ghostOwner != -1);
                     assert(ghostOwner != myRank);
                     PCounter[ghostOwner]++;
-                    QLocalVtx.push_back(v + StartIndex);
-                    QGhostVtx.push_back(w);
-                    QMsgType.push_back(FAILURE);
-                    QOwner.push_back(ghostOwner);
+
+                    privateQLocalVtx.push_back(v + StartIndex);
+                    privateQGhostVtx.push_back(w);
+                    privateQMsgType.push_back(FAILURE);
+                    privateQOwner.push_back(ghostOwner);
 
                 } // End of if(GHOST)
             }     // End of for loop

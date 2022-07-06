@@ -274,35 +274,35 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                       edgeLocWeight,
                                       candidateMate);
 
-    PARALLEL_PROCESS_EXPOSED_VERTEX_B(NLVer, 
-    candidateMate, 
-    verLocInd, 
-    verLocPtr, 
-    StartIndex, 
-    EndIndex, 
-    Mate, 
-    GMate, 
-    Ghost2LocalMap, 
-    edgeLocWeight, 
-    &myCard, 
-    &msgInd, 
-    &NumMessagesBundled, 
-    &S, 
-    verDistance, 
-    PCounter, 
-    Counter, 
-    myRank, 
-    numProcs, 
-    U, 
-    privateU, 
-    QLocalVtx, 
-    QGhostVtx, 
-    QMsgType, 
-    QOwner,
-    privateQLocalVtx,
-    privateQGhostVtx,
-    privateQMsgType,
-    privateQOwner);
+    PARALLEL_PROCESS_EXPOSED_VERTEX_B(NLVer,
+                                      candidateMate,
+                                      verLocInd,
+                                      verLocPtr,
+                                      StartIndex,
+                                      EndIndex,
+                                      Mate,
+                                      GMate,
+                                      Ghost2LocalMap,
+                                      edgeLocWeight,
+                                      &myCard,
+                                      &msgInd,
+                                      &NumMessagesBundled,
+                                      &S,
+                                      verDistance,
+                                      PCounter,
+                                      Counter,
+                                      myRank,
+                                      numProcs,
+                                      U,
+                                      privateU,
+                                      QLocalVtx,
+                                      QGhostVtx,
+                                      QMsgType,
+                                      QOwner,
+                                      privateQLocalVtx,
+                                      privateQGhostVtx,
+                                      privateQMsgType,
+                                      privateQOwner);
 
     tempCounter.clear(); // Do not need this any more
 
@@ -455,6 +455,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                                 cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") ";
                                                 fflush(stdout);
 #endif
+
+                                                // TODO refactor this
                                                 // Decrement the counter:
                                                 // Start: PARALLEL_PROCESS_CROSS_EDGE_B(v,w)
                                                 if (Counter[Ghost2LocalMap[w]] > 0)
@@ -579,29 +581,25 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                 // Avoid to ask for the critical section if there is nothing to add
                 if (privateU.size() < UCHUNK && !U.empty())
                     continue;
-#pragma omp critical(U)
-                {
-                    while (!privateU.empty())
-                    {
-                        U.push_back(privateU.pop_front());
-                    }
-
-                    myCard += privateMyCard;
-                } // End of critical U
+                queuesTransfer(U, privateU, QLocalVtx,
+                               QGhostVtx,
+                               QMsgType, QOwner, privateQLocalVtx,
+                               privateQGhostVtx,
+                               privateQMsgType,
+                               privateQOwner);
             }
         } // End of while ( /*!Q.empty()*/ !U.empty() )
 
-#pragma omp critical(privateMsg)
+#pragma omp critical
         {
-            while (!privateQLocalVtx.empty())
-            {
-
-                QLocalVtx.push_back(privateQLocalVtx.pop_front());
-                QGhostVtx.push_back(privateQGhostVtx.pop_front());
-                QMsgType.push_back(privateQMsgType.pop_front());
-                QOwner.push_back(privateQOwner.pop_front());
-            }
+            myCard += privateMyCard;
         }
+        queuesTransfer(U, privateU, QLocalVtx,
+                       QGhostVtx,
+                       QMsgType, QOwner, privateQLocalVtx,
+                       privateQGhostVtx,
+                       privateQMsgType,
+                       privateQOwner);
 
 #ifdef COUNT_LOCAL_VERTEX
         printf("Count local vertexes: %ld for thread %d of processor %d\n",
