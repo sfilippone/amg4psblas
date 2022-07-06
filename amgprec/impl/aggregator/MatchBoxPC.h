@@ -205,21 +205,51 @@ extern "C"
                            staticQueue &privateQOwner);
 
     inline void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
-                    MilanLongInt *verLocPtr,
-                    MilanLongInt *verLocInd,
-                    MilanInt myRank, 
-                    MilanReal *edgeLocWeight,
-                    MilanLongInt *candidateMate);
+                                                  MilanLongInt *verLocPtr,
+                                                  MilanLongInt *verLocInd,
+                                                  MilanInt myRank,
+                                                  MilanReal *edgeLocWeight,
+                                                  MilanLongInt *candidateMate);
 
-    void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
-        MilanLongInt NLVer, MilanLongInt NLEdge,
-        MilanLongInt *verLocPtr, MilanLongInt *verLocInd, MilanReal *edgeLocWeight,
-        MilanLongInt *verDistance,
-        MilanLongInt *Mate,
-        MilanInt myRank, MilanInt numProcs, MPI_Comm comm,
-        MilanLongInt *msgIndSent, MilanLongInt *msgActualSent, MilanReal *msgPercent,
-        MilanReal *ph0_time, MilanReal *ph1_time, MilanReal *ph2_time,
-        MilanLongInt *ph1_card, MilanLongInt *ph2_card);
+    inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
+                                                  MilanLongInt *candidateMate,
+                                                  MilanLongInt *verLocInd,
+                                                  MilanLongInt *verLocPtr,
+                                                  MilanLongInt StartIndex,
+                                                  MilanLongInt EndIndex,
+                                                  MilanLongInt *Mate,
+                                                  vector<MilanLongInt> &GMate,
+                                                  map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
+                                                  MilanReal *edgeLocWeight,
+                                                  MilanLongInt *myCardPtr,
+                                                  MilanLongInt *msgIndPtr,
+                                                  MilanLongInt *NumMessagesBundledPtr,
+                                                  MilanLongInt *SPtr,
+                                                  MilanLongInt *verDistance,
+                                                  MilanLongInt *PCounter,
+                                                  vector<MilanLongInt> &Counter,
+                                                  MilanInt myRank,
+                                                  MilanInt numProcs,
+                                                  staticQueue &U,
+                                                  staticQueue &privateU,
+                                                  vector<MilanLongInt> &QLocalVtx,
+                                                  vector<MilanLongInt> &QGhostVtx,
+                                                  vector<MilanLongInt> &QMsgType,
+                                                  vector<MilanInt> &QOwner,
+                                                  staticQueue &privateQLocalVtx,
+                                                  staticQueue &privateQGhostVtx,
+                                                  staticQueue &privateQMsgType,
+                                                  staticQueue &privateQOwner);
+
+        void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
+            MilanLongInt NLVer, MilanLongInt NLEdge,
+            MilanLongInt *verLocPtr, MilanLongInt *verLocInd, MilanReal *edgeLocWeight,
+            MilanLongInt *verDistance,
+            MilanLongInt *Mate,
+            MilanInt myRank, MilanInt numProcs, MPI_Comm comm,
+            MilanLongInt *msgIndSent, MilanLongInt *msgActualSent, MilanReal *msgPercent,
+            MilanReal *ph0_time, MilanReal *ph1_time, MilanReal *ph2_time,
+            MilanLongInt *ph1_card, MilanLongInt *ph2_card);
 
     void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
         MilanLongInt NLVer, MilanLongInt NLEdge,
