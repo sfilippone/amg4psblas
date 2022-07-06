@@ -241,6 +241,17 @@ extern "C"
                                                   staticQueue &privateQMsgType,
                                                   staticQueue &privateQOwner);
 
+        inline void queuesTransfer(staticQueue &U,
+                          staticQueue &privateU,
+                          vector<MilanLongInt> &QLocalVtx,
+                          vector<MilanLongInt> &QGhostVtx,
+                          vector<MilanLongInt> &QMsgType,
+                          vector<MilanInt> &QOwner,
+                          staticQueue &privateQLocalVtx,
+                          staticQueue &privateQGhostVtx,
+                          staticQueue &privateQMsgType,
+                          staticQueue &privateQOwner);
+
         void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
             MilanLongInt NLVer, MilanLongInt NLEdge,
             MilanLongInt *verLocPtr, MilanLongInt *verLocInd, MilanReal *edgeLocWeight,

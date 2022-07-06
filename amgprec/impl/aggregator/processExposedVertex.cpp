@@ -7,6 +7,7 @@
 #include "primitiveDataTypeDefinitions.h"
 #include "dataStrStaticQueue.h"
 #include "omp.h"
+#include "queueTransfer.cpp"
 
 /*
  * PARALLEL_PROCESS_EXPOSED_VERTEX_B
@@ -227,11 +228,12 @@ inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
             // End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
         } // End of for ( v=0; v < NLVer; v++ )
 
-#pragma omp critical(U)
-        {
-            while (!privateU.empty())
-                U.push_back(privateU.pop_front());
-        }
+        queuesTransfer(U, privateU, QLocalVtx,
+                       QGhostVtx,
+                       QMsgType, QOwner, privateQLocalVtx,
+                       privateQGhostVtx,
+                       privateQMsgType,
+                       privateQOwner);
 
 #pragma omp master
         {
@@ -239,17 +241,6 @@ inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
             *msgIndPtr = msgInd;
             *NumMessagesBundledPtr = NumMessagesBundled;
             *SPtr = S;
-        }
-
-#pragma omp critical(privateMsg)
-        {
-            while (!privateQLocalVtx.empty())
-            {
-                QLocalVtx.push_back(privateQLocalVtx.pop_front());
-                QGhostVtx.push_back(privateQGhostVtx.pop_front());
-                QMsgType.push_back(privateQMsgType.pop_front());
-                QOwner.push_back(privateQOwner.pop_front());
-            }
         }
 
     } // End of parallel region
