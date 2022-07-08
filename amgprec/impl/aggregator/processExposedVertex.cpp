@@ -9,14 +9,6 @@
 #include "omp.h"
 #include "queueTransfer.cpp"
 
-/*
- * PARALLEL_PROCESS_EXPOSED_VERTEX_B
- * TODO: write comment
- *
- * TODO: Test when it's actually more efficient to execute this code
- *       in parallel.
- */
-
 inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                                               MilanLongInt *candidateMate,
                                               MilanLongInt *verLocInd,
@@ -48,6 +40,7 @@ inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                                               staticQueue &privateQOwner)
 {
 
+    //TODO define all the constants in a single place!
     const MilanLongInt REQUEST = 1;
     const MilanLongInt SUCCESS = 2;
     const MilanLongInt FAILURE = 3;
