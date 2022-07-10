@@ -215,6 +215,7 @@ inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                        privateQMsgType,
                        privateQOwner);
 
+//TODO move this outside of the parallel region!!
 #pragma omp master
         {
             *myCardPtr = myCard;
