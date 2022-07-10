@@ -43,11 +43,6 @@ inline void processMatchedVertices(
     staticQueue &privateQOwner)
 {
 
-    // TODO define all the constants in a single place!
-    const MilanLongInt REQUEST = 1;
-    const MilanLongInt SUCCESS = 2;
-    const MilanLongInt FAILURE = 3;
-    const MilanLongInt SIZEINFO = 4;
     MilanLongInt adj1, adj2, adj11, adj12, k, k1, v = -1, w = -1, ghostOwner;
     MilanLongInt myCard = *myCardPtr, msgInd = *msgIndPtr, NumMessagesBundled = *NumMessagesBundledPtr, S = *SPtr, privateMyCard = 0;
 

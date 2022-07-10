@@ -65,6 +65,10 @@
 
 using namespace std;
 #define NUM_THREAD 4
+const MilanLongInt REQUEST = 1;
+const MilanLongInt SUCCESS = 2;
+const MilanLongInt FAILURE = 3;
+const MilanLongInt SIZEINFO = 4;
 
 // MPI type map
 template <typename T>

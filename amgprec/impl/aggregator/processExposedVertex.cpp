@@ -41,17 +41,12 @@ inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                                               staticQueue &privateQOwner)
 {
 
-    //TODO define all the constants in a single place!
-    const MilanLongInt REQUEST = 1;
-    const MilanLongInt SUCCESS = 2;
-    const MilanLongInt FAILURE = 3;
-    const MilanLongInt SIZEINFO = 4;
     MilanLongInt v = -1, k = -1, w = -1, adj11 = 0, adj12 = 0, k1 = 0, S = *SPtr;
     MilanLongInt myCard = 0, msgInd = 0;
     MilanLongInt NumMessagesBundled = 0;
     MilanInt ghostOwner = 0;
 
-#pragma omp parallel private(k, w, v, k1, adj11, adj12, ghostOwner) firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) default(shared) num_threads(4)
+#pragma omp parallel private(k, w, v, k1, adj11, adj12, ghostOwner) firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) default(shared) num_threads(NUM_THREAD)
     {
 #pragma omp for reduction(+ \
                           : msgInd, NumMessagesBundled, myCard, PCounter[:numProcs]) schedule(static)

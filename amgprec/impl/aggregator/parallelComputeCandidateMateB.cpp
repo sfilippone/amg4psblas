@@ -18,7 +18,7 @@ inline void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
 
     MilanLongInt v = -1;
 
-#pragma omp parallel private(v) default(shared) num_threads(4)
+#pragma omp parallel private(v) default(shared) num_threads(NUM_THREAD)
     {
 
 #pragma omp for schedule(static)

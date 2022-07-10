@@ -9,7 +9,8 @@
 #include "processExposedVertex.cpp"
 #include "processMatchedVertices.cpp"
 #include "sendBundledMessages.cpp"
-//#include "processCrossEdge.cpp"
+#include "processMessages.cpp"
+
 
 // ***********************************************************************
 //
@@ -155,10 +156,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     // Data structures for sending and receiving messages:
     vector<MilanLongInt> Message; // [ u, v, message_type ]
     Message.resize(3, -1);
-    const MilanLongInt REQUEST = 1;
-    const MilanLongInt SUCCESS = 2;
-    const MilanLongInt FAILURE = 3;
-    const MilanLongInt SIZEINFO = 4;
     MilanLongInt message_type = 0;
     // Data structures for Message Bundling:
     // Although up to two messages can be sent along any cross edge,
@@ -186,7 +183,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     MilanLongInt k = -1, adj1 = -1, adj2 = -1;
     MilanLongInt k1 = -1, adj11 = -1, adj12 = -1;
     MilanLongInt myCard = 0;
-    MilanInt Sender = 0; // This is the rank of the sending nodes, it has to be an integer! Fabio
 
     // Build the Ghost Vertex Set: Vg
     map<MilanLongInt, MilanLongInt> Ghost2LocalMap;       // Map each ghost vertex to a local vertex
@@ -614,90 +610,19 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         /////////////////////////// PROCESS MESSAGES //////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////
 
-#ifdef PRINT_DEBUG_INFO_
-        cout << "\n(" << myRank << "=========================************===============================" << endl;
-        fflush(stdout);
-        fflush(stdout);
-#endif
-#ifdef PRINT_DEBUG_INFO_
-        cout << "\n(" << myRank << ")About to begin Message processing phase ... S=" << S << endl;
-        fflush(stdout);
-#endif
-#ifdef PRINT_DEBUG_INFO_
-        cout << "\n(" << myRank << "=========================************===============================" << endl;
-        fflush(stdout);
-        fflush(stdout);
-#endif
-        // BLOCKING RECEIVE:
-#ifdef PRINT_DEBUG_INFO_
-        cout << "\n(" << myRank << " Waiting for blocking receive..." << endl;
-        fflush(stdout);
-        fflush(stdout);
-#endif
-        error_codeC = MPI_Recv(&Message[0], 3, TypeMap<MilanLongInt>(), MPI_ANY_SOURCE, ComputeTag, comm, &computeStatus);
-        if (error_codeC != MPI_SUCCESS)
-        {
-            MPI_Error_string(error_codeC, error_message, &message_length);
-            cout << "\n*Error in call to MPI_Receive on Slave: " << error_message << "\n";
-            fflush(stdout);
-        }
-        Sender = computeStatus.MPI_SOURCE;
-#ifdef PRINT_DEBUG_INFO_
-        cout << "\n(" << myRank << ")Received message from Process " << Sender << " Type= " << Message[2] << endl;
-        fflush(stdout);
-#endif
-        // If the Message Type is a size indicator, then receive the bigger message.
-        if (Message[2] == SIZEINFO)
-        {
-#ifdef PRINT_DEBUG_INFO_
-            cout << "\n(" << myRank << ")Received bundled message from Process " << Sender << " Size= " << Message[0] << endl;
-            fflush(stdout);
-#endif
-            bundleSize = Message[0]; //#of integers in the message
-            // Build the Message Buffer:
-            if (!ReceiveBuffer.empty())
-                ReceiveBuffer.clear();            // Empty it out first
-            ReceiveBuffer.resize(bundleSize, -1); // Initialize
-#ifdef PRINT_DEBUG_INFO_
-            cout << "\n(" << myRank << ")Message Bundle Before: " << endl;
-            for (i = 0; i < bundleSize; i++)
-                cout << ReceiveBuffer[i] << ",";
-            cout << endl;
-            fflush(stdout);
-#endif
-            // Receive the message
-            error_codeC = MPI_Recv(&ReceiveBuffer[0], bundleSize, TypeMap<MilanLongInt>(), Sender, BundleTag, comm, &computeStatus);
-            if (error_codeC != MPI_SUCCESS)
-            {
-                MPI_Error_string(error_codeC, error_message, &message_length);
-                cout << "\n*Error in call to MPI_Receive on processor " << myRank << " Error: " << error_message << "\n";
-                fflush(stdout);
-            }
-#ifdef PRINT_DEBUG_INFO_
-            cout << "\n(" << myRank << ")Message Bundle After: " << endl;
-            for (i = 0; i < bundleSize; i++)
-                cout << ReceiveBuffer[i] << ",";
-            cout << endl;
-            fflush(stdout);
-#endif
-        }
-        else
-        { // Just a single message:
-#ifdef PRINT_DEBUG_INFO_
-            cout << "\n(" << myRank << ")Received regular message from Process " << Sender << " u= " << Message[0] << " v= " << Message[1] << endl;
-            fflush(stdout);
-#endif
-            // Add the current message to Queue:
-            bundleSize = 3; //#of integers in the message
-            // Build the Message Buffer:
-            if (!ReceiveBuffer.empty())
-                ReceiveBuffer.clear();            // Empty it out first
-            ReceiveBuffer.resize(bundleSize, -1); // Initialize
+        processMessages(error_codeC, 
+                        numProcs,
+                        myRank,
+                        ComputeTag,
+                        BundleTag,
+                        comm,
+                        Message,
+                        error_message,
+                        message_length,
+                        ReceiveBuffer,
+                        &bundleSize);
 
-            ReceiveBuffer[0] = Message[0]; // u
-            ReceiveBuffer[1] = Message[1]; // v
-            ReceiveBuffer[2] = Message[2]; // message_type
-        }
+
         bundleCounter = 0;
         while (bundleCounter < bundleSize)
         {
@@ -707,17 +632,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
             bundleCounter++;
             message_type = ReceiveBuffer[bundleCounter]; // TYPE
             bundleCounter++;
-#ifdef DEBUG_GHOST_
-            if ((v < StartIndex) || (v > EndIndex))
-            {
-                cout << "\n(" << myRank << ") From ReceiveBuffer: This should not happen: u= " << u << " v= " << v << " Type= " << message_type << " StartIndex " << StartIndex << " EndIndex " << EndIndex << endl;
-                fflush(stdout);
-            }
-#endif
-#ifdef PRINT_DEBUG_INFO_
-            cout << "\n(" << myRank << ")Processing message: u= " << u << " v= " << v << " Type= " << message_type << endl;
-            fflush(stdout);
-#endif
+
             // CASE I: REQUEST
             if (message_type == REQUEST)
             {
@@ -774,33 +689,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         if (candidateMate[v - StartIndex] == u)
                         {
                             // Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-                            // Start: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
-                            adj11 = verLocPtr[v - StartIndex];
-                            adj12 = verLocPtr[v - StartIndex + 1];
-                            w = -1;
-                            heaviestEdgeWt = MilanRealMin; // Assign the smallest Value possible first LDBL_MIN
-                            for (k1 = adj11; k1 < adj12; k1++)
-                            {
-                                if ((verLocInd[k1] < StartIndex) || (verLocInd[k1] > EndIndex))
-                                {                                                  // Is it a ghost vertex?
-                                    if (GMate[Ghost2LocalMap[verLocInd[k1]]] >= 0) // Already matched
-                                        continue;
-                                }
-                                else
-                                {                                              // A local vertex
-                                    if (Mate[verLocInd[k1] - StartIndex] >= 0) // Already matched
-                                        continue;
-                                }
-
-                                if ((edgeLocWeight[k1] > heaviestEdgeWt) ||
-                                    ((edgeLocWeight[k1] == heaviestEdgeWt) && (w < verLocInd[k1])))
-                                {
-                                    heaviestEdgeWt = edgeLocWeight[k1];
-                                    w = verLocInd[k1];
-                                }
-                            } // End of for loop
+                            w = computeCandidateMate(verLocPtr[v - StartIndex], verLocPtr[v - StartIndex + 1], edgeLocWeight, k, verLocInd, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap);
                             candidateMate[v - StartIndex] = w;
-                            // End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
 #ifdef PRINT_DEBUG_INFO_
                             cout << "\n(" << myRank << ")" << v << " Points to: " << w << endl;
                             fflush(stdout);
@@ -830,7 +720,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                     {
                                         Mate[v - StartIndex] = w;     // v is local
                                         GMate[Ghost2LocalMap[w]] = v; // w is ghost
-                                        // Q.push_back(u);
                                         U.push_back(v);
                                         U.push_back(w);
                                         myCard++;
@@ -878,7 +767,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                         cout << "\n(" << myRank << ")Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs) << endl;
                                         fflush(stdout);
 #endif
-                                        // MPI_Bsend(&Message[0], 3, MilanMpiLongInt, findOwnerOfGhost(w, verDistance, myRank, numProcs),
                                         ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                                         assert(ghostOwner != -1);
                                         assert(ghostOwner != myRank);
