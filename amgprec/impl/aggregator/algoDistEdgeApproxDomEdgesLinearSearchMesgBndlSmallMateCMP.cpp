@@ -10,7 +10,7 @@
 #include "processMatchedVertices.cpp"
 #include "sendBundledMessages.cpp"
 #include "processMessages.cpp"
-
+#include "clean.cpp"
 
 // ***********************************************************************
 //
@@ -610,7 +610,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         /////////////////////////// PROCESS MESSAGES //////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////
 
-        processMessages(error_codeC, 
+        processMessages(error_codeC,
                         numProcs,
                         myRank,
                         ComputeTag,
@@ -621,7 +621,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         message_length,
                         ReceiveBuffer,
                         &bundleSize);
-
 
         bundleCounter = 0;
         while (bundleCounter < bundleSize)
@@ -802,66 +801,22 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #endif
     } // End of while (true)
 
-#ifdef PRINT_DEBUG_INFO_
-    cout << "\n(" << myRank << ") Waitall= " << endl;
-    fflush(stdout);
-#endif
-#ifdef DEBUG_HANG_
-    cout << "\n(" << myRank << ") Waitall " << endl;
-    fflush(stdout);
-#endif
-    // MPI_Barrier(comm);
-    // Cleanup Phase
-    MPI_Waitall(MessageIndex, &SRequest[0], &SStatus[0]);
-    // MPI_Buffer_attach(&Buffer, BufferSize); //Attach the Buffer
-    if (BufferSize > 0)
-    {
-        MPI_Buffer_detach(&Buffer, &BufferSize); // Detach the Buffer
-        free(Buffer);                            // Free the memory that was allocated
-    }
+    clean(myRank,
+          MessageIndex,
+          SRequest,
+          SStatus,
+          BufferSize,
+          Buffer,
+          msgActual,
+          msgActualSent,
+          msgInd,
+          msgIndSent,
+          NumMessagesBundled,
+          msgPercent);
+
     finishTime = MPI_Wtime();
     *ph2_time = finishTime - startTime; // Time taken for Phase-2
     *ph2_card = myCard;                 // Cardinality at the end of Phase-2
-
-#ifdef PRINT_DEBUG_INFO_
-    cout << "\n(" << myRank << ")End of function to compute matching: " << endl;
-    fflush(stdout);
-    cout << "\n(" << myRank << ")myCardinality: " << myCard << endl;
-    fflush(stdout);
-    cout << "\n(" << myRank << ")Matching took " << finishTime - startTime << "seconds" << endl;
-    fflush(stdout);
-    cout << "\n(" << myRank << ")** Getting out of the matching function **" << endl;
-    fflush(stdout);
-#endif
-#ifdef PRINT_DEBUG_INFO_
-    cout << "\n(" << myRank << ") Number of Ghost edges = " << numGhostEdges;
-    cout << "\n(" << myRank << ") Total number of potential message X 2 = " << numGhostEdges * 2;
-    cout << "\n(" << myRank << ") Number messages bundled = " << NumMessagesBundled;
-    cout << "\n(" << myRank << ") Total Individual Messages sent = " << msgInd;
-    if (msgInd > 0)
-    {
-        cout << "\n(" << myRank << ") Percentage of messages bundled = " << ((double)NumMessagesBundled / (double)(msgInd)) * 100.0 << "% \n";
-    }
-    fflush(stdout);
-#endif
-
-    *msgActualSent = msgActual;
-    *msgIndSent = msgInd;
-    if (msgInd > 0)
-    {
-        *msgPercent = ((double)NumMessagesBundled / (double)(msgInd)) * 100.0;
-    }
-    else
-    {
-        *msgPercent = 0;
-    }
-
-#ifdef DEBUG_HANG_
-    if (myRank == 0)
-        cout << "\n(" << myRank << ") Done" << endl;
-    fflush(stdout);
-#endif
-    // MPI_Barrier(comm);
 }
 // End of algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMate
 #endif
