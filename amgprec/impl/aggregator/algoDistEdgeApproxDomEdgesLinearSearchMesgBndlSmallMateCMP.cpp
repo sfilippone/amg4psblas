@@ -9,6 +9,7 @@
 #include "processExposedVertex.cpp"
 #include "processMatchedVertices.cpp"
 #include "sendBundledMessages.cpp"
+//#include "processCrossEdge.cpp"
 
 // ***********************************************************************
 //
@@ -506,21 +507,9 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                         cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") ";
                                         fflush(stdout);
 #endif
-                                        // Decrement the counter:
-                                        // Start: PARALLEL_PROCESS_CROSS_EDGE_B(v,w)
-                                        if (Counter[Ghost2LocalMap[w]] > 0)
-                                        {
-                                            Counter[Ghost2LocalMap[w]] = Counter[Ghost2LocalMap[w]] - 1; // Decrement
-                                            if (Counter[Ghost2LocalMap[w]] == 0)
-                                            {
-                                                S--; // Decrement S
-#ifdef PRINT_DEBUG_INFO_
-                                                cout << "\n(" << myRank << ")Decrementing S: Ghost vertex " << w << " has received all its messages";
-                                                fflush(stdout);
-#endif
-                                            }
-                                        } // End of if Counter[w] > 0
-                                        // End: PARALLEL_PROCESS_CROSS_EDGE_B(v,w)
+
+                                        PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, w, &S);
+
                                     } // End of if CandidateMate[w] = v
                                 }     // End of if a Ghost Vertex
                                 else
@@ -759,20 +748,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         cout << "\n(" << myRank << ")MATCH: (" << v << "," << u << ") " << endl;
                         fflush(stdout);
 #endif
-                        // Start: PARALLEL_PROCESS_CROSS_EDGE_B(v,u)
-                        if (Counter[Ghost2LocalMap[u]] > 0)
-                        {
-                            Counter[Ghost2LocalMap[u]] = Counter[Ghost2LocalMap[u]] - 1; // Decrement
-                            if (Counter[Ghost2LocalMap[u]] == 0)
-                            {
-                                S--; // Decrement S
-#ifdef PRINT_DEBUG_INFO_
-                                cout << "\n(" << myRank << ")Decrementing S: Ghost vertex " << u << " has received all its messages" << endl;
-                                fflush(stdout);
-#endif
-                            }
-                        } // End of if Counter[w] > 0
-                        // End: PARALLEL_PROCESS_CROSS_EDGE_B(v,u)
+                        PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, u, &S);
                     } // End of if ( candidateMate[v-StartIndex] == u )e
                 }     // End of if ( Mate[v] == -1 )
             }         // End of REQUEST
@@ -784,22 +760,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                     cout << "\n(" << myRank << ")Message type is SUCCESS" << endl;
                     fflush(stdout);
 #endif
-                    // Start: PARALLEL_PROCESS_CROSS_EDGE_B(v,u)
                     GMate[Ghost2LocalMap[u]] = EndIndex + 1; // Set a Dummy Mate to make sure that we do not (u is a ghost)
-                    // process it again
-                    if (Counter[Ghost2LocalMap[u]] > 0)
-                    {
-                        Counter[Ghost2LocalMap[u]] = Counter[Ghost2LocalMap[u]] - 1; // Decrement
-                        if (Counter[Ghost2LocalMap[u]] == 0)
-                        {
-                            S--; // Decrement S
-#ifdef PRINT_DEBUG_INFO_
-                            cout << "\n(" << myRank << ")Decrementing S: Ghost vertex " << u << " has received all its messages";
-                            fflush(stdout);
-#endif
-                        }
-                    } // End of if Counter[w] > 0
-                    // End: PARALLEL_PROCESS_CROSS_EDGE_B(v,u)
+                    PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, u, &S);
 #ifdef DEBUG_GHOST_
                     if ((v < 0) || (v < StartIndex) || ((v - StartIndex) > NLVer))
                     {
@@ -877,20 +839,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                         fflush(stdout);
 #endif
                                         // Decrement the counter:
-                                        // Start: PARALLEL_PROCESS_CROSS_EDGE_B(v,w)
-                                        if (Counter[Ghost2LocalMap[w]] > 0)
-                                        {
-                                            Counter[Ghost2LocalMap[w]] = Counter[Ghost2LocalMap[w]] - 1; // Decrement
-                                            if (Counter[Ghost2LocalMap[w]] == 0)
-                                            {
-                                                S--; // Decrement S
-#ifdef PRINT_DEBUG_INFO_
-                                                cout << "\n(" << myRank << ")Decrementing S: Ghost vertex " << w << " has received all its messages";
-                                                fflush(stdout);
-#endif
-                                            }
-                                        } // End of if Counter[w] > 0
-                                        // End: PARALLEL_PROCESS_CROSS_EDGE_B(v,w)
+                                        PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, w, &S);
                                     } // End of if CandidateMate[w] = v
                                 }     // End of if a Ghost Vertex
                                 else
@@ -949,22 +898,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                     cout << "\n(" << myRank << ")Message type is FAILURE" << endl;
                     fflush(stdout);
 #endif
-                    // Start: PARALLEL_PROCESS_CROSS_EDGE_B(v,u)
                     GMate[Ghost2LocalMap[u]] = EndIndex + 1; // Set a Dummy Mate to make sure that we do not (u is a ghost)
-                    // process it again
-                    if (Counter[Ghost2LocalMap[u]] > 0)
-                    {
-                        Counter[Ghost2LocalMap[u]] = Counter[Ghost2LocalMap[u]] - 1; // Decrement
-                        if (Counter[Ghost2LocalMap[u]] == 0)
-                        {
-                            S--; // Decrement S
-#ifdef PRINT_DEBUG_INFO_
-                            cout << "\n(" << myRank << ")Decrementing S: Ghost vertex " << u << " has received all its messages";
-                            fflush(stdout);
-#endif
-                        }
-                    } // End of if Counter[w] > 0
-                    // End: PARALLEL_PROCESS_CROSS_EDGE_B(v,u)
+                    PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, u, &S);
                 } // End of else: CASE III
             }     // End of else: CASE I
         }         // End of if (!MsgQ.empty())

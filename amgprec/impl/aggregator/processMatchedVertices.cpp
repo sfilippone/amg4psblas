@@ -177,20 +177,8 @@ inline void processMatchedVertices(
 
                                                 // TODO refactor this
                                                 // Decrement the counter:
-                                                // Start: PARALLEL_PROCESS_CROSS_EDGE_B(v,w)
-                                                if (Counter[Ghost2LocalMap[w]] > 0)
-                                                {
-                                                    Counter[Ghost2LocalMap[w]] = Counter[Ghost2LocalMap[w]] - 1; // Decrement
-                                                    if (Counter[Ghost2LocalMap[w]] == 0)
-                                                    {
-                                                        S--; // Decrement S
-#ifdef PRINT_DEBUG_INFO_
-                                                        cout << "\n(" << myRank << ")Decrementing S: Ghost vertex " << w << " has received all its messages";
-                                                        fflush(stdout);
-#endif
-                                                    }
-                                                } // End of if Counter[w] > 0
-                                                // End: PARALLEL_PROCESS_CROSS_EDGE_B(v,w)
+                                                PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, w, &S);
+
                                             } // End of if CandidateMate[w] = v
                                         }     // End of if a Ghost Vertex
                                         else

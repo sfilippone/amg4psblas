@@ -8,6 +8,7 @@
 #include "dataStrStaticQueue.h"
 #include "omp.h"
 #include "queueTransfer.cpp"
+#include "processCrossEdge.cpp"
 
 inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                                               MilanLongInt *candidateMate,
@@ -129,24 +130,7 @@ inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
 
                             //TODO refactor this!!
                             // Decrement the counter:
-                            // Start: PARALLEL_PROCESS_CROSS_EDGE_B(v)
-#pragma omp critical
-                            {
-                                if (Counter[Ghost2LocalMap[w]] > 0)
-                                {
-
-                                    Counter[Ghost2LocalMap[w]] -= 1; // Decrement
-                                    if (Counter[Ghost2LocalMap[w]] == 0)
-                                    {
-                                        S--; // Decrement S
-#ifdef PRINT_DEBUG_INFO_
-                                        cout << "\n(" << myRank << ")Decrementing S: Ghost vertex " << w << " has received all its messages";
-                                        fflush(stdout);
-#endif
-                                    }
-                                }
-                            } // End of if Counter[w] > 0
-                            // End: PARALLEL_PROCESS_CROSS_EDGE_B(v)
+                            PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, w, &S);
                         } // End of if CandidateMate[w] = v
 
                     } // End of if a Ghost Vertex
