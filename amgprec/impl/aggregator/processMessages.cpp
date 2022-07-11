@@ -1,13 +1,6 @@
 #include "MatchBoxPC.h"
-#include <stdio.h>
-#include <iostream>
-#include <map>
-#include <vector>
-#include "primitiveDataTypeDefinitions.h"
-#include "dataStrStaticQueue.h"
-#include "omp.h"
 
-inline void processMessages(int error_codeC,
+void processMessages(int error_codeC,
                             MilanInt numProcs,
                             MilanInt myRank,
                             int ComputeTag,

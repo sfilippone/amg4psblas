@@ -1,13 +1,6 @@
 #include "MatchBoxPC.h"
-#include <stdio.h>
-#include <iostream>
-#include <map>
-#include <vector>
-#include "primitiveDataTypeDefinitions.h"
-#include "dataStrStaticQueue.h"
-#include "omp.h"
 
-inline void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
+void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
                                 MilanInt *BufferSizePtr,
                                 MilanLongInt *Buffer,
                                 vector<MilanLongInt> &PCumulative,

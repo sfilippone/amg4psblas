@@ -1,15 +1,6 @@
 #include "MatchBoxPC.h"
-#include <stdio.h>
-#include <iostream>
-#include <map>
-#include <vector>
-#include "primitiveDataTypeDefinitions.h"
-#include "dataStrStaticQueue.h"
-#include "omp.h"
 
-#define UCHUNK 1000
-
-inline void extractUChunk(
+void extractUChunk(
     vector<MilanLongInt> &UChunkBeingProcessed,
     staticQueue &U,
     staticQueue &privateU)

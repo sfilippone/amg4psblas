@@ -1,10 +1,4 @@
 #include "MatchBoxPC.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <map>
-#include <vector>
-#include "primitiveDataTypeDefinitions.h"
-#include "dataStrStaticQueue.h"
 
 /**
  * //TODO documentation
@@ -17,7 +11,7 @@
  * @param Ghost2LocalMap
  * @return
  */
-inline bool isAlreadyMatched(MilanLongInt node,
+bool isAlreadyMatched(MilanLongInt node,
                              MilanLongInt StartIndex,
                              MilanLongInt EndIndex,
                              vector <MilanLongInt> &GMate,

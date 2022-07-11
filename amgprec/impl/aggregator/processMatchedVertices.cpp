@@ -1,16 +1,8 @@
 #include "MatchBoxPC.h"
-#include <stdio.h>
-#include <iostream>
-#include <map>
-#include <vector>
-#include "primitiveDataTypeDefinitions.h"
-#include "dataStrStaticQueue.h"
-#include "omp.h"
-#include "extractUChunk.cpp"
 
 //#define privateQueues
 
-inline void processMatchedVertices(
+void processMatchedVertices(
     MilanLongInt NLVer,
     vector<MilanLongInt> &UChunkBeingProcessed,
     staticQueue &U,
@@ -61,6 +53,7 @@ inline void processMatchedVertices(
 #endif
 
         // TODO what would be the optimal UCHUNK
+        // TODO refactor
         vector<MilanLongInt> UChunkBeingProcessed;
         UChunkBeingProcessed.reserve(UCHUNK);
 

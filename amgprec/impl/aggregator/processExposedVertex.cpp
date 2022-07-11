@@ -1,16 +1,6 @@
 #include "MatchBoxPC.h"
-#include <stdio.h>
-#include <iostream>
-#include <assert.h>
-#include <map>
-#include <vector>
-#include "primitiveDataTypeDefinitions.h"
-#include "dataStrStaticQueue.h"
-#include "omp.h"
-#include "queueTransfer.cpp"
-#include "processCrossEdge.cpp"
 
-inline void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
+void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                                               MilanLongInt *candidateMate,
                                               MilanLongInt *verLocInd,
                                               MilanLongInt *verLocPtr,

@@ -1,13 +1,7 @@
 #include "MatchBoxPC.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <map>
-#include <vector>
-#include "primitiveDataTypeDefinitions.h"
-#include "dataStrStaticQueue.h"
 
 ///Find the owner of a ghost node:
-inline MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
+MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
                                      MilanInt myRank, MilanInt numProcs) {
   //MilanLongInt Size = mVerDistance.size();
   MilanLongInt mStartInd = mVerDistance[myRank];

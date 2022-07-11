@@ -62,8 +62,21 @@ amg_s_parmatch_smth_bld.o \
 amg_s_parmatch_spmm_bld_inner.o
 
 MPCOBJS=MatchBoxPC.o \
+sendBundledMessages.o \
+initialize.o \
+extractUChunk.o \
+isAlreadyMatched.o \
+findOwnerOfGhost.o \
+computeCandidateMate.o \
+parallelComputeCandidateMateB.o \
+processMatchedVertices.o \
+processCrossEdge.o \
+queueTransfer.o \
+processMessages.o \
+processExposedVertex.o \
 algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o \
 algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP.o
+
 
 OBJS = $(FOBJS) $(MPCOBJS)
 

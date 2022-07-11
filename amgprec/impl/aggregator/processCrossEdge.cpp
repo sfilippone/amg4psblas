@@ -1,14 +1,6 @@
 #include "MatchBoxPC.h"
-#include <stdio.h>
-#include <iostream>
-#include <assert.h>
-#include <map>
-#include <vector>
-#include "primitiveDataTypeDefinitions.h"
-#include "dataStrStaticQueue.h"
-#include "omp.h"
 
-inline void PROCESS_CROSS_EDGE(vector<MilanLongInt> &Counter,
+void PROCESS_CROSS_EDGE(vector<MilanLongInt> &Counter,
                                map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
                                MilanLongInt edge,
                                MilanLongInt *SPtr)

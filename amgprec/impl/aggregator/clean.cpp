@@ -1,19 +1,10 @@
 #include "MatchBoxPC.h"
-#include <stdio.h>
-#include <iostream>
-#include <assert.h>
-#include <map>
-#include <vector>
-#include "primitiveDataTypeDefinitions.h"
-#include "dataStrStaticQueue.h"
-#include "omp.h"
-
 
 //TODO comment
 //TODO use task
 //TODO destroy the locks
 
-inline void clean(MilanInt myRank,
+void clean(MilanInt myRank,
                   MilanLongInt MessageIndex,
                   vector<MPI_Request> &SRequest,
                   vector<MPI_Status> &SStatus,

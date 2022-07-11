@@ -1,13 +1,6 @@
 #include "MatchBoxPC.h"
-#include <stdio.h>
-#include <iostream>
-#include <map>
-#include <vector>
-#include "primitiveDataTypeDefinitions.h"
-#include "dataStrStaticQueue.h"
-#include "omp.h"
 
-inline void queuesTransfer(staticQueue &U,
+void queuesTransfer(staticQueue &U,
                            staticQueue &privateU,
                            vector<MilanLongInt> &QLocalVtx,
                            vector<MilanLongInt> &QGhostVtx,

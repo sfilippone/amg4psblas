@@ -9,7 +9,7 @@
  * @param edgeLocWeight
  * @return
  */
-inline MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
+MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
                                               MilanLongInt adj2,
                                               MilanLongInt *verLocInd,
                                               MilanReal *edgeLocWeight)
@@ -45,7 +45,7 @@ inline MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
  * @param Ghost2LocalMap
  * @return
  */
-inline MilanLongInt computeCandidateMate(MilanLongInt adj1,
+MilanLongInt computeCandidateMate(MilanLongInt adj1,
                                          MilanLongInt adj2,
                                          MilanReal *edgeLocWeight,
                                          MilanLongInt k,

@@ -1,16 +1,6 @@
 #include "MatchBoxPC.h"
-#include <stdio.h>
-#include <iostream>
-#include <assert.h>
-#include <map>
-#include <vector>
-#include "primitiveDataTypeDefinitions.h"
-#include "dataStrStaticQueue.h"
-#include "omp.h"
 
-#define NUM_THREAD 4
-
-inline void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
+void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                        MilanLongInt StartIndex, MilanLongInt EndIndex,
                        MilanLongInt *numGhostEdgesPtr,
                        MilanLongInt *numGhostVerticesPtr,

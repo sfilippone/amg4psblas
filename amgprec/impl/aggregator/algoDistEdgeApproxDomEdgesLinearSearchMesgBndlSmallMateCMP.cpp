@@ -1,16 +1,4 @@
 #include "MatchBoxPC.h"
-#include <omp.h>
-#include <stdio.h>
-#include "isAlreadyMatched.cpp"
-#include "findOwnerOfGhost.cpp"
-#include "computeCandidateMate.cpp"
-#include "initialize.cpp"
-#include "parallelComputeCandidateMateB.cpp"
-#include "processExposedVertex.cpp"
-#include "processMatchedVertices.cpp"
-#include "sendBundledMessages.cpp"
-#include "processMessages.cpp"
-#include "clean.cpp"
 
 // ***********************************************************************
 //
