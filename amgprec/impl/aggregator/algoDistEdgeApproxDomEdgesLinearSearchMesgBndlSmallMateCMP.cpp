@@ -789,7 +789,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #endif
     } // End of while (true)
 
-    clean(myRank,
+    clean(NLVer,
+          myRank,
           MessageIndex,
           SRequest,
           SStatus,
@@ -800,7 +801,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
           msgInd,
           msgIndSent,
           NumMessagesBundled,
-          msgPercent);
+          msgPercent,
+          MateLock);
 
     finishTime = MPI_Wtime();
     *ph2_time = finishTime - startTime; // Time taken for Phase-2

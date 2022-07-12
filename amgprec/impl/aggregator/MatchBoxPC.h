@@ -234,7 +234,8 @@ extern "C"
                     staticQueue &privateQMsgType,
                     staticQueue &privateQOwner);
 
-    void clean(MilanInt myRank,
+    void clean(MilanLongInt NLVer,
+               MilanInt myRank,
                MilanLongInt MessageIndex,
                vector<MPI_Request> &SRequest,
                vector<MPI_Status> &SStatus,
@@ -245,7 +246,8 @@ extern "C"
                MilanLongInt msgInd,
                MilanLongInt *msgIndSent,
                MilanLongInt NumMessagesBundled,
-               MilanReal *msgPercent);
+               MilanReal *msgPercent,
+               omp_lock_t *MateLock);
 
     void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
                                            MilanLongInt *verLocPtr,
