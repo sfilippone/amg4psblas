@@ -121,14 +121,14 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     fflush(stdout);
 #endif
 
-    // inputSubGraph.getStartEndIndices(StartIndex, EndIndex);
     MilanLongInt StartIndex = verDistance[myRank]; // The starting vertex owned by the current rank
-    // MilanLongInt EndIndex = verDistance[myRank+1]; //The ending vertex owned by the current rank
     MilanLongInt EndIndex = verDistance[myRank + 1] - 1; // The ending vertex owned by the current rank
 
     MPI_Status computeStatus;
     const int ComputeTag = 7; // Predefined tag
-    const int BundleTag = 9;  // Predefined tag
+    const int BundleTag = 9;  // Predefined tag //TODO refactor this
+
+    //TODO refactor this
     int error_codeC;
     error_codeC = MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
     char error_message[MPI_MAX_ERROR_STRING];
@@ -144,7 +144,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     // Data structures for sending and receiving messages:
     vector<MilanLongInt> Message; // [ u, v, message_type ]
     Message.resize(3, -1);
-    MilanLongInt message_type = 0;
+    MilanLongInt message_type = 0; //TODO refactor this, it could be constants
     // Data structures for Message Bundling:
     // Although up to two messages can be sent along any cross edge,
     // only one message will be sent in the initialization phase -
@@ -158,6 +158,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         PCounter[i] = 0;
 
     MilanLongInt NumMessagesBundled = 0;
+    //TODO when the last computational section will be refactored this could be eliminated
     MilanInt ghostOwner = 0; // Changed by Fabio to be an integer, addresses needs to be integers!
     MilanLongInt *candidateMate = nullptr;
 #ifdef PRINT_DEBUG_INFO_
