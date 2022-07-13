@@ -10,9 +10,9 @@
  * @return
  */
 MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
-                                              MilanLongInt adj2,
-                                              MilanLongInt *verLocInd,
-                                              MilanReal *edgeLocWeight)
+                                       MilanLongInt adj2,
+                                       MilanLongInt *verLocInd,
+                                       MilanReal *edgeLocWeight)
 {
     MilanInt w = -1;
     MilanReal heaviestEdgeWt = MilanRealMin; // Assign the smallest Value possible first LDBL_MIN
@@ -46,15 +46,15 @@ MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
  * @return
  */
 MilanLongInt computeCandidateMate(MilanLongInt adj1,
-                                         MilanLongInt adj2,
-                                         MilanReal *edgeLocWeight,
-                                         MilanLongInt k,
-                                         MilanLongInt *verLocInd,
-                                         MilanLongInt StartIndex,
-                                         MilanLongInt EndIndex,
-                                         vector<MilanLongInt> &GMate,
-                                         MilanLongInt *Mate,
-                                         map<MilanLongInt, MilanLongInt> &Ghost2LocalMap)
+                                  MilanLongInt adj2,
+                                  MilanReal *edgeLocWeight,
+                                  MilanLongInt k,
+                                  MilanLongInt *verLocInd,
+                                  MilanLongInt StartIndex,
+                                  MilanLongInt EndIndex,
+                                  vector<MilanLongInt> &GMate,
+                                  MilanLongInt *Mate,
+                                  map<MilanLongInt, MilanLongInt> &Ghost2LocalMap)
 {
     // Start: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
 
