@@ -125,26 +125,16 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     MilanLongInt EndIndex = verDistance[myRank + 1] - 1; // The ending vertex owned by the current rank
 
     MPI_Status computeStatus;
-    const int ComputeTag = 7; // Predefined tag
-    const int BundleTag = 9;  // Predefined tag //TODO refactor this
 
-    //TODO refactor this
-    int error_codeC;
-    error_codeC = MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
-    char error_message[MPI_MAX_ERROR_STRING];
-    int message_length;
-
-    // MilanLongInt NLVer=0, NLEdge=0, StartIndex=0, EndIndex=0;
     MilanLongInt msgActual = 0, msgInd = 0;
     MilanReal heaviestEdgeWt = 0.0f; // Assumes positive weight
     MilanReal startTime, finishTime;
-    // MilanReal Precision = MPI_Wtick(); //Get the precision of the MPI Timer
+
     startTime = MPI_Wtime();
 
     // Data structures for sending and receiving messages:
     vector<MilanLongInt> Message; // [ u, v, message_type ]
     Message.resize(3, -1);
-    MilanLongInt message_type = 0; //TODO refactor this, it could be constants
     // Data structures for Message Bundling:
     // Although up to two messages can be sent along any cross edge,
     // only one message will be sent in the initialization phase -
@@ -204,7 +194,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     MilanLongInt *Buffer;
 
     // Declare the locks
-    //  TODO destroy the locks
     omp_lock_t MateLock[NLVer];
 
     initialize(NLVer, NLEdge, StartIndex,
@@ -341,8 +330,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         &MessageIndex,
                         numProcs,
                         myRank,
-                        ComputeTag,
-                        BundleTag,
+                        //ComputeTag,
+                        //BundleTag,
                         comm,
                         QLocalVtx,
                         QGhostVtx,
@@ -376,21 +365,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     fflush(stdout);
     fflush(stdout);
 #endif
-    // Buffer to receive bundled messages
-    // Maximum messages that can be received from any processor is
-    // twice the edge cut: REQUEST; REQUEST+(FAILURE/SUCCESS)
-    vector<MilanLongInt> ReceiveBuffer;
-    MilanLongInt bundleSize = 0, bundleCounter = 0;
-    try
-    {
-        ReceiveBuffer.reserve(numGhostEdges * 2 * 3); // Three integers per cross edge
-    }
-    catch (length_error)
-    {
-        cout << "Error in function algoDistEdgeApproxDominatingEdgesMessageBundling: \n";
-        cout << "Not enough memory to allocate the internal variables \n";
-        exit(1);
-    }
+
     while (true)
     {
 #ifdef DEBUG_HANG_
@@ -615,19 +590,13 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         verLocPtr,
                         k,
                         verLocInd,
-                        error_codeC,
                         numProcs,
                         myRank,
-                        ComputeTag,
-                        BundleTag,
                         comm,
                         Message,
-                        error_message,
-                        message_length,
-                        ReceiveBuffer,
+                        numGhostEdges,
                         u,
                         v,
-                        message_type,
                         &S,
                         U);
 

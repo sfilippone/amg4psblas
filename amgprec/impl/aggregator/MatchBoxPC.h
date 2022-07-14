@@ -73,6 +73,9 @@ const MilanLongInt SUCCESS = 2;
 const MilanLongInt FAILURE = 3;
 const MilanLongInt SIZEINFO = 4;
 
+const int ComputeTag = 7; // Predefined tag
+const int BundleTag = 9;  // Predefined tag
+
 // MPI type map
 template <typename T>
 MPI_Datatype TypeMap();
@@ -335,8 +338,6 @@ extern "C"
                              MilanLongInt *MessageIndexPtr,
                              MilanInt numProcs,
                              MilanInt myRank,
-                             int ComputeTag,
-                             int BundleTag,
                              MPI_Comm comm,
                              vector<MilanLongInt> &QLocalVtx,
                              vector<MilanLongInt> &QGhostVtx,
@@ -362,19 +363,13 @@ extern "C"
         MilanLongInt *verLocPtr,
         MilanLongInt k,
         MilanLongInt *verLocInd,
-        int error_codeC,
         MilanInt numProcs,
         MilanInt myRank,
-        int ComputeTag,
-        int BundleTag,
         MPI_Comm comm,
         vector<MilanLongInt> &Message,
-        char *error_message,
-        int message_length,
-        vector<MilanLongInt> &ReceiveBuffer,
+        MilanLongInt numGhostEdges,
         MilanLongInt u,
         MilanLongInt v,
-        MilanLongInt message_type,
         MilanLongInt *SPtr,
         staticQueue &U);
 

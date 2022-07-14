@@ -1,7 +1,5 @@
 #include "MatchBoxPC.h"
 
-//TODO there are many useless parameter passed to this function
-
 void processMessages(
     MilanLongInt NLVer,
     MilanLongInt *Mate,
@@ -19,19 +17,13 @@ void processMessages(
     MilanLongInt *verLocPtr,
     MilanLongInt k,
     MilanLongInt *verLocInd,
-    int error_codeC,
     MilanInt numProcs,
     MilanInt myRank,
-    int ComputeTag,
-    int BundleTag,
     MPI_Comm comm,
     vector<MilanLongInt> &Message,
-    char *error_message,
-    int message_length,
-    vector<MilanLongInt> &ReceiveBuffer,
+    MilanLongInt numGhostEdges,
     MilanLongInt u,
     MilanLongInt v,
-    MilanLongInt message_type,
     MilanLongInt *SPtr,
     staticQueue &U)
 {
@@ -42,6 +34,25 @@ void processMessages(
     MilanLongInt S = *SPtr; // TODO refactor this
     MilanLongInt adj11, adj12, k1;
     MilanLongInt ghostOwner;
+    int error_codeC;
+    error_codeC = MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
+    char error_message[MPI_MAX_ERROR_STRING];
+    int message_length;
+    MilanLongInt message_type = 0;
+    // Buffer to receive bundled messages
+    // Maximum messages that can be received from any processor is
+    // twice the edge cut: REQUEST; REQUEST+(FAILURE/SUCCESS)
+    vector<MilanLongInt> ReceiveBuffer;
+    try
+    {
+        ReceiveBuffer.reserve(numGhostEdges * 2 * 3); // Three integers per cross edge
+    }
+    catch (length_error)
+    {
+        cout << "Error in function algoDistEdgeApproxDominatingEdgesMessageBundling: \n";
+        cout << "Not enough memory to allocate the internal variables \n";
+        exit(1);
+    }
 
 #ifdef PRINT_DEBUG_INFO_
     cout

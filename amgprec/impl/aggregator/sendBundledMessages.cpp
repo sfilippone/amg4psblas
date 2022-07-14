@@ -12,8 +12,6 @@ void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
                                 MilanLongInt *MessageIndexPtr,
                                 MilanInt numProcs,
                                 MilanInt myRank,
-                                int ComputeTag,
-                                int BundleTag,
                                 MPI_Comm comm,
                                 vector<MilanLongInt> &QLocalVtx,
                                 vector<MilanLongInt> &QGhostVtx,
@@ -24,7 +22,6 @@ void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
 {
 
     MilanLongInt myIndex = 0, msgActual = *msgActualPtr, MessageIndex = *MessageIndexPtr, numGhostEdges = *numGhostEdgesPtr, numMessagesToSend;
-    const MilanLongInt SIZEINFO = 4;
     MilanInt i = 0, OneMessageSize = 0, BufferSize = *BufferSizePtr;
 
 #ifdef DEBUG_HANG_
