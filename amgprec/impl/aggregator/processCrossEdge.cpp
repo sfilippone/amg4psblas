@@ -1,16 +1,15 @@
 #include "MatchBoxPC.h"
 
 void PROCESS_CROSS_EDGE(vector<MilanLongInt> &Counter,
-                        map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
                         MilanLongInt edge,
                         MilanLongInt *SPtr)
 {
     // Decrement the counter:
     // Start: PARALLEL_PROCESS_CROSS_EDGE_B
-    if (Counter[Ghost2LocalMap[edge]] > 0)
+    if (Counter[edge] > 0)
     {
-        Counter[Ghost2LocalMap[edge]] -= 1; // Decrement
-        if (Counter[Ghost2LocalMap[edge]] == 0)
+        Counter[edge] -= 1; // Decrement
+        if (Counter[edge] == 0)
         {
             (*SPtr)--; // Decrement S
 #ifdef PRINT_DEBUG_INFO_

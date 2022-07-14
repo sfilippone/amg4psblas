@@ -290,7 +290,6 @@ extern "C"
                                            staticQueue &privateQOwner);
 
     void PROCESS_CROSS_EDGE(vector<MilanLongInt> &Counter,
-                            map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
                             MilanLongInt edge,
                             MilanLongInt *SPtr);
 

@@ -23,11 +23,9 @@ bool isAlreadyMatched(MilanLongInt node,
 #pragma omp critical(Mate)
     {
         if ((node < StartIndex) || (node > EndIndex)) { //Is it a ghost vertex?
-            if (GMate[Ghost2LocalMap[node]] >= 0)// Already matched
-                result = true;
+            result = GMate[Ghost2LocalMap[node]] >= 0;// Already matched
         } else { //A local vertex
-            if (Mate[node - StartIndex] >= 0) // Already matched
-                result = true;
+            result = (Mate[node - StartIndex] >= 0); // Already matched
         }
 
     }

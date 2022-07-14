@@ -142,7 +142,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     vector<MilanLongInt> QLocalVtx, QGhostVtx, QMsgType;
     vector<MilanInt> QOwner; // Changed by Fabio to be an integer, addresses needs to be integers!
 
-    // TODO move this inseide the initialization function
     MilanLongInt *PCounter = new MilanLongInt[numProcs];
     for (int i = 0; i < numProcs; i++)
         PCounter[i] = 0;
@@ -358,7 +357,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << ")Entering While(true) loop..";
     fflush(stdout);
-    // U.display(); fflush(stdout);
 #endif
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << "=========================************===============================" << endl;
@@ -468,7 +466,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                         fflush(stdout);
 #endif
 
-                                        PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, w, &S);
+                                        PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap[w], &S);
 
                                     } // End of if CandidateMate[w] = v
                                 }     // End of if a Ghost Vertex

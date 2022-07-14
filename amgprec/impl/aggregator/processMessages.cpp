@@ -30,7 +30,7 @@ void processMessages(
 
     MilanInt Sender;
     MPI_Status computeStatus;
-    MilanLongInt bundleSize, bundleCounter = 0, myCard = *myCardPtr, msgInd = *msgIndPtr, msgActual = *msgActualPtr, w;
+    MilanLongInt bundleSize, myCard = *myCardPtr, msgInd = *msgIndPtr, msgActual = *msgActualPtr, w;
     MilanLongInt adj11, adj12, k1;
     MilanLongInt ghostOwner;
     int error_codeC;
@@ -155,15 +155,13 @@ void processMessages(
     fflush(stdout);
 #endif
 
-    bundleCounter = 0;
-    while (bundleCounter < bundleSize)
+
+    //Most of the time bundleSize == 3, thus, it's not worth parallelizing thi loop
+    for (MilanLongInt bundleCounter = 3; bundleCounter < bundleSize + 3; bundleCounter += 3)
     {
-        u = ReceiveBuffer[bundleCounter]; // GHOST
-        bundleCounter++;
-        v = ReceiveBuffer[bundleCounter]; // LOCAL
-        bundleCounter++;
-        message_type = ReceiveBuffer[bundleCounter]; // TYPE
-        bundleCounter++;
+        u = ReceiveBuffer[bundleCounter - 3];            // GHOST
+        v = ReceiveBuffer[bundleCounter - 2];            // LOCAL
+        message_type = ReceiveBuffer[bundleCounter - 1]; // TYPE
 
         // CASE I: REQUEST
         if (message_type == REQUEST)
@@ -188,7 +186,6 @@ void processMessages(
                 {
                     GMate[Ghost2LocalMap[u]] = v; // u is ghost
                     Mate[v - StartIndex] = u;     // v is local
-                    // Q.push_back(u);
                     U.push_back(v);
                     U.push_back(u);
                     myCard++;
@@ -196,7 +193,8 @@ void processMessages(
                     cout << "\n(" << myRank << ")MATCH: (" << v << "," << u << ") " << endl;
                     fflush(stdout);
 #endif
-                    PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, u, S);
+
+                    PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap[u], S);
                 } // End of if ( candidateMate[v-StartIndex] == u )e
             }     // End of if ( Mate[v] == -1 )
         }         // End of REQUEST
@@ -208,8 +206,8 @@ void processMessages(
                 cout << "\n(" << myRank << ")Message type is SUCCESS" << endl;
                 fflush(stdout);
 #endif
-                GMate[Ghost2LocalMap[u]] = EndIndex + 1; // Set a Dummy Mate to make sure that we do not (u is a ghost)
-                PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, u, S);
+                GMate[Ghost2LocalMap[u]] = EndIndex + 1; // Set a Dummy Mate to make sure that we do not (u is a ghost) process it again
+                PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap[u], S);
 #ifdef DEBUG_GHOST_
                 if ((v < 0) || (v < StartIndex) || ((v - StartIndex) > NLVer))
                 {
@@ -261,8 +259,8 @@ void processMessages(
                                     cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") " << endl;
                                     fflush(stdout);
 #endif
-                                    // Decrement the counter:
-                                    PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, w, S);
+
+                                    PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap[w], S);
                                 } // End of if CandidateMate[w] = v
                             }     // End of if a Ghost Vertex
                             else
@@ -320,10 +318,10 @@ void processMessages(
                 cout << "\n(" << myRank << ")Message type is FAILURE" << endl;
                 fflush(stdout);
 #endif
-                GMate[Ghost2LocalMap[u]] = EndIndex + 1;            // Set a Dummy Mate to make sure that we do not (u is a ghost) process this anymore
-                PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, u, S); // Decrease the counter
-            }                                                       // End of else: CASE III
-        }                                                           // End of else: CASE I
+                GMate[Ghost2LocalMap[u]] = EndIndex + 1; // Set a Dummy Mate to make sure that we do not (u is a ghost) process this anymore
+                PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap[u], S); // Decrease the counter
+            }                                                      // End of else: CASE III
+        }                                                          // End of else: CASE I
     }
 
     *myCardPtr = myCard;
