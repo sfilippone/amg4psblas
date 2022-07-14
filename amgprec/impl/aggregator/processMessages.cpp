@@ -24,14 +24,13 @@ void processMessages(
     MilanLongInt numGhostEdges,
     MilanLongInt u,
     MilanLongInt v,
-    MilanLongInt *SPtr,
+    MilanLongInt *S,
     staticQueue &U)
 {
 
     MilanInt Sender;
     MPI_Status computeStatus;
     MilanLongInt bundleSize, bundleCounter = 0, myCard = *myCardPtr, msgInd = *msgIndPtr, msgActual = *msgActualPtr, w;
-    MilanLongInt S = *SPtr; // TODO refactor this
     MilanLongInt adj11, adj12, k1;
     MilanLongInt ghostOwner;
     int error_codeC;
@@ -39,6 +38,7 @@ void processMessages(
     char error_message[MPI_MAX_ERROR_STRING];
     int message_length;
     MilanLongInt message_type = 0;
+
     // Buffer to receive bundled messages
     // Maximum messages that can be received from any processor is
     // twice the edge cut: REQUEST; REQUEST+(FAILURE/SUCCESS)
@@ -61,7 +61,7 @@ void processMessages(
     fflush(stdout);
 #endif
 #ifdef PRINT_DEBUG_INFO_
-    cout << "\n(" << myRank << ")About to begin Message processing phase ... S=" << S << endl;
+    cout << "\n(" << myRank << ")About to begin Message processing phase ... *S=" << *S << endl;
     fflush(stdout);
 #endif
 #ifdef PRINT_DEBUG_INFO_
@@ -196,7 +196,7 @@ void processMessages(
                     cout << "\n(" << myRank << ")MATCH: (" << v << "," << u << ") " << endl;
                     fflush(stdout);
 #endif
-                    PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, u, &S);
+                    PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, u, S);
                 } // End of if ( candidateMate[v-StartIndex] == u )e
             }     // End of if ( Mate[v] == -1 )
         }         // End of REQUEST
@@ -209,7 +209,7 @@ void processMessages(
                 fflush(stdout);
 #endif
                 GMate[Ghost2LocalMap[u]] = EndIndex + 1; // Set a Dummy Mate to make sure that we do not (u is a ghost)
-                PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, u, &S);
+                PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, u, S);
 #ifdef DEBUG_GHOST_
                 if ((v < 0) || (v < StartIndex) || ((v - StartIndex) > NLVer))
                 {
@@ -262,7 +262,7 @@ void processMessages(
                                     fflush(stdout);
 #endif
                                     // Decrement the counter:
-                                    PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, w, &S);
+                                    PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, w, S);
                                 } // End of if CandidateMate[w] = v
                             }     // End of if a Ghost Vertex
                             else
@@ -321,13 +321,12 @@ void processMessages(
                 fflush(stdout);
 #endif
                 GMate[Ghost2LocalMap[u]] = EndIndex + 1;            // Set a Dummy Mate to make sure that we do not (u is a ghost) process this anymore
-                PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, u, &S); // Decrease the counter
+                PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap, u, S); // Decrease the counter
             }                                                       // End of else: CASE III
         }                                                           // End of else: CASE I
     }
 
     *myCardPtr = myCard;
-    *SPtr = S;
     *msgIndPtr = msgInd;
     *msgActualPtr = msgActual;
     return;
