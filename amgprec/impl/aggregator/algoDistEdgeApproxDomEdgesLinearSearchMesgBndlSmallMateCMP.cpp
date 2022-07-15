@@ -71,8 +71,6 @@
  Statistics: ph1_card, ph2_card : Size: |P| number of processes in the comm-world (number of matched edges in Phase 1 and Phase 2)
  */
 
-#define UCHUNK 1000
-
 #ifdef SERIAL_MPI
 #else
 
@@ -121,7 +119,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     fflush(stdout);
 #endif
 
-    MilanLongInt StartIndex = verDistance[myRank]; // The starting vertex owned by the current rank
+    MilanLongInt StartIndex = verDistance[myRank];       // The starting vertex owned by the current rank
     MilanLongInt EndIndex = verDistance[myRank + 1] - 1; // The ending vertex owned by the current rank
 
     MPI_Status computeStatus;
@@ -147,7 +145,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         PCounter[i] = 0;
 
     MilanLongInt NumMessagesBundled = 0;
-    //TODO when the last computational section will be refactored this could be eliminated
+    // TODO when the last computational section will be refactored this could be eliminated
     MilanInt ghostOwner = 0; // Changed by Fabio to be an integer, addresses needs to be integers!
     MilanLongInt *candidateMate = nullptr;
 #ifdef PRINT_DEBUG_INFO_
@@ -282,6 +280,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 
     vector<MilanLongInt> UChunkBeingProcessed;
     UChunkBeingProcessed.reserve(UCHUNK);
+
     processMatchedVertices(NLVer,
                            UChunkBeingProcessed,
                            U,
@@ -329,8 +328,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         &MessageIndex,
                         numProcs,
                         myRank,
-                        //ComputeTag,
-                        //BundleTag,
                         comm,
                         QLocalVtx,
                         QGhostVtx,
@@ -598,35 +595,35 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         &S,
                         U);
 
-    ///////////////////////// END OF PROCESS MESSAGES /////////////////////////////////
+        ///////////////////////// END OF PROCESS MESSAGES /////////////////////////////////
 #ifdef PRINT_DEBUG_INFO_
-    cout << "\n(" << myRank << ")Finished Message processing phase: S= " << S;
-    fflush(stdout);
-    cout << "\n(" << myRank << ")** SENT     : ACTUAL= " << msgActual;
-    fflush(stdout);
-    cout << "\n(" << myRank << ")** SENT     : INDIVIDUAL= " << msgInd << endl;
-    fflush(stdout);
+        cout << "\n(" << myRank << ")Finished Message processing phase: S= " << S;
+        fflush(stdout);
+        cout << "\n(" << myRank << ")** SENT     : ACTUAL= " << msgActual;
+        fflush(stdout);
+        cout << "\n(" << myRank << ")** SENT     : INDIVIDUAL= " << msgInd << endl;
+        fflush(stdout);
 #endif
-} // End of while (true)
+    } // End of while (true)
 
-clean(NLVer,
-      myRank,
-      MessageIndex,
-      SRequest,
-      SStatus,
-      BufferSize,
-      Buffer,
-      msgActual,
-      msgActualSent,
-      msgInd,
-      msgIndSent,
-      NumMessagesBundled,
-      msgPercent,
-      MateLock);
+    clean(NLVer,
+          myRank,
+          MessageIndex,
+          SRequest,
+          SStatus,
+          BufferSize,
+          Buffer,
+          msgActual,
+          msgActualSent,
+          msgInd,
+          msgIndSent,
+          NumMessagesBundled,
+          msgPercent,
+          MateLock);
 
-finishTime = MPI_Wtime();
-*ph2_time = finishTime - startTime; // Time taken for Phase-2
-*ph2_card = myCard;                 // Cardinality at the end of Phase-2
+    finishTime = MPI_Wtime();
+    *ph2_time = finishTime - startTime; // Time taken for Phase-2
+    *ph2_card = myCard;                 // Cardinality at the end of Phase-2
 }
 // End of algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMate
 #endif

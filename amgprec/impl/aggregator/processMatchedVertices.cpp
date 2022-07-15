@@ -1,6 +1,6 @@
 #include "MatchBoxPC.h"
 
-//#define privateQueues
+//#define error
 
 void processMatchedVertices(
     MilanLongInt NLVer,
@@ -38,8 +38,13 @@ void processMatchedVertices(
     MilanLongInt adj1, adj2, adj11, adj12, k, k1, v = -1, w = -1, ghostOwner;
     MilanLongInt myCard = *myCardPtr, msgInd = *msgIndPtr, NumMessagesBundled = *NumMessagesBundledPtr, S = *SPtr, privateMyCard = 0;
 
-    // TODO check if private queues arrive empty
-#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner) firstprivate(privateMyCard, privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) default(shared) num_threads(4)
+    // TODO check that the queues arrives empty
+    assert(privateQGhostVtx.empty());
+    assert(privateQLocalVtx.empty());
+    assert(privateQMsgType.empty());
+    assert(privateQOwner.empty());
+
+#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner) firstprivate(privateMyCard, privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) default(shared) num_threads(NUM_THREAD)
     {
 
 #ifdef PRINT_DEBUG_INFO_
@@ -140,25 +145,18 @@ void processMatchedVertices(
                                             cout << "\n(" << myRank << ")Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs);
 #endif
 
+                                            msgInd++;
+                                            NumMessagesBundled++;
                                             ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                                             assert(ghostOwner != -1);
                                             assert(ghostOwner != myRank);
+                                            PCounter[ghostOwner]++;
 
-#ifdef privateQueues
                                             privateQLocalVtx.push_back(v);
                                             privateQGhostVtx.push_back(w);
                                             privateQMsgType.push_back(REQUEST);
                                             privateQOwner.push_back(ghostOwner);
-#endif
-#ifndef privateQueues
-                                            QLocalVtx.push_back(v);
-                                            QGhostVtx.push_back(w);
-                                            QMsgType.push_back(REQUEST);
-                                            QOwner.push_back(ghostOwner);
-#endif
-                                            PCounter[ghostOwner]++;
-                                            NumMessagesBundled++;
-                                            msgInd++;
+
                                             if (candidateMate[NLVer + Ghost2LocalMap[w]] == v)
                                             {
                                                 Mate[v - StartIndex] = w;     // v is a local vertex
@@ -214,28 +212,18 @@ void processMatchedVertices(
                                                 cout << "\n(" << myRank << ")Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs);
                                                 fflush(stdout);
 #endif
-
-                                                // ghostOwner = inputSubGraph.findOwner(w);
+                                                msgInd++;
+                                                NumMessagesBundled++;
                                                 ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                                                 assert(ghostOwner != -1);
                                                 assert(ghostOwner != myRank);
+                                                PCounter[ghostOwner]++;
 
-#ifdef privateQueues
                                                 privateQLocalVtx.push_back(v);
                                                 privateQGhostVtx.push_back(w);
                                                 privateQMsgType.push_back(FAILURE);
                                                 privateQOwner.push_back(ghostOwner);
-#endif
-#ifndef privateQueues
-                                                QLocalVtx.push_back(v);
-                                                QGhostVtx.push_back(w);
-                                                QMsgType.push_back(FAILURE);
-                                                QOwner.push_back(ghostOwner);
-#endif
 
-                                                PCounter[ghostOwner]++;
-                                                NumMessagesBundled++;
-                                                msgInd++;
                                             } // End of if(GHOST)
                                         }     // End of for loop
                                     }         // End of Else: w == -1
@@ -270,26 +258,18 @@ void processMatchedVertices(
                                     fflush(stdout);
 #endif
 
+                                    msgInd++;
+                                    NumMessagesBundled++;
                                     ghostOwner = findOwnerOfGhost(v, verDistance, myRank, numProcs);
                                     assert(ghostOwner != -1);
                                     assert(ghostOwner != myRank);
+                                    PCounter[ghostOwner]++;
 
-#ifdef privateQueues
                                     privateQLocalVtx.push_back(u);
                                     privateQGhostVtx.push_back(v);
                                     privateQMsgType.push_back(SUCCESS);
                                     privateQOwner.push_back(ghostOwner);
-#endif
-#ifndef privateQueues
-                                    QLocalVtx.push_back(u);
-                                    QGhostVtx.push_back(v);
-                                    QMsgType.push_back(SUCCESS);
-                                    QOwner.push_back(ghostOwner);
-#endif
 
-                                    PCounter[ghostOwner]++;
-                                    NumMessagesBundled++;
-                                    msgInd++;
                                 } // End of If( v != Mate[u] )
 
                                 // omp_unset_lock(&MateLock[u - StartIndex]);
@@ -306,14 +286,15 @@ void processMatchedVertices(
                 if (privateU.size() < UCHUNK && !U.empty())
                     continue;
 
-#ifdef privateQueues
+                    printf("Executed \n");
+#ifdef error
 #pragma omp critical(U)
                 {
                     while (!privateU.empty())
                         U.push_back(privateU.pop_back());
                 }
 #endif
-#ifndef privateQueues
+#ifndef error
                 queuesTransfer(U, privateU, QLocalVtx,
                                QGhostVtx,
                                QMsgType, QOwner, privateQLocalVtx,
@@ -322,7 +303,7 @@ void processMatchedVertices(
                                privateQOwner);
 #endif
             }
-        } // End of while ( /*!Q.empty()*/ !U.empty() )
+        } // End of while ( !U.empty() )
 
         queuesTransfer(U, privateU, QLocalVtx,
                        QGhostVtx,

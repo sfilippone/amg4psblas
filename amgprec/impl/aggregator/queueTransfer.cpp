@@ -12,6 +12,7 @@ void queuesTransfer(staticQueue &U,
                            staticQueue &privateQOwner)
 {
 
+
 #pragma omp critical(U)
     {
         while (!privateU.empty())
