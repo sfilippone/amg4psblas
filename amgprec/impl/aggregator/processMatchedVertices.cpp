@@ -37,7 +37,6 @@ void processMatchedVertices(
 {
 
     MilanLongInt adj1, adj2, adj11, adj12, k, k1, v = -1, w = -1, ghostOwner;
-    MilanLongInt myCard = *myCardPtr, msgInd = *msgIndPtr, NumMessagesBundled = *NumMessagesBundledPtr, S = *SPtr, privateMyCard = 0;
 
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << "=========================************===============================" << endl;
@@ -48,7 +47,7 @@ void processMatchedVertices(
 #ifdef COUNT_LOCAL_VERTEX
     MilanLongInt localVertices = 0;
 #endif
-#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner) firstprivate(privateMyCard, privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) default(shared) num_threads(NUM_THREAD)
+#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner) firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) default(shared) num_threads(NUM_THREAD)
     {
 
         // TODO what would be the optimal UCHUNK
@@ -140,9 +139,9 @@ void processMatchedVertices(
 #pragma omp atomic
                                         PCounter[ghostOwner]++;
 #pragma omp atomic
-                                        msgInd++;
+                                        (*msgIndPtr)++;
 #pragma omp atomic
-                                        NumMessagesBundled++;
+                                        (*NumMessagesBundledPtr)++;
 
                                         privateQLocalVtx.push_back(v);
                                         privateQGhostVtx.push_back(w);
@@ -160,14 +159,15 @@ void processMatchedVertices(
                                                 // Q.push_back(u);
                                                 privateU.push_back(v);
                                                 privateU.push_back(w);
-                                                privateMyCard++;
+#pragma omp atomic
+                                                (*myCardPtr)++;
 #ifdef PRINT_DEBUG_INFO_
                                                 cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") ";
                                                 fflush(stdout);
 #endif
 
                                                 // Decrement the counter:
-                                                PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap[w], &S);
+                                                PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap[w], SPtr);
                                                 omp_unset_lock(&MateLock[v - StartIndex]);
                                             } // End of if CandidateMate[w] = v
                                         }
@@ -188,7 +188,8 @@ void processMatchedVertices(
                                                 // Q.push_back(u);
                                                 privateU.push_back(v);
                                                 privateU.push_back(w);
-                                                privateMyCard++;
+#pragma omp atomic
+                                                (*myCardPtr)++;
 #ifdef PRINT_DEBUG_INFO_
                                                 cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") ";
                                                 fflush(stdout);
@@ -222,9 +223,9 @@ void processMatchedVertices(
 #pragma omp atomic
                                             PCounter[ghostOwner]++;
 #pragma omp atomic
-                                            msgInd++;
+                                            (*msgIndPtr)++;
 #pragma omp atomic
-                                            NumMessagesBundled++;
+                                            (*NumMessagesBundledPtr)++;
 
                                             privateQLocalVtx.push_back(v);
                                             privateQGhostVtx.push_back(w);
@@ -264,10 +265,9 @@ void processMatchedVertices(
 #pragma omp atomic
                                 PCounter[ghostOwner]++;
 #pragma omp atomic
-                                msgInd++;
+                                (*msgIndPtr)++;
 #pragma omp atomic
-                                NumMessagesBundled++;
-
+                                (*NumMessagesBundledPtr)++;
                                 privateQLocalVtx.push_back(u);
                                 privateQGhostVtx.push_back(v);
                                 privateQMsgType.push_back(SUCCESS);
@@ -314,11 +314,6 @@ void processMatchedVertices(
                        privateQMsgType,
                        privateQOwner);
 
-// TODO it is possible that this is not working as expected
-//      further investigation needed.
-#pragma omp atomic
-        myCard += privateMyCard;
-
 #ifdef COUNT_LOCAL_VERTEX
         printf("Count local vertexes: %ld for thread %d of processor %d\n",
                localVertices,
@@ -327,8 +322,4 @@ void processMatchedVertices(
 
 #endif
     }
-    *myCardPtr = myCard;
-    *msgIndPtr = msgInd;
-    *NumMessagesBundledPtr = NumMessagesBundled;
-    *SPtr = S;
 }
