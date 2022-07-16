@@ -66,7 +66,7 @@
 using namespace std;
 
 #define NUM_THREAD 4
-#define UCHUNK 100000
+#define UCHUNK 1000
 
 const MilanLongInt REQUEST = 1;
 const MilanLongInt SUCCESS = 2;
@@ -323,7 +323,8 @@ extern "C"
         staticQueue &privateQLocalVtx,
         staticQueue &privateQGhostVtx,
         staticQueue &privateQMsgType,
-        staticQueue &privateQOwner);
+        staticQueue &privateQOwner,
+        omp_lock_t *MateLock);
 
     void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
                              MilanInt *BufferSizePtr,

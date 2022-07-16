@@ -281,6 +281,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     vector<MilanLongInt> UChunkBeingProcessed;
     UChunkBeingProcessed.reserve(UCHUNK);
 
+//#define PRINT_DEBUG_INFO_
     processMatchedVertices(NLVer,
                            UChunkBeingProcessed,
                            U,
@@ -310,7 +311,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                            privateQLocalVtx,
                            privateQGhostVtx,
                            privateQMsgType,
-                           privateQOwner);
+                           privateQOwner,
+                           MateLock);
 
     /////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////// SEND BUNDLED MESSAGES /////////////////////////////////////
