@@ -9,9 +9,9 @@ void processMessages(
     vector<MilanLongInt> &Counter,
     MilanLongInt StartIndex,
     MilanLongInt EndIndex,
-    MilanLongInt *myCardPtr,
-    MilanLongInt *msgIndPtr,
-    MilanLongInt *msgActualPtr,
+    MilanLongInt *myCard,
+    MilanLongInt *msgInd,
+    MilanLongInt *msgActual,
     MilanReal *edgeLocWeight,
     MilanLongInt *verDistance,
     MilanLongInt *verLocPtr,
@@ -30,7 +30,7 @@ void processMessages(
 
     MilanInt Sender;
     MPI_Status computeStatus;
-    MilanLongInt bundleSize, myCard = *myCardPtr, msgInd = *msgIndPtr, msgActual = *msgActualPtr, w;
+    MilanLongInt bundleSize, w;
     MilanLongInt adj11, adj12, k1;
     MilanLongInt ghostOwner;
     int error_codeC;
@@ -188,7 +188,7 @@ void processMessages(
                     Mate[v - StartIndex] = u;     // v is local
                     U.push_back(v);
                     U.push_back(u);
-                    myCard++;
+                    (*myCard)++;
 #ifdef PRINT_DEBUG_INFO_
                     cout << "\n(" << myRank << ")MATCH: (" << v << "," << u << ") " << endl;
                     fflush(stdout);
@@ -246,15 +246,15 @@ void processMessages(
                                 assert(ghostOwner != myRank);
 
                                 MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
-                                msgInd++;
-                                msgActual++;
+                                (*msgInd)++;
+                                (*msgActual)++;
                                 if (candidateMate[NLVer + Ghost2LocalMap[w]] == v)
                                 {
                                     Mate[v - StartIndex] = w;     // v is local
                                     GMate[Ghost2LocalMap[w]] = v; // w is ghost
                                     U.push_back(v);
                                     U.push_back(w);
-                                    myCard++;
+                                    (*myCard)++;
 #ifdef PRINT_DEBUG_INFO_
                                     cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") " << endl;
                                     fflush(stdout);
@@ -272,7 +272,7 @@ void processMessages(
                                     // Q.push_back(u);
                                     U.push_back(v);
                                     U.push_back(w);
-                                    myCard++;
+                                    (*myCard)++;
 #ifdef PRINT_DEBUG_INFO_
                                     cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") " << endl;
                                     fflush(stdout);
@@ -303,8 +303,8 @@ void processMessages(
                                     assert(ghostOwner != -1);
                                     assert(ghostOwner != myRank);
                                     MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
-                                    msgInd++;
-                                    msgActual++;
+                                    (*msgInd)++;
+                                    (*msgActual)++;
                                 } // End of if(GHOST)
                             }     // End of for loop
                         }         // End of Else: w == -1
@@ -324,8 +324,5 @@ void processMessages(
         }                                                          // End of else: CASE I
     }
 
-    *myCardPtr = myCard;
-    *msgIndPtr = msgInd;
-    *msgActualPtr = msgActual;
     return;
 }

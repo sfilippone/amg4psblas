@@ -1,7 +1,7 @@
 #include "MatchBoxPC.h"
 
 void PROCESS_CROSS_EDGE(MilanLongInt *edge,
-                        MilanLongInt *SPtr)
+                        MilanLongInt *S)
 {
     // Start: PARALLEL_PROCESS_CROSS_EDGE_B
     MilanLongInt captureCounter;
@@ -13,7 +13,7 @@ void PROCESS_CROSS_EDGE(MilanLongInt *edge,
 
     if (captureCounter == 0)
 #pragma omp atomic
-        (*SPtr)--; // Decrement S
+        (*S)--; // Decrement S
 
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << ")Decrementing S: Ghost vertex " << edge << " has received all its messages";

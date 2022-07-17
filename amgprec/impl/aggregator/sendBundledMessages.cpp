@@ -1,15 +1,15 @@
 #include "MatchBoxPC.h"
 
-void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
-                                MilanInt *BufferSizePtr,
+void sendBundledMessages(MilanLongInt *numGhostEdges,
+                                MilanInt *BufferSize,
                                 MilanLongInt *Buffer,
                                 vector<MilanLongInt> &PCumulative,
                                 vector<MilanLongInt> &PMessageBundle,
                                 vector<MilanLongInt> &PSizeInfoMessages,
                                 MilanLongInt *PCounter,
                                 MilanLongInt NumMessagesBundled,
-                                MilanLongInt *msgActualPtr,
-                                MilanLongInt *MessageIndexPtr,
+                                MilanLongInt *msgActual,
+                                MilanLongInt *MessageIndex,
                                 MilanInt numProcs,
                                 MilanInt myRank,
                                 MPI_Comm comm,
@@ -21,8 +21,8 @@ void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
                                 vector<MPI_Status> &SStatus)
 {
 
-    MilanLongInt myIndex = 0, msgActual = *msgActualPtr, MessageIndex = *MessageIndexPtr, numGhostEdges = *numGhostEdgesPtr, numMessagesToSend;
-    MilanInt i = 0, OneMessageSize = 0, BufferSize = *BufferSizePtr;
+    MilanLongInt myIndex = 0, numMessagesToSend;
+    MilanInt i = 0, OneMessageSize = 0;
 
 #ifdef DEBUG_HANG_
     if (myRank == 0)
@@ -105,7 +105,7 @@ PSizeInfoMessages.resize(numProcs * 3, 0);
 // Send the Messages
 #pragma omp task depend(inout                                                  \
                         : SRequest, PSizeInfoMessages, PCumulative) depend(out \
-                                                                           : msgActual, MessageIndex)
+                                                                           : *msgActual, *MessageIndex)
 {
     for (i = 0; i < numProcs; i++)
     {                    // Changed by Fabio to be an integer, addresses needs to be integers!
@@ -124,9 +124,9 @@ PSizeInfoMessages.resize(numProcs * 3, 0);
         if (PSizeInfoMessages[i * 3 + 0] > 0)
         { // Send only if it is a nonempty packet
             MPI_Isend(&PSizeInfoMessages[i * 3 + 0], 3, TypeMap<MilanLongInt>(), i, ComputeTag, comm,
-                      &SRequest[MessageIndex]);
-            msgActual++;
-            MessageIndex++;
+                      &SRequest[(*MessageIndex)]);
+            (*msgActual)++;
+            (*MessageIndex)++;
             // Now Send the message with the data packet:
 #ifdef PRINT_DEBUG_INFO_
             cout << "\n(" << myRank << ")SendiFFng Bundle to : " << i << endl;
@@ -136,8 +136,8 @@ PSizeInfoMessages.resize(numProcs * 3, 0);
             fflush(stdout);
 #endif
             MPI_Isend(&PMessageBundle[PCumulative[i] * 3], PSizeInfoMessages[i * 3 + 0],
-                      TypeMap<MilanLongInt>(), i, BundleTag, comm, &SRequest[MessageIndex]);
-            MessageIndex++;
+                      TypeMap<MilanLongInt>(), i, BundleTag, comm, &SRequest[(*MessageIndex)]);
+            (*MessageIndex)++;
         } // End of if size > 0
     }
 }
@@ -154,16 +154,16 @@ PSizeInfoMessages.resize(numProcs * 3, 0);
     QOwner.clear();
 }
 
-#pragma omp task depend(inout : OneMessageSize, BufferSize) depend(out : numMessagesToSend) depend(in : numGhostEdges)
+#pragma omp task depend(inout : OneMessageSize, *BufferSize) depend(out : numMessagesToSend) depend(in : *numGhostEdges)
 {
 
 #ifdef PRINT_DEBUG_INFO_
-    cout << "\n(" << myRank << ")Number of Ghost edges = " << numGhostEdges;
-    cout << "\n(" << myRank << ")Total number of potential message X 2 = " << numGhostEdges * 2;
+    cout << "\n(" << myRank << ")Number of Ghost edges = " << *numGhostEdges;
+    cout << "\n(" << myRank << ")Total number of potential message X 2 = " << *numGhostEdges * 2;
     cout << "\n(" << myRank << ")Number messages already sent in bundles = " << NumMessagesBundled;
-    if (numGhostEdges > 0)
+    if (*numGhostEdges > 0)
     {
-        cout << "\n(" << myRank << ")Percentage of total = " << ((double)NumMessagesBundled / (double)(numGhostEdges * 2)) * 100.0 << "% \n";
+        cout << "\n(" << myRank << ")Percentage of total = " << ((double)NumMessagesBundled / (double)(*numGhostEdges * 2)) * 100.0 << "% \n";
     }
     fflush(stdout);
 #endif
@@ -177,39 +177,39 @@ PSizeInfoMessages.resize(numProcs * 3, 0);
     // Request, Success, Failure.
     // But only two will be sent from a given processor.
     // Substract the number of messages that have already been sent as bundled messages:
-    numMessagesToSend = numGhostEdges * 2 - NumMessagesBundled;
-    BufferSize = (OneMessageSize + MPI_BSEND_OVERHEAD) * numMessagesToSend;
+    numMessagesToSend = (*numGhostEdges) * 2 - NumMessagesBundled;
+    *BufferSize = (OneMessageSize + MPI_BSEND_OVERHEAD) * numMessagesToSend;
 }
 
-#pragma omp task depend(out : Buffer) depend(in : BufferSize)
+#pragma omp task depend(out : Buffer) depend(in : *BufferSize)
 {
     Buffer = 0;
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << ")Size of One Message from PACK= " << OneMessageSize;
     cout << "\n(" << myRank << ")Size of Message overhead = " << MPI_BSEND_OVERHEAD;
-    cout << "\n(" << myRank << ")Number of Ghost edges = " << numGhostEdges;
+    cout << "\n(" << myRank << ")Number of Ghost edges = " << *numGhostEdges;
     cout << "\n(" << myRank << ")Number of remaining message = " << numMessagesToSend;
-    cout << "\n(" << myRank << ")BufferSize = " << BufferSize;
+    cout << "\n(" << myRank << ")BufferSize = " << (*BufferSize);
     cout << "\n(" << myRank << ")Attaching Buffer on.. ";
     fflush(stdout);
 #endif
-    if (BufferSize > 0)
+    if ((*BufferSize) > 0)
     {
-        Buffer = (MilanLongInt *)malloc(BufferSize); // Allocate memory
+        Buffer = (MilanLongInt *)malloc((*BufferSize)); // Allocate memory
         if (Buffer == 0)
         {
             cout << "Error in function algoDistEdgeApproxDominatingEdgesLinearSearch: \n";
             cout << "Not enough memory to allocate for send buffer on process " << myRank << "\n";
             exit(1);
         }
-        MPI_Buffer_attach(Buffer, BufferSize); // Attach the Buffer
+        MPI_Buffer_attach(Buffer, *BufferSize); // Attach the Buffer
     }
 }
 }
 }
 
-*MessageIndexPtr = MessageIndex;
-*msgActualPtr = msgActual;
-*numGhostEdgesPtr = numGhostEdges;
-*BufferSizePtr = BufferSize;
+//*MessageIndexPtr = MessageIndex;
+//*msgActualPtr = msgActual;
+//*numGhostEdgesPtr = numGhostEdges;
+//*BufferSizePtr = BufferSize;
 }
