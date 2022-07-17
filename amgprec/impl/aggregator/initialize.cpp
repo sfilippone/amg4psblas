@@ -1,36 +1,35 @@
 #include "MatchBoxPC.h"
 
 void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
-                       MilanLongInt StartIndex, MilanLongInt EndIndex,
-                       MilanLongInt *numGhostEdgesPtr,
-                       MilanLongInt *numGhostVerticesPtr,
-                       MilanLongInt *S,
-                       MilanLongInt *verLocInd,
-                       MilanLongInt *verLocPtr,
-                       map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
-                       vector<MilanLongInt> &Counter,
-                       vector<MilanLongInt> &verGhostPtr,
-                       vector<MilanLongInt> &verGhostInd,
-                       vector<MilanLongInt> &tempCounter,
-                       vector<MilanLongInt> &GMate,
-                       vector<MilanLongInt> &Message,
-                       vector<MilanLongInt> &QLocalVtx,
-                       vector<MilanLongInt> &QGhostVtx,
-                       vector<MilanLongInt> &QMsgType,
-                       vector<MilanInt> &QOwner,
-                       MilanLongInt *&candidateMate,
-                       staticQueue &U,
-                       staticQueue &privateU,
-                       staticQueue &privateQLocalVtx,
-                       staticQueue &privateQGhostVtx,
-                       staticQueue &privateQMsgType,
-                       staticQueue &privateQOwner)
+                MilanLongInt StartIndex, MilanLongInt EndIndex,
+                MilanLongInt *numGhostEdges,
+                MilanLongInt *numGhostVertices,
+                MilanLongInt *S,
+                MilanLongInt *verLocInd,
+                MilanLongInt *verLocPtr,
+                map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
+                vector<MilanLongInt> &Counter,
+                vector<MilanLongInt> &verGhostPtr,
+                vector<MilanLongInt> &verGhostInd,
+                vector<MilanLongInt> &tempCounter,
+                vector<MilanLongInt> &GMate,
+                vector<MilanLongInt> &Message,
+                vector<MilanLongInt> &QLocalVtx,
+                vector<MilanLongInt> &QGhostVtx,
+                vector<MilanLongInt> &QMsgType,
+                vector<MilanInt> &QOwner,
+                MilanLongInt *&candidateMate,
+                staticQueue &U,
+                staticQueue &privateU,
+                staticQueue &privateQLocalVtx,
+                staticQueue &privateQGhostVtx,
+                staticQueue &privateQMsgType,
+                staticQueue &privateQOwner)
 {
 
-    MilanLongInt insertMe = 0, numGhostEdges = 0, numGhostVertices = 0;
+    MilanLongInt insertMe = 0;
     MilanLongInt adj1, adj2;
     int i, v, k, w;
-
     // index that starts with zero to |Vg|  - 1
     map<MilanLongInt, MilanLongInt>::iterator storedAlready;
 
@@ -55,19 +54,17 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
              * only when a ghost edge is found and ghost edges are a minority,
              * circa 3.5% during the tests.
              */
-
 #pragma omp task depend(out \
-                        : numGhostEdges, Counter, Ghost2LocalMap, insertMe, storedAlready, numGhostVertices)
+                        : *numGhostEdges, Counter, Ghost2LocalMap, insertMe, storedAlready, *numGhostVertices)
             {
-
-#pragma omp taskloop num_tasks(NUM_THREAD) reduction(+ \
-                                                     : numGhostEdges)
+#pragma omp taskloop num_tasks(NUM_THREAD)
                 for (i = 0; i < NLEdge; i++)
                 { // O(m) - Each edge stored twice
                     insertMe = verLocInd[i];
                     if ((insertMe < StartIndex) || (insertMe > EndIndex))
                     { // Find a ghost
-                        numGhostEdges++;
+#pragma omp atomic
+                        (*numGhostEdges)++;
 #pragma omp critical
                         {
                             storedAlready = Ghost2LocalMap.find(insertMe);
@@ -76,24 +73,24 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                                 Counter[storedAlready->second]++; // Increment the counter
                             }
                             else
-                            {                                                // Insert an entry for the ghost:
-                                Ghost2LocalMap[insertMe] = numGhostVertices; // Add a map entry
-                                Counter.push_back(1);                        // Initialize the counter
-                                numGhostVertices++;                          // Increment the number of ghost vertices
-                            }                                                // End of else()
+                            {                                                 // Insert an entry for the ghost:
+                                Ghost2LocalMap[insertMe] = *numGhostVertices; // Add a map entry
+                                Counter.push_back(1);                         // Initialize the counter
+                                (*numGhostVertices)++;                          // Increment the number of ghost vertices
+                            }                                                 // End of else()
                         }
                     } // End of if ( (insertMe < StartIndex) || (insertMe > EndIndex) )
                 }     // End of for(ghost vertices)
             }         // end of task depend
 
-            // numGhostEdges = atomicNumGhostEdges;
+            // *numGhostEdges = atomicNumGhostEdges;
 #ifdef TIME_TRACKER
             Ghost2LocalInitialization = MPI_Wtime() - Ghost2LocalInitialization;
             fprintf(stderr, "Ghost2LocalInitialization time: %f\n", Ghost2LocalInitialization);
 #endif
 
 #ifdef PRINT_DEBUG_INFO_
-            cout << "\n(" << myRank << ")NGhosts:" << numGhostVertices << " GhostEdges: " << numGhostEdges;
+            cout << "\n(" << myRank << ")NGhosts:" << *numGhostVertices << " GhostEdges: " << *numGhostEdges;
             if (!Ghost2LocalMap.empty())
             {
                 cout << "\n(" << myRank << ")Final Map : on process ";
@@ -111,16 +108,16 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
 
 #pragma omp task depend(out                                                       \
                         : verGhostPtr, tempCounter, verGhostInd, GMate) depend(in \
-                                                                               : numGhostVertices, numGhostEdges)
+                                                                               : *numGhostVertices, *numGhostEdges)
             {
 
                 // Initialize adjacency Lists for Ghost Vertices:
                 try
                 {
-                    verGhostPtr.reserve(numGhostVertices + 1); // Pointer Vector
-                    tempCounter.reserve(numGhostVertices);     // Pointer Vector
-                    verGhostInd.reserve(numGhostEdges);        // Index Vector
-                    GMate.reserve(numGhostVertices);           // Ghost Mate Vector
+                    verGhostPtr.reserve(*numGhostVertices + 1); // Pointer Vector
+                    tempCounter.reserve(*numGhostVertices);     // Pointer Vector
+                    verGhostInd.reserve(*numGhostEdges);        // Index Vector
+                    GMate.reserve(*numGhostVertices);           // Ghost Mate Vector
                 }
                 catch (length_error)
                 {
@@ -129,11 +126,11 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                     exit(1);
                 }
                 // Initialize the Vectors:
-                verGhostPtr.resize(numGhostVertices + 1, 0); // Pointer Vector
-                tempCounter.resize(numGhostVertices, 0);     // Temporary Counter
-                verGhostInd.resize(numGhostEdges, -1);       // Index Vector
-                GMate.resize(numGhostVertices, -1);          // Temporary Counter
-                verGhostPtr[0] = 0;                          // The first value
+                verGhostPtr.resize(*numGhostVertices + 1, 0); // Pointer Vector
+                tempCounter.resize(*numGhostVertices, 0);     // Temporary Counter
+                verGhostInd.resize(*numGhostEdges, -1);       // Index Vector
+                GMate.resize(*numGhostVertices, -1);          // Temporary Counter
+                verGhostPtr[0] = 0;                           // The first value
 #ifdef PRINT_DEBUG_INFO_
                 cout << "\n(" << myRank << ")Ghost Vertex Pointer: ";
                 fflush(stdout);
@@ -143,13 +140,13 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
 
 #pragma omp task depend(out                      \
                         : verGhostPtr) depend(in \
-                                              : Counter, numGhostVertices)
+                                              : Counter, *numGhostVertices)
             {
 
 #ifdef TIME_TRACKER
                 double verGhostPtrInitialization = MPI_Wtime();
 #endif
-                for (i = 0; i < numGhostVertices; i++)
+                for (i = 0; i < *numGhostVertices; i++)
                 { // O(|Ghost Vertices|)
                     verGhostPtr[i + 1] = verGhostPtr[i] + Counter[i];
 #ifdef PRINT_DEBUG_INFO_
@@ -165,8 +162,8 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
             } // End of task
 
 #ifdef PRINT_DEBUG_INFO_
-            if (numGhostVertices > 0)
-                cout << verGhostPtr[numGhostVertices] << "\n";
+            if (*numGhostVertices > 0)
+                cout << verGhostPtr[*numGhostVertices] << "\n";
             fflush(stdout);
 #endif
 
@@ -220,22 +217,22 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
 
 #ifdef PRINT_DEBUG_INFO_
             cout << "\n(" << myRank << ")Ghost Vertex Index: ";
-            for (v = 0; v < numGhostEdges; v++)
+            for (v = 0; v < *numGhostEdges; v++)
                 cout << verGhostInd[v] << "\t";
             cout << endl;
             fflush(stdout);
 #endif
 
-#pragma omp task depend(in                          \
-                        : numGhostEdges) depend(out \
-                                                : QLocalVtx, QGhostVtx, QMsgType, QOwner)
+#pragma omp task depend(in                           \
+                        : *numGhostEdges) depend(out \
+                                                 : QLocalVtx, QGhostVtx, QMsgType, QOwner)
             {
                 try
                 {
-                    QLocalVtx.reserve(numGhostEdges); // Local Vertex
-                    QGhostVtx.reserve(numGhostEdges); // Ghost Vertex
-                    QMsgType.reserve(numGhostEdges);  // Message Type (Request/Failure)
-                    QOwner.reserve(numGhostEdges);    // Owner of the ghost: COmpute once and use later
+                    QLocalVtx.reserve(*numGhostEdges); // Local Vertex
+                    QGhostVtx.reserve(*numGhostEdges); // Ghost Vertex
+                    QMsgType.reserve(*numGhostEdges);  // Message Type (Request/Failure)
+                    QOwner.reserve(*numGhostEdges);    // Owner of the ghost: COmpute once and use later
                 }
                 catch (length_error)
                 {
@@ -268,14 +265,10 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
             fflush(stdout);
 #endif
 
-#pragma omp task depend(in                                            \
-                        : numGhostEdges, numGhostVertices) depend(out \
-                                                                  : candidateMate, S, U, privateU, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner)
+#pragma omp task depend(in                              \
+                        : *numGhostVertices) depend(out \
+                                                    : candidateMate, S, U, privateU, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner)
             {
-
-                // The values calculated in this function are sent back to the calling function
-                *numGhostEdgesPtr = numGhostEdges;
-                *numGhostVerticesPtr = numGhostVertices;
 
                 // Allocate Data Structures:
                 /*
@@ -283,9 +276,9 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                  * there is no point in using the vector (or maybe there is (???))
                  * so I replaced it with an array wich is slightly faster
                  */
-                candidateMate = new MilanLongInt[NLVer + numGhostVertices];
+                candidateMate = new MilanLongInt[NLVer + (*numGhostVertices)];
 
-                *S = numGhostVertices; // Initialize S with number of Ghost Vertices
+                *S = (*numGhostVertices); // Initialize S with number of Ghost Vertices
 
                 /*
                  * Create the Queue Data Structure for the Dominating Set
@@ -295,13 +288,13 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                  * of a staticQueue I had to destroy the previous object and instantiate
                  * a new one of the correct size.
                  */
-                new (&U) staticQueue(NLVer + numGhostVertices);
+                new (&U) staticQueue(NLVer + (*numGhostVertices));
 
                 // TODO how can I decide a more meaningfull size?
-                MilanLongInt size = numGhostVertices;
+                MilanLongInt size = (*numGhostVertices);
 
                 // Initialize the privte data structure
-                new (&privateU) staticQueue(NLVer + numGhostVertices); // TODO how can I put a meaningfull size?
+                new (&privateU) staticQueue(NLVer + (*numGhostVertices)); // TODO how can I put a meaningfull size?
                 new (&privateQLocalVtx) staticQueue(size);
                 new (&privateQGhostVtx) staticQueue(size);
                 new (&privateQMsgType) staticQueue(size);
