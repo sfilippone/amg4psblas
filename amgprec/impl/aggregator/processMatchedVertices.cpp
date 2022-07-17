@@ -183,7 +183,7 @@ void processMatchedVertices(
                             fflush(stdout);
 #endif
                             // Decrement the counter:
-                            PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap[w], SPtr);
+                            PROCESS_CROSS_EDGE(&Counter[Ghost2LocalMap[w]], SPtr);
                         case 2:
                             // Found a dominating edge, it is a ghost
                             ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);

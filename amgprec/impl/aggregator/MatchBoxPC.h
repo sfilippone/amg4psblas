@@ -287,8 +287,7 @@ extern "C"
                                            staticQueue &privateQMsgType,
                                            staticQueue &privateQOwner);
 
-    void PROCESS_CROSS_EDGE(vector<MilanLongInt> &Counter,
-                            MilanLongInt edge,
+    void PROCESS_CROSS_EDGE(MilanLongInt *edge,
                             MilanLongInt *SPtr);
 
     void processMatchedVertices(

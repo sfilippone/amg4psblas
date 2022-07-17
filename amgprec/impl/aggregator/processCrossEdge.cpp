@@ -1,14 +1,13 @@
 #include "MatchBoxPC.h"
 
-void PROCESS_CROSS_EDGE(vector<MilanLongInt> &Counter,
-                        MilanLongInt edge,
+void PROCESS_CROSS_EDGE(MilanLongInt *edge,
                         MilanLongInt *SPtr)
 {
     // Start: PARALLEL_PROCESS_CROSS_EDGE_B
     MilanLongInt captureCounter;
 
 #pragma omp atomic capture
-    captureCounter = --Counter[edge]; // Decrement
+    captureCounter = --(*edge); // Decrement
 
     //assert(captureCounter >= 0);
 

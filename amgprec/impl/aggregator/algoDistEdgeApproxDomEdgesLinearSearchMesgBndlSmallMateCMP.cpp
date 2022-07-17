@@ -456,7 +456,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                         fflush(stdout);
 #endif
 
-                                        PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap[w], &S);
+                                        PROCESS_CROSS_EDGE(&Counter[Ghost2LocalMap[w]], &S);
 
                                     } // End of if CandidateMate[w] = v
                                 }     // End of if a Ghost Vertex
