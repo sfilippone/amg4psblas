@@ -130,8 +130,6 @@ void processMatchedVertices(
                                                     Mate[v - StartIndex] = w;     // v is a local vertex
                                                     GMate[Ghost2LocalMap[w]] = v; // w is a ghost vertex
 
-                                                    // Decrement the counter:
-                                                    PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap[w], SPtr);
                                                 } // End of if CandidateMate[w] = v
                                             }     // End of if a Ghost Vertex
                                             else
@@ -150,7 +148,8 @@ void processMatchedVertices(
                                             }     // End of Else
 
                                         } // End of if(w >=0)
-                                        else option = 4;// End of Else: w == -1
+                                        else
+                                            option = 4; // End of Else: w == -1
                                         // End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
                                     }
                                 } // End of task
@@ -164,10 +163,10 @@ void processMatchedVertices(
                             {
                                 if (candidateMate[NLVer + Ghost2LocalMap[v]] == u)
                                     candidateMate[NLVer + Ghost2LocalMap[v]] = -1;
-                                if (v != Mate[u - StartIndex]) option = 5; // u is local
-                            } // End of critical
-                        }     // End of Else //A Ghost Vertex
-
+                                if (v != Mate[u - StartIndex])
+                                    option = 5; // u is local
+                            }                   // End of critical
+                        }                       // End of Else //A Ghost Vertex
 
                         switch (option)
                         {
@@ -184,6 +183,8 @@ void processMatchedVertices(
                             cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") ";
                             fflush(stdout);
 #endif
+                            // Decrement the counter:
+                            PROCESS_CROSS_EDGE(Counter, Ghost2LocalMap[w], SPtr);
                         case 2:
                             // Found a dominating edge, it is a ghost
                             ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
@@ -241,29 +242,29 @@ void processMatchedVertices(
                             }     // End of for loop
                             break;
                         default:
-                            
+
 #ifdef PRINT_DEBUG_INFO_
-                                    cout << "\n(" << myRank << ")Sending a success message: ";
-                                    cout << "\n(" << myRank << ")Ghost is " << v << " Owner is: " << findOwnerOfGhost(v, verDistance, myRank, numProcs) << "\n";
-                                    fflush(stdout);
+                            cout << "\n(" << myRank << ")Sending a success message: ";
+                            cout << "\n(" << myRank << ")Ghost is " << v << " Owner is: " << findOwnerOfGhost(v, verDistance, myRank, numProcs) << "\n";
+                            fflush(stdout);
 #endif
 
-                                    ghostOwner = findOwnerOfGhost(v, verDistance, myRank, numProcs);
-                                    assert(ghostOwner != -1);
-                                    assert(ghostOwner != myRank);
+                            ghostOwner = findOwnerOfGhost(v, verDistance, myRank, numProcs);
+                            assert(ghostOwner != -1);
+                            assert(ghostOwner != myRank);
 #pragma omp atomic
-                                    PCounter[ghostOwner]++;
+                            PCounter[ghostOwner]++;
 #pragma omp atomic
-                                    (*msgIndPtr)++;
+                            (*msgIndPtr)++;
 #pragma omp atomic
-                                    (*NumMessagesBundledPtr)++;
-                                    privateQLocalVtx.push_back(u);
-                                    privateQGhostVtx.push_back(v);
-                                    privateQMsgType.push_back(SUCCESS);
-                                    privateQOwner.push_back(ghostOwner);
+                            (*NumMessagesBundledPtr)++;
+                            privateQLocalVtx.push_back(u);
+                            privateQGhostVtx.push_back(v);
+                            privateQMsgType.push_back(SUCCESS);
+                            privateQOwner.push_back(ghostOwner);
 
                             break;
-                        } //End of switch
+                        } // End of switch
 
                     } // End of inner for
 
