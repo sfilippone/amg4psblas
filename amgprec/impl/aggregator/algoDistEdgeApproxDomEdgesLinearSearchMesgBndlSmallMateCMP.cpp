@@ -190,14 +190,10 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     MilanInt BufferSize;
     MilanLongInt *Buffer;
 
-    // Declare the locks
-    omp_lock_t MateLock[NLVer];
-
     initialize(NLVer, NLEdge, StartIndex,
                EndIndex, &numGhostEdges,
                &numGhostVertices, &S,
                verLocInd, verLocPtr,
-               MateLock,
                Ghost2LocalMap, Counter,
                verGhostPtr, verGhostInd,
                tempCounter, GMate,
@@ -307,8 +303,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                            privateQLocalVtx,
                            privateQGhostVtx,
                            privateQMsgType,
-                           privateQOwner,
-                           MateLock);
+                           privateQOwner);
 
     /////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////// SEND BUNDLED MESSAGES /////////////////////////////////////
@@ -616,8 +611,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
           msgInd,
           msgIndSent,
           NumMessagesBundled,
-          msgPercent,
-          MateLock);
+          msgPercent);
 
     finishTime = MPI_Wtime();
     *ph2_time = finishTime - startTime; // Time taken for Phase-2

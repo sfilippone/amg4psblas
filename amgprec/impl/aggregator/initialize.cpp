@@ -7,7 +7,6 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                        MilanLongInt *S,
                        MilanLongInt *verLocInd,
                        MilanLongInt *verLocPtr,
-                       omp_lock_t *MateLock,
                        map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
                        vector<MilanLongInt> &Counter,
                        vector<MilanLongInt> &verGhostPtr,
@@ -40,10 +39,6 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
 
 #pragma omp single
         {
-            // Initialize the locks
-#pragma omp taskloop num_tasks(NUM_THREAD)
-            for (i = 0; i < NLVer; i++)
-                omp_init_lock(&MateLock[i]);
 
 #ifdef TIME_TRACKER
             double Ghost2LocalInitialization = MPI_Wtime();

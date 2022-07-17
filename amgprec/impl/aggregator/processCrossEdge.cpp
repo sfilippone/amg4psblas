@@ -10,6 +10,8 @@ void PROCESS_CROSS_EDGE(vector<MilanLongInt> &Counter,
 #pragma omp atomic capture
     captureCounter = --Counter[edge]; // Decrement
 
+    //assert(captureCounter >= 0);
+
     if (captureCounter == 0)
 #pragma omp atomic
         (*SPtr)--; // Decrement S

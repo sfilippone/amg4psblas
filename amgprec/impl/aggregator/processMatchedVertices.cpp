@@ -31,8 +31,7 @@ void processMatchedVertices(
     staticQueue &privateQLocalVtx,
     staticQueue &privateQGhostVtx,
     staticQueue &privateQMsgType,
-    staticQueue &privateQOwner,
-    omp_lock_t *MateLock)
+    staticQueue &privateQOwner)
 {
 
     MilanLongInt adj1, adj2, adj11, adj12, k, k1, v = -1, w = -1, ghostOwner;

@@ -16,8 +16,7 @@ void clean(MilanLongInt NLVer,
            MilanLongInt msgInd,
            MilanLongInt *msgIndSent,
            MilanLongInt NumMessagesBundled,
-           MilanReal *msgPercent,
-           omp_lock_t *MateLock)
+           MilanReal *msgPercent)
 {
     // Cleanup Phase
 
@@ -83,10 +82,6 @@ void clean(MilanLongInt NLVer,
                     *msgPercent = 0;
                 }
             }
-            // Destroy the locks
-#pragma omp taskloop num_tasks(NUM_THREAD)
-            for (int i = 0; i < NLVer; i++)
-                omp_destroy_lock(&MateLock[i]);
 
 #ifdef DEBUG_HANG_
             if (myRank == 0)

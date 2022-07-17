@@ -217,7 +217,6 @@ extern "C"
                     MilanLongInt *S,
                     MilanLongInt *verLocInd,
                     MilanLongInt *verLocPtr,
-                    omp_lock_t *MateLock,
                     map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
                     vector<MilanLongInt> &Counter,
                     vector<MilanLongInt> &verGhostPtr,
@@ -249,8 +248,7 @@ extern "C"
                MilanLongInt msgInd,
                MilanLongInt *msgIndSent,
                MilanLongInt NumMessagesBundled,
-               MilanReal *msgPercent,
-               omp_lock_t *MateLock);
+               MilanReal *msgPercent);
 
     void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
                                            MilanLongInt *verLocPtr,
@@ -322,8 +320,7 @@ extern "C"
         staticQueue &privateQLocalVtx,
         staticQueue &privateQGhostVtx,
         staticQueue &privateQMsgType,
-        staticQueue &privateQOwner,
-        omp_lock_t *MateLock);
+        staticQueue &privateQOwner);
 
         void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
                                  MilanInt *BufferSizePtr,
