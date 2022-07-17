@@ -1,5 +1,7 @@
 #include "MatchBoxPC.h"
 
+
+//TODO parallelize this
 ///Find the owner of a ghost node:
 MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
                                      MilanInt myRank, MilanInt numProcs) {

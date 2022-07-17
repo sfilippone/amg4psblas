@@ -66,7 +66,7 @@
 using namespace std;
 
 #define NUM_THREAD 4
-#define UCHUNK 1000
+#define UCHUNK 5
 
 const MilanLongInt REQUEST = 1;
 const MilanLongInt SUCCESS = 2;
@@ -295,7 +295,6 @@ extern "C"
 
     void processMatchedVertices(
         MilanLongInt NLVer,
-        vector<MilanLongInt> &UChunkBeingProcessed,
         staticQueue &U,
         staticQueue &privateU,
         MilanLongInt StartIndex,
@@ -326,25 +325,25 @@ extern "C"
         staticQueue &privateQOwner,
         omp_lock_t *MateLock);
 
-    void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
-                             MilanInt *BufferSizePtr,
-                             MilanLongInt *Buffer,
-                             vector<MilanLongInt> &PCumulative,
-                             vector<MilanLongInt> &PMessageBundle,
-                             vector<MilanLongInt> &PSizeInfoMessages,
-                             MilanLongInt *PCounter,
-                             MilanLongInt NumMessagesBundled,
-                             MilanLongInt *msgActualPtr,
-                             MilanLongInt *MessageIndexPtr,
-                             MilanInt numProcs,
-                             MilanInt myRank,
-                             MPI_Comm comm,
-                             vector<MilanLongInt> &QLocalVtx,
-                             vector<MilanLongInt> &QGhostVtx,
-                             vector<MilanLongInt> &QMsgType,
-                             vector<MilanInt> &QOwner,
-                             vector<MPI_Request> &SRequest,
-                             vector<MPI_Status> &SStatus);
+        void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
+                                 MilanInt *BufferSizePtr,
+                                 MilanLongInt *Buffer,
+                                 vector<MilanLongInt> &PCumulative,
+                                 vector<MilanLongInt> &PMessageBundle,
+                                 vector<MilanLongInt> &PSizeInfoMessages,
+                                 MilanLongInt *PCounter,
+                                 MilanLongInt NumMessagesBundled,
+                                 MilanLongInt *msgActualPtr,
+                                 MilanLongInt *MessageIndexPtr,
+                                 MilanInt numProcs,
+                                 MilanInt myRank,
+                                 MPI_Comm comm,
+                                 vector<MilanLongInt> &QLocalVtx,
+                                 vector<MilanLongInt> &QGhostVtx,
+                                 vector<MilanLongInt> &QMsgType,
+                                 vector<MilanInt> &QOwner,
+                                 vector<MPI_Request> &SRequest,
+                                 vector<MPI_Status> &SStatus);
 
     void processMessages(
         MilanLongInt NLVer,

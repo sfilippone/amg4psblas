@@ -278,12 +278,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     /////////////////////////// PROCESS MATCHED VERTICES //////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
 
-    vector<MilanLongInt> UChunkBeingProcessed;
-    UChunkBeingProcessed.reserve(UCHUNK);
-
-//#define PRINT_DEBUG_INFO_
     processMatchedVertices(NLVer,
-                           UChunkBeingProcessed,
+                           //UChunkBeingProcessed,
                            U,
                            privateU,
                            StartIndex,
