@@ -4,6 +4,7 @@
 
 void processMatchedVertices(
     MilanLongInt NLVer,
+    vector<MilanLongInt> &UChunkBeingProcessed,
     staticQueue &U,
     staticQueue &privateU,
     MilanLongInt StartIndex,
@@ -36,6 +37,8 @@ void processMatchedVertices(
 
     MilanLongInt adj1, adj2, adj11, adj12, k, k1, v = -1, w = -1, ghostOwner;
     int option;
+    MilanLongInt mateVal;
+
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << "=========================************===============================" << endl;
     fflush(stdout);
@@ -45,13 +48,8 @@ void processMatchedVertices(
 #ifdef COUNT_LOCAL_VERTEX
     MilanLongInt localVertices = 0;
 #endif
-#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option) firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) default(shared) num_threads(NUM_THREAD)
+#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option) firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner, UChunkBeingProcessed) default(shared) num_threads(NUM_THREAD)
     {
-
-        // TODO what would be the optimal UCHUNK
-        // TODO refactor
-        vector<MilanLongInt> UChunkBeingProcessed;
-        UChunkBeingProcessed.reserve(UCHUNK);
 
         while (!U.empty())
         {
@@ -86,9 +84,10 @@ void processMatchedVertices(
                             cout << "\n(" << myRank << ")v: " << v << " c(v)= " << candidateMate[v - StartIndex] << " Mate[v]: " << Mate[v];
                             fflush(stdout);
 #endif
-
+#pragma omp atomic read
+                            mateVal = Mate[v - StartIndex];
                             // If the current vertex is pointing to a matched vertex and is not matched
-                            if (not isAlreadyMatched(v, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap))
+                            if (mateVal < 0)
                             {
 #pragma omp critical
                                 {

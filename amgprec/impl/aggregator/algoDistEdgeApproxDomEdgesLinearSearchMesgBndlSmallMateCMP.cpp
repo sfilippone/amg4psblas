@@ -274,8 +274,12 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     /////////////////////////// PROCESS MATCHED VERTICES //////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
 
+    // TODO what would be the optimal UCHUNK
+    vector<MilanLongInt> UChunkBeingProcessed;
+    UChunkBeingProcessed.reserve(UCHUNK);
+
     processMatchedVertices(NLVer,
-                           //UChunkBeingProcessed,
+                           UChunkBeingProcessed,
                            U,
                            privateU,
                            StartIndex,
@@ -382,117 +386,47 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                     v = verLocInd[k];
                     if ((v >= StartIndex) && (v <= EndIndex))
                     {                                  // v is a Local Vertex:
-                        if (Mate[v - StartIndex] >= 0) // v is already matched
-                            continue;
+                        //if (Mate[v - StartIndex] >= 0) // v is already matched
+                        //    continue;
 #ifdef PRINT_DEBUG_INFO_
                         cout << "\n(" << myRank << ")v: " << v << " c(v)= " << candidateMate[v - StartIndex] << " Mate[v]: " << Mate[v];
                         fflush(stdout);
 #endif
-                        if (candidateMate[v - StartIndex] == u)
-                        { // Only if pointing to the matched vertex
-                            // Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-                            // Start: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
-                            adj11 = verLocPtr[v - StartIndex];
-                            adj12 = verLocPtr[v - StartIndex + 1];
-                            w = -1;
-                            heaviestEdgeWt = MilanRealMin; // Assign the smallest Value possible first LDBL_MIN
-                            for (k1 = adj11; k1 < adj12; k1++)
-                            {
-                                if ((verLocInd[k1] < StartIndex) || (verLocInd[k1] > EndIndex))
-                                {                                                  // Is it a ghost vertex?
-                                    if (GMate[Ghost2LocalMap[verLocInd[k1]]] >= 0) // Already matched
-                                        continue;
-                                }
-                                else
-                                {                                              // A local vertex
-                                    if (Mate[verLocInd[k1] - StartIndex] >= 0) // Already matched
-                                        continue;
-                                }
+                        // If the current vertex is pointing to a matched vertex and is not matched
+                        if (Mate[v - StartIndex] < 0)
+                        {
+                            if (candidateMate[v - StartIndex] == u)
+                            { // Only if pointing to the matched vertex
+                              // Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
+                                // Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
+                                w = computeCandidateMate(verLocPtr[v - StartIndex],
+                                                         verLocPtr[v - StartIndex + 1],
+                                                         edgeLocWeight, 0,
+                                                         verLocInd,
+                                                         StartIndex,
+                                                         EndIndex,
+                                                         GMate,
+                                                         Mate,
+                                                         Ghost2LocalMap);
 
-                                if ((edgeLocWeight[k1] > heaviestEdgeWt) ||
-                                    ((edgeLocWeight[k1] == heaviestEdgeWt) && (w < verLocInd[k1])))
+                                candidateMate[v - StartIndex] = w;
+                                // End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
+#ifdef PRINT_DEBUG_INFO_
+                                cout << "\n(" << myRank << ")" << v << " Points to: " << w;
+                                fflush(stdout);
+#endif
+                                // If found a dominating edge:
+                                if (w >= 0)
                                 {
-                                    heaviestEdgeWt = edgeLocWeight[k1];
-                                    w = verLocInd[k1];
-                                }
-                            } // End of for loop
-                            candidateMate[v - StartIndex] = w;
-                            // End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
-#ifdef PRINT_DEBUG_INFO_
-                            cout << "\n(" << myRank << ")" << v << " Points to: " << w;
-                            fflush(stdout);
-#endif
-                            // If found a dominating edge:
-                            if (w >= 0)
-                            {
-                                if ((w < StartIndex) || (w > EndIndex))
-                                { // w is a ghost
-                                    // Build the Message Packet:
-                                    Message[0] = v;       // LOCAL
-                                    Message[1] = w;       // GHOST
-                                    Message[2] = REQUEST; // TYPE
-                                    // Send a Request (Asynchronous)
-#ifdef PRINT_DEBUG_INFO_
-                                    cout << "\n(" << myRank << ")Sending a request message:";
-                                    cout << "\n(" << myRank << ")Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                                    fflush(stdout);
-#endif
-                                    ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                                    assert(ghostOwner != -1);
-                                    assert(ghostOwner != myRank);
-                                    MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
-                                    msgInd++;
-                                    msgActual++;
-                                    if (candidateMate[NLVer + Ghost2LocalMap[w]] == v)
-                                    {
-                                        Mate[v - StartIndex] = w;     // v is local
-                                        GMate[Ghost2LocalMap[w]] = v; // w is ghost
-                                        // Q.push_back(u);
-                                        U.push_back(v);
-                                        U.push_back(w);
-                                        myCard++;
-#ifdef PRINT_DEBUG_INFO_
-                                        cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") ";
-                                        fflush(stdout);
-#endif
-
-                                        PROCESS_CROSS_EDGE(&Counter[Ghost2LocalMap[w]], &S);
-
-                                    } // End of if CandidateMate[w] = v
-                                }     // End of if a Ghost Vertex
-                                else
-                                { // w is a local vertex
-                                    if (candidateMate[w - StartIndex] == v)
-                                    {
-                                        Mate[v - StartIndex] = w; // v is local
-                                        Mate[w - StartIndex] = v; // w is local
-                                        // Q.push_back(u);
-                                        U.push_back(v);
-                                        U.push_back(w);
-                                        myCard++;
-#ifdef PRINT_DEBUG_INFO_
-                                        cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") ";
-                                        fflush(stdout);
-#endif
-                                    } // End of if(CandidateMate(w) = v
-                                }     // End of Else
-                            }         // End of if(w >=0)
-                            else
-                            { // no dominating edge found: w == -1
-                                adj11 = verLocPtr[v - StartIndex];
-                                adj12 = verLocPtr[v - StartIndex + 1];
-                                for (k1 = adj11; k1 < adj12; k1++)
-                                {
-                                    w = verLocInd[k1];
                                     if ((w < StartIndex) || (w > EndIndex))
-                                    { // A ghost
+                                    { // w is a ghost
                                         // Build the Message Packet:
                                         Message[0] = v;       // LOCAL
                                         Message[1] = w;       // GHOST
-                                        Message[2] = FAILURE; // TYPE
+                                        Message[2] = REQUEST; // TYPE
                                         // Send a Request (Asynchronous)
 #ifdef PRINT_DEBUG_INFO_
-                                        cout << "\n(" << myRank << ")Sending a failure message: ";
+                                        cout << "\n(" << myRank << ")Sending a request message:";
                                         cout << "\n(" << myRank << ")Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs);
                                         fflush(stdout);
 #endif
@@ -502,12 +436,72 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                         MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
                                         msgInd++;
                                         msgActual++;
-                                    } // End of if(GHOST)
-                                }     // End of for loop
-                            }         // End of Else: w == -1
-                            // End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-                        } // End of If (candidateMate[v-StartIndex] == u)
-                    }     // End of if ( (v >= StartIndex) && (v <= EndIndex) ) //If Local Vertex:
+                                        if (candidateMate[NLVer + Ghost2LocalMap[w]] == v)
+                                        {
+                                            Mate[v - StartIndex] = w;     // v is local
+                                            GMate[Ghost2LocalMap[w]] = v; // w is ghost
+                                            // Q.push_back(u);
+                                            U.push_back(v);
+                                            U.push_back(w);
+                                            myCard++;
+#ifdef PRINT_DEBUG_INFO_
+                                            cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") ";
+                                            fflush(stdout);
+#endif
+
+                                            PROCESS_CROSS_EDGE(&Counter[Ghost2LocalMap[w]], &S);
+
+                                        } // End of if CandidateMate[w] = v
+                                    }     // End of if a Ghost Vertex
+                                    else
+                                    { // w is a local vertex
+                                        if (candidateMate[w - StartIndex] == v)
+                                        {
+                                            Mate[v - StartIndex] = w; // v is local
+                                            Mate[w - StartIndex] = v; // w is local
+                                            // Q.push_back(u);
+                                            U.push_back(v);
+                                            U.push_back(w);
+                                            myCard++;
+#ifdef PRINT_DEBUG_INFO_
+                                            cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") ";
+                                            fflush(stdout);
+#endif
+                                        } // End of if(CandidateMate(w) = v
+                                    }     // End of Else
+                                }         // End of if(w >=0)
+                                else
+                                { // no dominating edge found: w == -1
+                                    adj11 = verLocPtr[v - StartIndex];
+                                    adj12 = verLocPtr[v - StartIndex + 1];
+                                    for (k1 = adj11; k1 < adj12; k1++)
+                                    {
+                                        w = verLocInd[k1];
+                                        if ((w < StartIndex) || (w > EndIndex))
+                                        { // A ghost
+                                            // Build the Message Packet:
+                                            Message[0] = v;       // LOCAL
+                                            Message[1] = w;       // GHOST
+                                            Message[2] = FAILURE; // TYPE
+                                            // Send a Request (Asynchronous)
+#ifdef PRINT_DEBUG_INFO_
+                                            cout << "\n(" << myRank << ")Sending a failure message: ";
+                                            cout << "\n(" << myRank << ")Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs);
+                                            fflush(stdout);
+#endif
+                                            ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
+                                            assert(ghostOwner != -1);
+                                            assert(ghostOwner != myRank);
+                                            MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
+                                            msgInd++;
+                                            msgActual++;
+                                        } // End of if(GHOST)
+                                    }     // End of for loop
+                                }         // End of Else: w == -1
+                                // End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
+                            } // End of If (candidateMate[v-StartIndex] == u)
+                        }
+                    } // End of if ( (v >= StartIndex) && (v <= EndIndex) ) //If Local Vertex:
                     else
                     { // Neighbor v is a ghost vertex
                         if (candidateMate[NLVer + Ghost2LocalMap[v]] == u)

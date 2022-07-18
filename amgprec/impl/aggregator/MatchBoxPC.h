@@ -292,6 +292,7 @@ extern "C"
 
     void processMatchedVertices(
         MilanLongInt NLVer,
+        vector<MilanLongInt> &UChunkBeingProcessed,
         staticQueue &U,
         staticQueue &privateU,
         MilanLongInt StartIndex,
