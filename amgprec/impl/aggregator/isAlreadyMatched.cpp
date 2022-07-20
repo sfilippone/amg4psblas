@@ -1,6 +1,5 @@
 #include "MatchBoxPC.h"
 
-//TODO can be optimized!!
 /**
  * //TODO documentation
  * @param k
@@ -13,14 +12,14 @@
  * @return
  */
 bool isAlreadyMatched(MilanLongInt node,
-                             MilanLongInt StartIndex,
-                             MilanLongInt EndIndex,
-                             vector <MilanLongInt> &GMate,
-                             MilanLongInt* Mate,
-                             map <MilanLongInt, MilanLongInt> &Ghost2LocalMap
-) {
+                      MilanLongInt StartIndex,
+                      MilanLongInt EndIndex,
+                      vector<MilanLongInt> &GMate,
+                      MilanLongInt *Mate,
+                      map<MilanLongInt, MilanLongInt> &Ghost2LocalMap)
+{
 
-    bool result = false;
+    /*
 #pragma omp critical(Mate)
     {
         if ((node < StartIndex) || (node > EndIndex)) { //Is it a ghost vertex?
@@ -30,6 +29,18 @@ bool isAlreadyMatched(MilanLongInt node,
         }
 
     }
+    */
+    MilanLongInt val;
+    if ((node < StartIndex) || (node > EndIndex)) // if ghost vertex
+    { 
+#pragma omp atomic read
+        val = GMate[Ghost2LocalMap[node]];
+        return val >= 0; // Already matched
+    }
 
-    return result;
+    // If not ghost vertex
+#pragma omp atomic read
+    val = Mate[node - StartIndex];
+
+    return val >= 0; // Already matched
 }

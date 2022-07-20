@@ -1,8 +1,6 @@
 #include "MatchBoxPC.h"
 
 // TODO comment
-// TODO use task
-// TODO destroy the locks
 
 void clean(MilanLongInt NLVer,
            MilanInt myRank,
