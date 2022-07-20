@@ -104,7 +104,7 @@ void processMessages(
         ReceiveBuffer.resize(bundleSize, -1); // Initialize
 #ifdef PRINT_DEBUG_INFO_
         cout << "\n(" << myRank << ")Message Bundle Before: " << endl;
-        for (i = 0; i < bundleSize; i++)
+        for (int i = 0; i < bundleSize; i++)
             cout << ReceiveBuffer[i] << ",";
         cout << endl;
         fflush(stdout);
@@ -119,7 +119,7 @@ void processMessages(
         }
 #ifdef PRINT_DEBUG_INFO_
         cout << "\n(" << myRank << ")Message Bundle After: " << endl;
-        for (i = 0; i < bundleSize; i++)
+        for (int i = 0; i < bundleSize; i++)
             cout << ReceiveBuffer[i] << ",";
         cout << endl;
         fflush(stdout);

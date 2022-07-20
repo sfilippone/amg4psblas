@@ -32,7 +32,12 @@ void processMatchedVertices(
     staticQueue &privateQLocalVtx,
     staticQueue &privateQGhostVtx,
     staticQueue &privateQMsgType,
-    staticQueue &privateQOwner)
+    staticQueue &privateQOwner,
+    bool sendMessages,
+    MPI_Comm comm,
+    MilanLongInt *msgActual,
+    MilanLongInt *msgInd,
+    vector<MilanLongInt> &Message)
 {
 
     MilanLongInt adj1, adj2, adj11, adj12, k, k1, v = -1, w = -1, ghostOwner;
@@ -48,7 +53,7 @@ void processMatchedVertices(
 #ifdef COUNT_LOCAL_VERTEX
     MilanLongInt localVertices = 0;
 #endif
-#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option) firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner, UChunkBeingProcessed) default(shared) num_threads(NUM_THREAD)
+#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option) firstprivate(Message, privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner, UChunkBeingProcessed) default(shared) num_threads(NUM_THREAD)
     {
 
         while (!U.empty())
@@ -144,16 +149,14 @@ void processMatchedVertices(
 #endif
                                                 } // End of if(CandidateMate(w) = v
                                             }     // End of Else
-
-                                        } // End of if(w >=0)
+                                        }         // End of if(w >=0)
                                         else
                                             option = 4; // End of Else: w == -1
                                         // End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-                                    }
-                                } // End of task
-                            }     // End of If (candidateMate[v-StartIndex] == u
-
-                        } // End of if ( (v >= StartIndex) && (v <= EndIndex) ) //If Local Vertex:
+                                    } // End of If (candidateMate[v-StartIndex] == u
+                                }     // End of task
+                            }         // mateval < 0
+                        }             // End of if ( (v >= StartIndex) && (v <= EndIndex) ) //If Local Vertex:
                         else
                         { // Neighbor is a ghost vertex
 
@@ -184,16 +187,36 @@ void processMatchedVertices(
                             // Decrement the counter:
                             PROCESS_CROSS_EDGE(&Counter[Ghost2LocalMap[w]], SPtr);
                         case 2:
+
                             // Found a dominating edge, it is a ghost
                             ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                             assert(ghostOwner != -1);
                             assert(ghostOwner != myRank);
+                            if (sendMessages)
+                            {
+                                // Build the Message Packet:
+                                Message[0] = v;       // LOCAL
+                                Message[1] = w;       // GHOST
+                                Message[2] = REQUEST; // TYPE
+                                                      // Send a Request (Asynchronous)
+                                                      //#pragma omp master
+                                                      //                                {
+                                MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
+//                                }
 #pragma omp atomic
-                            PCounter[ghostOwner]++;
+                                (*msgActual)++;
+                            }
+                            else
+                            {
+#pragma omp atomic
+                                PCounter[ghostOwner]++;
+#pragma omp atomic
+                                (*NumMessagesBundledPtr)++;
+                            }
+
 #pragma omp atomic
                             (*msgIndPtr)++;
-#pragma omp atomic
-                            (*NumMessagesBundledPtr)++;
+
                             privateQLocalVtx.push_back(v);
                             privateQGhostVtx.push_back(w);
                             privateQMsgType.push_back(REQUEST);
@@ -224,12 +247,30 @@ void processMatchedVertices(
                                     ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                                     assert(ghostOwner != -1);
                                     assert(ghostOwner != myRank);
+                                    if (sendMessages)
+                                    {
+                                        // Build the Message Packet:
+                                        Message[0] = v;       // LOCAL
+                                        Message[1] = w;       // GHOST
+                                        Message[2] = FAILURE; // TYPE
+                                                              // Send a Request (Asynchronous)
+                                                              //#pragma omp master
+                                                              //                                        {
+                                        MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
+//                                        }
 #pragma omp atomic
-                                    PCounter[ghostOwner]++;
+                                        (*msgActual)++;
+                                    }
+                                    else
+                                    {
+#pragma omp atomic
+                                        PCounter[ghostOwner]++;
+#pragma omp atomic
+                                        (*NumMessagesBundledPtr)++;
+                                    }
+
 #pragma omp atomic
                                     (*msgIndPtr)++;
-#pragma omp atomic
-                                    (*NumMessagesBundledPtr)++;
 
                                     privateQLocalVtx.push_back(v);
                                     privateQGhostVtx.push_back(w);
@@ -239,6 +280,7 @@ void processMatchedVertices(
                                 } // End of if(GHOST)
                             }     // End of for loop
                             break;
+                        case 5:
                         default:
 
 #ifdef PRINT_DEBUG_INFO_
@@ -250,12 +292,32 @@ void processMatchedVertices(
                             ghostOwner = findOwnerOfGhost(v, verDistance, myRank, numProcs);
                             assert(ghostOwner != -1);
                             assert(ghostOwner != myRank);
+                            if (sendMessages)
+                            {
+                                // Build the Message Packet:
+                                Message[0] = u;       // LOCAL
+                                Message[1] = v;       // GHOST
+                                Message[2] = SUCCESS; // TYPE
+
+                                // Send a Request (Asynchronous)
+                                //#pragma omp master
+                                //                                {
+                                MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
+//                                }
 #pragma omp atomic
-                            PCounter[ghostOwner]++;
+                                (*msgActual)++;
+                            }
+                            else
+                            {
+#pragma omp atomic
+                                (*NumMessagesBundledPtr)++;
+#pragma omp atomic
+                                PCounter[ghostOwner]++;
+                            }
+
 #pragma omp atomic
                             (*msgIndPtr)++;
-#pragma omp atomic
-                            (*NumMessagesBundledPtr)++;
+
                             privateQLocalVtx.push_back(u);
                             privateQGhostVtx.push_back(v);
                             privateQMsgType.push_back(SUCCESS);

@@ -9,7 +9,7 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
                                 MilanLongInt *PCounter,
                                 MilanLongInt NumMessagesBundled,
                                 MilanLongInt *msgActual,
-                                MilanLongInt *MessageIndex,
+                                MilanLongInt *msgInd,
                                 MilanInt numProcs,
                                 MilanInt myRank,
                                 MPI_Comm comm,
@@ -105,7 +105,7 @@ PSizeInfoMessages.resize(numProcs * 3, 0);
 // Send the Messages
 #pragma omp task depend(inout                                                  \
                         : SRequest, PSizeInfoMessages, PCumulative) depend(out \
-                                                                           : *msgActual, *MessageIndex)
+                                                                           : *msgActual, *msgInd)
 {
     for (i = 0; i < numProcs; i++)
     {                    // Changed by Fabio to be an integer, addresses needs to be integers!
@@ -124,9 +124,9 @@ PSizeInfoMessages.resize(numProcs * 3, 0);
         if (PSizeInfoMessages[i * 3 + 0] > 0)
         { // Send only if it is a nonempty packet
             MPI_Isend(&PSizeInfoMessages[i * 3 + 0], 3, TypeMap<MilanLongInt>(), i, ComputeTag, comm,
-                      &SRequest[(*MessageIndex)]);
+                      &SRequest[(*msgInd)]);
             (*msgActual)++;
-            (*MessageIndex)++;
+            (*msgInd)++;
             // Now Send the message with the data packet:
 #ifdef PRINT_DEBUG_INFO_
             cout << "\n(" << myRank << ")SendiFFng Bundle to : " << i << endl;
@@ -136,8 +136,8 @@ PSizeInfoMessages.resize(numProcs * 3, 0);
             fflush(stdout);
 #endif
             MPI_Isend(&PMessageBundle[PCumulative[i] * 3], PSizeInfoMessages[i * 3 + 0],
-                      TypeMap<MilanLongInt>(), i, BundleTag, comm, &SRequest[(*MessageIndex)]);
-            (*MessageIndex)++;
+                      TypeMap<MilanLongInt>(), i, BundleTag, comm, &SRequest[(*msgInd)]);
+            (*msgInd)++;
         } // End of if size > 0
     }
 }
@@ -207,9 +207,4 @@ PSizeInfoMessages.resize(numProcs * 3, 0);
 }
 }
 }
-
-//*MessageIndexPtr = MessageIndex;
-//*msgActualPtr = msgActual;
-//*numGhostEdgesPtr = numGhostEdges;
-//*BufferSizePtr = BufferSize;
 }

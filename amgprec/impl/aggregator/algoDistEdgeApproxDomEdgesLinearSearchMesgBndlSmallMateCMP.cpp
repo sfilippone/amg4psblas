@@ -368,9 +368,51 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         ///////////////////////////////////////////////////////////////////////////////////
         /////////////////////////// PROCESS MATCHED VERTICES //////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////
-        while (/*!Q.empty()*/ !U.empty())
+        ///*
+
+//#define error
+#ifdef error
+        processMatchedVertices(NLVer,
+                               UChunkBeingProcessed,
+                               U,
+                               privateU,
+                               StartIndex,
+                               EndIndex,
+                               &myCard,
+                               &msgInd,
+                               &NumMessagesBundled,
+                               &S,
+                               verLocPtr,
+                               verLocInd,
+                               verDistance,
+                               PCounter,
+                               Counter,
+                               myRank,
+                               numProcs,
+                               candidateMate,
+                               GMate,
+                               Mate,
+                               Ghost2LocalMap,
+                               edgeLocWeight,
+                               QLocalVtx,
+                               QGhostVtx,
+                               QMsgType,
+                               QOwner,
+                               privateQLocalVtx,
+                               privateQGhostVtx,
+                               privateQMsgType,
+                               privateQOwner,
+                               true,
+                               comm,
+                               &msgActual,
+                               &msgInd,
+                               Message);
+#endif
+#ifndef error
+
+        while (!U.empty())
         {
-            // Q.pop_front();
+
             u = U.pop_front(); // Get an element from the queue
 #ifdef PRINT_DEBUG_INFO_
             cout << "\n(" << myRank << ")u: " << u;
@@ -385,9 +427,9 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                 {
                     v = verLocInd[k];
                     if ((v >= StartIndex) && (v <= EndIndex))
-                    {                                  // v is a Local Vertex:
-                        //if (Mate[v - StartIndex] >= 0) // v is already matched
-                        //    continue;
+                    { // v is a Local Vertex:
+                      // if (Mate[v - StartIndex] >= 0) // v is already matched
+                      //    continue;
 #ifdef PRINT_DEBUG_INFO_
                         cout << "\n(" << myRank << ")v: " << v << " c(v)= " << candidateMate[v - StartIndex] << " Mate[v]: " << Mate[v];
                         fflush(stdout);
@@ -500,8 +542,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                 }         // End of Else: w == -1
                                 // End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
                             } // End of If (candidateMate[v-StartIndex] == u)
-                        }
-                    } // End of if ( (v >= StartIndex) && (v <= EndIndex) ) //If Local Vertex:
+                        }     // if (Mate[v - StartIndex] < 0)
+                    }         // End of if ( (v >= StartIndex) && (v <= EndIndex) ) //If Local Vertex:
                     else
                     { // Neighbor v is a ghost vertex
                         if (candidateMate[NLVer + Ghost2LocalMap[v]] == u)
@@ -536,7 +578,9 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                     }     // End of Else //A Ghost Vertex
                 }         // End of For Loop adj(u)
             }             // End of if ( (u >= StartIndex) && (u <= EndIndex) ) //Process Only If a Local Vertex
-        }                 // End of while ( /*!Q.empty()*/ !U.empty() )
+        }                 // End of while ( !U.empty() )
+#endif
+
         ///////////////////////// END OF PROCESS MATCHED VERTICES /////////////////////////
 
         //// BREAK IF NO MESSAGES EXPECTED /////////

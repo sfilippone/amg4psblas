@@ -76,6 +76,8 @@ const MilanLongInt SIZEINFO = 4;
 const int ComputeTag = 7; // Predefined tag
 const int BundleTag = 9;  // Predefined tag
 
+static vector<MilanLongInt> DEFAULT_VECTOR;
+
 // MPI type map
 template <typename T>
 MPI_Datatype TypeMap();
@@ -320,27 +322,32 @@ extern "C"
         staticQueue &privateQLocalVtx,
         staticQueue &privateQGhostVtx,
         staticQueue &privateQMsgType,
-        staticQueue &privateQOwner);
+        staticQueue &privateQOwner,
+        bool sendMessages = false,
+        MPI_Comm comm = NULL,
+        MilanLongInt *msgActual = nullptr,
+        MilanLongInt *msgInd = nullptr,
+        vector<MilanLongInt> &Message = DEFAULT_VECTOR);
 
-        void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
-                                 MilanInt *BufferSizePtr,
-                                 MilanLongInt *Buffer,
-                                 vector<MilanLongInt> &PCumulative,
-                                 vector<MilanLongInt> &PMessageBundle,
-                                 vector<MilanLongInt> &PSizeInfoMessages,
-                                 MilanLongInt *PCounter,
-                                 MilanLongInt NumMessagesBundled,
-                                 MilanLongInt *msgActualPtr,
-                                 MilanLongInt *MessageIndexPtr,
-                                 MilanInt numProcs,
-                                 MilanInt myRank,
-                                 MPI_Comm comm,
-                                 vector<MilanLongInt> &QLocalVtx,
-                                 vector<MilanLongInt> &QGhostVtx,
-                                 vector<MilanLongInt> &QMsgType,
-                                 vector<MilanInt> &QOwner,
-                                 vector<MPI_Request> &SRequest,
-                                 vector<MPI_Status> &SStatus);
+    void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
+                             MilanInt *BufferSizePtr,
+                             MilanLongInt *Buffer,
+                             vector<MilanLongInt> &PCumulative,
+                             vector<MilanLongInt> &PMessageBundle,
+                             vector<MilanLongInt> &PSizeInfoMessages,
+                             MilanLongInt *PCounter,
+                             MilanLongInt NumMessagesBundled,
+                             MilanLongInt *msgActualPtr,
+                             MilanLongInt *MessageIndexPtr,
+                             MilanInt numProcs,
+                             MilanInt myRank,
+                             MPI_Comm comm,
+                             vector<MilanLongInt> &QLocalVtx,
+                             vector<MilanLongInt> &QGhostVtx,
+                             vector<MilanLongInt> &QMsgType,
+                             vector<MilanInt> &QOwner,
+                             vector<MPI_Request> &SRequest,
+                             vector<MPI_Status> &SStatus);
 
     void processMessages(
         MilanLongInt NLVer,
