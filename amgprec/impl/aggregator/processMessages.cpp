@@ -28,6 +28,8 @@ void processMessages(
     staticQueue &U)
 {
 
+//#define PRINT_DEBUG_INFO_
+
     MilanInt Sender;
     MPI_Status computeStatus;
     MilanLongInt bundleSize, w;
@@ -92,6 +94,8 @@ void processMessages(
 
     if (Message[2] == SIZEINFO)
     {
+        //printf("Inizio sizeinfo\n");
+        fflush(stdout);
 
 #ifdef PRINT_DEBUG_INFO_
         cout << "\n(" << myRank << ")Received bundled message from Process " << Sender << " Size= " << Message[0] << endl;
@@ -124,6 +128,9 @@ void processMessages(
         cout << endl;
         fflush(stdout);
 #endif
+
+        //printf("Fine sizeinfo\n");
+        fflush(stdout);
     }
     else
     { // Just a single message:

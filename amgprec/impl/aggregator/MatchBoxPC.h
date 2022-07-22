@@ -65,8 +65,8 @@
 
 using namespace std;
 
-#define NUM_THREAD 4
-#define UCHUNK 5
+const int NUM_THREAD = 2;
+const int UCHUNK = 50;
 
 const MilanLongInt REQUEST = 1;
 const MilanLongInt SUCCESS = 2;

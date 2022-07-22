@@ -199,10 +199,11 @@ void processMatchedVertices(
                                 Message[1] = w;       // GHOST
                                 Message[2] = REQUEST; // TYPE
                                                       // Send a Request (Asynchronous)
-                                                      //#pragma omp master
-                                                      //                                {
+
+                                printf("Send case 2: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
+                                fflush(stdout);
                                 MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
-//                                }
+
 #pragma omp atomic
                                 (*msgActual)++;
                             }
@@ -254,10 +255,10 @@ void processMatchedVertices(
                                         Message[1] = w;       // GHOST
                                         Message[2] = FAILURE; // TYPE
                                                               // Send a Request (Asynchronous)
-                                                              //#pragma omp master
-                                                              //                                        {
+
+                                        printf("Send case 4: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
+                                        fflush(stdout);
                                         MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
-//                                        }
 #pragma omp atomic
                                         (*msgActual)++;
                                     }
@@ -300,10 +301,9 @@ void processMatchedVertices(
                                 Message[2] = SUCCESS; // TYPE
 
                                 // Send a Request (Asynchronous)
-                                //#pragma omp master
-                                //                                {
+                                // printf("Send case 5: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
+                                fflush(stdout);
                                 MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
-//                                }
 #pragma omp atomic
                                 (*msgActual)++;
                             }
@@ -327,39 +327,17 @@ void processMatchedVertices(
                         } // End of switch
 
                     } // End of inner for
-
-                    // TODO privateU.size() < UCHUNK could be commented but it generate errors, why?
-                    if (privateU.size() > UCHUNK || U.empty())
-                    {
-#pragma omp critical(U)
-                        {
-                            while (!privateU.empty())
-                                U.push_back(privateU.pop_back());
-                        }
-
-#ifndef error
-#pragma omp critical(privateMsg)
-                        {
-                            while (!privateQLocalVtx.empty())
-                            {
-                                QLocalVtx.push_back(privateQLocalVtx.pop_back());
-                                QGhostVtx.push_back(privateQGhostVtx.pop_back());
-                                QMsgType.push_back(privateQMsgType.pop_back());
-                                QOwner.push_back(privateQOwner.pop_back());
-                            }
-                        }
-
-#endif
-                    } // End of private.size()
                 }
             } // End of outer for
-        }     // End of while ( !U.empty() )
-        queuesTransfer(U, privateU, QLocalVtx,
-                       QGhostVtx,
-                       QMsgType, QOwner, privateQLocalVtx,
-                       privateQGhostVtx,
-                       privateQMsgType,
-                       privateQOwner);
+
+            queuesTransfer(U, privateU, QLocalVtx,
+                           QGhostVtx,
+                           QMsgType, QOwner, privateQLocalVtx,
+                           privateQGhostVtx,
+                           privateQMsgType,
+                           privateQOwner);
+
+        } // End of while ( !U.empty() )
 
 #ifdef COUNT_LOCAL_VERTEX
         printf("Count local vertexes: %ld for thread %d of processor %d\n",
