@@ -399,7 +399,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                privateQGhostVtx,
                                privateQMsgType,
                                privateQOwner,
-                               true,
                                comm,
                                &msgActual,
                                Message);

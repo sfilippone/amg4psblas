@@ -31,7 +31,6 @@ void processMatchedVerticesAndSendMessages(
     staticQueue &privateQGhostVtx,
     staticQueue &privateQMsgType,
     staticQueue &privateQOwner,
-    bool sendMessages,
     MPI_Comm comm,
     MilanLongInt *msgActual,
     vector<MilanLongInt> &Message)
@@ -41,7 +40,7 @@ void processMatchedVerticesAndSendMessages(
     int option;
     MilanLongInt mateVal;
 
-    vector<MilanLongInt> messagesToSend;
+    vector<MilanLongInt> privatemessagesToSend, messagesToSend;
 
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << "=========================************===============================" << endl;
@@ -52,16 +51,15 @@ void processMatchedVerticesAndSendMessages(
 #ifdef COUNT_LOCAL_VERTEX
     MilanLongInt localVertices = 0;
 #endif
-#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option) \
-    firstprivate(Message, privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner, UChunkBeingProcessed) \ 
-default(shared) \ 
-num_threads(NUM_THREAD)                                                                 \
-        reduction(+                                                                     \
-                  : msgInd[:1], PCounter                                                \
-                  [:numProcs], myCard                                                   \
-                  [:1], NumMessagesBundled                                              \
-                  [:1], msgActual                                                       \
-                  [:1])
+#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option, privatemessagesToSend)                                                      \
+    firstprivate(Message, privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner, UChunkBeingProcessed) default(shared) \
+        num_threads(NUM_THREAD)                                                                                                                                     \
+            reduction(+                                                                                                                                             \
+                      : msgInd[:1], PCounter                                                                                                                        \
+                      [:numProcs], myCard                                                                                                                           \
+                      [:1], NumMessagesBundled                                                                                                                      \
+                      [:1], msgActual                                                                                                                               \
+                      [:1])
     {
 
         while (!U.empty())
@@ -199,33 +197,22 @@ num_threads(NUM_THREAD)                                                         
                             ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                             // assert(ghostOwner != -1);
                             // assert(ghostOwner != myRank);
-                            if (sendMessages)
-                            {
-                                // Build the Message Packet:
-                                Message[0] = v;       // LOCAL
-                                Message[1] = w;       // GHOST
-                                Message[2] = REQUEST; // TYPE
-                                                      // Send a Request (Asynchronous)
 
-                                // printf("Send case 2: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
-                                // fflush(stdout);
-#pragma omp critical(sendMessage)
-                                {
-                                    messagesToSend.push_back(v);
-                                    messagesToSend.push_back(w);
-                                    messagesToSend.push_back(REQUEST);
-                                    messagesToSend.push_back(ghostOwner);
-                                }
-                                // MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
+                            // Build the Message Packet:
+                            Message[0] = v;       // LOCAL
+                            Message[1] = w;       // GHOST
+                            Message[2] = REQUEST; // TYPE
+                                                  // Send a Request (Asynchronous)
 
-                                (*msgActual)++;
-                            }
-                            else
-                            {
-                                PCounter[ghostOwner]++;
-                                (*NumMessagesBundled)++;
-                            }
+                            // printf("Send case 2: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
+                            // fflush(stdout);
+                            privatemessagesToSend.push_back(v);
+                            privatemessagesToSend.push_back(w);
+                            privatemessagesToSend.push_back(REQUEST);
+                            privatemessagesToSend.push_back(ghostOwner);
+                            // MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
 
+                            (*msgActual)++;
                             (*msgInd)++;
 
                             privateQLocalVtx.push_back(v);
@@ -257,32 +244,22 @@ num_threads(NUM_THREAD)                                                         
                                     ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                                     // assert(ghostOwner != -1);
                                     // assert(ghostOwner != myRank);
-                                    if (sendMessages)
-                                    {
-                                        // Build the Message Packet:
-                                        Message[0] = v;       // LOCAL
-                                        Message[1] = w;       // GHOST
-                                        Message[2] = FAILURE; // TYPE
-                                                              // Send a Request (Asynchronous)
 
-                                        // printf("Send case 4: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
-                                        // fflush(stdout);
-#pragma omp critical(sendMessage)
-                                        {
-                                            messagesToSend.push_back(v);
-                                            messagesToSend.push_back(w);
-                                            messagesToSend.push_back(FAILURE);
-                                            messagesToSend.push_back(ghostOwner);
-                                        }
-                                        // MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
-                                        (*msgActual)++;
-                                    }
-                                    else
-                                    {
-                                        PCounter[ghostOwner]++;
-                                        (*NumMessagesBundled)++;
-                                    }
+                                    // Build the Message Packet:
+                                    Message[0] = v;       // LOCAL
+                                    Message[1] = w;       // GHOST
+                                    Message[2] = FAILURE; // TYPE
+                                                          // Send a Request (Asynchronous)
 
+                                    // printf("Send case 4: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
+                                    // fflush(stdout);
+                                    privatemessagesToSend.push_back(v);
+                                    privatemessagesToSend.push_back(w);
+                                    privatemessagesToSend.push_back(FAILURE);
+                                    privatemessagesToSend.push_back(ghostOwner);
+                                    // MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
+
+                                    (*msgActual)++;
                                     (*msgInd)++;
 
                                     privateQLocalVtx.push_back(v);
@@ -305,32 +282,22 @@ num_threads(NUM_THREAD)                                                         
                             ghostOwner = findOwnerOfGhost(v, verDistance, myRank, numProcs);
                             // assert(ghostOwner != -1);
                             // assert(ghostOwner != myRank);
-                            if (sendMessages)
-                            {
-                                // Build the Message Packet:
-                                Message[0] = u;       // LOCAL
-                                Message[1] = v;       // GHOST
-                                Message[2] = SUCCESS; // TYPE
 
-                                // Send a Request (Asynchronous)
-                                // printf("Send case 5: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
-                                // fflush(stdout);
-#pragma omp critical(sendMessage)
-                                {
-                                    messagesToSend.push_back(u);
-                                    messagesToSend.push_back(v);
-                                    messagesToSend.push_back(SUCCESS);
-                                    messagesToSend.push_back(ghostOwner);
-                                }
-                                // MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
-                                (*msgActual)++;
-                            }
-                            else
-                            {
-                                (*NumMessagesBundled)++;
-                                PCounter[ghostOwner]++;
-                            }
+                            // Build the Message Packet:
+                            Message[0] = u;       // LOCAL
+                            Message[1] = v;       // GHOST
+                            Message[2] = SUCCESS; // TYPE
 
+                            // Send a Request (Asynchronous)
+                            // printf("Send case 5: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
+                            // fflush(stdout);)
+                            privatemessagesToSend.push_back(u);
+                            privatemessagesToSend.push_back(v);
+                            privatemessagesToSend.push_back(SUCCESS);
+                            privatemessagesToSend.push_back(ghostOwner);
+                            // MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
+
+                            (*msgActual)++;
                             (*msgInd)++;
 
                             privateQLocalVtx.push_back(u);
@@ -340,10 +307,16 @@ num_threads(NUM_THREAD)                                                         
 
                             break;
                         } // End of switch
-
-                    } // End of inner for
+                    }     // End of inner for
                 }
             } // End of outer for
+
+#pragma omp critical(sendMessageTransfer)
+            {
+                messagesToSend.insert(messagesToSend.end(), privatemessagesToSend.begin(), privatemessagesToSend.end());
+
+                privatemessagesToSend.clear();
+            }
 
             queuesTransfer(U, privateU, QLocalVtx,
                            QGhostVtx,

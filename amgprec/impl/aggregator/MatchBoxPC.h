@@ -355,7 +355,6 @@ extern "C"
         staticQueue &privateQGhostVtx,
         staticQueue &privateQMsgType,
         staticQueue &privateQOwner,
-        bool sendMessages,
         MPI_Comm comm,
         MilanLongInt *msgActual,
         vector<MilanLongInt> &Message);
