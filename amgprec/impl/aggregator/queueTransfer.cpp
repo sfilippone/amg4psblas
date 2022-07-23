@@ -1,7 +1,7 @@
 #include "MatchBoxPC.h"
 
-void queuesTransfer(staticQueue &U,
-                    staticQueue &privateU,
+void queuesTransfer(vector<MilanLongInt> &U,
+                    vector<MilanLongInt> &privateU,
                     vector<MilanLongInt> &QLocalVtx,
                     vector<MilanLongInt> &QGhostVtx,
                     vector<MilanLongInt> &QMsgType,
@@ -14,9 +14,10 @@ void queuesTransfer(staticQueue &U,
 
 #pragma omp critical(U)
     {
-        while (!privateU.empty())
-            U.push_back(privateU.pop_back());
+        U.insert(U.end(), privateU.begin(), privateU.end());
     }
+
+    privateU.clear();
 
 #pragma omp critical(sendMessageTransfer)
     {

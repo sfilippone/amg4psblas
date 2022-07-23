@@ -3,8 +3,8 @@
 void processMatchedVertices(
     MilanLongInt NLVer,
     vector<MilanLongInt> &UChunkBeingProcessed,
-    staticQueue &U,
-    staticQueue &privateU,
+    vector<MilanLongInt> &U,
+    vector<MilanLongInt> &privateU,
     MilanLongInt StartIndex,
     MilanLongInt EndIndex,
     MilanLongInt *myCard,
@@ -274,6 +274,27 @@ void processMatchedVertices(
                            privateQGhostVtx,
                            privateQMsgType,
                            privateQOwner);
+
+#pragma omp critical(U)
+            {
+                U.insert(U.end(), privateU.begin(), privateU.end());
+            }
+
+            privateU.clear();
+
+#pragma omp critical(sendMessageTransfer)
+            {
+
+                QLocalVtx.insert(QLocalVtx.end(), privateQLocalVtx.begin(), privateQLocalVtx.end());
+                QGhostVtx.insert(QGhostVtx.end(), privateQGhostVtx.begin(), privateQGhostVtx.end());
+                QMsgType.insert(QMsgType.end(), privateQMsgType.begin(), privateQMsgType.end());
+                QOwner.insert(QOwner.end(), privateQOwner.begin(), privateQOwner.end());
+            }
+
+            privateQLocalVtx.clear();
+            privateQGhostVtx.clear();
+            privateQMsgType.clear();
+            privateQOwner.clear();
 
         } // End of while ( !U.empty() )
 

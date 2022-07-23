@@ -2,8 +2,8 @@
 
 void extractUChunk(
     vector<MilanLongInt> &UChunkBeingProcessed,
-    staticQueue &U,
-    staticQueue &privateU)
+    vector<MilanLongInt> &U,
+    vector<MilanLongInt> &privateU)
 {
 
     UChunkBeingProcessed.clear();
@@ -13,7 +13,8 @@ void extractUChunk(
         if (U.empty() && !privateU.empty()) // If U is empty but there are nodes in private U
         {
             while (!privateU.empty())
-                UChunkBeingProcessed.push_back(privateU.pop_back());
+                UChunkBeingProcessed.push_back(privateU.back());
+            privateU.pop_back();
         }
         else
         {
@@ -21,9 +22,10 @@ void extractUChunk(
             { // Pop the new nodes
                 if (U.empty())
                     break;
-                UChunkBeingProcessed.push_back(U.pop_back());
+                UChunkBeingProcessed.push_back(U.back());
+                U.pop_back();
             }
         }
 
-    } // End of critical U
+    } // End of critical U // End of critical U
 }

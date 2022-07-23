@@ -3,8 +3,8 @@
 void processMatchedVerticesAndSendMessages(
     MilanLongInt NLVer,
     vector<MilanLongInt> &UChunkBeingProcessed,
-    staticQueue &U,
-    staticQueue &privateU,
+    vector<MilanLongInt> &U,
+    vector<MilanLongInt> &privateU,
     MilanLongInt StartIndex,
     MilanLongInt EndIndex,
     MilanLongInt *myCard,

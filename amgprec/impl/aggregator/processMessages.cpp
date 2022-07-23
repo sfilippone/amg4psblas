@@ -25,7 +25,7 @@ void processMessages(
     MilanLongInt u,
     MilanLongInt v,
     MilanLongInt *S,
-    staticQueue &U)
+    vector<MilanLongInt> &U)
 {
 
     //#define PRINT_DEBUG_INFO_

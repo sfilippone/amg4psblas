@@ -183,8 +183,8 @@ extern "C"
                                            MilanLongInt *verLocInd,
                                            MilanReal *edgeLocWeight);
 
-    void queuesTransfer(staticQueue &U,
-                        staticQueue &privateU,
+    void queuesTransfer(vector<MilanLongInt> &U,
+                        vector<MilanLongInt> &privateU,
                         vector<MilanLongInt> &QLocalVtx,
                         vector<MilanLongInt> &QGhostVtx,
                         vector<MilanLongInt> &QMsgType,
@@ -231,8 +231,8 @@ extern "C"
                     vector<MilanLongInt> &QMsgType,
                     vector<MilanInt> &QOwner,
                     MilanLongInt *&candidateMate,
-                    staticQueue &U,
-                    staticQueue &privateU,
+                    vector<MilanLongInt> &U,
+                    vector<MilanLongInt> &privateU,
                     vector<MilanLongInt> &privateQLocalVtx,
                     vector<MilanLongInt> &privateQGhostVtx,
                     vector<MilanLongInt> &privateQMsgType,
@@ -278,8 +278,8 @@ extern "C"
                                            vector<MilanLongInt> &Counter,
                                            MilanInt myRank,
                                            MilanInt numProcs,
-                                           staticQueue &U,
-                                           staticQueue &privateU,
+                                           vector<MilanLongInt> &U,
+                                           vector<MilanLongInt> &privateU,
                                            vector<MilanLongInt> &QLocalVtx,
                                            vector<MilanLongInt> &QGhostVtx,
                                            vector<MilanLongInt> &QMsgType,
@@ -295,8 +295,8 @@ extern "C"
     void processMatchedVertices(
         MilanLongInt NLVer,
         vector<MilanLongInt> &UChunkBeingProcessed,
-        staticQueue &U,
-        staticQueue &privateU,
+        vector<MilanLongInt> &U,
+        vector<MilanLongInt> &privateU,
         MilanLongInt StartIndex,
         MilanLongInt EndIndex,
         MilanLongInt *myCardPtr,
@@ -327,8 +327,8 @@ extern "C"
     void processMatchedVerticesAndSendMessages(
         MilanLongInt NLVer,
         vector<MilanLongInt> &UChunkBeingProcessed,
-        staticQueue &U,
-        staticQueue &privateU,
+        vector<MilanLongInt> &U,
+        vector<MilanLongInt> &privateU,
         MilanLongInt StartIndex,
         MilanLongInt EndIndex,
         MilanLongInt *myCardPtr,
@@ -404,12 +404,12 @@ extern "C"
         MilanLongInt u,
         MilanLongInt v,
         MilanLongInt *SPtr,
-        staticQueue &U);
+        vector<MilanLongInt> &U);
 
     void extractUChunk(
         vector<MilanLongInt> &UChunkBeingProcessed,
-        staticQueue &U,
-        staticQueue &privateU);
+        vector<MilanLongInt> &U,
+        vector<MilanLongInt> &privateU);
 
     void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         MilanLongInt NLVer, MilanLongInt NLEdge,

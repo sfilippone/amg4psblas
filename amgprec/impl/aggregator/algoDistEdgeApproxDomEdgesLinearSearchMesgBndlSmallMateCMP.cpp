@@ -182,7 +182,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     vector<MilanLongInt> GMate; // Proportional to the number of ghost vertices
     MilanLongInt S;
     MilanLongInt privateMyCard = 0;
-    staticQueue U, privateU;
     vector<MilanLongInt> PCumulative, PMessageBundle, PSizeInfoMessages;
     vector<MPI_Request> SRequest;  // Requests that are used for each send message
     vector<MPI_Status> SStatus;    // Status of sent messages, used in MPI_Wait
@@ -192,6 +191,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 
     vector<MilanLongInt> privateQLocalVtx, privateQGhostVtx, privateQMsgType;
     vector<MilanInt> privateQOwner;
+    vector<MilanLongInt> U, privateU;
 
     initialize(NLVer, NLEdge, StartIndex,
                EndIndex, &numGhostEdges,
@@ -240,7 +240,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
      * TODO: Test when it's actually more efficient to execute this code
      *       in parallel.
      */
-
     PARALLEL_PROCESS_EXPOSED_VERTEX_B(NLVer,
                                       candidateMate,
                                       verLocInd,

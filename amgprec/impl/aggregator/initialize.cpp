@@ -19,8 +19,8 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                 vector<MilanLongInt> &QMsgType,
                 vector<MilanInt> &QOwner,
                 MilanLongInt *&candidateMate,
-                staticQueue &U,
-                staticQueue &privateU,
+                vector<MilanLongInt> &U,
+                vector<MilanLongInt> &privateU,
                 vector<MilanLongInt> &privateQLocalVtx,
                 vector<MilanLongInt> &privateQGhostVtx,
                 vector<MilanLongInt> &privateQMsgType,
@@ -288,18 +288,15 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                  * of a staticQueue I had to destroy the previous object and instantiate
                  * a new one of the correct size.
                  */
-                new (&U) staticQueue(NLVer + (*numGhostVertices));
+                //new (&U) staticQueue(NLVer + (*numGhostVertices));
+                U.reserve(NLVer + (*numGhostVertices));
 
-                // TODO how can I decide a more meaningfull size?
-                MilanLongInt size = (*numGhostVertices);
-
-                // Initialize the privte data structure
-                new (&privateU) staticQueue(NLVer + (*numGhostVertices)); // TODO how can I put a meaningfull size?
-                
+                // Initialize the private vectors                
                 privateQLocalVtx.reserve(*numGhostVertices);
                 privateQGhostVtx.reserve(*numGhostVertices);
                 privateQMsgType.reserve(*numGhostVertices);
                 privateQOwner.reserve(*numGhostVertices);
+                privateU.reserve(*numGhostVertices);
             } // end of task
 
         } // End of single region
