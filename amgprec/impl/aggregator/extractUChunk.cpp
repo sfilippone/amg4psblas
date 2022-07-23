@@ -11,14 +11,18 @@ void extractUChunk(
     {
 
         if (U.empty() && !privateU.empty()) // If U is empty but there are nodes in private U
+        {
             while (!privateU.empty())
-                U.push_back(privateU.pop_front());
-
-        for (int i = 0; i < UCHUNK; i++)
-        { // Pop the new nodes
-            if (U.empty())
-                break;
-            UChunkBeingProcessed.push_back(U.pop_front());
+                UChunkBeingProcessed.push_back(privateU.pop_back());
+        }
+        else
+        {
+            for (int i = 0; i < UCHUNK; i++)
+            { // Pop the new nodes
+                if (U.empty())
+                    break;
+                UChunkBeingProcessed.push_back(U.pop_back());
+            }
         }
 
     } // End of critical U
