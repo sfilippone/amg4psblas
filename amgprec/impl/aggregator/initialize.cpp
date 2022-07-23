@@ -21,10 +21,10 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                 MilanLongInt *&candidateMate,
                 staticQueue &U,
                 staticQueue &privateU,
-                staticQueue &privateQLocalVtx,
-                staticQueue &privateQGhostVtx,
-                staticQueue &privateQMsgType,
-                staticQueue &privateQOwner)
+                vector<MilanLongInt> &privateQLocalVtx,
+                vector<MilanLongInt> &privateQGhostVtx,
+                vector<MilanLongInt> &privateQMsgType,
+                vector<MilanInt> &privateQOwner)
 {
 
     MilanLongInt insertMe = 0;
@@ -295,10 +295,11 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
 
                 // Initialize the privte data structure
                 new (&privateU) staticQueue(NLVer + (*numGhostVertices)); // TODO how can I put a meaningfull size?
-                new (&privateQLocalVtx) staticQueue(size);
-                new (&privateQGhostVtx) staticQueue(size);
-                new (&privateQMsgType) staticQueue(size);
-                new (&privateQOwner) staticQueue(size);
+                
+                privateQLocalVtx.reserve(*numGhostVertices);
+                privateQGhostVtx.reserve(*numGhostVertices);
+                privateQMsgType.reserve(*numGhostVertices);
+                privateQOwner.reserve(*numGhostVertices);
             } // end of task
 
         } // End of single region

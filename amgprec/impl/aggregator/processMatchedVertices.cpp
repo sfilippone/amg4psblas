@@ -27,10 +27,10 @@ void processMatchedVertices(
     vector<MilanLongInt> &QGhostVtx,
     vector<MilanLongInt> &QMsgType,
     vector<MilanInt> &QOwner,
-    staticQueue &privateQLocalVtx,
-    staticQueue &privateQGhostVtx,
-    staticQueue &privateQMsgType,
-    staticQueue &privateQOwner)
+    vector<MilanLongInt> &privateQLocalVtx,
+    vector<MilanLongInt> &privateQGhostVtx,
+    vector<MilanLongInt> &privateQMsgType,
+    vector<MilanInt> &privateQOwner)
 {
 
     MilanLongInt adj1, adj2, adj11, adj12, k, k1, v = -1, w = -1, ghostOwner;

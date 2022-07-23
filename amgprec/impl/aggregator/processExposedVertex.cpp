@@ -25,10 +25,10 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                                        vector<MilanLongInt> &QGhostVtx,
                                        vector<MilanLongInt> &QMsgType,
                                        vector<MilanInt> &QOwner,
-                                       staticQueue &privateQLocalVtx,
-                                       staticQueue &privateQGhostVtx,
-                                       staticQueue &privateQMsgType,
-                                       staticQueue &privateQOwner)
+                                       vector<MilanLongInt> &privateQLocalVtx,
+                                       vector<MilanLongInt> &privateQGhostVtx,
+                                       vector<MilanLongInt> &privateQMsgType,
+                                       vector<MilanInt> &privateQOwner)
 {
 
     MilanLongInt v = -1, k = -1, w = -1, adj11 = 0, adj12 = 0, k1 = 0;
@@ -39,8 +39,11 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
         num_threads(NUM_THREAD)
 
     {
-#pragma omp for reduction(+ \
-                          : PCounter[:numProcs], myCard[:1], msgInd[:1], NumMessagesBundled[:1]) schedule(static)
+#pragma omp for reduction(+                             \
+                          : PCounter[:numProcs], myCard \
+                          [:1], msgInd                  \
+                          [:1], NumMessagesBundled      \
+                          [:1]) schedule(static)
         for (v = 0; v < NLVer; v++)
         {
             option = -1;

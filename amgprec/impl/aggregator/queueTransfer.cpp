@@ -1,17 +1,16 @@
 #include "MatchBoxPC.h"
 
 void queuesTransfer(staticQueue &U,
-                           staticQueue &privateU,
-                           vector<MilanLongInt> &QLocalVtx,
-                           vector<MilanLongInt> &QGhostVtx,
-                           vector<MilanLongInt> &QMsgType,
-                           vector<MilanInt> &QOwner,
-                           staticQueue &privateQLocalVtx,
-                           staticQueue &privateQGhostVtx,
-                           staticQueue &privateQMsgType,
-                           staticQueue &privateQOwner)
+                    staticQueue &privateU,
+                    vector<MilanLongInt> &QLocalVtx,
+                    vector<MilanLongInt> &QGhostVtx,
+                    vector<MilanLongInt> &QMsgType,
+                    vector<MilanInt> &QOwner,
+                    vector<MilanLongInt> &privateQLocalVtx,
+                    vector<MilanLongInt> &privateQGhostVtx,
+                    vector<MilanLongInt> &privateQMsgType,
+                    vector<MilanInt> &privateQOwner)
 {
-
 
 #pragma omp critical(U)
     {
@@ -19,14 +18,17 @@ void queuesTransfer(staticQueue &U,
             U.push_back(privateU.pop_back());
     }
 
-#pragma omp critical(privateMsg)
+#pragma omp critical(sendMessageTransfer)
     {
-        while (!privateQLocalVtx.empty())
-        {
-            QLocalVtx.push_back(privateQLocalVtx.pop_back());
-            QGhostVtx.push_back(privateQGhostVtx.pop_back());
-            QMsgType.push_back(privateQMsgType.pop_back());
-            QOwner.push_back(privateQOwner.pop_back());
-        }
+
+        QLocalVtx.insert(QLocalVtx.end(), privateQLocalVtx.begin(), privateQLocalVtx.end());
+        QGhostVtx.insert(QGhostVtx.end(), privateQGhostVtx.begin(), privateQGhostVtx.end());
+        QMsgType.insert(QMsgType.end(), privateQMsgType.begin(), privateQMsgType.end());
+        QOwner.insert(QOwner.end(), privateQOwner.begin(), privateQOwner.end());
     }
+
+    privateQLocalVtx.clear();
+    privateQGhostVtx.clear();
+    privateQMsgType.clear();
+    privateQOwner.clear();
 }

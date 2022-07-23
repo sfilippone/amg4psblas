@@ -27,6 +27,10 @@ void processMatchedVerticesAndSendMessages(
     vector<MilanLongInt> &QGhostVtx,
     vector<MilanLongInt> &QMsgType,
     vector<MilanInt> &QOwner,
+    vector<MilanLongInt> &privateQLocalVtx,
+    vector<MilanLongInt> &privateQGhostVtx,
+    vector<MilanLongInt> &privateQMsgType,
+    vector<MilanInt> &privateQOwner,
     MPI_Comm comm,
     MilanLongInt *msgActual,
     vector<MilanLongInt> &Message)
@@ -37,13 +41,6 @@ void processMatchedVerticesAndSendMessages(
     int option;
     MilanLongInt mateVal;
 
-    // TODO reserve!!!
-    vector<MilanLongInt> privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner;
-    privateQLocalVtx.reserve(100000);
-    privateQGhostVtx.reserve(100000);
-    privateQMsgType.reserve(100000);
-    privateQOwner.reserve(100000);
-
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << "=========================************===============================" << endl;
     fflush(stdout);
@@ -53,7 +50,7 @@ void processMatchedVerticesAndSendMessages(
 #ifdef COUNT_LOCAL_VERTEX
     MilanLongInt localVertices = 0;
 #endif
-#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option)                                                      \
+#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option)                                                                             \
     firstprivate(Message, privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner, UChunkBeingProcessed) default(shared) \
         num_threads(NUM_THREAD)                                                                                                                                     \
             reduction(+                                                                                                                                             \
@@ -286,25 +283,12 @@ void processMatchedVerticesAndSendMessages(
                 }
             } // End of outer for
 
-#pragma omp critical(U)
-            {
-                while (!privateU.empty())
-                    U.push_back(privateU.pop_back());
-            }
-
-#pragma omp critical(sendMessageTransfer)
-            {
-
-                QLocalVtx.insert(QLocalVtx.end(), privateQLocalVtx.begin(), privateQLocalVtx.end());
-                QGhostVtx.insert(QGhostVtx.end(), privateQGhostVtx.begin(), privateQGhostVtx.end());
-                QMsgType.insert(QMsgType.end(), privateQMsgType.begin(), privateQMsgType.end());
-                QOwner.insert(QOwner.end(), privateQOwner.begin(), privateQOwner.end());
-
-                privateQLocalVtx.clear();
-                privateQGhostVtx.clear();
-                privateQMsgType.clear();
-                privateQOwner.clear();
-            }
+            queuesTransfer(U, privateU, QLocalVtx,
+                           QGhostVtx,
+                           QMsgType, QOwner, privateQLocalVtx,
+                           privateQGhostVtx,
+                           privateQMsgType,
+                           privateQOwner);
 
         } // End of while ( !U.empty() )
 
@@ -317,7 +301,7 @@ void processMatchedVerticesAndSendMessages(
 #endif
     } // End of parallel region
 
-    //Send the messages
+    // Send the messages
     for (int i = initialSize; i < QOwner.size(); i++)
     {
 

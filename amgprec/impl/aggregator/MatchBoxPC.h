@@ -189,10 +189,10 @@ extern "C"
                         vector<MilanLongInt> &QGhostVtx,
                         vector<MilanLongInt> &QMsgType,
                         vector<MilanInt> &QOwner,
-                        staticQueue &privateQLocalVtx,
-                        staticQueue &privateQGhostVtx,
-                        staticQueue &privateQMsgType,
-                        staticQueue &privateQOwner);
+                        vector<MilanLongInt> &privateQLocalVtx,
+                        vector<MilanLongInt> &privateQGhostVtx,
+                        vector<MilanLongInt> &privateQMsgType,
+                        vector<MilanInt> &privateQOwner);
 
     bool isAlreadyMatched(MilanLongInt node,
                           MilanLongInt StartIndex,
@@ -233,10 +233,10 @@ extern "C"
                     MilanLongInt *&candidateMate,
                     staticQueue &U,
                     staticQueue &privateU,
-                    staticQueue &privateQLocalVtx,
-                    staticQueue &privateQGhostVtx,
-                    staticQueue &privateQMsgType,
-                    staticQueue &privateQOwner);
+                    vector<MilanLongInt> &privateQLocalVtx,
+                    vector<MilanLongInt> &privateQGhostVtx,
+                    vector<MilanLongInt> &privateQMsgType,
+                    vector<MilanInt> &privateQOwner);
 
     void clean(MilanLongInt NLVer,
                MilanInt myRank,
@@ -284,10 +284,10 @@ extern "C"
                                            vector<MilanLongInt> &QGhostVtx,
                                            vector<MilanLongInt> &QMsgType,
                                            vector<MilanInt> &QOwner,
-                                           staticQueue &privateQLocalVtx,
-                                           staticQueue &privateQGhostVtx,
-                                           staticQueue &privateQMsgType,
-                                           staticQueue &privateQOwner);
+                                           vector<MilanLongInt> &privateQLocalVtx,
+                                           vector<MilanLongInt> &privateQGhostVtx,
+                                           vector<MilanLongInt> &privateQMsgType,
+                                           vector<MilanInt> &privateQOwner);
 
     void PROCESS_CROSS_EDGE(MilanLongInt *edge,
                             MilanLongInt *SPtr);
@@ -319,10 +319,10 @@ extern "C"
         vector<MilanLongInt> &QGhostVtx,
         vector<MilanLongInt> &QMsgType,
         vector<MilanInt> &QOwner,
-        staticQueue &privateQLocalVtx,
-        staticQueue &privateQGhostVtx,
-        staticQueue &privateQMsgType,
-        staticQueue &privateQOwner);
+        vector<MilanLongInt> &privateQLocalVtx,
+        vector<MilanLongInt> &privateQGhostVtx,
+        vector<MilanLongInt> &privateQMsgType,
+        vector<MilanInt> &privateQOwner);
 
     void processMatchedVerticesAndSendMessages(
         MilanLongInt NLVer,
@@ -351,6 +351,10 @@ extern "C"
         vector<MilanLongInt> &QGhostVtx,
         vector<MilanLongInt> &QMsgType,
         vector<MilanInt> &QOwner,
+        vector<MilanLongInt> &privateQLocalVtx,
+        vector<MilanLongInt> &privateQGhostVtx,
+        vector<MilanLongInt> &privateQMsgType,
+        vector<MilanInt> &privateQOwner,
         MPI_Comm comm,
         MilanLongInt *msgActual,
         vector<MilanLongInt> &Message);

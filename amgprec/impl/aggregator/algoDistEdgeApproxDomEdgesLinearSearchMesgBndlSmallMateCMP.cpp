@@ -182,13 +182,16 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     vector<MilanLongInt> GMate; // Proportional to the number of ghost vertices
     MilanLongInt S;
     MilanLongInt privateMyCard = 0;
-    staticQueue U, privateU, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner;
+    staticQueue U, privateU;
     vector<MilanLongInt> PCumulative, PMessageBundle, PSizeInfoMessages;
     vector<MPI_Request> SRequest;  // Requests that are used for each send message
     vector<MPI_Status> SStatus;    // Status of sent messages, used in MPI_Wait
     MilanLongInt MessageIndex = 0; // Pointer for current message
     MilanInt BufferSize;
     MilanLongInt *Buffer;
+
+    vector<MilanLongInt> privateQLocalVtx, privateQGhostVtx, privateQMsgType;
+    vector<MilanInt> privateQOwner;
 
     initialize(NLVer, NLEdge, StartIndex,
                EndIndex, &numGhostEdges,
@@ -370,34 +373,38 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         ///////////////////////////////////////////////////////////////////////////////////
 
         processMatchedVerticesAndSendMessages(NLVer,
-                               UChunkBeingProcessed,
-                               U,
-                               privateU,
-                               StartIndex,
-                               EndIndex,
-                               &myCard,
-                               &msgInd,
-                               &NumMessagesBundled,
-                               &S,
-                               verLocPtr,
-                               verLocInd,
-                               verDistance,
-                               PCounter,
-                               Counter,
-                               myRank,
-                               numProcs,
-                               candidateMate,
-                               GMate,
-                               Mate,
-                               Ghost2LocalMap,
-                               edgeLocWeight,
-                               QLocalVtx,
-                               QGhostVtx,
-                               QMsgType,
-                               QOwner,
-                               comm,
-                               &msgActual,
-                               Message);
+                                              UChunkBeingProcessed,
+                                              U,
+                                              privateU,
+                                              StartIndex,
+                                              EndIndex,
+                                              &myCard,
+                                              &msgInd,
+                                              &NumMessagesBundled,
+                                              &S,
+                                              verLocPtr,
+                                              verLocInd,
+                                              verDistance,
+                                              PCounter,
+                                              Counter,
+                                              myRank,
+                                              numProcs,
+                                              candidateMate,
+                                              GMate,
+                                              Mate,
+                                              Ghost2LocalMap,
+                                              edgeLocWeight,
+                                              QLocalVtx,
+                                              QGhostVtx,
+                                              QMsgType,
+                                              QOwner,
+                                              privateQLocalVtx,
+                                              privateQGhostVtx,
+                                              privateQMsgType,
+                                              privateQOwner,
+                                              comm,
+                                              &msgActual,
+                                              Message);
 
         ///////////////////////// END OF PROCESS MATCHED VERTICES /////////////////////////
 
