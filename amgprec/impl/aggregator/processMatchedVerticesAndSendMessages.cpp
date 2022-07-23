@@ -27,20 +27,22 @@ void processMatchedVerticesAndSendMessages(
     vector<MilanLongInt> &QGhostVtx,
     vector<MilanLongInt> &QMsgType,
     vector<MilanInt> &QOwner,
-    staticQueue &privateQLocalVtx,
-    staticQueue &privateQGhostVtx,
-    staticQueue &privateQMsgType,
-    staticQueue &privateQOwner,
     MPI_Comm comm,
     MilanLongInt *msgActual,
     vector<MilanLongInt> &Message)
 {
 
+    MilanLongInt initialSize = QLocalVtx.size();
     MilanLongInt adj1, adj2, adj11, adj12, k, k1, v = -1, w = -1, ghostOwner;
     int option;
     MilanLongInt mateVal;
 
-    vector<MilanLongInt> privatemessagesToSend, messagesToSend;
+    // TODO reserve!!!
+    vector<MilanLongInt> privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner;
+    privateQLocalVtx.reserve(100000);
+    privateQGhostVtx.reserve(100000);
+    privateQMsgType.reserve(100000);
+    privateQOwner.reserve(100000);
 
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << "=========================************===============================" << endl;
@@ -51,7 +53,7 @@ void processMatchedVerticesAndSendMessages(
 #ifdef COUNT_LOCAL_VERTEX
     MilanLongInt localVertices = 0;
 #endif
-#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option, privatemessagesToSend)                                                      \
+#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option)                                                      \
     firstprivate(Message, privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner, UChunkBeingProcessed) default(shared) \
         num_threads(NUM_THREAD)                                                                                                                                     \
             reduction(+                                                                                                                                             \
@@ -195,21 +197,12 @@ void processMatchedVerticesAndSendMessages(
 
                             // Found a dominating edge, it is a ghost
                             ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                            // assert(ghostOwner != -1);
-                            // assert(ghostOwner != myRank);
 
                             // Build the Message Packet:
-                            Message[0] = v;       // LOCAL
-                            Message[1] = w;       // GHOST
-                            Message[2] = REQUEST; // TYPE
-                                                  // Send a Request (Asynchronous)
-
-                            // printf("Send case 2: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
-                            // fflush(stdout);
-                            privatemessagesToSend.push_back(v);
-                            privatemessagesToSend.push_back(w);
-                            privatemessagesToSend.push_back(REQUEST);
-                            privatemessagesToSend.push_back(ghostOwner);
+                            // Message[0] = v;       // LOCAL
+                            // Message[1] = w;       // GHOST
+                            // Message[2] = REQUEST; // TYPE
+                            // Send a Request (Asynchronous)
                             // MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
 
                             (*msgActual)++;
@@ -242,21 +235,12 @@ void processMatchedVerticesAndSendMessages(
 #endif
 
                                     ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                                    // assert(ghostOwner != -1);
-                                    // assert(ghostOwner != myRank);
 
                                     // Build the Message Packet:
-                                    Message[0] = v;       // LOCAL
-                                    Message[1] = w;       // GHOST
-                                    Message[2] = FAILURE; // TYPE
-                                                          // Send a Request (Asynchronous)
-
-                                    // printf("Send case 4: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
-                                    // fflush(stdout);
-                                    privatemessagesToSend.push_back(v);
-                                    privatemessagesToSend.push_back(w);
-                                    privatemessagesToSend.push_back(FAILURE);
-                                    privatemessagesToSend.push_back(ghostOwner);
+                                    // Message[0] = v;       // LOCAL
+                                    // Message[1] = w;       // GHOST
+                                    // Message[2] = FAILURE; // TYPE
+                                    // Send a Request (Asynchronous)
                                     // MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
 
                                     (*msgActual)++;
@@ -280,21 +264,12 @@ void processMatchedVerticesAndSendMessages(
 #endif
 
                             ghostOwner = findOwnerOfGhost(v, verDistance, myRank, numProcs);
-                            // assert(ghostOwner != -1);
-                            // assert(ghostOwner != myRank);
 
                             // Build the Message Packet:
-                            Message[0] = u;       // LOCAL
-                            Message[1] = v;       // GHOST
-                            Message[2] = SUCCESS; // TYPE
-
+                            // Message[0] = u;       // LOCAL
+                            // Message[1] = v;       // GHOST
+                            // Message[2] = SUCCESS; // TYPE
                             // Send a Request (Asynchronous)
-                            // printf("Send case 5: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
-                            // fflush(stdout);)
-                            privatemessagesToSend.push_back(u);
-                            privatemessagesToSend.push_back(v);
-                            privatemessagesToSend.push_back(SUCCESS);
-                            privatemessagesToSend.push_back(ghostOwner);
                             // MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
 
                             (*msgActual)++;
@@ -311,19 +286,25 @@ void processMatchedVerticesAndSendMessages(
                 }
             } // End of outer for
 
-#pragma omp critical(sendMessageTransfer)
+#pragma omp critical(U)
             {
-                messagesToSend.insert(messagesToSend.end(), privatemessagesToSend.begin(), privatemessagesToSend.end());
-
-                privatemessagesToSend.clear();
+                while (!privateU.empty())
+                    U.push_back(privateU.pop_back());
             }
 
-            queuesTransfer(U, privateU, QLocalVtx,
-                           QGhostVtx,
-                           QMsgType, QOwner, privateQLocalVtx,
-                           privateQGhostVtx,
-                           privateQMsgType,
-                           privateQOwner);
+#pragma omp critical(sendMessageTransfer)
+            {
+
+                QLocalVtx.insert(QLocalVtx.end(), privateQLocalVtx.begin(), privateQLocalVtx.end());
+                QGhostVtx.insert(QGhostVtx.end(), privateQGhostVtx.begin(), privateQGhostVtx.end());
+                QMsgType.insert(QMsgType.end(), privateQMsgType.begin(), privateQMsgType.end());
+                QOwner.insert(QOwner.end(), privateQOwner.begin(), privateQOwner.end());
+
+                privateQLocalVtx.clear();
+                privateQGhostVtx.clear();
+                privateQMsgType.clear();
+                privateQOwner.clear();
+            }
 
         } // End of while ( !U.empty() )
 
@@ -336,12 +317,15 @@ void processMatchedVerticesAndSendMessages(
 #endif
     } // End of parallel region
 
-    for (int i = 0; i < messagesToSend.size(); i += 4)
+    //Send the messages
+    for (int i = initialSize; i < QOwner.size(); i++)
     {
-        Message[0] = messagesToSend[i];
-        Message[1] = messagesToSend[i + 1];
-        Message[2] = messagesToSend[i + 2];
-        ghostOwner = messagesToSend[i + 3];
+
+        Message[0] = QLocalVtx[i];
+        Message[1] = QGhostVtx[i];
+        Message[2] = QMsgType[i];
+        ghostOwner = QOwner[i];
+
         MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
     }
 }

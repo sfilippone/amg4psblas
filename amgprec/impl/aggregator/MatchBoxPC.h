@@ -351,10 +351,6 @@ extern "C"
         vector<MilanLongInt> &QGhostVtx,
         vector<MilanLongInt> &QMsgType,
         vector<MilanInt> &QOwner,
-        staticQueue &privateQLocalVtx,
-        staticQueue &privateQGhostVtx,
-        staticQueue &privateQMsgType,
-        staticQueue &privateQOwner,
         MPI_Comm comm,
         MilanLongInt *msgActual,
         vector<MilanLongInt> &Message);
