@@ -7,9 +7,9 @@ void processMatchedVertices(
     staticQueue &privateU,
     MilanLongInt StartIndex,
     MilanLongInt EndIndex,
-    MilanLongInt *myCardPtr,
-    MilanLongInt *msgIndPtr,
-    MilanLongInt *NumMessagesBundledPtr,
+    MilanLongInt *myCard,
+    MilanLongInt *msgInd,
+    MilanLongInt *NumMessagesBundled,
     MilanLongInt *SPtr,
     MilanLongInt *verLocPtr,
     MilanLongInt *verLocInd,
@@ -46,7 +46,14 @@ void processMatchedVertices(
 #ifdef COUNT_LOCAL_VERTEX
     MilanLongInt localVertices = 0;
 #endif
-#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option) firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner, UChunkBeingProcessed) default(shared) num_threads(NUM_THREAD)
+#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option)                                                                    \
+    firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner, UChunkBeingProcessed) default(shared) \
+        num_threads(NUM_THREAD)                                                                                                                            \
+            reduction(+                                                                                                                                    \
+                      : msgInd[:1], PCounter                                                                                                               \
+                      [:numProcs], myCard                                                                                                                  \
+                      [:1], NumMessagesBundled                                                                                                             \
+                      [:1])
     {
 
         while (!U.empty())
@@ -171,8 +178,8 @@ void processMatchedVertices(
                             // Found a dominating edge, it is a ghost and candidateMate[NLVer + Ghost2LocalMap[w]] == v
                             privateU.push_back(v);
                             privateU.push_back(w);
-#pragma omp atomic
-                            (*myCardPtr)++;
+
+                            (*myCard)++;
 #ifdef PRINT_DEBUG_INFO_
                             cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") ";
                             fflush(stdout);
@@ -183,14 +190,11 @@ void processMatchedVertices(
 
                             // Found a dominating edge, it is a ghost
                             ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                            assert(ghostOwner != -1);
-                            assert(ghostOwner != myRank);
-#pragma omp atomic
+                            // assert(ghostOwner != -1);
+                            // assert(ghostOwner != myRank);
                             PCounter[ghostOwner]++;
-#pragma omp atomic
-                            (*NumMessagesBundledPtr)++;
-#pragma omp atomic
-                            (*msgIndPtr)++;
+                            (*NumMessagesBundled)++;
+                            (*msgInd)++;
 
                             privateQLocalVtx.push_back(v);
                             privateQGhostVtx.push_back(w);
@@ -200,8 +204,8 @@ void processMatchedVertices(
                         case 3:
                             privateU.push_back(v);
                             privateU.push_back(w);
-#pragma omp atomic
-                            (*myCardPtr)++;
+
+                            (*myCard)++;
                             break;
                         case 4:
                             // Could not find a dominating vertex
@@ -220,14 +224,12 @@ void processMatchedVertices(
 #endif
 
                                     ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                                    assert(ghostOwner != -1);
-                                    assert(ghostOwner != myRank);
-#pragma omp atomic
+                                    // assert(ghostOwner != -1);
+                                    // assert(ghostOwner != myRank);
+
                                     PCounter[ghostOwner]++;
-#pragma omp atomic
-                                    (*NumMessagesBundledPtr)++;
-#pragma omp atomic
-                                    (*msgIndPtr)++;
+                                    (*NumMessagesBundled)++;
+                                    (*msgInd)++;
 
                                     privateQLocalVtx.push_back(v);
                                     privateQGhostVtx.push_back(w);
@@ -247,16 +249,12 @@ void processMatchedVertices(
 #endif
 
                             ghostOwner = findOwnerOfGhost(v, verDistance, myRank, numProcs);
-                            assert(ghostOwner != -1);
-                            assert(ghostOwner != myRank);
+                            // assert(ghostOwner != -1);
+                            // assert(ghostOwner != myRank);
 
-#pragma omp atomic
-                            (*NumMessagesBundledPtr)++;
-#pragma omp atomic
+                            (*NumMessagesBundled)++;
                             PCounter[ghostOwner]++;
-
-#pragma omp atomic
-                            (*msgIndPtr)++;
+                            (*msgInd)++;
 
                             privateQLocalVtx.push_back(u);
                             privateQGhostVtx.push_back(v);

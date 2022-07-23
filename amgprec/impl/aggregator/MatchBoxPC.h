@@ -358,7 +358,6 @@ extern "C"
         bool sendMessages,
         MPI_Comm comm,
         MilanLongInt *msgActual,
-        MilanLongInt *msgInd,
         vector<MilanLongInt> &Message);
 
     void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,

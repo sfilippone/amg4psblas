@@ -243,8 +243,8 @@ void processMessages(
                                 fflush(stdout);
 #endif
                                 ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                                assert(ghostOwner != -1);
-                                assert(ghostOwner != myRank);
+                                //assert(ghostOwner != -1);
+                                //assert(ghostOwner != myRank);
 
                                 MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
                                 (*msgInd)++;
@@ -301,8 +301,8 @@ void processMessages(
                                     fflush(stdout);
 #endif
                                     ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                                    assert(ghostOwner != -1);
-                                    assert(ghostOwner != myRank);
+                                    //assert(ghostOwner != -1);
+                                    //assert(ghostOwner != myRank);
                                     MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
                                     (*msgInd)++;
                                     (*msgActual)++;

@@ -34,9 +34,13 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
     MilanLongInt v = -1, k = -1, w = -1, adj11 = 0, adj12 = 0, k1 = 0;
     MilanInt ghostOwner = 0, option;
 
-#pragma omp parallel private(option, k, w, v, k1, adj11, adj12, ghostOwner) firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) default(shared) num_threads(NUM_THREAD)
+#pragma omp parallel private(option, k, w, v, k1, adj11, adj12, ghostOwner)                                                          \
+    firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) default(shared) \
+        num_threads(NUM_THREAD)
+
     {
-#pragma omp for reduction(+ : PCounter[:numProcs]) schedule(static)
+#pragma omp for reduction(+ \
+                          : PCounter[:numProcs], myCard[:1], msgInd[:1], NumMessagesBundled[:1]) schedule(static)
         for (v = 0; v < NLVer; v++)
         {
             option = -1;
@@ -76,7 +80,6 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
 
                     if (w >= 0)
                     {
-#pragma omp atomic
                         (*myCard)++;
                         if ((w < StartIndex) || (w > EndIndex))
                         { // w is a ghost vertex
@@ -129,13 +132,11 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                         cout << "\n(" << myRank << ")Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs);
                         fflush(stdout);
 #endif
-#pragma omp atomic
                         (*msgInd)++;
-#pragma omp atomic
                         (*NumMessagesBundled)++;
                         ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                        assert(ghostOwner != -1);
-                        assert(ghostOwner != myRank);
+                        // assert(ghostOwner != -1);
+                        // assert(ghostOwner != myRank);
                         PCounter[ghostOwner]++;
 
                         privateQLocalVtx.push_back(v + StartIndex);
@@ -169,13 +170,11 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                 cout << "\n(" << myRank << ")Local is: " << v + StartIndex << " Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs) << endl;
                 fflush(stdout);
 #endif
-#pragma omp atomic
                 (*msgInd)++;
-#pragma omp atomic
                 (*NumMessagesBundled)++;
                 ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-                assert(ghostOwner != -1);
-                assert(ghostOwner != myRank);
+                // assert(ghostOwner != -1);
+                // assert(ghostOwner != myRank);
                 PCounter[ghostOwner]++;
 
                 privateQLocalVtx.push_back(v + StartIndex);

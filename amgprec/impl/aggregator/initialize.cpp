@@ -57,13 +57,13 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
 #pragma omp task depend(out \
                         : *numGhostEdges, Counter, Ghost2LocalMap, insertMe, storedAlready, *numGhostVertices)
             {
-#pragma omp taskloop num_tasks(NUM_THREAD)
+#pragma omp taskloop num_tasks(NUM_THREAD) reduction(+ \
+                                                     : numGhostEdges[:1])
                 for (i = 0; i < NLEdge; i++)
                 { // O(m) - Each edge stored twice
                     insertMe = verLocInd[i];
                     if ((insertMe < StartIndex) || (insertMe > EndIndex))
                     { // Find a ghost
-#pragma omp atomic
                         (*numGhostEdges)++;
 #pragma omp critical
                         {
@@ -76,7 +76,7 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                             {                                                 // Insert an entry for the ghost:
                                 Ghost2LocalMap[insertMe] = *numGhostVertices; // Add a map entry
                                 Counter.push_back(1);                         // Initialize the counter
-                                (*numGhostVertices)++;                          // Increment the number of ghost vertices
+                                (*numGhostVertices)++;                        // Increment the number of ghost vertices
                             }                                                 // End of else()
                         }
                     } // End of if ( (insertMe < StartIndex) || (insertMe > EndIndex) )

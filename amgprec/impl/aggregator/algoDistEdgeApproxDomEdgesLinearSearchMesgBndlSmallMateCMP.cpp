@@ -402,7 +402,6 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                true,
                                comm,
                                &msgActual,
-                               &msgInd,
                                Message);
 
         ///////////////////////// END OF PROCESS MATCHED VERTICES /////////////////////////
