@@ -65,8 +65,8 @@
 
 using namespace std;
 
-const int NUM_THREAD = 2;
-const int UCHUNK = 50;
+const int NUM_THREAD = 4;
+const int UCHUNK = 10;
 
 const MilanLongInt REQUEST = 1;
 const MilanLongInt SUCCESS = 2;
@@ -322,12 +322,44 @@ extern "C"
         staticQueue &privateQLocalVtx,
         staticQueue &privateQGhostVtx,
         staticQueue &privateQMsgType,
+        staticQueue &privateQOwner);
+
+    void processMatchedVerticesAndSendMessages(
+        MilanLongInt NLVer,
+        vector<MilanLongInt> &UChunkBeingProcessed,
+        staticQueue &U,
+        staticQueue &privateU,
+        MilanLongInt StartIndex,
+        MilanLongInt EndIndex,
+        MilanLongInt *myCardPtr,
+        MilanLongInt *msgIndPtr,
+        MilanLongInt *NumMessagesBundledPtr,
+        MilanLongInt *SPtr,
+        MilanLongInt *verLocPtr,
+        MilanLongInt *verLocInd,
+        MilanLongInt *verDistance,
+        MilanLongInt *PCounter,
+        vector<MilanLongInt> &Counter,
+        MilanInt myRank,
+        MilanInt numProcs,
+        MilanLongInt *candidateMate,
+        vector<MilanLongInt> &GMate,
+        MilanLongInt *Mate,
+        map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
+        MilanReal *edgeLocWeight,
+        vector<MilanLongInt> &QLocalVtx,
+        vector<MilanLongInt> &QGhostVtx,
+        vector<MilanLongInt> &QMsgType,
+        vector<MilanInt> &QOwner,
+        staticQueue &privateQLocalVtx,
+        staticQueue &privateQGhostVtx,
+        staticQueue &privateQMsgType,
         staticQueue &privateQOwner,
-        bool sendMessages = false,
-        MPI_Comm comm = NULL,
-        MilanLongInt *msgActual = nullptr,
-        MilanLongInt *msgInd = nullptr,
-        vector<MilanLongInt> &Message = DEFAULT_VECTOR);
+        bool sendMessages,
+        MPI_Comm comm,
+        MilanLongInt *msgActual,
+        MilanLongInt *msgInd,
+        vector<MilanLongInt> &Message);
 
     void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
                              MilanInt *BufferSizePtr,

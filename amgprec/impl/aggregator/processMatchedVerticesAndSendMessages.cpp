@@ -1,6 +1,6 @@
 #include "MatchBoxPC.h"
 
-void processMatchedVertices(
+void processMatchedVerticesAndSendMessages(
     MilanLongInt NLVer,
     vector<MilanLongInt> &UChunkBeingProcessed,
     staticQueue &U,
@@ -30,12 +30,19 @@ void processMatchedVertices(
     staticQueue &privateQLocalVtx,
     staticQueue &privateQGhostVtx,
     staticQueue &privateQMsgType,
-    staticQueue &privateQOwner)
+    staticQueue &privateQOwner,
+    bool sendMessages,
+    MPI_Comm comm,
+    MilanLongInt *msgActual,
+    MilanLongInt *msgInd,
+    vector<MilanLongInt> &Message)
 {
 
     MilanLongInt adj1, adj2, adj11, adj12, k, k1, v = -1, w = -1, ghostOwner;
     int option;
     MilanLongInt mateVal;
+
+    vector<MilanLongInt> messagesToSend;
 
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << "=========================************===============================" << endl;
@@ -46,7 +53,7 @@ void processMatchedVertices(
 #ifdef COUNT_LOCAL_VERTEX
     MilanLongInt localVertices = 0;
 #endif
-#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option) firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner, UChunkBeingProcessed) default(shared) num_threads(NUM_THREAD)
+#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option) firstprivate(Message, privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner, UChunkBeingProcessed) default(shared) num_threads(NUM_THREAD)
     {
 
         while (!U.empty())
@@ -185,10 +192,36 @@ void processMatchedVertices(
                             ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                             assert(ghostOwner != -1);
                             assert(ghostOwner != myRank);
+                            if (sendMessages)
+                            {
+                                // Build the Message Packet:
+                                Message[0] = v;       // LOCAL
+                                Message[1] = w;       // GHOST
+                                Message[2] = REQUEST; // TYPE
+                                                      // Send a Request (Asynchronous)
+
+                                //printf("Send case 2: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
+                                //fflush(stdout);
+#pragma omp critical(sendMessage)
+                                {
+                                    messagesToSend.push_back(v);
+                                    messagesToSend.push_back(w);
+                                    messagesToSend.push_back(REQUEST);
+                                    messagesToSend.push_back(ghostOwner);
+                                }
+                                // MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
+
 #pragma omp atomic
-                            PCounter[ghostOwner]++;
+                                (*msgActual)++;
+                            }
+                            else
+                            {
 #pragma omp atomic
-                            (*NumMessagesBundledPtr)++;
+                                PCounter[ghostOwner]++;
+#pragma omp atomic
+                                (*NumMessagesBundledPtr)++;
+                            }
+
 #pragma omp atomic
                             (*msgIndPtr)++;
 
@@ -222,10 +255,35 @@ void processMatchedVertices(
                                     ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                                     assert(ghostOwner != -1);
                                     assert(ghostOwner != myRank);
+                                    if (sendMessages)
+                                    {
+                                        // Build the Message Packet:
+                                        Message[0] = v;       // LOCAL
+                                        Message[1] = w;       // GHOST
+                                        Message[2] = FAILURE; // TYPE
+                                                              // Send a Request (Asynchronous)
+
+                                        //printf("Send case 4: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
+                                        //fflush(stdout);
+#pragma omp critical(sendMessage)
+                                        {
+                                            messagesToSend.push_back(v);
+                                            messagesToSend.push_back(w);
+                                            messagesToSend.push_back(FAILURE);
+                                            messagesToSend.push_back(ghostOwner);
+                                        }
+                                        // MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
 #pragma omp atomic
-                                    PCounter[ghostOwner]++;
+                                        (*msgActual)++;
+                                    }
+                                    else
+                                    {
 #pragma omp atomic
-                                    (*NumMessagesBundledPtr)++;
+                                        PCounter[ghostOwner]++;
+#pragma omp atomic
+                                        (*NumMessagesBundledPtr)++;
+                                    }
+
 #pragma omp atomic
                                     (*msgIndPtr)++;
 
@@ -249,11 +307,34 @@ void processMatchedVertices(
                             ghostOwner = findOwnerOfGhost(v, verDistance, myRank, numProcs);
                             assert(ghostOwner != -1);
                             assert(ghostOwner != myRank);
+                            if (sendMessages)
+                            {
+                                // Build the Message Packet:
+                                Message[0] = u;       // LOCAL
+                                Message[1] = v;       // GHOST
+                                Message[2] = SUCCESS; // TYPE
 
+                                // Send a Request (Asynchronous)
+                                //printf("Send case 5: (%ld, %ld, %ld)\n", Message[0], Message[1], Message[2]);
+                                //fflush(stdout);
+#pragma omp critical(sendMessage)
+                                {
+                                    messagesToSend.push_back(u);
+                                    messagesToSend.push_back(v);
+                                    messagesToSend.push_back(SUCCESS);
+                                    messagesToSend.push_back(ghostOwner);
+                                }
+                                // MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
 #pragma omp atomic
-                            (*NumMessagesBundledPtr)++;
+                                (*msgActual)++;
+                            }
+                            else
+                            {
 #pragma omp atomic
-                            PCounter[ghostOwner]++;
+                                (*NumMessagesBundledPtr)++;
+#pragma omp atomic
+                                PCounter[ghostOwner]++;
+                            }
 
 #pragma omp atomic
                             (*msgIndPtr)++;
@@ -287,4 +368,13 @@ void processMatchedVertices(
 
 #endif
     } // End of parallel region
+
+    for (int i = 0; i < messagesToSend.size(); i += 4)
+    {
+        Message[0] = messagesToSend[i];       
+        Message[1] = messagesToSend[i + 1];       
+        Message[2] = messagesToSend[i + 2];
+        ghostOwner = messagesToSend[i + 3]; 
+        MPI_Bsend(&Message[0], 3, TypeMap<MilanLongInt>(), ghostOwner, ComputeTag, comm);
+    }
 }

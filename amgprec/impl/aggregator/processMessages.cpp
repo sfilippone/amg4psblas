@@ -28,7 +28,7 @@ void processMessages(
     staticQueue &U)
 {
 
-//#define PRINT_DEBUG_INFO_
+    //#define PRINT_DEBUG_INFO_
 
     MilanInt Sender;
     MPI_Status computeStatus;
@@ -94,8 +94,6 @@ void processMessages(
 
     if (Message[2] == SIZEINFO)
     {
-        //printf("Inizio sizeinfo\n");
-        fflush(stdout);
 
 #ifdef PRINT_DEBUG_INFO_
         cout << "\n(" << myRank << ")Received bundled message from Process " << Sender << " Size= " << Message[0] << endl;
@@ -128,9 +126,6 @@ void processMessages(
         cout << endl;
         fflush(stdout);
 #endif
-
-        //printf("Fine sizeinfo\n");
-        fflush(stdout);
     }
     else
     { // Just a single message:
@@ -162,8 +157,7 @@ void processMessages(
     fflush(stdout);
 #endif
 
-
-    //Most of the time bundleSize == 3, thus, it's not worth parallelizing thi loop
+    // Most of the time bundleSize == 3, thus, it's not worth parallelizing thi loop
     for (MilanLongInt bundleCounter = 3; bundleCounter < bundleSize + 3; bundleCounter += 3)
     {
         u = ReceiveBuffer[bundleCounter - 3];            // GHOST
@@ -325,10 +319,10 @@ void processMessages(
                 cout << "\n(" << myRank << ")Message type is FAILURE" << endl;
                 fflush(stdout);
 #endif
-                GMate[Ghost2LocalMap[u]] = EndIndex + 1; // Set a Dummy Mate to make sure that we do not (u is a ghost) process this anymore
+                GMate[Ghost2LocalMap[u]] = EndIndex + 1;            // Set a Dummy Mate to make sure that we do not (u is a ghost) process this anymore
                 PROCESS_CROSS_EDGE(&Counter[Ghost2LocalMap[u]], S); // Decrease the counter
-            }                                                      // End of else: CASE III
-        }                                                          // End of else: CASE I
+            }                                                       // End of else: CASE III
+        }                                                           // End of else: CASE I
     }
 
     return;

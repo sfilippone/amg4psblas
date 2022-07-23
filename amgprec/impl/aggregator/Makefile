@@ -70,13 +70,13 @@ findOwnerOfGhost.o \
 computeCandidateMate.o \
 parallelComputeCandidateMateB.o \
 processMatchedVertices.o \
+processMatchedVerticesAndSendMessages.o \
 processCrossEdge.o \
 queueTransfer.o \
 processMessages.o \
 processExposedVertex.o \
 algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o \
 algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP.o
-
 
 OBJS = $(FOBJS) $(MPCOBJS)
 
