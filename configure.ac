@@ -132,6 +132,11 @@ AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc 
 FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
 AC_PROG_CC([cc xlc pgcc icc gcc ])
+if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
+   AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
+else
+   C99OPT="$ac_cv_prog_cc_stdc";
+fi	
 CFLAGS="$save_CFLAGS";
 save_CXXFLAGS="$CXXFLAGS";
 AC_PROG_CXX([CC xlc++  icpc g++])
@@ -165,12 +170,6 @@ fi
 if test "X$CC" == "X" ; then
 	AC_MSG_ERROR([Problem : No C compiler specified nor found!])
 fi
-AC_PROG_CC_STDC()
-if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
-   AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
-else
-   C99OPT="$ac_cv_prog_cc_stdc";
-fi	
 ###############################################################################
 #			Suitable MPI compilers detection
 ###############################################################################
