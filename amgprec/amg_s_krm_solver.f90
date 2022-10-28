@@ -473,7 +473,7 @@ contains
     end if
     write(iout_,*) trim(prefix_), '    method: ',sv%method
     write(iout_,*) trim(prefix_), '     kprec: ',sv%kprec
-    call sv%prec%descr(iout_,info,prefix='KRM : '//prefix_)
+    call sv%prec%descr(info,iout_,prefix='KRM : '//prefix_)
     write(iout_,*) trim(prefix_), '     itmax: ',sv%itmax
     write(iout_,*) trim(prefix_), '       eps: ',sv%eps
 
