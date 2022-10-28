@@ -64,7 +64,7 @@ module amg_base_prec_type
   !
   use psb_const_mod
   use psb_base_mod, only :&
-       & psb_desc_type, psb_i_vect_type, psb_i_base_vect_type,&
+       & psb_desc_type, psb_ctxt_type,&
        & psb_ipk_, psb_dpk_, psb_spk_, psb_epk_,  &
        & psb_cdfree, psb_halo_, psb_none_, psb_sum_, psb_avg_, &
        & psb_nohalo_, psb_square_root_, psb_toupper, psb_root_,&
