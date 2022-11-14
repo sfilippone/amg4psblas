@@ -72,12 +72,6 @@
 
 #ifdef SERIAL_MPI
 #else
-//MPI type map
-template<typename T> MPI_Datatype TypeMap();
-template<> inline MPI_Datatype TypeMap<int64_t>() { return MPI_LONG_LONG; }
-template<> inline MPI_Datatype TypeMap<int>() { return MPI_INT; }
-template<> inline MPI_Datatype TypeMap<double>() { return MPI_DOUBLE; }
-template<> inline MPI_Datatype TypeMap<float>() { return MPI_FLOAT; }
 
 // DOUBLE PRECISION VERSION
 //WARNING: The vertex block on a given rank is contiguous

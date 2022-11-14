@@ -60,17 +60,43 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 		MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
 #if !defined(SERIAL_MPI)
   MPI_Comm C_comm=MPI_Comm_f2c(icomm);
+
 #ifdef DEBUG
   fprintf(stderr,"MatchBoxPC: rank %d nlver %ld nledge %ld [ %ld %ld ]\n",
 	  myRank,NLVer, NLEdge,verDistance[0],verDistance[1]);
 #endif
-  dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(NLVer, NLEdge,
+
+
+#define TIME_TRACKER
+    #ifdef TIME_TRACKER
+        double tmr = MPI_Wtime();
+    #endif
+
+#define OMP
+#ifdef OMP
+        dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(NLVer, NLEdge,
 							   verLocPtr, verLocInd, edgeLocWeight,
 							   verDistance,  Mate,
 							   myRank, numProcs, C_comm,
 							   msgIndSent, msgActualSent, msgPercent,
 							   ph0_time, ph1_time, ph2_time,
 							   ph1_card, ph2_card );
+#else
+        dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(NLVer, NLEdge,
+							   verLocPtr, verLocInd, edgeLocWeight,
+							   verDistance,  Mate,
+							   myRank, numProcs, C_comm,
+							   msgIndSent, msgActualSent, msgPercent,
+							   ph0_time, ph1_time, ph2_time,
+							   ph1_card, ph2_card );
+#endif
+
+
+  #ifdef TIME_TRACKER
+    tmr = MPI_Wtime() - tmr;
+    fprintf(stderr, "Elaboration time: %f for %ld nodes\n", tmr, NLVer);
+  #endif
+
 #endif
 }
 

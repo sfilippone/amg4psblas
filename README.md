@@ -1,4 +1,3 @@
-
                          AMG4PSBLAS  
  Algebraic Multigrid Package  based on PSBLAS (Parallel Sparse BLAS version 3.8)
     
