@@ -67,6 +67,7 @@ initialize.o \
 extractUChunk.o \
 isAlreadyMatched.o \
 findOwnerOfGhost.o \
+clean.o \
 computeCandidateMate.o \
 parallelComputeCandidateMateB.o \
 processMatchedVertices.o \

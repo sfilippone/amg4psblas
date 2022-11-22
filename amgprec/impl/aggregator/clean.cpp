@@ -33,7 +33,7 @@ void clean(MilanLongInt NLVer,
                 cout << "\n(" << myRank << ") Waitall " << endl;
                 fflush(stdout);
 #endif
-                return;
+                //return;
 
                 MPI_Waitall(MessageIndex, &SRequest[0], &SStatus[0]);
 

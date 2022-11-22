@@ -1109,7 +1109,7 @@ contains
     verlocptr(:)   = verlocptr(:)  + 1
     verlocind(:)   = verlocind(:) + 1
     verdistance(:) = verdistance(:) + 1
-
+    if (me==0) write(0,*) 'Ph0/1/2 time ',ph0_time, ph1_time, ph2_time
     if (debug_sync) then
       call psb_barrier(ictxt)
       if (me == 0) write(0,*)' Done MatchBoxP '
