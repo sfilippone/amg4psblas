@@ -17,6 +17,7 @@ amg_c_base_onelev_csetr.o \
 amg_c_base_onelev_descr.o \
 amg_c_base_onelev_dump.o \
 amg_c_base_onelev_free.o \
+amg_c_base_onelev_free_smoothers.o \
 amg_c_base_onelev_mat_asb.o \
 amg_c_base_onelev_setag.o \
 amg_c_base_onelev_setsm.o \
@@ -32,6 +33,7 @@ amg_d_base_onelev_csetr.o \
 amg_d_base_onelev_descr.o \
 amg_d_base_onelev_dump.o \
 amg_d_base_onelev_free.o \
+amg_d_base_onelev_free_smoothers.o \
 amg_d_base_onelev_mat_asb.o \
 amg_d_base_onelev_setag.o \
 amg_d_base_onelev_setsm.o \
@@ -47,6 +49,7 @@ amg_s_base_onelev_csetr.o \
 amg_s_base_onelev_descr.o \
 amg_s_base_onelev_dump.o \
 amg_s_base_onelev_free.o \
+amg_s_base_onelev_free_smoothers.o \
 amg_s_base_onelev_mat_asb.o \
 amg_s_base_onelev_setag.o \
 amg_s_base_onelev_setsm.o \
@@ -62,6 +65,7 @@ amg_z_base_onelev_csetr.o \
 amg_z_base_onelev_descr.o \
 amg_z_base_onelev_dump.o \
 amg_z_base_onelev_free.o \
+amg_z_base_onelev_free_smoothers.o \
 amg_z_base_onelev_mat_asb.o \
 amg_z_base_onelev_setag.o \
 amg_z_base_onelev_setsm.o \

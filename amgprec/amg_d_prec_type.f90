@@ -135,7 +135,9 @@ module amg_d_prec_type
     procedure, pass(prec)               :: build        => amg_dprecbld
     procedure, pass(prec)               :: hierarchy_build   => amg_d_hierarchy_bld
     procedure, pass(prec)               :: hierarchy_rebuild => amg_d_hierarchy_rebld
+    procedure, pass(prec)               :: hierarchy_free    => amg_d_hierarchy_free    
     procedure, pass(prec)               :: smoothers_build   => amg_d_smoothers_bld
+    procedure, pass(prec)               :: smoothers_free    => amg_d_smoothers_free
     procedure, pass(prec)               :: descr        =>  amg_dfile_prec_descr
   end type amg_dprec_type
 
@@ -344,6 +346,14 @@ module amg_d_prec_type
       !      character, intent(in),optional             :: upd
     end subroutine amg_d_smoothers_bld
   end interface amg_smoothers_bld
+
+  interface amg_smoothers_free
+    module procedure  amg_d_smoothers_free
+  end interface amg_smoothers_free
+
+  interface amg_hierarchy_free
+    module procedure amg_d_hierarchy_free
+  end interface amg_hierarchy_free
 
 contains
   !
@@ -618,6 +628,68 @@ contains
 
   end subroutine amg_d_prec_free
 
+  subroutine amg_d_smoothers_free(prec,info)
+
+    implicit none
+
+    ! Arguments
+    class(amg_dprec_type), intent(inout) :: prec
+    integer(psb_ipk_), intent(out)        :: info
+
+    ! Local variables
+    integer(psb_ipk_)   :: me,err_act,i
+    character(len=20)   :: name
+
+    info=psb_success_
+    name = 'amg_d_smoothers_free'
+    call psb_erractionsave(err_act)
+    if (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_; goto 9999
+    end if
+
+    if (allocated(prec%precv)) then
+      do i=1,size(prec%precv)
+        call prec%precv(i)%free_smoothers(info)
+      end do
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(err_act)
+    return
+
+  end subroutine amg_d_smoothers_free
+
+  subroutine amg_d_hierarchy_free(prec,info)
+
+    implicit none
+
+    ! Arguments
+    class(amg_dprec_type), intent(inout) :: prec
+    integer(psb_ipk_), intent(out)        :: info
+
+    ! Local variables
+    integer(psb_ipk_)   :: me,err_act,i
+    character(len=20)   :: name
+
+    info=psb_success_
+    name = 'amg_d_hierarchy_free'
+    call psb_erractionsave(err_act)
+    if (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_; goto 9999
+    end if
+
+    me=-1
+    write(0,*) 'Missing implementation '
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(err_act)
+    return
+
+  end subroutine amg_d_hierarchy_free
 
 
   !

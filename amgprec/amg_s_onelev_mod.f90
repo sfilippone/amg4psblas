@@ -190,6 +190,7 @@ module amg_s_onelev_mod
     procedure, pass(lv) :: descr   => amg_s_base_onelev_descr
     procedure, pass(lv) :: default => s_base_onelev_default
     procedure, pass(lv) :: free    => amg_s_base_onelev_free
+    procedure, pass(lv) :: free_smoothers => amg_s_base_onelev_free_smoothers
     procedure, pass(lv) :: nullify => s_base_onelev_nullify
     procedure, pass(lv) :: check => amg_s_base_onelev_check
     procedure, pass(lv) :: dump  => amg_s_base_onelev_dump
@@ -286,7 +287,7 @@ module amg_s_onelev_mod
     end subroutine amg_s_base_onelev_cnv
   end interface
 
-interface
+  interface
     subroutine amg_s_base_onelev_free(lv,info)
       import :: psb_sspmat_type, psb_s_vect_type, psb_s_base_vect_type, &
            & psb_slinmap_type, psb_spk_, amg_s_onelev_type, &
@@ -296,6 +297,18 @@ interface
       class(amg_s_onelev_type), intent(inout) :: lv
       integer(psb_ipk_), intent(out)                :: info
     end subroutine amg_s_base_onelev_free
+  end interface
+
+  interface
+    subroutine amg_s_base_onelev_free_smoothers(lv,info)
+      import :: psb_sspmat_type, psb_s_vect_type, psb_s_base_vect_type, &
+           & psb_slinmap_type, psb_spk_, amg_s_onelev_type, &
+           & psb_ipk_, psb_epk_, psb_desc_type
+      implicit none
+
+      class(amg_s_onelev_type), intent(inout) :: lv
+      integer(psb_ipk_), intent(out)                :: info
+    end subroutine amg_s_base_onelev_free_smoothers
   end interface
 
   interface
