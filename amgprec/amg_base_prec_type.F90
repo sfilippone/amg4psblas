@@ -94,6 +94,7 @@ module amg_base_prec_type
     integer(psb_ipk_) :: aggr_omega_alg, aggr_eig, aggr_filter
     integer(psb_ipk_) :: coarse_mat, coarse_solve
   contains
+    procedure, pass(pm) :: get_coarse_mat  => ml_parms_get_coarse_mat
     procedure, pass(pm) :: get_coarse  => ml_parms_get_coarse
     procedure, pass(pm) :: clone       => ml_parms_clone
     procedure, pass(pm) :: descr       => ml_parms_descr
@@ -576,6 +577,33 @@ contains
       val  = -1
     end select
   end function amg_stringval
+
+  function amg_get_coarse_mat_name(val) result(res)
+    character(len=15) :: res
+    integer :: val
+    select case(val)
+    case (0,1)
+      res = matrix_names(val)
+    case default
+      res = 'Unknown '
+    end select
+  end function amg_get_coarse_mat_name
+
+  subroutine amg_warn_coarse_mat(val,expected)
+    integer(psb_ipk_) :: val, expected
+    if (val /= expected) then
+      write(0,*) 'Warning: resetting COARSE_MAT on an existing hierarchy from ',&
+           & amg_get_coarse_mat_name(val), ' to ',amg_get_coarse_mat_name(expected)
+    end if
+  end subroutine amg_warn_coarse_mat
+
+  
+  function  ml_parms_get_coarse_mat(pm) result(res)
+    implicit none
+    class(amg_ml_parms), intent(in)    :: pm
+    integer(psb_ipk_) :: res
+    res   = pm%coarse_mat
+  end function ml_parms_get_coarse_mat
 
   subroutine  ml_parms_get_coarse(pm,pmin)
     implicit none

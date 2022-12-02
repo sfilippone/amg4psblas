@@ -242,7 +242,6 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
 #else
     call prec%set('COARSE_SOLVE','ILU',info)
 #endif
-
   case default
     write(psb_err_unit,*) name,&
          &': Warning: Unknown preconditioner type request "',ptype,'"'
