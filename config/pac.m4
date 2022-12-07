@@ -608,8 +608,12 @@ dnl Maybe new structure with UMFPACK UFconfig AMD?
 fi
 
 
-if test "x$pac_umf_header_ok" == "xyes" ; then 
-      UMF_LIBS="$UMF_LIBDIR $amg4psblas_cv_umfpack"
+if test "x$pac_umf_header_ok" == "xyes" ; then
+      if  test "x$UMF_LIBDIR" == "x" ; then
+	  UMF_LIBS="$amg4psblas_cv_umfpack"
+      else
+          UMF_LIBS="$UMF_LIBDIR $amg4psblas_cv_umfpack"
+      fi
       LIBS="$UMF_LIBS -lm $LIBS $EXTRA_LIBS";
       AC_MSG_CHECKING([for umfpack_di_symbolic in $UMF_LIBS])
       AC_TRY_LINK_FUNC(umfpack_di_symbolic, 
@@ -632,7 +636,7 @@ if test "x$pac_umf_header_ok" == "xyes" ; then
         dnl Maybe UMFPACK/Lib? 
         UMF_LIBDIR="-L$amg4psblas_cv_umfpackdir/AMD/Lib -L$amg4psblas_cv_umfpackdir/UMFPACK/Lib"
         UMF_LIBS="$amg4psblas_cv_umfpack $UMF_LIBDIR -lm"
-             LIBS="$UMF_LIBS $SAVE_LIBS $EXTRA_LIBS"
+        LIBS="$UMF_LIBS $SAVE_LIBS $EXTRA_LIBS"
       AC_MSG_CHECKING([for umfpack_di_symbolic in $UMF_LIBS])
       AC_TRY_LINK_FUNC(umfpack_di_symbolic, 
        [amg4psblas_cv_have_umfpack=yes;pac_umf_lib_ok=yes; ],
@@ -716,7 +720,11 @@ dnl Maybe Include subdirs?
 fi
 
 if test "x$pac_slu_header_ok" == "xyes" ; then 
- SLU_LIBS="$SLU_LIBS $amg4psblas_cv_superlu"
+   if  test "x$SLU_LIBS" == "x" ; then
+       SLU_LIBS="$amg4psblas_cv_superlu"
+   else
+     SLU_LIBS="$SLU_LIBS $amg4psblas_cv_superlu"
+   fi  
  LIBS="$SLU_LIBS -lm $save_LIBS";
  AC_MSG_CHECKING([for superlu_malloc in $SLU_LIBS])
  AC_TRY_LINK_FUNC(superlu_malloc, 
@@ -841,7 +849,11 @@ dnl Maybe Include subdirs?
 fi
 
 if test "x$pac_sludist_header_ok" == "xyes" ; then 
-      SLUDIST_LIBS="$SLUDIST_LIBS $amg4psblas_cv_superludist"
+      if  test "x$SLUDIST_LIBS" == "x" ; then
+         SLUDIST_LIBS="$amg4psblas_cv_superludist"
+      else
+         SLUDIST_LIBS="$SLUDIST_LIBS $amg4psblas_cv_superludist"
+      fi  
       LIBS="$SLUDIST_LIBS -lm $save_LIBS";
       AC_MSG_CHECKING([for superlu_malloc_dist in $SLUDIST_LIBS])
       AC_TRY_LINK_FUNC(superlu_malloc_dist, 
@@ -1150,7 +1162,11 @@ if test "x$pac_mumps_fmods_ok" == "xno" ; then
 fi   
 
 if test "x$pac_mumps_fmods_ok" == "xyes" || test "x$pac_mumps_fincs_ok" == "xyes" ; then  
-    MUMPS_LIBS="$MUMPS_LIBS $amg4psblas_cv_mumps"
+    if  test "x$MUMPS_LIBS" == "x" ; then
+        MUMPS_LIBS="$amg4psblas_cv_mumps"
+    else
+      MUMPS_LIBS="$MUMPS_LIBS $amg4psblas_cv_mumps"
+    fi  
     LIBS="$MUMPS_LIBS  $save_LIBS  $EXTRA_LIBS";
     AC_MSG_CHECKING([for dmumps in $MUMPS_LIBS])
 			AC_TRY_LINK_FUNC(dmumps, 

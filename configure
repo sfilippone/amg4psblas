@@ -9892,7 +9892,11 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
 fi
 
 if test "x$pac_mumps_fmods_ok" == "xyes" || test "x$pac_mumps_fincs_ok" == "xyes" ; then
-    MUMPS_LIBS="$MUMPS_LIBS $amg4psblas_cv_mumps"
+    if  test "x$MUMPS_LIBS" == "x" ; then
+        MUMPS_LIBS="$amg4psblas_cv_mumps"
+    else
+      MUMPS_LIBS="$MUMPS_LIBS $amg4psblas_cv_mumps"
+    fi
     LIBS="$MUMPS_LIBS  $save_LIBS  $EXTRA_LIBS";
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for dmumps in $MUMPS_LIBS" >&5
 printf %s "checking for dmumps in $MUMPS_LIBS... " >&6; }
@@ -10084,7 +10088,11 @@ fi
 
 
 if test "x$pac_umf_header_ok" == "xyes" ; then
-      UMF_LIBS="$UMF_LIBDIR $amg4psblas_cv_umfpack"
+      if  test "x$UMF_LIBDIR" == "x" ; then
+	  UMF_LIBS="$amg4psblas_cv_umfpack"
+      else
+          UMF_LIBS="$UMF_LIBDIR $amg4psblas_cv_umfpack"
+      fi
       LIBS="$UMF_LIBS -lm $LIBS $EXTRA_LIBS";
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for umfpack_di_symbolic in $UMF_LIBS" >&5
 printf %s "checking for umfpack_di_symbolic in $UMF_LIBS... " >&6; }
@@ -10149,7 +10157,7 @@ printf "%s\n" "$pac_umf_lib_ok" >&6; }
      if test "x$pac_umf_lib_ok" == "xno" ; then
                 UMF_LIBDIR="-L$amg4psblas_cv_umfpackdir/AMD/Lib -L$amg4psblas_cv_umfpackdir/UMFPACK/Lib"
         UMF_LIBS="$amg4psblas_cv_umfpack $UMF_LIBDIR -lm"
-             LIBS="$UMF_LIBS $SAVE_LIBS $EXTRA_LIBS"
+        LIBS="$UMF_LIBS $SAVE_LIBS $EXTRA_LIBS"
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for umfpack_di_symbolic in $UMF_LIBS" >&5
 printf %s "checking for umfpack_di_symbolic in $UMF_LIBS... " >&6; }
       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -10306,7 +10314,11 @@ done
 fi
 
 if test "x$pac_slu_header_ok" == "xyes" ; then
- SLU_LIBS="$SLU_LIBS $amg4psblas_cv_superlu"
+   if  test "x$SLU_LIBS" == "x" ; then
+       SLU_LIBS="$amg4psblas_cv_superlu"
+   else
+     SLU_LIBS="$SLU_LIBS $amg4psblas_cv_superlu"
+   fi
  LIBS="$SLU_LIBS -lm $save_LIBS";
  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for superlu_malloc in $SLU_LIBS" >&5
 printf %s "checking for superlu_malloc in $SLU_LIBS... " >&6; }
@@ -10563,7 +10575,11 @@ done
 fi
 
 if test "x$pac_sludist_header_ok" == "xyes" ; then
-      SLUDIST_LIBS="$SLUDIST_LIBS $amg4psblas_cv_superludist"
+      if  test "x$SLUDIST_LIBS" == "x" ; then
+         SLUDIST_LIBS="$amg4psblas_cv_superludist"
+      else
+         SLUDIST_LIBS="$SLUDIST_LIBS $amg4psblas_cv_superludist"
+      fi
       LIBS="$SLUDIST_LIBS -lm $save_LIBS";
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for superlu_malloc_dist in $SLUDIST_LIBS" >&5
 printf %s "checking for superlu_malloc_dist in $SLUDIST_LIBS... " >&6; }
