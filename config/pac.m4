@@ -609,7 +609,7 @@ fi
 
 
 if test "x$pac_umf_header_ok" == "xyes" ; then 
-      UMF_LIBS="$amg4psblas_cv_umfpack $UMF_LIBDIR"
+      UMF_LIBS="$UMF_LIBDIR $amg4psblas_cv_umfpack"
       LIBS="$UMF_LIBS -lm $LIBS $EXTRA_LIBS";
       AC_MSG_CHECKING([for umfpack_di_symbolic in $UMF_LIBS])
       AC_TRY_LINK_FUNC(umfpack_di_symbolic, 
@@ -619,8 +619,8 @@ if test "x$pac_umf_header_ok" == "xyes" ; then
      if test "x$pac_umf_lib_ok" == "xno" ; then 
         dnl Maybe Lib or lib? 
         UMF_LIBDIR="-L$amg4psblas_cv_umfpackdir/Lib -L$amg4psblas_cv_umfpackdir/lib"
-        UMF_LIBS="$amg4psblas_cv_umfpack $UMF_LIBDIR -lm $SAVE_LIBS  $EXTRA_LIBS"
-        LIBS="$UMF_LIBS"
+        UMF_LIBS="$amg4psblas_cv_umfpack $UMF_LIBDIR -lm"
+        LIBS="$UMF_LIBS $SAVE_LIBS  $EXTRA_LIBS "
         
       AC_MSG_CHECKING([for umfpack_di_symbolic in $UMF_LIBS])
       AC_TRY_LINK_FUNC(umfpack_di_symbolic, 
@@ -631,8 +631,8 @@ if test "x$pac_umf_header_ok" == "xyes" ; then
      if test "x$pac_umf_lib_ok" == "xno" ; then 
         dnl Maybe UMFPACK/Lib? 
         UMF_LIBDIR="-L$amg4psblas_cv_umfpackdir/AMD/Lib -L$amg4psblas_cv_umfpackdir/UMFPACK/Lib"
-        UMF_LIBS="$amg4psblas_cv_umfpack $UMF_LIBDIR -lm $SAVE_LIBS $EXTRA_LIBS"
-             LIBS="$UMF_LIBS"
+        UMF_LIBS="$amg4psblas_cv_umfpack $UMF_LIBDIR -lm"
+             LIBS="$UMF_LIBS $SAVE_LIBS $EXTRA_LIBS"
       AC_MSG_CHECKING([for umfpack_di_symbolic in $UMF_LIBS])
       AC_TRY_LINK_FUNC(umfpack_di_symbolic, 
        [amg4psblas_cv_have_umfpack=yes;pac_umf_lib_ok=yes; ],
@@ -716,7 +716,7 @@ dnl Maybe Include subdirs?
 fi
 
 if test "x$pac_slu_header_ok" == "xyes" ; then 
- SLU_LIBS="$amg4psblas_cv_superlu $SLU_LIBS"
+ SLU_LIBS="$SLU_LIBS $amg4psblas_cv_superlu"
  LIBS="$SLU_LIBS -lm $save_LIBS";
  AC_MSG_CHECKING([for superlu_malloc in $SLU_LIBS])
  AC_TRY_LINK_FUNC(superlu_malloc, 
@@ -813,7 +813,7 @@ elif test "x$amg4psblas_cv_superludistdir" != "x"; then
    SLUDIST_LIBS="-L$amg4psblas_cv_superludistdir"
 fi
 
-LIBS="$SLUDIST_LIBS $save_LIBS"
+LIBS="$save_LIBS $SLUDIST_LIBS"
 CPPFLAGS="$SLUDIST_INCLUDES $save_CPPFLAGS"
 
 AC_CHECK_HEADERS([superlu_ddefs.h],
@@ -841,7 +841,7 @@ dnl Maybe Include subdirs?
 fi
 
 if test "x$pac_sludist_header_ok" == "xyes" ; then 
-      SLUDIST_LIBS="$amg4psblas_cv_superludist $SLUDIST_LIBS"
+      SLUDIST_LIBS="$SLUDIST_LIBS $amg4psblas_cv_superludist"
       LIBS="$SLUDIST_LIBS -lm $save_LIBS";
       AC_MSG_CHECKING([for superlu_malloc_dist in $SLUDIST_LIBS])
       AC_TRY_LINK_FUNC(superlu_malloc_dist, 
@@ -1150,7 +1150,7 @@ if test "x$pac_mumps_fmods_ok" == "xno" ; then
 fi   
 
 if test "x$pac_mumps_fmods_ok" == "xyes" || test "x$pac_mumps_fincs_ok" == "xyes" ; then  
-    MUMPS_LIBS="$amg4psblas_cv_mumps $MUMPS_LIBS"
+    MUMPS_LIBS="$MUMPS_LIBS $amg4psblas_cv_mumps"
     LIBS="$MUMPS_LIBS  $save_LIBS  $EXTRA_LIBS";
     AC_MSG_CHECKING([for dmumps in $MUMPS_LIBS])
 			AC_TRY_LINK_FUNC(dmumps, 
