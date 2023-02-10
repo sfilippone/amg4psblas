@@ -14,8 +14,7 @@ void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
     {
 
 #pragma omp for schedule(static)
-        for (v = 0; v < NLVer; v++)
-        {
+        for (v = 0; v < NLVer; v++) {
 #ifdef PRINT_DEBUG_INFO_
             cout << "\n(" << myRank << ")Processing: " << v + StartIndex << endl;
             fflush(stdout);

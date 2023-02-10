@@ -17,16 +17,13 @@ MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
     MilanInt w = -1;
     MilanReal heaviestEdgeWt = MilanRealMin; // Assign the smallest Value possible first LDBL_MIN
     int finalK;
-    for (int k = adj1; k < adj2; k++)
-    {
-
-        if ((edgeLocWeight[k] > heaviestEdgeWt) ||
-            ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k])))
-        {
-            heaviestEdgeWt = edgeLocWeight[k];
-            w = verLocInd[k];
-            finalK = k;
-        }
+    for (int k = adj1; k < adj2; k++) {
+      if ((edgeLocWeight[k] > heaviestEdgeWt) ||
+	  ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k])))     {
+	heaviestEdgeWt = edgeLocWeight[k];
+	w = verLocInd[k];
+	finalK = k;
+      }
     } // End of for loop
     return finalK;
 }
@@ -60,19 +57,17 @@ MilanLongInt computeCandidateMate(MilanLongInt adj1,
 
     MilanInt w = -1;
     MilanReal heaviestEdgeWt = MilanRealMin; // Assign the smallest Value possible first LDBL_MIN
-    for (k = adj1; k < adj2; k++)
-    {
-        if (isAlreadyMatched(verLocInd[k], StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap))
-            continue;
-
-        if ((edgeLocWeight[k] > heaviestEdgeWt) ||
-            ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k])))
-        {
-            heaviestEdgeWt = edgeLocWeight[k];
-            w = verLocInd[k];
-        }
+    for (k = adj1; k < adj2; k++)   {
+      if (isAlreadyMatched(verLocInd[k], StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap))
+	continue;
+      
+      if ((edgeLocWeight[k] > heaviestEdgeWt) ||
+	  ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k])))     {
+	heaviestEdgeWt = edgeLocWeight[k];
+	w = verLocInd[k];
+      }
     } // End of for loop
       //  End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
-
+    
     return w;
 }

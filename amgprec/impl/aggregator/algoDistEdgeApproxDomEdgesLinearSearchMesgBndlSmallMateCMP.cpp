@@ -70,7 +70,7 @@
  Statistics: ph0_time, ph1_time, ph2_time: Runtimes
  Statistics: ph1_card, ph2_card : Size: |P| number of processes in the comm-world (number of matched edges in Phase 1 and Phase 2)
  */
-
+//#define DEBUG_HANG_
 #ifdef SERIAL_MPI
 #else
 
@@ -110,17 +110,24 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 #endif
 
 #ifdef PRINT_DEBUG_INFO_
-    cout << "\n(" << myRank << ") verDistance [" << verDistance[0] << "," << verDistance[1] << "," << verDistance[2] << "," << verDistance[3] << "]";
+    cout << "\n(" << myRank << ") verDistance [" ;
+    for (int i = 0; i < numProcs; i++)
+      cout << verDistance[i] << "," << verDistance[i+1];
+    cout  << "]\n";
     fflush(stdout);
 #endif
 #ifdef DEBUG_HANG_
-    if (myRank == 0)
-        cout << "\n(" << myRank << ") verDistance [" << verDistance[0] << "," << verDistance[1] << "," << verDistance[2] << "," << verDistance[3] << "]";
+    if (myRank == 0) {
+      cout << "\n(" << myRank << ") verDistance [" ;
+      for (int i = 0; i < numProcs; i++)
+	cout << verDistance[i] << "," ;
+      cout  << verDistance[numProcs]<< "]\n";
+    }
     fflush(stdout);
 #endif
 
     MilanLongInt StartIndex = verDistance[myRank];       // The starting vertex owned by the current rank
-    MilanLongInt EndIndex = verDistance[myRank + 1] - 1; // The ending vertex owned by the current rank
+    MilanLongInt EndIndex   = verDistance[myRank + 1] - 1; // The ending vertex owned by the current rank
 
     MPI_Status computeStatus;
 
@@ -211,7 +218,11 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 
     finishTime = MPI_Wtime();
     *ph0_time = finishTime - startTime; // Time taken for Phase-0: Initialization
-
+#ifdef DEBUG_HANG_
+    cout << myRank << " Finished initialization" << endl;
+    fflush(stdout);
+#endif
+   
     startTime = MPI_Wtime();
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -233,6 +244,17 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                       edgeLocWeight,
                                       candidateMate);
 
+#ifdef DEBUG_HANG_
+    cout << myRank << " Finished Exposed Vertex" << endl;
+    fflush(stdout);
+#if 0
+    cout << myRank << " candidateMate after parallelCompute " <<endl;
+    for (int i=0; i<NLVer; i++) {
+      cout << candidateMate[i] << " " ;
+    }
+    cout << endl;
+#endif
+#endif
     /*
      * PARALLEL_PROCESS_EXPOSED_VERTEX_B
      * TODO: write comment
@@ -271,6 +293,18 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                                       privateQOwner);
 
     tempCounter.clear(); // Do not need this any more
+
+#ifdef DEBUG_HANG_
+    cout << myRank << " Finished Exposed Vertex" << endl;
+    fflush(stdout);
+#if 0
+    cout << myRank << " Mate after Exposed Vertices " <<endl;
+    for (int i=0; i<NLVer; i++) {
+      cout << Mate[i] << " " ;
+    }
+    cout << endl;
+#endif
+#endif
 
     ///////////////////////////////////////////////////////////////////////////////////
     /////////////////////////// PROCESS MATCHED VERTICES //////////////////////////////
@@ -311,6 +345,19 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                            privateQMsgType,
                            privateQOwner);
 
+
+#ifdef DEBUG_HANG_
+    cout << myRank << " Finished Process Vertices" << endl;
+    fflush(stdout);
+#if 0
+    cout << myRank << " Mate after Matched Vertices " <<endl;
+    for (int i=0; i<NLVer; i++) {
+      cout << Mate[i] << " " ;
+    }
+    cout << endl;
+#endif
+#endif
+
     /////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////// SEND BUNDLED MESSAGES /////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -339,6 +386,12 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 
     finishTime = MPI_Wtime();
     *ph1_time = finishTime - startTime; // Time taken for Phase-1
+
+#ifdef DEBUG_HANG_
+    cout << myRank << " Finished sendBundles" << endl;
+    fflush(stdout);
+#endif
+ 
     *ph1_card = myCard;                 // Cardinality at the end of Phase-1
     startTime = MPI_Wtime();
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -360,65 +413,72 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     fflush(stdout);
 #endif
 
-    while (true)
-    {
+    while (true)  {
 #ifdef DEBUG_HANG_
-        if (myRank == 0)
-            cout << "\n(" << myRank << ") Main loop" << endl;
-        fflush(stdout);
+      //if (myRank == 0)
+      cout << "\n(" << myRank << ") Main loop" << endl;
+      fflush(stdout);
 #endif
         ///////////////////////////////////////////////////////////////////////////////////
         /////////////////////////// PROCESS MATCHED VERTICES //////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////
-
-        processMatchedVerticesAndSendMessages(NLVer,
-                                              UChunkBeingProcessed,
-                                              U,
-                                              privateU,
-                                              StartIndex,
-                                              EndIndex,
-                                              &myCard,
-                                              &msgInd,
-                                              &NumMessagesBundled,
-                                              &S,
-                                              verLocPtr,
-                                              verLocInd,
-                                              verDistance,
-                                              PCounter,
-                                              Counter,
-                                              myRank,
-                                              numProcs,
-                                              candidateMate,
-                                              GMate,
-                                              Mate,
-                                              Ghost2LocalMap,
-                                              edgeLocWeight,
-                                              QLocalVtx,
-                                              QGhostVtx,
-                                              QMsgType,
-                                              QOwner,
-                                              privateQLocalVtx,
-                                              privateQGhostVtx,
-                                              privateQMsgType,
-                                              privateQOwner,
-                                              comm,
-                                              &msgActual,
-                                              Message);
-
-        ///////////////////////// END OF PROCESS MATCHED VERTICES /////////////////////////
+      
+      processMatchedVerticesAndSendMessages(NLVer,
+					    UChunkBeingProcessed,
+					    U,
+					    privateU,
+					    StartIndex,
+					    EndIndex,
+					    &myCard,
+					    &msgInd,
+					    &NumMessagesBundled,
+					    &S,
+					    verLocPtr,
+					    verLocInd,
+					    verDistance,
+					    PCounter,
+					    Counter,
+					    myRank,
+					    numProcs,
+					    candidateMate,
+					    GMate,
+					    Mate,
+					    Ghost2LocalMap,
+					    edgeLocWeight,
+					    QLocalVtx,
+					    QGhostVtx,
+					    QMsgType,
+					    QOwner,
+					    privateQLocalVtx,
+					    privateQGhostVtx,
+					    privateQMsgType,
+					    privateQOwner,
+					    comm,
+					    &msgActual,
+					    Message);
+      
+      ///////////////////////// END OF PROCESS MATCHED VERTICES /////////////////////////
 
         //// BREAK IF NO MESSAGES EXPECTED /////////
+#ifdef DEBUG_HANG_
+#if 0
+      cout << myRank << " Mate after ProcessMatchedAndSend phase "<<S <<endl;
+      for (int i=0; i<NLVer; i++) {
+	cout << Mate[i] << " " ;
+      }
+      cout << endl;
+#endif
+#endif
 #ifdef PRINT_DEBUG_INFO_
         cout << "\n(" << myRank << ")Deciding whether to break: S= " << S << endl;
 #endif
 
-        if (S == 0)
-        {
+        if (S == 0) {
 #ifdef DEBUG_HANG_
-            cout << "\n(" << myRank << ") Breaking out" << endl;
-            fflush(stdout);
+	  cout << "\n(" << myRank << ") Breaking out" << endl;
+	  fflush(stdout);
 #endif
-            break;
+	  break;
         }
         ///////////////////////////////////////////////////////////////////////////////////
         /////////////////////////// PROCESS MESSAGES //////////////////////////////////////
@@ -451,6 +511,15 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
                         U);
 
         ///////////////////////// END OF PROCESS MESSAGES /////////////////////////////////
+#ifdef DEBUG_HANG_
+#if 0
+      cout << myRank << " Mate after ProcessMessages phase "<<S <<endl;
+      for (int i=0; i<NLVer; i++) {
+	cout << Mate[i] << " " ;
+      }
+      cout << endl;
+#endif
+#endif
 #ifdef PRINT_DEBUG_INFO_
         cout << "\n(" << myRank << ")Finished Message processing phase: S= " << S;
         fflush(stdout);
