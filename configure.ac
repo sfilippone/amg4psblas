@@ -98,6 +98,7 @@ AC_PREREQ(2.59)
 #
 #
 AC_PROG_INSTALL
+INSTALL="${INSTALL} -p"
 
 AC_MSG_CHECKING([where to install])
 case $prefix in  
