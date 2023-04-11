@@ -58,6 +58,7 @@ module amg_c_ainv_solver
     procedure, pass(sv) :: check   => amg_c_ainv_solver_check
     procedure, pass(sv) :: build   => amg_c_ainv_solver_bld
     procedure, pass(sv) :: clone   => amg_c_ainv_solver_clone
+    procedure, pass(sv) :: clone_settings   => amg_c_ainv_solver_clone_settings
     procedure, pass(sv) :: cseti   => amg_c_ainv_solver_cseti
     procedure, pass(sv) :: csetc   => amg_c_ainv_solver_csetc
     procedure, pass(sv) :: csetr   => amg_c_ainv_solver_csetr
@@ -85,6 +86,16 @@ module amg_c_ainv_solver
     end subroutine amg_c_ainv_solver_clone
   end interface
 
+  interface
+    subroutine amg_c_ainv_solver_clone_settings(sv,svout,info)
+      import :: psb_desc_type, psb_cspmat_type,  psb_c_base_sparse_mat, &
+       & amg_c_base_solver_type, psb_dpk_, amg_c_ainv_solver_type, psb_ipk_
+      Implicit None
+      class(amg_c_ainv_solver_type), intent(inout)              :: sv
+      class(amg_c_base_solver_type), allocatable, intent(inout) :: svout
+      integer(psb_ipk_), intent(out)                            :: info
+    end subroutine amg_c_ainv_solver_clone_settings
+  end interface
 
   interface
     subroutine amg_c_ainv_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
