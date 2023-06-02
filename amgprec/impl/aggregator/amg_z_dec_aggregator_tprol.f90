@@ -97,6 +97,8 @@ subroutine  amg_z_dec_aggregator_build_tprol(ag,parms,ag_data,&
   integer(psb_lpk_)   :: ntaggr
   integer(psb_ipk_)   :: debug_level, debug_unit
   logical             :: clean_zeros
+  integer(psb_ipk_), save :: idx_map_bld=-1, idx_map_tprol=-1
+  logical, parameter      :: do_timings=.false.
 
   name='amg_z_dec_aggregator_tprol'
   call psb_erractionsave(err_act)
@@ -108,6 +110,10 @@ subroutine  amg_z_dec_aggregator_build_tprol(ag,parms,ag_data,&
   info  = psb_success_
   ctxt = desc_a%get_context()
   call psb_info(ctxt,me,np)
+  if ((do_timings).and.(idx_map_bld==-1))       &
+       & idx_map_bld = psb_get_timer_idx("DEC_TPROL: map_bld")
+  if ((do_timings).and.(idx_map_tprol==-1))     &
+       & idx_map_tprol = psb_get_timer_idx("DEC_TPROL: map_tprol")
 
   call amg_check_def(parms%ml_cycle,'Multilevel cycle',&
        &   amg_mult_ml_,is_legal_ml_cycle)
@@ -121,10 +127,14 @@ subroutine  amg_z_dec_aggregator_build_tprol(ag,parms,ag_data,&
   ! The decoupled aggregator based on SOC measures ignores
   ! ag_data except for clean_zeros; soc_map_bld is a procedure pointer.
   !
+  if (do_timings) call psb_tic(idx_map_bld)
   clean_zeros = ag%do_clean_zeros
   call ag%soc_map_bld(parms%aggr_ord,parms%aggr_thresh,clean_zeros,a,desc_a,nlaggr,ilaggr,info)
+  if (do_timings) call psb_toc(idx_map_bld)
+  if (do_timings) call psb_tic(idx_map_tprol)
 
   if (info==psb_success_) call amg_map_to_tprol(desc_a,ilaggr,nlaggr,t_prol,info)
+  if (do_timings) call psb_toc(idx_map_tprol)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='soc_map_bld/map_to_tprol')

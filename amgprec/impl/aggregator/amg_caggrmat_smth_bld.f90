@@ -140,6 +140,9 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   real(psb_spk_)     :: anorm, omega, tmp, dg, theta
   logical, parameter :: debug_new=.false.
   character(len=80) :: filename
+  logical, parameter :: do_timings=.false.
+  integer(psb_ipk_), save :: idx_spspmm=-1, idx_phase1=-1, idx_gtrans=-1, idx_phase2=-1, idx_refine=-1
+  integer(psb_ipk_), save :: idx_phase3=-1, idx_cdasb=-1, idx_ptap=-1
 
   name='amg_aggrmat_smth_bld'
   info=psb_success_
@@ -153,6 +156,23 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
+  if ((do_timings).and.(idx_spspmm==-1)) &
+       & idx_spspmm = psb_get_timer_idx("DEC_SMTH_BLD: par_spspmm")
+  if ((do_timings).and.(idx_phase1==-1)) &
+       & idx_phase1 = psb_get_timer_idx("DEC_SMTH_BLD: phase1    ")
+  if ((do_timings).and.(idx_phase2==-1)) &
+       & idx_phase2 = psb_get_timer_idx("DEC_SMTH_BLD: phase2    ")
+  if ((do_timings).and.(idx_phase3==-1)) &
+       & idx_phase3 = psb_get_timer_idx("DEC_SMTH_BLD: phase3    ")
+  if ((do_timings).and.(idx_gtrans==-1)) &
+       & idx_gtrans = psb_get_timer_idx("DEC_SMTH_BLD: gtrans    ")
+  if ((do_timings).and.(idx_refine==-1)) &
+       & idx_refine = psb_get_timer_idx("DEC_SMTH_BLD: refine    ")
+  if ((do_timings).and.(idx_cdasb==-1)) &
+       & idx_cdasb = psb_get_timer_idx("DEC_SMTH_BLD: cdasb     ")
+  if ((do_timings).and.(idx_ptap==-1)) &
+       & idx_ptap = psb_get_timer_idx("DEC_SMTH_BLD: ptap_bld  ")
+
 
   nglob = desc_a%get_global_rows()
   nrow  = desc_a%get_local_rows()
@@ -171,6 +191,7 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   ! naggr: number of local aggregates
   ! nrow: local rows. 
   ! 
+  if (do_timings) call psb_tic(idx_phase1)
 
   ! Get the diagonal D
   adiag = a%get_diag(info)
@@ -196,7 +217,7 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
     !
     ! Build the filtered matrix Af from A
     ! 
-
+    !$OMP parallel do private(i,j,tmp,jd) schedule(static)
     do i=1, nrow
       tmp = czero
       jd  = -1 
@@ -214,11 +235,13 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
         acsrf%val(jd)=acsrf%val(jd)-tmp
       end if
     enddo
+    !$OMP end parallel do 
     ! Take out zeroed terms 
     call acsrf%clean_zeros(info)
   end if
 
 
+  !$OMP parallel do private(i) schedule(static)
   do i=1,size(adiag)
     if (adiag(i) /= czero) then
       adiag(i) = cone / adiag(i)
@@ -226,7 +249,7 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
       adiag(i) = cone
     end if
   end do
-
+  !$OMP end parallel do 
   if (parms%aggr_omega_alg == amg_eig_est_) then 
 
     if (parms%aggr_eig == amg_max_norm_) then 
@@ -252,8 +275,9 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
     call psb_errpush(info,name,a_err='invalid amg_aggr_omega_alg_')
     goto 9999
   end if
+  if (do_timings) call psb_toc(idx_phase1)
 
-  
+  if (do_timings) call psb_tic(idx_phase2)
   call acsrf%scal(adiag,info)
   if (info /= psb_success_) goto 9999
 
@@ -267,6 +291,8 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
 
   call psb_cdasb(desc_ac,info)
   call psb_cd_reinit(desc_ac,info)
+  if (do_timings) call psb_toc(idx_phase2)
+  if (do_timings) call psb_tic(idx_phase3)
   !
   ! Build the smoothed prolongator using either A or Af
   !    acsr1 = (I-w*D*A) Prol      acsr1 = (I-w*D*Af) Prol 
@@ -279,8 +305,8 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
     call psb_errpush(psb_err_from_subroutine_,name,a_err='spspmm 1')
     goto 9999
   end if
-
-
+  if (do_timings) call psb_toc(idx_phase3)
+  if (do_timings) call psb_tic(idx_ptap)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Done SPSPMM 1'
@@ -292,7 +318,7 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
 
   call op_prol%mv_from(coo_prol)
   call op_restr%mv_from(coo_restr)
-
+  if (do_timings) call psb_toc(idx_ptap)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Done smooth_aggregate '
