@@ -109,6 +109,8 @@ subroutine amg_d_base_onelev_mat_asb(lv,a,desc_a,ilaggr,nlaggr,t_prol,info)
   type(psb_dspmat_type)    :: ac, op_restr, op_prol
   integer(psb_ipk_)        :: nzl, inl
   integer(psb_ipk_)        :: debug_level, debug_unit
+  integer(psb_ipk_), save  :: idx_matbld=-1, idx_matasb=-1, idx_mapbld=-1
+  logical, parameter :: do_timings=.false.
 
   name='amg_d_onelev_mat_asb'
   call psb_erractionsave(err_act)
@@ -120,6 +122,12 @@ subroutine amg_d_base_onelev_mat_asb(lv,a,desc_a,ilaggr,nlaggr,t_prol,info)
   info  = psb_success_
   ctxt = desc_a%get_context()
   call psb_info(ctxt,me,np)
+  if ((do_timings).and.(idx_matbld==-1))       &
+       & idx_matbld = psb_get_timer_idx("LEV_MASB: mat_bld")
+  if ((do_timings).and.(idx_matasb==-1))     &
+       & idx_matasb = psb_get_timer_idx("LEV_MASB: mat_asb")
+  if ((do_timings).and.(idx_mapbld==-1))       &
+       & idx_mapbld = psb_get_timer_idx("LEV_MASB: map_bld")
 
   call amg_check_def(lv%parms%aggr_prol,'Smoother',&
        &   amg_smooth_prol_,is_legal_ml_aggr_prol)
@@ -139,9 +147,10 @@ subroutine amg_d_base_onelev_mat_asb(lv,a,desc_a,ilaggr,nlaggr,t_prol,info)
   ! the mapping defined by amg_aggrmap_bld and applying the aggregation
   ! algorithm specified by lv%iprcparm(amg_aggr_prol_)
   !
+  if (do_timings) call psb_tic(idx_matbld)
   call lv%aggr%mat_bld(lv%parms,a,desc_a,ilaggr,nlaggr,&
        & lv%ac,lv%desc_ac,op_prol,op_restr,t_prol,info)
-
+  if (do_timings) call psb_toc(idx_matbld)
   if(info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_aggrmat_asb')
     goto 9999
@@ -151,14 +160,17 @@ subroutine amg_d_base_onelev_mat_asb(lv,a,desc_a,ilaggr,nlaggr,t_prol,info)
   ! Now build its descriptor and convert global indices for
   ! ac, op_restr and op_prol
   !
+  if (do_timings) call psb_tic(idx_matasb)
   if (info == psb_success_) &
        & call lv%aggr%mat_asb(lv%parms,a,desc_a,&
        & lv%ac,lv%desc_ac,op_prol,op_restr,info)
-  
+  if (do_timings) call psb_toc(idx_matasb)
+  if (do_timings) call psb_tic(idx_mapbld)  
   if (info == psb_success_) call lv%ac%cscnv(info,type='csr',dupl=psb_dupl_add_)
   
   if (info == psb_success_) call lv%aggr%bld_map(desc_a, lv%desc_ac,&
        & ilaggr,nlaggr,op_restr,op_prol,lv%linmap,info)
+  if (do_timings) call psb_toc(idx_mapbld)  
   if(info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='mat_asb/map_bld')
     goto 9999

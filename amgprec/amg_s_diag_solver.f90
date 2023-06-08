@@ -219,7 +219,7 @@ contains
 
   end subroutine s_diag_solver_free
 
-  subroutine s_diag_solver_descr(sv,info,iout,coarse)
+  subroutine s_diag_solver_descr(sv,info,iout,coarse,prefix)
 
     Implicit None
 
@@ -228,11 +228,13 @@ contains
     integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_), intent(in), optional     :: iout
     logical, intent(in), optional               :: coarse
+    character(len=*), intent(in), optional      :: prefix
 
     ! Local variables
     integer(psb_ipk_)      :: err_act
     character(len=20), parameter :: name='amg_s_diag_solver_descr'
     integer(psb_ipk_) :: iout_
+    character(1024)    :: prefix_
 
     info = psb_success_
     if (present(iout)) then 
@@ -240,8 +242,13 @@ contains
     else
       iout_ = psb_out_unit
     endif
-    
-    write(iout_,*) '  Diagonal local solver '
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
+
+    write(iout_,*) trim(prefix_), '  Diagonal local solver '
 
     return
 
@@ -352,7 +359,7 @@ module amg_s_l1_diag_solver
   
 contains
 
-  subroutine s_l1_diag_solver_descr(sv,info,iout,coarse)
+  subroutine s_l1_diag_solver_descr(sv,info,iout,coarse,prefix)
 
     Implicit None
 
@@ -361,11 +368,13 @@ contains
     integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_), intent(in), optional     :: iout
     logical, intent(in), optional               :: coarse
+    character(len=*), intent(in), optional  :: prefix
 
     ! Local variables
     integer(psb_ipk_)      :: err_act
     character(len=20), parameter :: name='amg_s_l1_diag_solver_descr'
     integer(psb_ipk_) :: iout_
+    character(1024)    :: prefix_
 
     info = psb_success_
     if (present(iout)) then 
@@ -373,8 +382,13 @@ contains
     else
       iout_ = psb_out_unit
     endif
-    
-    write(iout_,*) '  L1 Diagonal solver '
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
+
+    write(iout_,*) trim(prefix_), '  L1 Diagonal solver '
 
     return
 

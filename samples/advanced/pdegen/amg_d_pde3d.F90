@@ -74,6 +74,9 @@ program amg_d_pde3d
   use amg_d_pde3d_exp_mod
   use amg_d_pde3d_gauss_mod
   use amg_d_genpde_mod
+#if defined(OPENMP)
+  use omp_lib
+#endif
   implicit none
 
   ! input parameters
@@ -94,7 +97,7 @@ program amg_d_pde3d
   type(psb_d_vect_type) :: x,b,r
   ! parallel environment
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: iam, np
+  integer(psb_ipk_)   :: iam, np, nth
 
   ! solver parameters
   integer(psb_ipk_)        :: iter, itmax,itrace, istopc, irst, nlv
@@ -201,6 +204,15 @@ program amg_d_pde3d
 
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
+#if defined(OPENMP)
+  !$OMP parallel shared(nth)
+  !$OMP master
+  nth = omp_get_num_threads()
+  !$OMP end master
+  !$OMP end parallel
+#else
+  nth = 1
+#endif
 
   if (iam < 0) then
     ! This should not happen, but just in case
@@ -464,6 +476,8 @@ program amg_d_pde3d
   call prec%descr(info,iout=psb_out_unit)
   if (iam == psb_root_) then
     write(psb_out_unit,'("Computed solution on ",i8," processors")')  np
+    write(psb_out_unit,'("Number of threads                  : ",i12)') nth
+    write(psb_out_unit,'("Total number of tasks              : ",i12)') nth*np
     write(psb_out_unit,'("Linear system size                 : ",i12)') system_size
     write(psb_out_unit,'("PDE Coefficients                   : ",a)') trim(pdecoeff)
     write(psb_out_unit,'("Krylov method                      : ",a)') trim(s_choice%kmethd)

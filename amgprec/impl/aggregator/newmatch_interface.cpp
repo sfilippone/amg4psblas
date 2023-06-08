@@ -99,8 +99,8 @@ psb_i_t dnew_Match_If(psb_i_t ipar, psb_i_t matching, psb_d_t lambda,
    } else if (lambda >= 0 && lambda <= 1.0){
      lambda = lambda*eps + (1.0-lambda)*(fmax(maxweight-2.0*minweight,0.0) );
    }
-   fprintf(stderr,"Calling matching:  pre %d nt %d  lambda %g   %g  %g\n",
-	   preprocess,nt,lambda,maxweight,minweight);
+   //fprintf(stderr,"Calling matching:  pre %d nt %d  lambda %g   %g  %g\n",
+   //	   preprocess,nt,lambda,maxweight,minweight);
    
    runRomaWrapper(s,t,weights, nr, mateNode,preprocess,romaInput,lambda ,nt, pstat, timeDiff);
    /* loop here only makes sense when nr==nz */

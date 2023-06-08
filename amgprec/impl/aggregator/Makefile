@@ -70,13 +70,31 @@ amg_d_newmatch_spmm_bld_ov.o
 
 MPCXXOBJS=MatchBoxPC.o \
 algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.o \
-newmatch_interface.o
+newmatch_interface.o \
+sendBundledMessages.o \
+initialize.o \
+extractUChunk.o \
+isAlreadyMatched.o \
+findOwnerOfGhost.o \
+clean.o \
+computeCandidateMate.o \
+parallelComputeCandidateMateB.o \
+processMatchedVertices.o \
+processMatchedVerticesAndSendMessages.o \
+processCrossEdge.o \
+queueTransfer.o \
+processMessages.o \
+processExposedVertex.o \
+algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP.o \
+MatchingAlgorithms.o
 
 OBJS = $(FOBJS) $(MPCOBJS) $(MPCXXOBJS) 
 
 LIBNAME=libamg_prec.a
 
-lib:  $(OBJS)
+objs: $(OBJS)
+
+lib:  objs
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 

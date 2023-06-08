@@ -35,7 +35,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amg_d_ainv_solver_descr(sv,info,iout,coarse)
+subroutine amg_d_ainv_solver_descr(sv,info,iout,coarse,prefix)
 
 
   use psb_base_mod
@@ -48,11 +48,13 @@ subroutine amg_d_ainv_solver_descr(sv,info,iout,coarse)
   integer(psb_ipk_), intent(out)            :: info
   integer(psb_ipk_), intent(in), optional   :: iout
   logical, intent(in), optional             :: coarse
+  character(len=*), intent(in), optional  :: prefix
 
   ! Local variables
   integer(psb_ipk_)      :: err_act
   character(len=20), parameter :: name='amg_d_ainv_solver_descr'
   integer(psb_ipk_)      :: iout_
+  character(1024)    :: prefix_
 
   call psb_erractionsave(err_act)
   info = psb_success_
@@ -61,11 +63,16 @@ subroutine amg_d_ainv_solver_descr(sv,info,iout,coarse)
   else
     iout_ = 6
   endif
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
 
-  write(iout_,*) '  AINV: Approximate Inverse with sparse biconjugation '
-  write(iout_,*) '  Algorithm variant      : ',sv%algname(sv%alg)
-  write(iout_,*) '  Fill level             : ',sv%fill_in
-  write(iout_,*) '  Fill threshold         : ',sv%thresh
+  write(iout_,*) trim(prefix_), '  AINV: Approximate Inverse with sparse biconjugation '
+  write(iout_,*) trim(prefix_), '  Algorithm variant      : ',sv%algname(sv%alg)
+  write(iout_,*) trim(prefix_), '  Fill level             : ',sv%fill_in
+  write(iout_,*) trim(prefix_), '  Fill threshold         : ',sv%thresh
 
   call psb_erractionrestore(err_act)
   return

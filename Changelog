@@ -1,5 +1,6 @@
 Changelog. A lot less detailed than usual, at least for past
 	history.
+2022/05/20: Restart ChangeLog. Updated to new name AMG4PSBLAS, now using PSB3.8	
 2018/10/28: Fix interface to MUMPS and configry machinery. Require PSB 3.6.
 2018/10/10: ICTXT argument in prec%init().	
 2018/07/30: Fixes for Intel compilers. BootCMatch interface in examples. 	

@@ -63,17 +63,20 @@ OBJS=$(MODOBJS)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=libamg_prec.a
 
-all: lib impld
+all: objs impld
 
-impld: $(OBJS)
-	$(MAKE) -C impl
+objs: $(OBJS)
+	/bin/cp -p amg_const.h $(INCDIR)
+	/bin/cp -p *$(.mod) $(MODDIR)
+
+impld: objs
+	cd impl && $(MAKE) 
 
 lib: $(OBJS) impld
+	cd impl && $(MAKE) lib
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p amg_const.h $(INCDIR)
-	/bin/cp -p *$(.mod) $(MODDIR)
 
 
 $(MODOBJS): $(PSBLAS_MODDIR)/$(PSBBASEMODNAME)$(.mod)
@@ -221,4 +224,4 @@ clean: implclean
 	/bin/rm -f $(OBJS) $(LOCAL_MODS) *$(.mod)
 
 implclean:
-	$(MAKE) -C impl clean
+	cd impl && $(MAKE) clean

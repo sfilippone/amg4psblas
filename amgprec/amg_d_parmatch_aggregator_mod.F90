@@ -132,8 +132,6 @@ module amg_d_parmatch_aggregator_mod
     type(psb_dspmat_type), allocatable  :: prol, restr
     type(psb_dspmat_type), allocatable  :: ac, base_a, rwa
     type(psb_desc_type), allocatable    :: desc_ac, desc_ax, base_desc, rwdesc
-    integer(psb_ipk_) :: max_csize
-    integer(psb_ipk_) :: max_nlevels
     logical           :: reproducible_matching = .false.
     logical           :: need_symmetrize       = .false.
     logical           :: unsmoothed_hierarchy  = .true.
@@ -392,18 +390,25 @@ contains
 
   end function amg_d_parmatch_aggregator_sizeof
 
-  subroutine  amg_d_parmatch_aggregator_descr(ag,parms,iout,info)
+  subroutine  amg_d_parmatch_aggregator_descr(ag,parms,iout,info,prefix)
     implicit none
     class(amg_d_parmatch_aggregator_type), intent(in) :: ag
     type(amg_dml_parms), intent(in)   :: parms
     integer(psb_ipk_), intent(in)  :: iout
     integer(psb_ipk_), intent(out) :: info
+    character(len=*), intent(in), optional  :: prefix
+    character(1024)    :: prefix_
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
 
-    write(iout,*) 'Parallel Matching Aggregator'
-    write(iout,*) '   Number of matching  sweeps: ',ag%n_sweeps
-    write(iout,*) '   Matching algorithm         : MatchBoxP (PREIS)'
-    write(iout,*) 'Aggregator object type: ',ag%fmt()
-    call parms%mldescr(iout,info)
+    write(iout,*) trim(prefix_),' ','Parallel Matching Aggregator'
+    write(iout,*) trim(prefix_),' ','   Number of matching  sweeps: ',ag%n_sweeps
+    write(iout,*) trim(prefix_),' ','   Matching algorithm         : MatchBoxP (PREIS)'
+    write(iout,*) trim(prefix_),' ','Aggregator object type: ',ag%fmt()
+    call parms%mldescr(iout,info,prefix=prefix)
 
     return
   end subroutine amg_d_parmatch_aggregator_descr
@@ -452,10 +457,10 @@ contains
            & agnext%matching_alg = ag%matching_alg
       if (.not.is_legal_nsweeps(agnext%n_sweeps))&
            & agnext%n_sweeps     = ag%n_sweeps
-      if (.not.is_legal_csize(agnext%max_csize))&
-           & agnext%max_csize    = ag%max_csize
-      if (.not.is_legal_nlevels(agnext%max_nlevels))&
-           & agnext%max_nlevels  = ag%max_nlevels
+!!$      if (.not.is_legal_csize(agnext%max_csize))&
+!!$           & agnext%max_csize    = ag%max_csize
+!!$      if (.not.is_legal_nlevels(agnext%max_nlevels))&
+!!$           & agnext%max_nlevels  = ag%max_nlevels
       ! Is this going to generate shallow copies/memory leaks/double frees?
       ! To be investigated further.
       call psb_safe_ab_cpy(ag%w_nxt,agnext%w,info)
@@ -540,10 +545,6 @@ contains
     case('AGGR_SIZE')
       ag%orig_aggr_size = val
       ag%n_sweeps=max(1,ceiling(log(val*1.0)/log(2.0)))
-    case('PRMC_MAX_CSIZE')
-      ag%max_csize=val
-    case('PRMC_MAX_NLEVELS')
-      ag%max_nlevels=val
     case('PRMC_W_SIZE')
       call ag%bld_default_w(val)
     case('PRMC_REPRODUCIBLE_MATCHING')
@@ -569,8 +570,8 @@ contains
     ag%matching_alg  = 0
     ag%n_sweeps      = 1
     ag%jacobi_sweeps = 0
-    ag%max_nlevels   = 36
-    ag%max_csize     = -1
+!!$    ag%max_nlevels   = 36
+!!$    ag%max_csize     = -1
     !
     ! Apparently BootCMatch works better
     ! by keeping all entries

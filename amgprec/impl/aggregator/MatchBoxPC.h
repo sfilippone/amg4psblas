@@ -52,145 +52,412 @@
 
 #ifndef _matchboxpC_H_
 #define _matchboxpC_H_
-//Turn on a lot of debugging information with this switch:
+// Turn on a lot of debugging information with this switch:
 //#define PRINT_DEBUG_INFO_
 #include <stdio.h>
 #include <iostream>
 #include <assert.h>
 #include <map>
 #include <vector>
-// #include "matchboxp.h"
+#include "omp.h"
 #include "primitiveDataTypeDefinitions.h"
 #include "dataStrStaticQueue.h"
 
 using namespace std;
 
+const int NUM_THREAD = 4;
+const int UCHUNK = 10;
+
+const MilanLongInt REQUEST = 1;
+const MilanLongInt SUCCESS = 2;
+const MilanLongInt FAILURE = 3;
+const MilanLongInt SIZEINFO = 4;
+
+const int ComputeTag = 7; // Predefined tag
+const int BundleTag = 9;  // Predefined tag
+
+static vector<MilanLongInt> DEFAULT_VECTOR;
+
+// MPI type map
+template <typename T>
+MPI_Datatype TypeMap();
+template <>
+inline MPI_Datatype TypeMap<int64_t>() { return MPI_LONG_LONG; }
+template <>
+inline MPI_Datatype TypeMap<int>() { return MPI_INT; }
+template <>
+inline MPI_Datatype TypeMap<double>() { return MPI_DOUBLE; }
+template <>
+inline MPI_Datatype TypeMap<float>() { return MPI_FLOAT; }
+
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #if !defined(SERIAL_MPI)
-  
-#define MilanMpiLongInt  MPI_LONG_LONG
+
+#define MilanMpiLongInt MPI_LONG_LONG
 
 #ifndef _primitiveDataType_Definition_
 #define _primitiveDataType_Definition_
-    //Regular integer:
-    #ifndef INTEGER_H
-    #define INTEGER_H
-        typedef int32_t MilanInt;
-    #endif
+// Regular integer:
+#ifndef INTEGER_H
+#define INTEGER_H
+    typedef int32_t MilanInt;
+#endif
 
-    //Regular long integer:
-    #ifndef LONG_INT_H
-    #define LONG_INT_H
-        #ifdef BIT64
-            typedef int64_t MilanLongInt;
-            typedef MPI_LONG MilanMpiLongInt;
-        #else
-            typedef int32_t MilanLongInt;
-            typedef MPI_INT MilanMpiLongInt;
-        #endif
-    #endif
+// Regular long integer:
+#ifndef LONG_INT_H
+#define LONG_INT_H
+#ifdef BIT64
+    typedef int64_t MilanLongInt;
+    typedef MPI_LONG MilanMpiLongInt;
+#else
+    typedef int32_t MilanLongInt;
+    typedef MPI_INT MilanMpiLongInt;
+#endif
+#endif
 
-    //Regular boolean
-    #ifndef BOOL_H
-    #define BOOL_H
-        typedef bool MilanBool;
-    #endif
+// Regular boolean
+#ifndef BOOL_H
+#define BOOL_H
+    typedef bool MilanBool;
+#endif
 
-    //Regular double and absolute value computation:
-    #ifndef REAL_H
-    #define REAL_H
-        typedef double MilanReal;
-        typedef MPI_DOUBLE MilanMpiReal;
-        inline MilanReal MilanAbs(MilanReal value)
-        {
-            return fabs(value);
-        }
-    #endif
+// Regular double and absolute value computation:
+#ifndef REAL_H
+#define REAL_H
+    typedef double MilanReal;
+    typedef MPI_DOUBLE MilanMpiReal;
+    inline MilanReal MilanAbs(MilanReal value)
+    {
+        return fabs(value);
+    }
+#endif
 
-    //Regular float and absolute value computation:
-    #ifndef FLOAT_H
-    #define FLOAT_H
-        typedef float MilanFloat;
-        typedef MPI_FLOAT MilanMpiFloat;
-        inline MilanFloat MilanAbsFloat(MilanFloat value)
-        {
-            return fabs(value);
-        }
-    #endif
+// Regular float and absolute value computation:
+#ifndef FLOAT_H
+#define FLOAT_H
+    typedef float MilanFloat;
+    typedef MPI_FLOAT MilanMpiFloat;
+    inline MilanFloat MilanAbsFloat(MilanFloat value)
+    {
+        return fabs(value);
+    }
+#endif
 
-    //// Define the limits:
-    #ifndef LIMITS_H
-    #define LIMITS_H
-    //Integer Maximum and Minimum:
-  //      #define MilanIntMax INT_MAX
-  //    #define MilanIntMin INT_MIN
-        #define MilanIntMax INT32_MAX
-        #define MilanIntMin INT32_MIN
+//// Define the limits:
+#ifndef LIMITS_H
+#define LIMITS_H
+    // Integer Maximum and Minimum:
+    //      #define MilanIntMax INT_MAX
+    //    #define MilanIntMin INT_MIN
+#define MilanIntMax INT32_MAX
+#define MilanIntMin INT32_MIN
 
-        #ifdef BIT64
-            #define MilanLongIntMax INT64_MAX
-            #define MilanLongIntMin -INT64_MAX
-        #else
-            #define MilanLongIntMax INT32_MAX
-            #define MilanLongIntMin -INT32_MAX
-        #endif
+#ifdef BIT64
+#define MilanLongIntMax INT64_MAX
+#define MilanLongIntMin -INT64_MAX
+#else
+#define MilanLongIntMax INT32_MAX
+#define MilanLongIntMin -INT32_MAX
+#endif
 
-    #endif
+#endif
 
     // +INFINITY
     const double PLUS_INFINITY = numeric_limits<int>::infinity();
     const double MINUS_INFINITY = -PLUS_INFINITY;
-    //#define MilanRealMax LDBL_MAX
-    #define MilanRealMax PLUS_INFINITY
-    #define MilanRealMin MINUS_INFINITY
+//#define MilanRealMax LDBL_MAX
+#define MilanRealMax PLUS_INFINITY
+#define MilanRealMin MINUS_INFINITY
 #endif
 
-//Function of find the owner of a ghost vertex using binary search:
-inline MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
-                                     MilanInt myRank, MilanInt numProcs);
+    // Function of find the owner of a ghost vertex using binary search:
+    MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
+                              MilanInt myRank, MilanInt numProcs);
 
-  void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC
-(
- MilanLongInt NLVer, MilanLongInt NLEdge,
- MilanLongInt* verLocPtr, MilanLongInt* verLocInd, MilanReal* edgeLocWeight,
- MilanLongInt* verDistance,
- MilanLongInt* Mate,
- MilanInt myRank, MilanInt numProcs, MPI_Comm comm,
- MilanLongInt* msgIndSent, MilanLongInt* msgActualSent, MilanReal* msgPercent,
- MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
- MilanLongInt* ph1_card, MilanLongInt* ph2_card );
+    MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
+                                           MilanLongInt adj2,
+                                           MilanLongInt *verLocInd,
+                                           MilanReal *edgeLocWeight);
 
- void salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC
-(
-MilanLongInt NLVer, MilanLongInt NLEdge,
-MilanLongInt* verLocPtr, MilanLongInt* verLocInd, MilanFloat* edgeLocWeight,
-MilanLongInt* verDistance,
-MilanLongInt* Mate,
-MilanInt myRank, MilanInt numProcs, MPI_Comm comm,
-MilanLongInt* msgIndSent, MilanLongInt* msgActualSent, MilanReal* msgPercent,
-MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
-MilanLongInt* ph1_card, MilanLongInt* ph2_card );
+    void queuesTransfer(vector<MilanLongInt> &U,
+                        vector<MilanLongInt> &privateU,
+                        vector<MilanLongInt> &QLocalVtx,
+                        vector<MilanLongInt> &QGhostVtx,
+                        vector<MilanLongInt> &QMsgType,
+                        vector<MilanInt> &QOwner,
+                        vector<MilanLongInt> &privateQLocalVtx,
+                        vector<MilanLongInt> &privateQGhostVtx,
+                        vector<MilanLongInt> &privateQMsgType,
+                        vector<MilanInt> &privateQOwner);
 
-void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
-		MilanLongInt* verLocPtr, MilanLongInt* verLocInd, MilanReal* edgeLocWeight,
-		MilanLongInt* verDistance,
-		MilanLongInt* Mate,
-		MilanInt myRank, MilanInt numProcs, MilanInt icomm,
-		MilanLongInt* msgIndSent, MilanLongInt* msgActualSent, MilanReal* msgPercent,
-		MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
-		MilanLongInt* ph1_card, MilanLongInt* ph2_card );
+    bool isAlreadyMatched(MilanLongInt node,
+                          MilanLongInt StartIndex,
+                          MilanLongInt EndIndex,
+                          vector<MilanLongInt> &GMate,
+                          MilanLongInt *Mate,
+                          map<MilanLongInt, MilanLongInt> &Ghost2LocalMap);
 
-void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
-		MilanLongInt* verLocPtr, MilanLongInt* verLocInd, MilanFloat* edgeLocWeight,
-		MilanLongInt* verDistance,
-		MilanLongInt* Mate,
-		MilanInt myRank, MilanInt numProcs, MilanInt icomm,
-		MilanLongInt* msgIndSent, MilanLongInt* msgActualSent, MilanReal* msgPercent,
-		MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
-		MilanLongInt* ph1_card, MilanLongInt* ph2_card );
+    MilanLongInt computeCandidateMate(MilanLongInt adj1,
+                                      MilanLongInt adj2,
+                                      MilanReal *edgeLocWeight,
+                                      MilanLongInt k,
+                                      MilanLongInt *verLocInd,
+                                      MilanLongInt StartIndex,
+                                      MilanLongInt EndIndex,
+                                      vector<MilanLongInt> &GMate,
+                                      MilanLongInt *Mate,
+                                      map<MilanLongInt, MilanLongInt> &Ghost2LocalMap);
+
+    void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
+                    MilanLongInt StartIndex, MilanLongInt EndIndex,
+                    MilanLongInt *numGhostEdgesPtr,
+                    MilanLongInt *numGhostVerticesPtr,
+                    MilanLongInt *S,
+                    MilanLongInt *verLocInd,
+                    MilanLongInt *verLocPtr,
+                    map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
+                    vector<MilanLongInt> &Counter,
+                    vector<MilanLongInt> &verGhostPtr,
+                    vector<MilanLongInt> &verGhostInd,
+                    vector<MilanLongInt> &tempCounter,
+                    vector<MilanLongInt> &GMate,
+                    vector<MilanLongInt> &Message,
+                    vector<MilanLongInt> &QLocalVtx,
+                    vector<MilanLongInt> &QGhostVtx,
+                    vector<MilanLongInt> &QMsgType,
+                    vector<MilanInt> &QOwner,
+                    MilanLongInt *&candidateMate,
+                    vector<MilanLongInt> &U,
+                    vector<MilanLongInt> &privateU,
+                    vector<MilanLongInt> &privateQLocalVtx,
+                    vector<MilanLongInt> &privateQGhostVtx,
+                    vector<MilanLongInt> &privateQMsgType,
+                    vector<MilanInt> &privateQOwner);
+
+    void clean(MilanLongInt NLVer,
+               MilanInt myRank,
+               MilanLongInt MessageIndex,
+               vector<MPI_Request> &SRequest,
+               vector<MPI_Status> &SStatus,
+               MilanInt BufferSize,
+               MilanLongInt *Buffer,
+               MilanLongInt msgActual,
+               MilanLongInt *msgActualSent,
+               MilanLongInt msgInd,
+               MilanLongInt *msgIndSent,
+               MilanLongInt NumMessagesBundled,
+               MilanReal *msgPercent);
+
+    void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
+                                           MilanLongInt *verLocPtr,
+                                           MilanLongInt *verLocInd,
+                                           MilanInt myRank,
+                                           MilanReal *edgeLocWeight,
+                                           MilanLongInt *candidateMate);
+
+    void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
+                                           MilanLongInt *candidateMate,
+                                           MilanLongInt *verLocInd,
+                                           MilanLongInt *verLocPtr,
+                                           MilanLongInt StartIndex,
+                                           MilanLongInt EndIndex,
+                                           MilanLongInt *Mate,
+                                           vector<MilanLongInt> &GMate,
+                                           map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
+                                           MilanReal *edgeLocWeight,
+                                           MilanLongInt *myCardPtr,
+                                           MilanLongInt *msgIndPtr,
+                                           MilanLongInt *NumMessagesBundledPtr,
+                                           MilanLongInt *SPtr,
+                                           MilanLongInt *verDistance,
+                                           MilanLongInt *PCounter,
+                                           vector<MilanLongInt> &Counter,
+                                           MilanInt myRank,
+                                           MilanInt numProcs,
+                                           vector<MilanLongInt> &U,
+                                           vector<MilanLongInt> &privateU,
+                                           vector<MilanLongInt> &QLocalVtx,
+                                           vector<MilanLongInt> &QGhostVtx,
+                                           vector<MilanLongInt> &QMsgType,
+                                           vector<MilanInt> &QOwner,
+                                           vector<MilanLongInt> &privateQLocalVtx,
+                                           vector<MilanLongInt> &privateQGhostVtx,
+                                           vector<MilanLongInt> &privateQMsgType,
+                                           vector<MilanInt> &privateQOwner);
+
+    void PROCESS_CROSS_EDGE(MilanLongInt *edge,
+                            MilanLongInt *SPtr);
+
+    void processMatchedVertices(
+        MilanLongInt NLVer,
+        vector<MilanLongInt> &UChunkBeingProcessed,
+        vector<MilanLongInt> &U,
+        vector<MilanLongInt> &privateU,
+        MilanLongInt StartIndex,
+        MilanLongInt EndIndex,
+        MilanLongInt *myCardPtr,
+        MilanLongInt *msgIndPtr,
+        MilanLongInt *NumMessagesBundledPtr,
+        MilanLongInt *SPtr,
+        MilanLongInt *verLocPtr,
+        MilanLongInt *verLocInd,
+        MilanLongInt *verDistance,
+        MilanLongInt *PCounter,
+        vector<MilanLongInt> &Counter,
+        MilanInt myRank,
+        MilanInt numProcs,
+        MilanLongInt *candidateMate,
+        vector<MilanLongInt> &GMate,
+        MilanLongInt *Mate,
+        map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
+        MilanReal *edgeLocWeight,
+        vector<MilanLongInt> &QLocalVtx,
+        vector<MilanLongInt> &QGhostVtx,
+        vector<MilanLongInt> &QMsgType,
+        vector<MilanInt> &QOwner,
+        vector<MilanLongInt> &privateQLocalVtx,
+        vector<MilanLongInt> &privateQGhostVtx,
+        vector<MilanLongInt> &privateQMsgType,
+        vector<MilanInt> &privateQOwner);
+
+    void processMatchedVerticesAndSendMessages(
+        MilanLongInt NLVer,
+        vector<MilanLongInt> &UChunkBeingProcessed,
+        vector<MilanLongInt> &U,
+        vector<MilanLongInt> &privateU,
+        MilanLongInt StartIndex,
+        MilanLongInt EndIndex,
+        MilanLongInt *myCardPtr,
+        MilanLongInt *msgIndPtr,
+        MilanLongInt *NumMessagesBundledPtr,
+        MilanLongInt *SPtr,
+        MilanLongInt *verLocPtr,
+        MilanLongInt *verLocInd,
+        MilanLongInt *verDistance,
+        MilanLongInt *PCounter,
+        vector<MilanLongInt> &Counter,
+        MilanInt myRank,
+        MilanInt numProcs,
+        MilanLongInt *candidateMate,
+        vector<MilanLongInt> &GMate,
+        MilanLongInt *Mate,
+        map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
+        MilanReal *edgeLocWeight,
+        vector<MilanLongInt> &QLocalVtx,
+        vector<MilanLongInt> &QGhostVtx,
+        vector<MilanLongInt> &QMsgType,
+        vector<MilanInt> &QOwner,
+        vector<MilanLongInt> &privateQLocalVtx,
+        vector<MilanLongInt> &privateQGhostVtx,
+        vector<MilanLongInt> &privateQMsgType,
+        vector<MilanInt> &privateQOwner,
+        MPI_Comm comm,
+        MilanLongInt *msgActual,
+        vector<MilanLongInt> &Message);
+
+    void sendBundledMessages(MilanLongInt *numGhostEdgesPtr,
+                             MilanInt *BufferSizePtr,
+                             MilanLongInt *Buffer,
+                             vector<MilanLongInt> &PCumulative,
+                             vector<MilanLongInt> &PMessageBundle,
+                             vector<MilanLongInt> &PSizeInfoMessages,
+                             MilanLongInt *PCounter,
+                             MilanLongInt NumMessagesBundled,
+                             MilanLongInt *msgActualPtr,
+                             MilanLongInt *MessageIndexPtr,
+                             MilanInt numProcs,
+                             MilanInt myRank,
+                             MPI_Comm comm,
+                             vector<MilanLongInt> &QLocalVtx,
+                             vector<MilanLongInt> &QGhostVtx,
+                             vector<MilanLongInt> &QMsgType,
+                             vector<MilanInt> &QOwner,
+                             vector<MPI_Request> &SRequest,
+                             vector<MPI_Status> &SStatus);
+
+    void processMessages(
+        MilanLongInt NLVer,
+        MilanLongInt *Mate,
+        MilanLongInt *candidateMate,
+        map<MilanLongInt, MilanLongInt> &Ghost2LocalMap,
+        vector<MilanLongInt> &GMate,
+        vector<MilanLongInt> &Counter,
+        MilanLongInt StartIndex,
+        MilanLongInt EndIndex,
+        MilanLongInt *myCardPtr,
+        MilanLongInt *msgIndPtr,
+        MilanLongInt *msgActualPtr,
+        MilanReal *edgeLocWeight,
+        MilanLongInt *verDistance,
+        MilanLongInt *verLocPtr,
+        MilanLongInt k,
+        MilanLongInt *verLocInd,
+        MilanInt numProcs,
+        MilanInt myRank,
+        MPI_Comm comm,
+        vector<MilanLongInt> &Message,
+        MilanLongInt numGhostEdges,
+        MilanLongInt u,
+        MilanLongInt v,
+        MilanLongInt *SPtr,
+        vector<MilanLongInt> &U);
+
+    void extractUChunk(
+        vector<MilanLongInt> &UChunkBeingProcessed,
+        vector<MilanLongInt> &U,
+        vector<MilanLongInt> &privateU);
+
+    void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
+        MilanLongInt NLVer, MilanLongInt NLEdge,
+        MilanLongInt *verLocPtr, MilanLongInt *verLocInd, MilanReal *edgeLocWeight,
+        MilanLongInt *verDistance,
+        MilanLongInt *Mate,
+        MilanInt myRank, MilanInt numProcs, MPI_Comm comm,
+        MilanLongInt *msgIndSent, MilanLongInt *msgActualSent, MilanReal *msgPercent,
+        MilanReal *ph0_time, MilanReal *ph1_time, MilanReal *ph2_time,
+        MilanLongInt *ph1_card, MilanLongInt *ph2_card);
+
+    void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
+        MilanLongInt NLVer, MilanLongInt NLEdge,
+        MilanLongInt *verLocPtr, MilanLongInt *verLocInd, MilanReal *edgeLocWeight,
+        MilanLongInt *verDistance,
+        MilanLongInt *Mate,
+        MilanInt myRank, MilanInt numProcs, MPI_Comm comm,
+        MilanLongInt *msgIndSent, MilanLongInt *msgActualSent, MilanReal *msgPercent,
+        MilanReal *ph0_time, MilanReal *ph1_time, MilanReal *ph2_time,
+        MilanLongInt *ph1_card, MilanLongInt *ph2_card);
+
+    void salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
+        MilanLongInt NLVer, MilanLongInt NLEdge,
+        MilanLongInt *verLocPtr, MilanLongInt *verLocInd, MilanFloat *edgeLocWeight,
+        MilanLongInt *verDistance,
+        MilanLongInt *Mate,
+        MilanInt myRank, MilanInt numProcs, MPI_Comm comm,
+        MilanLongInt *msgIndSent, MilanLongInt *msgActualSent, MilanReal *msgPercent,
+        MilanReal *ph0_time, MilanReal *ph1_time, MilanReal *ph2_time,
+        MilanLongInt *ph1_card, MilanLongInt *ph2_card);
+
+    void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
+                     MilanLongInt *verLocPtr, MilanLongInt *verLocInd, MilanReal *edgeLocWeight,
+                     MilanLongInt *verDistance,
+                     MilanLongInt *Mate,
+                     MilanInt myRank, MilanInt numProcs, MilanInt icomm,
+                     MilanLongInt *msgIndSent, MilanLongInt *msgActualSent, MilanReal *msgPercent,
+                     MilanReal *ph0_time, MilanReal *ph1_time, MilanReal *ph2_time,
+                     MilanLongInt *ph1_card, MilanLongInt *ph2_card);
+
+    void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
+                     MilanLongInt *verLocPtr, MilanLongInt *verLocInd, MilanFloat *edgeLocWeight,
+                     MilanLongInt *verDistance,
+                     MilanLongInt *Mate,
+                     MilanInt myRank, MilanInt numProcs, MilanInt icomm,
+                     MilanLongInt *msgIndSent, MilanLongInt *msgActualSent, MilanReal *msgPercent,
+                     MilanReal *ph0_time, MilanReal *ph1_time, MilanReal *ph2_time,
+                     MilanLongInt *ph1_card, MilanLongInt *ph2_card);
 
 #endif
 #ifdef __cplusplus

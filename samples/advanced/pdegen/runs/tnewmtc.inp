@@ -1,6 +1,6 @@
 %%%%%%%%%%%  General  arguments % Lines starting with % are ignored.
 CSR                         ! Storage format CSR COO JAD
-0080                        ! IDIM; domain size. Linear system size is IDIM**3
+0140                        ! IDIM; domain size. Linear system size is IDIM**3
 CONST                       ! PDECOEFF: CONST, EXP, GAUSS Coefficients of the PDE
 BICGSTAB                    ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES
 2                           ! ISTOPC
@@ -40,7 +40,7 @@ VCYCLE                      ! Type of multilevel CYCLE: VCYCLE WCYCLE KCYCLE MUL
 -3                          ! Target coarse matrix size per process; if <0, lib default
 SMOOTHED                    ! Type of aggregation: SMOOTHED UNSMOOTHED
 NEWMTC                      ! Parallel aggregation: DEC, SYMDEC, COUPLED NEWMTC
-MATCHBOXP                   ! aggregation measure SOC1, MATCHBOXP NEWMTC
+NEWMTC                      ! aggregation measure SOC1, MATCHBOXP NEWMTC
 8                           ! Requested size of the aggregates for MATCHBOXP
 NATURAL                     ! Ordering of aggregation NATURAL DEGREE
 NOFILTER                    ! Filtering of matrix:  FILTER NOFILTER

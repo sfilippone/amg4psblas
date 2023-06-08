@@ -143,9 +143,10 @@ contains
     type(psb_ls_coo_sparse_mat) :: tmpcoo
     logical  :: display_out_, print_out_, reproducible_
     logical, parameter  :: dump=.false., debug=.false., dump_mate=.false., &
-         & debug_ilaggr=.false., debug_sync=.false.
+         & debug_ilaggr=.false., debug_sync=.false., debug_mate=.false.
     integer(psb_ipk_), save :: idx_bldmtc=-1, idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
     logical, parameter :: do_timings=.true.
+    integer, parameter :: ilaggr_neginit=-1, ilaggr_nonlocal=-2
 
     ictxt = desc_a%get_ctxt()
     call psb_info(ictxt,iam,np)
@@ -187,7 +188,7 @@ contains
     call desc_a%l2gip(ilv,info,owned=.false.)
 
     call psb_geall(ilaggr,desc_a,info)
-    ilaggr = -1
+    ilaggr = ilaggr_neginit
     call psb_geasb(ilaggr,desc_a,info)
     nr = a%get_nrows()
     nc = a%get_ncols()
@@ -213,7 +214,20 @@ contains
       call psb_barrier(ictxt)
       if (iam == 0) write(0,*)' out from buildmatching:', info
     end if
-
+    if (debug_mate) then
+      block
+        integer(psb_lpk_), allocatable :: ckmate(:)
+        allocate(ckmate(nr))
+        ckmate(1:nr) = mate(1:nr)
+        call psb_msort(ckmate(1:nr))
+        do i=1,nr-1
+          if ((ckmate(i)>0) .and. (ckmate(i) == ckmate(i+1))) then
+            write(0,*) iam,' Duplicate mate entry  at',i,' :',ckmate(i)
+          end if
+        end do
+      end block
+    end if
+     
     if (info == 0) then
       if (do_timings) call psb_tic(idx_phase2)
       if (debug_sync) then
@@ -259,7 +273,7 @@ contains
           cycle
         else
 
-          if (ilaggr(k) == -1) then
+          if (ilaggr(k) == ilaggr_neginit) then
 
             wk   = w(k)
             widx = w(idx)
@@ -267,7 +281,7 @@ contains
             nrmagg = wmax*sqrt((wk/wmax)**2+(widx/wmax)**2)
             if (nrmagg > epsilon(nrmagg)) then
               if (idx <= nr) then
-                if (ilaggr(idx) == -1) then
+                if (ilaggr(idx) == ilaggr_neginit) then
                   ! Now, if both vertices are local, the aggregate is local
                   ! (kinda obvious).
                   nlaggr(iam) = nlaggr(iam) + 1
@@ -275,6 +289,9 @@ contains
                   ilaggr(idx) = nlaggr(iam)
                   wtemp(k)    = w(k)/nrmagg
                   wtemp(idx)  = w(idx)/nrmagg
+                else
+                  write(0,*) iam,' Inconsistent mate? ',k,mate(k),idx,&
+                       &mate(idx),ilaggr(idx)
                 end if
                 nlpairs = nlpairs+1
               else if (idx <= nc) then
@@ -294,7 +311,7 @@ contains
                     ilaggr(k)   = nlaggr(iam)
                     nlpairs = nlpairs+1
                   else
-                    ilaggr(k) = -2
+                    ilaggr(k) = ilaggr_nonlocal
                   end if
                 else
                   ! Use a statistically unbiased tie-breaking rule,
@@ -309,7 +326,7 @@ contains
                     ilaggr(k)   = nlaggr(iam)
                     nlpairs = nlpairs+1
                   else
-                    ilaggr(k) = -2
+                    ilaggr(k) = ilaggr_nonlocal
                   end if
                 end if
               end if
@@ -325,6 +342,12 @@ contains
                 nlsingl     = nlsingl + 1
               end if
             end if
+            if (ilaggr(k) == ilaggr_neginit) then
+              write(0,*) iam,' Error: no update to ',k,mate(k),&
+                   & abs(w(k)),nrmagg,epsilon(nrmagg),wtemp(k)
+            end if
+          else
+            if (ilaggr(k)<0) write(0,*) 'Strange? ',k,ilaggr(k)
           end if
         end if
       end do
@@ -332,7 +355,7 @@ contains
       if (do_timings) call psb_tic(idx_phase3)
 
       ! Ok, now compute offsets, gather halo and fix non-local
-      ! aggregates  (those where ilaggr == -2)
+      ! aggregates  (those where ilaggr == ilaggr_nonlocal)
       call psb_sum(ictxt,nlaggr)
       ntaggr  = sum(nlaggr(0:np-1))
       naggrm1 = sum(nlaggr(0:iam-1))
@@ -347,7 +370,7 @@ contains
       call psb_halo(wtemp,desc_a,info)
       ! Cleanup as yet unmarked entries
       do k=1,nr
-        if (ilaggr(k) == -2) then
+        if (ilaggr(k) == ilaggr_nonlocal) then
           idx = mate(k)
           if (idx > nr) then
             i   = ilaggr(idx)
@@ -359,9 +382,14 @@ contains
           else
             write(0,*) 'Error : unresolved (paired) index ',k,idx,i,nr,nc, ilv(k),ilv(idx)
           end if
-        end if
-        if (ilaggr(k) <0) then
-          write(0,*) 'Matchboxp: Funny number: ',k,ilv(k),ilaggr(k),wtemp(k)
+        else if (ilaggr(k) <0) then
+          write(0,*) iam,'Matchboxp: Funny number: ',k,ilv(k),ilaggr(k),wtemp(k)
+          write(0,*) iam,'         :             : ',nr,nc,mate(k)
+          if (mate(k) <= nr) then
+            write(0,*) iam,'         :             : ',ilaggr(mate(k)),mate(mate(k)),&
+                 & ilv(k),ilv(mate(k)), ilv(mate(mate(k))),ilaggr(mate(mate(k)))
+          end if
+          flush(0)
         end if
       end do
       if (debug_sync) then
@@ -414,7 +442,7 @@ contains
 
       end block
       if (iam == 0) then
-        write(0,*) 'Matching statistics: Unmatched nodes ',&
+        write(0,*) iam,'Matching statistics: Unmatched nodes ',&
              & nunmatched,' Singletons:',nlsingl,' Pairs:',nlpairs
       end if
 

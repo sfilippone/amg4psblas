@@ -67,22 +67,25 @@ OBJS=$(F90OBJS) $(COBJS) $(MPCOBJS)
 
 LIBNAME=libamg_prec.a
 
+objs: $(OBJS) aggrd levd smoothd solvd
+
 lib:  $(OBJS) aggrd levd smoothd solvd
+	cd aggregator && $(MAKE) lib
+	cd level && $(MAKE) lib
+	cd smoother && $(MAKE) lib
+	cd solver && $(MAKE) lib
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
 aggrd:
-	$(MAKE) -C aggregator
+	cd aggregator && $(MAKE) objs
 levd:
-	$(MAKE) -C level
+	cd level && $(MAKE)  objs
 smoothd:
-	$(MAKE) -C smoother
+	cd smoother   && $(MAKE)  objs
 solvd:
-	$(MAKE) -C solver
+	cd solver && $(MAKE)  objs
 
-mpobjs: 
-	(make $(MPFOBJS) FC="$(MPFC)" FCOPT="$(FCOPT)")
-	(make $(MPCOBJS) CC="$(MPCC)" CCOPT="$(CCOPT)")
 
 veryclean: clean
 	/bin/rm -f $(LIBNAME)
@@ -91,10 +94,10 @@ clean: solvclean smoothclean levclean aggrclean
 	/bin/rm -f $(OBJS) $(LOCAL_MODS)
 
 aggrclean:
-		$(MAKE) -C aggregator clean
+	cd aggregator && $(MAKE) clean
 levclean:
-		$(MAKE) -C level clean
+	cd level && $(MAKE) clean
 smoothclean:
-		$(MAKE) -C smoother clean
+	cd smoother && 	$(MAKE)  clean
 solvclean:
-		$(MAKE) -C solver clean
+	cd solver && $(MAKE)  clean

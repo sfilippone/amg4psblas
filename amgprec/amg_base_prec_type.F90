@@ -64,7 +64,7 @@ module amg_base_prec_type
   !
   use psb_const_mod
   use psb_base_mod, only :&
-       & psb_desc_type, psb_i_vect_type, psb_i_base_vect_type,&
+       & psb_desc_type, psb_ctxt_type,&
        & psb_ipk_, psb_dpk_, psb_spk_, psb_epk_,  &
        & psb_cdfree, psb_halo_, psb_none_, psb_sum_, psb_avg_, &
        & psb_nohalo_, psb_square_root_, psb_toupper, psb_root_,&
@@ -81,9 +81,9 @@ module amg_base_prec_type
   !
   ! Version numbers
   !
-  character(len=*), parameter   :: amg_version_string_ = "1.0.0"
+  character(len=*), parameter   :: amg_version_string_ = "1.1.0"
   integer(psb_ipk_), parameter  :: amg_version_major_  = 1
-  integer(psb_ipk_), parameter  :: amg_version_minor_  = 0
+  integer(psb_ipk_), parameter  :: amg_version_minor_  = 1
   integer(psb_ipk_), parameter  :: amg_patchlevel_     = 0
 
   type amg_ml_parms
@@ -656,43 +656,52 @@ contains
     end if
   end subroutine ml_parms_mlcycledsc
 
-  subroutine ml_parms_mldescr(pm,iout,info)
+  subroutine ml_parms_mldescr(pm,iout,info,prefix)
 
     Implicit None
 
     ! Arguments
-    class(amg_ml_parms), intent(in) :: pm
-    integer(psb_ipk_), intent(in)             :: iout
-    integer(psb_ipk_), intent(out)            :: info
+    class(amg_ml_parms), intent(in)        :: pm
+    integer(psb_ipk_), intent(in)          :: iout
+    integer(psb_ipk_), intent(out)         :: info
+    character(len=*), intent(in), optional :: prefix
+
+    character(1024)  :: prefix_ 
     info = psb_success_
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
+    
     if ((pm%ml_cycle>=amg_no_ml_).and.(pm%ml_cycle<=amg_max_ml_cycle_)) then
 
 
-      write(iout,*) '  Parallel aggregation algorithm: ',&
+      write(iout,*) trim(prefix),'  Parallel aggregation algorithm: ',&
            &   par_aggr_alg_names(pm%par_aggr_alg)
-      if (pm%aggr_type>0) write(iout,*) '  Aggregation type: ',&
+      if (pm%aggr_type>0) write(iout,*) trim(prefix),'  Aggregation type: ',&
            & aggr_type_names(pm%aggr_type)
       !if (pm%par_aggr_alg /= amg_ext_aggr_) then
         if ( pm%aggr_ord /= amg_aggr_ord_nat_) &
-             & write(iout,*) '               with initial ordering: ',&
+             & write(iout,*) trim(prefix),'               with initial ordering: ',&
              &   ord_names(pm%aggr_ord)
-        write(iout,*) '  Aggregation prolongator: ', &
+        write(iout,*) trim(prefix),'  Aggregation prolongator: ', &
              &  aggr_prols(pm%aggr_prol)
         if (pm%aggr_prol /= amg_no_smooth_) then
-          write(iout,*) '              with: ', aggr_filters(pm%aggr_filter)
+          write(iout,*) trim(prefix),'              with: ', aggr_filters(pm%aggr_filter)
           if (pm%aggr_omega_alg == amg_eig_est_) then
-            write(iout,*) '  Damping omega computation: spectral radius estimate'
-            write(iout,*) '  Spectral radius estimate: ', &
+            write(iout,*) trim(prefix),'  Damping omega computation: spectral radius estimate'
+            write(iout,*) trim(prefix),'  Spectral radius estimate: ', &
                  & eigen_estimates(pm%aggr_eig)
           else if (pm%aggr_omega_alg == amg_user_choice_) then
-            write(iout,*) '  Damping omega computation: user defined value.'
+            write(iout,*) trim(prefix),'  Damping omega computation: user defined value.'
           else
-            write(iout,*) '  Damping omega computation: unknown value in iprcparm!!'
+            write(iout,*) trim(prefix),'  Damping omega computation: unknown value in iprcparm!!'
           end if
         end if
       !end if
     else
-      write(iout,*) '  Multilevel type: Unkonwn value. Something is amiss....',&
+      write(iout,*) trim(prefix),'  Multilevel type: Unkonwn value. Something is amiss....',&
            & pm%ml_cycle
     end if
 
@@ -700,15 +709,16 @@ contains
 
   end subroutine ml_parms_mldescr
 
-  subroutine ml_parms_descr(pm,iout,info,coarse)
+  subroutine ml_parms_descr(pm,iout,info,coarse,prefix)
 
     Implicit None
 
     ! Arguments
-    class(amg_ml_parms), intent(in) :: pm
-    integer(psb_ipk_), intent(in)             :: iout
-    integer(psb_ipk_), intent(out)            :: info
-    logical, intent(in), optional   :: coarse
+    class(amg_ml_parms), intent(in)        :: pm
+    integer(psb_ipk_), intent(in)          :: iout
+    integer(psb_ipk_), intent(out)         :: info
+    logical, intent(in), optional          :: coarse
+    character(len=*), intent(in), optional :: prefix
     logical :: coarse_
 
     info = psb_success_
@@ -719,7 +729,7 @@ contains
     end if
 
     if (coarse_) then
-      call pm%coarsedescr(iout,info)
+      call pm%coarsedescr(iout,info,prefix=prefix)
     end if
 
     return
@@ -727,81 +737,126 @@ contains
   end subroutine ml_parms_descr
 
 
-  subroutine ml_parms_coarsedescr(pm,iout,info)
+  subroutine ml_parms_coarsedescr(pm,iout,info,prefix)
 
 
     Implicit None
 
     ! Arguments
-    class(amg_ml_parms), intent(in) :: pm
-    integer(psb_ipk_), intent(in)             :: iout
-    integer(psb_ipk_), intent(out)            :: info
+    class(amg_ml_parms), intent(in)       :: pm
+    integer(psb_ipk_), intent(in)         :: iout
+    integer(psb_ipk_), intent(out)        :: info
+    character(len=*), intent(in), optional :: prefix
+
+    character(1024)  :: prefix_ 
 
     info = psb_success_
-    write(iout,*) '  Coarse matrix: ',&
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
+
+    write(iout,*) trim(prefix),'  Coarse matrix: ',&
          & matrix_names(pm%coarse_mat)
     select case(pm%coarse_solve)
     case (amg_bjac_,amg_as_)
-      write(iout,*) '  Number of sweeps : ',&
-           & pm%sweeps_pre
-      write(iout,*) '  Coarse solver: ',&
+      write(iout,*) trim(prefix),'  Coarse solver: ',&
            & 'Block Jacobi'
+      write(iout,*) trim(prefix),'  Number of sweeps : ',&
+           & pm%sweeps_pre
     case (amg_l1_bjac_)
-      write(iout,*) '  Number of sweeps : ',&
-           & pm%sweeps_pre
-      write(iout,*) '  Coarse solver: ',&
+      write(iout,*) trim(prefix),'  Coarse solver: ',&
            & 'L1-Block Jacobi'
-    case (amg_jac_)
-      write(iout,*) '  Number of sweeps : ',&
+      write(iout,*) trim(prefix),'  Number of sweeps : ',&
            & pm%sweeps_pre
-      write(iout,*) '  Coarse solver: ',&
+    case (amg_jac_)
+      write(iout,*) trim(prefix),'  Coarse solver: ',&
            & 'Point Jacobi'
+      write(iout,*) trim(prefix),'  Number of sweeps : ',&
+           & pm%sweeps_pre
+    case (amg_l1_jac_)
+      write(iout,*) trim(prefix),'  Coarse solver: ',&
+           & 'L1-Jacobi'
+      write(iout,*) trim(prefix),'  Number of sweeps : ',&
+           & pm%sweeps_pre
+    case (amg_l1_fbgs_)
+      write(iout,*) trim(prefix),'  Coarse solver: ',&
+           & 'L1 Forward-Backward Gauss-Seidel (Hybrid)'
+      write(iout,*) trim(prefix),'  Number of sweeps : ',&
+           & pm%sweeps_pre
+    case (amg_l1_gs_)
+      write(iout,*) trim(prefix),'  Coarse solver: ',&
+           & 'L1 Gauss-Seidel (Hybrid)'
+      write(iout,*) trim(prefix),'  Number of sweeps : ',&
+           & pm%sweeps_pre
+    case (amg_fbgs_)
+      write(iout,*) trim(prefix),'  Coarse solver: ',&
+           & 'Forward-Backward Gauss-Seidel (Hybrid)'
+      write(iout,*) trim(prefix),'  Number of sweeps : ',&
+           & pm%sweeps_pre
     case default
-      write(iout,*) '  Coarse solver: ',&
+      write(iout,*) trim(prefix),'  Coarse solver: ',&
            & amg_fact_names(pm%coarse_solve)
     end select
-
+    
   end subroutine ml_parms_coarsedescr
 
-  subroutine s_ml_parms_descr(pm,iout,info,coarse)
+  subroutine s_ml_parms_descr(pm,iout,info,coarse,prefix)
 
     Implicit None
 
     ! Arguments
-    class(amg_sml_parms), intent(in) :: pm
-    integer(psb_ipk_), intent(in)             :: iout
-    integer(psb_ipk_), intent(out)            :: info
-    logical, intent(in), optional   :: coarse
+    class(amg_sml_parms), intent(in)       :: pm
+    integer(psb_ipk_), intent(in)          :: iout
+    integer(psb_ipk_), intent(out)         :: info
+    logical, intent(in), optional          :: coarse
+    character(len=*), intent(in), optional :: prefix
+
+    character(1024)  :: prefix_ 
 
     info = psb_success_
-
-    call pm%amg_ml_parms%descr(iout,info,coarse)
-    if (pm%aggr_prol /= amg_no_smooth_) then
-      write(iout,*) '  Damping omega value  :',pm%aggr_omega_val
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
     end if
-    write(iout,*) '  Aggregation threshold:',pm%aggr_thresh
+
+    call pm%amg_ml_parms%descr(iout,info,coarse,prefix=prefix)
+    if (pm%aggr_prol /= amg_no_smooth_) then
+      write(iout,*) trim(prefix),'  Damping omega value  :',pm%aggr_omega_val
+    end if
+    write(iout,*) trim(prefix),'  Aggregation threshold:',pm%aggr_thresh
 
     return
 
   end subroutine s_ml_parms_descr
 
-  subroutine d_ml_parms_descr(pm,iout,info,coarse)
+  subroutine d_ml_parms_descr(pm,iout,info,coarse,prefix)
 
     Implicit None
 
     ! Arguments
-    class(amg_dml_parms), intent(in) :: pm
-    integer(psb_ipk_), intent(in)             :: iout
-    integer(psb_ipk_), intent(out)            :: info
-    logical, intent(in), optional   :: coarse
+    class(amg_dml_parms), intent(in)       :: pm
+    integer(psb_ipk_), intent(in)          :: iout
+    integer(psb_ipk_), intent(out)         :: info
+    logical, intent(in), optional          :: coarse
+    character(len=*), intent(in), optional :: prefix
+
+    character(1024)  :: prefix_ 
 
     info = psb_success_
-
-    call pm%amg_ml_parms%descr(iout,info,coarse)
-    if (pm%aggr_prol /= amg_no_smooth_) then
-      write(iout,*) '  Damping omega value  :',pm%aggr_omega_val
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
     end if
-    write(iout,*) '  Aggregation threshold:',pm%aggr_thresh
+
+    call pm%amg_ml_parms%descr(iout,info,coarse,prefix=prefix)
+    if (pm%aggr_prol /= amg_no_smooth_) then
+      write(iout,*) trim(prefix),'  Damping omega value  :',pm%aggr_omega_val
+    end if
+    write(iout,*) trim(prefix),'  Aggregation threshold:',pm%aggr_thresh
 
     return
 

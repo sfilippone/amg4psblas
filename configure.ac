@@ -34,11 +34,11 @@ dnl NOTE : odd configurations like ifc + gcc still await in the mist of the unkn
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([AMG4PSBLAS],1.0.0, [https://github.com/sfilippone/amg4psblas/issues])
+AC_INIT([AMG4PSBLAS],1.1.0, [https://github.com/sfilippone/amg4psblas/issues])
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-amg4psblas_cv_version="1.0.0"
+amg4psblas_cv_version="1.1.0"
 
 # A sample source file
 AC_CONFIG_SRCDIR([amgprec/amg_prec_type.f90])
@@ -132,7 +132,15 @@ AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc 
 FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
 AC_PROG_CC([cc xlc pgcc icc gcc ])
+if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
+   AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
+else
+   C99OPT="$ac_cv_prog_cc_stdc";
+fi	
 CFLAGS="$save_CFLAGS";
+save_CXXFLAGS="$CXXFLAGS";
+AC_PROG_CXX([CC xlc++  icpc g++])
+CXXFLAGS="$save_CXXFLAGS";
 dnl AC_PROG_CXX
 
 dnl AC_PROG_F90 doesn't exist, at the time of writing this !
@@ -158,6 +166,10 @@ if eval "$FC -qversion 2>&1 | grep XL 2>/dev/null" ; then
  # since (as far as it is known to us) -WF, is not used in earlier versions.
  # More problems could be undocumented yet.
 fi 
+
+if test "X$CC" == "X" ; then
+	AC_MSG_ERROR([Problem : No C compiler specified nor found!])
+fi
 ###############################################################################
 #			Suitable MPI compilers detection
 ###############################################################################
@@ -171,6 +183,7 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    FAKEMPI="fakempi.o";
    MPIFC="$FC";
    MPICC="$CC";
+   MPICXX="$CXX";	
    CXXDEFINES="-DSERIAL_MPI $CXXDEFINES";
 
 else 
@@ -190,9 +203,17 @@ if test "X$MPIFC" = "X" ; then
 fi
 
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
+AC_LANG([C++])
+if test "X$MPICXX" = "X" ; then
+    # This is our MPICC compiler preference: it will override ACX_MPI's first try.
+    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpc  mpicxx])
+fi
+ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C++]])])
+AC_LANG([Fortran])
 
 FC="$MPIFC" ;
 CC="$MPICC";
+CXX="$MPICXX";
 fi
 
 AC_LANG([C])
@@ -217,10 +238,12 @@ fi
 
 dnl NOTE : no spaces before the comma, and no brackets before the second argument!
 PAC_ARG_WITH_FLAGS(ccopt,CCOPT)
+PAC_ARG_WITH_FLAGS(cxxopt,CXXOPT)
 PAC_ARG_WITH_FLAGS(fcopt,FCOPT)
 PAC_ARG_WITH_LIBS
 PAC_ARG_WITH_FLAGS(clibs,CLIBS)
 PAC_ARG_WITH_FLAGS(flibs,FLIBS)
+PAC_ARG_WITH_FLAGS(cxxlibs,CXXLIBS)
 
 dnl candidates for removal:
 PAC_ARG_WITH_FLAGS(library-path,LIBRARYPATH)
@@ -229,6 +252,20 @@ PAC_ARG_WITH_FLAGS(module-path,MODULE_PATH)
 
 # we just gave the user the chance to append values to these variables
 PAC_ARG_WITH_EXTRA_LIBS
+
+# Check if we need extra libs (e.g. for OpenMPI)
+AC_MSG_CHECKING([Extra mpicxx libs?])
+xtrlibs=`mpicxx --showme:link 2>/dev/null`;
+if (( $? == 0 ))
+then
+  EXTRA_LIBS="$EXTRA_LIBS $xtrlibs";
+  AC_MSG_RESULT([$xtrlibs])
+else
+  AC_MSG_RESULT([none])
+fi
+
+
+ 
 
 ###############################################################################
 # Sanity checks, although redundant (useful when debugging this configure.ac)!
@@ -395,6 +432,36 @@ if test "X$CCOPT" == "X" ; then
  fi
 fi
 #CFLAGS="${CCOPT}"
+if test "X$CXXOPT" == "X" ; then
+  CXXOPT="$CXXFLAGS";
+fi	
+if test "X$CXXOPT" == "X" ; then
+ if test "X$psblas_cv_fc" == "Xgcc" ; then
+ # note that no space should be placed around the equality symbol in assignements
+ # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
+   CXXOPT="-g -O3  $CXXOPT"
+
+ elif test "X$psblas_cv_fc" == X"xlf" ; then
+   # XL compiler : consider using -qarch=auto
+     CXXOPT="-O3 -qarch=auto $CXXOPT"
+ elif test "X$psblas_cv_fc" == X"ifc" ; then
+   # other compilers ..
+     CXXOPT="-O3 $CXXOPT"
+ elif test "X$psblas_cv_fc" == X"pg" ; then
+   # other compilers ..
+     CXXCOPT="-fast $CXXOPT"
+  # NOTE : PG & Sun use -fast instead -O3
+ elif test "X$psblas_cv_fc" == X"sun" ; then
+   # other compilers ..
+     CXXOPT="-fast $CXXOPT"
+ elif test "X$psblas_cv_fc" == X"cray" ; then
+     CXXOPT="-O3 $CXXOPT"
+     MPICXX="CC"
+ else 
+     CXXOPT="-g -O3 $CXXOPT"
+ fi
+fi
+
 
 # Honor FCFLAGS if they were specified explicitly, but --with-fcopt take precedence
 if test "X$FCOPT" == "X" ; then
@@ -443,7 +510,8 @@ fi
 ##############################################################################
 FC=${FC}
 CC=${CC}
-MPCC=${MPICC}
+CXX=${CXX}
+CCOPT="$CCOPT $C99OPT"
 
 
 ##############################################################################
@@ -478,6 +546,30 @@ fi
 if test "X$FLINK" == "X" ; then
    FLINK=${MPF90}
 fi
+# Custom test : do we have a module or include for MPI Fortran interface?
+if test x"$pac_cv_serial_mpi" == x"yes" ; then
+   FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+else 
+ PAC_FORTRAN_CHECK_HAVE_MPI_MOD_F08()
+ if test x"$pac_cv_mpi_f08" == x"yes" ; then
+dnl    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD_F08 $FDEFINES";
+    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+  else					     	     
+    PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
+ 	  [FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"],
+	  [FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"])	  
+ fi
+fi
+
+FLINK="$MPIFC"
+PAC_ARG_OPENMP()
+if test x"$pac_cv_openmp" == x"yes" ; then
+   FDEFINES="$psblas_cv_define_prepend-DOPENMP $FDEFINES";
+   CDEFINES="-DOPENMP $CDEFINES";	
+   FCOPT="$FCOPT $pac_cv_openmp_fcopt";
+   CCOPT="$CCOPT $pac_cv_openmp_ccopt";
+   FLINK="$FLINK $pac_cv_openmp_fcopt";
+fi
 
 PAC_FORTRAN_HAVE_PSBLAS([AC_MSG_RESULT([yes.])],
 	[AC_MSG_ERROR([no.  Could not find working version of PSBLAS.])])
@@ -494,8 +586,8 @@ if test "x$pac_cv_psblas_patchlevel" == "xunknown"; then
    AC_MSG_ERROR([PSBLAS patchlevel "$pac_cv_psblas_patchlevel".])
 fi
 if (( $pac_cv_psblas_major < 3 )) ||
-   (  (( $pac_cv_psblas_major == 3 )) && (( $pac_cv_psblas_minor < 7 ))) ; then
-  AC_MSG_ERROR([I need at least PSBLAS version 3.7.]) 
+   (  (( $pac_cv_psblas_major == 3 )) && (( $pac_cv_psblas_minor < 8 ))) ; then
+  AC_MSG_ERROR([I need at least PSBLAS version 3.8.0]) 
 else
   AC_MSG_NOTICE([Am configuring with PSBLAS version $pac_cv_psblas_major.$pac_cv_psblas_minor.$pac_cv_psblas_patchlevel.])
 fi
@@ -693,14 +785,10 @@ fi
 PAC_CHECK_SUPERLUDIST()
 
 if test "x$amg4psblas_cv_have_superludist" == "xyes" ; then
-   pac_sludist_version="$amg4psblas_cv_superludist_major";      
-   if (($amg4psblas_cv_superludist_major==6)); then
-      if (($amg4psblas_cv_superludist_minor>=3)); then
-        pac_sludist_version="63";
-      fi
-   fi	
+   pac_sludist_version="$amg4psblas_cv_superludist_major$amg4psblas_cv_superludist_minor";  
+   AC_MSG_NOTICE([Configuring with SuperLU_DIST version flag $pac_sludist_version])
    SLUDIST_FLAGS=""	       
-   SLUDIST_FLAGS="-DHave_SLUDist_ -DSLUD_VERSION_$pac_sludist_version $SLUDIST_INCLUDES"
+   SLUDIST_FLAGS="-DHave_SLUDist_ -DSLUD_VERSION_="$pac_sludist_version" $SLUDIST_INCLUDES"
    FDEFINES="$amg_cv_define_prepend-DHAVE_SLUDIST_ $FDEFINES"
 else
    SLUDIST_FLAGS=""

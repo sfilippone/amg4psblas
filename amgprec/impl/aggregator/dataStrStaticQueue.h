@@ -80,9 +80,11 @@ class staticQueue
 		MilanLongInt squeueTail;
 		MilanLongInt NumNodes;
 
+		//FIXME I had to comment this piece of code in order to make everything work.
+		//		why?
 		//Prevent Assignment and Pass by Value:
-		staticQueue(const staticQueue& src);
-		staticQueue& operator=(const staticQueue& rhs);
+		//staticQueue(const staticQueue& src);
+		//staticQueue& operator=(const staticQueue& rhs);
 
 	public:
 		//Constructors and Destructors

@@ -3,11 +3,11 @@ AMGINCDIR=$(AMGDIR)/include
 include $(AMGINCDIR)/Make.inc.amg4psblas
 AMGMODDIR=$(AMGDIR)/modules
 AMGLIBDIR=$(AMGDIR)/lib
-AMG_LIBS=-L$(AMGLIBDIR) -lpsb_krylov -lamg_prec -lpsb_prec
+AMG_LIBS=-L$(AMGLIBDIR) -lpsb_krylov -lamg_prec -lpsb_prec 
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(AMGMODDIR) $(FMFLAG)$(AMGINCDIR) $(PSBLAS_INCLUDES) $(FIFLAG).
 
 LINKOPT=
-XTRALINK=-lstdc++ -lroma -L../../../../ParallelRomaF-main/lib/ -fopenmp
+XTRALINK=-lstdc++ -lroma  -fopenmp
 EXEDIR=./runs
 
 all: amg_s_pde3d amg_d_pde3d amg_s_pde2d amg_d_pde2d
@@ -45,7 +45,7 @@ check: all
 
 clean:
 	/bin/rm -f data_input.o *.o *$(.mod)\
-        $(EXEDIR)/mld_d_pde3d  $(EXEDIR)/mld_s_pde3d $(EXEDIR)/mld_d_pde2d  $(EXEDIR)/mld_s_pde2d
+        $(EXEDIR)/amg_d_pde3d  $(EXEDIR)/amg_s_pde3d $(EXEDIR)/amg_d_pde2d  $(EXEDIR)/amg_s_pde2d
 
 verycleanlib:
 	(cd ../..; make veryclean)

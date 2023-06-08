@@ -496,23 +496,23 @@ contains
     !
     ! Now call matching!
     !
-    if (debug) write(0,*) iam,' buildmatching into PMatchBox:'
+    if (debug) write(0,*) iam,' buildmatching into NewMatch:'
     if (do_timings) call psb_tic(idx_cmboxp)
     info = dnew_Match_If(ipar,matching,lambda,nr,c_loc(tcsr%irp),c_loc(tcsr%ja),&
          & c_loc(tcsr%val),c_loc(diag),c_loc(w),c_loc(mate))
     if (do_timings) call psb_toc(idx_cmboxp)
-    if (debug) write(0,*) iam,' buildmatching from PMatchBox:', info
+    if (debug) write(0,*) iam,' buildmatching from NewMatch:', info
     if (debug_sync) then
       call psb_max(ictxt,info)
-      if (iam == 0) write(0,*)' done PMatchBox', info
+      if (iam == 0) write(0,*)' done NewMatch', info
     end if
 
     if (do_timings) call psb_tic(idx_phase3)
     nunmatch = count(mate(1:nr)<=0)
         ! call psb_sum(ictxt,nunmatch)
-    if (nunmatch /= 0) write(0,*) iam,' Unmatched nodes local imbalance ',nunmatch
- !    if (count(mate(1:nr)<0) /= nunmatch) write(0,*) iam,' Matching results ?',&
- !        & nunmatch, count(mate(1:nr)<0)
+    !if (nunmatch /= 0) write(0,*) iam,' Unmatched nodes local imbalance ',nunmatch
+    !    if (count(mate(1:nr)<0) /= nunmatch) write(0,*) iam,' Matching results ?',&
+    !        & nunmatch, count(mate(1:nr)<0)
     if (debug_sync) then
       call psb_barrier(ictxt)
       if (iam == 0) write(0,*)' done build_matching '

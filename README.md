@@ -1,6 +1,5 @@
-
                          AMG4PSBLAS  
- Algebraic Multigrid Package  based on PSBLAS (Parallel Sparse BLAS version 3.7)
+ Algebraic Multigrid Package  based on PSBLAS (Parallel Sparse BLAS version 3.8)
     
 Salvatore Filippone    (University of Rome Tor Vergata and IAC-CNR)
 Pasqua D'Ambra         (IAC-CNR, Naples, IT)

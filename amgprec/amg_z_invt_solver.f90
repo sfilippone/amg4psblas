@@ -134,16 +134,17 @@ module amg_z_invt_solver
   end interface
 
   interface
-    subroutine amg_z_invt_solver_descr(sv,info,iout,coarse)
+    subroutine amg_z_invt_solver_descr(sv,info,iout,coarse,prefix)
       import :: psb_dpk_, amg_z_invt_solver_type, psb_ipk_
 
       Implicit None
 
       ! Arguments
       class(amg_z_invt_solver_type), intent(in) :: sv
-      integer(psb_ipk_), intent(out)            :: info
-      integer(psb_ipk_), intent(in), optional   :: iout
-      logical, intent(in), optional             :: coarse
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), intent(in), optional     :: iout
+      logical, intent(in), optional               :: coarse
+      character(len=*), intent(in), optional      :: prefix
 
     end subroutine amg_z_invt_solver_descr
   end interface

@@ -68,8 +68,8 @@ dnl Warning : square brackets are EVIL!
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -106,8 +106,8 @@ dnl Warning : square brackets are EVIL!
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -143,8 +143,8 @@ AC_DEFUN(PAC_CHECK_HAVE_GFORTRAN,
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -178,8 +178,8 @@ AC_DEFUN(PAC_HAVE_MODERN_GFORTRAN,
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])
 		     AC_MSG_NOTICE([Sorry, we require GNU Fortran version 4.8.4 or later.])
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -213,7 +213,7 @@ AC_DEFUN([PAC_ARG_WITH_FLAGS],
 AC_MSG_CHECKING([whether additional [$2] flags should be added (should be invoked only once)])
 dnl AC_MSG_CHECKING([whether additional [$2] flags should be added])
 AC_ARG_WITH($1,
-AC_HELP_STRING([--with-$1], 
+AS_HELP_STRING([--with-$1], 
 [additional [$2] flags to be added: will prepend to [$2]]),
 [
 $2="${withval} ${$2}"
@@ -245,7 +245,7 @@ AC_DEFUN([PAC_ARG_WITH_LIBS],
 [
 AC_MSG_CHECKING([whether additional libraries are needed])
 AC_ARG_WITH(libs,
-AC_HELP_STRING([--with-libs], 
+AS_HELP_STRING([--with-libs], 
 [List additional link flags  here.  For example, --with-libs=-lspecial_system_lib
 or --with-libs=-L/path/to/libs]),
 [
@@ -279,7 +279,7 @@ AC_DEFUN([PAC_ARG_WITH_EXTRA_LIBS],
 [
 AC_MSG_CHECKING([whether additional libraries are needed])
 AC_ARG_WITH(extra-libs,
-AC_HELP_STRING([--with-extra-libs], 
+AS_HELP_STRING([--with-extra-libs], 
 [List additional link flags  here.  For example, --with-extra-libs=-lspecial_system_lib
 or --with-extra-libs=-L/path/to/libs]),
 [
@@ -310,17 +310,17 @@ dnl
 AC_DEFUN([PAC_ARG_WITH_PSBLAS],
 [
 AC_ARG_WITH(psblas,
-AC_HELP_STRING([--with-psblas=DIR], [The install directory for PSBLAS, for example,
+AS_HELP_STRING([--with-psblas=DIR], [The install directory for PSBLAS, for example,
  --with-psblas=/opt/packages/psblas-3.5]),
 [pac_cv_psblas_dir=$withval],
 [pac_cv_psblas_dir=''])
-AC_ARG_WITH(psblas-incdir, AC_HELP_STRING([--with-psblas-incdir=DIR], [Specify the directory for PSBLAS C includes.]),
+AC_ARG_WITH(psblas-incdir, AS_HELP_STRING([--with-psblas-incdir=DIR], [Specify the directory for PSBLAS C includes.]),
         [pac_cv_psblas_incdir=$withval],
         [pac_cv_psblas_incdir=''])
-AC_ARG_WITH(psblas-moddir, AC_HELP_STRING([--with-psblas-moddir=DIR], [Specify the directory for PSBLAS Fortran modules.]),
+AC_ARG_WITH(psblas-moddir, AS_HELP_STRING([--with-psblas-moddir=DIR], [Specify the directory for PSBLAS Fortran modules.]),
         [pac_cv_psblas_moddir=$withval],
         [pac_cv_psblas_moddir=''])
-AC_ARG_WITH(psblas-libdir, AC_HELP_STRING([--with-psblas-libdir=DIR], [Specify the directory for PSBLAS library.]),
+AC_ARG_WITH(psblas-libdir, AS_HELP_STRING([--with-psblas-libdir=DIR], [Specify the directory for PSBLAS library.]),
         [pac_cv_psblas_libdir=$withval],
         [pac_cv_psblas_libdir=''])
 if test x"$pac_cv_psblas_incdir" == "x" ; then
@@ -543,17 +543,17 @@ dnl
 dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
 dnl
 AC_DEFUN(PAC_CHECK_UMFPACK,
-[AC_ARG_WITH(umfpack, AC_HELP_STRING([--with-umfpack=LIBNAME], [Specify the library name for UMFPACK and its support libraries. 
+[AC_ARG_WITH(umfpack, AS_HELP_STRING([--with-umfpack=LIBNAME], [Specify the library name for UMFPACK and its support libraries. 
 Default: "-lumfpack -lamd"]),
         [amg4psblas_cv_umfpack=$withval],
         [amg4psblas_cv_umfpack='-lumfpack -lamd'])
-AC_ARG_WITH(umfpackdir, AC_HELP_STRING([--with-umfpackdir=DIR], [Specify the directory for UMFPACK library and includes.]),
+AC_ARG_WITH(umfpackdir, AS_HELP_STRING([--with-umfpackdir=DIR], [Specify the directory for UMFPACK library and includes.]),
         [amg4psblas_cv_umfpackdir=$withval],
         [amg4psblas_cv_umfpackdir=''])
-AC_ARG_WITH(umfpackincdir, AC_HELP_STRING([--with-umfpackincdir=DIR], [Specify the directory for UMFPACK includes.]),
+AC_ARG_WITH(umfpackincdir, AS_HELP_STRING([--with-umfpackincdir=DIR], [Specify the directory for UMFPACK includes.]),
         [amg4psblas_cv_umfpackincdir=$withval],
         [amg4psblas_cv_umfpackincdir=''])
-AC_ARG_WITH(umfpacklibdir, AC_HELP_STRING([--with-umfpacklibdir=DIR], [Specify the directory for UMFPACK library.]),
+AC_ARG_WITH(umfpacklibdir, AS_HELP_STRING([--with-umfpacklibdir=DIR], [Specify the directory for UMFPACK library.]),
         [amg4psblas_cv_umfpacklibdir=$withval],
         [amg4psblas_cv_umfpacklibdir=''])
 
@@ -660,17 +660,17 @@ dnl
 dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
 dnl
 AC_DEFUN(PAC_CHECK_SUPERLU,
-[AC_ARG_WITH(superlu, AC_HELP_STRING([--with-superlu=LIBNAME], [Specify the library name for SUPERLU library.
+[AC_ARG_WITH(superlu, AS_HELP_STRING([--with-superlu=LIBNAME], [Specify the library name for SUPERLU library.
 Default: "-lsuperlu"]),
         [amg4psblas_cv_superlu=$withval],
         [amg4psblas_cv_superlu='-lsuperlu'])
-AC_ARG_WITH(superludir, AC_HELP_STRING([--with-superludir=DIR], [Specify the directory for SUPERLU library and includes.]),
+AC_ARG_WITH(superludir, AS_HELP_STRING([--with-superludir=DIR], [Specify the directory for SUPERLU library and includes.]),
         [amg4psblas_cv_superludir=$withval],
         [amg4psblas_cv_superludir=''])
-AC_ARG_WITH(superluincdir, AC_HELP_STRING([--with-superluincdir=DIR], [Specify the directory for SUPERLU includes.]),
+AC_ARG_WITH(superluincdir, AS_HELP_STRING([--with-superluincdir=DIR], [Specify the directory for SUPERLU includes.]),
         [amg4psblas_cv_superluincdir=$withval],
         [amg4psblas_cv_superluincdir=''])
-AC_ARG_WITH(superlulibdir, AC_HELP_STRING([--with-superlulibdir=DIR], [Specify the directory for SUPERLU library.]),
+AC_ARG_WITH(superlulibdir, AS_HELP_STRING([--with-superlulibdir=DIR], [Specify the directory for SUPERLU library.]),
         [amg4psblas_cv_superlulibdir=$withval],
         [amg4psblas_cv_superlulibdir=''])
 AC_LANG_PUSH([C])
@@ -779,18 +779,18 @@ dnl
 dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
 dnl
 AC_DEFUN(PAC_CHECK_SUPERLUDIST,
-[AC_ARG_WITH(superludist, AC_HELP_STRING([--with-superludist=LIBNAME], [Specify the libname for SUPERLUDIST library. Requires you also specify SuperLU. Default: "-lsuperlu_dist"]),
+[AC_ARG_WITH(superludist, AS_HELP_STRING([--with-superludist=LIBNAME], [Specify the libname for SUPERLUDIST library. Requires you also specify SuperLU. Default: "-lsuperlu_dist"]),
         [amg4psblas_cv_superludist=$withval],
         [amg4psblas_cv_superludist='-lsuperlu_dist'])
-AC_ARG_WITH(superludistdir, AC_HELP_STRING([--with-superludistdir=DIR], [Specify the directory for SUPERLUDIST library and includes.]),
+AC_ARG_WITH(superludistdir, AS_HELP_STRING([--with-superludistdir=DIR], [Specify the directory for SUPERLUDIST library and includes.]),
         [amg4psblas_cv_superludistdir=$withval],
         [amg4psblas_cv_superludistdir=''])
 
-AC_ARG_WITH(superludistincdir, AC_HELP_STRING([--with-superludistincdir=DIR], [Specify the directory for SUPERLUDIST includes.]),
+AC_ARG_WITH(superludistincdir, AS_HELP_STRING([--with-superludistincdir=DIR], [Specify the directory for SUPERLUDIST includes.]),
         [amg4psblas_cv_superludistincdir=$withval],
         [amg4psblas_cv_superludistincdir=''])
 
-AC_ARG_WITH(superludistlibdir, AC_HELP_STRING([--with-superludistlibdir=DIR], [Specify the directory for SUPERLUDIST library.]),
+AC_ARG_WITH(superludistlibdir, AS_HELP_STRING([--with-superludistlibdir=DIR], [Specify the directory for SUPERLUDIST library.]),
         [amg4psblas_cv_superludistlibdir=$withval],
         [amg4psblas_cv_superludistlibdir=''])
 
@@ -852,6 +852,7 @@ if test "x$pac_sludist_header_ok" == "xyes" ; then
      dnl Maybe lib?
      SLUDIST_LIBS="$amg4psblas_cv_superludist  -L$amg4psblas_cv_superludistdir/lib";
      LIBS="$SLUDIST_LIBS -lm $save_LIBS";
+     AC_MSG_CHECKING([for superlu_malloc_dist in $SLUDIST_LIBS])
      AC_TRY_LINK_FUNC(superlu_malloc_dist, 
 		     [amg4psblas_cv_have_superludist=yes;pac_sludist_lib_ok=yes;],
 		     [amg4psblas_cv_have_superludist=no;pac_sludist_lib_ok=no; 
@@ -861,12 +862,13 @@ if test "x$pac_sludist_header_ok" == "xyes" ; then
      dnl Maybe lib64?
      SLUDIST_LIBS="$amg4psblas_cv_superludist  -L$amg4psblas_cv_superludistdir/lib64";
      LIBS="$SLUDIST_LIBS -lm $save_LIBS";
+     AC_MSG_CHECKING([for superlu_malloc_dist in $SLUDIST_LIBS])
      AC_TRY_LINK_FUNC(superlu_malloc_dist, 
 		     [amg4psblas_cv_have_superludist=yes;pac_sludist_lib_ok=yes;],
 		     [amg4psblas_cv_have_superludist=no;pac_sludist_lib_ok=no; 
 		      SLUDIST_LIBS="";SLUDIST_INCLUDES=""])
   fi
-  AC_MSG_RESULT($pac_sludist_lib_ok)
+  AC_MSG_RESULT([$pac_sludist_lib_ok $SLUDIST_LIBS])
 fi
 
 if test "x$pac_sludist_lib_ok" == "xyes" ; then
@@ -954,22 +956,22 @@ dnl
 dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
 dnl
 AC_DEFUN(PAC_CHECK_MUMPS,
-[AC_ARG_WITH(mumps, AC_HELP_STRING([--with-mumps=LIBNAME], [Specify the libname for MUMPS. Default: autodetect with minimum "-lmumps_common -lpord"]),
+[AC_ARG_WITH(mumps, AS_HELP_STRING([--with-mumps=LIBNAME], [Specify the libname for MUMPS. Default: autodetect with minimum "-lmumps_common -lpord"]),
         [amg4psblas_cv_mumps=$withval],
         [amg4psblas_cv_mumps='-lsmumps -ldmumps -lcmumps -lzmumps -lmumps_common -lpord'])
- AC_ARG_WITH(mumpsdir, AC_HELP_STRING([--with-mumpsdir=DIR], [Specify the directory for MUMPS library and includes. Note: you will need to add auxiliary libraries with --extra-libs; this depends on how MUMPS was configured and installed, at a minimum you will need SCALAPACK and BLAS]),
+ AC_ARG_WITH(mumpsdir, AS_HELP_STRING([--with-mumpsdir=DIR], [Specify the directory for MUMPS library and includes. Note: you will need to add auxiliary libraries with --extra-libs; this depends on how MUMPS was configured and installed, at a minimum you will need SCALAPACK and BLAS]),
         [amg4psblas_cv_mumpsdir=$withval],
         [amg4psblas_cv_mumpsdir=''])
 
-AC_ARG_WITH(mumpsincdir, AC_HELP_STRING([--with-mumpsincdir=DIR], [Specify the directory for MUMPS includes.]),
+AC_ARG_WITH(mumpsincdir, AS_HELP_STRING([--with-mumpsincdir=DIR], [Specify the directory for MUMPS includes.]),
         [amg4psblas_cv_mumpsincdir=$withval],
         [amg4psblas_cv_mumpsincdir=''])
 
-AC_ARG_WITH(mumpsmoddir, AC_HELP_STRING([--with-mumpsmoddir=DIR], [Specify the directory for MUMPS Fortran modules.]),
+AC_ARG_WITH(mumpsmoddir, AS_HELP_STRING([--with-mumpsmoddir=DIR], [Specify the directory for MUMPS Fortran modules.]),
         [amg4psblas_cv_mumpsmoddir=$withval],
         [amg4psblas_cv_mumpsmoddir=''])
 
-AC_ARG_WITH(mumpslibdir, AC_HELP_STRING([--with-mumpslibdir=DIR], [Specify the directory for MUMPS library.]),
+AC_ARG_WITH(mumpslibdir, AS_HELP_STRING([--with-mumpslibdir=DIR], [Specify the directory for MUMPS library.]),
         [amg4psblas_cv_mumpslibdir=$withval],
         [amg4psblas_cv_mumpslibdir=''])
 
@@ -1190,7 +1192,7 @@ dnl
 AC_DEFUN([PAC_ARG_SERIAL_MPI],
 [AC_MSG_CHECKING([whether we want serial  mpi stubs])
 AC_ARG_ENABLE(serial,
-AC_HELP_STRING([--enable-serial], 
+AS_HELP_STRING([--enable-serial], 
 [Specify whether to enable a fake mpi library to run in serial mode. ]),
 [
 pac_cv_serial_mpi="yes";
@@ -1231,8 +1233,8 @@ AC_DEFUN(PAC_FORTRAN_CHECK_HAVE_MPI_MOD,
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1274,8 +1276,8 @@ end program conftest],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1296,7 +1298,7 @@ AC_DEFUN([PAC_ARG_LONG_INTEGERS],
 [
 AC_MSG_CHECKING([whether we want long (8 bytes) integers])
 AC_ARG_ENABLE(long-integers,
-AC_HELP_STRING([--enable-long-integers], 
+AS_HELP_STRING([--enable-long-integers], 
 [Specify usage of 64 bits integers. ]),
 [
 pac_cv_long_integers="yes";
@@ -1366,8 +1368,8 @@ end program conftest],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1411,8 +1413,8 @@ end program xtt],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1442,8 +1444,8 @@ dnl Warning : square brackets are EVIL!
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1478,8 +1480,8 @@ end program conftest],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1515,8 +1517,8 @@ end program conftest],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1578,8 +1580,8 @@ end module conftest],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1617,8 +1619,8 @@ end program conftest],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1647,8 +1649,8 @@ AC_DEFUN(PAC_FORTRAN_TEST_ISO_FORTRAN_ENV,
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1697,8 +1699,8 @@ end program conftest],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1742,8 +1744,8 @@ end program stt],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1785,8 +1787,8 @@ end program xtt],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1830,8 +1832,8 @@ end program xtt],
 		  [  AC_MSG_RESULT([yes])
 		     ifelse([$1], , :, [ $1])],
 		  [  AC_MSG_RESULT([no])	
-		     echo "configure: failed program was:" >&AC_FD_CC
-		     cat conftest.$ac_ext >&AC_FD_CC
+		     echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+		     cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 		     ifelse([$2], , , [ $2])])
 AC_LANG_POP([Fortran])
 ])
@@ -1889,7 +1891,7 @@ dnl AC_REQUIRE([AC_FC_LIBRARY_LDFLAGS])
 pac_blas_ok=no 
 
 AC_ARG_WITH(blas,
-	[AC_HELP_STRING([--with-blas=<lib>], [use BLAS library <lib>])])
+	[AS_HELP_STRING([--with-blas=<lib>], [use BLAS library <lib>])])
 case $with_blas in
 	yes | "") ;;
 	no) pac_blas_ok=disable ;;
@@ -1897,7 +1899,7 @@ case $with_blas in
 	*) BLAS_LIBS="-l$with_blas" ;;
 esac
 AC_ARG_WITH(blasdir,
-	[AC_HELP_STRING([--with-blasdir=<dir>], [search for BLAS library in <dir>])])
+	[AS_HELP_STRING([--with-blasdir=<dir>], [search for BLAS library in <dir>])])
 case $with_blasdir in
   "") ;;
       *) if test -d $with_blasdir; then 
@@ -2090,7 +2092,7 @@ AC_REQUIRE([PAC_BLAS])
 pac_lapack_ok=no
 
 AC_ARG_WITH(lapack,
-        [AC_HELP_STRING([--with-lapack=<lib>], [use LAPACK library <lib>])])
+        [AS_HELP_STRING([--with-lapack=<lib>], [use LAPACK library <lib>])])
 case $with_lapack in
         yes | "") ;;
         no) pac_lapack_ok=disable ;;
@@ -2122,8 +2124,8 @@ EOF
 	  AC_MSG_RESULT([yes])	
 	else
 	  AC_MSG_RESULT([no])	
-	  echo "configure: failed program was:" >&AC_FD_CC
-	  cat conftest.$ac_ext >&AC_FD_CC
+	  echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+	  cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD
 	fi 
 	rm -f conftest*
         LIBS="$save_LIBS"
@@ -2149,8 +2151,8 @@ EOF
 	  AC_MSG_RESULT([yes])	
 	else
 	  AC_MSG_RESULT([no])	
-	  echo "configure: failed program was:" >&AC_FD_CC
-	  cat conftest.$ac_ext >&AC_FD_CC
+	  echo "configure: failed program was:" >&AS_MESSAGE_LOG_FD
+	  cat conftest.$ac_ext >&AS_MESSAGE_LOG_FD  
 	fi 
 	rm -f conftest*
         LIBS="$save_LIBS"
@@ -2197,7 +2199,7 @@ AC_DEFUN([PAC_ARG_WITH_IPK],
 [
 AC_MSG_CHECKING([what size in bytes we want for local indices and data])
 AC_ARG_WITH(ipk,
-	    AC_HELP_STRING([--with-ipk=<bytes>], 
+	    AS_HELP_STRING([--with-ipk=<bytes>], 
 			   [Specify the size in bytes for local indices and data, default 4 bytes. ]),
 	    [pac_cv_ipk_size=$withval;],
 	    [pac_cv_ipk_size=4;]
@@ -2226,7 +2228,7 @@ AC_DEFUN([PAC_ARG_WITH_LPK],
 [
  AC_MSG_CHECKING([what size in bytes we want for global indices and data])
  AC_ARG_WITH(lpk,
-	     AC_HELP_STRING([--with-lpk=<bytes>], 
+	     AS_HELP_STRING([--with-lpk=<bytes>], 
 			    [Specify the size in bytes for global indices and data, default 8 bytes. ]),
 	     [pac_cv_lpk_size=$withval;],
 	     [pac_cv_lpk_size=8;]
@@ -2256,20 +2258,20 @@ dnl
 dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
 dnl
 AC_DEFUN(PAC_CHECK_METIS,
-[AC_ARG_WITH(metis, AC_HELP_STRING([--with-metis=LIBNAME], [Specify the library name for METIS library. 
+[AC_ARG_WITH(metis, AS_HELP_STRING([--with-metis=LIBNAME], [Specify the library name for METIS library. 
 Default: "-lmetis"]),
         [psblas_cv_metis=$withval],
         [psblas_cv_metis='-lmetis'])
-AC_ARG_WITH(metisincfile, AC_HELP_STRING([--with-metisincfile=DIR], [Specify the name  for METIS include file.]),
+AC_ARG_WITH(metisincfile, AS_HELP_STRING([--with-metisincfile=DIR], [Specify the name  for METIS include file.]),
         [psblas_cv_metisincfile=$withval],
         [psblas_cv_metisincfile='metis.h'])
-AC_ARG_WITH(metisdir, AC_HELP_STRING([--with-metisdir=DIR], [Specify the directory for METIS library and includes.]),
+AC_ARG_WITH(metisdir, AS_HELP_STRING([--with-metisdir=DIR], [Specify the directory for METIS library and includes.]),
         [psblas_cv_metisdir=$withval],
         [psblas_cv_metisdir=''])
-AC_ARG_WITH(metisincdir, AC_HELP_STRING([--with-metisincdir=DIR], [Specify the directory for METIS includes.]),
+AC_ARG_WITH(metisincdir, AS_HELP_STRING([--with-metisincdir=DIR], [Specify the directory for METIS includes.]),
         [psblas_cv_metisincdir=$withval],
         [psblas_cv_metisincdir=''])
-AC_ARG_WITH(metislibdir, AC_HELP_STRING([--with-metislibdir=DIR], [Specify the directory for METIS library.]),
+AC_ARG_WITH(metislibdir, AS_HELP_STRING([--with-metislibdir=DIR], [Specify the directory for METIS library.]),
         [psblas_cv_metislibdir=$withval],
         [psblas_cv_metislibdir=''])
 

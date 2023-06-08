@@ -157,7 +157,7 @@ contains
     return
   end subroutine d_id_solver_free
 
-  subroutine d_id_solver_descr(sv,info,iout,coarse)
+  subroutine d_id_solver_descr(sv,info,iout,coarse,prefix)
 
     Implicit None
 
@@ -165,12 +165,14 @@ contains
     class(amg_d_id_solver_type), intent(in) :: sv
     integer(psb_ipk_), intent(out)            :: info
     integer(psb_ipk_), intent(in), optional   :: iout
-    logical, intent(in), optional       :: coarse
+    logical, intent(in), optional             :: coarse
+    character(len=*), intent(in), optional    :: prefix
 
     ! Local variables
     integer(psb_ipk_)      :: err_act
     character(len=20), parameter :: name='amg_d_id_solver_descr'
     integer(psb_ipk_) :: iout_
+    character(1024)    :: prefix_
 
     info = psb_success_
     if (present(iout)) then 
@@ -178,8 +180,13 @@ contains
     else
       iout_ = psb_out_unit
     endif
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
     
-    write(iout_,*) '  Identity local solver '
+    write(iout_,*) trim(prefix_), '  Identity local solver '
 
     return
 

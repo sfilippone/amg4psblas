@@ -329,17 +329,24 @@ contains
     val = "new matching aggregation"
   end function d_newmatch_aggregator_fmt
 
-  subroutine  d_newmatch_aggregator_descr(ag,parms,iout,info)
+  subroutine  d_newmatch_aggregator_descr(ag,parms,iout,info,prefix)
     implicit none 
     class(amg_d_newmatch_aggregator_type), intent(in) :: ag
     type(amg_dml_parms), intent(in)   :: parms
     integer(psb_ipk_), intent(in)  :: iout
     integer(psb_ipk_), intent(out) :: info
+    character(len=*), intent(in), optional  :: prefix
+    character(1024)    :: prefix_
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
 
-    write(iout,*) 'NewMatch Aggregator'
-    write(iout,*) '   Number of Matching   sweeps: ',ag%n_sweeps
-    write(iout,*) '   Matching algorithm         : ',ag%matching_alg
-    write(iout,*) 'Aggregator object type: ',ag%fmt()
+    write(iout,*) trim(prefix_),' ','NewMatch Aggregator'
+    write(iout,*) trim(prefix_),' ','   Number of Matching   sweeps: ',ag%n_sweeps
+    write(iout,*) trim(prefix_),' ','   Matching algorithm         : ',ag%matching_alg
+    write(iout,*) trim(prefix_),' ','Aggregator object type: ',ag%fmt()
     call parms%mldescr(iout,info)
     
     return

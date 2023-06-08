@@ -259,7 +259,7 @@ module amg_d_onelev_mod
   end interface
 
   interface
-    subroutine amg_d_base_onelev_descr(lv,il,nl,ilmin,info,iout, verbosity)
+    subroutine amg_d_base_onelev_descr(lv,il,nl,ilmin,info,iout, verbosity,prefix)
       import :: psb_dspmat_type, psb_d_vect_type, psb_d_base_vect_type, &
            & psb_dlinmap_type, psb_dpk_, amg_d_onelev_type, &
            & psb_ipk_, psb_epk_, psb_desc_type
@@ -270,6 +270,7 @@ module amg_d_onelev_mod
       integer(psb_ipk_), intent(out)          :: info
       integer(psb_ipk_), intent(in), optional :: iout
       integer(psb_ipk_), intent(in), optional :: verbosity
+      character(len=*), intent(in), optional  :: prefix
     end subroutine amg_d_base_onelev_descr
   end interface
 
