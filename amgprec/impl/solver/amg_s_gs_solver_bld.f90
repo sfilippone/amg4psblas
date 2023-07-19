@@ -56,6 +56,8 @@ subroutine amg_s_gs_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
   character(len=20)   :: name='s_gs_solver_bld', ch_err
+  integer(psb_ipk_), save :: idx_tril=-1
+  logical, parameter      :: do_timings=.true.
 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -65,6 +67,8 @@ subroutine amg_s_gs_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
+  if ((do_timings).and.(idx_tril==-1))       &
+       & idx_tril = psb_get_timer_idx("GS_BLD: tril")
 
 
   n_row  = desc_a%get_local_rows()
@@ -76,9 +80,12 @@ subroutine amg_s_gs_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
     !
     ! This cuts out the off-diagonal part, because it's supposed to
     ! be handled by the outer Jacobi smoother.
-    ! 
+    !
+    !write(0,*) 'Calling A%TRIL in gs_solver_bld'
+    if (do_timings) call psb_tic(idx_tril)
     call a%tril(sv%l,info,diag=izero,jmax=nrow_a,u=sv%u)
-
+    if (do_timings) call psb_toc(idx_tril)
+    !write(0,*) 'From A%TRIL in gs_solver_bld',a%get_nzeros(),sv%l%get_nzeros(),sv%u%get_nzeros()
   else
 
     info = psb_err_missing_override_method_

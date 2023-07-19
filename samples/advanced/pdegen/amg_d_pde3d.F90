@@ -195,7 +195,7 @@ program amg_d_pde3d
   ! other variables
   integer(psb_ipk_)  :: info, i, k
   character(len=20)  :: name,ch_err
-
+  type(psb_d_csr_sparse_mat) :: amold
   info=psb_success_
 
 
@@ -402,7 +402,7 @@ program amg_d_pde3d
   end if
   call psb_barrier(ctxt)
   t1 = psb_wtime()
-  call prec%smoothers_build(a,desc_a,info)
+  call prec%smoothers_build(a,desc_a,info,amold=amold)
   tprec = psb_wtime()-t1
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_smoothers_bld')
@@ -492,7 +492,7 @@ program amg_d_pde3d
     write(psb_out_unit,'("Storage format for DESC_A          : ",a  )') desc_a%get_fmt()
 
   end if
-
+  call psb_print_timers(ctxt)
   !
   !  cleanup storage and exit
   !

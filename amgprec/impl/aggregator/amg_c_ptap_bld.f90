@@ -76,7 +76,7 @@ subroutine amg_c_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
   integer(psb_ipk_) :: nrow, ncol, nrl, nzl, ip, nzt, i, k
   integer(psb_lpk_) ::  nrsave, ncsave, nzsave, nza
   logical, parameter :: do_timings=.false., oldstyle=.false., debug=.false.  
-  integer(psb_ipk_), save :: idx_spspmm=-1
+  integer(psb_ipk_), save :: idx_spspmm=-1, idx_cpytrans1=-1, idx_cpytrans2=-1
 
   name='amg_ptap_bld'
   if(psb_get_errstatus().ne.0) return 
@@ -93,7 +93,11 @@ subroutine amg_c_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
   ncol  = desc_a%get_local_cols()
 
   if ((do_timings).and.(idx_spspmm==-1)) &
-       & idx_spspmm = psb_get_timer_idx("SPMM_BLD: par_spspmm")
+       & idx_spspmm = psb_get_timer_idx("PTAP_BLD: par_spspmm")
+  if ((do_timings).and.(idx_cpytrans1==-1)) &
+       & idx_cpytrans1 = psb_get_timer_idx("PTAP_BLD: cpy&trans1")
+  if ((do_timings).and.(idx_cpytrans2==-1)) &
+       & idx_cpytrans2 = psb_get_timer_idx("PTAP_BLD: cpy&trans2")
 
   naggr   = nlaggr(me+1)
   ntaggr  = sum(nlaggr)
@@ -128,6 +132,7 @@ subroutine amg_c_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
   ! Ok first product done.
 
   if (present(desc_ax)) then
+    if (do_timings) call psb_tic(idx_cpytrans1)
     block 
       call coo_prol%cp_to_coo(coo_restr,info)
       call coo_restr%set_ncols(desc_ac%get_local_cols())
@@ -137,7 +142,7 @@ subroutine amg_c_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
       call coo_restr%set_ncols(desc_ax%get_local_cols())
     end block
     call csr_restr%cp_from_coo(coo_restr,info)
-
+    if (do_timings) call psb_toc(idx_cpytrans1)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='spcnv coo_restr')
       goto 9999
@@ -167,27 +172,28 @@ subroutine amg_c_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
 
     call coo_restr%transp()
     nzl = coo_restr%get_nzeros()
-    nrl = desc_ac%get_local_rows() 
-    i=0
+    nrl = desc_ac%get_local_rows()
+    call coo_restr%fix(info)
+    i=coo_restr%get_nzeros()
     !
     ! Only keep local rows
     !
-    do k=1, nzl
-      if ((1 <= coo_restr%ia(k)) .and.(coo_restr%ia(k) <= nrl)) then
-        i = i+1
-        coo_restr%val(i) = coo_restr%val(k)
-        coo_restr%ia(i)  = coo_restr%ia(k)
-        coo_restr%ja(i)  = coo_restr%ja(k)
+    search: do k=i,1,-1
+      if (coo_restr%ia(k) <= nrl) then
+        call coo_restr%set_nzeros(k)
+        exit search
       end if
-    end do
-    call coo_restr%set_nzeros(i)
-    call coo_restr%fix(info) 
+    end do search
+
     nzl  = coo_restr%get_nzeros()
     call coo_restr%set_nrows(desc_ac%get_local_rows())
     call coo_restr%set_ncols(desc_a%get_local_cols())
     if (debug) call check_coo(me,trim(name)//' Check 2 on coo_restr:',coo_restr)
+    if (do_timings) call psb_tic(idx_cpytrans2)
+        
     call csr_restr%cp_from_coo(coo_restr,info)
 
+    if (do_timings) call psb_toc(idx_cpytrans2)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='spcnv coo_restr')
       goto 9999
