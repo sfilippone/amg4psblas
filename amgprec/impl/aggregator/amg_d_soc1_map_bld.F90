@@ -87,7 +87,7 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   integer(psb_ipk_), intent(out)               :: info
 
   ! Local variables
-  integer(psb_ipk_), allocatable :: ils(:), neigh(:), irow(:), icol(:),&
+  integer(psb_ipk_), allocatable :: ioffs(:), neigh(:), irow(:), icol(:),&
        & ideg(:), idxs(:)
   integer(psb_lpk_), allocatable :: tmpaggr(:)
   real(psb_dpk_), allocatable  :: val(:), diag(:)
@@ -130,7 +130,7 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
 
   nr = a%get_nrows()
   nc = a%get_ncols()
-  allocate(ilaggr(nr),neigh(nr),ideg(nr),idxs(nr),&
+  allocate(ilaggr(nr),ioffs(nr),neigh(nr),ideg(nr),idxs(nr),&
        & icol(nc),val(nc),stat=info)
   if(info /= psb_success_) then
     info=psb_err_alloc_request_
@@ -154,7 +154,8 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
     !$omp parallel do private(i)
     do i=1, nr
       ilaggr(i) = -(nr+1)
-      idxs(i)   = i 
+      idxs(i)   = i
+      ioffs(i)  = 0
     end do
     !$omp end parallel do 
   else
@@ -162,6 +163,7 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
     do i=1, nr
       ilaggr(i) = -(nr+1)
       ideg(i)   = acsr%irp(i+1) - acsr%irp(i)
+      ioffs(i)  = 0
     end do
     !$omp end parallel do 
     call psb_msort(ideg,ix=idxs,dir=psb_sort_down_)
@@ -172,37 +174,35 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   ! Phase one: Start with disjoint groups.
   ! 
   naggr = 0
-#if 0&&defined(OPENMP)
+#if defined(OPENMP)
   block
     integer(psb_ipk_), allocatable  :: bnds(:), locnaggr(:)
     integer(psb_ipk_) :: myth,nths, kk
-    !$omp parallel shared(bnds,locnaggr,ilaggr,nr,naggr,diag,theta,nths) private(icol,val,myth,kk)
+    !$omp parallel shared(bnds,ioffs,locnaggr,ilaggr,nr,naggr,diag,theta,nths) &
+    !$omp private(icol,val,myth,kk)
     block
-      integer(psb_ipk_) :: ii,nlp,k,n,ia,isz, nc, i,j,m, nz, ilg,  ip, rsz,  minip
+      integer(psb_ipk_) :: ii,nlp,k,kp,n,ia,isz, nc, i,j,m, nz, ilg,  ip, rsz
       nths = omp_get_num_threads()
       myth = omp_get_thread_num()
       rsz = nr/nths
       if (myth < mod(nr,nths)) rsz = rsz + 1
-!!$      write(0,*) 'From thread : rsz ',myth,rsz
       !$omp master
-      allocate(bnds(0:nths),locnaggr(0:nths))
+      allocate(bnds(0:nths),locnaggr(0:nths+1))
       locnaggr(:) = 0
       bnds(0) = 1
       !$omp end master      
       !$omp barrier
       bnds(myth+1) = rsz
+      !$omp barrier
       !$omp master
-!!$      write(0,*) 'From master 1: ',bnds      
       do i=1,nths
         bnds(i) = bnds(i) + bnds(i-1)
       end do
-!!$      write(0,*) 'From master 2: ',bnds
       !$omp end master
       !$omp barrier
 
-      !$omp  do schedule(static) 
+      !$omp  do schedule(static)
       do kk=0, nths-1
-!!$        write(0,*) 'From thread ',myth,kk,bnds(kk),bnds(kk+1)-1
         step1: do ii=bnds(kk), bnds(kk+1)-1
           if (info /= 0) cycle
           i = idxs(ii)
@@ -228,94 +228,67 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
             !
             ! Build the set of all strongly coupled nodes 
             !
-            if (.false.) then 
-              ip = 0
-              do k=1, nz
-                j   = icol(k)
-                if ((bnds(myth)<=j).and.(j<=(bnds(myth+1)-1))) then 
-                  if (abs(val(k)) > theta*sqrt(abs(diag(i)*diag(j)))) then
-                    ip = ip + 1
-                    icol(ip) = icol(k)
-                  end if
-                end if
-              enddo
+            ip = 0
+            do k=1, nz
+              j   = icol(k)
+              if (ilaggr(j) > 0) cycle step1
+              if (abs(val(k)) > theta*sqrt(abs(diag(i)*diag(j)))) then
+                ip = ip + 1
+                icol(ip) = icol(k)
+              end if
+            enddo
 
-              !
-              ! If the whole strongly coupled neighborhood of I is
-              ! as yet unconnected, turn it into the next aggregate.
-              ! Same if ip==0 (in which case, neighborhood only
-              ! contains I even if it does not look like it from matrix)
-              !
+            !
+            ! If the whole strongly coupled neighborhood of I is
+            ! as yet unconnected, turn it into the next aggregate.
+            ! Same if ip==0 (in which case, neighborhood only
+            ! contains I even if it does not look like it from matrix)
+            !
+            disjoint = all(ilaggr(icol(1:ip)) == -(nr+1)).or.(ip==0)
+            if (disjoint) then       
+              !$omp critical(update_ilaggr)
               disjoint = all(ilaggr(icol(1:ip)) == -(nr+1)).or.(ip==0)
               if (disjoint) then       
                 locnaggr(kk)     = locnaggr(kk) + 1
                 do k=1, ip
-                  ilaggr(icol(k)) = locnaggr(kk)
+                  ilaggr(icol(k)) = bnds(kk)-1+locnaggr(kk)
+                  ioffs(icol(k))  = kk
                 end do
-                ilaggr(i) = locnaggr(kk)
+                ilaggr(i) = bnds(kk)-1+locnaggr(kk)
+                ioffs(i)  = kk
               end if
-            else
-              ip = 0
-              minip = nr +1              
-              do k=1, nz
-                j   = icol(k)
-                if (abs(val(k)) > theta*sqrt(abs(diag(i)*diag(j)))) then
-                  ip = ip + 1
-                  icol(ip) = icol(k)
-                  minip = min(icol(ip),minip)
-                end if
-              enddo
-              if (bnds(myth)<=minip) then
-
-                !
-                ! If the whole strongly coupled neighborhood of I is
-                ! as yet unconnected, turn it into the next aggregate.
-                ! Same if ip==0 (in which case, neighborhood only
-                ! contains I even if it does not look like it from matrix)
-                !
-                disjoint = all(ilaggr(icol(1:ip)) == -(nr+1)).or.(ip==0)
-                if (disjoint) then       
-                  !$omp critical(update_ilaggr)
-                  disjoint = all(ilaggr(icol(1:ip)) == -(nr+1)).or.(ip==0)
-                  if (disjoint) then       
-                    locnaggr(kk)     = locnaggr(kk) + 1
-                    do k=1, ip
-                      ilaggr(icol(k)) = locnaggr(kk)
-                    end do
-                    ilaggr(i) = locnaggr(kk)
-                  end if
-                  !$omp end critical(update_ilaggr)
-                end if
-              endif
+              !$omp end critical(update_ilaggr)
             end if
+
           end if
         enddo step1
       end do
       !$omp end do
-      !$omp barrier
+
       !$omp master
       naggr = sum(locnaggr(0:nths-1))
-!!$      write(0,*) 'NAGGR ',naggr, 'locnaggr ',locnaggr(0:nths-1)
       do i=1,nths
         locnaggr(i) = locnaggr(i) + locnaggr(i-1)
       end do
-      do i=nths,1,-1
+      do i=nths+1,1,-1
         locnaggr(i) = locnaggr(i-1)
       end do
       locnaggr(0) = 0
-      !$omp end master
+      !$omp end master 
       !$omp barrier
       !$omp  do schedule(static) 
       do kk=0, nths-1
         do ii=bnds(kk), bnds(kk+1)-1
-          if (ilaggr(ii) > 0) ilaggr(ii) = ilaggr(ii) + locnaggr(kk)
+          if (ilaggr(ii) > 0) then
+            kp = ioffs(ii) 
+            ilaggr(ii) = ilaggr(ii)- (bnds(kp)-1) + locnaggr(kp)
+          end if
         end do
       end do
       !$omp end do
     end block
     !$omp end parallel
   end block
-!!$  write(0,*) 'Out of parallel looop NAGGR ',naggr
 #else
   step1: do ii=1, nr
     if (info /= 0) cycle
@@ -369,7 +342,6 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       end if
     endif
   enddo step1
-!!$  write(0,*) 'NAGGR ',naggr
 #endif
   if (debug_level >= psb_debug_outer_) then 
     write(debug_unit,*) me,' ',trim(name),&
@@ -381,10 +353,11 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   !
   ! Phase two: join the neighbours
   !
-  ! $ omp workshare
+  !$omp workshare
   tmpaggr = ilaggr
-  ! $ omp end workshare
-  ! $ omp parallel do schedule(static) shared(tmpaggr,ilaggr,nr,naggr,diag,theta) private(ii,i,j,k,nz,icol,val,ip)
+  !$omp end workshare
+  !$omp parallel do schedule(static) shared(tmpaggr,ilaggr,nr,naggr,diag,theta)& 
+  !$omp     private(ii,i,j,k,nz,icol,val,ip)
   step2: do ii=1,nr
     i = idxs(ii)
 
@@ -415,14 +388,14 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       end if
     end if
   end do step2
-  ! $ omp end parallel do
+  !$omp end parallel do
   if (do_timings) call psb_toc(idx_soc1_p2)
   if (debug_level >= psb_debug_outer_) then 
     write(debug_unit,*) me,' ',trim(name),&
          & ' Check 1.5:',naggr,count(ilaggr(1:nr) == -(nr+1)), count(ilaggr(1:nr)>0),&
          & count(ilaggr(1:nr) == -(nr+1))+count(ilaggr(1:nr)>0),nr
   end if
-  
+
   if (do_timings) call psb_tic(idx_soc1_p3)
   !
   ! Phase three: sweep over leftovers, if any 
@@ -488,7 +461,6 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   end do
   if (do_timings) call psb_toc(idx_soc1_p3)
   if (naggr > ncol) then 
-    !write(0,*) name,'Error : naggr > ncol',naggr,ncol
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Fatal error: naggr>ncol')
     goto 9999
@@ -518,7 +490,6 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
          & ' Check   2:',naggr,count(ilaggr(1:nr) == -(nr+1)), count(ilaggr(1:nr)>0),&
          & count(ilaggr(1:nr) == -(nr+1))+count(ilaggr(1:nr)>0),nr
   end if
-!!$  write(0,*) nlaggr(1:np),'ILAGGR : ',ilaggr(1:nr)
 
   call acsr%free()
   call psb_erractionrestore(err_act)
