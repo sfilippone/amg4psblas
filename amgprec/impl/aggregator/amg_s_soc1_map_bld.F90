@@ -178,6 +178,18 @@ subroutine amg_s_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   block
     integer(psb_ipk_), allocatable  :: bnds(:), locnaggr(:)
     integer(psb_ipk_) :: myth,nths, kk
+    ! The parallelization makes use of a locaggr(:) array; each thread
+    ! keeps its own version of naggr, and when the loop ends, a prefix is applied
+    ! to locnaggr to determine:
+    ! 1. The total number of aggregaters NAGGR;
+    ! 2. How much should each thread shift its own aggregates
+    ! Part 2 requires to keep track of which thread defined each entry
+    ! of ilaggr(), so that each entry can be adjusted correctly: even
+    ! if an entry I belongs to the range BNDS(TH)>BNDS(TH+1)-1, it may have
+    ! been set because it is strongly connected to an entry J belonging to a
+    ! different thread. 
+
+    
     !$omp parallel shared(bnds,ioffs,locnaggr,ilaggr,nr,naggr,diag,theta,nths) &
     !$omp private(icol,val,myth,kk)
     block
@@ -231,6 +243,8 @@ subroutine amg_s_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
             ip = 0
             do k=1, nz
               j   = icol(k)
+              ! If any of the neighbours is already assigned,
+              ! we will not reset. 
               if (ilaggr(j) > 0) cycle step1
               if (abs(val(k)) > theta*sqrt(abs(diag(i)*diag(j)))) then
                 ip = ip + 1
