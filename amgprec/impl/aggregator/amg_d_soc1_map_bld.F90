@@ -87,7 +87,7 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   integer(psb_ipk_), intent(out)               :: info
 
   ! Local variables
-  integer(psb_ipk_), allocatable :: ioffs(:), neigh(:), irow(:), icol(:),&
+  integer(psb_ipk_), allocatable :: neigh(:), irow(:), icol(:),&
        & ideg(:), idxs(:)
   integer(psb_lpk_), allocatable :: tmpaggr(:)
   real(psb_dpk_), allocatable  :: val(:), diag(:)
@@ -130,7 +130,7 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
 
   nr = a%get_nrows()
   nc = a%get_ncols()
-  allocate(ilaggr(nr),ioffs(nr),neigh(nr),ideg(nr),idxs(nr),&
+  allocate(ilaggr(nr),neigh(nr),ideg(nr),idxs(nr),&
        & icol(nc),val(nc),stat=info)
   if(info /= psb_success_) then
     info=psb_err_alloc_request_
@@ -151,19 +151,17 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   if (do_timings) call psb_toc(idx_soc1_p0)
   if (clean_zeros) call acsr%clean_zeros(info)
   if (iorder == amg_aggr_ord_nat_) then 
-    !$omp parallel do private(i)
+    !$omp parallel do private(i) schedule(static)
     do i=1, nr
       ilaggr(i) = -(nr+1)
       idxs(i)   = i
-      ioffs(i)  = 0
     end do
     !$omp end parallel do 
   else
-    !$omp parallel do private(i)
+    !$omp parallel do private(i) schedule(static)
     do i=1, nr
       ilaggr(i) = -(nr+1)
       ideg(i)   = acsr%irp(i+1) - acsr%irp(i)
-      ioffs(i)  = 0
     end do
     !$omp end parallel do 
     call psb_msort(ideg,ix=idxs,dir=psb_sort_down_)
@@ -189,11 +187,12 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
     ! been set because it is strongly connected to an entry J belonging to a
     ! different thread. 
 
-    
-    !$omp parallel shared(bnds,ioffs,locnaggr,ilaggr,nr,naggr,diag,theta,nths) &
+    info = 0
+    !$omp parallel shared(bnds,locnaggr,ilaggr,nr,naggr,diag,theta,nths) &
     !$omp private(icol,val,myth,kk)
     block
       integer(psb_ipk_) :: ii,nlp,k,kp,n,ia,isz, nc, i,j,m, nz, ilg,  ip, rsz
+      integer(psb_lpk_) :: itmp
       nths = omp_get_num_threads()
       myth = omp_get_thread_num()
       rsz = nr/nths
@@ -213,7 +212,7 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       !$omp end master
       !$omp barrier
 
-      !$omp  do schedule(static)
+      !$omp  do schedule(static) private(disjoint) reduction(max: info)
       do kk=0, nths-1
         step1: do ii=bnds(kk), bnds(kk+1)-1
           if (info /= 0) cycle
@@ -257,23 +256,31 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
             ! as yet unconnected, turn it into the next aggregate.
             ! Same if ip==0 (in which case, neighborhood only
             ! contains I even if it does not look like it from matrix)
+            ! The fact that DISJOINT is private and not under lock
+            ! generates a certain un-repeatability, in that between
+            ! computing DISJOINT and assigning, another thread might
+            ! alter the values of ILAGGR.
+            ! However, a certain unrepeatability is already present
+            ! because the sequence of aggregates is computed with a
+            ! different order than in serial mode.
             !
             disjoint = all(ilaggr(icol(1:ip)) == -(nr+1)).or.(ip==0)
-            if (disjoint) then       
-              !$omp critical(update_ilaggr)
-              disjoint = all(ilaggr(icol(1:ip)) == -(nr+1)).or.(ip==0)
-              if (disjoint) then       
-                locnaggr(kk)     = locnaggr(kk) + 1
-                do k=1, ip
-                  ilaggr(icol(k)) = bnds(kk)-1+locnaggr(kk)
-                  ioffs(icol(k))  = kk
-                end do
-                ilaggr(i) = bnds(kk)-1+locnaggr(kk)
-                ioffs(i)  = kk
+            if (disjoint) then
+              locnaggr(kk)     = locnaggr(kk) + 1
+              itmp = (bnds(kk)-1+locnaggr(kk))*nths+kk
+              if (itmp < (bnds(kk)-1+locnaggr(kk))) then
+                info = 12345678
+                cycle step1
               end if
-              !$omp end critical(update_ilaggr)
+              !$omp atomic write
+              ilaggr(i) = itmp
+              !$omp end atomic
+              do k=1, ip
+                !$omp atomic write
+                ilaggr(icol(k)) = itmp
+                !$omp end atomic
+              end do
             end if
-
           end if
         enddo step1
       end do
@@ -293,9 +300,9 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       !$omp  do schedule(static) 
       do kk=0, nths-1
         do ii=bnds(kk), bnds(kk+1)-1
-          if (ilaggr(ii) > 0) then
-            kp = ioffs(ii) 
-            ilaggr(ii) = ilaggr(ii)- (bnds(kp)-1) + locnaggr(kp)
+          if (ilaggr(ii) > 0) then 
+            kp = mod(ilaggr(ii),nths)
+            ilaggr(ii) = (ilaggr(ii)/nths)- (bnds(kp)-1) + locnaggr(kp)
           end if
         end do
       end do
@@ -303,6 +310,12 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
     end block
     !$omp end parallel
   end block
+  if (info /= 0) then
+    if (info == 12345678) write(0,*) 'Overflow in encoding ILAGGR'
+    info=psb_err_internal_error_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
 #else
   step1: do ii=1, nr
     if (info /= 0) cycle

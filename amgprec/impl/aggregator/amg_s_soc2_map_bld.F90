@@ -71,6 +71,9 @@ subroutine amg_s_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   use psb_base_mod
   use amg_base_prec_type
   use amg_s_inner_mod
+#if defined(OPENMP)
+  use omp_lib
+#endif
 
   implicit none
 
@@ -99,6 +102,9 @@ subroutine amg_s_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   integer(psb_ipk_) :: np, me
   integer(psb_ipk_) :: nrow, ncol, n_ne
   character(len=20)  :: name, ch_err
+  integer(psb_ipk_), save :: idx_soc2_p1=-1, idx_soc2_p2=-1, idx_soc2_p3=-1
+  integer(psb_ipk_), save :: idx_soc2_p0=-1
+  logical, parameter      :: do_timings=.true.
 
   info=psb_success_
   name = 'amg_soc2_map_bld'
@@ -114,6 +120,14 @@ subroutine amg_s_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   nrow   = desc_a%get_local_rows()
   ncol   = desc_a%get_local_cols()
   nrglob = desc_a%get_global_rows()
+  if ((do_timings).and.(idx_soc2_p0==-1))       &
+       & idx_soc2_p0 = psb_get_timer_idx("SOC2_MAP: phase0")
+  if ((do_timings).and.(idx_soc2_p1==-1))       &
+       & idx_soc2_p1 = psb_get_timer_idx("SOC2_MAP: phase1")
+  if ((do_timings).and.(idx_soc2_p2==-1))       &
+       & idx_soc2_p2 = psb_get_timer_idx("SOC2_MAP: phase2")
+  if ((do_timings).and.(idx_soc2_p3==-1))       &
+       & idx_soc2_p3 = psb_get_timer_idx("SOC2_MAP: phase3")
 
   nr = a%get_nrows()
   nc = a%get_ncols()
@@ -125,6 +139,7 @@ subroutine amg_s_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
     goto 9999
   end if
 
+  if (do_timings) call psb_tic(idx_soc2_p0)
   diag = a%get_diag(info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -137,55 +152,64 @@ subroutine amg_s_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   ! 
   call a%cp_to(muij)
   if (clean_zeros) call muij%clean_zeros(info)
+  !$omp parallel do private(i,j,k) shared(nr,diag,muij) schedule(static)
   do i=1, nr
     do k=muij%irp(i),muij%irp(i+1)-1
       j = muij%ja(k)
       if (j<= nr) muij%val(k) = abs(muij%val(k))/sqrt(abs(diag(i)*diag(j)))
     end do
   end do
-
+  !$omp end parallel do 
   !
   ! Compute the 1-neigbour; mark strong links with +1, weak links with -1
   !
   call s_neigh_coo%allocate(nr,nr,muij%get_nzeros())
-  ip = 0 
   do i=1, nr
     do k=muij%irp(i),muij%irp(i+1)-1
       j = muij%ja(k)
+      s_neigh_coo%ia(k)  = i
+      s_neigh_coo%ja(k)  = j
       if (j<=nr) then 
-        ip = ip + 1
-        s_neigh_coo%ia(ip)  = i
-        s_neigh_coo%ja(ip)  = j
         if (real(muij%val(k)) >= theta) then 
-          s_neigh_coo%val(ip) = sone
+          s_neigh_coo%val(k) = sone
         else
-          s_neigh_coo%val(ip) = -sone
+          s_neigh_coo%val(k) = -sone
         end if
+      else
+        s_neigh_coo%val(k) = -sone        
       end if
     end do
   end do
   !write(*,*) 'S_NEIGH: ',nr,ip
-  call s_neigh_coo%set_nzeros(ip)
+  call s_neigh_coo%set_nzeros(muij%get_nzeros())
   call s_neigh%mv_from_coo(s_neigh_coo,info)
 
-  if (iorder == amg_aggr_ord_nat_) then 
+  if (iorder == amg_aggr_ord_nat_) then
+    
+    !$omp parallel do private(i) shared(ilaggr,idxs) schedule(static)
     do i=1, nr
       ilaggr(i) = -(nr+1)
       idxs(i)   = i 
     end do
+    !$omp end parallel do 
   else 
+    !$omp parallel do private(i) shared(ilaggr,idxs,muij)  schedule(static)
     do i=1, nr
       ilaggr(i) = -(nr+1)
       ideg(i)   = muij%irp(i+1) - muij%irp(i)
     end do
+    !$omp end parallel do
     call psb_msort(ideg,ix=idxs,dir=psb_sort_down_)
   end if
 
+  if (do_timings) call psb_toc(idx_soc2_p0)
+  if (do_timings) call psb_tic(idx_soc2_p1)
 
   !
   ! Phase one: Start with disjoint groups.
   ! 
   naggr = 0
+#if defined(OPENMP)  
   icnt = 0
   step1: do ii=1, nr
     i = idxs(ii)
@@ -224,7 +248,47 @@ subroutine amg_s_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       end if
     endif
   enddo step1
-  
+
+#else
+  icnt = 0
+  step1: do ii=1, nr
+    i = idxs(ii)
+
+    if (ilaggr(i) == -(nr+1)) then 
+      !
+      ! Get the 1-neighbourhood of I 
+      !
+      ip1 = s_neigh%irp(i)
+      nz  = s_neigh%irp(i+1)-ip1
+      !
+      ! If the neighbourhood only contains I, skip it
+      !
+      if (nz ==0) then
+        ilaggr(i) = 0
+        cycle step1
+      end if
+      if ((nz==1).and.(s_neigh%ja(ip1)==i)) then
+        ilaggr(i) = 0
+        cycle step1
+      end if      
+      !
+      ! If the whole strongly coupled neighborhood of I is
+      ! as yet unconnected, turn it into the next aggregate.
+      !
+      nzcnt = count(real(s_neigh%val(ip1:ip1+nz-1)) > 0)
+      icol(1:nzcnt) = pack(s_neigh%ja(ip1:ip1+nz-1),(real(s_neigh%val(ip1:ip1+nz-1)) > 0))
+      disjoint = all(ilaggr(icol(1:nzcnt)) == -(nr+1)) 
+      if (disjoint) then 
+        icnt      = icnt + 1 
+        naggr     = naggr + 1
+        do k=1, nzcnt
+          ilaggr(icol(k)) = naggr
+        end do
+        ilaggr(i) = naggr
+      end if
+    endif
+  enddo step1
+#endif  
   if (debug_level >= psb_debug_outer_) then 
     write(debug_unit,*) me,' ',trim(name),&
          & ' Check 1:',count(ilaggr == -(nr+1))
