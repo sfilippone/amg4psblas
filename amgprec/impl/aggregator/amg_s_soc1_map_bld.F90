@@ -187,47 +187,51 @@ subroutine amg_s_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
     ! been set because it is strongly connected to an entry J belonging to a
     ! different thread. 
 
-    info = 0
-    !$omp parallel shared(bnds,locnaggr,ilaggr,nr,naggr,diag,theta,nths) &
-    !$omp private(icol,val,myth,kk)
+    !$omp parallel shared(bnds,idxs,locnaggr,ilaggr,nr,naggr,diag,theta,nths,info) &
+    !$omp private(icol,val,myth,kk) 
     block
       integer(psb_ipk_) :: ii,nlp,k,kp,n,ia,isz, nc, i,j,m, nz, ilg,  ip, rsz
       integer(psb_lpk_) :: itmp
-      nths = omp_get_num_threads()
-      myth = omp_get_thread_num()
-      rsz = nr/nths
-      if (myth < mod(nr,nths)) rsz = rsz + 1
       !$omp master
+      nths = omp_get_num_threads()
       allocate(bnds(0:nths),locnaggr(0:nths+1))
       locnaggr(:) = 0
       bnds(0) = 1
       !$omp end master      
       !$omp barrier
+      myth = omp_get_thread_num()
+      rsz = nr/nths
+      if (myth < mod(nr,nths)) rsz = rsz + 1
       bnds(myth+1) = rsz
       !$omp barrier
       !$omp master
       do i=1,nths
         bnds(i) = bnds(i) + bnds(i-1)
       end do
+      info = 0
       !$omp end master
       !$omp barrier
-
-      !$omp  do schedule(static) private(disjoint) reduction(max: info)
+      
+      !$omp do schedule(static) private(disjoint) 
       do kk=0, nths-1
         step1: do ii=bnds(kk), bnds(kk+1)-1
-          if (info /= 0) cycle
-          i = idxs(ii)
+          i = idxs(ii)          
+          if (info /= 0) cycle step1
           if ((i<1).or.(i>nr)) then
+            !$omp atomic write
             info=psb_err_internal_error_
+            !$omp end atomic 
             call psb_errpush(info,name)
             cycle step1
             !goto 9999
           end if
-
+            
           if (ilaggr(i) == -(nr+1)) then
             nz         = (acsr%irp(i+1)-acsr%irp(i))
             if ((nz<0).or.(nz>size(icol))) then
+              !$omp atomic write
               info=psb_err_internal_error_
+              !$omp end atomic 
               call psb_errpush(info,name)
               cycle step1
               !goto 9999
@@ -250,7 +254,7 @@ subroutine amg_s_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
                 icol(ip) = icol(k)
               end if
             enddo
-
+            
             !
             ! If the whole strongly coupled neighborhood of I is
             ! as yet unconnected, turn it into the next aggregate.
@@ -263,13 +267,18 @@ subroutine amg_s_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
             ! However, a certain unrepeatability is already present
             ! because the sequence of aggregates is computed with a
             ! different order than in serial mode.
+            ! In any case, even if the enteries of ILAGGR may be
+            ! overwritten, the important thing is that each entry is
+            ! consistent and they generate a correct aggregation map.
             !
             disjoint = all(ilaggr(icol(1:ip)) == -(nr+1)).or.(ip==0)
             if (disjoint) then
               locnaggr(kk)     = locnaggr(kk) + 1
               itmp = (bnds(kk)-1+locnaggr(kk))*nths+kk
               if (itmp < (bnds(kk)-1+locnaggr(kk))) then
-                info = 12345678
+                !$omp atomic update
+                info = max(12345678,info)
+                !$omp end atomic
                 cycle step1
               end if
               !$omp atomic write
