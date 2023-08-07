@@ -478,7 +478,10 @@ subroutine amg_z_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   end do step3
 
   ! Any leftovers?
+  !$omp parallel do schedule(static) shared(ilaggr,info)& 
+  !$omp     private(ii,i,j,k,nz,icol,val,ip)
   do i=1, nr
+    if (info /= 0) cycle
     if (ilaggr(i) < 0) then
       nz = (acsr%irp(i+1)-acsr%irp(i))
       if (nz == 1) then
@@ -489,9 +492,11 @@ subroutine amg_z_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
         ! other processes. 
         ilaggr(i) = -(nrglob+nr)
       else
+        !$omp atomic write
         info=psb_err_internal_error_
+        !$omp end atomic
         call psb_errpush(info,name,a_err='Fatal error: non-singleton leftovers')
-        goto 9999
+        cycle 
       endif
     end if
   end do
