@@ -393,7 +393,7 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   tmpaggr = ilaggr
   !$omp end workshare
   !$omp parallel do schedule(static) shared(tmpaggr,ilaggr,nr,naggr,diag,theta)& 
-  !$omp     private(ii,i,j,k,nz,icol,val,ip)
+  !$omp     private(ii,i,j,k,nz,icol,val,ip,cpling)
   step2: do ii=1,nr
     i = idxs(ii)
 

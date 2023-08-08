@@ -68,7 +68,7 @@
 !
 subroutine amg_c_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,info)
 
-  use psb_base_mod
+  use psb_base_mod 
   use amg_base_prec_type
   use amg_c_inner_mod
 #if defined(OPENMP)
@@ -164,6 +164,7 @@ subroutine amg_c_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   ! Compute the 1-neigbour; mark strong links with +1, weak links with -1
   !
   call s_neigh_coo%allocate(nr,nr,muij%get_nzeros())
+  !$omp parallel do private(i,j,k) shared(nr,diag,muij) schedule(static)
   do i=1, nr
     do k=muij%irp(i),muij%irp(i+1)-1
       j = muij%ja(k)
@@ -180,6 +181,7 @@ subroutine amg_c_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       end if
     end do
   end do
+  !$omp end parallel do
   !write(*,*) 'S_NEIGH: ',nr,ip
   call s_neigh_coo%set_nzeros(muij%get_nzeros())
   call s_neigh%mv_from_coo(s_neigh_coo,info)
@@ -209,45 +211,156 @@ subroutine amg_c_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   ! Phase one: Start with disjoint groups.
   ! 
   naggr = 0
-#if defined(OPENMP)  
-  icnt = 0
-  step1: do ii=1, nr
-    i = idxs(ii)
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_), allocatable  :: bnds(:), locnaggr(:)
+    integer(psb_ipk_) :: myth,nths, kk
+    ! The parallelization makes use of a locaggr(:) array; each thread
+    ! keeps its own version of naggr, and when the loop ends, a prefix is applied
+    ! to locnaggr to determine:
+    ! 1. The total number of aggregaters NAGGR;
+    ! 2. How much should each thread shift its own aggregates
+    ! Part 2 requires to keep track of which thread defined each entry
+    ! of ilaggr(), so that each entry can be adjusted correctly: even
+    ! if an entry I belongs to the range BNDS(TH)>BNDS(TH+1)-1, it may have
+    ! been set because it is strongly connected to an entry J belonging to a
+    ! different thread. 
 
-    if (ilaggr(i) == -(nr+1)) then 
-      !
-      ! Get the 1-neighbourhood of I 
-      !
-      ip1 = s_neigh%irp(i)
-      nz  = s_neigh%irp(i+1)-ip1
-      !
-      ! If the neighbourhood only contains I, skip it
-      !
-      if (nz ==0) then
-        ilaggr(i) = 0
-        cycle step1
-      end if
-      if ((nz==1).and.(s_neigh%ja(ip1)==i)) then
-        ilaggr(i) = 0
-        cycle step1
-      end if      
-      !
-      ! If the whole strongly coupled neighborhood of I is
-      ! as yet unconnected, turn it into the next aggregate.
-      !
-      nzcnt = count(real(s_neigh%val(ip1:ip1+nz-1)) > 0)
-      icol(1:nzcnt) = pack(s_neigh%ja(ip1:ip1+nz-1),(real(s_neigh%val(ip1:ip1+nz-1)) > 0))
-      disjoint = all(ilaggr(icol(1:nzcnt)) == -(nr+1)) 
-      if (disjoint) then 
-        icnt      = icnt + 1 
-        naggr     = naggr + 1
-        do k=1, nzcnt
-          ilaggr(icol(k)) = naggr
+    !$omp parallel shared(s_neigh,bnds,idxs,locnaggr,ilaggr,nr,naggr,diag,theta,nths,info) &
+    !$omp private(icol,val,myth,kk) 
+    block
+      integer(psb_ipk_) :: ii,nlp,k,kp,n,ia,isz,nc,i,j,m,nz,ilg,ip,rsz,ip1,nzcnt
+      integer(psb_lpk_) :: itmp
+      !$omp master
+      nths = omp_get_num_threads()
+      allocate(bnds(0:nths),locnaggr(0:nths+1))
+      locnaggr(:) = 0
+      bnds(0) = 1
+      !$omp end master      
+      !$omp barrier
+      myth = omp_get_thread_num()
+      rsz = nr/nths
+      if (myth < mod(nr,nths)) rsz = rsz + 1
+      bnds(myth+1) = rsz
+      !$omp barrier
+      !$omp master
+      do i=1,nths
+        bnds(i) = bnds(i) + bnds(i-1)
+      end do
+      info = 0
+      !$omp end master
+      !$omp barrier
+
+      !$omp do schedule(static) private(disjoint) 
+      do kk=0, nths-1
+        step1: do ii=bnds(kk), bnds(kk+1)-1
+          i = idxs(ii)
+          if (info /= 0) then
+            write(0,*) ' Step1:',kk,ii,i,info
+            cycle step1
+          end if
+          if ((i<1).or.(i>nr)) then
+            !$omp atomic write
+            info=psb_err_internal_error_
+            !$omp end atomic 
+            call psb_errpush(info,name)
+            cycle step1
+            !goto 9999
+          end if
+
+
+          if (ilaggr(i) == -(nr+1)) then 
+            !
+            ! Get the 1-neighbourhood of I 
+            !
+            ip1 = s_neigh%irp(i)
+            nz  = s_neigh%irp(i+1)-ip1
+            !
+            ! If the neighbourhood only contains I, skip it
+            !
+            if (nz ==0) then
+              ilaggr(i) = 0
+              cycle step1
+            end if
+            if ((nz==1).and.(s_neigh%ja(ip1)==i)) then
+              ilaggr(i) = 0
+              cycle step1
+            end if
+
+            nzcnt = count(real(s_neigh%val(ip1:ip1+nz-1)) > 0)
+            icol(1:nzcnt) = pack(s_neigh%ja(ip1:ip1+nz-1),(real(s_neigh%val(ip1:ip1+nz-1)) > 0))
+            disjoint = all(ilaggr(icol(1:nzcnt)) == -(nr+1)) 
+
+            !
+            ! If the whole strongly coupled neighborhood of I is
+            ! as yet unconnected, turn it into the next aggregate.
+            ! Same if ip==0 (in which case, neighborhood only
+            ! contains I even if it does not look like it from matrix)
+            ! The fact that DISJOINT is private and not under lock
+            ! generates a certain un-repeatability, in that between
+            ! computing DISJOINT and assigning, another thread might
+            ! alter the values of ILAGGR.
+            ! However, a certain unrepeatability is already present
+            ! because the sequence of aggregates is computed with a
+            ! different order than in serial mode.
+            ! In any case, even if the enteries of ILAGGR may be
+            ! overwritten, the important thing is that each entry is
+            ! consistent and they generate a correct aggregation map.
+            !
+            if (disjoint) then
+              locnaggr(kk)     = locnaggr(kk) + 1
+              itmp = (bnds(kk)-1+locnaggr(kk))*nths+kk
+              if (itmp < (bnds(kk)-1+locnaggr(kk))) then
+                !$omp atomic update
+                info = max(12345678,info)
+                !$omp end atomic
+                cycle step1
+              end if
+              !$omp atomic write
+              ilaggr(i) = itmp
+              !$omp end atomic
+              do k=1, nzcnt
+                !$omp atomic write
+                ilaggr(icol(k)) = itmp
+                !$omp end atomic
+              end do
+            end if
+          end if
+        enddo step1
+      end do
+      !$omp end do
+
+      !$omp master
+      naggr = sum(locnaggr(0:nths-1))
+      do i=1,nths
+        locnaggr(i) = locnaggr(i) + locnaggr(i-1)
+      end do
+      do i=nths+1,1,-1
+        locnaggr(i) = locnaggr(i-1)
+      end do
+      locnaggr(0) = 0
+      !write(0,*) 'LNAG ',locnaggr(nths+1)
+      !$omp end master 
+      !$omp barrier
+      !$omp  do schedule(static) 
+      do kk=0, nths-1
+        do ii=bnds(kk), bnds(kk+1)-1
+          if (ilaggr(ii) > 0) then 
+            kp = mod(ilaggr(ii),nths)
+            ilaggr(ii) = (ilaggr(ii)/nths)- (bnds(kp)-1) + locnaggr(kp)
+          end if
         end do
-        ilaggr(i) = naggr
-      end if
-    endif
-  enddo step1
+      end do
+      !$omp end do
+    end block
+    !$omp end parallel
+  end block
+  if (info /= 0) then
+    if (info == 12345678) write(0,*) 'Overflow in encoding ILAGGR'
+    info=psb_err_internal_error_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
 
 #else
   icnt = 0
