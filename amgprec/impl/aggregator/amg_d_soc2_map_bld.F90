@@ -406,11 +406,16 @@ subroutine amg_d_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
     write(debug_unit,*) me,' ',trim(name),&
          & ' Check 1:',count(ilaggr == -(nr+1))
   end if
-
+  if (do_timings) call psb_toc(idx_soc2_p1)
+  if (do_timings) call psb_tic(idx_soc2_p2)
   !
   ! Phase two: join the neighbours
   !
+  !$omp workshare
   tmpaggr = ilaggr
+  !$omp end workshare
+  !$omp parallel do schedule(static) shared(tmpaggr,ilaggr,nr,naggr,diag,muij,s_neigh)& 
+  !$omp     private(ii,i,j,k,nz,icol,val,ip,cpling)
   step2: do ii=1,nr
     i = idxs(ii)
 
@@ -436,8 +441,9 @@ subroutine amg_d_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       end if
     end if
   end do step2
-
-
+  !$omp end parallel do
+  if (do_timings) call psb_toc(idx_soc2_p2)
+  if (do_timings) call psb_tic(idx_soc2_p3)
   !
   ! Phase three: sweep over leftovers, if any 
   !
@@ -471,6 +477,8 @@ subroutine amg_d_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   end do step3
 
   ! Any leftovers?
+  !$omp parallel do schedule(static) shared(ilaggr,s_neigh,info)& 
+  !$omp     private(ii,i,j,k)
   do i=1, nr
     if (ilaggr(i) <= 0) then
       nz = (s_neigh%irp(i+1)-s_neigh%irp(i))
@@ -482,13 +490,17 @@ subroutine amg_d_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
         ! other processes. 
         ilaggr(i) = -(nrglob+nr)
       else
+        !$omp atomic write
         info=psb_err_internal_error_
+        !$omp end atomic
         call psb_errpush(info,name,a_err='Fatal error: non-singleton leftovers')
-        goto 9999
+        cycle
       endif
     end if
   end do
-
+  !$omp end parallel do
+  if (info /= 0) goto 9999
+  if (do_timings) call psb_toc(idx_soc2_p3)  
   if (naggr > ncol) then 
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Fatal error: naggr>ncol')

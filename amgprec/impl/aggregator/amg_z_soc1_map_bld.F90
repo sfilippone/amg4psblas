@@ -500,6 +500,8 @@ subroutine amg_z_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       endif
     end if
   end do
+  !$omp end parallel do
+  if (info /= 0) goto 9999
   if (do_timings) call psb_toc(idx_soc1_p3)
   if (naggr > ncol) then 
     info=psb_err_internal_error_
