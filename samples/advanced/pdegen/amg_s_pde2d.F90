@@ -463,14 +463,14 @@ program amg_s_pde2d
   call psb_sum(ctxt,precsize)
   call prec%descr(info,iout=psb_out_unit)
   if (iam == psb_root_) then
-    write(psb_out_unit,'("Computed solution on ",i8," processors")')  np
+    write(psb_out_unit,'("Computed solution on ",i8," process(es)")')  np
     write(psb_out_unit,'("Number of threads                  : ",i12)') nth
     write(psb_out_unit,'("Total number of tasks              : ",i12)') nth*np
     write(psb_out_unit,'("Linear system size                 : ",i12)') system_size
-    write(psb_out_unit,'("PDE Coefficients                   : ",a)')  trim(pdecoeff)
-    write(psb_out_unit,'("Krylov method                      : ",a)')  trim(s_choice%kmethd)
-    write(psb_out_unit,'("Preconditioner                     : ",a)')  trim(p_choice%descr)
-    write(psb_out_unit,'("Iterations to convergence          : ",i12)')   iter
+    write(psb_out_unit,'("PDE Coefficients                   : ",a)') trim(pdecoeff)
+    write(psb_out_unit,'("Krylov method                      : ",a)') trim(s_choice%kmethd)
+    write(psb_out_unit,'("Preconditioner                     : ",a)') trim(p_choice%descr)
+    write(psb_out_unit,'("Iterations to convergence          : ",i12)')    iter
     write(psb_out_unit,'("Relative error estimate on exit    : ",es12.5)') err
     write(psb_out_unit,'("Number of levels in hierarchy      : ",i12)')    prec%get_nlevs()
     write(psb_out_unit,'("Time to build hierarchy            : ",es12.5)') thier
