@@ -36,9 +36,9 @@
 !   
 !  
 !
-! File: amg_c_soc1_map__bld.f90
+! File: amg_z_soc1_map__bld.f90
 !
-! Subroutine: amg_c_soc1_map_bld
+! Subroutine: amg_z_soc1_map_bld
 ! Version:    complex
 !
 !  This routine builds the tentative prolongator based on the
@@ -53,12 +53,12 @@
 ! Note: upon exit 
 !
 ! Arguments:
-!    a       -  type(psb_cspmat_type).
+!    a       -  type(psb_zspmat_type).
 !               The sparse matrix structure containing the local part of the
 !               matrix to be preconditioned.
 !    desc_a  -  type(psb_desc_type), input.
 !               The communication descriptor of a.
-!    p       -  type(amg_cprec_type), input/output.
+!    p       -  type(amg_zprec_type), input/output.
 !               The preconditioner data structure; upon exit it contains 
 !               the multilevel hierarchy of prolongators, restrictors
 !               and coarse matrices.
@@ -67,31 +67,33 @@
 !
 !
 !
-subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,info)
+subroutine amg_z_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,info)
 
   use psb_base_mod
   use amg_base_prec_type
-  use amg_c_inner_mod
-
+  use amg_z_inner_mod
+#if defined(OPENMP)
+  use omp_lib
+#endif
   implicit none
 
   ! Arguments
   integer(psb_ipk_), intent(in)     :: iorder
   logical, intent(in)               :: clean_zeros
-  type(psb_cspmat_type), intent(in) :: a
+  type(psb_zspmat_type), intent(in) :: a
   type(psb_desc_type), intent(in)    :: desc_a
-  real(psb_spk_), intent(in)         :: theta
+  real(psb_dpk_), intent(in)         :: theta
   integer(psb_lpk_), allocatable, intent(out)  :: ilaggr(:),nlaggr(:)
   integer(psb_ipk_), intent(out)               :: info
 
   ! Local variables
-  integer(psb_ipk_), allocatable :: ils(:), neigh(:), irow(:), icol(:),&
+  integer(psb_ipk_), allocatable :: neigh(:), irow(:), icol(:),&
        & ideg(:), idxs(:)
   integer(psb_lpk_), allocatable :: tmpaggr(:)
-  complex(psb_spk_), allocatable  :: val(:), diag(:)
+  complex(psb_dpk_), allocatable  :: val(:), diag(:)
   integer(psb_ipk_) :: icnt,nlp,k,n,ia,isz,nr, nc, naggr,i,j,m, nz, ilg, ii, ip
-  type(psb_c_csr_sparse_mat) :: acsr
-  real(psb_spk_)  :: cpling, tcl
+  type(psb_z_csr_sparse_mat) :: acsr
+  real(psb_dpk_)  :: cpling, tcl
   logical :: disjoint
   integer(psb_ipk_) :: debug_level, debug_unit,err_act
   type(psb_ctxt_type) :: ctxt
@@ -99,6 +101,9 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   integer(psb_ipk_)   :: nrow, ncol, n_ne
   integer(psb_lpk_)   :: nrglob
   character(len=20)   :: name, ch_err
+  integer(psb_ipk_), save :: idx_soc1_p1=-1, idx_soc1_p2=-1, idx_soc1_p3=-1
+  integer(psb_ipk_), save :: idx_soc1_p0=-1
+  logical, parameter      :: do_timings=.true.
 
   info=psb_success_
   name = 'amg_soc1_map_bld'
@@ -114,6 +119,14 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   nrow   = desc_a%get_local_rows()
   ncol   = desc_a%get_local_cols()
   nrglob = desc_a%get_global_rows()
+  if ((do_timings).and.(idx_soc1_p0==-1))       &
+       & idx_soc1_p0 = psb_get_timer_idx("SOC1_MAP: phase0")
+  if ((do_timings).and.(idx_soc1_p1==-1))       &
+       & idx_soc1_p1 = psb_get_timer_idx("SOC1_MAP: phase1")
+  if ((do_timings).and.(idx_soc1_p2==-1))       &
+       & idx_soc1_p2 = psb_get_timer_idx("SOC1_MAP: phase2")
+  if ((do_timings).and.(idx_soc1_p3==-1))       &
+       & idx_soc1_p3 = psb_get_timer_idx("SOC1_MAP: phase3")
 
   nr = a%get_nrows()
   nc = a%get_ncols()
@@ -133,41 +146,203 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
     goto 9999
   end if
 
+  if (do_timings) call psb_tic(idx_soc1_p0)
   call a%cp_to(acsr)
+  if (do_timings) call psb_toc(idx_soc1_p0)
   if (clean_zeros) call acsr%clean_zeros(info)
   if (iorder == amg_aggr_ord_nat_) then 
+    !$omp parallel do private(i) schedule(static)
     do i=1, nr
       ilaggr(i) = -(nr+1)
-      idxs(i)   = i 
+      idxs(i)   = i
     end do
-  else 
+    !$omp end parallel do 
+  else
+    !$omp parallel do private(i) schedule(static)
     do i=1, nr
       ilaggr(i) = -(nr+1)
       ideg(i)   = acsr%irp(i+1) - acsr%irp(i)
     end do
+    !$omp end parallel do 
     call psb_msort(ideg,ix=idxs,dir=psb_sort_down_)
   end if
-
+  if (do_timings) call psb_tic(idx_soc1_p1)
 
   !
   ! Phase one: Start with disjoint groups.
   ! 
   naggr = 0
-  icnt = 0
+#if defined(OPENMP)
+  block
+    integer(psb_ipk_), allocatable  :: bnds(:), locnaggr(:)
+    integer(psb_ipk_) :: myth,nths, kk
+    ! The parallelization makes use of a locaggr(:) array; each thread
+    ! keeps its own version of naggr, and when the loop ends, a prefix is applied
+    ! to locnaggr to determine:
+    ! 1. The total number of aggregaters NAGGR;
+    ! 2. How much should each thread shift its own aggregates
+    ! Part 2 requires to keep track of which thread defined each entry
+    ! of ilaggr(), so that each entry can be adjusted correctly: even
+    ! if an entry I belongs to the range BNDS(TH)>BNDS(TH+1)-1, it may have
+    ! been set because it is strongly connected to an entry J belonging to a
+    ! different thread. 
+
+    !$omp parallel shared(bnds,idxs,locnaggr,ilaggr,nr,naggr,diag,theta,nths,info) &
+    !$omp private(icol,val,myth,kk) 
+    block
+      integer(psb_ipk_) :: ii,nlp,k,kp,n,ia,isz, nc, i,j,m, nz, ilg,  ip, rsz
+      integer(psb_lpk_) :: itmp
+      !$omp master
+      nths = omp_get_num_threads()
+      allocate(bnds(0:nths),locnaggr(0:nths+1))
+      locnaggr(:) = 0
+      bnds(0) = 1
+      !$omp end master      
+      !$omp barrier
+      myth = omp_get_thread_num()
+      rsz = nr/nths
+      if (myth < mod(nr,nths)) rsz = rsz + 1
+      bnds(myth+1) = rsz
+      !$omp barrier
+      !$omp master
+      do i=1,nths
+        bnds(i) = bnds(i) + bnds(i-1)
+      end do
+      info = 0
+      !$omp end master
+      !$omp barrier
+      
+      !$omp do schedule(static) private(disjoint) 
+      do kk=0, nths-1
+        step1: do ii=bnds(kk), bnds(kk+1)-1
+          i = idxs(ii)          
+          if (info /= 0) cycle step1
+          if ((i<1).or.(i>nr)) then
+            !$omp atomic write
+            info=psb_err_internal_error_
+            !$omp end atomic 
+            call psb_errpush(info,name)
+            cycle step1
+            !goto 9999
+          end if
+            
+          if (ilaggr(i) == -(nr+1)) then
+            nz         = (acsr%irp(i+1)-acsr%irp(i))
+            if ((nz<0).or.(nz>size(icol))) then
+              !$omp atomic write
+              info=psb_err_internal_error_
+              !$omp end atomic 
+              call psb_errpush(info,name)
+              cycle step1
+              !goto 9999
+            end if
+
+            icol(1:nz) = acsr%ja(acsr%irp(i):acsr%irp(i+1)-1)
+            val(1:nz)  = acsr%val(acsr%irp(i):acsr%irp(i+1)-1) 
+
+            !
+            ! Build the set of all strongly coupled nodes 
+            !
+            ip = 0
+            do k=1, nz
+              j   = icol(k)
+              ! If any of the neighbours is already assigned,
+              ! we will not reset. 
+              if (ilaggr(j) > 0) cycle step1
+              if (abs(val(k)) > theta*sqrt(abs(diag(i)*diag(j)))) then
+                ip = ip + 1
+                icol(ip) = icol(k)
+              end if
+            enddo
+            
+            !
+            ! If the whole strongly coupled neighborhood of I is
+            ! as yet unconnected, turn it into the next aggregate.
+            ! Same if ip==0 (in which case, neighborhood only
+            ! contains I even if it does not look like it from matrix)
+            ! The fact that DISJOINT is private and not under lock
+            ! generates a certain un-repeatability, in that between
+            ! computing DISJOINT and assigning, another thread might
+            ! alter the values of ILAGGR.
+            ! However, a certain unrepeatability is already present
+            ! because the sequence of aggregates is computed with a
+            ! different order than in serial mode.
+            ! In any case, even if the enteries of ILAGGR may be
+            ! overwritten, the important thing is that each entry is
+            ! consistent and they generate a correct aggregation map.
+            !
+            disjoint = all(ilaggr(icol(1:ip)) == -(nr+1)).or.(ip==0)
+            if (disjoint) then
+              locnaggr(kk)     = locnaggr(kk) + 1
+              itmp = (bnds(kk)-1+locnaggr(kk))*nths+kk
+              if (itmp < (bnds(kk)-1+locnaggr(kk))) then
+                !$omp atomic update
+                info = max(12345678,info)
+                !$omp end atomic
+                cycle step1
+              end if
+              !$omp atomic write
+              ilaggr(i) = itmp
+              !$omp end atomic
+              do k=1, ip
+                !$omp atomic write
+                ilaggr(icol(k)) = itmp
+                !$omp end atomic
+              end do
+            end if
+          end if
+        enddo step1
+      end do
+      !$omp end do
+
+      !$omp master
+      naggr = sum(locnaggr(0:nths-1))
+      do i=1,nths
+        locnaggr(i) = locnaggr(i) + locnaggr(i-1)
+      end do
+      do i=nths+1,1,-1
+        locnaggr(i) = locnaggr(i-1)
+      end do
+      locnaggr(0) = 0
+      !$omp end master 
+      !$omp barrier
+      !$omp  do schedule(static) 
+      do kk=0, nths-1
+        do ii=bnds(kk), bnds(kk+1)-1
+          if (ilaggr(ii) > 0) then 
+            kp = mod(ilaggr(ii),nths)
+            ilaggr(ii) = (ilaggr(ii)/nths)- (bnds(kp)-1) + locnaggr(kp)
+          end if
+        end do
+      end do
+      !$omp end do
+    end block
+    !$omp end parallel
+  end block
+  if (info /= 0) then
+    if (info == 12345678) write(0,*) 'Overflow in encoding ILAGGR'
+    info=psb_err_internal_error_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+#else
   step1: do ii=1, nr
+    if (info /= 0) cycle
     i = idxs(ii)
     if ((i<1).or.(i>nr)) then
       info=psb_err_internal_error_
       call psb_errpush(info,name)
-      goto 9999
+      cycle step1
+      !goto 9999
     end if
-    
+
     if (ilaggr(i) == -(nr+1)) then
       nz         = (acsr%irp(i+1)-acsr%irp(i))
       if ((nz<0).or.(nz>size(icol))) then
         info=psb_err_internal_error_
         call psb_errpush(info,name)
-        goto 9999
+        cycle step1
+        !goto 9999
       end if
 
       icol(1:nz) = acsr%ja(acsr%irp(i):acsr%irp(i+1)-1)
@@ -176,7 +351,7 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       !
       ! Build the set of all strongly coupled nodes 
       !
-      ip = 0 
+      ip = 0
       do k=1, nz
         j   = icol(k)
         if ((1<=j).and.(j<=nr)) then 
@@ -194,8 +369,7 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       ! contains I even if it does not look like it from matrix)
       !
       disjoint = all(ilaggr(icol(1:ip)) == -(nr+1)).or.(ip==0)
-      if (disjoint) then 
-        icnt      = icnt + 1 
+      if (disjoint) then       
         naggr     = naggr + 1
         do k=1, ip
           ilaggr(icol(k)) = naggr
@@ -204,16 +378,22 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       end if
     endif
   enddo step1
-  
+#endif
   if (debug_level >= psb_debug_outer_) then 
     write(debug_unit,*) me,' ',trim(name),&
-         & ' Check 1:',count(ilaggr == -(nr+1))
+         & ' Check   1:',naggr,count(ilaggr(1:nr) == -(nr+1)), count(ilaggr(1:nr)>0),&
+         & count(ilaggr(1:nr) == -(nr+1))+count(ilaggr(1:nr)>0),nr
   end if
-
+  if (do_timings) call psb_toc(idx_soc1_p1)
+  if (do_timings) call psb_tic(idx_soc1_p2)
   !
   ! Phase two: join the neighbours
   !
+  !$omp workshare
   tmpaggr = ilaggr
+  !$omp end workshare
+  !$omp parallel do schedule(static) shared(tmpaggr,ilaggr,nr,naggr,diag,theta)& 
+  !$omp     private(ii,i,j,k,nz,icol,val,ip,cpling)
   step2: do ii=1,nr
     i = idxs(ii)
 
@@ -227,7 +407,7 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       ! Find the most strongly connected neighbour that is
       ! already aggregated, if any, and join its aggregate
       !
-      cpling = szero
+      cpling = dzero
       ip = 0
       do k=1, nz
         j   = icol(k)
@@ -244,8 +424,15 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       end if
     end if
   end do step2
+  !$omp end parallel do
+  if (do_timings) call psb_toc(idx_soc1_p2)
+  if (debug_level >= psb_debug_outer_) then 
+    write(debug_unit,*) me,' ',trim(name),&
+         & ' Check 1.5:',naggr,count(ilaggr(1:nr) == -(nr+1)), count(ilaggr(1:nr)>0),&
+         & count(ilaggr(1:nr) == -(nr+1))+count(ilaggr(1:nr)>0),nr
+  end if
 
-
+  if (do_timings) call psb_tic(idx_soc1_p3)
   !
   ! Phase three: sweep over leftovers, if any 
   !
@@ -261,7 +448,7 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       ! Find its strongly  connected neighbourhood not 
       ! already aggregated, and make it into a new aggregate.
       !
-      cpling = szero
+      cpling = dzero
       ip = 0
       do k=1, nz
         j   = icol(k)
@@ -274,7 +461,6 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
         end if
       enddo
       if (ip > 0) then
-        icnt      = icnt + 1 
         naggr     = naggr + 1
         ilaggr(i) = naggr
         do k=1, ip
@@ -292,7 +478,10 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   end do step3
 
   ! Any leftovers?
+  !$omp parallel do schedule(static) shared(ilaggr,info)& 
+  !$omp     private(ii,i,j,k,nz,icol,val,ip)
   do i=1, nr
+    if (info /= 0) cycle
     if (ilaggr(i) < 0) then
       nz = (acsr%irp(i+1)-acsr%irp(i))
       if (nz == 1) then
@@ -303,15 +492,18 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
         ! other processes. 
         ilaggr(i) = -(nrglob+nr)
       else
+        !$omp atomic write
         info=psb_err_internal_error_
+        !$omp end atomic
         call psb_errpush(info,name,a_err='Fatal error: non-singleton leftovers')
-        goto 9999
+        cycle 
       endif
     end if
   end do
-
+  !$omp end parallel do
+  if (info /= 0) goto 9999
+  if (do_timings) call psb_toc(idx_soc1_p3)
   if (naggr > ncol) then 
-    !write(0,*) name,'Error : naggr > ncol',naggr,ncol
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Fatal error: naggr>ncol')
     goto 9999
@@ -336,9 +528,13 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   nlaggr(:) = 0
   nlaggr(me+1) = naggr
   call psb_sum(ctxt,nlaggr(1:np))
+  if (debug_level >= psb_debug_outer_) then 
+    write(debug_unit,*) me,' ',trim(name),&
+         & ' Check   2:',naggr,count(ilaggr(1:nr) == -(nr+1)), count(ilaggr(1:nr)>0),&
+         & count(ilaggr(1:nr) == -(nr+1))+count(ilaggr(1:nr)>0),nr
+  end if
 
   call acsr%free()
-
   call psb_erractionrestore(err_act)
   return
 
@@ -346,5 +542,5 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
 
   return
 
-end subroutine amg_c_soc1_map_bld
+end subroutine amg_z_soc1_map_bld
 

@@ -36,9 +36,9 @@
 !
 !
 !
-! File: amg_s_pde3d.f90
+! File: amg_d_pde3d.f90
 !
-! Program: amg_s_pde3d
+! Program: amg_d_pde3d
 ! This sample program solves a linear system obtained by discretizing a
 ! PDE with Dirichlet BCs.
 !
@@ -64,16 +64,19 @@
 ! 3. A 3D distribution in which the unit cube is partitioned
 !    into subcubes, each one assigned to a process.
 !
-program amg_s_pde3d
+program amg_d_pde3d
   use psb_base_mod
   use amg_prec_mod
   use psb_krylov_mod
   use psb_util_mod
   use data_input
-  use amg_s_pde3d_base_mod
-  use amg_s_pde3d_exp_mod
-  use amg_s_pde3d_gauss_mod
-  use amg_s_genpde_mod
+  use amg_d_pde3d_base_mod
+  use amg_d_pde3d_exp_mod
+  use amg_d_pde3d_gauss_mod
+  use amg_d_genpde_mod
+#if defined(OPENMP)
+  use omp_lib
+#endif
   implicit none
 
   ! input parameters
@@ -86,20 +89,20 @@ program amg_s_pde3d
   real(psb_dpk_) :: t1, t2, tprec, thier, tslv
 
   ! sparse matrix and preconditioner
-  type(psb_sspmat_type) :: a
-  type(amg_sprec_type)  :: prec
+  type(psb_dspmat_type) :: a
+  type(amg_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense vectors
-  type(psb_s_vect_type) :: x,b,r
+  type(psb_d_vect_type) :: x,b,r
   ! parallel environment
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: iam, np
+  integer(psb_ipk_)   :: iam, np, nth
 
   ! solver parameters
   integer(psb_ipk_)        :: iter, itmax,itrace, istopc, irst, nlv
   integer(psb_epk_) :: amatsize, precsize, descsize
-  real(psb_spk_)   :: err, resmx, resmxp
+  real(psb_dpk_)   :: err, resmx, resmxp
 
   ! Krylov solver data
   type solverdata
@@ -108,7 +111,7 @@ program amg_s_pde3d
     integer(psb_ipk_)  :: itmax       ! maximum number of iterations
     integer(psb_ipk_)  :: itrace      ! tracing
     integer(psb_ipk_)  :: irst        ! restart
-    real(psb_spk_)     :: eps         ! stopping tolerance
+    real(psb_dpk_)     :: eps         ! stopping tolerance
   end type solverdata
   type(solverdata)       :: s_choice
 
@@ -132,10 +135,10 @@ program amg_s_pde3d
     integer(psb_ipk_)  :: aggr_size   ! Requested size of the aggregates for MATCHBOXP
     character(len=16)  :: aggr_ord    ! ordering for aggregation: NATURAL, DEGREE
     character(len=16)  :: aggr_filter ! filtering: FILTER, NO_FILTER
-    real(psb_spk_)     :: mncrratio  ! minimum aggregation ratio
-    real(psb_spk_), allocatable :: athresv(:) ! smoothed aggregation threshold vector
+    real(psb_dpk_)     :: mncrratio  ! minimum aggregation ratio
+    real(psb_dpk_), allocatable :: athresv(:) ! smoothed aggregation threshold vector
     integer(psb_ipk_)  :: thrvsz      ! size of threshold vector
-    real(psb_spk_)     :: athres      ! smoothed aggregation threshold
+    real(psb_dpk_)     :: athres      ! smoothed aggregation threshold
     integer(psb_ipk_)  :: csizepp     ! minimum size of coarsest matrix per process
 
     ! AMG smoother or pre-smoother; also 1-lev preconditioner
@@ -149,7 +152,7 @@ program amg_s_pde3d
     character(len=16)  :: variant     ! AINV variant: LLK, etc
     integer(psb_ipk_)  :: fill        ! fill-in for incomplete LU factorization
     integer(psb_ipk_)  :: invfill     ! Inverse fill-in for INVK
-    real(psb_spk_)     :: thr         ! threshold for ILUT factorization
+    real(psb_dpk_)     :: thr         ! threshold for ILUT factorization
 
     ! AMG post-smoother; ignored by 1-lev preconditioner
     character(len=16)  :: smther2     ! post-smoother type: BJAC, AS
@@ -162,7 +165,7 @@ program amg_s_pde3d
     character(len=16)  :: variant2    ! AINV variant: LLK, etc
     integer(psb_ipk_)  :: fill2       ! fill-in for incomplete LU factorization
     integer(psb_ipk_)  :: invfill2    ! Inverse fill-in for INVK
-    real(psb_spk_)      :: thr2        ! threshold for ILUT factorization
+    real(psb_dpk_)      :: thr2        ! threshold for ILUT factorization
 
     ! coarsest-level solver
     character(len=16)  :: cmat        ! coarsest matrix layout: REPL, DIST
@@ -172,7 +175,7 @@ program amg_s_pde3d
     character(len=16)  :: csbsolve    ! coarsest-lev local subsolver: ILU, ILUT,
                                       ! MILU, UMF, MUMPS, SLU
     integer(psb_ipk_)  :: cfill       ! fill-in for incomplete LU factorization
-    real(psb_spk_)     :: cthres      ! threshold for ILUT factorization
+    real(psb_dpk_)     :: cthres      ! threshold for ILUT factorization
     integer(psb_ipk_)  :: cjswp       ! sweeps for GS or JAC coarsest-lev subsolver
 
     ! Dump data
@@ -192,12 +195,21 @@ program amg_s_pde3d
   ! other variables
   integer(psb_ipk_)  :: info, i, k
   character(len=20)  :: name,ch_err
-
+  type(psb_d_csr_sparse_mat) :: amold
   info=psb_success_
 
 
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
+#if defined(OPENMP)
+  !$OMP parallel shared(nth)
+  !$OMP master
+  nth = omp_get_num_threads()
+  !$OMP end master
+  !$OMP end parallel
+#else
+  nth = 1
+#endif
 
   if (iam < 0) then
     ! This should not happen, but just in case
@@ -205,7 +217,7 @@ program amg_s_pde3d
     stop
   endif
   if(psb_get_errstatus() /= 0) goto 9999
-  name='amg_s_pde3d'
+  name='amg_d_pde3d'
   call psb_set_errverbosity(itwo)
   !
   ! Hello world
@@ -390,7 +402,7 @@ program amg_s_pde3d
   end if
   call psb_barrier(ctxt)
   t1 = psb_wtime()
-  call prec%smoothers_build(a,desc_a,info)
+  call prec%smoothers_build(a,desc_a,info,amold=amold)
   tprec = psb_wtime()-t1
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_smoothers_bld')
@@ -441,8 +453,8 @@ program amg_s_pde3d
   call psb_geall(r,desc_a,info)
   call r%zero()
   call psb_geasb(r,desc_a,info)
-  call psb_geaxpby(sone,b,szero,r,desc_a,info)
-  call psb_spmm(-sone,a,x,sone,r,desc_a,info)
+  call psb_geaxpby(done,b,dzero,r,desc_a,info)
+  call psb_spmm(-done,a,x,done,r,desc_a,info)
   resmx  = psb_genrm2(r,desc_a,info)
   resmxp = psb_geamax(r,desc_a,info)
 
@@ -455,7 +467,9 @@ program amg_s_pde3d
   call psb_sum(ctxt,precsize)
   call prec%descr(info,iout=psb_out_unit)
   if (iam == psb_root_) then
-    write(psb_out_unit,'("Computed solution on ",i8," processors")')  np
+    write(psb_out_unit,'("Computed solution on ",i8," process(es)")')  np
+    write(psb_out_unit,'("Number of threads                  : ",i12)') nth
+    write(psb_out_unit,'("Total number of tasks              : ",i12)') nth*np
     write(psb_out_unit,'("Linear system size                 : ",i12)') system_size
     write(psb_out_unit,'("PDE Coefficients                   : ",a)') trim(pdecoeff)
     write(psb_out_unit,'("Krylov method                      : ",a)') trim(s_choice%kmethd)
@@ -478,7 +492,7 @@ program amg_s_pde3d
     write(psb_out_unit,'("Storage format for DESC_A          : ",a  )') desc_a%get_fmt()
 
   end if
-
+  call psb_print_timers(ctxt)
   !
   !  cleanup storage and exit
   !
@@ -697,4 +711,4 @@ contains
     
   end subroutine get_parms
 
-end program amg_s_pde3d
+end program amg_d_pde3d

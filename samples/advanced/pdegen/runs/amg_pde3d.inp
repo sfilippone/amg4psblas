@@ -1,6 +1,6 @@
 %%%%%%%%%%%  General  arguments % Lines starting with % are ignored.
 CSR                         ! Storage format CSR COO JAD
-0080                        ! IDIM; domain size. Linear system size is IDIM**3
+0200                        ! IDIM; domain size. Linear system size is IDIM**3
 CONST                       ! PDECOEFF: CONST, EXP, GAUSS Coefficients of the PDE
 BICGSTAB                    ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES
 2                           ! ISTOPC
@@ -9,7 +9,7 @@ BICGSTAB                    ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS F
 30                          ! IRST (restart for RGMRES and BiCGSTABL)
 1.d-6                       ! EPS
 %%%%%%%%%%%  Main preconditioner choices %%%%%%%%%%%%%%%%
-ML-VCYCLE-BJAC-D-BJAC       ! Longer descriptive name for preconditioner (up to 20 chars)
+ML-VBM-VCYCLE-FBGS-D-BJAC       ! Longer descriptive name for preconditioner (up to 20 chars)
 ML                          ! Preconditioner type: NONE JACOBI GS FBGS BJAC AS ML
 %%%%%%%%%%%  First smoother (for all levels but coarsest) %%%%%%%%%%%%%%%%
 FBGS                        ! Smoother type JACOBI FBGS GS BWGS BJAC AS. For 1-level, repeats previous.
@@ -39,8 +39,8 @@ VCYCLE                      ! Type of multilevel CYCLE: VCYCLE WCYCLE KCYCLE MUL
 -3                          ! Max Number of levels in a multilevel preconditioner; if <0, lib default
 -3                          ! Target coarse matrix size per process; if <0, lib default
 SMOOTHED                    ! Type of aggregation: SMOOTHED UNSMOOTHED
-COUPLED                     ! Parallel aggregation: DEC, SYMDEC, COUPLED
-MATCHBOXP                   ! aggregation measure SOC1, MATCHBOXP
+DEC                         ! Parallel aggregation: DEC, SYMDEC, COUPLED
+SOC1                        ! aggregation measure SOC1, MATCHBOXP
 8                           ! Requested size of the aggregates for MATCHBOXP
 NATURAL                     ! Ordering of aggregation NATURAL DEGREE
 -1.5                        ! Coarsening ratio, if < 0 use library default
