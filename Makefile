@@ -1,7 +1,7 @@
 include Make.inc
 
 
-all:  objs lib
+all: libdir objs lib
 
 objs: amgp cbnd
 
@@ -15,9 +15,9 @@ libdir:
 	(if test ! -d modules ; then mkdir modules; fi;)	
 	($(INSTALL_DATA) Make.inc  include/Make.inc.amg4psblas)
         
-
 amgp:
 	cd amgprec && $(MAKE) objs
+
 cbnd: amgp
 	cd cbind && $(MAKE)  objs
 
@@ -39,6 +39,7 @@ install: lib
 	 	 mkdir -p  $(INSTALL_SAMPLESDIR)/advanced && \
 		(cd samples/simple; /bin/cp -fr pdegen fileread $(INSTALL_SAMPLESDIR)/simple ) && \
 		(cd samples/advanced; /bin/cp -fr pdegen fileread $(INSTALL_SAMPLESDIR)/advanced )
+
 cleanlib:
 	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
 	(cd include; /bin/rm -f *.a *$(.mod) *$(.fh))
