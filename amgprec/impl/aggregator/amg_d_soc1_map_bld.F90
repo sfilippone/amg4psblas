@@ -248,6 +248,7 @@ subroutine amg_d_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
               j   = icol(k)
               ! If any of the neighbours is already assigned,
               ! we will not reset. 
+              if (j>nr) cycle step1
               if (ilaggr(j) > 0) cycle step1
               if (abs(val(k)) > theta*sqrt(abs(diag(i)*diag(j)))) then
                 ip = ip + 1
