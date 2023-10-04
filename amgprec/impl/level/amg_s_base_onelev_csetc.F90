@@ -244,7 +244,7 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
     end if
 
     select case(val)
-    case('DEC')
+    case('DEC','DECOUPLED')
       allocate(amg_s_dec_aggregator_type :: lv%aggr, stat=info)
     case('SYMDEC')
       allocate(amg_s_symdec_aggregator_type :: lv%aggr, stat=info)
