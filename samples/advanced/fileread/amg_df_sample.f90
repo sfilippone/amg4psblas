@@ -586,7 +586,7 @@ program amg_df_sample
   call psb_gefree(b_col,desc_a,info)
   call psb_gefree(x_col,desc_a,info)
   call psb_gefree(r_col,desc_a,info)
-  call psb_gefree(ref_col,desc_a,info)
+  if (have_ref) call psb_gefree(ref_col,desc_a,info)
   call psb_spfree(a, desc_a,info)
   call prec%free(info)
   call psb_cdfree(desc_a,info)
