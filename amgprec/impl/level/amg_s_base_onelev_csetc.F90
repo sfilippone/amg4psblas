@@ -186,10 +186,10 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
     case ('NONE','NOPREC','FACT_NONE')
       call lv%set(amg_s_id_solver_mold,info,pos=pos)
 
-    case ('DIAG')
+    case ('DIAG','JACOBI')
       call lv%set(amg_s_diag_solver_mold,info,pos=pos)
 
-    case ('L1-DIAG')
+    case ('L1-DIAG','L1-JACOBI')
       call lv%set(amg_s_l1_diag_solver_mold,info,pos=pos)
 
     case ('GS','FGS','FWGS')
