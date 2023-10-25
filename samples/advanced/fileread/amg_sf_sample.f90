@@ -380,6 +380,8 @@ program amg_sf_sample
   case ('BJAC')
     call prec%set('smoother_sweeps', p_choice%jsweeps, info)
     call prec%set('sub_solve',       p_choice%solve,   info)
+    if (psb_toupper(p_choice%solve)=='MUMPS') &
+         & call prec%set('mumps_loc_glob','local_solver',info)
     call prec%set('sub_fillin',      p_choice%fill,    info)
     call prec%set('sub_iluthrs',     p_choice%thr,     info)
 
@@ -389,6 +391,8 @@ program amg_sf_sample
     call prec%set('sub_restr',       p_choice%restr,   info)
     call prec%set('sub_prol',        p_choice%prol,    info)
     call prec%set('sub_solve',       p_choice%solve,   info)
+    if (psb_toupper(p_choice%solve)=='MUMPS') &
+         & call prec%set('mumps_loc_glob','local_solver',info)
     call prec%set('sub_fillin',      p_choice%fill,    info)
     call prec%set('sub_iluthrs',     p_choice%thr,     info)
     
@@ -428,6 +432,8 @@ program amg_sf_sample
       call prec%set('sub_restr',       p_choice%restr,      info)
       call prec%set('sub_prol',        p_choice%prol,       info)
       call prec%set('sub_solve',       p_choice%solve,      info)
+      if (psb_toupper(p_choice%solve)=='MUMPS') &
+           & call prec%set('mumps_loc_glob','local_solver',info)
       call prec%set('sub_fillin',      p_choice%fill,       info)
       call prec%set('sub_iluthrs',     p_choice%thr,        info)
     end select
@@ -443,6 +449,8 @@ program amg_sf_sample
         call prec%set('sub_restr',       p_choice%restr2,    info,pos='post')
         call prec%set('sub_prol',        p_choice%prol2,     info,pos='post')
         call prec%set('sub_solve',       p_choice%solve2,    info,pos='post')
+        if (psb_toupper(p_choice%solve2)=='MUMPS') &
+             & call prec%set('mumps_loc_glob','local_solver',info)
         call prec%set('sub_fillin',      p_choice%fill2,     info,pos='post')
         call prec%set('sub_iluthrs',     p_choice%thr2,      info,pos='post')
       end select
