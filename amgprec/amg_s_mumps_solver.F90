@@ -78,7 +78,8 @@ module amg_s_mumps_solver
     !
     ! Controls to be set before MUMPS instantiation:
     !
-    ! IPAR(1) : MUMPS_LOC_GLOB   0==amg_local_solver_: LOCAL   1==amg_global_solver_: GLOBAL
+    ! IPAR(1) : MUMPS_LOC_GLOB   0==amg_local_solver_: 'LOCAL_SOLVER
+    !                            1==amg_global_solver_: 'GLOBAL_SOLVER'
     ! IPAR(2) : MUMPS_PRINT_ERR  print verbosity (see MUMPS)
     ! IPAR(3) : MUMPS_SYM        0: non-symmetric   2: symmetric
     integer(psb_ipk_), dimension(3) :: ipar
