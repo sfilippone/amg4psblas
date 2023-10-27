@@ -46,6 +46,7 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_z_as_smoother
   use amg_z_diag_solver
   use amg_z_l1_diag_solver
+  use amg_z_jac_solver
   use amg_z_ilu_solver
   use amg_z_id_solver
   use amg_z_gs_solver
@@ -84,6 +85,8 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
   type(amg_z_as_smoother_type)     ::  amg_z_as_smoother_mold
   type(amg_z_diag_solver_type)     ::  amg_z_diag_solver_mold
   type(amg_z_l1_diag_solver_type)  ::  amg_z_l1_diag_solver_mold
+  type(amg_z_jac_solver_type)      ::  amg_z_jac_solver_mold
+  type(amg_z_l1_jac_solver_type)   ::  amg_z_l1_jac_solver_mold
   type(amg_z_ilu_solver_type)      ::  amg_z_ilu_solver_mold
   type(amg_z_id_solver_type)       ::  amg_z_id_solver_mold
   type(amg_z_gs_solver_type)       ::  amg_z_gs_solver_mold
@@ -197,11 +200,16 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
     case ('NONE','NOPREC','FACT_NONE')
       call lv%set(amg_z_id_solver_mold,info,pos=pos)
 
-    case ('DIAG','JACOBI')
+    case ('DIAG')
       call lv%set(amg_z_diag_solver_mold,info,pos=pos)
 
-    case ('L1-DIAG','L1-JACOBI')
+    case ('JACOBI')
+      call lv%set(amg_z_jac_solver_mold,info,pos=pos)
+
+    case ('L1-DIAG')
       call lv%set(amg_z_l1_diag_solver_mold,info,pos=pos)
+    case ('L1-JACOBI')
+      call lv%set(amg_z_l1_jac_solver_mold,info,pos=pos)
 
     case ('GS','FGS','FWGS')
       call lv%set(amg_z_gs_solver_mold,info,pos=pos)

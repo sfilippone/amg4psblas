@@ -35,17 +35,17 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine amg_z_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
+subroutine amg_z_l1_jac_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   
   use psb_base_mod
-  use amg_z_diag_solver, amg_protect_name => amg_z_diag_solver_bld
+  use amg_z_jac_solver, amg_protect_name => amg_z_l1_jac_solver_bld
 
   Implicit None
 
   ! Arguments
   type(psb_zspmat_type), intent(in), target           :: a
   Type(psb_desc_type), Intent(inout)                  :: desc_a 
-  class(amg_z_diag_solver_type), intent(inout)        :: sv
+  class(amg_z_l1_jac_solver_type), intent(inout)        :: sv
   integer(psb_ipk_), intent(out)                      :: info
   type(psb_zspmat_type), intent(in), target, optional :: b
   class(psb_z_base_sparse_mat), intent(in), optional  :: amold
@@ -53,11 +53,11 @@ subroutine amg_z_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   class(psb_i_base_vect_type), intent(in), optional   :: imold
   ! Local variables
   integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota
-  complex(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
-  complex(psb_dpk_), allocatable :: tdb(:)
+  complex(psb_dpk_), allocatable :: tdb(:), tx(:),ty(:)
+  type(psb_z_csr_sparse_mat) :: tcsr
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
-  character(len=20)   :: name='z_diag_solver_bld', ch_err
+  character(len=20)   :: name='z_l1_jac_solver_bld', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -71,13 +71,25 @@ subroutine amg_z_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
   n_row  = desc_a%get_local_rows()
   nrow_a = a%get_nrows()
-
-  sv%d = a%get_diag(info)
+  if (present(b)) then
+    info=psb_err_internal_error_
+    call psb_errpush(info,name)
+    goto 9999      
+  end if
+    
+  call a%cp_to(tcsr)
+  call sv%a%mv_from(tcsr)
+  if (present(amold)) call sv%a%cscnv(info,mold=amold)
+  
+  tx   = a%get_diag(info)
+  sv%d = a%arwsum(info)
+  sv%d(:) = sv%d(:) - abs(tx(:)) + tx(:) 
   if (info == psb_success_) call psb_realloc(n_row,sv%d,info)
   if (present(b)) then 
-    tdb=b%get_diag(info)
+    tdb=b%arwsum(info)
+    ty =b%get_diag(info)
     if (size(tdb)+nrow_a > n_row) call psb_realloc(nrow_a+size(tdb),sv%d,info)
-    if (info == psb_success_) sv%d(nrow_a+1:nrow_a+size(tdb)) = tdb(:)
+    if (info == psb_success_) sv%d(nrow_a+1:nrow_a+size(tdb)) = tdb(:) - abs(ty(:)) + ty(:)
   end if
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='get_diag')
@@ -111,85 +123,6 @@ subroutine amg_z_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine amg_z_diag_solver_bld
+end subroutine amg_z_l1_jac_solver_bld
 
 
-subroutine amg_z_l1_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
-  
-  use psb_base_mod
-  use amg_z_l1_diag_solver, amg_protect_name => amg_z_l1_diag_solver_bld
-
-  Implicit None
-
-  ! Arguments
-  type(psb_zspmat_type), intent(in), target           :: a
-  Type(psb_desc_type), Intent(inout)                  :: desc_a 
-  class(amg_z_l1_diag_solver_type), intent(inout)        :: sv
-  integer(psb_ipk_), intent(out)                      :: info
-  type(psb_zspmat_type), intent(in), target, optional :: b
-  class(psb_z_base_sparse_mat), intent(in), optional  :: amold
-  class(psb_z_base_vect_type), intent(in), optional   :: vmold
-  class(psb_i_base_vect_type), intent(in), optional   :: imold
-  ! Local variables
-  integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota
-  complex(psb_dpk_), allocatable :: tdb(:), tx(:), ty(:) 
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
-  character(len=20)   :: name='z_l1_diag_solver_bld', ch_err
-
-  info=psb_success_
-  call psb_erractionsave(err_act)
-  debug_unit  = psb_get_debug_unit()
-  debug_level = psb_get_debug_level()
-  ctxt       = desc_a%get_context()
-  call psb_info(ctxt, me, np)
-  if (debug_level >= psb_debug_outer_) &
-       & write(debug_unit,*) me,' ',trim(name),' start'
-
-
-  n_row  = desc_a%get_local_rows()
-  nrow_a = a%get_nrows()
-
-  tx   = a%get_diag(info)
-  sv%d = a%arwsum(info)
-  sv%d(:) = sv%d(:) - abs(tx(:)) + tx(:) 
-  if (info == psb_success_) call psb_realloc(n_row,sv%d,info)
-  if (present(b)) then 
-    tdb=b%arwsum(info)
-    ty =b%get_diag(info)
-    if (size(tdb)+nrow_a > n_row) call psb_realloc(nrow_a+size(tdb),sv%d,info)
-    if (info == psb_success_) sv%d(nrow_a+1:nrow_a+size(tdb)) = tdb(:) - abs(ty(:)) + ty(:)
-  end if
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='arwsum')
-    goto 9999      
-  end if
-
-  do i=1,n_row
-    if (sv%d(i) == zzero) then 
-      sv%d(i) = zone
-    else
-      sv%d(i) = zone/sv%d(i)
-    end if
-  end do
-  allocate(sv%dv,stat=info) 
-  if (info == psb_success_) then 
-    call sv%dv%bld(sv%d)
-    if (present(vmold)) call sv%dv%cnv(vmold)
-    call sv%dv%sync()
-  else
-    call psb_errpush(psb_err_from_subroutine_,name,& 
-         & a_err='Allocate sv%dv')
-    goto 9999      
-  end if
-
-  if (debug_level >= psb_debug_outer_) &
-       & write(debug_unit,*) me,' ',trim(name),' end'
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(err_act)
-
-  return
-end subroutine amg_z_l1_diag_solver_bld

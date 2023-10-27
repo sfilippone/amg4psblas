@@ -8,8 +8,8 @@
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
-!        Fabio Durastante 
-!
+!        Fabio Durastante        
+!   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!
+!   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,33 +33,40 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!
-!
-subroutine amg_c_base_ainv_solver_cnv(sv,info,amold,vmold,imold)
+!   
+!  
+subroutine amg_z_jac_solver_cnv(sv,info,amold,vmold,imold)
+
   use psb_base_mod
-  use amg_c_base_ainv_mod, amg_protect_name => amg_c_base_ainv_solver_cnv
+  use amg_z_jac_solver, amg_protect_name => amg_z_jac_solver_cnv
+
   Implicit None
+
   ! Arguments
-  class(amg_c_base_ainv_solver_type), intent(inout)  :: sv
-  integer(psb_ipk_), intent(out)                     :: info
-  class(psb_c_base_sparse_mat), intent(in), optional :: amold
-  class(psb_c_base_vect_type), intent(in), optional  :: vmold
+  class(amg_z_jac_solver_type), intent(inout)         :: sv
+  integer(psb_ipk_), intent(out)                        :: info
+  class(psb_z_base_sparse_mat), intent(in), optional  :: amold
+  class(psb_z_base_vect_type), intent(in), optional   :: vmold
   class(psb_i_base_vect_type), intent(in), optional  :: imold
+  ! Local variables
+  integer(psb_ipk_) :: err_act, debug_unit, debug_level
+  character(len=20) :: name='z_jac_solver_cnv', ch_err
 
-  !local
-  integer(psb_ipk_)  :: iam, np
-  type(psb_ctxt_type)   :: ctxt
-  character(len=80)  :: prefix_
-  character(len=120) :: fname ! len should be at least 20 more than
-  logical :: solver_
-  !  len of prefix_
+  info=psb_success_
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
-  info = 0
+  if (present(amold)) call sv%a%cscnv(info,mold=amold)
+  if ((info==0).and.present(vmold)) call sv%dv%cnv(mold=vmold)
 
-  if (present(amold)) then
-    call sv%w%cscnv(info,mold=amold)
-    call sv%z%cscnv(info,mold=amold)
-  end if
-  call sv%dv%cnv(mold=vmold)
+  if (debug_level >= psb_debug_outer_) &
+       & write(debug_unit,*) trim(name),' end'
 
-end subroutine amg_c_base_ainv_solver_cnv
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end subroutine amg_z_jac_solver_cnv

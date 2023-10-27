@@ -84,6 +84,7 @@ subroutine amg_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
   use amg_d_diag_solver
   use amg_d_l1_diag_solver
   use amg_d_ilu_solver
+  use amg_d_jac_solver
   use amg_d_id_solver
   use amg_d_gs_solver
   use amg_d_ainv_solver
@@ -314,6 +315,7 @@ subroutine amg_dcprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
   use amg_d_diag_solver
   use amg_d_l1_diag_solver
   use amg_d_ilu_solver
+  use amg_d_jac_solver
   use amg_d_id_solver
   use amg_d_gs_solver
   use amg_d_ainv_solver

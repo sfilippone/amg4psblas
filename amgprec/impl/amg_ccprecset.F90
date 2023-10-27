@@ -84,6 +84,7 @@ subroutine amg_ccprecseti(p,what,val,info,ilev,ilmax,pos,idx)
   use amg_c_diag_solver
   use amg_c_l1_diag_solver
   use amg_c_ilu_solver
+  use amg_c_jac_solver
   use amg_c_id_solver
   use amg_c_gs_solver
   use amg_c_ainv_solver
@@ -308,6 +309,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
   use amg_c_diag_solver
   use amg_c_l1_diag_solver
   use amg_c_ilu_solver
+  use amg_c_jac_solver
   use amg_c_id_solver
   use amg_c_gs_solver
   use amg_c_ainv_solver

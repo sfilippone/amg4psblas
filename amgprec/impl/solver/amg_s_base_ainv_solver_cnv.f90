@@ -47,7 +47,6 @@ subroutine amg_s_base_ainv_solver_cnv(sv,info,amold,vmold,imold)
   class(psb_i_base_vect_type), intent(in), optional  :: imold
 
   !local
-  integer(psb_ipk_)  :: i, j, il1, iln, lname, lev
   integer(psb_ipk_)  :: iam, np
   type(psb_ctxt_type)   :: ctxt
   character(len=80)  :: prefix_

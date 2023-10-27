@@ -288,6 +288,8 @@ program amg_d_pde3d
     call prec%set('sub_solve',       p_choice%solve,   info)
     if (psb_toupper(p_choice%solve)=='MUMPS') &
          & call prec%set('mumps_loc_glob','local_solver',info)
+    if ((psb_toupper(p_choice%solve)=='JACOBI').or.(psb_toupper(p_choice%solve)=='L1-JACOBI')) &
+         & call prec%set('solver_sweeps',8,info)
     call prec%set('sub_fillin',      p_choice%fill,    info)
     call prec%set('sub_iluthrs',     p_choice%thr,     info)
 

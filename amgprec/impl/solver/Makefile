@@ -302,7 +302,43 @@ amg_z_invk_solver_clone.o \
 amg_z_invk_solver_clone_settings.o \
 amg_z_invk_solver_cseti.o \
 amg_z_invk_solver_descr.o \
-amg_z_krm_solver_impl.o 
+amg_z_krm_solver_impl.o \
+amg_c_jac_solver_clone_settings.o \
+amg_c_jac_solver_clear_data.o \
+amg_c_jac_solver_cnv.o \
+amg_c_jac_solver_clone.o \
+amg_c_jac_solver_dmp.o \
+amg_c_jac_solver_apply_vect.o \
+amg_c_jac_solver_apply.o \
+amg_c_jac_solver_bld.o \
+amg_c_l1_jac_solver_bld.o \
+amg_z_jac_solver_clone_settings.o \
+amg_z_jac_solver_clear_data.o \
+amg_z_jac_solver_cnv.o \
+amg_z_jac_solver_clone.o \
+amg_z_jac_solver_dmp.o \
+amg_z_jac_solver_apply_vect.o \
+amg_z_jac_solver_apply.o \
+amg_z_jac_solver_bld.o \
+amg_z_l1_jac_solver_bld.o \
+amg_s_jac_solver_clone_settings.o \
+amg_s_jac_solver_clear_data.o \
+amg_s_jac_solver_cnv.o \
+amg_s_jac_solver_clone.o \
+amg_s_jac_solver_dmp.o \
+amg_s_jac_solver_apply_vect.o \
+amg_s_jac_solver_apply.o \
+amg_s_jac_solver_bld.o \
+amg_s_l1_jac_solver_bld.o \
+amg_d_jac_solver_clone_settings.o \
+amg_d_jac_solver_clear_data.o \
+amg_d_jac_solver_cnv.o \
+amg_d_jac_solver_clone.o \
+amg_d_jac_solver_dmp.o \
+amg_d_jac_solver_apply_vect.o \
+amg_d_jac_solver_apply.o \
+amg_d_jac_solver_bld.o \
+amg_d_l1_jac_solver_bld.o 
 
 LIBNAME=libamg_prec.a
 

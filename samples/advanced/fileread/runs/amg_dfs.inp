@@ -5,7 +5,7 @@ NONE                        ! Initial guess
 amg_sol.mtx                 ! Reference solution
 MM                          ! File format: MatrixMarket or Harwell-Boeing
 CSR                         ! Storage format: CSR COO JAD 
-GRAPH                       ! PART (partition method): BLOCK GRAPH
+GRAPH			    ! PART (partition method): BLOCK GRAPH
 CG                          ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES
 2                           ! ISTOPC
 00500                       ! ITMAX

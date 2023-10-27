@@ -84,6 +84,7 @@ subroutine amg_scprecseti(p,what,val,info,ilev,ilmax,pos,idx)
   use amg_s_diag_solver
   use amg_s_l1_diag_solver
   use amg_s_ilu_solver
+  use amg_s_jac_solver
   use amg_s_id_solver
   use amg_s_gs_solver
   use amg_s_ainv_solver
@@ -308,6 +309,7 @@ subroutine amg_scprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
   use amg_s_diag_solver
   use amg_s_l1_diag_solver
   use amg_s_ilu_solver
+  use amg_s_jac_solver
   use amg_s_id_solver
   use amg_s_gs_solver
   use amg_s_ainv_solver

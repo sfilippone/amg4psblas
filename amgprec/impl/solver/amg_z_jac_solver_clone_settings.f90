@@ -8,8 +8,8 @@
 !  
 !        Salvatore Filippone  
 !        Pasqua D'Ambra   
-!        Fabio Durastante 
-!
+!        Fabio Durastante        
+!   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!
+!   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,33 +33,37 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!
-!
-subroutine amg_c_base_ainv_solver_cnv(sv,info,amold,vmold,imold)
+!   
+!  
+subroutine amg_z_jac_solver_clone_settings(sv,svout,info)
+  
   use psb_base_mod
-  use amg_c_base_ainv_mod, amg_protect_name => amg_c_base_ainv_solver_cnv
+  use amg_z_jac_solver, amg_protect_name =>  amg_z_jac_solver_clone_settings
   Implicit None
   ! Arguments
-  class(amg_c_base_ainv_solver_type), intent(inout)  :: sv
-  integer(psb_ipk_), intent(out)                     :: info
-  class(psb_c_base_sparse_mat), intent(in), optional :: amold
-  class(psb_c_base_vect_type), intent(in), optional  :: vmold
-  class(psb_i_base_vect_type), intent(in), optional  :: imold
+  class(amg_z_jac_solver_type), intent(inout) :: sv
+  class(amg_z_base_solver_type), intent(inout) :: svout
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_)  :: err_act
+  character(len=20) :: name='z_jac_solver_clone_settings'
 
-  !local
-  integer(psb_ipk_)  :: iam, np
-  type(psb_ctxt_type)   :: ctxt
-  character(len=80)  :: prefix_
-  character(len=120) :: fname ! len should be at least 20 more than
-  logical :: solver_
-  !  len of prefix_
+  call psb_erractionsave(err_act)
 
-  info = 0
+  select type(svout)
+  class is(amg_z_jac_solver_type)
+    svout%sweeps = sv%sweeps
+    svout%eps    = sv%eps
+    
+  class default    
+    info = psb_err_internal_error_
+    call psb_errpush(info,name)
+    goto 9999 
+  end select
 
-  if (present(amold)) then
-    call sv%w%cscnv(info,mold=amold)
-    call sv%z%cscnv(info,mold=amold)
-  end if
-  call sv%dv%cnv(mold=vmold)
+  call psb_erractionrestore(err_act)
+  return
 
-end subroutine amg_c_base_ainv_solver_cnv
+9999 call psb_error_handler(err_act)
+
+  return
+end subroutine amg_z_jac_solver_clone_settings

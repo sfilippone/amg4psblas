@@ -132,8 +132,7 @@ subroutine amg_c_l1_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   class(psb_i_base_vect_type), intent(in), optional   :: imold
   ! Local variables
   integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota
-  complex(psb_spk_), pointer :: ww(:), aux(:), tx(:),ty(:)
-  complex(psb_spk_), allocatable :: tdb(:)
+  complex(psb_spk_), allocatable :: tdb(:), tx(:), ty(:) 
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
   character(len=20)   :: name='c_l1_diag_solver_bld', ch_err
@@ -151,12 +150,15 @@ subroutine amg_c_l1_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   n_row  = desc_a%get_local_rows()
   nrow_a = a%get_nrows()
 
+  tx   = a%get_diag(info)
   sv%d = a%arwsum(info)
+  sv%d(:) = sv%d(:) - abs(tx(:)) + tx(:) 
   if (info == psb_success_) call psb_realloc(n_row,sv%d,info)
   if (present(b)) then 
     tdb=b%arwsum(info)
+    ty =b%get_diag(info)
     if (size(tdb)+nrow_a > n_row) call psb_realloc(nrow_a+size(tdb),sv%d,info)
-    if (info == psb_success_) sv%d(nrow_a+1:nrow_a+size(tdb)) = tdb(:)
+    if (info == psb_success_) sv%d(nrow_a+1:nrow_a+size(tdb)) = tdb(:) - abs(ty(:)) + ty(:)
   end if
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='arwsum')

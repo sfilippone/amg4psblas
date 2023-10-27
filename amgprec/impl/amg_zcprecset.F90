@@ -84,6 +84,7 @@ subroutine amg_zcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
   use amg_z_diag_solver
   use amg_z_l1_diag_solver
   use amg_z_ilu_solver
+  use amg_z_jac_solver
   use amg_z_id_solver
   use amg_z_gs_solver
   use amg_z_ainv_solver
@@ -314,6 +315,7 @@ subroutine amg_zcprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
   use amg_z_diag_solver
   use amg_z_l1_diag_solver
   use amg_z_ilu_solver
+  use amg_z_jac_solver
   use amg_z_id_solver
   use amg_z_gs_solver
   use amg_z_ainv_solver
