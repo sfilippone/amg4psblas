@@ -18,6 +18,7 @@ BJAC                        ! Smoother type JACOBI FBGS GS BWGS BJAC AS. For 1-l
 HALO                        ! AS restriction operator: NONE HALO
 NONE                        ! AS prolongation operator: NONE SUM AVG
 JACOBI                      ! Subdomain solver for BJAC/AS: JACOBI GS BGS ILU ILUT MILU MUMPS SLU UMF
+8                           ! Inner solver sweeps (GS and JACOBI)
 LLK                         ! AINV variant
 0                           ! Fill level P for ILU(P) and ILU(T,P)
 1                           ! Inverse Fill level P for INVK
@@ -29,6 +30,7 @@ NONE                        ! Second (post) smoother, ignored if NONE
 HALO                        ! AS restriction operator: NONE HALO
 NONE                        ! AS prolongation operator: NONE SUM AVG
 ILU                         ! Subdomain solver for BJAC/AS: JACOBI GS BGS ILU ILUT MILU MUMPS SLU UMF
+8                           ! Inner solver sweeps (GS and JACOBI)
 LLK                         ! AINV variant
 0                           ! Fill level P for ILU(P) and ILU(T,P)
 8                           ! Inverse Fill level P for INVK

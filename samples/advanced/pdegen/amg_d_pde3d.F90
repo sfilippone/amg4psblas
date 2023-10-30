@@ -126,62 +126,64 @@ program amg_d_pde3d
     ! AMG cycles for ML
     ! general AMG data
     character(len=16)  :: mlcycle      ! AMG cycle type
-    integer(psb_ipk_)  :: maxlevs     ! maximum number of levels in AMG preconditioner
+    integer(psb_ipk_)  :: maxlevs      ! maximum number of levels in AMG preconditioner
 
     ! AMG aggregation
     character(len=16)  :: aggr_prol    ! aggregation type: SMOOTHED, NONSMOOTHED
     character(len=16)  :: par_aggr_alg ! parallel aggregation algorithm: DEC, SYMDEC
-    character(len=16)  :: aggr_type   ! Type of aggregation SOC1, SOC2, MATCHBOXP
-    integer(psb_ipk_)  :: aggr_size   ! Requested size of the aggregates for MATCHBOXP
-    character(len=16)  :: aggr_ord    ! ordering for aggregation: NATURAL, DEGREE
-    character(len=16)  :: aggr_filter ! filtering: FILTER, NO_FILTER
-    real(psb_dpk_)     :: mncrratio  ! minimum aggregation ratio
+    character(len=16)  :: aggr_type    ! Type of aggregation SOC1, SOC2, MATCHBOXP
+    integer(psb_ipk_)  :: aggr_size    ! Requested size of the aggregates for MATCHBOXP
+    character(len=16)  :: aggr_ord     ! ordering for aggregation: NATURAL, DEGREE
+    character(len=16)  :: aggr_filter  ! filtering: FILTER, NO_FILTER
+    real(psb_dpk_)      :: mncrratio    ! minimum aggregation ratio
     real(psb_dpk_), allocatable :: athresv(:) ! smoothed aggregation threshold vector
-    integer(psb_ipk_)  :: thrvsz      ! size of threshold vector
-    real(psb_dpk_)     :: athres      ! smoothed aggregation threshold
-    integer(psb_ipk_)  :: csizepp     ! minimum size of coarsest matrix per process
+    integer(psb_ipk_)  :: thrvsz       ! size of threshold vector
+    real(psb_dpk_)      :: athres       ! smoothed aggregation threshold
+    integer(psb_ipk_)  :: csizepp      ! minimum size of coarsest matrix per process
 
     ! AMG smoother or pre-smoother; also 1-lev preconditioner
-    character(len=16)  :: smther      ! (pre-)smoother type: BJAC, AS
-    integer(psb_ipk_)  :: jsweeps     ! (pre-)smoother / 1-lev prec. sweeps
-    integer(psb_ipk_)  :: novr        ! number of overlap layers
-    character(len=16)  :: restr       ! restriction over application of AS
-    character(len=16)  :: prol        ! prolongation over application of AS
-    character(len=16)  :: solve       ! local subsolver type: ILU, MILU, ILUT,
-                                      ! UMF, MUMPS, SLU, FWGS, BWGS, JAC
-    character(len=16)  :: variant     ! AINV variant: LLK, etc
-    integer(psb_ipk_)  :: fill        ! fill-in for incomplete LU factorization
-    integer(psb_ipk_)  :: invfill     ! Inverse fill-in for INVK
-    real(psb_dpk_)     :: thr         ! threshold for ILUT factorization
+    character(len=16)  :: smther       ! (pre-)smoother type: BJAC, AS
+    integer(psb_ipk_)  :: jsweeps      ! (pre-)smoother / 1-lev prec. sweeps
+    integer(psb_ipk_)  :: novr         ! number of overlap layers
+    character(len=16)  :: restr        ! restriction over application of AS
+    character(len=16)  :: prol         ! prolongation over application of AS
+    character(len=16)  :: solve        ! local subsolver type: ILU, MILU, ILUT,
+                                       ! UMF, MUMPS, SLU, FWGS, BWGS, JAC
+    integer(psb_ipk_)  :: ssweeps      ! inner solver sweeps
+    character(len=16)  :: variant      ! AINV variant: LLK, etc
+    integer(psb_ipk_)  :: fill         ! fill-in for incomplete LU factorization
+    integer(psb_ipk_)  :: invfill      ! Inverse fill-in for INVK
+    real(psb_dpk_)      :: thr          ! threshold for ILUT factorization
 
     ! AMG post-smoother; ignored by 1-lev preconditioner
-    character(len=16)  :: smther2     ! post-smoother type: BJAC, AS
-    integer(psb_ipk_)  :: jsweeps2    ! post-smoother sweeps
-    integer(psb_ipk_)  :: novr2       ! number of overlap layers
-    character(len=16)  :: restr2      ! restriction  over application of AS
-    character(len=16)  :: prol2       ! prolongation over application of AS
-    character(len=16)  :: solve2      ! local subsolver type: ILU, MILU, ILUT,
-                                      ! UMF, MUMPS, SLU, FWGS, BWGS, JAC
-    character(len=16)  :: variant2    ! AINV variant: LLK, etc
-    integer(psb_ipk_)  :: fill2       ! fill-in for incomplete LU factorization
-    integer(psb_ipk_)  :: invfill2    ! Inverse fill-in for INVK
-    real(psb_dpk_)      :: thr2        ! threshold for ILUT factorization
+    character(len=16)  :: smther2      ! post-smoother type: BJAC, AS
+    integer(psb_ipk_)  :: jsweeps2     ! post-smoother sweeps
+    integer(psb_ipk_)  :: novr2        ! number of overlap layers
+    character(len=16)  :: restr2       ! restriction  over application of AS
+    character(len=16)  :: prol2        ! prolongation over application of AS
+    character(len=16)  :: solve2       ! local subsolver type: ILU, MILU, ILUT,
+                                       ! UMF, MUMPS, SLU, FWGS, BWGS, JAC
+    integer(psb_ipk_)  :: ssweeps2     ! inner solver sweeps
+    character(len=16)  :: variant2     ! AINV variant: LLK, etc
+    integer(psb_ipk_)  :: fill2        ! fill-in for incomplete LU factorization
+    integer(psb_ipk_)  :: invfill2     ! Inverse fill-in for INVK
+    real(psb_dpk_)      :: thr2         ! threshold for ILUT factorization
 
     ! coarsest-level solver
-    character(len=16)  :: cmat        ! coarsest matrix layout: REPL, DIST
-    character(len=16)  :: csolve      ! coarsest-lev solver: BJAC, SLUDIST (distr.
-                                      ! mat.); UMF, MUMPS, SLU, ILU, ILUT, MILU
-                                      ! (repl. mat.)
-    character(len=16)  :: csbsolve    ! coarsest-lev local subsolver: ILU, ILUT,
-                                      ! MILU, UMF, MUMPS, SLU
-    integer(psb_ipk_)  :: cfill       ! fill-in for incomplete LU factorization
-    real(psb_dpk_)     :: cthres      ! threshold for ILUT factorization
-    integer(psb_ipk_)  :: cjswp       ! sweeps for GS or JAC coarsest-lev subsolver
+    character(len=16)  :: cmat         ! coarsest matrix layout: REPL, DIST
+    character(len=16)  :: csolve       ! coarsest-lev solver: BJAC, SLUDIST (distr.
+                                       ! mat.); UMF, MUMPS, SLU, ILU, ILUT, MILU
+                                       ! (repl. mat.)
+    character(len=16)  :: csbsolve     ! coarsest-lev local subsolver: ILU, ILUT,
+                                       ! MILU, UMF, MUMPS, SLU
+    integer(psb_ipk_)  :: cfill        ! fill-in for incomplete LU factorization
+    real(psb_dpk_)     :: cthres        ! threshold for ILUT factorization
+    integer(psb_ipk_)  :: cjswp        ! sweeps for GS or JAC coarsest-lev subsolver
 
     ! Dump data
     logical            :: dump = .false.
-    integer(psb_ipk_)  :: dlmin       ! Minimum level to dump 
-    integer(psb_ipk_)  :: dlmax       ! Maximum level to dump
+    integer(psb_ipk_)  :: dlmin        ! Minimum level to dump 
+    integer(psb_ipk_)  :: dlmax        ! Maximum level to dump
     logical            :: dump_ac         = .false.
     logical            :: dump_rp         = .false.
     logical            :: dump_tprol      = .false.
@@ -286,10 +288,9 @@ program amg_d_pde3d
   case ('BJAC')
     call prec%set('smoother_sweeps', p_choice%jsweeps, info)
     call prec%set('sub_solve',       p_choice%solve,   info)
+    call prec%set('solver_sweeps',   p_choice%ssweeps,   info)
     if (psb_toupper(p_choice%solve)=='MUMPS') &
          & call prec%set('mumps_loc_glob','local_solver',info)
-    if ((psb_toupper(p_choice%solve)=='JACOBI').or.(psb_toupper(p_choice%solve)=='L1-JACOBI')) &
-         & call prec%set('solver_sweeps',8,info)
     call prec%set('sub_fillin',      p_choice%fill,    info)
     call prec%set('sub_iluthrs',     p_choice%thr,     info)
 
@@ -299,6 +300,7 @@ program amg_d_pde3d
     call prec%set('sub_restr',       p_choice%restr,   info)
     call prec%set('sub_prol',        p_choice%prol,    info)
     call prec%set('sub_solve',       p_choice%solve,   info)
+    call prec%set('solver_sweeps',   p_choice%ssweeps,   info)
     if (psb_toupper(p_choice%solve)=='MUMPS') &
          & call prec%set('mumps_loc_glob','local_solver',info)
     call prec%set('sub_fillin',      p_choice%fill,    info)
@@ -355,7 +357,7 @@ program amg_d_pde3d
         if (psb_toupper(p_choice%solve)=='MUMPS') &
              & call prec%set('mumps_loc_glob','local_solver',info)
       end select
-
+      call prec%set('solver_sweeps',   p_choice%ssweeps,   info)
       call prec%set('sub_fillin',      p_choice%fill,       info)
       call prec%set('inv_fillin',      p_choice%invfill,    info)
       call prec%set('sub_iluthrs',     p_choice%thr,        info)
@@ -384,7 +386,7 @@ program amg_d_pde3d
           if (psb_toupper(p_choice%solve2)=='MUMPS') &
                & call prec%set('mumps_loc_glob','local_solver',info)
         end select
-
+        call prec%set('solver_sweeps',   p_choice%ssweeps2,   info,pos='post')
         call prec%set('sub_fillin',      p_choice%fill2,     info,pos='post')
         call prec%set('inv_fillin',      p_choice%invfill2,  info,pos='post')
         call prec%set('sub_iluthrs',     p_choice%thr2,      info,pos='post')
@@ -583,6 +585,7 @@ contains
       call read_data(prec%restr,inp_unit)      ! restriction  over application of AS
       call read_data(prec%prol,inp_unit)       ! prolongation over application of AS
       call read_data(prec%solve,inp_unit)      ! local subsolver
+      call read_data(prec%ssweeps,inp_unit)    ! inner solver sweeps 
       call read_data(prec%variant,inp_unit)    ! AINV variant
       call read_data(prec%fill,inp_unit)       ! fill-in for incomplete LU
       call read_data(prec%invfill,inp_unit)    !Inverse fill-in for INVK
@@ -594,6 +597,7 @@ contains
       call read_data(prec%restr2,inp_unit)      ! restriction  over application of AS
       call read_data(prec%prol2,inp_unit)       ! prolongation over application of AS
       call read_data(prec%solve2,inp_unit)      ! local subsolver
+      call read_data(prec%ssweeps2,inp_unit)    ! inner solver sweeps 
       call read_data(prec%variant2,inp_unit)    ! AINV variant
       call read_data(prec%fill2,inp_unit)       ! fill-in for incomplete LU
       call read_data(prec%invfill2,inp_unit)    !Inverse fill-in for INVK
@@ -663,6 +667,7 @@ contains
     call psb_bcast(ctxt,prec%restr)
     call psb_bcast(ctxt,prec%prol)
     call psb_bcast(ctxt,prec%solve)
+    call psb_bcast(ctxt,prec%ssweeps)
     call psb_bcast(ctxt,prec%variant)
     call psb_bcast(ctxt,prec%fill)
     call psb_bcast(ctxt,prec%invfill)
@@ -674,6 +679,7 @@ contains
     call psb_bcast(ctxt,prec%restr2)
     call psb_bcast(ctxt,prec%prol2)
     call psb_bcast(ctxt,prec%solve2)
+    call psb_bcast(ctxt,prec%ssweeps2)
     call psb_bcast(ctxt,prec%variant2)
     call psb_bcast(ctxt,prec%fill2)
     call psb_bcast(ctxt,prec%invfill2)
