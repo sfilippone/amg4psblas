@@ -35,55 +35,30 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amg_d_jac_smoother_clone(sm,smout,info)
+subroutine amg_d_poly_smoother_cseti(sm,what,val,info,idx)
 
   use psb_base_mod
-  use amg_d_jac_smoother, amg_protect_name => amg_d_jac_smoother_clone
-
+  use amg_d_poly_smoother, amg_protect_nam => amg_d_poly_smoother_cseti
   Implicit None
 
   ! Arguments
-  class(amg_d_jac_smoother_type), intent(inout)               :: sm
-  class(amg_d_base_smoother_type), allocatable, intent(inout) :: smout
-  integer(psb_ipk_), intent(out)                :: info
-  ! Local variables
+  class(amg_d_poly_smoother_type), intent(inout) :: sm
+  character(len=*), intent(in)                 :: what
+  integer(psb_ipk_), intent(in)                :: val
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), intent(in), optional      :: idx
   integer(psb_ipk_) :: err_act
+  character(len=20)  :: name='d_poly_smoother_cseti'
 
-
-  info=psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
-  if (allocated(smout)) then
-    call smout%free(info)
-    if (info == psb_success_) deallocate(smout, stat=info)
-  end if
-  if (info == psb_success_) &
-       & allocate(amg_d_jac_smoother_type :: smout, stat=info)
-  if (info /= 0) then
-    info = psb_err_alloc_dealloc_
-    goto 9999
-  end if
-
-  select type(smo => smout)
-  type is (amg_d_jac_smoother_type)
-    smo%nd_nnz_tot = sm%nd_nnz_tot
-    smo%checkres   = sm%checkres
-    smo%printres   = sm%printres
-    smo%checkiter  = sm%checkiter
-    smo%printiter  = sm%printiter
-    smo%tol        = sm%tol
-    smo%pa         => sm%pa
-    call sm%nd%clone(smo%nd,info)
-    if ((info==psb_success_).and.(allocated(sm%sv))) then
-      allocate(smout%sv,mold=sm%sv,stat=info)
-      if (info == psb_success_) call sm%sv%clone(smo%sv,info)
-    end if
-
-  class default
-    info = psb_err_internal_error_
+  select case(psb_toupper(what))
+  case('SMOOTHER_DEGREE')
+    sm%pdegree = val
+  case default
+    call sm%amg_d_base_smoother_type%set(what,val,info,idx=idx)
   end select
-
-  if (info /= 0) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -91,4 +66,4 @@ subroutine amg_d_jac_smoother_clone(sm,smout,info)
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine amg_d_jac_smoother_clone
+end subroutine amg_d_poly_smoother_cseti

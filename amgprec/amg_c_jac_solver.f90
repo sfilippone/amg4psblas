@@ -403,7 +403,10 @@ contains
     info = psb_success_
 
     call sv%a%free()
-    call sv%dv%free(info)
+    if (allocated(sv%dv)) then
+      call sv%dv%free(info)
+      deallocate(sv%dv)
+    end if
     if (allocated(sv%d)) deallocate(sv%d)
 
     call psb_erractionrestore(err_act)

@@ -47,6 +47,7 @@ module amg_d_prec_mod
   use amg_d_prec_type
   use amg_d_jac_smoother
   use amg_d_as_smoother
+  use amg_d_poly_smoother
   use amg_d_id_solver
   use amg_d_diag_solver
   use amg_d_l1_diag_solver

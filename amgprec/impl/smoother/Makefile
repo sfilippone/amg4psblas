@@ -97,6 +97,17 @@ amg_d_jac_smoother_csetr.o \
 amg_d_l1_jac_smoother_bld.o \
 amg_d_l1_jac_smoother_descr.o \
 amg_d_l1_jac_smoother_clone.o \
+amg_d_poly_smoother_apply_vect.o \
+amg_d_poly_smoother_bld.o \
+amg_d_poly_smoother_cnv.o \
+amg_d_poly_smoother_clone.o \
+amg_d_poly_smoother_clone_settings.o \
+amg_d_poly_smoother_clear_data.o \
+amg_d_poly_smoother_descr.o \
+amg_d_poly_smoother_dmp.o \
+amg_d_poly_smoother_csetc.o \
+amg_d_poly_smoother_cseti.o \
+amg_d_poly_smoother_csetr.o \
 amg_s_as_smoother_apply.o \
 amg_s_as_smoother_apply_vect.o \
 amg_s_as_smoother_bld.o \

@@ -35,15 +35,15 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amg_d_jac_smoother_clone(sm,smout,info)
+subroutine amg_d_poly_smoother_clone(sm,smout,info)
 
   use psb_base_mod
-  use amg_d_jac_smoother, amg_protect_name => amg_d_jac_smoother_clone
+  use amg_d_poly_smoother, amg_protect_name => amg_d_poly_smoother_clone
 
   Implicit None
 
   ! Arguments
-  class(amg_d_jac_smoother_type), intent(inout)               :: sm
+  class(amg_d_poly_smoother_type), intent(inout)               :: sm
   class(amg_d_base_smoother_type), allocatable, intent(inout) :: smout
   integer(psb_ipk_), intent(out)                :: info
   ! Local variables
@@ -58,22 +58,18 @@ subroutine amg_d_jac_smoother_clone(sm,smout,info)
     if (info == psb_success_) deallocate(smout, stat=info)
   end if
   if (info == psb_success_) &
-       & allocate(amg_d_jac_smoother_type :: smout, stat=info)
+       & allocate(amg_d_poly_smoother_type :: smout, stat=info)
   if (info /= 0) then
     info = psb_err_alloc_dealloc_
     goto 9999
   end if
 
   select type(smo => smout)
-  type is (amg_d_jac_smoother_type)
-    smo%nd_nnz_tot = sm%nd_nnz_tot
-    smo%checkres   = sm%checkres
-    smo%printres   = sm%printres
-    smo%checkiter  = sm%checkiter
-    smo%printiter  = sm%printiter
-    smo%tol        = sm%tol
+  type is (amg_d_poly_smoother_type)
+    smo%pdegree    = sm%pdegree
+    smo%rho_ba     = sm%rho_ba
+    smo%poly_beta  = sm%poly_beta
     smo%pa         => sm%pa
-    call sm%nd%clone(smo%nd,info)
     if ((info==psb_success_).and.(allocated(sm%sv))) then
       allocate(smout%sv,mold=sm%sv,stat=info)
       if (info == psb_success_) call sm%sv%clone(smo%sv,info)
@@ -91,4 +87,4 @@ subroutine amg_d_jac_smoother_clone(sm,smout,info)
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine amg_d_jac_smoother_clone
+end subroutine amg_d_poly_smoother_clone

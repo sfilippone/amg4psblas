@@ -52,7 +52,7 @@ subroutine amg_d_ilu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   class(psb_d_base_vect_type), intent(in), optional   :: vmold
   class(psb_i_base_vect_type), intent(in), optional   :: imold
   ! Local variables
-  integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota
+  integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota, psb_fctype
 !!$    real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
@@ -97,10 +97,24 @@ subroutine amg_d_ilu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
     goto 9999      
   endif
 
-
+  select case(sv%fact_type)
+  case (amg_ilu_n_)
+    psb_fctype = amg_ilu_n_
+  case (amg_milu_n_)
+    psb_fctype = amg_milu_n_
+  case (amg_ilu_t_)
+    psb_fctype = amg_ilu_t_
+  case default
+    ! If we end up here, something was wrong up in the call chain. 
+    info = psb_err_input_value_invalid_i_
+    call psb_errpush(psb_err_input_value_invalid_i_,name,&
+         & i_err=(/ithree,sv%fact_type,izero,izero,izero/))
+    goto 9999
+  end select
+  
   select case(sv%fact_type)
 
-  case (psb_ilu_t_)
+  case (amg_ilu_t_)
     !
     ! ILU(k,t)
     !
@@ -124,7 +138,7 @@ subroutine amg_d_ilu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
       goto 9999
     end if
 
-  case(psb_ilu_n_,psb_milu_n_) 
+  case(amg_ilu_n_,amg_milu_n_) 
     !
     ! ILU(k) and MILU(k)
     !
@@ -140,17 +154,17 @@ subroutine amg_d_ilu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
       ! There seems to be a problem with the separate implementation of MILU(0),
       ! contained into psb_ilu0_fact. This must be investigated. For the time being,
       ! resort to the implementation of MILU(k) with k=0.
-      if (sv%fact_type == psb_ilu_n_) then 
-        call psb_ilu0_fact(sv%fact_type,a,sv%l,sv%u,&
+      if (sv%fact_type == amg_ilu_n_) then 
+        call psb_ilu0_fact(psb_fctype,a,sv%l,sv%u,&
              & sv%d,info,blck=b)
       else
-        call psb_iluk_fact(sv%fill_in,sv%fact_type,&
+        call psb_iluk_fact(sv%fill_in,psb_fctype,&
              & a,sv%l,sv%u,sv%d,info,blck=b)
       endif
     case(1:)
       ! Fill-in >= 1
       ! The same routine implements both ILU(k) and MILU(k)
-      call psb_iluk_fact(sv%fill_in,sv%fact_type,&
+      call psb_iluk_fact(sv%fill_in,psb_fctype,&
            & a,sv%l,sv%u,sv%d,info,blck=b)
     end select
     if (info /= psb_success_) then

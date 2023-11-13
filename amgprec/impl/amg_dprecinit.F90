@@ -93,6 +93,7 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
   use psb_base_mod
   use amg_d_prec_mod, amg_protect_name => amg_dprecinit
   use amg_d_jac_smoother
+  use amg_d_poly_smoother
   use amg_d_as_smoother
   use amg_d_id_solver
   use amg_d_diag_solver
@@ -152,6 +153,15 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
     ilev_ = 1
     allocate(prec%precv(nlev_),stat=info)
     allocate(amg_d_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
+    if (info /= psb_success_) return
+    allocate(amg_d_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
+    call prec%precv(ilev_)%default()
+
+  case ('POLY')
+    nlev_ = 1
+    ilev_ = 1
+    allocate(prec%precv(nlev_),stat=info)
+    allocate(amg_d_poly_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
     allocate(amg_d_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()

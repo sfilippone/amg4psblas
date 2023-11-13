@@ -45,6 +45,7 @@ subroutine amg_d_base_onelev_cseti(lv,what,val,info,pos,idx)
   use amg_d_parmatch_aggregator_mod
   use amg_d_jac_smoother
   use amg_d_as_smoother
+  use amg_d_poly_smoother
   use amg_d_diag_solver
   use amg_d_l1_diag_solver
   use amg_d_ilu_solver
@@ -79,6 +80,7 @@ subroutine amg_d_base_onelev_cseti(lv,what,val,info,pos,idx)
   type(amg_d_jac_smoother_type)    ::  amg_d_jac_smoother_mold
   type(amg_d_l1_jac_smoother_type) ::  amg_d_l1_jac_smoother_mold
   type(amg_d_as_smoother_type)     ::  amg_d_as_smoother_mold
+  type(amg_d_poly_smoother_type)   ::  amg_d_poly_smoother_mold
   type(amg_d_diag_solver_type)     ::  amg_d_diag_solver_mold
   type(amg_d_l1_diag_solver_type)  ::  amg_d_l1_diag_solver_mold
   type(amg_d_ilu_solver_type)      ::  amg_d_ilu_solver_mold
@@ -141,6 +143,10 @@ subroutine amg_d_base_onelev_cseti(lv,what,val,info,pos,idx)
       call lv%set(amg_d_as_smoother_mold,info,pos=pos)
       if (info == 0) call lv%set(amg_d_ilu_solver_mold,info,pos=pos)
 
+    case (amg_poly_)
+      call lv%set(amg_d_poly_smoother_mold,info,pos=pos)
+      if (info == 0) call lv%set(amg_d_l1_diag_solver_mold,info,pos=pos)
+
     case (amg_fbgs_)
       call lv%set(amg_d_jac_smoother_mold,info,pos='pre')
       if (info == 0) call lv%set(amg_d_gs_solver_mold,info,pos='pre')
@@ -177,7 +183,7 @@ subroutine amg_d_base_onelev_cseti(lv,what,val,info,pos,idx)
     case (amg_bwgs_)
       call lv%set(amg_d_bwgs_solver_mold,info,pos=pos)
 
-    case (psb_ilu_n_,psb_milu_n_,psb_ilu_t_)
+    case (amg_ilu_n_,amg_milu_n_,amg_ilu_t_)
       call lv%set(amg_d_ilu_solver_mold,info,pos=pos)
       if (info == 0) then
         if ((ipos_==amg_smooth_pre_) .or.(ipos_==amg_smooth_both_)) then

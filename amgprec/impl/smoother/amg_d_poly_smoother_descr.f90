@@ -1,15 +1,15 @@
-!
-!
+!  
+!   
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.7)
-!
-!    (C) Copyright 2021
-!
-!        Salvatore Filippone
-!        Pasqua D'Ambra
-!        Daniela di Serafino
-!
+!    
+!    (C) Copyright 2021 
+!  
+!        Salvatore Filippone  
+!        Pasqua D'Ambra   
+!        Fabio Durastante        
+!   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!
+!   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,62 +33,63 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!
-!
-subroutine amg_d_jac_smoother_clone(sm,smout,info)
+!   
+!  
+subroutine amg_d_poly_smoother_descr(sm,info,iout,coarse,prefix)
 
   use psb_base_mod
-  use amg_d_jac_smoother, amg_protect_name => amg_d_jac_smoother_clone
+  use amg_d_diag_solver
+  use amg_d_poly_smoother, amg_protect_name => amg_d_poly_smoother_descr
+  use amg_d_diag_solver
+  use amg_d_gs_solver
 
   Implicit None
 
   ! Arguments
-  class(amg_d_jac_smoother_type), intent(inout)               :: sm
-  class(amg_d_base_smoother_type), allocatable, intent(inout) :: smout
-  integer(psb_ipk_), intent(out)                :: info
+  class(amg_d_poly_smoother_type), intent(in) :: sm
+  integer(psb_ipk_), intent(out)               :: info
+  integer(psb_ipk_), intent(in), optional      :: iout
+  logical, intent(in), optional              :: coarse
+  character(len=*), intent(in), optional  :: prefix
+
   ! Local variables
-  integer(psb_ipk_) :: err_act
+  integer(psb_ipk_)      :: err_act
+  character(len=20), parameter :: name='amg_d_poly_smoother_descr'
+  integer(psb_ipk_)      :: iout_
+  logical      :: coarse_
+  character(1024)    :: prefix_
 
-
-  info=psb_success_
   call psb_erractionsave(err_act)
-
-  if (allocated(smout)) then
-    call smout%free(info)
-    if (info == psb_success_) deallocate(smout, stat=info)
+  info = psb_success_
+  if (present(coarse)) then 
+    coarse_ = coarse
+  else
+    coarse_ = .false.
   end if
-  if (info == psb_success_) &
-       & allocate(amg_d_jac_smoother_type :: smout, stat=info)
-  if (info /= 0) then
-    info = psb_err_alloc_dealloc_
-    goto 9999
+  if (present(iout)) then 
+    iout_ = iout 
+  else
+    iout_ = psb_out_unit
+  endif
+  if (present(prefix)) then
+    prefix_ = prefix
+  else
+    prefix_ = ""
   end if
 
-  select type(smo => smout)
-  type is (amg_d_jac_smoother_type)
-    smo%nd_nnz_tot = sm%nd_nnz_tot
-    smo%checkres   = sm%checkres
-    smo%printres   = sm%printres
-    smo%checkiter  = sm%checkiter
-    smo%printiter  = sm%printiter
-    smo%tol        = sm%tol
-    smo%pa         => sm%pa
-    call sm%nd%clone(smo%nd,info)
-    if ((info==psb_success_).and.(allocated(sm%sv))) then
-      allocate(smout%sv,mold=sm%sv,stat=info)
-      if (info == psb_success_) call sm%sv%clone(smo%sv,info)
-    end if
+  write(iout_,*) trim(prefix_), '  Polynomial smoother   '
+  write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
+  write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
+  if (allocated(sm%poly_beta)) write(iout_,*) trim(prefix_), '   Coefficients:        ',sm%poly_beta(1:sm%pdegree)
+  if (allocated(sm%sv)) then
+    write(iout_,*) trim(prefix_), '       Local solver details:'
+    call sm%sv%descr(info,iout_,coarse=coarse,prefix=prefix)
+  end if
 
-  class default
-    info = psb_err_internal_error_
-  end select
-
-  if (info /= 0) goto 9999
 
   call psb_erractionrestore(err_act)
   return
 
 9999 call psb_error_handler(err_act)
-
   return
-end subroutine amg_d_jac_smoother_clone
+end subroutine amg_d_poly_smoother_descr

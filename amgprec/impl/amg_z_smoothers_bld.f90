@@ -186,8 +186,8 @@ subroutine amg_z_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
              & ' but it has been changed to distributed.'
       end if
 
-    case(psb_ilu_n_, psb_ilu_t_,psb_milu_n_)
-      if (prec%precv(iszv)%sm%sv%get_id() /= psb_ilu_n_) then
+    case(amg_ilu_n_, amg_ilu_t_,amg_milu_n_)
+      if (prec%precv(iszv)%sm%sv%get_id() /= amg_ilu_n_) then
         write(psb_err_unit,*) &
              & 'AMG4PSBLAS: Warning: original coarse solver was requested as ',&
              & amg_fact_names(coarse_solve_id)

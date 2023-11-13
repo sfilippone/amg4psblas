@@ -35,55 +35,67 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amg_d_jac_smoother_clone(sm,smout,info)
+subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
 
   use psb_base_mod
-  use amg_d_jac_smoother, amg_protect_name => amg_d_jac_smoother_clone
-
+  use amg_d_diag_solver
+  use amg_d_beta_coeff_mod
+  use amg_d_poly_smoother, amg_protect_name => amg_d_poly_smoother_bld
   Implicit None
 
   ! Arguments
-  class(amg_d_jac_smoother_type), intent(inout)               :: sm
-  class(amg_d_base_smoother_type), allocatable, intent(inout) :: smout
-  integer(psb_ipk_), intent(out)                :: info
+  type(psb_dspmat_type), intent(in), target          :: a
+  Type(psb_desc_type), Intent(inout)                 :: desc_a
+  class(amg_d_poly_smoother_type), intent(inout)      :: sm
+  integer(psb_ipk_), intent(out)                     :: info
+  class(psb_d_base_sparse_mat), intent(in), optional :: amold
+  class(psb_d_base_vect_type), intent(in), optional  :: vmold
+  class(psb_i_base_vect_type), intent(in), optional  :: imold
   ! Local variables
-  integer(psb_ipk_) :: err_act
-
+  type(psb_dspmat_type) :: tmpa
+  integer(psb_ipk_)   :: n_row,n_col, nrow_a, nztota, nzeros
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
+  character(len=20)   :: name='d_poly_smoother_bld', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+  ctxt       = desc_a%get_context()
+  call psb_info(ctxt, me, np)
+  if (debug_level >= psb_debug_outer_) &
+       & write(debug_unit,*) me,' ',trim(name),' start'
 
-  if (allocated(smout)) then
-    call smout%free(info)
-    if (info == psb_success_) deallocate(smout, stat=info)
+
+  n_row  = desc_a%get_local_rows()
+  n_col  = desc_a%get_local_cols()
+  nrow_a = a%get_nrows()
+  nztota = a%get_nzeros()
+
+  if ((1<=sm%pdegree).and.(sm%pdegree<=30)) then
+    call psb_realloc(sm%pdegree,sm%poly_beta,info)
+    sm%poly_beta(1:sm%pdegree) = amg_d_beta_mat(1:sm%pdegree,sm%pdegree)
+  else
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,&
+         & a_err='invalid sm%degree')
+    goto 9999
   end if
-  if (info == psb_success_) &
-       & allocate(amg_d_jac_smoother_type :: smout, stat=info)
-  if (info /= 0) then
-    info = psb_err_alloc_dealloc_
+  sm%pa => a
+  call sm%sv%build(a,desc_a,info,amold=amold,vmold=vmold)
+  if (info /= psb_success_) then
+    call psb_errpush(psb_err_from_subroutine_,name,&
+         & a_err='sv%build')
     goto 9999
   end if
 
-  select type(smo => smout)
-  type is (amg_d_jac_smoother_type)
-    smo%nd_nnz_tot = sm%nd_nnz_tot
-    smo%checkres   = sm%checkres
-    smo%printres   = sm%printres
-    smo%checkiter  = sm%checkiter
-    smo%printiter  = sm%printiter
-    smo%tol        = sm%tol
-    smo%pa         => sm%pa
-    call sm%nd%clone(smo%nd,info)
-    if ((info==psb_success_).and.(allocated(sm%sv))) then
-      allocate(smout%sv,mold=sm%sv,stat=info)
-      if (info == psb_success_) call sm%sv%clone(smo%sv,info)
-    end if
-
-  class default
-    info = psb_err_internal_error_
-  end select
-
-  if (info /= 0) goto 9999
+  if (sm%rho_ba <= dzero) then
+    sm%rho_ba = psb_dspnrm1(a,desc_a,info)
+  end if
+  
+  if (debug_level >= psb_debug_outer_) &
+       & write(debug_unit,*) me,' ',trim(name),' end'
 
   call psb_erractionrestore(err_act)
   return
@@ -91,4 +103,5 @@ subroutine amg_d_jac_smoother_clone(sm,smout,info)
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine amg_d_jac_smoother_clone
+
+end subroutine amg_d_poly_smoother_bld
