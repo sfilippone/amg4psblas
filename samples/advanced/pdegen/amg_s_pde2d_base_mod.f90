@@ -46,37 +46,37 @@ contains
   ! functions parametrizing the differential equation
   !
   function b1(x,y)
-    use psb_base_mod, only : psb_spk_, szero, sone
+    implicit none 
     real(psb_spk_) :: b1
     real(psb_spk_), intent(in) :: x,y
     b1 = szero/1.414_psb_spk_
   end function b1
   function b2(x,y)
-    use psb_base_mod, only : psb_spk_, szero, sone
+    implicit none 
     real(psb_spk_) ::  b2
     real(psb_spk_), intent(in) :: x,y
     b2 = szero/1.414_psb_spk_
   end function b2
   function c(x,y)
-    use psb_base_mod, only : psb_spk_, szero, sone
+    implicit none 
     real(psb_spk_) ::  c
     real(psb_spk_), intent(in) :: x,y
     c = szero
   end function c
   function a1(x,y)
-    use psb_base_mod, only : psb_spk_, szero, sone
+    implicit none 
     real(psb_spk_) ::  a1
     real(psb_spk_), intent(in) :: x,y
     a1=sone*epsilon
   end function a1
   function a2(x,y)
-    use psb_base_mod, only : psb_spk_, szero, sone
+    implicit none 
     real(psb_spk_) ::  a2
     real(psb_spk_), intent(in) :: x,y
     a2=sone*epsilon
   end function a2
   function g(x,y)
-    use psb_base_mod, only : psb_spk_, szero, sone
+    implicit none 
     real(psb_spk_) ::  g
     real(psb_spk_), intent(in) :: x,y
     g = szero

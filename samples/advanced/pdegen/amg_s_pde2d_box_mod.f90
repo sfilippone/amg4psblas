@@ -46,37 +46,37 @@ contains
   ! functions parametrizing the differential equation
   !
   function b1_box(x,y)
-    use psb_base_mod, only : psb_spk_, szero, sone
+    implicit none 
     real(psb_spk_) :: b1_box
     real(psb_spk_), intent(in) :: x,y
     b1_box = sone/1.414_psb_spk_
   end function b1_box
   function b2_box(x,y)
-    use psb_base_mod, only : psb_spk_, szero, sone
+    implicit none 
     real(psb_spk_) ::  b2_box
     real(psb_spk_), intent(in) :: x,y
     b2_box = sone/1.414_psb_spk_
   end function b2_box
   function c_box(x,y)
-    use psb_base_mod, only : psb_spk_, szero, sone
+    implicit none 
     real(psb_spk_) ::  c_box
     real(psb_spk_), intent(in) :: x,y
     c_box = szero
   end function c_box
   function a1_box(x,y)
-    use psb_base_mod, only : psb_spk_, szero, sone
+    implicit none 
     real(psb_spk_) ::  a1_box
     real(psb_spk_), intent(in) :: x,y
     a1_box=sone*epsilon
   end function a1_box
   function a2_box(x,y)
-    use psb_base_mod, only : psb_spk_, szero, sone
+    implicit none 
     real(psb_spk_) ::  a2_box
     real(psb_spk_), intent(in) :: x,y
     a2_box=sone*epsilon
   end function a2_box
   function g_box(x,y)
-    use psb_base_mod, only : psb_spk_, szero, sone
+    implicit none 
     real(psb_spk_) ::  g_box
     real(psb_spk_), intent(in) :: x,y
     g_box = szero
