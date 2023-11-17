@@ -75,15 +75,37 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
   nrow_a = a%get_nrows()
   nztota = a%get_nzeros()
 
-  if ((1<=sm%pdegree).and.(sm%pdegree<=30)) then
-    call psb_realloc(sm%pdegree,sm%poly_beta,info)
-    sm%poly_beta(1:sm%pdegree) = amg_d_beta_mat(1:sm%pdegree,sm%pdegree)
-  else
+  select case(sm%variant)
+  case(amg_poly_lottes_)
+    ! do nothing
+  case(amg_poly_lottes_beta_)
+    if ((1<=sm%pdegree).and.(sm%pdegree<=30)) then
+      call psb_realloc(sm%pdegree,sm%poly_beta,info)
+      sm%poly_beta(1:sm%pdegree) = amg_d_poly_beta_mat(1:sm%pdegree,sm%pdegree)
+    else
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,&
+           & a_err='invalid sm%degree for poly_beta')
+      goto 9999
+    end if
+  case(amg_poly_new_)
+
+    if ((1<=sm%pdegree).and.(sm%pdegree<=6)) then
+      call psb_realloc(sm%pdegree,sm%poly_a,info)
+      sm%poly_a(1:sm%pdegree) = amg_d_poly_a_vect(1:sm%pdegree)
+    else
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,&
+           & a_err='invalid sm%degree for poly_a')
+      goto 9999
+    end if
+  case default  
     info = psb_err_internal_error_
     call psb_errpush(info,name,&
-         & a_err='invalid sm%degree')
+         & a_err='invalid sm%variant')
     goto 9999
-  end if
+  end select
+
   sm%pa => a
   if (.not.allocated(sm%sv)) then 
     info = psb_err_internal_error_
@@ -97,7 +119,7 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
          & a_err='sv%build')
     goto 9999
   end if
-  
+
 !!$  if (.false.) then 
 !!$    select type(ssv => sm%sv)
 !!$    class is(amg_d_l1_diag_solver_type)
@@ -143,7 +165,7 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
       sm%rho_ba = done
     end select
   end if
-  
+
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' end'
 

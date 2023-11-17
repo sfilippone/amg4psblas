@@ -52,7 +52,39 @@
 module amg_d_poly_coeff_mod
   use psb_base_mod
 
-  real(psb_dpk_), parameter :: amg_d_beta_vect(900) = [ &
+  real(psb_dpk_), parameter :: amg_d_poly_a_vect(30) = [ &
+       & 0.3333333333333333_psb_dpk_, &
+       & 0.1805359927403007_psb_dpk_, &
+       & 0.1159278464862213_psb_dpk_, &
+       & 0.0820780659590383_psb_dpk_, &
+       & 0.0618496002413377_psb_dpk_, &
+       & 0.0486605823426062_psb_dpk_, &
+       & 0.0395132986024057_psb_dpk_, &
+       & 0.0328701017544880_psb_dpk_, &
+       & 0.0278702862721800_psb_dpk_, &
+       & 0.0239987409600620_psb_dpk_, &
+       & 0.0209304400432259_psb_dpk_, &
+       & 0.0184513099045066_psb_dpk_, &
+       & 0.0164152586042591_psb_dpk_, &
+       & 0.0147195638076874_psb_dpk_, &
+       & 0.0132901324757843_psb_dpk_, &
+       & 0.0120723317737698_psb_dpk_, &
+       & 0.0110250964606384_psb_dpk_, &
+       & 0.0101170330064859_psb_dpk_, &
+       & 0.0093237789039835_psb_dpk_, &
+       & 0.0086261728849515_psb_dpk_, &
+       & 0.0080089618703679_psb_dpk_, &
+       & 0.0074598709610601_psb_dpk_, &
+       & 0.0069689238144320_psb_dpk_, &
+       & 0.0065279387776372_psb_dpk_, &
+       & 0.0061301503808627_psb_dpk_, &
+       & 0.0057699215598864_psb_dpk_, &
+       & 0.0054425224281914_psb_dpk_, &
+       & 0.0051439584672521_psb_dpk_, &
+       & 0.0048708358327268_psb_dpk_, &
+       & 0.0046202548314912_psb_dpk_ ];
+  
+  real(psb_dpk_), parameter :: amg_d_poly_beta_vect(900) = [ &
        & 1.1250000000000000_psb_dpk_, 0.0000000000000000_psb_dpk_, &
        & 0.0000000000000000_psb_dpk_, 0.0000000000000000_psb_dpk_, &
        & 0.0000000000000000_psb_dpk_, 0.0000000000000000_psb_dpk_, &
@@ -511,6 +543,6 @@ module amg_d_poly_coeff_mod
 !!$       & 1.0238728757031315_psb_dpk_, 1.2640890537108553_psb_dpk_,  0.0_psb_dpk_,&
 !!$       & 1.0084254478202830_psb_dpk_, 1.0886783920873087_psb_dpk_, 1.3375312590961856_psb_dpk_]
 
-  real(psb_dpk_), parameter  :: amg_d_beta_mat(30,30)=reshape(amg_d_beta_vect,[30,30])
+  real(psb_dpk_), parameter  :: amg_d_poly_beta_mat(30,30)=reshape(amg_d_poly_beta_vect,[30,30])
 
 end module amg_d_poly_coeff_mod

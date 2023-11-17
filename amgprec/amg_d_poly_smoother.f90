@@ -63,6 +63,7 @@ module amg_d_poly_smoother
     integer(psb_ipk_)              :: rho_estimate_iterations=10
     type(psb_dspmat_type), pointer :: pa => null()
     real(psb_dpk_), allocatable    :: poly_beta(:)
+    real(psb_dpk_), allocatable    :: poly_a(:)
     real(psb_dpk_)                 :: rho_ba = -done
   contains
     procedure, pass(sm) :: apply_v => amg_d_poly_smoother_apply_vect
