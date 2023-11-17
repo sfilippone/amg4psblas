@@ -343,7 +343,6 @@ program amg_d_pde3d
     call prec%set('smoother_type',   p_choice%smther,     info)
     call prec%set('smoother_sweeps', p_choice%jsweeps,    info)
     call prec%set('poly_degree',     p_choice%degree,    info)
-    write(0,*) 'pvariant :',p_choice%pvariant
     call prec%set('poly_variant',    p_choice%pvariant,   info)
     
     select case (psb_toupper(p_choice%smther))
