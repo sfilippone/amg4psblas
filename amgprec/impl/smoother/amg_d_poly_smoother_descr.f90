@@ -78,6 +78,14 @@ subroutine amg_d_poly_smoother_descr(sm,info,iout,coarse,prefix)
   end if
 
   write(iout_,*) trim(prefix_), '  Polynomial smoother   '
+  select case(sm%variant)
+  case(amg_poly_lottes_)
+    write(iout_,*) trim(prefix_), '        variant:        ','POLY_LOTTES'
+  case(amg_poly_lottes_beta_)
+    write(iout_,*) trim(prefix_), '        variant:        ','POLY_LOTTES_BETA'
+  case default
+    write(iout_,*) trim(prefix_), '        variant:        ','UNKNOWN???'
+  end select
   write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
   write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
   if (allocated(sm%poly_beta)) write(iout_,*) trim(prefix_), '   Coefficients:        ',sm%poly_beta(1:sm%pdegree)

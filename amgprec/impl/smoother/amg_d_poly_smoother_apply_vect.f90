@@ -129,15 +129,64 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
     call ty%zero()
     call tz%zero()       
 
-    do i=1, sm%pdegree      
-      call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Y')
-      cz = (2*i*done-3)/(2*i*done+done)
-      cr = (8*i*done-4)/((2*i*done+done)*sm%rho_ba)
-      call psb_geaxpby(cr,ty,cz,tz,desc_data,info)
-      call psb_geaxpby(sm%poly_beta(i),tz,done,tx,desc_data,info)
-      call psb_spmm(-done,sm%pa,tz,done,r,desc_data,info,work=aux,trans=trans_)
-    end do
+    select case(sm%variant)
+    case(amg_poly_lottes_)
+      !  b == x 
+      !  x == tx
+      ! 
+      do i=1, sm%pdegree
+        !   B r_{k-1}
+        call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
+        cz = (2*i*done-3)/(2*i*done+done)
+        cr = (8*i*done-4)/((2*i*done+done)*sm%rho_ba)
+        ! z_k =  cz z_{k-1} + cr ty = cz z_{k-1} + cr Br_{k-1}
+        call psb_geaxpby(cr,ty,cz,tz,desc_data,info)
+        ! r_k =    b-Ax_k  = x -A tx
+        call psb_geaxpby(done,tz,done,tx,desc_data,info)
+        if (.false.) then
+          call psb_geaxpby(done,x,dzero,r,desc_data,info)
+          call psb_spmm(-done,sm%pa,tx,done,r,desc_data,info,work=aux,trans=trans_)
+        else
+          call psb_spmm(-done,sm%pa,tz,done,r,desc_data,info,work=aux,trans=trans_)
+        end if
+!!$        res  = psb_genrm2(r,desc_data,info)
+!!$        write(0,*) 'Polynomial smoother ',i,res
+        ! x_k =  x_{k-1} + z_k
+      end do
 
+    case(amg_poly_lottes_beta_)
+
+      !  b == x 
+      !  x == tx
+      ! 
+      do i=1, sm%pdegree
+        !   B r_{k-1}
+        call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
+        cz = (2*i*done-3)/(2*i*done+done)
+        cr = (8*i*done-4)/((2*i*done+done)*sm%rho_ba)
+        ! z_k =  cz z_{k-1} + cr ty = cz z_{k-1} + cr Br_{k-1}
+        call psb_geaxpby(cr,ty,cz,tz,desc_data,info)
+        ! r_k =    b-Ax_k  = x -A tx
+        call psb_geaxpby(sm%poly_beta(i),tz,done,tx,desc_data,info)
+        if (.false.) then
+          call psb_geaxpby(done,x,dzero,r,desc_data,info)
+          call psb_spmm(-done,sm%pa,tx,done,r,desc_data,info,work=aux,trans=trans_)
+        else
+          call psb_spmm(-done,sm%pa,tz,done,r,desc_data,info,work=aux,trans=trans_)
+        end if
+!!$        res  = psb_genrm2(r,desc_data,info)
+!!$        write(0,*) 'Polynomial smoother ',i,res
+        ! x_k =  x_{k-1} + z_k
+      end do
+
+      
+    case default
+      info=psb_err_internal_error_
+      call psb_errpush(info,name,&
+           & a_err='wrong polynomial variant')
+      goto 9999
+    end select
+    
     if (info == psb_success_) call psb_geaxpby(alpha,tx,beta,y,desc_data,info)
 
     if (info /= psb_success_) then
@@ -339,19 +388,19 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 !!$
 !!$  endif
 !!$
-    if (.not.(4*n_col <= size(work))) then
-      deallocate(aux)
-    endif
+  if (.not.(4*n_col <= size(work))) then
+    deallocate(aux)
+  endif
 
 !!$  if(sm%checkres) then
 !!$    call psb_gefree(r,desc_data,info)
 !!$  end if
 
-    call psb_erractionrestore(err_act)
-    return
+  call psb_erractionrestore(err_act)
+  return
 
 9999 call psb_error_handler(err_act)
 
-    return
+  return
 
-  end subroutine amg_d_poly_smoother_apply_vect
+end subroutine amg_d_poly_smoother_apply_vect

@@ -51,14 +51,14 @@
 !
 module amg_d_poly_smoother
   use amg_d_base_smoother_mod
-  use amg_d_beta_coeff_mod
+  use amg_d_poly_coeff_mod
   
   type, extends(amg_d_base_smoother_type) :: amg_d_poly_smoother_type
     ! The local solver component is inherited from the
     ! parent type.
     !    class(amg_d_base_solver_type), allocatable :: sv
     !
-    integer(psb_ipk_)              :: pdegree
+    integer(psb_ipk_)              :: pdegree, variant
     type(psb_dspmat_type), pointer :: pa => null()
     real(psb_dpk_), allocatable    :: poly_beta(:)
     real(psb_dpk_)                 :: rho_ba
@@ -319,6 +319,7 @@ contains
     !
     sm%pdegree = 1
     sm%rho_ba  = dzero
+    sm%variant = amg_poly_lottes_
 
     if (allocated(sm%sv)) then
       call sm%sv%default()

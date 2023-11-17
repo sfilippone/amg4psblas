@@ -163,7 +163,7 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
     allocate(prec%precv(nlev_),stat=info)
     allocate(amg_d_poly_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
-    allocate(amg_d_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
+    allocate(amg_d_l1_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
 
   case ('L1-DIAG','L1-JACOBI','L1_DIAG','L1_JACOBI')

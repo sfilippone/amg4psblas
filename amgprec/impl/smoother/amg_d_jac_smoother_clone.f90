@@ -72,7 +72,6 @@ subroutine amg_d_jac_smoother_clone(sm,smout,info)
     smo%checkiter  = sm%checkiter
     smo%printiter  = sm%printiter
     smo%tol        = sm%tol
-    smo%pa         => sm%pa
     call sm%nd%clone(smo%nd,info)
     if ((info==psb_success_).and.(allocated(sm%sv))) then
       allocate(smout%sv,mold=sm%sv,stat=info)

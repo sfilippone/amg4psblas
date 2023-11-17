@@ -49,7 +49,7 @@
 !  main diagonal block), so that it becomes possible to implement
 !  a pure Jacobi or L1-Jacobi global solver.
 !
-module amg_d_beta_coeff_mod
+module amg_d_poly_coeff_mod
   use psb_base_mod
 
   real(psb_dpk_), parameter :: amg_d_beta_vect(900) = [ &
@@ -513,4 +513,4 @@ module amg_d_beta_coeff_mod
 
   real(psb_dpk_), parameter  :: amg_d_beta_mat(30,30)=reshape(amg_d_beta_vect,[30,30])
 
-end module amg_d_beta_coeff_mod
+end module amg_d_poly_coeff_mod

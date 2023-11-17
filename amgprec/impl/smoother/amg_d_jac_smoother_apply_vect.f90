@@ -109,7 +109,7 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
     end if
   endif
 
-  if(sm%checkres) then
+  if(.true..or.sm%checkres) then
     call psb_geall(r,desc_data,info)
     call psb_geasb(r,desc_data,info)
     resdenum = psb_genrm2(x,desc_data,info)
@@ -159,7 +159,10 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
                & a_err='wrong  init to smoother_apply')
           goto 9999
         end select
-
+!!$            call psb_geaxpby(done,x,dzero,r,desc_data,info)
+!!$            call psb_spmm(-done,sm%pa,ty,done,r,desc_data,info)
+!!$            res  = psb_genrm2(r,desc_data,info)
+!!$            write(0,*) 'Jacobi smoother ',1,res
         do i=1, sweeps-1
           !
           ! Compute Y(j+1) =  Y(j)+ D^(-1)*(X-A*Y(j)),
@@ -173,9 +176,13 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           call sm%sv%apply(done,tx,done,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
 
           if (info /= psb_success_) exit
+!!$            call psb_geaxpby(done,x,dzero,r,desc_data,info)
+!!$            call psb_spmm(-done,sm%pa,ty,done,r,desc_data,info)
+!!$            res  = psb_genrm2(r,desc_data,info)
+!!$            write(0,*) 'Jacobi smoother ',i+1,res
 
           if ( sm%checkres.and.(mod(i,sm%checkiter) == 0) ) then
-            call psb_geaxpby(done,x,dzero,r,r,desc_data,info)
+            call psb_geaxpby(done,x,dzero,r,desc_data,info)
             call psb_spmm(-done,sm%pa,ty,done,r,desc_data,info)
             res  = psb_genrm2(r,desc_data,info)
             if( sm%printres ) then

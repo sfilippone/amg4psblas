@@ -321,6 +321,12 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_repl_mat_       = 1
   integer(psb_ipk_), parameter :: amg_max_coarse_mat_ = amg_repl_mat_
   !
+  ! Legal values for entry: amg_poly_variant_
+  !
+  integer(psb_ipk_), parameter :: amg_poly_lottes_      = 0
+  integer(psb_ipk_), parameter :: amg_poly_lottes_beta_ = 1
+  integer(psb_ipk_), parameter :: amg_poly_new_         = 2
+  !
   ! Legal values for entry: amg_prec_status_
   !
   integer(psb_ipk_), parameter :: amg_prec_built_ = 98765
@@ -560,6 +566,12 @@ contains
       val = amg_as_
     case('POLY')
       val = amg_poly_
+    case('POLY_LOTTES')
+      val = amg_poly_lottes_
+    case('POLY_LOTTES_BETA')
+      val = amg_poly_lottes_beta_
+    case('POLY_NEW')
+      val = amg_poly_new_
     case('A_NORMI')
       val = amg_max_norm_
     case('USER_CHOICE')

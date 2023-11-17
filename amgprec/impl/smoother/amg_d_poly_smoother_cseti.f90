@@ -54,8 +54,16 @@ subroutine amg_d_poly_smoother_cseti(sm,what,val,info,idx)
   call psb_erractionsave(err_act)
 
   select case(psb_toupper(what))
-  case('SMOOTHER_DEGREE')
+  case('POLY_DEGREE')
     sm%pdegree = val
+  case('POLY_VARIANT')
+    select case(val)
+    case(amg_poly_lottes_,amg_poly_lottes_beta_,amg_poly_new_)
+      sm%variant = val
+    case default
+      write(0,*) 'Invalid choice for POLY_VARIANT, defaulting to amg_poly_lottes_'
+      sm%variant = amg_poly_lottes_
+    end select
   case default
     call sm%amg_d_base_smoother_type%set(what,val,info,idx=idx)
   end select

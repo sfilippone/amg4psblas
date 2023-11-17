@@ -81,7 +81,6 @@ subroutine amg_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
   use amg_d_prec_mod, amg_protect_name => amg_dcprecseti
   use amg_d_jac_smoother
   use amg_d_as_smoother
-  use amg_d_poly_smoother
   use amg_d_diag_solver
   use amg_d_l1_diag_solver
   use amg_d_ilu_solver
@@ -126,7 +125,7 @@ subroutine amg_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
     info = 3111
     write(psb_err_unit,*) name,&
          & ': Error: uninitialized preconditioner,',&
-         & ' should call amg_PRECINIT'    
+         &' should call amg_PRECINIT'
     return
   endif
 
@@ -313,7 +312,6 @@ subroutine amg_dcprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
   use amg_d_prec_mod, amg_protect_name => amg_dcprecsetc
   use amg_d_jac_smoother
   use amg_d_as_smoother
-  use amg_d_poly_smoother
   use amg_d_diag_solver
   use amg_d_l1_diag_solver
   use amg_d_ilu_solver
@@ -403,10 +401,6 @@ subroutine amg_dcprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
         case ('BJAC')
           do il=ilev_, ilmax_
             call  p%precv(il)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
-          end do
-        case ('POLY')
-          do il=ilev_, ilmax_
-            call  p%precv(il)%set('SMOOTHER_TYPE',amg_poly_,info,pos=pos)
           end do
         case ('L1-BJAC')
           do il=ilev_, ilmax_

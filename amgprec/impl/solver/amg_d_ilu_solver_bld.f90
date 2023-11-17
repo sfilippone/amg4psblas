@@ -99,11 +99,11 @@ subroutine amg_d_ilu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
   select case(sv%fact_type)
   case (amg_ilu_n_)
-    psb_fctype = amg_ilu_n_
+    psb_fctype = psb_ilu_n_
   case (amg_milu_n_)
-    psb_fctype = amg_milu_n_
+    psb_fctype = psb_milu_n_
   case (amg_ilu_t_)
-    psb_fctype = amg_ilu_t_
+    psb_fctype = psb_ilu_t_
   case default
     ! If we end up here, something was wrong up in the call chain. 
     info = psb_err_input_value_invalid_i_
