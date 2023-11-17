@@ -2,7 +2,7 @@
 CSR                         ! Storage format CSR COO JAD
 0150                        ! IDIM; domain size. Linear system size is IDIM**3
 CONST                       ! PDECOEFF: CONST, EXP, GAUSS Coefficients of the PDE
-BICGSTAB                    ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES
+CG                          ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES
 2                           ! ISTOPC
 00050                       ! ITMAX
 1                           ! ITRACE
@@ -10,9 +10,9 @@ BICGSTAB                    ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS F
 1.d-6                       ! EPS
 %%%%%%%%%%%  Main preconditioner choices %%%%%%%%%%%%%%%%
 ML-VBM-VCYCLE-FBGS-D-BJAC       ! Longer descriptive name for preconditioner (up to 20 chars)
-ML                        ! Preconditioner type: NONE JACOBI GS FBGS BJAC AS ML
+ML                        ! Preconditioner type: NONE JACOBI GS FBGS BJAC AS ML POLY
 %%%%%%%%%%%  First smoother (for all levels but coarsest) %%%%%%%%%%%%%%%%
-L1-JACOBI                   ! Smoother type JACOBI FBGS GS BWGS BJAC AS. For 1-level, repeats previous.
+L1-JACOBI                   ! Smoother type JACOBI FBGS GS BWGS BJAC AS POLY  r 1-level, repeats previous.
 6                           ! Number of sweeps for smoother
 1                           ! degree for polynomial smoother
 POLY_LOTTES_BETA            ! Polynomial variant
