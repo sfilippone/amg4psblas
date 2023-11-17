@@ -54,8 +54,13 @@ subroutine amg_d_poly_smoother_csetr(sm,what,val,info,idx)
   call psb_erractionsave(err_act)
 
   select case(psb_toupper(what))
-  case('RHO_BA')
-    sm%rho_ba  = val
+  case('POLY_RHO_BA')
+    if ((dzero<val).and.(val<=done)) then 
+      sm%rho_ba  = val
+    else
+      write(0,*) 'Invalid choice for POLY_RHO_BA, defaulting to compute estimate'
+      sm%rho_ba = -done
+    end if
   case default
     call sm%amg_d_base_smoother_type%set(what,val,info,idx=idx)
   end select

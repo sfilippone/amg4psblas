@@ -98,44 +98,50 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
     goto 9999
   end if
   
-  if (.false.) then 
-    select type(ssv => sm%sv)
-    class is(amg_d_l1_diag_solver_type)
-      da  = a%arwsum(info)
-      dsv = ssv%dv%get_vect()
-      sm%rho_ba = maxval(da(1:n_row)*dsv(1:n_row))
-    class default
-      write(0,*) 'PolySmoother BUILD: only L1-Jacobi/L1-DIAG for now ',ssv%get_fmt()
-      sm%rho_ba = done          
+!!$  if (.false.) then 
+!!$    select type(ssv => sm%sv)
+!!$    class is(amg_d_l1_diag_solver_type)
+!!$      da  = a%arwsum(info)
+!!$      dsv = ssv%dv%get_vect()
+!!$      sm%rho_ba = maxval(da(1:n_row)*dsv(1:n_row))
+!!$    class default
+!!$      write(0,*) 'PolySmoother BUILD: only L1-Jacobi/L1-DIAG for now ',ssv%get_fmt()
+!!$      sm%rho_ba = done          
+!!$    end select
+!!$  else
+  if (sm%rho_ba <= dzero) then
+    select case(sm%rho_estimate)
+    case(amg_poly_rho_est_power_)
+      block
+        type(psb_d_vect_type) :: tq, tt, tz,wv(2)
+        real(psb_dpk_)        :: znrm, lambda
+        real(psb_dpk_),allocatable :: work(:)
+        integer(psb_ipk_)     :: i, n_cols
+        n_cols = desc_a%get_local_cols()
+        allocate(work(4*n_cols))
+        call psb_geasb(tz,desc_a,info,mold=vmold,scratch=.true.)
+        call psb_geasb(tt,desc_a,info,mold=vmold,scratch=.true.)
+        call psb_geasb(wv(1),desc_a,info,mold=vmold,scratch=.true.)
+        call psb_geasb(wv(2),desc_a,info,mold=vmold,scratch=.true.)
+        call psb_geall(tq,desc_a,info)
+        call tq%set(done)
+        call psb_geasb(tq,desc_a,info,mold=vmold)
+        call psb_spmm(done,a,tq,dzero,tt,desc_a,info) !
+        call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = BA q_k
+        do i=1,sm%rho_estimate_iterations
+          znrm = psb_genrm2(tz,desc_a,info)               ! znrm = |z_k|_2
+          call psb_geaxpby((done/znrm),tz,dzero,tq,desc_a,info)  ! q_k = z_k/znrm        
+          call psb_spmm(done,a,tq,dzero,tt,desc_a,info) ! t_{k+1} = BA q_k
+          call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = B t_{k+1}       
+          lambda = psb_gedot(tq,tz,desc_a,info)      ! lambda = q_k^T z_{k+1} = q_k^T BA q_k
+          !write(0,*) 'BLD: lambda estimate ',i,lambda
+        end do
+        sm%rho_ba = lambda
+      end block
+    case default
+      write(0,*) ' Unknown algorithm for RHO(BA) estimate, defaulting to a value of 1.0 '
+      sm%rho_ba = done
     end select
-  else
-    block
-      type(psb_d_vect_type) :: tq, tt, tz,wv(2)
-      real(psb_dpk_)        :: znrm, lambda
-      real(psb_dpk_),allocatable :: work(:)
-      integer(psb_ipk_)     :: i, n_cols
-      n_cols = desc_a%get_local_cols()
-      allocate(work(4*n_cols))
-      call psb_geasb(tz,desc_a,info,mold=vmold,scratch=.true.)
-      call psb_geasb(tt,desc_a,info,mold=vmold,scratch=.true.)
-      call psb_geasb(wv(1),desc_a,info,mold=vmold,scratch=.true.)
-      call psb_geasb(wv(2),desc_a,info,mold=vmold,scratch=.true.)
-      call psb_geall(tq,desc_a,info)
-      call tq%set(done)
-      call psb_geasb(tq,desc_a,info,mold=vmold)
-      call psb_spmm(done,a,tq,dzero,tt,desc_a,info) !
-      call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = BA q_k
-      do i=1,20
-        znrm = psb_genrm2(tz,desc_a,info)               ! znrm = |z_k|_2
-        call psb_geaxpby((done/znrm),tz,dzero,tq,desc_a,info)  ! q_k = z_k/znrm        
-        call psb_spmm(done,a,tq,dzero,tt,desc_a,info) ! t_{k+1} = BA q_k
-        call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = B t_{k+1}       
-        lambda = psb_gedot(tq,tz,desc_a,info)      ! lambda = q_k^T z_{k+1} = q_k^T BA q_k
-        !write(0,*) 'BLD: lambda estimate ',i,lambda
-      end do
-      sm%rho_ba = lambda
-      !sm%rho_ba = done
-    end block
   end if
   
   if (debug_level >= psb_debug_outer_) &

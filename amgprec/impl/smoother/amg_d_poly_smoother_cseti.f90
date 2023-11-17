@@ -64,6 +64,21 @@ subroutine amg_d_poly_smoother_cseti(sm,what,val,info,idx)
       write(0,*) 'Invalid choice for POLY_VARIANT, defaulting to amg_poly_lottes_',val
       sm%variant = amg_poly_lottes_
     end select
+  case('POLY_RHO_ESTIMATE')
+    select case(val)
+    case (amg_poly_rho_est_power_)
+      sm%rho_estimate = val
+    case default
+      write(0,*) 'Invalid choice for POLY_RHO_ESTIMATE, defaulting to amg_poly_rho_power'
+      sm%variant = amg_poly_rho_est_power_
+    end select      
+  case('POLY_RHO_ESTIMATE_ITERATIONS')
+    if (val>0) then 
+      sm%rho_estimate_iterations = val
+    else
+      write(0,*) 'Invalid choice for POLY_RHO_ESTIMATE_ITERATIONS, defaulting to 20'
+      sm%variant = 20
+    end if
   case default
     call sm%amg_d_base_smoother_type%set(what,val,info,idx=idx)
   end select

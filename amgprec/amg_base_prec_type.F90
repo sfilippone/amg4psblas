@@ -326,6 +326,9 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_poly_lottes_      = 0
   integer(psb_ipk_), parameter :: amg_poly_lottes_beta_ = 1
   integer(psb_ipk_), parameter :: amg_poly_new_         = 2
+  
+  integer(psb_ipk_), parameter :: amg_poly_rho_est_power_ = 0
+
   !
   ! Legal values for entry: amg_prec_status_
   !
@@ -572,6 +575,8 @@ contains
       val = amg_poly_lottes_beta_
     case('POLY_NEW')
       val = amg_poly_new_
+    case('POLY_RHO_EST_POWER')
+      val =  amg_poly_rho_est_power_
     case('A_NORMI')
       val = amg_max_norm_
     case('USER_CHOICE')

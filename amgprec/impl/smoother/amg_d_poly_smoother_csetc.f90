@@ -55,6 +55,8 @@ subroutine amg_d_poly_smoother_csetc(sm,what,val,info,idx)
   select case(psb_toupper(trim(what)))
   case('POLY_VARIANT')
     call sm%set(what,amg_stringval(val),info,idx=idx)
+  case('POLY_RHO_ESTIMATE')
+    call sm%set(what,amg_stringval(val),info,idx=idx)
   case default
     call sm%amg_d_base_smoother_type%set(what,val,info,idx=idx)
   end select

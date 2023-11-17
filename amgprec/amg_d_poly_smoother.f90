@@ -59,9 +59,11 @@ module amg_d_poly_smoother
     !    class(amg_d_base_solver_type), allocatable :: sv
     !
     integer(psb_ipk_)              :: pdegree, variant
+    integer(psb_ipk_)              :: rho_estimate=amg_poly_rho_est_power_
+    integer(psb_ipk_)              :: rho_estimate_iterations=10
     type(psb_dspmat_type), pointer :: pa => null()
     real(psb_dpk_), allocatable    :: poly_beta(:)
-    real(psb_dpk_)                 :: rho_ba
+    real(psb_dpk_)                 :: rho_ba = -done
   contains
     procedure, pass(sm) :: apply_v => amg_d_poly_smoother_apply_vect
 !!$    procedure, pass(sm) :: apply_a => amg_d_poly_smoother_apply
@@ -317,10 +319,11 @@ contains
     !
     ! Default: BJAC with no residual check
     !
-    sm%pdegree = 1
-    sm%rho_ba  = dzero
-    sm%variant = amg_poly_lottes_
-
+    sm%pdegree      = 1
+    sm%rho_ba       = -done
+    sm%variant      = amg_poly_lottes_
+    sm%rho_estimate = amg_poly_rho_est_power_
+    sm%rho_estimate_iterations = 20
     if (allocated(sm%sv)) then
       call sm%sv%default()
     end if
