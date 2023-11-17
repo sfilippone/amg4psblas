@@ -134,7 +134,7 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
         !write(0,*) 'BLD: lambda estimate ',i,lambda
       end do
       sm%rho_ba = lambda
-      sm%rho_ba = done
+      !sm%rho_ba = done
     end block
   end if
   
