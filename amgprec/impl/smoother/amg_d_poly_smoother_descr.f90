@@ -80,15 +80,17 @@ subroutine amg_d_poly_smoother_descr(sm,info,iout,coarse,prefix)
   write(iout_,*) trim(prefix_), '  Polynomial smoother   '
   select case(sm%variant)
   case(amg_poly_lottes_)
-    write(iout_,*) trim(prefix_), '        variant:        ','POLY_LOTTES'
+    write(iout_,*) trim(prefix_), '        variant:        ','POLY_LOTTES'    
+    write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
+    write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
   case(amg_poly_lottes_beta_)
     write(iout_,*) trim(prefix_), '        variant:        ','POLY_LOTTES_BETA'
+    write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
+    write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
+    if (allocated(sm%poly_beta)) write(iout_,*) trim(prefix_), '   Coefficients:        ',sm%poly_beta(1:sm%pdegree)
   case default
     write(iout_,*) trim(prefix_), '        variant:        ','UNKNOWN???'
   end select
-  write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
-  write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
-  if (allocated(sm%poly_beta)) write(iout_,*) trim(prefix_), '   Coefficients:        ',sm%poly_beta(1:sm%pdegree)
   if (allocated(sm%sv)) then
     write(iout_,*) trim(prefix_), '       Local solver details:'
     call sm%sv%descr(info,iout_,coarse=coarse,prefix=prefix)

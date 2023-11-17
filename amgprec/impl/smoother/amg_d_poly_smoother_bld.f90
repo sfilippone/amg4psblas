@@ -98,7 +98,7 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
     goto 9999
   end if
   
-  if (.true.) then 
+  if (.false.) then 
     select type(ssv => sm%sv)
     class is(amg_d_l1_diag_solver_type)
       da  = a%arwsum(info)
@@ -110,28 +110,31 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
     end select
   else
     block
-      type(psb_d_vect_type) :: tq, tz,wv(2)
-      real(psb_dpk_)        :: qnrm, lambda
+      type(psb_d_vect_type) :: tq, tt, tz,wv(2)
+      real(psb_dpk_)        :: znrm, lambda
       real(psb_dpk_),allocatable :: work(:)
       integer(psb_ipk_)     :: i, n_cols
       n_cols = desc_a%get_local_cols()
       allocate(work(4*n_cols))
       call psb_geasb(tz,desc_a,info,mold=vmold,scratch=.true.)
+      call psb_geasb(tt,desc_a,info,mold=vmold,scratch=.true.)
       call psb_geasb(wv(1),desc_a,info,mold=vmold,scratch=.true.)
       call psb_geasb(wv(2),desc_a,info,mold=vmold,scratch=.true.)
       call psb_geall(tq,desc_a,info)
       call tq%set(done)
-      call psb_geasb(tq,desc_a,info,mold=vmold) 
-      call psb_spmm(done,a,tq,dzero,tz,desc_a,info) ! z_1 = A q_0
-      do i=1,10
-        call sm%sv%apply_v(done,tz,dzero,tq,desc_a,'NoTrans',work,wv,info) ! q_k = M^{-1} q_k
-        qnrm = psb_genrmi(tq,desc_a,info)               ! qnrm = |q_k|_inf
-        call tq%scal((done/qnrm))                       ! q_k = q_k/qnrm
-        call psb_spmm(done,a,tq,dzero,tz,desc_a,info) ! z_{k=1} = A q_k
-        lambda = psb_gedot(tq,tz,desc_a,info)      ! lambda = q_k^T z_{k+1} = q_k^T A q_k
-        write(0,*) 'BLD: lambda estimate ',i,lambda
+      call psb_geasb(tq,desc_a,info,mold=vmold)
+      call psb_spmm(done,a,tq,dzero,tt,desc_a,info) !
+      call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = BA q_k
+      do i=1,20
+        znrm = psb_genrm2(tz,desc_a,info)               ! znrm = |z_k|_2
+        call psb_geaxpby((done/znrm),tz,dzero,tq,desc_a,info)  ! q_k = z_k/znrm        
+        call psb_spmm(done,a,tq,dzero,tt,desc_a,info) ! t_{k+1} = BA q_k
+        call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = B t_{k+1}       
+        lambda = psb_gedot(tq,tz,desc_a,info)      ! lambda = q_k^T z_{k+1} = q_k^T BA q_k
+        !write(0,*) 'BLD: lambda estimate ',i,lambda
       end do
       sm%rho_ba = lambda
+      sm%rho_ba = done
     end block
   end if
   

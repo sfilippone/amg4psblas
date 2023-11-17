@@ -464,12 +464,12 @@ contains
     character(len=*), parameter :: name='amg_stringval'
   ! Local variable
     integer :: index_tab
-    character(len=15) ::string2
+    character(len=128) ::string2
     index_tab=index(string,char(9))
     if (index_tab.NE.0)  then
-       string2=string(1:index_tab-1)
+      string2=string(1:index_tab-1)
     else
-       string2=string
+      string2=string
     endif
     select case(psb_toupper(trim(string2)))
     case('NONE')

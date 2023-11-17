@@ -61,7 +61,7 @@ subroutine amg_d_poly_smoother_cseti(sm,what,val,info,idx)
     case(amg_poly_lottes_,amg_poly_lottes_beta_,amg_poly_new_)
       sm%variant = val
     case default
-      write(0,*) 'Invalid choice for POLY_VARIANT, defaulting to amg_poly_lottes_'
+      write(0,*) 'Invalid choice for POLY_VARIANT, defaulting to amg_poly_lottes_',val
       sm%variant = amg_poly_lottes_
     end select
   case default

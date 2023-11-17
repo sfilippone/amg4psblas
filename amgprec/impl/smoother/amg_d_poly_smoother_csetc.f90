@@ -53,7 +53,7 @@ subroutine amg_d_poly_smoother_csetc(sm,what,val,info,idx)
   call psb_erractionsave(err_act)
 
   select case(psb_toupper(trim(what)))
-  case('POLY-VARIANT')
+  case('POLY_VARIANT')
     call sm%set(what,amg_stringval(val),info,idx=idx)
   case default
     call sm%amg_d_base_smoother_type%set(what,val,info,idx=idx)
