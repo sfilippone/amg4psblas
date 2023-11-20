@@ -90,15 +90,16 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
     end if
   case(amg_poly_new_)
 
-    if ((1<=sm%pdegree).and.(sm%pdegree<=6)) then
-      call psb_realloc(sm%pdegree,sm%poly_a,info)
-      sm%poly_a(1:sm%pdegree) = amg_d_poly_a_vect(1:sm%pdegree)
+    if ((1<=sm%pdegree).and.(sm%pdegree<=30)) then
+      !Ok
+      sm%cf_a = amg_d_poly_a_vect(sm%pdegree)
     else
       info = psb_err_internal_error_
       call psb_errpush(info,name,&
            & a_err='invalid sm%degree for poly_a')
       goto 9999
     end if
+    
   case default  
     info = psb_err_internal_error_
     call psb_errpush(info,name,&

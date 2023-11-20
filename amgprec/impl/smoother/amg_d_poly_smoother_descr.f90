@@ -88,6 +88,11 @@ subroutine amg_d_poly_smoother_descr(sm,info,iout,coarse,prefix)
     write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
     write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
     if (allocated(sm%poly_beta)) write(iout_,*) trim(prefix_), '   Coefficients:        ',sm%poly_beta(1:sm%pdegree)
+  case(amg_poly_new_)
+    write(iout_,*) trim(prefix_), '        variant:        ','POLY_NEW'
+    write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
+    write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
+    write(iout_,*) trim(prefix_), '   Coefficient:        ',sm%cf_a
   case default
     write(iout_,*) trim(prefix_), '        variant:        ','UNKNOWN???'
   end select
