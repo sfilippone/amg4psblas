@@ -170,7 +170,7 @@ subroutine amg_cfile_prec_descr(prec,info,iout,root, verbosity,prefix)
             call prec%precv(1)%sm%descr(info,iout=iout_,prefix=prefix)
             nswps = prec%precv(1)%parms%sweeps_pre
           end if
-          write(iout_,*) trim(prefix_), '  Number of  sweeps : ',nswps
+          write(iout_,*) trim(prefix_), '  Number of  sweeps/degree : ',nswps
           write(iout_,*) trim(prefix_)
 
         else if (nlev > 1) then

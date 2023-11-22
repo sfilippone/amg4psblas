@@ -56,7 +56,13 @@ subroutine amg_d_poly_smoother_clone_settings(sm,smout,info)
 
     smout%pa => null()
     smout%pdegree   = sm%pdegree
-
+    smout%variant   = sm%variant
+    smout%cf_a      = sm%cf_a
+    smout%rho_ba    = sm%rho_ba
+    smout%rho_estimate  = sm%rho_estimate
+    smout%rho_estimate_iterations  = sm%rho_estimate_iterations
+    smout%poly_beta = sm%poly_beta
+    
     if (allocated(smout%sv)) then
       if (.not.same_type_as(sm%sv,smout%sv)) then
         call smout%sv%free(info)

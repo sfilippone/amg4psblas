@@ -8,7 +8,7 @@
 !
 !        Salvatore Filippone
 !        Pasqua D'Ambra
-!        Fabio Durastante
+!        Daniela di Serafino
 !
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -34,56 +34,43 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-module amg_d_pde2d_box_mod
-  use psb_base_mod, only : psb_dpk_, dzero, done
-  real(psb_dpk_), save, private :: epsilon=done/80
-contains
-  subroutine pde_set_parm2d_box(dat)
-    real(psb_dpk_), intent(in) :: dat
-    epsilon = dat
-  end subroutine pde_set_parm2d_box
-  !
-  ! functions parametrizing the differential equation
-  !
-  function b1_box(x,y)
-    implicit none 
-    real(psb_dpk_) :: b1_box
-    real(psb_dpk_), intent(in) :: x,y
-    b1_box = done/1.414_psb_dpk_
-  end function b1_box
-  function b2_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  b2_box
-    real(psb_dpk_), intent(in) :: x,y
-    b2_box = done/1.414_psb_dpk_
-  end function b2_box
-  function c_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  c_box
-    real(psb_dpk_), intent(in) :: x,y
-    c_box = dzero
-  end function c_box
-  function a1_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  a1_box
-    real(psb_dpk_), intent(in) :: x,y
-    a1_box=done*epsilon
-  end function a1_box
-  function a2_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  a2_box
-    real(psb_dpk_), intent(in) :: x,y
-    a2_box=done*epsilon
-  end function a2_box
-  function g_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  g_box
-    real(psb_dpk_), intent(in) :: x,y
-    g_box = dzero
-    if (x == done) then
-      g_box = done
-    else if (x == dzero) then
-      g_box = done
-    end if
-  end function g_box
-end module amg_d_pde2d_box_mod
+!
+subroutine amg_s_poly_smoother_csetc(sm,what,val,info,idx)
+
+  use psb_base_mod
+  use amg_s_poly_smoother, amg_protect_name => amg_s_poly_smoother_csetc
+  Implicit None
+  ! Arguments
+  class(amg_s_poly_smoother_type), intent(inout) :: sm
+  character(len=*), intent(in)                     :: what
+  character(len=*), intent(in)                   :: val
+  integer(psb_ipk_), intent(out)                 :: info
+  integer(psb_ipk_), intent(in), optional       :: idx
+  integer(psb_ipk_) :: err_act, ival
+  character(len=20) :: name='d_poly_smoother_csetc'
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  select case(psb_toupper(trim(what)))
+  case('POLY_VARIANT')
+    call sm%set(what,amg_stringval(val),info,idx=idx)
+  case('POLY_RHO_ESTIMATE')
+    call sm%set(what,amg_stringval(val),info,idx=idx)
+  case default
+    call sm%amg_s_base_smoother_type%set(what,val,info,idx=idx)
+  end select
+
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end subroutine amg_s_poly_smoother_csetc

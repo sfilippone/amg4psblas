@@ -43,6 +43,7 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_s_dec_aggregator_mod
   use amg_s_symdec_aggregator_mod
   use amg_s_parmatch_aggregator_mod
+  use amg_s_poly_smoother
   use amg_s_jac_smoother
   use amg_s_as_smoother
   use amg_s_diag_solver
@@ -89,6 +90,7 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
   type(amg_s_ainv_solver_type)     ::  amg_s_ainv_solver_mold
   type(amg_s_invk_solver_type)     ::  amg_s_invk_solver_mold
   type(amg_s_invt_solver_type)     ::  amg_s_invt_solver_mold
+  type(amg_s_poly_smoother_type)   ::  amg_s_poly_smoother_mold
 #if defined(HAVE_SLU_)
   type(amg_s_slu_solver_type)   ::  amg_s_slu_solver_mold
 #endif
@@ -144,6 +146,9 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
       call lv%set(amg_s_as_smoother_mold,info,pos=pos)
       if (info == 0) call lv%set(amg_s_ilu_solver_mold,info,pos=pos)
 
+    case ('POLY')
+      call lv%set(amg_s_poly_smoother_mold,info,pos=pos)
+      if (info == 0) call lv%set(amg_s_l1_diag_solver_mold,info,pos=pos)
     case ('GS','FWGS')
       call lv%set(amg_s_jac_smoother_mold,info,pos='pre')
       if (info == 0) call lv%set(amg_s_gs_solver_mold,info,pos='pre')
@@ -189,16 +194,11 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
     case ('NONE','NOPREC','FACT_NONE')
       call lv%set(amg_s_id_solver_mold,info,pos=pos)
 
-    case ('DIAG')
+    case ('DIAG','JACOBI')
       call lv%set(amg_s_diag_solver_mold,info,pos=pos)
 
-    case ('JACOBI')
-      call lv%set(amg_s_jac_solver_mold,info,pos=pos)
-
-    case ('L1-DIAG')
+    case ('L1-DIAG','L1-JACOBI')
       call lv%set(amg_s_l1_diag_solver_mold,info,pos=pos)
-    case ('L1-JACOBI')
-      call lv%set(amg_s_l1_jac_solver_mold,info,pos=pos)
 
     case ('GS','FGS','FWGS')
       call lv%set(amg_s_gs_solver_mold,info,pos=pos)

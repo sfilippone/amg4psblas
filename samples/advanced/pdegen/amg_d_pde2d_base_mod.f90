@@ -38,52 +38,52 @@ module amg_d_pde2d_base_mod
   use psb_base_mod, only : psb_dpk_, dzero, done
   real(psb_dpk_), save, private :: epsilon=done/80
 contains
-  subroutine pde_set_parm(dat)
+  subroutine pde_set_parm2d_base(dat)
     real(psb_dpk_), intent(in) :: dat
     epsilon = dat
-  end subroutine pde_set_parm
+  end subroutine pde_set_parm2d_base
   !
   ! functions parametrizing the differential equation
   !
-  function b1(x,y)
+  function b1_base(x,y)
     implicit none 
-    real(psb_dpk_) :: b1
+    real(psb_dpk_) :: b1_base
     real(psb_dpk_), intent(in) :: x,y
-    b1 = dzero/1.414_psb_dpk_
-  end function b1
-  function b2(x,y)
+    b1_base = dzero/1.414_psb_dpk_
+  end function b1_base
+  function b2_base(x,y)
     implicit none 
-    real(psb_dpk_) ::  b2
+    real(psb_dpk_) ::  b2_base
     real(psb_dpk_), intent(in) :: x,y
-    b2 = dzero/1.414_psb_dpk_
-  end function b2
-  function c(x,y)
+    b2_base = dzero/1.414_psb_dpk_
+  end function b2_base
+  function c_base(x,y)
     implicit none 
-    real(psb_dpk_) ::  c
+    real(psb_dpk_) ::  c_base
     real(psb_dpk_), intent(in) :: x,y
-    c = dzero
-  end function c
-  function a1(x,y)
+    c_base = dzero
+  end function c_base
+  function a1_base(x,y)
     implicit none 
-    real(psb_dpk_) ::  a1
+    real(psb_dpk_) ::  a1_base
     real(psb_dpk_), intent(in) :: x,y
-    a1=done*epsilon
-  end function a1
-  function a2(x,y)
+    a1_base=done*epsilon
+  end function a1_base
+  function a2_base(x,y)
     implicit none 
-    real(psb_dpk_) ::  a2
+    real(psb_dpk_) ::  a2_base
     real(psb_dpk_), intent(in) :: x,y
-    a2=done*epsilon
-  end function a2
-  function g(x,y)
+    a2_base=done*epsilon
+  end function a2_base
+  function g_base(x,y)
     implicit none 
-    real(psb_dpk_) ::  g
+    real(psb_dpk_) ::  g_base
     real(psb_dpk_), intent(in) :: x,y
-    g = dzero
+    g_base = dzero
     if (x == done) then
-      g = done
+      g_base = done
     else if (x == dzero) then
-      g = done
+      g_base = done
     end if
-  end function g
+  end function g_base
 end module amg_d_pde2d_base_mod

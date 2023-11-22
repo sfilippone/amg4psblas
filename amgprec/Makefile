@@ -21,7 +21,7 @@ DMODOBJS=amg_d_prec_type.o \
 
 SMODOBJS=amg_s_prec_type.o amg_s_ilu_fact_mod.o \
 	amg_s_inner_mod.o amg_s_ilu_solver.o amg_s_diag_solver.o amg_s_jac_smoother.o amg_s_as_smoother.o \
-	amg_s_slu_solver.o amg_s_id_solver.o\
+	amg_s_poly_smoother.o amg_s_slu_solver.o amg_s_id_solver.o\
 	amg_s_base_solver_mod.o amg_s_base_smoother_mod.o amg_s_onelev_mod.o  \
 	amg_s_gs_solver.o amg_s_mumps_solver.o  amg_s_jac_solver.o \
 	amg_s_base_aggregator_mod.o  \
@@ -166,6 +166,7 @@ amg_dprecinit.o amg_dprecset.o: amg_d_diag_solver.o amg_d_ilu_solver.o \
 		amg_d_umf_solver.o amg_d_as_smoother.o amg_d_jac_smoother.o \
 	        amg_d_id_solver.o amg_d_slu_solver.o amg_d_sludist_solver.o
 amg_d_poly_smoother.o: amg_d_base_smoother_mod.o amg_d_poly_coeff_mod.o
+amg_s_poly_smoother.o: amg_s_base_smoother_mod.o amg_d_poly_coeff_mod.o	
 
 amg_s_mumps_solver.o amg_s_gs_solver.o amg_s_id_solver.o amg_s_slu_solver.o \
 amg_s_diag_solver.o amg_s_ilu_solver.o amg_s_jac_solver.o: amg_s_base_solver_mod.o  amg_s_prec_type.o

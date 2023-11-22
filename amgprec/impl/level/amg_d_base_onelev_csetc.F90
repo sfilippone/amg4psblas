@@ -43,9 +43,9 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_d_dec_aggregator_mod
   use amg_d_symdec_aggregator_mod
   use amg_d_parmatch_aggregator_mod
+  use amg_d_poly_smoother
   use amg_d_jac_smoother
   use amg_d_as_smoother
-  use amg_d_poly_smoother
   use amg_d_diag_solver
   use amg_d_l1_diag_solver
   use amg_d_jac_solver
@@ -85,7 +85,6 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
   type(amg_d_jac_smoother_type)    ::  amg_d_jac_smoother_mold
   type(amg_d_l1_jac_smoother_type) ::  amg_d_l1_jac_smoother_mold
   type(amg_d_as_smoother_type)     ::  amg_d_as_smoother_mold
-  type(amg_d_poly_smoother_type)   ::  amg_d_poly_smoother_mold
   type(amg_d_diag_solver_type)     ::  amg_d_diag_solver_mold
   type(amg_d_l1_diag_solver_type)  ::  amg_d_l1_diag_solver_mold
   type(amg_d_jac_solver_type)      ::  amg_d_jac_solver_mold
@@ -97,6 +96,7 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
   type(amg_d_ainv_solver_type)     ::  amg_d_ainv_solver_mold
   type(amg_d_invk_solver_type)     ::  amg_d_invk_solver_mold
   type(amg_d_invt_solver_type)     ::  amg_d_invt_solver_mold
+  type(amg_d_poly_smoother_type)   ::  amg_d_poly_smoother_mold
 #if defined(HAVE_UMF_)
   type(amg_d_umf_solver_type)     ::  amg_d_umf_solver_mold
 #endif
@@ -161,7 +161,6 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
     case ('POLY')
       call lv%set(amg_d_poly_smoother_mold,info,pos=pos)
       if (info == 0) call lv%set(amg_d_l1_diag_solver_mold,info,pos=pos)
-
     case ('GS','FWGS')
       call lv%set(amg_d_jac_smoother_mold,info,pos='pre')
       if (info == 0) call lv%set(amg_d_gs_solver_mold,info,pos='pre')

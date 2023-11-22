@@ -1,7 +1,7 @@
 %%%%%%%%%%%  General  arguments % Lines starting with % are ignored.
 CSR                         ! Storage format CSR COO JAD
 0150                        ! IDIM; domain size. Linear system size is IDIM**3
-CONST                       ! PDECOEFF: CONST, EXP, GAUSS Coefficients of the PDE
+CONST                       ! PDECOEFF: CONST, EXP, BOX, GAUSS Coefficients of the PDE
 CG                          ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES
 2                           ! ISTOPC
 00500                       ! ITMAX
@@ -12,16 +12,16 @@ CG                          ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS F
 ML-VBM-VCYCLE-FBGS-D-BJAC       ! Longer descriptive name for preconditioner (up to 20 chars)
 ML                        ! Preconditioner type: NONE JACOBI GS FBGS BJAC AS ML POLY
 %
+%%%%%%%%%%%  First smoother (for all levels but coarsest) %%%%%%%%%%%%%%%%
+FBGS                        ! Smoother type JACOBI FBGS GS BWGS BJAC AS POLY  r 1-level, repeats previous.
+6                           ! Number of sweeps for smoother
+1                           ! degree for polynomial smoother
+POLY_LOTTES_BETA            ! Polynomial variant
 %  Fields to be added for POLY
 %    POLY_RHO_ESTIMATE             Currently only POLY_RHO_EST_POWER
 %    POLY_RHO_ESTIMATE_ITERATIONS  default = 20
 %    POLY_RHO_BA                   set to value
 %
-%%%%%%%%%%%  First smoother (for all levels but coarsest) %%%%%%%%%%%%%%%%
-L1-JACOBI                   ! Smoother type JACOBI FBGS GS BWGS BJAC AS POLY  r 1-level, repeats previous.
-6                           ! Number of sweeps for smoother
-1                           ! degree for polynomial smoother
-POLY_LOTTES_BETA            ! Polynomial variant
 0                           ! Number of overlap layers for AS preconditioner
 HALO                        ! AS restriction operator: NONE HALO
 NONE                        ! AS prolongation operator: NONE SUM AVG
@@ -32,7 +32,7 @@ LLK                         ! AINV variant
 1                           ! Inverse Fill level P for INVK
 1.d-4                       ! Threshold T for ILU(T,P)
 %%%%%%%%%%%  Second smoother, always ignored for non-ML  %%%%%%%%%%%%%%%%
-L1-JACOBI                   ! Second (post) smoother, ignored if NONE
+NONE                        ! Second (post) smoother, ignored if NONE
 6                           ! Number of sweeps for (post) smoother
 1                           ! degree for polynomial smoother
 POLY_LOTTES_BETA                 ! Polynomial variant

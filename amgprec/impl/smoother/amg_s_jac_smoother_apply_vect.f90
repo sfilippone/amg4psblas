@@ -175,7 +175,7 @@ subroutine amg_s_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           if (info /= psb_success_) exit
 
           if ( sm%checkres.and.(mod(i,sm%checkiter) == 0) ) then
-            call psb_geaxpby(sone,x,szero,r,r,desc_data,info)
+            call psb_geaxpby(sone,x,szero,r,desc_data,info)
             call psb_spmm(-sone,sm%pa,ty,sone,r,desc_data,info)
             res  = psb_genrm2(r,desc_data,info)
             if( sm%printres ) then

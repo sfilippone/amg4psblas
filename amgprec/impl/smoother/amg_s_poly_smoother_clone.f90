@@ -8,7 +8,7 @@
 !
 !        Salvatore Filippone
 !        Pasqua D'Ambra
-!        Fabio Durastante
+!        Daniela di Serafino
 !
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
@@ -34,56 +34,57 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-module amg_d_pde2d_box_mod
-  use psb_base_mod, only : psb_dpk_, dzero, done
-  real(psb_dpk_), save, private :: epsilon=done/80
-contains
-  subroutine pde_set_parm2d_box(dat)
-    real(psb_dpk_), intent(in) :: dat
-    epsilon = dat
-  end subroutine pde_set_parm2d_box
-  !
-  ! functions parametrizing the differential equation
-  !
-  function b1_box(x,y)
-    implicit none 
-    real(psb_dpk_) :: b1_box
-    real(psb_dpk_), intent(in) :: x,y
-    b1_box = done/1.414_psb_dpk_
-  end function b1_box
-  function b2_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  b2_box
-    real(psb_dpk_), intent(in) :: x,y
-    b2_box = done/1.414_psb_dpk_
-  end function b2_box
-  function c_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  c_box
-    real(psb_dpk_), intent(in) :: x,y
-    c_box = dzero
-  end function c_box
-  function a1_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  a1_box
-    real(psb_dpk_), intent(in) :: x,y
-    a1_box=done*epsilon
-  end function a1_box
-  function a2_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  a2_box
-    real(psb_dpk_), intent(in) :: x,y
-    a2_box=done*epsilon
-  end function a2_box
-  function g_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  g_box
-    real(psb_dpk_), intent(in) :: x,y
-    g_box = dzero
-    if (x == done) then
-      g_box = done
-    else if (x == dzero) then
-      g_box = done
+!
+subroutine amg_s_poly_smoother_clone(sm,smout,info)
+
+  use psb_base_mod
+  use amg_s_poly_smoother, amg_protect_name => amg_s_poly_smoother_clone
+
+  Implicit None
+
+  ! Arguments
+  class(amg_s_poly_smoother_type), intent(inout)               :: sm
+  class(amg_s_base_smoother_type), allocatable, intent(inout) :: smout
+  integer(psb_ipk_), intent(out)                :: info
+  ! Local variables
+  integer(psb_ipk_) :: err_act
+
+
+  info=psb_success_
+  call psb_erractionsave(err_act)
+
+  if (allocated(smout)) then
+    call smout%free(info)
+    if (info == psb_success_) deallocate(smout, stat=info)
+  end if
+  if (info == psb_success_) &
+       & allocate(amg_s_poly_smoother_type :: smout, stat=info)
+  if (info /= 0) then
+    info = psb_err_alloc_dealloc_
+    goto 9999
+  end if
+
+  select type(smo => smout)
+  type is (amg_s_poly_smoother_type)
+    smo%pdegree    = sm%pdegree
+    smo%rho_ba     = sm%rho_ba
+    smo%poly_beta  = sm%poly_beta
+    smo%pa         => sm%pa
+    if ((info==psb_success_).and.(allocated(sm%sv))) then
+      allocate(smout%sv,mold=sm%sv,stat=info)
+      if (info == psb_success_) call sm%sv%clone(smo%sv,info)
     end if
-  end function g_box
-end module amg_d_pde2d_box_mod
+
+  class default
+    info = psb_err_internal_error_
+  end select
+
+  if (info /= 0) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end subroutine amg_s_poly_smoother_clone

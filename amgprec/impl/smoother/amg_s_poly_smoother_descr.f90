@@ -35,16 +35,16 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine amg_d_poly_smoother_descr(sm,info,iout,coarse,prefix)
+subroutine amg_s_poly_smoother_descr(sm,info,iout,coarse,prefix)
 
   use psb_base_mod
-  use amg_d_diag_solver
-  use amg_d_poly_smoother, amg_protect_name => amg_d_poly_smoother_descr
+  use amg_s_diag_solver
+  use amg_s_poly_smoother, amg_protect_name => amg_s_poly_smoother_descr
 
   Implicit None
 
   ! Arguments
-  class(amg_d_poly_smoother_type), intent(in) :: sm
+  class(amg_s_poly_smoother_type), intent(in) :: sm
   integer(psb_ipk_), intent(out)               :: info
   integer(psb_ipk_), intent(in), optional      :: iout
   logical, intent(in), optional              :: coarse
@@ -52,7 +52,7 @@ subroutine amg_d_poly_smoother_descr(sm,info,iout,coarse,prefix)
 
   ! Local variables
   integer(psb_ipk_)      :: err_act
-  character(len=20), parameter :: name='amg_d_poly_smoother_descr'
+  character(len=20), parameter :: name='amg_s_poly_smoother_descr'
   integer(psb_ipk_)      :: iout_
   logical      :: coarse_
   character(1024)    :: prefix_
@@ -105,4 +105,4 @@ subroutine amg_d_poly_smoother_descr(sm,info,iout,coarse,prefix)
 
 9999 call psb_error_handler(err_act)
   return
-end subroutine amg_d_poly_smoother_descr
+end subroutine amg_s_poly_smoother_descr

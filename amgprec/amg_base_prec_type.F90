@@ -687,10 +687,10 @@ contains
            &   ml_names(pm%ml_cycle)
       select case (pm%ml_cycle)
       case (amg_add_ml_)
-        write(iout,*) '  Number of smoother sweeps : ',&
+        write(iout,*) '  Number of smoother sweeps/degree : ',&
              & pm%sweeps_pre
       case (amg_mult_ml_,amg_vcycle_ml_, amg_wcycle_ml_, amg_kcycle_ml_, amg_kcyclesym_ml_)
-        write(iout,*) '  Number of smoother sweeps : pre: ',&
+        write(iout,*) '  Number of smoother sweeps/degree : pre: ',&
              &  pm%sweeps_pre ,'  post: ', pm%sweeps_post
       end select
 

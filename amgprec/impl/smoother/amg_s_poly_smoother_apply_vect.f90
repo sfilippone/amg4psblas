@@ -35,34 +35,34 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
+subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
      & sweeps,work,wv,info,init,initu)
 
   use psb_base_mod
-  use amg_d_diag_solver
+  use amg_s_diag_solver
   use psb_base_krylov_conv_mod, only : log_conv
-  use amg_d_poly_smoother, amg_protect_name => amg_d_poly_smoother_apply_vect
+  use amg_s_poly_smoother, amg_protect_name => amg_s_poly_smoother_apply_vect
   implicit none
   type(psb_desc_type), intent(in)                 :: desc_data
-  class(amg_d_poly_smoother_type), intent(inout) :: sm
-  type(psb_d_vect_type),intent(inout)           :: x
-  type(psb_d_vect_type),intent(inout)           :: y
-  real(psb_dpk_),intent(in)                      :: alpha,beta
+  class(amg_s_poly_smoother_type), intent(inout) :: sm
+  type(psb_s_vect_type),intent(inout)           :: x
+  type(psb_s_vect_type),intent(inout)           :: y
+  real(psb_spk_),intent(in)                      :: alpha,beta
   character(len=1),intent(in)                     :: trans
   integer(psb_ipk_), intent(in)                   :: sweeps
-  real(psb_dpk_),target, intent(inout)           :: work(:)
-  type(psb_d_vect_type),intent(inout)           :: wv(:)
+  real(psb_spk_),target, intent(inout)           :: work(:)
+  type(psb_s_vect_type),intent(inout)           :: wv(:)
   integer(psb_ipk_), intent(out)                  :: info
   character, intent(in), optional                :: init
-  type(psb_d_vect_type),intent(inout), optional   :: initu
+  type(psb_s_vect_type),intent(inout), optional   :: initu
   !
   integer(psb_ipk_)    :: n_row,n_col
-  type(psb_d_vect_type)  :: tx, ty, tz, r
-  real(psb_dpk_), pointer :: aux(:)
+  type(psb_s_vect_type)  :: tx, ty, tz, r
+  real(psb_spk_), pointer :: aux(:)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me, i, err_act
   character           :: trans_, init_
-  real(psb_dpk_)      :: res, resdenum
+  real(psb_spk_)      :: res, resdenum
   character(len=20)   :: name='d_poly_smoother_apply_v'
 
   call psb_erractionsave(err_act)
@@ -104,7 +104,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
       info=psb_err_alloc_request_
       call psb_errpush(info,name,&
            & i_err=(/4*n_col,izero,izero,izero,izero/),&
-           & a_err='real(psb_dpk_)')
+           & a_err='real(psb_spk_)')
       goto 9999
     end if
   endif
@@ -123,7 +123,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   sm%pdegree = sweeps
   associate(tx => wv(1), ty => wv(2), tz => wv(3), r => wv(4))
 
-    call psb_geaxpby(done,x,dzero,r,desc_data,info)
+    call psb_geaxpby(sone,x,szero,r,desc_data,info)
     call tx%zero()
     call ty%zero()
     call tz%zero()       
@@ -131,24 +131,24 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
     select case(sm%variant)
     case(amg_poly_lottes_)
       block 
-        real(psb_dpk_)      :: cz, cr
+        real(psb_spk_)      :: cz, cr
         !  b == x 
         !  x == tx
         ! 
         do i=1, sweeps
           !   B r_{k-1}
-          call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
-          cz = (2*i*done-3)/(2*i*done+done)
-          cr = (8*i*done-4)/((2*i*done+done)*sm%rho_ba)
+          call sm%sv%apply(sone,r,szero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
+          cz = (2*i*sone-3)/(2*i*sone+sone)
+          cr = (8*i*sone-4)/((2*i*sone+sone)*sm%rho_ba)
           ! z_k =  cz z_{k-1} + cr ty = cz z_{k-1} + cr Br_{k-1}
           call psb_geaxpby(cr,ty,cz,tz,desc_data,info)
           ! r_k =    b-Ax_k  = x -A tx
-          call psb_geaxpby(done,tz,done,tx,desc_data,info)
+          call psb_geaxpby(sone,tz,sone,tx,desc_data,info)
           if (.false.) then
-            call psb_geaxpby(done,x,dzero,r,desc_data,info)
-            call psb_spmm(-done,sm%pa,tx,done,r,desc_data,info,work=aux,trans=trans_)
+            call psb_geaxpby(sone,x,szero,r,desc_data,info)
+            call psb_spmm(-sone,sm%pa,tx,sone,r,desc_data,info,work=aux,trans=trans_)
           else
-            call psb_spmm(-done,sm%pa,tz,done,r,desc_data,info,work=aux,trans=trans_)
+            call psb_spmm(-sone,sm%pa,tz,sone,r,desc_data,info,work=aux,trans=trans_)
           end if
 !!$        res  = psb_genrm2(r,desc_data,info)
 !!$        write(0,*) 'Polynomial smoother ',i,res
@@ -159,7 +159,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
     case(amg_poly_lottes_beta_)
 
       block 
-        real(psb_dpk_)      :: cz, cr
+        real(psb_spk_)      :: cz, cr
         !  b == x 
         !  x == tx
         !
@@ -173,18 +173,18 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 
         do i=1, sweeps
           !   B r_{k-1}
-          call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
-          cz = (2*i*done-3)/(2*i*done+done)
-          cr = (8*i*done-4)/((2*i*done+done)*sm%rho_ba)
+          call sm%sv%apply(sone,r,szero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
+          cz = (2*i*sone-3)/(2*i*sone+sone)
+          cr = (8*i*sone-4)/((2*i*sone+sone)*sm%rho_ba)
           ! z_k =  cz z_{k-1} + cr ty = cz z_{k-1} + cr Br_{k-1}
           call psb_geaxpby(cr,ty,cz,tz,desc_data,info)
           ! r_k =    b-Ax_k  = x -A tx
-          call psb_geaxpby(sm%poly_beta(i),tz,done,tx,desc_data,info)
+          call psb_geaxpby(sm%poly_beta(i),tz,sone,tx,desc_data,info)
           if (.false.) then
-            call psb_geaxpby(done,x,dzero,r,desc_data,info)
-            call psb_spmm(-done,sm%pa,tx,done,r,desc_data,info,work=aux,trans=trans_)
+            call psb_geaxpby(sone,x,szero,r,desc_data,info)
+            call psb_spmm(-sone,sm%pa,tx,sone,r,desc_data,info,work=aux,trans=trans_)
           else
-            call psb_spmm(-done,sm%pa,tz,done,r,desc_data,info,work=aux,trans=trans_)
+            call psb_spmm(-sone,sm%pa,tz,sone,r,desc_data,info,work=aux,trans=trans_)
           end if
 !!$        res  = psb_genrm2(r,desc_data,info)
 !!$        write(0,*) 'Polynomial smoother ',i,res
@@ -194,31 +194,31 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
       
     case(amg_poly_new_)
       block 
-        real(psb_dpk_)      :: sigma, theta, delta, rho_old, rho
+        real(psb_spk_)      :: sigma, theta, delta, rho_old, rho
         !  b == x 
         !  x == tx
         !
         sm%cf_a = amg_d_poly_a_vect(sweeps)
 
-        theta = (done+sm%cf_a)/2
-        delta = (done-sm%cf_a)/2
+        theta = (sone+sm%cf_a)/2
+        delta = (sone-sm%cf_a)/2
         sigma = theta/delta
-        rho_old = done/sigma
-        call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
-        call psb_geaxpby((done/sm%rho_ba),ty,dzero,r,desc_data,info)
-        call psb_geaxpby((done/theta),r,dzero,tz,desc_data,info)
+        rho_old = sone/sigma
+        call sm%sv%apply(sone,r,szero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
+        call psb_geaxpby((sone/sm%rho_ba),ty,szero,r,desc_data,info)
+        call psb_geaxpby((sone/theta),r,szero,tz,desc_data,info)
         ! tz == d
         do i=1, sweeps
           ! x_{k+1} = x_k + d_k
-          call psb_geaxpby(done,tz,done,tx,desc_data,info)
+          call psb_geaxpby(sone,tz,sone,tx,desc_data,info)
           ! 
           ! r_{k-1} = r_k - (1/rho(BA)) B A d_k
-          call psb_spmm(done,sm%pa,tz,dzero,ty,desc_data,info,work=aux,trans=trans_)
-          call sm%sv%apply(-done,ty,done,r,desc_data,trans_,aux,wv(5:),info,init='Z')
+          call psb_spmm(sone,sm%pa,tz,szero,ty,desc_data,info,work=aux,trans=trans_)
+          call sm%sv%apply(-sone,ty,sone,r,desc_data,trans_,aux,wv(5:),info,init='Z')
 
           !
           ! d_{k+1} = (rho rho_old) d_k + 2(rho/delta) r_{k+1}
-          rho = done/(2*sigma - rho_old)
+          rho = sone/(2*sigma - rho_old)
           call psb_geaxpby((2*rho/delta),r,(rho*rho_old),tz,desc_data,info)
 !!$          res  = psb_genrm2(r,desc_data,info)
 !!$          write(0,*) 'Polynomial smoother ',i,res
@@ -259,7 +259,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 !!$
 !!$  else if (sweeps >= 0) then
 !!$    select type (smsv => sm%sv)
-!!$    class is (amg_d_diag_solver_type)
+!!$    class is (amg_s_diag_solver_type)
 !!$      !
 !!$      ! This means we are dealing with a pure Jacobi smoother/solver.
 !!$      !
@@ -267,13 +267,13 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 !!$        select case (init_)
 !!$        case('Z')
 !!$
-!!$          call sm%sv%apply(done,x,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Z')
+!!$          call sm%sv%apply(sone,x,szero,ty,desc_data,trans_,aux,wv(3:),info,init='Z')
 !!$
 !!$        case('Y')
-!!$          call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-!!$          call psb_geaxpby(done,y,dzero,ty,desc_data,info)
-!!$          call psb_spmm(-done,sm%pa,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-!!$          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
+!!$          call psb_geaxpby(sone,x,szero,tx,desc_data,info)
+!!$          call psb_geaxpby(sone,y,szero,ty,desc_data,info)
+!!$          call psb_spmm(-sone,sm%pa,ty,sone,tx,desc_data,info,work=aux,trans=trans_)
+!!$          call sm%sv%apply(sone,tx,szero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
 !!$
 !!$        case('U')
 !!$          if (.not.present(initu)) then
@@ -281,10 +281,10 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 !!$                 & a_err='missing initu to smoother_apply')
 !!$            goto 9999
 !!$          end if
-!!$          call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-!!$          call psb_geaxpby(done,initu,dzero,ty,desc_data,info)
-!!$          call psb_spmm(-done,sm%pa,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-!!$          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
+!!$          call psb_geaxpby(sone,x,szero,tx,desc_data,info)
+!!$          call psb_geaxpby(sone,initu,szero,ty,desc_data,info)
+!!$          call psb_spmm(-sone,sm%pa,ty,sone,tx,desc_data,info,work=aux,trans=trans_)
+!!$          call sm%sv%apply(sone,tx,szero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
 !!$
 !!$        case default
 !!$          call psb_errpush(psb_err_internal_error_,name,&
@@ -297,18 +297,18 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 !!$          ! Compute Y(j+1) =  Y(j)+ D^(-1)*(X-A*Y(j)),
 !!$          !  where is the diagonal and  A the matrix.
 !!$          !
-!!$          call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-!!$          call psb_spmm(-done,sm%pa,ty,done,tx,desc_data,info,work=aux,trans=trans_)
+!!$          call psb_geaxpby(sone,x,szero,tx,desc_data,info)
+!!$          call psb_spmm(-sone,sm%pa,ty,sone,tx,desc_data,info,work=aux,trans=trans_)
 !!$
 !!$          if (info /= psb_success_) exit
 !!$
-!!$          call sm%sv%apply(done,tx,done,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
+!!$          call sm%sv%apply(sone,tx,sone,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
 !!$
 !!$          if (info /= psb_success_) exit
 !!$
 !!$          if ( sm%checkres.and.(mod(i,sm%checkiter) == 0) ) then
-!!$            call psb_geaxpby(done,x,dzero,r,r,desc_data,info)
-!!$            call psb_spmm(-done,sm%pa,ty,done,r,desc_data,info)
+!!$            call psb_geaxpby(sone,x,szero,r,r,desc_data,info)
+!!$            call psb_spmm(-sone,sm%pa,ty,sone,r,desc_data,info)
 !!$            res  = psb_genrm2(r,desc_data,info)
 !!$            if( sm%printres ) then
 !!$              call log_conv("BJAC",me,i,sm%printiter,res,resdenum,sm%tol)
@@ -358,13 +358,13 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 !!$        select case (init_)
 !!$        case('Z')
 !!$
-!!$          call sm%sv%apply(done,x,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Z')
+!!$          call sm%sv%apply(sone,x,szero,ty,desc_data,trans_,aux,wv(3:),info,init='Z')
 !!$
 !!$        case('Y')
-!!$          call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-!!$          call psb_geaxpby(done,y,dzero,ty,desc_data,info)
-!!$          call psb_spmm(-done,sm%nd,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-!!$          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
+!!$          call psb_geaxpby(sone,x,szero,tx,desc_data,info)
+!!$          call psb_geaxpby(sone,y,szero,ty,desc_data,info)
+!!$          call psb_spmm(-sone,sm%nd,ty,sone,tx,desc_data,info,work=aux,trans=trans_)
+!!$          call sm%sv%apply(sone,tx,szero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
 !!$
 !!$        case('U')
 !!$          if (.not.present(initu)) then
@@ -372,10 +372,10 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 !!$                 & a_err='missing initu to smoother_apply')
 !!$            goto 9999
 !!$          end if
-!!$          call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-!!$          call psb_geaxpby(done,initu,dzero,ty,desc_data,info)
-!!$          call psb_spmm(-done,sm%nd,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-!!$          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
+!!$          call psb_geaxpby(sone,x,szero,tx,desc_data,info)
+!!$          call psb_geaxpby(sone,initu,szero,ty,desc_data,info)
+!!$          call psb_spmm(-sone,sm%nd,ty,sone,tx,desc_data,info,work=aux,trans=trans_)
+!!$          call sm%sv%apply(sone,tx,szero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
 !!$
 !!$        case default
 !!$          call psb_errpush(psb_err_internal_error_,name,&
@@ -389,18 +389,18 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 !!$          ! block diagonal part and the remaining part of the local matrix
 !!$          ! and Y(j) is the approximate solution at sweep j.
 !!$          !
-!!$          call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-!!$          call psb_spmm(-done,sm%nd,ty,done,tx,desc_data,info,work=aux,trans=trans_)
+!!$          call psb_geaxpby(sone,x,szero,tx,desc_data,info)
+!!$          call psb_spmm(-sone,sm%nd,ty,sone,tx,desc_data,info,work=aux,trans=trans_)
 !!$
 !!$          if (info /= psb_success_) exit
 !!$
-!!$          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
+!!$          call sm%sv%apply(sone,tx,szero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
 !!$
 !!$          if (info /= psb_success_) exit
 !!$
 !!$          if ( sm%checkres.and.(mod(i,sm%checkiter) == 0) ) then
-!!$            call psb_geaxpby(done,x,dzero,r,r,desc_data,info)
-!!$            call psb_spmm(-done,sm%pa,ty,done,r,desc_data,info)
+!!$            call psb_geaxpby(sone,x,szero,r,r,desc_data,info)
+!!$            call psb_spmm(-sone,sm%pa,ty,sone,r,desc_data,info)
 !!$            res  = psb_genrm2(r,desc_data,info)
 !!$            if( sm%printres ) then
 !!$              call log_conv("BJAC",me,i,sm%printiter,res,resdenum,sm%tol)
@@ -450,4 +450,4 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 
   return
 
-end subroutine amg_d_poly_smoother_apply_vect
+end subroutine amg_s_poly_smoother_apply_vect

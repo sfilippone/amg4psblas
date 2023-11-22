@@ -72,6 +72,7 @@ program amg_d_pde3d
   use data_input
   use amg_d_pde3d_base_mod
   use amg_d_pde3d_exp_mod
+  use amg_d_pde3d_box_mod
   use amg_d_pde3d_gauss_mod
   use amg_d_genpde_mod
 #if defined(OPENMP)
@@ -201,7 +202,7 @@ program amg_d_pde3d
   ! other variables
   integer(psb_ipk_)  :: info, i, k
   character(len=20)  :: name,ch_err
-  type(psb_d_csr_sparse_mat) :: amold
+
   info=psb_success_
 
 
@@ -247,10 +248,13 @@ program amg_d_pde3d
   select case(psb_toupper(trim(pdecoeff)))
   case("CONST")
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
-        & a1,a2,a3,b1,b2,b3,c,g,info)
+        & a1_base,a2_base,a3_base,b1_base,b2_base,b3_base,c_base,g_base,info)
   case("EXP")
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
         & a1_exp,a2_exp,a3_exp,b1_exp,b2_exp,b3_exp,c_exp,g_exp,info)
+  case("BOX")
+    call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
+        & a1_box,a2_box,a3_box,b1_box,b2_box,b3_box,c_box,g_box,info)
   case("GAUSS")
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
         & a1_gauss,a2_gauss,a3_gauss,b1_gauss,b2_gauss,b3_gauss,c_gauss,g_gauss,info)
@@ -412,7 +416,6 @@ program amg_d_pde3d
     call prec%set('coarse_sweeps',   p_choice%cjswp,     info)
 
   end select
-!!$  call prec%descr(info,iout=psb_out_unit)
 
   ! build the preconditioner
   call psb_barrier(ctxt)
@@ -425,7 +428,7 @@ program amg_d_pde3d
   end if
   call psb_barrier(ctxt)
   t1 = psb_wtime()
-  call prec%smoothers_build(a,desc_a,info,amold=amold)
+  call prec%smoothers_build(a,desc_a,info)
   tprec = psb_wtime()-t1
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_smoothers_bld')

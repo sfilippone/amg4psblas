@@ -38,10 +38,10 @@ module amg_s_pde3d_exp_mod
   use psb_base_mod, only : psb_spk_, sone, szero
   real(psb_spk_), save, private :: epsilon=sone/160
 contains
-  subroutine pde_set_parm(dat)
+  subroutine pde_set_parm3d_exp(dat)
     real(psb_spk_), intent(in) :: dat
     epsilon = dat
-  end subroutine pde_set_parm
+  end subroutine pde_set_parm3d_exp
   !
   ! functions parametrizing the differential equation
   !

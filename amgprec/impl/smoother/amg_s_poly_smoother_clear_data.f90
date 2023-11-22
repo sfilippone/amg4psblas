@@ -1,15 +1,15 @@
-!
-!
+!  
+!   
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.7)
-!
-!    (C) Copyright 2021
-!
-!        Salvatore Filippone
-!        Pasqua D'Ambra
-!        Fabio Durastante
-!
+!    
+!    (C) Copyright 2021 
+!  
+!        Salvatore Filippone  
+!        Pasqua D'Ambra   
+!        Fabio Durastante        
+!   
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!
+!   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,57 +33,38 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!
-module amg_d_pde2d_box_mod
-  use psb_base_mod, only : psb_dpk_, dzero, done
-  real(psb_dpk_), save, private :: epsilon=done/80
-contains
-  subroutine pde_set_parm2d_box(dat)
-    real(psb_dpk_), intent(in) :: dat
-    epsilon = dat
-  end subroutine pde_set_parm2d_box
-  !
-  ! functions parametrizing the differential equation
-  !
-  function b1_box(x,y)
-    implicit none 
-    real(psb_dpk_) :: b1_box
-    real(psb_dpk_), intent(in) :: x,y
-    b1_box = done/1.414_psb_dpk_
-  end function b1_box
-  function b2_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  b2_box
-    real(psb_dpk_), intent(in) :: x,y
-    b2_box = done/1.414_psb_dpk_
-  end function b2_box
-  function c_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  c_box
-    real(psb_dpk_), intent(in) :: x,y
-    c_box = dzero
-  end function c_box
-  function a1_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  a1_box
-    real(psb_dpk_), intent(in) :: x,y
-    a1_box=done*epsilon
-  end function a1_box
-  function a2_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  a2_box
-    real(psb_dpk_), intent(in) :: x,y
-    a2_box=done*epsilon
-  end function a2_box
-  function g_box(x,y)
-    implicit none 
-    real(psb_dpk_) ::  g_box
-    real(psb_dpk_), intent(in) :: x,y
-    g_box = dzero
-    if (x == done) then
-      g_box = done
-    else if (x == dzero) then
-      g_box = done
-    end if
-  end function g_box
-end module amg_d_pde2d_box_mod
+!   
+!  
+subroutine amg_s_poly_smoother_clear_data(sm,info)
+  
+  use psb_base_mod
+  use amg_s_poly_smoother, amg_protect_name =>  amg_s_poly_smoother_clear_data
+  Implicit None
+  ! Arguments
+  class(amg_s_poly_smoother_type), intent(inout) :: sm
+  integer(psb_ipk_), intent(out)                   :: info
+  integer(psb_ipk_)  :: err_act
+  character(len=20) :: name='amg_s_poly_smoother_clear_data'
+
+  call psb_erractionsave(err_act)
+
+  info = 0
+  sm%pdegree = 0
+  if (allocated(sm%poly_beta)) deallocate(sm%poly_beta)
+  sm%pa      => null()  
+  if ((info==0).and.allocated(sm%sv)) then
+    call sm%sv%clear_data(info)
+  end if
+  if (info /= 0) then
+    info = psb_err_internal_error_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+
+  return
+end subroutine amg_s_poly_smoother_clear_data

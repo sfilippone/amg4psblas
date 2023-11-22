@@ -35,28 +35,28 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
+subroutine amg_s_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
 
   use psb_base_mod
-  use amg_d_diag_solver
-  use amg_d_l1_diag_solver
+  use amg_s_diag_solver
+  use amg_s_l1_diag_solver
   use amg_d_poly_coeff_mod
-  use amg_d_poly_smoother, amg_protect_name => amg_d_poly_smoother_bld
+  use amg_s_poly_smoother, amg_protect_name => amg_s_poly_smoother_bld
   Implicit None
 
   ! Arguments
-  type(psb_dspmat_type), intent(in), target          :: a
+  type(psb_sspmat_type), intent(in), target          :: a
   Type(psb_desc_type), Intent(inout)                 :: desc_a
-  class(amg_d_poly_smoother_type), intent(inout)      :: sm
+  class(amg_s_poly_smoother_type), intent(inout)      :: sm
   integer(psb_ipk_), intent(out)                     :: info
-  class(psb_d_base_sparse_mat), intent(in), optional :: amold
-  class(psb_d_base_vect_type), intent(in), optional  :: vmold
+  class(psb_s_base_sparse_mat), intent(in), optional :: amold
+  class(psb_s_base_vect_type), intent(in), optional  :: vmold
   class(psb_i_base_vect_type), intent(in), optional  :: imold
   ! Local variables
-  type(psb_dspmat_type) :: tmpa
+  type(psb_sspmat_type) :: tmpa
   integer(psb_ipk_)   :: n_row,n_col, nrow_a, nztota, nzeros
   type(psb_ctxt_type) :: ctxt
-  real(psb_dpk_), allocatable :: da(:), dsv(:) 
+  real(psb_spk_), allocatable :: da(:), dsv(:) 
   integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
   character(len=20)   :: name='d_poly_smoother_bld', ch_err
 
@@ -123,22 +123,22 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
 
 !!$  if (.false.) then 
 !!$    select type(ssv => sm%sv)
-!!$    class is(amg_d_l1_diag_solver_type)
+!!$    class is(amg_s_l1_diag_solver_type)
 !!$      da  = a%arwsum(info)
 !!$      dsv = ssv%dv%get_vect()
 !!$      sm%rho_ba = maxval(da(1:n_row)*dsv(1:n_row))
 !!$    class default
 !!$      write(0,*) 'PolySmoother BUILD: only L1-Jacobi/L1-DIAG for now ',ssv%get_fmt()
-!!$      sm%rho_ba = done          
+!!$      sm%rho_ba = sone          
 !!$    end select
 !!$  else
-  if (sm%rho_ba <= dzero) then
+  if (sm%rho_ba <= szero) then
     select case(sm%rho_estimate)
     case(amg_poly_rho_est_power_)
       block
-        type(psb_d_vect_type) :: tq, tt, tz,wv(2)
-        real(psb_dpk_)        :: znrm, lambda
-        real(psb_dpk_),allocatable :: work(:)
+        type(psb_s_vect_type) :: tq, tt, tz,wv(2)
+        real(psb_spk_)        :: znrm, lambda
+        real(psb_spk_),allocatable :: work(:)
         integer(psb_ipk_)     :: i, n_cols
         n_cols = desc_a%get_local_cols()
         allocate(work(4*n_cols))
@@ -147,15 +147,15 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
         call psb_geasb(wv(1),desc_a,info,mold=vmold,scratch=.true.)
         call psb_geasb(wv(2),desc_a,info,mold=vmold,scratch=.true.)
         call psb_geall(tq,desc_a,info)
-        call tq%set(done)
+        call tq%set(sone)
         call psb_geasb(tq,desc_a,info,mold=vmold)
-        call psb_spmm(done,a,tq,dzero,tt,desc_a,info) !
-        call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = BA q_k
+        call psb_spmm(sone,a,tq,szero,tt,desc_a,info) !
+        call sm%sv%apply_v(sone,tt,szero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = BA q_k
         do i=1,sm%rho_estimate_iterations
           znrm = psb_genrm2(tz,desc_a,info)               ! znrm = |z_k|_2
-          call psb_geaxpby((done/znrm),tz,dzero,tq,desc_a,info)  ! q_k = z_k/znrm        
-          call psb_spmm(done,a,tq,dzero,tt,desc_a,info) ! t_{k+1} = BA q_k
-          call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = B t_{k+1}       
+          call psb_geaxpby((sone/znrm),tz,szero,tq,desc_a,info)  ! q_k = z_k/znrm        
+          call psb_spmm(sone,a,tq,szero,tt,desc_a,info) ! t_{k+1} = BA q_k
+          call sm%sv%apply_v(sone,tt,szero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = B t_{k+1}       
           lambda = psb_gedot(tq,tz,desc_a,info)      ! lambda = q_k^T z_{k+1} = q_k^T BA q_k
           !write(0,*) 'BLD: lambda estimate ',i,lambda
         end do
@@ -163,7 +163,7 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
       end block
     case default
       write(0,*) ' Unknown algorithm for RHO(BA) estimate, defaulting to a value of 1.0 '
-      sm%rho_ba = done
+      sm%rho_ba = sone
     end select
   end if
 
@@ -177,4 +177,4 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
 
   return
 
-end subroutine amg_d_poly_smoother_bld
+end subroutine amg_s_poly_smoother_bld

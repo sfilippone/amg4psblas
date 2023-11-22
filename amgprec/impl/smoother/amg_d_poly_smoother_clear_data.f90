@@ -44,7 +44,7 @@ subroutine amg_d_poly_smoother_clear_data(sm,info)
   class(amg_d_poly_smoother_type), intent(inout) :: sm
   integer(psb_ipk_), intent(out)                   :: info
   integer(psb_ipk_)  :: err_act
-  character(len=20) :: name='d_poly_smoother_clear_data'
+  character(len=20) :: name='amg_d_poly_smoother_clear_data'
 
   call psb_erractionsave(err_act)
 

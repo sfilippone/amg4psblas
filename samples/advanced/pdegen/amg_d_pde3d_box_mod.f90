@@ -34,56 +34,68 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-module amg_d_pde2d_box_mod
-  use psb_base_mod, only : psb_dpk_, dzero, done
+module amg_d_pde3d_box_mod
+  use psb_base_mod, only : psb_dpk_, done, dzero
   real(psb_dpk_), save, private :: epsilon=done/80
 contains
-  subroutine pde_set_parm2d_box(dat)
+  subroutine pde_set_parm3d_box(dat)
     real(psb_dpk_), intent(in) :: dat
     epsilon = dat
-  end subroutine pde_set_parm2d_box
+  end subroutine pde_set_parm3d_box
   !
   ! functions parametrizing the differential equation
   !
-  function b1_box(x,y)
+  function b1_box(x,y,z)
     implicit none 
     real(psb_dpk_) :: b1_box
-    real(psb_dpk_), intent(in) :: x,y
-    b1_box = done/1.414_psb_dpk_
+    real(psb_dpk_), intent(in) :: x,y,z
+    b1_box=done/sqrt(3.0_psb_dpk_)
   end function b1_box
-  function b2_box(x,y)
+  function b2_box(x,y,z)
     implicit none 
     real(psb_dpk_) ::  b2_box
-    real(psb_dpk_), intent(in) :: x,y
-    b2_box = done/1.414_psb_dpk_
+    real(psb_dpk_), intent(in) :: x,y,z
+    b2_box=done/sqrt(3.0_psb_dpk_)
   end function b2_box
-  function c_box(x,y)
+  function b3_box(x,y,z)
+    implicit none 
+    real(psb_dpk_) ::  b3_box
+    real(psb_dpk_), intent(in) :: x,y,z
+    b3_box=done/sqrt(3.0_psb_dpk_)
+  end function b3_box
+  function c_box(x,y,z)
     implicit none 
     real(psb_dpk_) ::  c_box
-    real(psb_dpk_), intent(in) :: x,y
-    c_box = dzero
+    real(psb_dpk_), intent(in) :: x,y,z
+    c_box=dzero
   end function c_box
-  function a1_box(x,y)
+  function a1_box(x,y,z)
     implicit none 
     real(psb_dpk_) ::  a1_box
-    real(psb_dpk_), intent(in) :: x,y
-    a1_box=done*epsilon
+    real(psb_dpk_), intent(in) :: x,y,z
+    a1_box=epsilon
   end function a1_box
-  function a2_box(x,y)
+  function a2_box(x,y,z)
     implicit none 
     real(psb_dpk_) ::  a2_box
-    real(psb_dpk_), intent(in) :: x,y
-    a2_box=done*epsilon
+    real(psb_dpk_), intent(in) :: x,y,z
+    a2_box=epsilon
   end function a2_box
-  function g_box(x,y)
+  function a3_box(x,y,z)
+    implicit none 
+    real(psb_dpk_) ::  a3_box
+    real(psb_dpk_), intent(in) :: x,y,z
+    a3_box=epsilon
+  end function a3_box
+  function g_box(x,y,z)
     implicit none 
     real(psb_dpk_) ::  g_box
-    real(psb_dpk_), intent(in) :: x,y
-    g_box = dzero
+    real(psb_dpk_), intent(in) :: x,y,z
+    g_box= dzero
     if (x == done) then
       g_box = done
     else if (x == dzero) then
       g_box = done
     end if
   end function g_box
-end module amg_d_pde2d_box_mod
+end module amg_d_pde3d_box_mod

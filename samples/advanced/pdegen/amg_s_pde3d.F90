@@ -72,6 +72,7 @@ program amg_s_pde3d
   use data_input
   use amg_s_pde3d_base_mod
   use amg_s_pde3d_exp_mod
+  use amg_s_pde3d_box_mod
   use amg_s_pde3d_gauss_mod
   use amg_s_genpde_mod
 #if defined(OPENMP)
@@ -125,16 +126,16 @@ program amg_s_pde3d
     integer(psb_ipk_)  :: outer_sweeps ! number of outer sweeps: sweeps for 1-level,
     ! AMG cycles for ML
     ! general AMG data
-    character(len=16)  :: mlcycle      ! AMG cycle type
+    character(len=32)  :: mlcycle      ! AMG cycle type
     integer(psb_ipk_)  :: maxlevs      ! maximum number of levels in AMG preconditioner
 
     ! AMG aggregation
-    character(len=16)  :: aggr_prol    ! aggregation type: SMOOTHED, NONSMOOTHED
-    character(len=16)  :: par_aggr_alg ! parallel aggregation algorithm: DEC, SYMDEC
-    character(len=16)  :: aggr_type    ! Type of aggregation SOC1, SOC2, MATCHBOXP
+    character(len=32)  :: aggr_prol    ! aggregation type: SMOOTHED, NONSMOOTHED
+    character(len=32)  :: par_aggr_alg ! parallel aggregation algorithm: DEC, SYMDEC
+    character(len=32)  :: aggr_type    ! Type of aggregation SOC1, SOC2, MATCHBOXP
     integer(psb_ipk_)  :: aggr_size    ! Requested size of the aggregates for MATCHBOXP
-    character(len=16)  :: aggr_ord     ! ordering for aggregation: NATURAL, DEGREE
-    character(len=16)  :: aggr_filter  ! filtering: FILTER, NO_FILTER
+    character(len=32)  :: aggr_ord     ! ordering for aggregation: NATURAL, DEGREE
+    character(len=32)  :: aggr_filter  ! filtering: FILTER, NO_FILTER
     real(psb_spk_)      :: mncrratio    ! minimum aggregation ratio
     real(psb_spk_), allocatable :: athresv(:) ! smoothed aggregation threshold vector
     integer(psb_ipk_)  :: thrvsz       ! size of threshold vector
@@ -142,39 +143,43 @@ program amg_s_pde3d
     integer(psb_ipk_)  :: csizepp      ! minimum size of coarsest matrix per process
 
     ! AMG smoother or pre-smoother; also 1-lev preconditioner
-    character(len=16)  :: smther       ! (pre-)smoother type: BJAC, AS
+    character(len=32)  :: smther       ! (pre-)smoother type: BJAC, AS
     integer(psb_ipk_)  :: jsweeps      ! (pre-)smoother / 1-lev prec. sweeps
+    integer(psb_ipk_)  :: degree       ! degree for polynomial smoother
+    character(len=32)  :: pvariant     ! polynomial  variant
     integer(psb_ipk_)  :: novr         ! number of overlap layers
-    character(len=16)  :: restr        ! restriction over application of AS
-    character(len=16)  :: prol         ! prolongation over application of AS
-    character(len=16)  :: solve        ! local subsolver type: ILU, MILU, ILUT,
+    character(len=32)  :: restr        ! restriction over application of AS
+    character(len=32)  :: prol         ! prolongation over application of AS
+    character(len=32)  :: solve        ! local subsolver type: ILU, MILU, ILUT,
                                        ! UMF, MUMPS, SLU, FWGS, BWGS, JAC
     integer(psb_ipk_)  :: ssweeps      ! inner solver sweeps
-    character(len=16)  :: variant      ! AINV variant: LLK, etc
+    character(len=32)  :: variant      ! AINV variant: LLK, etc
     integer(psb_ipk_)  :: fill         ! fill-in for incomplete LU factorization
     integer(psb_ipk_)  :: invfill      ! Inverse fill-in for INVK
     real(psb_spk_)      :: thr          ! threshold for ILUT factorization
 
     ! AMG post-smoother; ignored by 1-lev preconditioner
-    character(len=16)  :: smther2      ! post-smoother type: BJAC, AS
+    character(len=32)  :: smther2      ! post-smoother type: BJAC, AS
     integer(psb_ipk_)  :: jsweeps2     ! post-smoother sweeps
+    integer(psb_ipk_)  :: degree2      ! degree for polynomial smoother
+    character(len=32)  :: pvariant2    ! polynomial  variant
     integer(psb_ipk_)  :: novr2        ! number of overlap layers
-    character(len=16)  :: restr2       ! restriction  over application of AS
-    character(len=16)  :: prol2        ! prolongation over application of AS
-    character(len=16)  :: solve2       ! local subsolver type: ILU, MILU, ILUT,
+    character(len=32)  :: restr2       ! restriction  over application of AS
+    character(len=32)  :: prol2        ! prolongation over application of AS
+    character(len=32)  :: solve2       ! local subsolver type: ILU, MILU, ILUT,
                                        ! UMF, MUMPS, SLU, FWGS, BWGS, JAC
     integer(psb_ipk_)  :: ssweeps2     ! inner solver sweeps
-    character(len=16)  :: variant2     ! AINV variant: LLK, etc
+    character(len=32)  :: variant2     ! AINV variant: LLK, etc
     integer(psb_ipk_)  :: fill2        ! fill-in for incomplete LU factorization
     integer(psb_ipk_)  :: invfill2     ! Inverse fill-in for INVK
     real(psb_spk_)      :: thr2         ! threshold for ILUT factorization
 
     ! coarsest-level solver
-    character(len=16)  :: cmat         ! coarsest matrix layout: REPL, DIST
-    character(len=16)  :: csolve       ! coarsest-lev solver: BJAC, SLUDIST (distr.
+    character(len=32)  :: cmat         ! coarsest matrix layout: REPL, DIST
+    character(len=32)  :: csolve       ! coarsest-lev solver: BJAC, SLUDIST (distr.
                                        ! mat.); UMF, MUMPS, SLU, ILU, ILUT, MILU
                                        ! (repl. mat.)
-    character(len=16)  :: csbsolve     ! coarsest-lev local subsolver: ILU, ILUT,
+    character(len=32)  :: csbsolve     ! coarsest-lev local subsolver: ILU, ILUT,
                                        ! MILU, UMF, MUMPS, SLU
     integer(psb_ipk_)  :: cfill        ! fill-in for incomplete LU factorization
     real(psb_spk_)     :: cthres        ! threshold for ILUT factorization
@@ -197,7 +202,7 @@ program amg_s_pde3d
   ! other variables
   integer(psb_ipk_)  :: info, i, k
   character(len=20)  :: name,ch_err
-  type(psb_s_csr_sparse_mat) :: amold
+
   info=psb_success_
 
 
@@ -243,10 +248,13 @@ program amg_s_pde3d
   select case(psb_toupper(trim(pdecoeff)))
   case("CONST")
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
-        & a1,a2,a3,b1,b2,b3,c,g,info)
+        & a1_base,a2_base,a3_base,b1_base,b2_base,b3_base,c_base,g_base,info)
   case("EXP")
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
         & a1_exp,a2_exp,a3_exp,b1_exp,b2_exp,b3_exp,c_exp,g_exp,info)
+  case("BOX")
+    call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
+        & a1_box,a2_box,a3_box,b1_box,b2_box,b3_box,c_box,g_box,info)
   case("GAUSS")
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
         & a1_gauss,a2_gauss,a3_gauss,b1_gauss,b2_gauss,b3_gauss,c_gauss,g_gauss,info)
@@ -285,10 +293,12 @@ program amg_s_pde3d
     ! 1-level sweeps from "outer_sweeps"
     call prec%set('smoother_sweeps', p_choice%jsweeps, info)
 
-  case ('BJAC')
+  case ('BJAC','POLY')
     call prec%set('smoother_sweeps', p_choice%jsweeps, info)
     call prec%set('sub_solve',       p_choice%solve,   info)
     call prec%set('solver_sweeps',   p_choice%ssweeps,   info)
+    call prec%set('poly_degree',     p_choice%degree,    info)
+    call prec%set('poly_variant',    p_choice%pvariant,  info)
     if (psb_toupper(p_choice%solve)=='MUMPS') &
          & call prec%set('mumps_loc_glob','local_solver',info)
     call prec%set('sub_fillin',      p_choice%fill,    info)
@@ -336,7 +346,9 @@ program amg_s_pde3d
 
     call prec%set('smoother_type',   p_choice%smther,     info)
     call prec%set('smoother_sweeps', p_choice%jsweeps,    info)
-
+    call prec%set('poly_degree',     p_choice%degree,    info)
+    call prec%set('poly_variant',    p_choice%pvariant,  info)
+    
     select case (psb_toupper(p_choice%smther))
     case ('GS','BWGS','FBGS','JACOBI','L1-JACOBI','L1-FBGS')
       ! do nothing
@@ -366,6 +378,8 @@ program amg_s_pde3d
     if (psb_toupper(p_choice%smther2) /= 'NONE') then
       call prec%set('smoother_type',   p_choice%smther2,   info,pos='post')
       call prec%set('smoother_sweeps', p_choice%jsweeps2,  info,pos='post')
+      call prec%set('poly_degree',     p_choice%degree2,   info,pos='post')
+      call prec%set('poly_variant',    p_choice%pvariant2, info,pos='post')
       select case (psb_toupper(p_choice%smther2))
       case ('GS','BWGS','FBGS','JACOBI','L1-JACOBI','L1-FBGS')
         ! do nothing
@@ -414,7 +428,7 @@ program amg_s_pde3d
   end if
   call psb_barrier(ctxt)
   t1 = psb_wtime()
-  call prec%smoothers_build(a,desc_a,info,amold=amold)
+  call prec%smoothers_build(a,desc_a,info)
   tprec = psb_wtime()-t1
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_smoothers_bld')
@@ -581,6 +595,8 @@ contains
       ! First smoother / 1-lev preconditioner
       call read_data(prec%smther,inp_unit)     ! smoother type
       call read_data(prec%jsweeps,inp_unit)    ! (pre-)smoother / 1-lev prec sweeps
+      call read_data(prec%degree,inp_unit)     ! (pre-)smoother / 1-lev prec sweeps
+      call read_data(prec%pvariant,inp_unit)   ! 
       call read_data(prec%novr,inp_unit)       ! number of overlap layers
       call read_data(prec%restr,inp_unit)      ! restriction  over application of AS
       call read_data(prec%prol,inp_unit)       ! prolongation over application of AS
@@ -593,11 +609,13 @@ contains
       ! Second smoother/ AMG post-smoother (if NONE ignored in main)
       call read_data(prec%smther2,inp_unit)     ! smoother type
       call read_data(prec%jsweeps2,inp_unit)    ! (post-)smoother sweeps
+      call read_data(prec%degree2,inp_unit)    ! (post-)smoother sweeps
+      call read_data(prec%pvariant2,inp_unit)   !
       call read_data(prec%novr2,inp_unit)       ! number of overlap layers
       call read_data(prec%restr2,inp_unit)      ! restriction  over application of AS
       call read_data(prec%prol2,inp_unit)       ! prolongation over application of AS
       call read_data(prec%solve2,inp_unit)      ! local subsolver
-      call read_data(prec%ssweeps2,inp_unit)    ! inner solver sweeps 
+      call read_data(prec%ssweeps2,inp_unit)    ! inner solver sweeps
       call read_data(prec%variant2,inp_unit)    ! AINV variant
       call read_data(prec%fill2,inp_unit)       ! fill-in for incomplete LU
       call read_data(prec%invfill2,inp_unit)    !Inverse fill-in for INVK
@@ -663,6 +681,8 @@ contains
     ! broadcast first (pre-)smoother / 1-lev prec data
     call psb_bcast(ctxt,prec%smther)
     call psb_bcast(ctxt,prec%jsweeps)
+    call psb_bcast(ctxt,prec%degree)
+    call psb_bcast(ctxt,prec%pvariant)
     call psb_bcast(ctxt,prec%novr)
     call psb_bcast(ctxt,prec%restr)
     call psb_bcast(ctxt,prec%prol)
@@ -675,6 +695,8 @@ contains
     ! broadcast second (post-)smoother
     call psb_bcast(ctxt,prec%smther2)
     call psb_bcast(ctxt,prec%jsweeps2)
+    call psb_bcast(ctxt,prec%degree2)
+    call psb_bcast(ctxt,prec%pvariant2)
     call psb_bcast(ctxt,prec%novr2)
     call psb_bcast(ctxt,prec%restr2)
     call psb_bcast(ctxt,prec%prol2)
