@@ -72,6 +72,7 @@ program amg_d_pde2d
   use amg_d_pde2d_base_mod
   use amg_d_pde2d_exp_mod
   use amg_d_pde2d_box_mod
+  use amg_d_pde2d_gauss_mod
   use amg_d_genpde_mod
 #if defined(OPENMP)
   use omp_lib
@@ -124,16 +125,16 @@ program amg_d_pde2d
     integer(psb_ipk_)  :: outer_sweeps ! number of outer sweeps: sweeps for 1-level,
     ! AMG cycles for ML
     ! general AMG data
-    character(len=16)  :: mlcycle      ! AMG cycle type
+    character(len=32)  :: mlcycle      ! AMG cycle type
     integer(psb_ipk_)  :: maxlevs     ! maximum number of levels in AMG preconditioner
 
     ! AMG aggregation
-    character(len=16)  :: aggr_prol    ! aggregation type: SMOOTHED, NONSMOOTHED
-    character(len=16)  :: par_aggr_alg ! parallel aggregation algorithm: DEC, SYMDEC
-    character(len=16)  :: aggr_type   ! Type of aggregation SOC1, SOC2, MATCHBOXP
+    character(len=32)  :: aggr_prol    ! aggregation type: SMOOTHED, NONSMOOTHED
+    character(len=32)  :: par_aggr_alg ! parallel aggregation algorithm: DEC, SYMDEC
+    character(len=32)  :: aggr_type   ! Type of aggregation SOC1, SOC2, MATCHBOXP
     integer(psb_ipk_)  :: aggr_size   ! Requested size of the aggregates for MATCHBOXP
-    character(len=16)  :: aggr_ord    ! ordering for aggregation: NATURAL, DEGREE
-    character(len=16)  :: aggr_filter ! filtering: FILTER, NO_FILTER
+    character(len=32)  :: aggr_ord    ! ordering for aggregation: NATURAL, DEGREE
+    character(len=32)  :: aggr_filter ! filtering: FILTER, NO_FILTER
     real(psb_dpk_)     :: mncrratio  ! minimum aggregation ratio
     real(psb_dpk_), allocatable :: athresv(:) ! smoothed aggregation threshold vector
     integer(psb_ipk_)  :: thrvsz      ! size of threshold vector
@@ -141,39 +142,39 @@ program amg_d_pde2d
     integer(psb_ipk_)  :: csizepp     ! minimum size of coarsest matrix per process
 
     ! AMG smoother or pre-smoother; also 1-lev preconditioner
-    character(len=16)  :: smther       ! (pre-)smoother type: BJAC, AS
+    character(len=32)  :: smther       ! (pre-)smoother type: BJAC, AS
     integer(psb_ipk_)  :: jsweeps      ! (pre-)smoother / 1-lev prec. sweeps
     integer(psb_ipk_)  :: novr         ! number of overlap layers
-    character(len=16)  :: restr        ! restriction over application of AS
-    character(len=16)  :: prol         ! prolongation over application of AS
-    character(len=16)  :: solve        ! local subsolver type: ILU, MILU, ILUT,
+    character(len=32)  :: restr        ! restriction over application of AS
+    character(len=32)  :: prol         ! prolongation over application of AS
+    character(len=32)  :: solve        ! local subsolver type: ILU, MILU, ILUT,
                                        ! UMF, MUMPS, SLU, FWGS, BWGS, JAC
     integer(psb_ipk_)  :: ssweeps      ! inner solver sweeps
-    character(len=16)  :: variant      ! AINV variant: LLK, etc
+    character(len=32)  :: variant      ! AINV variant: LLK, etc
     integer(psb_ipk_)  :: fill         ! fill-in for incomplete LU factorization
     integer(psb_ipk_)  :: invfill      ! Inverse fill-in for INVK
     real(psb_dpk_)      :: thr          ! threshold for ILUT factorization
 
     ! AMG post-smoother; ignored by 1-lev preconditioner
-    character(len=16)  :: smther2      ! post-smoother type: BJAC, AS
+    character(len=32)  :: smther2      ! post-smoother type: BJAC, AS
     integer(psb_ipk_)  :: jsweeps2     ! post-smoother sweeps
     integer(psb_ipk_)  :: novr2        ! number of overlap layers
-    character(len=16)  :: restr2       ! restriction  over application of AS
-    character(len=16)  :: prol2        ! prolongation over application of AS
-    character(len=16)  :: solve2       ! local subsolver type: ILU, MILU, ILUT,
+    character(len=32)  :: restr2       ! restriction  over application of AS
+    character(len=32)  :: prol2        ! prolongation over application of AS
+    character(len=32)  :: solve2       ! local subsolver type: ILU, MILU, ILUT,
                                        ! UMF, MUMPS, SLU, FWGS, BWGS, JAC
     integer(psb_ipk_)  :: ssweeps2     ! inner solver sweeps
-    character(len=16)  :: variant2     ! AINV variant: LLK, etc
+    character(len=32)  :: variant2     ! AINV variant: LLK, etc
     integer(psb_ipk_)  :: fill2        ! fill-in for incomplete LU factorization
     integer(psb_ipk_)  :: invfill2     ! Inverse fill-in for INVK
     real(psb_dpk_)      :: thr2         ! threshold for ILUT factorization
 
     ! coarsest-level solver
-    character(len=16)  :: cmat        ! coarsest matrix layout: REPL, DIST
-    character(len=16)  :: csolve      ! coarsest-lev solver: BJAC, SLUDIST (distr.
+    character(len=32)  :: cmat        ! coarsest matrix layout: REPL, DIST
+    character(len=32)  :: csolve      ! coarsest-lev solver: BJAC, SLUDIST (distr.
                                       ! mat.); UMF, MUMPS, SLU, ILU, ILUT, MILU
                                       ! (repl. mat.)
-    character(len=16)  :: csbsolve    ! coarsest-lev local subsolver: ILU, ILUT,
+    character(len=32)  :: csbsolve    ! coarsest-lev local subsolver: ILU, ILUT,
                                       ! MILU, UMF, MUMPS, SLU
     integer(psb_ipk_)  :: cfill       ! fill-in for incomplete LU factorization
     real(psb_dpk_)     :: cthres      ! threshold for ILUT factorization
@@ -241,13 +242,16 @@ program amg_d_pde2d
   select case(psb_toupper(trim(pdecoeff)))
   case("CONST")
     call amg_gen_pde2d(ctxt,idim,a,b,x,desc_a,afmt,&
-        & a1,a2,b1,b2,c,g,info)
+        & a1_base,a2_base,b1_base,b2_base,c_base,g_base,info)
   case("EXP")
     call amg_gen_pde2d(ctxt,idim,a,b,x,desc_a,afmt,&
         & a1_exp,a2_exp,b1_exp,b2_exp,c_exp,g_exp,info)
   case("BOX")
     call amg_gen_pde2d(ctxt,idim,a,b,x,desc_a,afmt,&
         & a1_box,a2_box,b1_box,b2_box,c_box,g_box,info)
+  case("GAUSS")
+    call amg_gen_pde2d(ctxt,idim,a,b,x,desc_a,afmt,&
+        & a1_gauss,a2_gauss,b1_gauss,b2_gauss,c_gauss,g_gauss,info)
   case default
     info=psb_err_from_subroutine_
     ch_err='amg_gen_pdecoeff'

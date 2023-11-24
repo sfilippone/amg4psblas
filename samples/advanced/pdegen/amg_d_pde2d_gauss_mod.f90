@@ -34,56 +34,56 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-module amg_d_pde2d_box_mod
-  use psb_base_mod, only : psb_dpk_, dzero, done
+module amg_d_pde2d_gauss_mod
+  use psb_base_mod, only : psb_dpk_, done, dzero
   real(psb_dpk_), save, private :: epsilon=done/80
 contains
-  subroutine pde_set_parm2d_box(dat)
+  subroutine pde_set_parm2d_gauss(dat)
     real(psb_dpk_), intent(in) :: dat
     epsilon = dat
-  end subroutine pde_set_parm2d_box
+  end subroutine pde_set_parm2d_gauss
   !
   ! functions parametrizing the differential equation
   !
-  function b1_box(x,y)
+  function b1_gauss(x,y)
     implicit none 
-    real(psb_dpk_) :: b1_box
+    real(psb_dpk_) :: b1_gauss
     real(psb_dpk_), intent(in) :: x,y
-    b1_box = done/1.414_psb_dpk_
-  end function b1_box
-  function b2_box(x,y)
+    b1_gauss=done/sqrt(3.0_psb_dpk_)-2*x*exp(-(x**2+y**2))
+  end function b1_gauss
+  function b2_gauss(x,y)
     implicit none 
-    real(psb_dpk_) ::  b2_box
+    real(psb_dpk_) ::  b2_gauss
     real(psb_dpk_), intent(in) :: x,y
-    b2_box = done/1.414_psb_dpk_
-  end function b2_box
-  function c_box(x,y)
+    b2_gauss=done/sqrt(3.0_psb_dpk_)-2*y*exp(-(x**2+y**2))
+  end function b2_gauss
+  function c_gauss(x,y)
     implicit none 
-    real(psb_dpk_) ::  c_box
+    real(psb_dpk_) ::  c_gauss
     real(psb_dpk_), intent(in) :: x,y
-    c_box = dzero
-  end function c_box
-  function a1_box(x,y)
+    c_gauss=dzero
+  end function c_gauss
+  function a1_gauss(x,y)
     implicit none 
-    real(psb_dpk_) ::  a1_box
+    real(psb_dpk_) ::  a1_gauss
     real(psb_dpk_), intent(in) :: x,y
-    a1_box=done*epsilon
-  end function a1_box
-  function a2_box(x,y)
+    a1_gauss=epsilon*exp(-(x**2+y**2))
+  end function a1_gauss
+  function a2_gauss(x,y)
     implicit none 
-    real(psb_dpk_) ::  a2_box
+    real(psb_dpk_) ::  a2_gauss
     real(psb_dpk_), intent(in) :: x,y
-    a2_box=done*epsilon
-  end function a2_box
-  function g_box(x,y)
+    a2_gauss=epsilon*exp(-(x**2+y**2))
+  end function a2_gauss
+  function g_gauss(x,y)
     implicit none 
-    real(psb_dpk_) ::  g_box
+    real(psb_dpk_) ::  g_gauss
     real(psb_dpk_), intent(in) :: x,y
-    g_box = dzero
+    g_gauss = dzero
     if (x == done) then
-      g_box = done
+      g_gauss = done
     else if (x == dzero) then
-      g_box = done
+      g_gauss = done
     end if
-  end function g_box
-end module amg_d_pde2d_box_mod
+  end function g_gauss
+end module amg_d_pde2d_gauss_mod
