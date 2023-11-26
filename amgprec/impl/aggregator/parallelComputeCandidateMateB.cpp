@@ -1,4 +1,5 @@
 #include "MatchBoxPC.h"
+#if !defined(SERIAL_MPI)
 
 void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
                                               MilanLongInt *verLocPtr,
@@ -25,3 +26,4 @@ void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
         }
     }
 }
+#endif

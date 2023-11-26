@@ -9,6 +9,8 @@
  * @param edgeLocWeight
  * @return
  */
+#if !defined(SERIAL_MPI)
+
 MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
                                        MilanLongInt adj2,
                                        MilanLongInt *verLocInd,
@@ -71,3 +73,4 @@ MilanLongInt computeCandidateMate(MilanLongInt adj1,
     
     return w;
 }
+#endif

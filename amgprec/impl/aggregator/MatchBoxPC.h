@@ -78,6 +78,8 @@ const int BundleTag = 9;  // Predefined tag
 
 static vector<MilanLongInt> DEFAULT_VECTOR;
 
+#if !defined(SERIAL_MPI)
+
 // MPI type map
 template <typename T>
 MPI_Datatype TypeMap();
@@ -89,6 +91,7 @@ template <>
 inline MPI_Datatype TypeMap<double>() { return MPI_DOUBLE; }
 template <>
 inline MPI_Datatype TypeMap<float>() { return MPI_FLOAT; }
+#endif
 
 #ifdef __cplusplus
 extern "C"

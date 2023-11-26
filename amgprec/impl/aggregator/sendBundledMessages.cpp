@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-
+#if !defined(SERIAL_MPI)
 void sendBundledMessages(MilanLongInt *numGhostEdges,
                                 MilanInt *BufferSize,
                                 MilanLongInt *Buffer,
@@ -207,3 +207,4 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
 }
 }
 }
+#endif

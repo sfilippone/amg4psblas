@@ -1,6 +1,7 @@
 #include "MatchBoxPC.h"
 
 // TODO comment
+#if !defined(SERIAL_MPI)
 
 void clean(MilanLongInt NLVer,
            MilanInt myRank,
@@ -89,3 +90,4 @@ void clean(MilanLongInt NLVer,
         }
     }
 }
+#endif

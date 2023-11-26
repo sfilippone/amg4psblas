@@ -42,7 +42,9 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_d_base_aggregator_mod
   use amg_d_dec_aggregator_mod
   use amg_d_symdec_aggregator_mod
+#if !defined(SERIAL_MPI)
   use amg_d_parmatch_aggregator_mod
+#endif
   use amg_d_jac_smoother
   use amg_d_as_smoother
   use amg_d_diag_solver
@@ -267,6 +269,8 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
       if (info == 0) deallocate(lv%aggr,stat=info)
       if (info /= 0) then
         info = psb_err_internal_error_
+        call psb_errpush(info,name,a_err='aggregator deallocation?')
+        goto 9999
         return
       end if
     end if
@@ -276,10 +280,18 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
       allocate(amg_d_dec_aggregator_type :: lv%aggr, stat=info)
     case('SYMDEC')
       allocate(amg_d_symdec_aggregator_type :: lv%aggr, stat=info)
+#if !defined(SERIAL_MPI)
     case('COUP','COUPLED')
       allocate(amg_d_parmatch_aggregator_type :: lv%aggr, stat=info)
-    case default
+#endif
+  case default
       info =  psb_err_internal_error_
+#if !defined(SERIAL_MPI)
+      call psb_errpush(info,name,a_err='Unsupported PAR_AGGR_ALG')
+#else
+      call psb_errpush(info,name,a_err='PAR_AGGR_ALG unsupported (SERIAL_MPI on)')
+#endif
+      goto 9999
     end select
     if (info == psb_success_) call lv%aggr%default()
 

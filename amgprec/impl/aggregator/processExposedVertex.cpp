@@ -1,4 +1,5 @@
 #include "MatchBoxPC.h"
+#if !defined(SERIAL_MPI)
 
 void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                                        MilanLongInt *candidateMate,
@@ -193,3 +194,4 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
 
     } // End of parallel region
 }
+#endif

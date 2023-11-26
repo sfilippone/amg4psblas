@@ -1,5 +1,6 @@
 #include "MatchBoxPC.h"
 
+#if !defined(SERIAL_MPI)
 void processMatchedVertices(
     MilanLongInt NLVer,
     vector<MilanLongInt> &UChunkBeingProcessed,
@@ -292,3 +293,4 @@ void processMatchedVertices(
 #endif
     } // End of parallel region
 }
+#endif

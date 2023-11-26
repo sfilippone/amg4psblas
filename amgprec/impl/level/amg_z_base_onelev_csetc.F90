@@ -42,6 +42,8 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_z_base_aggregator_mod
   use amg_z_dec_aggregator_mod
   use amg_z_symdec_aggregator_mod
+#if !defined(SERIAL_MPI)
+#endif
   use amg_z_jac_smoother
   use amg_z_as_smoother
   use amg_z_diag_solver
@@ -266,6 +268,8 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
       if (info == 0) deallocate(lv%aggr,stat=info)
       if (info /= 0) then
         info = psb_err_internal_error_
+        call psb_errpush(info,name,a_err='aggregator deallocation?')
+        goto 9999
         return
       end if
     end if
@@ -275,8 +279,16 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
       allocate(amg_z_dec_aggregator_type :: lv%aggr, stat=info)
     case('SYMDEC')
       allocate(amg_z_symdec_aggregator_type :: lv%aggr, stat=info)
-    case default
+#if !defined(SERIAL_MPI)
+#endif
+  case default
       info =  psb_err_internal_error_
+#if !defined(SERIAL_MPI)
+      call psb_errpush(info,name,a_err='Unsupported PAR_AGGR_ALG')
+#else
+      call psb_errpush(info,name,a_err='PAR_AGGR_ALG unsupported (SERIAL_MPI on)')
+#endif
+      goto 9999
     end select
     if (info == psb_success_) call lv%aggr%default()
 

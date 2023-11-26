@@ -1,5 +1,6 @@
 #include "MatchBoxPC.h"
 //#define DEBUG_HANG_
+#if !defined(SERIAL_MPI)
 
 void processMessages(
     MilanLongInt NLVer,
@@ -313,3 +314,4 @@ void processMessages(
     
     return;
 }
+#endif

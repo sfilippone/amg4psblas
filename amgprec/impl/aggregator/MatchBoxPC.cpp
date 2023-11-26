@@ -42,7 +42,6 @@
 #include <stdlib.h>
 #if !defined(SERIAL_MPI)
 #include <mpi.h>
-#endif
 
 #include "MatchBoxPC.h"
 #ifdef __cplusplus
@@ -126,4 +125,5 @@ void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 
 #ifdef __cplusplus
 }
+#endif
 #endif
