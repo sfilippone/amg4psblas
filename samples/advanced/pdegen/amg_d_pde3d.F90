@@ -508,7 +508,7 @@ program amg_d_pde3d
     write(psb_out_unit,'("Storage format for DESC_A          : ",a  )') desc_a%get_fmt()
 
   end if
-  call psb_print_timers(ctxt)
+
   !
   !  cleanup storage and exit
   !
