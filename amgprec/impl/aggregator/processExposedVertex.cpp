@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-
+#ifdef OMP
 void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                                        MilanLongInt *candidateMate,
                                        MilanLongInt *verLocInd,
@@ -29,7 +29,7 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                                        vector<MilanLongInt> &privateQGhostVtx,
                                        vector<MilanLongInt> &privateQMsgType,
                                        vector<MilanInt> &privateQOwner)
-{ 
+{
 
     MilanLongInt v = -1, k = -1, w = -1, adj11 = 0, adj12 = 0, k1 = 0;
     MilanInt ghostOwner = 0, option, igw;
@@ -79,7 +79,7 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
 					       Ghost2LocalMap);
 		      candidateMate[v] = w;
                     }
-		    
+
                     if (w >= 0) {
 		      (*myCard)++;
 		      if ((w < StartIndex) || (w > EndIndex)) { // w is a ghost vertex
@@ -88,29 +88,29 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
 			  option = 1;
 			  Mate[v] = w;
 			  GMate[Ghost2LocalMap[w]] = v + StartIndex; // w is a Ghost
-			  
+
 			} // End of if CandidateMate[w] = v
 
 		      } // End of if a Ghost Vertex
 		      else  { // w is a local vertex
-			
+
 			if (candidateMate[w - StartIndex] == (v + StartIndex)) {
 			  option = 3;
 			  Mate[v] = w;                           // v is local
 			  Mate[w - StartIndex] = v + StartIndex; // w is local
-			  
+
 #ifdef PRINT_DEBUG_INFO_
 			  cout << "\n(" << myRank << ")MATCH: (" << v + StartIndex << "," << w << ") ";
 			  fflush(stdout);
 #endif
-			  
+
 			} // End of if ( candidateMate[w-StartIndex] == (v+StartIndex) )
 		      }     // End of Else
-		      
+
                     } // End of second if
-		    
+
                 } // End critical processExposed
-		
+
             } // End of if(w >=0)
             else  {
 	      // This piece of code is executed a really small amount of times
@@ -131,17 +131,17 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
 		  // assert(ghostOwner != -1);
 		  // assert(ghostOwner != myRank);
 		  PCounter[ghostOwner]++;
-		  
+
 		  privateQLocalVtx.push_back(v + StartIndex);
 		  privateQGhostVtx.push_back(w);
 		  privateQMsgType.push_back(FAILURE);
 		  privateQOwner.push_back(ghostOwner);
-		  
+
 		} // End of if(GHOST)
 	      }     // End of for loop
             }
             // End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-	    
+
             switch (option)
             {
             case -1:
@@ -193,3 +193,4 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
 
     } // End of parallel region
 }
+#endif

@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-
+#ifdef OMP
 /// Find the owner of a ghost node:
 MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
                           MilanInt myRank, MilanInt numProcs)
@@ -27,3 +27,4 @@ MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
 
   return Current;
 } // End of findOwnerOfGhost()
+#endif

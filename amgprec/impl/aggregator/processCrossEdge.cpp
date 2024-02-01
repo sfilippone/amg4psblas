@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-
+#ifdef OMP
 void PROCESS_CROSS_EDGE(MilanLongInt *edge,
                         MilanLongInt *S)
 {
@@ -22,3 +22,4 @@ void PROCESS_CROSS_EDGE(MilanLongInt *edge,
 
     // End: PARALLEL_PROCESS_CROSS_EDGE_B
 }
+#endif

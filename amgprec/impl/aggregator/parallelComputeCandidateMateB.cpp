@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-
+#ifdef OMP
 void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
                                               MilanLongInt *verLocPtr,
                                               MilanLongInt *verLocInd,
@@ -25,3 +25,4 @@ void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
         }
     }
 }
+#endif

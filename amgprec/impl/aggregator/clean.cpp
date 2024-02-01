@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-
+#ifdef OMP
 // TODO comment
 
 void clean(MilanLongInt NLVer,
@@ -89,3 +89,4 @@ void clean(MilanLongInt NLVer,
         }
     }
 }
+#endif

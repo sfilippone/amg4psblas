@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-
+#ifdef OMP
 void queuesTransfer(vector<MilanLongInt> &U,
                     vector<MilanLongInt> &privateU,
                     vector<MilanLongInt> &QLocalVtx,
@@ -34,3 +34,4 @@ void queuesTransfer(vector<MilanLongInt> &U,
     privateQOwner.clear();
 
 }
+#endif

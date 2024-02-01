@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-
+#ifdef OMP
 /**
  * Execute the research fr the Candidate Mate without controlling if the vertices are already matched.
  * Returns the vertices with the highest weight
@@ -60,7 +60,7 @@ MilanLongInt computeCandidateMate(MilanLongInt adj1,
     for (k = adj1; k < adj2; k++)   {
       if (isAlreadyMatched(verLocInd[k], StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap))
 	continue;
-      
+
       if ((edgeLocWeight[k] > heaviestEdgeWt) ||
 	  ((edgeLocWeight[k] == heaviestEdgeWt) && (w < verLocInd[k])))     {
 	heaviestEdgeWt = edgeLocWeight[k];
@@ -68,6 +68,7 @@ MilanLongInt computeCandidateMate(MilanLongInt adj1,
       }
     } // End of for loop
       //  End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
-    
+
     return w;
 }
+#endif

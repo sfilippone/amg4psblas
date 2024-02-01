@@ -59,7 +59,11 @@
 #include <assert.h>
 #include <map>
 #include <vector>
+#ifdef OMP
+// OpenMP is included and used if and only if the OpenMP version of the matching
+// is required
 #include "omp.h"
+#endif
 #include "primitiveDataTypeDefinitions.h"
 #include "dataStrStaticQueue.h"
 
@@ -173,6 +177,10 @@ extern "C"
 #define MilanRealMax PLUS_INFINITY
 #define MilanRealMin MINUS_INFINITY
 #endif
+
+#ifdef OMP
+/* These functions are only used in the experimental OMP implementation, if that
+is disabled there is no reason to actually compile or reference them. */
 
     // Function of find the owner of a ghost vertex using binary search:
     MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
@@ -420,6 +428,14 @@ extern "C"
         MilanLongInt *msgIndSent, MilanLongInt *msgActualSent, MilanReal *msgPercent,
         MilanReal *ph0_time, MilanReal *ph1_time, MilanReal *ph2_time,
         MilanLongInt *ph1_card, MilanLongInt *ph2_card);
+#endif
+
+
+#ifndef OMP
+   //Function of find the owner of a ghost vertex using binary search:
+   inline MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
+                                        MilanInt myRank, MilanInt numProcs);
+#endif
 
     void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
         MilanLongInt NLVer, MilanLongInt NLEdge,

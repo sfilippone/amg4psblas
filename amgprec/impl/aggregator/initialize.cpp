@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-
+#ifdef OMP
 void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                 MilanLongInt StartIndex, MilanLongInt EndIndex,
                 MilanLongInt *numGhostEdges,
@@ -291,7 +291,7 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                 //new (&U) staticQueue(NLVer + (*numGhostVertices));
                 U.reserve(NLVer + (*numGhostVertices));
 
-                // Initialize the private vectors                
+                // Initialize the private vectors
                 privateQLocalVtx.reserve(*numGhostVertices);
                 privateQGhostVtx.reserve(*numGhostVertices);
                 privateQMsgType.reserve(*numGhostVertices);
@@ -302,3 +302,4 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
         } // End of single region
     }     // End of parallel region
 }
+#endif

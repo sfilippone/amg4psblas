@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-
+#ifdef OMP
 // ***********************************************************************
 //
 //        MatchboxP: A C++ library for approximate weighted matching
@@ -222,7 +222,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     cout << myRank << " Finished initialization" << endl;
     fflush(stdout);
 #endif
-   
+
     startTime = MPI_Wtime();
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -391,7 +391,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     cout << myRank << " Finished sendBundles" << endl;
     fflush(stdout);
 #endif
- 
+
     *ph1_card = myCard;                 // Cardinality at the end of Phase-1
     startTime = MPI_Wtime();
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -422,7 +422,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         ///////////////////////////////////////////////////////////////////////////////////
         /////////////////////////// PROCESS MATCHED VERTICES //////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////
-      
+
       processMatchedVerticesAndSendMessages(NLVer,
 					    UChunkBeingProcessed,
 					    U,
@@ -456,7 +456,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 					    comm,
 					    &msgActual,
 					    Message);
-      
+
       ///////////////////////// END OF PROCESS MATCHED VERTICES /////////////////////////
 
         //// BREAK IF NO MESSAGES EXPECTED /////////
@@ -551,4 +551,5 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 // End of algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMate
 #endif
 
+#endif
 #endif

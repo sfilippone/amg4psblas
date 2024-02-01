@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-
+#ifdef OMP
 /**
  * //TODO documentation
  * @param k
@@ -32,7 +32,7 @@ bool isAlreadyMatched(MilanLongInt node,
     */
     MilanLongInt val;
     if ((node < StartIndex) || (node > EndIndex)) // if ghost vertex
-    { 
+    {
 #pragma omp atomic read
         val = GMate[Ghost2LocalMap[node]];
         return val >= 0; // Already matched
@@ -44,3 +44,4 @@ bool isAlreadyMatched(MilanLongInt node,
 
     return val >= 0; // Already matched
 }
+#endif
