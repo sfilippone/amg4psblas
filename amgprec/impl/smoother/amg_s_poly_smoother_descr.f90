@@ -1,15 +1,15 @@
-!  
-!   
+!
+!
 !                             AMG4PSBLAS version 1.0
 !    Algebraic Multigrid Package
 !               based on PSBLAS (Parallel Sparse BLAS version 3.7)
-!    
-!    (C) Copyright 2021 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Fabio Durastante        
-!   
+!
+!    (C) Copyright 2021
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -21,7 +21,7 @@
 !      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -33,8 +33,8 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
+!
+!
 subroutine amg_s_poly_smoother_descr(sm,info,iout,coarse,prefix)
 
   use psb_base_mod
@@ -59,13 +59,13 @@ subroutine amg_s_poly_smoother_descr(sm,info,iout,coarse,prefix)
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  if (present(coarse)) then 
+  if (present(coarse)) then
     coarse_ = coarse
   else
     coarse_ = .false.
   end if
-  if (present(iout)) then 
-    iout_ = iout 
+  if (present(iout)) then
+    iout_ = iout
   else
     iout_ = psb_out_unit
   endif
@@ -78,19 +78,19 @@ subroutine amg_s_poly_smoother_descr(sm,info,iout,coarse,prefix)
   write(iout_,*) trim(prefix_), '  Polynomial smoother   '
   select case(sm%variant)
   case(amg_poly_lottes_)
-    write(iout_,*) trim(prefix_), '        variant:        ','POLY_LOTTES'    
-    !write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
+    write(iout_,*) trim(prefix_), '        variant:        ','POLY_LOTTES'
+    write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
     write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
   case(amg_poly_lottes_beta_)
     write(iout_,*) trim(prefix_), '        variant:        ','POLY_LOTTES_BETA'
-    !write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
+    write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
     write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
-    !if (allocated(sm%poly_beta)) write(iout_,*) trim(prefix_), '   Coefficients:        ',sm%poly_beta(1:sm%pdegree)
+    if (allocated(sm%poly_beta)) write(iout_,*) trim(prefix_), '   Coefficients:        ',sm%poly_beta(1:sm%pdegree)
   case(amg_poly_new_)
     write(iout_,*) trim(prefix_), '        variant:        ','POLY_NEW'
-    !write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
+    write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
     write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
-    !write(iout_,*) trim(prefix_), '   Coefficient:        ',sm%cf_a
+    write(iout_,*) trim(prefix_), '    Coefficient:        ',sm%cf_a
   case default
     write(iout_,*) trim(prefix_), '        variant:        ','UNKNOWN???'
   end select

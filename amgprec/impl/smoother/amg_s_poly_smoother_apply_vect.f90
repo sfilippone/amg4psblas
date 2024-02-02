@@ -49,7 +49,7 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   type(psb_s_vect_type),intent(inout)           :: y
   real(psb_spk_),intent(in)                      :: alpha,beta
   character(len=1),intent(in)                     :: trans
-  integer(psb_ipk_), intent(in)                   :: sweeps
+  integer(psb_ipk_), intent(in)                   :: sweeps ! this is ignored here, the polynomial degree dictates the value
   real(psb_spk_),target, intent(inout)           :: work(:)
   type(psb_s_vect_type),intent(inout)           :: wv(:)
   integer(psb_ipk_), intent(out)                  :: info
@@ -115,22 +115,22 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
          & a_err='invalid wv size in smoother_apply')
     goto 9999
   end if
-  sm%pdegree = sweeps
+
   associate(tx => wv(1), ty => wv(2), tz => wv(3), r => wv(4))
 
     call psb_geaxpby(sone,x,szero,r,desc_data,info)
     call tx%zero()
     call ty%zero()
-    call tz%zero()       
+    call tz%zero()
 
     select case(sm%variant)
     case(amg_poly_lottes_)
-      block 
+      block
         real(psb_spk_)      :: cz, cr
-        !  b == x 
+        !  b == x
         !  x == tx
-        ! 
-        do i=1, sweeps
+        !
+        do i=1, sm%pdegree
           !   B r_{k-1}
           call sm%sv%apply(sone,r,szero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
           cz = (2*i*sone-3)/(2*i*sone+sone)
@@ -153,20 +153,20 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 
     case(amg_poly_lottes_beta_)
 
-      block 
+      block
         real(psb_spk_)      :: cz, cr
-        !  b == x 
+        !  b == x
         !  x == tx
         !
         if (allocated(sm%poly_beta)) then
-          if (size(sm%poly_beta) /= sweeps) deallocate(sm%poly_beta)
+          if (size(sm%poly_beta) /= sm%pdegree) deallocate(sm%poly_beta)
         end if
         if (.not.allocated(sm%poly_beta)) then
-          call psb_realloc(sweeps,sm%poly_beta,info)
-          sm%poly_beta(1:sweeps) = amg_d_poly_beta_mat(1:sweeps,sweeps)
+          call psb_realloc(sm%pdegree,sm%poly_beta,info)
+          sm%poly_beta(1:sm%pdegree) = amg_d_poly_beta_mat(1:sm%pdegree,sm%pdegree)
         end if
 
-        do i=1, sweeps
+        do i=1, sm%pdegree
           !   B r_{k-1}
           call sm%sv%apply(sone,r,szero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
           cz = (2*i*sone-3)/(2*i*sone+sone)
@@ -186,14 +186,14 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           ! x_k =  x_{k-1} + z_k
         end do
       end block
-      
+
     case(amg_poly_new_)
-      block 
+      block
         real(psb_spk_)      :: sigma, theta, delta, rho_old, rho
-        !  b == x 
+        !  b == x
         !  x == tx
         !
-        sm%cf_a = amg_d_poly_a_vect(sweeps)
+
 
         theta = (sone+sm%cf_a)/2
         delta = (sone-sm%cf_a)/2
@@ -203,10 +203,10 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
         call psb_geaxpby((sone/sm%rho_ba),ty,szero,r,desc_data,info)
         call psb_geaxpby((sone/theta),r,szero,tz,desc_data,info)
         ! tz == d
-        do i=1, sweeps
+        do i=1, sm%pdegree
           ! x_{k+1} = x_k + d_k
           call psb_geaxpby(sone,tz,sone,tx,desc_data,info)
-          ! 
+          !
           ! r_{k-1} = r_k - (1/rho(BA)) B A d_k
           call psb_spmm(sone,sm%pa,tz,szero,ty,desc_data,info,work=aux,trans=trans_)
           call sm%sv%apply(-sone,ty,sone,r,desc_data,trans_,aux,wv(5:),info,init='Z')
