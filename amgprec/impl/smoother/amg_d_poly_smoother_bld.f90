@@ -56,7 +56,7 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
   type(psb_dspmat_type) :: tmpa
   integer(psb_ipk_)   :: n_row,n_col, nrow_a, nztota, nzeros
   type(psb_ctxt_type) :: ctxt
-  real(psb_dpk_), allocatable :: da(:), dsv(:)
+  real(psb_dpk_), allocatable :: da(:), dsv(:) 
   integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
   character(len=20)   :: name='d_poly_smoother_bld', ch_err
 
@@ -75,39 +75,39 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
   nrow_a = a%get_nrows()
   nztota = a%get_nzeros()
   select case(sm%variant)
-    case(amg_poly_lottes_)
-      ! do nothing
-    case(amg_poly_lottes_beta_)
-      if ((1<=sm%pdegree).and.(sm%pdegree<=30)) then
-        call psb_realloc(sm%pdegree,sm%poly_beta,info)
-        sm%poly_beta(1:sm%pdegree) = amg_d_poly_beta_mat(1:sm%pdegree,sm%pdegree)
-      else
-        info = psb_err_internal_error_
-        call psb_errpush(info,name,&
-             & a_err='invalid sm%degree for poly_beta')
-        goto 9999
-      end if
-    case(amg_poly_new_)
-      write(psb_out_unit,*) "Nella fase di build sm%pdegree = ",sm%pdegree
-      if ((1<=sm%pdegree).and.(sm%pdegree<=30)) then
-        !Ok
-        sm%cf_a = amg_d_poly_a_vect(sm%pdegree)
-      else
-        info = psb_err_internal_error_
-        call psb_errpush(info,name,&
-             & a_err='invalid sm%degree for poly_a')
-        goto 9999
-      end if
-
-    case default
+  case(amg_poly_lottes_)
+    ! do nothing
+  case(amg_poly_lottes_beta_)
+    if ((1<=sm%pdegree).and.(sm%pdegree<=30)) then
+      call psb_realloc(sm%pdegree,sm%poly_beta,info)
+      sm%poly_beta(1:sm%pdegree) = amg_d_poly_beta_mat(1:sm%pdegree,sm%pdegree)
+    else
       info = psb_err_internal_error_
       call psb_errpush(info,name,&
-           & a_err='invalid sm%variant')
+           & a_err='invalid sm%degree for poly_beta')
       goto 9999
-    end select
+    end if
+  case(amg_poly_new_)
+
+    if ((1<=sm%pdegree).and.(sm%pdegree<=30)) then
+      !Ok
+      sm%cf_a = amg_d_poly_a_vect(sm%pdegree)
+    else
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,&
+           & a_err='invalid sm%degree for poly_a')
+      goto 9999
+    end if
+
+  case default  
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,&
+         & a_err='invalid sm%variant')
+    goto 9999
+  end select
 
   sm%pa => a
-  if (.not.allocated(sm%sv)) then
+  if (.not.allocated(sm%sv)) then 
     info = psb_err_internal_error_
     call psb_errpush(info,name,&
          & a_err='unallocated sm%sv')
@@ -120,7 +120,7 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
     goto 9999
   end if
 
-!!$  if (.false.) then
+!!$  if (.false.) then 
 !!$    select type(ssv => sm%sv)
 !!$    class is(amg_d_l1_diag_solver_type)
 !!$      da  = a%arwsum(info)
@@ -128,7 +128,7 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
 !!$      sm%rho_ba = maxval(da(1:n_row)*dsv(1:n_row))
 !!$    class default
 !!$      write(0,*) 'PolySmoother BUILD: only L1-Jacobi/L1-DIAG for now ',ssv%get_fmt()
-!!$      sm%rho_ba = done
+!!$      sm%rho_ba = done          
 !!$    end select
 !!$  else
   if (sm%rho_ba <= dzero) then
@@ -152,9 +152,9 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
         call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = BA q_k
         do i=1,sm%rho_estimate_iterations
           znrm = psb_genrm2(tz,desc_a,info)               ! znrm = |z_k|_2
-          call psb_geaxpby((done/znrm),tz,dzero,tq,desc_a,info)  ! q_k = z_k/znrm
+          call psb_geaxpby((done/znrm),tz,dzero,tq,desc_a,info)  ! q_k = z_k/znrm        
           call psb_spmm(done,a,tq,dzero,tt,desc_a,info) ! t_{k+1} = BA q_k
-          call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = B t_{k+1}
+          call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = B t_{k+1}       
           lambda = psb_gedot(tq,tz,desc_a,info)      ! lambda = q_k^T z_{k+1} = q_k^T BA q_k
           !write(0,*) 'BLD: lambda estimate ',i,lambda
         end do
