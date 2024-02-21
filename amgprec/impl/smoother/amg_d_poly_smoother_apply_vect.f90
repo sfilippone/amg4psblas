@@ -121,13 +121,13 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
     call psb_geaxpby(done,x,dzero,r,desc_data,info)
     call tx%zero()
     call ty%zero()
-    call tz%zero()       
+    call tz%zero()
 
     select case(sm%variant)
     case(amg_poly_lottes_)
-      block 
+      block
         real(psb_dpk_)      :: cz, cr
-        !  b == x 
+        !  b == x
         !  x == tx
         !
         do i=1, sm%pdegree
@@ -157,9 +157,9 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 
     case(amg_poly_lottes_beta_)
 
-      block 
+      block
         real(psb_dpk_)      :: cz, cr
-        !  b == x 
+        !  b == x
         !  x == tx
         !
         if (allocated(sm%poly_beta)) then
@@ -196,9 +196,9 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
       end block
 
     case(amg_poly_new_)
-      block 
+      block
         real(psb_dpk_)      :: sigma, theta, delta, rho_old, rho
-        !  b == x 
+        !  b == x
         !  x == tx
         !
         sm%cf_a = amg_d_poly_a_vect(sm%pdegree)
@@ -234,7 +234,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
             call psb_abgdxyz((2*rho/delta),(rho*rho_old),done,done,r,tz,tx,desc_data,info)
           end if
 !!$          res  = psb_genrm2(r,desc_data,info)
-!!$          write(0,*) 'Polynomial smoother ',i,res
+!!$          write(0,*) 'Polynomial smoother NEW ',i,res
           ! x_k =  x_{k-1} + z_k
         end do
       end block
@@ -257,204 +257,9 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
     end if
   end associate
 
-
-
-
-!!$  if ((.not.sm%sv%is_iterative()).and.((sweeps == 1).or.(sm%nd_nnz_tot==0))) then
-!!$    !  if .not.sv%is_iterative, there's no need to pass init
-!!$    call sm%sv%apply(alpha,x,beta,y,desc_data,trans_,aux,wv,info)
-!!$
-!!$    if (info /= psb_success_) then
-!!$      call psb_errpush(psb_err_internal_error_,&
-!!$           & name,a_err='Error in sub_aply Jacobi Sweeps = 1')
-!!$      goto 9999
-!!$    endif
-!!$
-!!$  else if (sweeps >= 0) then
-!!$    select type (smsv => sm%sv)
-!!$    class is (amg_d_diag_solver_type)
-!!$      !
-!!$      ! This means we are dealing with a pure Jacobi smoother/solver.
-!!$      !
-!!$      associate(tx => wv(1), ty => wv(2))
-!!$        select case (init_)
-!!$        case('Z')
-!!$
-!!$          call sm%sv%apply(done,x,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Z')
-!!$
-!!$        case('Y')
-!!$          call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-!!$          call psb_geaxpby(done,y,dzero,ty,desc_data,info)
-!!$          call psb_spmm(-done,sm%pa,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-!!$          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
-!!$
-!!$        case('U')
-!!$          if (.not.present(initu)) then
-!!$            call psb_errpush(psb_err_internal_error_,name,&
-!!$                 & a_err='missing initu to smoother_apply')
-!!$            goto 9999
-!!$          end if
-!!$          call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-!!$          call psb_geaxpby(done,initu,dzero,ty,desc_data,info)
-!!$          call psb_spmm(-done,sm%pa,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-!!$          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
-!!$
-!!$        case default
-!!$          call psb_errpush(psb_err_internal_error_,name,&
-!!$               & a_err='wrong  init to smoother_apply')
-!!$          goto 9999
-!!$        end select
-!!$
-!!$        do i=1, sweeps-1
-!!$          !
-!!$          ! Compute Y(j+1) =  Y(j)+ D^(-1)*(X-A*Y(j)),
-!!$          !  where is the diagonal and  A the matrix.
-!!$          !
-!!$          call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-!!$          call psb_spmm(-done,sm%pa,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-!!$
-!!$          if (info /= psb_success_) exit
-!!$
-!!$          call sm%sv%apply(done,tx,done,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
-!!$
-!!$          if (info /= psb_success_) exit
-!!$
-!!$          if ( sm%checkres.and.(mod(i,sm%checkiter) == 0) ) then
-!!$            call psb_geaxpby(done,x,dzero,r,r,desc_data,info)
-!!$            call psb_spmm(-done,sm%pa,ty,done,r,desc_data,info)
-!!$            res  = psb_genrm2(r,desc_data,info)
-!!$            if( sm%printres ) then
-!!$              call log_conv("BJAC",me,i,sm%printiter,res,resdenum,sm%tol)
-!!$            end if
-!!$            if ( res < sm%tol*resdenum ) then
-!!$              if( (sm%printres).and.(mod(sm%printiter,sm%checkiter)/=0) ) &
-!!$               & call log_conv("BJAC",me,i,1,res,resdenum,sm%tol)
-!!$              exit
-!!$            end if
-!!$          end if
-!!$
-!!$        end do
-!!$
-!!$
-!!$        if (info == psb_success_) call psb_geaxpby(alpha,ty,beta,y,desc_data,info)
-!!$
-!!$        if (info /= psb_success_) then
-!!$          info=psb_err_internal_error_
-!!$          call psb_errpush(info,name,&
-!!$               & a_err='subsolve with Jacobi sweeps > 1')
-!!$          goto 9999
-!!$        end if
-!!$
-!!$
-!!$      end associate
-!!$
-!!$    class default
-!!$      !
-!!$      !
-!!$      ! Apply multiple sweeps of a block-Jacobi solver
-!!$      ! to compute an approximate solution of a linear system.
-!!$      !
-!!$      !
-!!$      if (size(wv) < 2) then
-!!$        info = psb_err_internal_error_
-!!$        call psb_errpush(info,name,&
-!!$             & a_err='invalid wv size in smoother_apply')
-!!$        goto 9999
-!!$      end if
-!!$      associate(tx => wv(1), ty => wv(2))
-!!$
-!!$        !
-!!$        !  Unroll  the first iteration and fold it inside SELECT CASE
-!!$        !  this will save one AXPBY and one SPMM when INIT=Z, and will be
-!!$        !  significant when sweeps=1 (a common case)
-!!$        !
-!!$        select case (init_)
-!!$        case('Z')
-!!$
-!!$          call sm%sv%apply(done,x,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Z')
-!!$
-!!$        case('Y')
-!!$          call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-!!$          call psb_geaxpby(done,y,dzero,ty,desc_data,info)
-!!$          call psb_spmm(-done,sm%nd,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-!!$          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
-!!$
-!!$        case('U')
-!!$          if (.not.present(initu)) then
-!!$            call psb_errpush(psb_err_internal_error_,name,&
-!!$                 & a_err='missing initu to smoother_apply')
-!!$            goto 9999
-!!$          end if
-!!$          call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-!!$          call psb_geaxpby(done,initu,dzero,ty,desc_data,info)
-!!$          call psb_spmm(-done,sm%nd,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-!!$          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
-!!$
-!!$        case default
-!!$          call psb_errpush(psb_err_internal_error_,name,&
-!!$               & a_err='wrong  init to smoother_apply')
-!!$          goto 9999
-!!$        end select
-!!$
-!!$        do i=1, sweeps-1
-!!$          !
-!!$          ! Compute Y(j+1) = D^(-1)*(X-ND*Y(j)), where D and ND are the
-!!$          ! block diagonal part and the remaining part of the local matrix
-!!$          ! and Y(j) is the approximate solution at sweep j.
-!!$          !
-!!$          call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-!!$          call psb_spmm(-done,sm%nd,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-!!$
-!!$          if (info /= psb_success_) exit
-!!$
-!!$          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
-!!$
-!!$          if (info /= psb_success_) exit
-!!$
-!!$          if ( sm%checkres.and.(mod(i,sm%checkiter) == 0) ) then
-!!$            call psb_geaxpby(done,x,dzero,r,r,desc_data,info)
-!!$            call psb_spmm(-done,sm%pa,ty,done,r,desc_data,info)
-!!$            res  = psb_genrm2(r,desc_data,info)
-!!$            if( sm%printres ) then
-!!$              call log_conv("BJAC",me,i,sm%printiter,res,resdenum,sm%tol)
-!!$            end if
-!!$            if (res < sm%tol*resdenum ) then
-!!$              if( (sm%printres).and.( mod(sm%printiter,sm%checkiter) /=0 ) ) &
-!!$                & call log_conv("BJAC",me,i,1,res,resdenum,sm%tol)
-!!$              exit
-!!$            end if
-!!$          end if
-!!$
-!!$        end do
-!!$
-!!$        if (info == psb_success_) call psb_geaxpby(alpha,ty,beta,y,desc_data,info)
-!!$
-!!$        if (info /= psb_success_) then
-!!$          info=psb_err_internal_error_
-!!$          call psb_errpush(info,name,&
-!!$               & a_err='subsolve with Jacobi sweeps > 1')
-!!$          goto 9999
-!!$        end if
-!!$
-!!$      end associate
-!!$    end select
-!!$
-!!$  else
-!!$
-!!$    info = psb_err_iarg_neg_
-!!$    call psb_errpush(info,name,&
-!!$         & i_err=(/itwo,sweeps,izero,izero,izero/))
-!!$    goto 9999
-!!$
-!!$  endif
-!!$
   if (.not.(4*n_col <= size(work))) then
     deallocate(aux)
   endif
-
-!!$  if(sm%checkres) then
-!!$    call psb_gefree(r,desc_data,info)
-!!$  end if
 
   call psb_erractionrestore(err_act)
   return
