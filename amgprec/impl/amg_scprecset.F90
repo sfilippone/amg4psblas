@@ -194,6 +194,15 @@ subroutine amg_scprecseti(p,what,val,info,ilev,ilmax,pos,idx)
         end if
         call p%precv(nlev_)%set('SUB_FILLIN',val,info,pos=pos)
 
+      case('COARSE_INVFILL')
+        if (ilev_ /= nlev_) then
+          write(psb_err_unit,*) name,&
+               & ': Error: Inconsistent specification of WHAT vs. ILEV'
+          info = -2
+          return
+        end if
+        call p%precv(nlev_)%set('INV_FILLIN',val,info,pos=pos)
+
      case('BJAC_ITRACE')
        if (ilev_ /= nlev_) then
          write(psb_err_unit,*) name,&
@@ -241,6 +250,11 @@ subroutine amg_scprecseti(p,what,val,info,ilev,ilmax,pos,idx)
     case('COARSE_FILLIN')
       if (nlev_ > 1) then
         call p%precv(nlev_)%set('SUB_FILLIN',val,info,pos=pos)
+      end if
+
+    case('COARSE_INVFILL')
+      if (nlev_ > 1) then
+        call p%precv(nlev_)%set('INV_FILLIN',val,info,pos=pos)
       end if
 
     case('BJAC_ITRACE')
