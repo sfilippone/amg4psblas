@@ -135,7 +135,7 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           call sm%sv%apply(sone,r,szero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
           cz = (2*i*sone-3)/(2*i*sone+sone)
           cr = (8*i*sone-4)/((2*i*sone+sone)*sm%rho_ba)
-          if (.false.) then 
+          if (.false.) then
             ! z_k =  cz z_{k-1} + cr ty = cz z_{k-1} + cr Br_{k-1}
             call psb_geaxpby(cr,ty,cz,tz,desc_data,info)
             ! r_k =    b-Ax_k  = x -A tx
@@ -175,7 +175,7 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           call sm%sv%apply(sone,r,szero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
           cz = (2*i*sone-3)/(2*i*sone+sone)
           cr = (8*i*sone-4)/((2*i*sone+sone)*sm%rho_ba)
-          if (.false.) then 
+          if (.false.) then
             ! z_k =  cz z_{k-1} + cr ty = cz z_{k-1} + cr Br_{k-1}
             call psb_geaxpby(cr,ty,cz,tz,desc_data,info)
             ! r_k =    b-Ax_k  = x -A tx
@@ -201,7 +201,6 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
         !  b == x
         !  x == tx
         !
-        sm%cf_a = amg_d_poly_a_vect(sm%pdegree)
 
         theta = (sone+sm%cf_a)/2
         delta = (sone-sm%cf_a)/2
@@ -209,25 +208,25 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
         rho_old = sone/sigma
         call sm%sv%apply(sone,r,szero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
         call psb_geaxpby((sone/sm%rho_ba),ty,szero,r,desc_data,info)
-        if (.false.) then 
+        if (.false.) then
           call psb_geaxpby((sone/theta),r,szero,tz,desc_data,info)
           call psb_geaxpby(sone,tz,sone,tx,desc_data,info)
         else
           call psb_abgdxyz((sone/theta),szero,sone,sone,r,tz,tx,desc_data,info)
         end if
-          
+
         ! tz == d
-        do i=1, sm%pdegree
+        do i=1, sm%pdegree-1
           !
            !
           ! r_{k-1} = r_k - (1/rho(BA)) B A d_k
           call psb_spmm(sone,sm%pa,tz,szero,ty,desc_data,info,work=aux,trans=trans_)
-          call sm%sv%apply(-sone,ty,sone,r,desc_data,trans_,aux,wv(5:),info,init='Z')
+          call sm%sv%apply(-(sone/sm%rho_ba),ty,sone,r,desc_data,trans_,aux,wv(5:),info,init='Z')
 
           !
           ! d_{k+1} = (rho rho_old) d_k + 2(rho/delta) r_{k+1}
           rho = sone/(2*sigma - rho_old)
-          if (.false.) then 
+          if (.false.) then
             call psb_geaxpby((2*rho/delta),r,(rho*rho_old),tz,desc_data,info)
             call psb_geaxpby(sone,tz,sone,tx,desc_data,info)
           else
@@ -236,6 +235,7 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 !!$          res  = psb_genrm2(r,desc_data,info)
 !!$          write(0,*) 'Polynomial smoother NEW ',i,res
           ! x_k =  x_{k-1} + z_k
+          rho_old = rho
         end do
       end block
 
