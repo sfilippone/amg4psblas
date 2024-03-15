@@ -187,6 +187,7 @@ module amg_z_onelev_mod
     procedure, pass(lv) :: clone   => z_base_onelev_clone
     procedure, pass(lv) :: cnv     => amg_z_base_onelev_cnv
     procedure, pass(lv) :: descr   => amg_z_base_onelev_descr
+    procedure, pass(lv) :: memory_use  => amg_z_base_onelev_memory_use
     procedure, pass(lv) :: default => z_base_onelev_default
     procedure, pass(lv) :: free    => amg_z_base_onelev_free
     procedure, pass(lv) :: free_smoothers => amg_z_base_onelev_free_smoothers
@@ -271,6 +272,22 @@ module amg_z_onelev_mod
       integer(psb_ipk_), intent(in), optional :: verbosity
       character(len=*), intent(in), optional  :: prefix
     end subroutine amg_z_base_onelev_descr
+  end interface
+
+  interface
+    subroutine amg_z_base_onelev_memory_use(lv,il,nl,ilmin,info,iout, verbosity,prefix)
+      import :: psb_zspmat_type, psb_z_vect_type, psb_z_base_vect_type, &
+           & psb_zlinmap_type, psb_dpk_, amg_z_onelev_type, &
+           & psb_ipk_, psb_epk_, psb_desc_type
+      Implicit None
+      ! Arguments
+      class(amg_z_onelev_type), intent(in)    :: lv
+      integer(psb_ipk_), intent(in)           :: il,nl,ilmin
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), intent(in), optional :: iout
+      integer(psb_ipk_), intent(in), optional :: verbosity
+      character(len=*), intent(in), optional  :: prefix
+    end subroutine amg_z_base_onelev_memory_use
   end interface
 
   interface

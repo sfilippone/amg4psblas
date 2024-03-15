@@ -139,6 +139,7 @@ module amg_z_prec_type
     procedure, pass(prec)               :: smoothers_build   => amg_z_smoothers_bld
     procedure, pass(prec)               :: smoothers_free    => amg_z_smoothers_free
     procedure, pass(prec)               :: descr        =>  amg_zfile_prec_descr
+    procedure, pass(prec)               :: memory_use   =>  amg_zfile_prec_memory_use
   end type amg_zprec_type
 
   private :: amg_z_dump, amg_z_get_compl,  amg_z_cmp_compl,&
@@ -168,6 +169,21 @@ module amg_z_prec_type
       integer(psb_ipk_), intent(in), optional :: verbosity
       character(len=*), intent(in), optional  :: prefix
     end subroutine amg_zfile_prec_descr
+  end interface
+
+  
+  interface amg_memory_use
+    subroutine amg_zfile_prec_memory_use(prec,info,iout,root,verbosity,prefix)
+      import :: amg_zprec_type, psb_ipk_
+      implicit none
+      ! Arguments
+      class(amg_zprec_type), intent(in)     :: prec
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), intent(in), optional :: iout
+      integer(psb_ipk_), intent(in), optional :: root
+      integer(psb_ipk_), intent(in), optional :: verbosity
+      character(len=*), intent(in), optional  :: prefix
+    end subroutine amg_zfile_prec_memory_use
   end interface
 
   interface amg_sizeof
