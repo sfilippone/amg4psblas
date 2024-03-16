@@ -109,11 +109,11 @@ subroutine amg_zfile_prec_memory_use(prec,info,iout,root, verbosity,prefix,globa
   ctxt = prec%ctxt
   call psb_info(ctxt,me,np)
   prefix_ = ""
-  if (verbosity == 0) then 
+  if (verbosity_ == 0) then 
     if (present(prefix)) then
       prefix_ = prefix
     end if
-  else if (verbosity > 0) then 
+  else if (verbosity_ > 0) then 
     if (present(prefix)) then
       write(prefix_,'(a,a,i5,a)') prefix,' from process ',me,': '
     else

@@ -100,11 +100,6 @@ subroutine amg_d_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,verbosity,prefi
 
   write(iout_,*) trim(prefix_)
 
-  if (coarse)  then 
-    write(iout_,*) trim(prefix_), ' Level ',il,' (coarse)'
-  else
-    write(iout_,*) trim(prefix_), ' Level ',il
-  end if
 
   if (global_) then
     allocate(sz(6))
@@ -117,6 +112,11 @@ subroutine amg_d_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,verbosity,prefi
     if (allocated(lv%wrk))  sz(6) =  lv%wrk%sizeof()
     call psb_sum(ctxt,sz)
     if (me == 0) then 
+      if (coarse)  then 
+        write(iout_,*) trim(prefix_), ' Level ',il,' (coarse)'
+      else
+        write(iout_,*) trim(prefix_), ' Level ',il
+      end if
       write(iout_,*) trim(prefix_), '           Matrix:',                         sz(1) 
       write(iout_,*) trim(prefix_), '       Descriptor:',                         sz(2) 
       if (il >1) write(iout_,*) trim(prefix_), '       Linear map:',              sz(3) 
@@ -127,6 +127,11 @@ subroutine amg_d_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,verbosity,prefi
     
   else
     if ((me == 0).or.(verbosity_>0)) then 
+      if (coarse)  then 
+        write(iout_,*) trim(prefix_), ' Level ',il,' (coarse)'
+      else
+        write(iout_,*) trim(prefix_), ' Level ',il
+      end if
       write(iout_,*) trim(prefix_), '           Matrix:', lv%base_a%sizeof()
       write(iout_,*) trim(prefix_), '       Descriptor:', lv%base_desc%sizeof()
       if (il >1) write(iout_,*) trim(prefix_), '       Linear map:', lv%linmap%sizeof()
