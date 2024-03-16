@@ -65,7 +65,7 @@
 !         0: normal
 !        >1: increased details 
 !
-subroutine amg_zfile_prec_memory_use(prec,info,iout,root, verbosity,prefix)
+subroutine amg_zfile_prec_memory_use(prec,info,iout,root, verbosity,prefix,global)
   use psb_base_mod
   use amg_z_prec_mod, amg_protect_name => amg_zfile_prec_memory_use
   use amg_z_inner_mod
@@ -79,6 +79,7 @@ subroutine amg_zfile_prec_memory_use(prec,info,iout,root, verbosity,prefix)
   integer(psb_ipk_), intent(in), optional :: root
   integer(psb_ipk_), intent(in), optional :: verbosity
   character(len=*), intent(in), optional  :: prefix
+  logical, intent(in), optional           :: global
 
 
   ! Local variables
@@ -88,6 +89,7 @@ subroutine amg_zfile_prec_memory_use(prec,info,iout,root, verbosity,prefix)
   logical             :: is_symgs
   character(len=20), parameter :: name='amg_file_prec_memory_use'
   integer(psb_ipk_)  :: iout_, root_, verbosity_
+  logical            :: global_
   character(1024)    :: prefix_
 
   info = psb_success_
@@ -103,17 +105,24 @@ subroutine amg_zfile_prec_memory_use(prec,info,iout,root, verbosity,prefix)
     verbosity_ = 0
   end if
   if (verbosity_ < 0) goto 9998
-  if (present(prefix)) then
-    prefix_ = prefix
-  else
-    prefix_ = ""
-  end if
-
+    
   ctxt = prec%ctxt
-
+  call psb_info(ctxt,me,np)
+  prefix_ = ""
+  if (verbosity == 0) then 
+    if (present(prefix)) then
+      prefix_ = prefix
+    end if
+  else if (verbosity > 0) then 
+    if (present(prefix)) then
+      write(prefix_,'(a,a,i5,a)') prefix,' from process ',me,': '
+    else
+      write(prefix_,'(a,i5,a)') 'Process ',me,': '
+    end if
+    
+  end if
   if (allocated(prec%precv)) then
 
-    call psb_info(ctxt,me,np)
     if (present(root)) then 
       root_ = root
     else
@@ -122,23 +131,31 @@ subroutine amg_zfile_prec_memory_use(prec,info,iout,root, verbosity,prefix)
     if (root_ == -1) root_ = me
 
     if (verbosity_ >=0) then 
-      !
-      ! The preconditioner description is printed by processor psb_root_.
-      ! This agrees with the fact that all the parameters defining the
-      ! preconditioner have the same values on all the procs (this is
-      ! ensured by amg_precbld).
-      !
-      if (me == root_) then
+      if (verbosity_ == 0) then 
+        !
+        if (me == root_) then
 
-        write(iout_,*) 
-        write(iout_,'(a,1x,a)') trim(prefix_),'Preconditioner memory usage'
+          write(iout_,*) 
+          write(iout_,'(a,1x,a)') trim(prefix_),'Preconditioner memory usage'
+          nlev = size(prec%precv)
+          do ilev=1,nlev
+            call prec%precv(ilev)%memory_use(ilev,nlev,ilmin,info, &
+                 & iout=iout_,prefix=trim(prefix_),global=global)
+          end do
+        end if
+      else if (verbosity_ >0) then
+
+        if (me == root_) then
+          write(iout_,*) 
+          write(iout_,'(a,1x,a)') trim(prefix_),'Preconditioner memory usage'
+        end if
         nlev = size(prec%precv)
         do ilev=1,nlev
           call prec%precv(ilev)%memory_use(ilev,nlev,ilmin,info, &
-               & iout=iout_,verbosity=verbosity,prefix=prefix)
+               & iout=iout_,prefix=trim(prefix_),global=global)
         end do
       end if
-    end if
+      
   else
     write(iout_,*) trim(name), &
          & ': Error: no base preconditioner available, something is wrong!'

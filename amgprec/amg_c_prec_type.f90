@@ -173,7 +173,7 @@ module amg_c_prec_type
 
   
   interface amg_memory_use
-    subroutine amg_cfile_prec_memory_use(prec,info,iout,root,verbosity,prefix)
+    subroutine amg_cfile_prec_memory_use(prec,info,iout,root,verbosity,prefix,global)
       import :: amg_cprec_type, psb_ipk_
       implicit none
       ! Arguments
@@ -183,6 +183,7 @@ module amg_c_prec_type
       integer(psb_ipk_), intent(in), optional :: root
       integer(psb_ipk_), intent(in), optional :: verbosity
       character(len=*), intent(in), optional  :: prefix
+      logical, intent(in), optional           :: global
     end subroutine amg_cfile_prec_memory_use
   end interface
 

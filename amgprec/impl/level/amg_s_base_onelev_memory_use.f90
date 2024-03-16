@@ -42,8 +42,8 @@
 !         0: normal
 !        >1: increased details 
 !
-subroutine amg_s_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,verbosity,prefix)
-  
+subroutine amg_s_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,prefix,global)
+
   use psb_base_mod
   use amg_s_onelev_mod, amg_protect_name => amg_s_base_onelev_memory_use
   Implicit None
@@ -52,21 +52,25 @@ subroutine amg_s_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,verbosity,prefi
   integer(psb_ipk_), intent(in)           :: il,nl,ilmin
   integer(psb_ipk_), intent(out)          :: info
   integer(psb_ipk_), intent(in), optional :: iout
-  integer(psb_ipk_), intent(in), optional :: verbosity
   character(len=*), intent(in), optional  :: prefix
+  logical, intent(in), optional           :: global
 
 
   ! Local variables
-  integer(psb_ipk_)  :: err_act
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)  :: err_act ,me, np
   character(len=20), parameter :: name='amg_s_base_onelev_memory_use'
-  integer(psb_ipk_)  :: iout_, verbosity_
-  logical      :: coarse
+  integer(psb_ipk_)  :: iout_
+  logical      :: coarse, global_
   character(1024)    :: prefix_
+  integer(psb_epk_), allocatable  :: sz(:)
 
 
   call psb_erractionsave(err_act)
 
-
+  ctxt = lv%base_desc%get_ctxt()
+  call psb_info(ctxt,me,np)
+  
   coarse = (il==nl)
 
   if (present(iout)) then 
@@ -74,34 +78,54 @@ subroutine amg_s_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,verbosity,prefi
   else 
     iout_ = psb_out_unit
   end if
-  
-  if (present(verbosity)) then
-    verbosity_ = verbosity
+
+  if (present(global)) then
+    global_ = global
   else
-    verbosity_ = 0
+    global_ = .false.
   end if
-  if (verbosity_ < 0) goto 9998
-    if (present(prefix)) then
-      prefix_ = prefix
-    else
-      prefix_ = ""
-    end if
+
+  if (present(prefix)) then
+    prefix_ = prefix
+  else
+    prefix_ = ""
+  end if
 
   write(iout_,*) trim(prefix_)
-  
+
   if (coarse)  then 
     write(iout_,*) trim(prefix_), ' Level ',il,' (coarse)'
   else
     write(iout_,*) trim(prefix_), ' Level ',il
   end if
-  
-  write(iout_,*) trim(prefix_), '           Matrix:', lv%base_a%sizeof()
-  write(iout_,*) trim(prefix_), '       Descriptor:', lv%base_desc%sizeof()
-  if (il >1) write(iout_,*) trim(prefix_), '       Linear map:', lv%linmap%sizeof()
-  if (allocated(lv%sm)) write(iout_,*) trim(prefix_), '         Smoother:', lv%sm%sizeof()
-  if (allocated(lv%sm2a)) write(iout_,*) trim(prefix_), '       Smoother 2:', lv%sm2a%sizeof()
-  if (allocated(lv%wrk)) write(iout_,*) trim(prefix_), '        Workspace:', lv%wrk%sizeof()
-  
+
+  if (global_) then
+    allocate(sz(6))
+    sz(:) = 0 
+    sz(1) =  lv%base_a%sizeof()
+    sz(2) =  lv%base_desc%sizeof()
+    if (il >1)              sz(3) =  lv%linmap%sizeof()
+    if (allocated(lv%sm))   sz(4) =  lv%sm%sizeof()
+    if (allocated(lv%sm2a)) sz(5) =  lv%sm2a%sizeof()
+    if (allocated(lv%wrk))  sz(6) =  lv%wrk%sizeof()
+    call psb_sum(ctxt,sz)
+    if (me == 0) then 
+      write(iout_,*) trim(prefix_), '           Matrix:',                         sz(1) 
+      write(iout_,*) trim(prefix_), '       Descriptor:',                         sz(2) 
+      if (il >1) write(iout_,*) trim(prefix_), '       Linear map:',              sz(3) 
+      if (allocated(lv%sm)) write(iout_,*) trim(prefix_), '         Smoother:',   sz(4) 
+      if (allocated(lv%sm2a)) write(iout_,*) trim(prefix_), '       Smoother 2:', sz(5) 
+      if (allocated(lv%wrk)) write(iout_,*) trim(prefix_), '        Workspace:',  sz(6)
+    end if
+    
+  else
+    write(iout_,*) trim(prefix_), '           Matrix:', lv%base_a%sizeof()
+    write(iout_,*) trim(prefix_), '       Descriptor:', lv%base_desc%sizeof()
+    if (il >1) write(iout_,*) trim(prefix_), '       Linear map:', lv%linmap%sizeof()
+    if (allocated(lv%sm)) write(iout_,*) trim(prefix_), '         Smoother:', lv%sm%sizeof()
+    if (allocated(lv%sm2a)) write(iout_,*) trim(prefix_), '       Smoother 2:', lv%sm2a%sizeof()
+    if (allocated(lv%wrk)) write(iout_,*) trim(prefix_), '        Workspace:', lv%wrk%sizeof()
+  endif
 
 9998 continue
   call psb_erractionrestore(err_act)
