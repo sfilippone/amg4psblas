@@ -105,7 +105,7 @@ subroutine amg_sfile_prec_memory_use(prec,info,iout,root, verbosity,prefix,globa
     verbosity_ = 0
   end if
   if (verbosity_ < 0) goto 9998
-    
+
   ctxt = prec%ctxt
   call psb_info(ctxt,me,np)
   prefix_ = ""
@@ -119,48 +119,34 @@ subroutine amg_sfile_prec_memory_use(prec,info,iout,root, verbosity,prefix,globa
     else
       write(prefix_,'(a,i5,a)') 'Process ',me,': '
     end if
-    
+
   end if
-  if (allocated(prec%precv)) then
-
-    if (present(root)) then 
-      root_ = root
-    else
-      root_ = psb_root_
-    end if
-    if (root_ == -1) root_ = me
-
-    if (verbosity_ >=0) then 
-      if (verbosity_ == 0) then 
-        !
-        if (me == root_) then
-
-          write(iout_,*) 
-          write(iout_,'(a,1x,a)') trim(prefix_),'Preconditioner memory usage'
-          nlev = size(prec%precv)
-          do ilev=1,nlev
-            call prec%precv(ilev)%memory_use(ilev,nlev,ilmin,info, &
-                 & iout=iout_,prefix=trim(prefix_),global=global)
-          end do
-        end if
-      else if (verbosity_ >0) then
-
-        if (me == root_) then
-          write(iout_,*) 
-          write(iout_,'(a,1x,a)') trim(prefix_),'Preconditioner memory usage'
-        end if
-        nlev = size(prec%precv)
-        do ilev=1,nlev
-          call prec%precv(ilev)%memory_use(ilev,nlev,ilmin,info, &
-               & iout=iout_,prefix=trim(prefix_),global=global)
-        end do
-      end if
-      
+  
+  if (present(root)) then 
+    root_ = root
   else
-    write(iout_,*) trim(name), &
-         & ': Error: no base preconditioner available, something is wrong!'
-    info = -2
-    return
-  endif
+    root_ = psb_root_
+  end if
+  if (root_ == -1) root_ = me
+
+  if (allocated(prec%precv)) then
+    if (verbosity_ >=0) then 
+      if (me == root_) then
+        write(iout_,*) 
+        write(iout_,'(a,1x,a)') trim(prefix_),'Preconditioner memory usage'
+      end if
+      nlev = size(prec%precv)
+      do ilev=1,nlev
+        call prec%precv(ilev)%memory_use(ilev,nlev,ilmin,info, &
+             & iout=iout_,verbosity=verbosity_,prefix=trim(prefix_),global=global)
+      end do
+
+    else
+      write(iout_,*) trim(name), &
+           & ': Error: no base preconditioner available, something is wrong!'
+      info = -2
+      return
+    endif
+  end if
 9998 continue
 end subroutine amg_sfile_prec_memory_use

@@ -42,7 +42,7 @@
 !         0: normal
 !        >1: increased details 
 !
-subroutine amg_c_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,prefix,global)
+subroutine amg_c_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,verbosity,prefix,global)
 
   use psb_base_mod
   use amg_c_onelev_mod, amg_protect_name => amg_c_base_onelev_memory_use
@@ -53,6 +53,7 @@ subroutine amg_c_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,prefix,global)
   integer(psb_ipk_), intent(out)          :: info
   integer(psb_ipk_), intent(in), optional :: iout
   character(len=*), intent(in), optional  :: prefix
+      integer(psb_ipk_), intent(in), optional :: verbosity
   logical, intent(in), optional           :: global
 
 
@@ -60,7 +61,7 @@ subroutine amg_c_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,prefix,global)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)  :: err_act ,me, np
   character(len=20), parameter :: name='amg_c_base_onelev_memory_use'
-  integer(psb_ipk_)  :: iout_
+  integer(psb_ipk_)  :: iout_, verbosity_
   logical      :: coarse, global_
   character(1024)    :: prefix_
   integer(psb_epk_), allocatable  :: sz(:)
@@ -79,6 +80,12 @@ subroutine amg_c_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,prefix,global)
     iout_ = psb_out_unit
   end if
 
+  if (present(verbosity)) then
+    verbosity_ = verbosity
+  else
+    verbosity_ = 0
+  end if
+  if (verbosity_ < 0) goto 9998
   if (present(global)) then
     global_ = global
   else
@@ -119,12 +126,14 @@ subroutine amg_c_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,prefix,global)
     end if
     
   else
-    write(iout_,*) trim(prefix_), '           Matrix:', lv%base_a%sizeof()
-    write(iout_,*) trim(prefix_), '       Descriptor:', lv%base_desc%sizeof()
-    if (il >1) write(iout_,*) trim(prefix_), '       Linear map:', lv%linmap%sizeof()
-    if (allocated(lv%sm)) write(iout_,*) trim(prefix_), '         Smoother:', lv%sm%sizeof()
-    if (allocated(lv%sm2a)) write(iout_,*) trim(prefix_), '       Smoother 2:', lv%sm2a%sizeof()
-    if (allocated(lv%wrk)) write(iout_,*) trim(prefix_), '        Workspace:', lv%wrk%sizeof()
+    if ((me == 0).or.(verbosity_>0)) then 
+      write(iout_,*) trim(prefix_), '           Matrix:', lv%base_a%sizeof()
+      write(iout_,*) trim(prefix_), '       Descriptor:', lv%base_desc%sizeof()
+      if (il >1) write(iout_,*) trim(prefix_), '       Linear map:', lv%linmap%sizeof()
+      if (allocated(lv%sm)) write(iout_,*) trim(prefix_), '         Smoother:', lv%sm%sizeof()
+      if (allocated(lv%sm2a)) write(iout_,*) trim(prefix_), '       Smoother 2:', lv%sm2a%sizeof()
+      if (allocated(lv%wrk)) write(iout_,*) trim(prefix_), '        Workspace:', lv%wrk%sizeof()
+    end if
   endif
 
 9998 continue

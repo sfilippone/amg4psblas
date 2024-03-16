@@ -276,7 +276,7 @@ module amg_s_onelev_mod
   end interface
 
   interface
-    subroutine amg_s_base_onelev_memory_use(lv,il,nl,ilmin,info,iout, prefix,global)
+    subroutine amg_s_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,verbosity, prefix,global)
       import :: psb_sspmat_type, psb_s_vect_type, psb_s_base_vect_type, &
            & psb_slinmap_type, psb_spk_, amg_s_onelev_type, &
            & psb_ipk_, psb_epk_, psb_desc_type
@@ -286,6 +286,7 @@ module amg_s_onelev_mod
       integer(psb_ipk_), intent(in)           :: il,nl,ilmin
       integer(psb_ipk_), intent(out)          :: info
       integer(psb_ipk_), intent(in), optional :: iout
+      integer(psb_ipk_), intent(in), optional :: verbosity
       character(len=*), intent(in), optional  :: prefix
       logical, intent(in), optional           :: global
     end subroutine amg_s_base_onelev_memory_use
