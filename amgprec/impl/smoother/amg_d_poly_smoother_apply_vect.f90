@@ -64,6 +64,9 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   character           :: trans_, init_
   real(psb_dpk_)      :: res, resdenum
   character(len=20)   :: name='d_poly_smoother_apply_v'
+  logical, parameter  :: do_timings=.true.
+  integer(psb_ipk_), save  :: poly_1=-1, poly_2=-1, poly_3=-1
+  integer(psb_ipk_), save  :: poly_mv=-1, poly_sv=-1, poly_vect=-1
 
   call psb_erractionsave(err_act)
 
@@ -93,6 +96,18 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
     goto 9999
   end if
 
+  if ((do_timings).and.(poly_1==-1))       &
+       & poly_1 = psb_get_timer_idx("POLY: Chebychev4")
+  if ((do_timings).and.(poly_2==-1))       &
+       & poly_2 = psb_get_timer_idx("POLY: OptChebychev4")
+  if ((do_timings).and.(poly_3==-1))       &
+       & poly_3 = psb_get_timer_idx("POLY: OptChebychev1")
+  if ((do_timings).and.(poly_mv==-1))       &
+       & poly_mv = psb_get_timer_idx("POLY: spMV")
+  if ((do_timings).and.(poly_vect==-1))       &
+       & poly_vect = psb_get_timer_idx("POLY: Vectors")
+  if ((do_timings).and.(poly_sv==-1))       &
+       & poly_sv = psb_get_timer_idx("POLY: solver")
   n_row = desc_data%get_local_rows()
   n_col = desc_data%get_local_cols()
 
@@ -125,6 +140,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 
     select case(sm%variant)
     case(amg_poly_lottes_)
+      if (do_timings) call psb_tic(poly_1)
       block
         real(psb_dpk_)      :: cz, cr
         !  b == x
@@ -154,8 +170,10 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           ! x_k =  x_{k-1} + z_k
         end do
       end block
+      if (do_timings) call psb_toc(poly_1)
 
     case(amg_poly_lottes_beta_)
+      if (do_timings) call psb_tic(poly_2)
 
       block
         real(psb_dpk_)      :: cz, cr
@@ -194,34 +212,51 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           ! x_k =  x_{k-1} + z_k
         end do
       end block
+      if (do_timings) call psb_toc(poly_2)
 
     case(amg_poly_new_)
+      if (do_timings) call psb_tic(poly_3)
+        
       block
         real(psb_dpk_)      :: sigma, theta, delta, rho_old, rho
         !  b == x
         !  x == tx
         !
-
+        sm%rho_ba = 1.12d0
+        !write(0,*) 'Parameter: ',sm%cf_a,sm%rho_ba
+        
         theta = (done+sm%cf_a)/2
         delta = (done-sm%cf_a)/2
         sigma = theta/delta
         rho_old = done/sigma
+        if (do_timings) call psb_tic(poly_sv)
         call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
+        if (do_timings) call psb_toc(poly_sv)
+        if (do_timings) call psb_tic(poly_vect)
         call psb_geaxpby((done/sm%rho_ba),ty,dzero,r,desc_data,info)
+        !write(0,*) 'POLY_NEW Iteration',0,' :',psb_genrm2(r,desc_data,info)
         if (.false.) then
           call psb_geaxpby((done/theta),r,dzero,tz,desc_data,info)
           call psb_geaxpby(done,tz,done,tx,desc_data,info)
         else
           call psb_abgdxyz((done/theta),dzero,done,done,r,tz,tx,desc_data,info)
         end if
+        if (do_timings) call psb_toc(poly_vect)
 
         ! tz == d
         do i=1, sm%pdegree-1
           !
            !
           ! r_{k-1} = r_k - (1/rho(BA)) B A d_k
+          if (do_timings) call psb_tic(poly_mv)
           call psb_spmm(done,sm%pa,tz,dzero,ty,desc_data,info,work=aux,trans=trans_)
+          if (do_timings) call psb_toc(poly_mv)
+          if (do_timings) call psb_tic(poly_sv)
           call sm%sv%apply(-(done/sm%rho_ba),ty,done,r,desc_data,trans_,aux,wv(5:),info,init='Z')
+          if (do_timings) call psb_toc(poly_sv)
+          if (do_timings) call psb_tic(poly_vect)
+        
+          !write(0,*) 'POLY_NEW Iteration',i,' :',psb_genrm2(r,desc_data,info)          
 
           !
           ! d_{k+1} = (rho rho_old) d_k + 2(rho/delta) r_{k+1}
@@ -236,9 +271,36 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 !!$          write(0,*) 'Polynomial smoother NEW ',i,res
           ! x_k =  x_{k-1} + z_k
           rho_old = rho
+          if (do_timings) call psb_toc(poly_vect)
         end do
       end block
-
+      if (do_timings) call psb_toc(poly_3)
+        
+    case(amg_poly_dbg_)
+      block
+        real(psb_dpk_)      :: sigma, theta, delta, rho_old, rho
+        !  b == x
+        !  x == tx
+        !
+        write(0,*) 'Parameter: ',sm%cf_a
+        theta = (done+sm%cf_a)/2
+        delta = (done-sm%cf_a)/2
+        sigma = theta/delta
+        rho_old = done/sigma
+        call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
+        call psb_geaxpby(done,ty,dzero,r,desc_data,info)
+        call psb_geaxpby(done/theta,r,dzero,tz,desc_data,info)
+        write(0,*) 'POLY_DBG Iteration',0,' :',psb_genrm2(r,desc_data,info)
+        do i=1, sm%pdegree
+          call psb_geaxpby(done,tz,done,tx,desc_data,info)
+          call psb_spmm(done,sm%pa,tz,dzero,ty,desc_data,info,work=aux,trans=trans_)
+          call sm%sv%apply(-(done),ty,done,r,desc_data,trans_,aux,wv(5:),info,init='Z')
+          write(0,*) 'POLY_DBG Iteration',i,' :',psb_genrm2(r,desc_data,info)          
+          rho = done/(2*sigma - rho_old)
+          call psb_geaxpby((2*rho/delta),r,rho*rho_old,tz,desc_data,info)
+          rho_old = rho
+        end do
+      end block
 
     case default
       info=psb_err_internal_error_
