@@ -486,7 +486,7 @@ subroutine amg_ld_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
   integer(psb_lpk_) :: nrow, nglob, ncol, ntaggr, nrl, nzl, ip, &
        &  nzt, naggrm1, naggrp1, i, k
   integer(psb_lpk_) ::  nrsave, ncsave, nzsave, nza
-  logical, parameter :: do_timings=.false., oldstyle=.false., debug=.false.  
+  logical, parameter :: do_timings=.true., oldstyle=.false., debug=.false.  
   integer(psb_ipk_), save :: idx_spspmm=-1
 
   name='amg_ptap_bld'

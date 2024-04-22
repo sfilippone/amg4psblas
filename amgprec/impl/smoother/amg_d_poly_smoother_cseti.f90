@@ -58,7 +58,7 @@ subroutine amg_d_poly_smoother_cseti(sm,what,val,info,idx)
     sm%pdegree = val
   case('POLY_VARIANT')
     select case(val)
-    case(amg_poly_lottes_,amg_poly_lottes_beta_,amg_poly_new_,amg_poly_dbg_)
+    case(amg_poly_lottes_,amg_poly_lottes_beta_,amg_poly_new_)
       sm%variant = val
     case default
       write(0,*) 'Invalid choice for POLY_VARIANT, defaulting to amg_poly_lottes_',val

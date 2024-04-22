@@ -591,8 +591,6 @@ contains
     integer(psb_ipk_)   :: nlev, ilev, sweeps
     logical             :: pre, post
     character(len=20)   :: name
-    logical, parameter  :: do_timings=.true.
-    integer(psb_ipk_), save  :: ml_mlt_smth=-1, ml_mlt_rp=-1, ml_mlt_rsd=-1
 
     name = 'inner_inner_mult'
     info = psb_success_
@@ -610,12 +608,6 @@ contains
     if(debug_level > 1) then
       write(debug_unit,*) me,' inner_mult at level ',level
     end if
-    if ((do_timings).and.(ml_mlt_smth==-1))       &
-         & ml_mlt_smth = psb_get_timer_idx("ML-MLT: smoother ")
-    if ((do_timings).and.(ml_mlt_rp==-1))       &
-         & ml_mlt_rp = psb_get_timer_idx("ML-MLT: RestProl")
-    if ((do_timings).and.(ml_mlt_rsd==-1))       &
-         & ml_mlt_rsd = psb_get_timer_idx("ML-MLT: Residual")
 
     sweeps_post = p%precv(level)%parms%sweeps_post
     sweeps_pre  = p%precv(level)%parms%sweeps_pre
@@ -631,7 +623,7 @@ contains
         ! Apply the first smoother
         ! The residual has been prepared before the recursive call. 
         !
-        if (do_timings) call psb_tic(ml_mlt_smth)
+
         if (pre) then
           if (me >=0) then
 !!$            write(0,*) me,'Applying smoother pre ', level
@@ -654,13 +646,10 @@ contains
             end if
           end if
         endif
-        if (do_timings) call psb_toc(ml_mlt_smth)
-
         !
         ! Compute the residual for next level and call recursively
         !
         if (pre) then
-          if (do_timings) call psb_tic(ml_mlt_rsd)
           call psb_geaxpby(done,vx2l,&
                & dzero,vty,&
                & base_desc,info)
@@ -668,9 +657,6 @@ contains
           if (info == psb_success_) call psb_spmm(-done,base_a,&
                & vy2l,done,vty,&
                & base_desc,info,work=work,trans=trans)
-          if (do_timings) call psb_toc(ml_mlt_rsd)
-          if (do_timings) call psb_tic(ml_mlt_rp)
-         
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
                  & a_err='Error during residue')
@@ -685,9 +671,7 @@ contains
                  & a_err='Error during restriction')
             goto 9999
           end if
-          if (do_timings) call psb_toc(ml_mlt_rp)
         else
-          if (do_timings) call psb_tic(ml_mlt_rp)
           ! Shortcut: just transfer x2l. 
           call p%precv(level+1)%map_rstr(done,vx2l,&
                & dzero,p%precv(level+1)%wrk%vx2l,&
@@ -698,7 +682,6 @@ contains
                  & a_err='Error during restriction')
             goto 9999
           end if
-          if (do_timings) call psb_toc(ml_mlt_rp)
         endif
 
         call inner_ml_aply(level+1,p,trans,work,info)
@@ -706,12 +689,10 @@ contains
         !
         ! Apply the prolongator
         !  
-        if (do_timings) call psb_tic(ml_mlt_rp)
         call p%precv(level+1)%map_prol(done,&
              & p%precv(level+1)%wrk%vy2l,done,vy2l,&
              & info,work=work,&
              & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
-        if (do_timings) call psb_toc(ml_mlt_rp)
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
                & a_err='Error during prolongation')
@@ -719,7 +700,7 @@ contains
         end if
 
         if (p%precv(level)%parms%ml_cycle == amg_wcycle_ml_) then
-          if (do_timings) call psb_tic(ml_mlt_rsd)
+
           if (me >=0) then 
             call psb_geaxpby(done,vx2l, dzero,vty,&
                  & base_desc,info)        
@@ -727,13 +708,10 @@ contains
                  & vy2l,done,vty,&
                  & base_desc,info,work=work,trans=trans)
           end if
-          if (do_timings) call psb_toc(ml_mlt_rsd)
-          if (do_timings) call psb_tic(ml_mlt_rp)
           if (info == psb_success_) &
                & call p%precv(level+1)%map_rstr(done,vty,&
                & dzero,p%precv(level+1)%wrk%vx2l,info,work=work,&
                & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
-          if (do_timings) call psb_toc(ml_mlt_rp)
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
                  & a_err='Error during W-cycle restriction')
@@ -742,12 +720,10 @@ contains
 
           call inner_ml_aply(level+1,p,trans,work,info)
 
-          if (do_timings) call psb_tic(ml_mlt_rp)
           if (info == psb_success_) call p%precv(level+1)%map_prol(done, &
                & p%precv(level+1)%wrk%vy2l,done,vy2l,&
                & info,work=work,&
                & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
-          if (do_timings) call psb_toc(ml_mlt_rp)
 
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
@@ -760,7 +736,6 @@ contains
 
         if (post) then
           if (me >=0) then 
-            if (do_timings) call psb_tic(ml_mlt_rsd)
             call psb_geaxpby(done,vx2l,&
                  & dzero,vty,&
                  & base_desc,info)
@@ -772,9 +747,7 @@ contains
                    & a_err='Error during residue')
               goto 9999
             end if
-            if (do_timings) call psb_toc(ml_mlt_rsd)
             
-            if (do_timings) call psb_tic(ml_mlt_smth)
             !
             ! Apply the second smoother
             !
@@ -789,7 +762,6 @@ contains
                    & vty,done,vy2l, base_desc, trans,&
                    & sweeps,work,wv,info,init='Z')
             end if
-            if (do_timings) call psb_toc(ml_mlt_smth)
           end if
 
           if (info /= psb_success_) then
@@ -802,14 +774,12 @@ contains
 
       else if (level == nlev) then
 !!$        write(0,*) me,'Applying smoother at top level ',psb_errstatus_fatal()
-        if (do_timings) call psb_tic(ml_mlt_smth)
         if (me >=0) then 
           sweeps = p%precv(level)%parms%sweeps_pre
           if (info == psb_success_) call p%precv(level)%sm%apply(done,&
                & vx2l,dzero,vy2l,base_desc, trans,&
                & sweeps,work,wv,info)
         end if 
-        if (do_timings) call psb_toc(ml_mlt_smth)
 !!$        write(0,*) me,' Done applying smoother at top level ',psb_errstatus_fatal()
 
       else

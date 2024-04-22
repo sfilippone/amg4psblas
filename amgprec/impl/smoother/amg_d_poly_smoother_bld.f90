@@ -87,14 +87,10 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
            & a_err='invalid sm%degree for poly_beta')
       goto 9999
     end if
-  case(amg_poly_new_, amg_poly_dbg_)
+  case(amg_poly_new_)
 
     if ((1<=sm%pdegree).and.(sm%pdegree<=30)) then
       !Ok
-!!$      write(0,*) 'Vector: '      
-!!$      do i=1,size(amg_d_poly_a_vect)
-!!$        write(0,*) i,amg_d_poly_a_vect(i)
-!!$      end do
       sm%cf_a = amg_d_poly_a_vect(sm%pdegree)
     else
       info = psb_err_internal_error_
