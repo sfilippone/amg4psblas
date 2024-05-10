@@ -256,7 +256,7 @@ contains
     Implicit None
 
     ! Arguments
-    type(psb_dspmat_type), intent(in), target           :: a
+    type(psb_dspmat_type), intent(inout), target        :: a
     Type(psb_desc_type), Intent(inout)                  :: desc_a 
     class(amg_d_slu_solver_type), intent(inout)         :: sv
     integer, intent(out)                                :: info

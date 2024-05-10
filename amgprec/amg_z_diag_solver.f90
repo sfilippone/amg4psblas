@@ -119,7 +119,7 @@ module amg_z_diag_solver
       import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
            & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_diag_solver_type, psb_ipk_, psb_i_base_vect_type      
-      type(psb_zspmat_type), intent(in), target           :: a
+      type(psb_zspmat_type), intent(inout), target        :: a
       Type(psb_desc_type), Intent(inout)                    :: desc_a 
       class(amg_z_diag_solver_type), intent(inout)        :: sv
       integer(psb_ipk_), intent(out)                        :: info
@@ -331,7 +331,7 @@ module amg_z_l1_diag_solver
       import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
            & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_l1_diag_solver_type, psb_ipk_, psb_i_base_vect_type      
-      type(psb_zspmat_type), intent(in), target           :: a
+      type(psb_zspmat_type), intent(inout), target        :: a
       Type(psb_desc_type), Intent(inout)                    :: desc_a 
       class(amg_z_l1_diag_solver_type), intent(inout)        :: sv
       integer(psb_ipk_), intent(out)                        :: info

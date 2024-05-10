@@ -89,7 +89,7 @@ subroutine amg_c_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,verbosity,prefi
   if (present(global)) then
     global_ = global
   else
-    global_ = .false.
+    global_ = .true.
   end if
 
   if (present(prefix)) then

@@ -41,7 +41,7 @@ subroutine amg_z_base_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   use amg_z_base_solver_mod, amg_protect_name =>  amg_z_base_solver_bld
   Implicit None
   ! Arguments
-  type(psb_zspmat_type), intent(in), target           :: a
+  type(psb_zspmat_type), intent(inout), target        :: a
   Type(psb_desc_type), Intent(inout)                  :: desc_a 
   class(amg_z_base_solver_type), intent(inout)        :: sv
   integer(psb_ipk_), intent(out)                      :: info

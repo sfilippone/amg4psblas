@@ -46,8 +46,7 @@ subroutine d_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   Implicit None
 
   ! Arguments
-  type(psb_dspmat_type)                               :: c 
-  type(psb_dspmat_type), intent(in), target           :: a
+  type(psb_dspmat_type), intent(inout), target        :: a
   Type(psb_desc_type), Intent(inout)                  :: desc_a 
   class(amg_d_mumps_solver_type), intent(inout)       :: sv
   integer(psb_ipk_), intent(out)                      :: info
@@ -56,6 +55,7 @@ subroutine d_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   class(psb_d_base_vect_type), intent(in), optional   :: vmold
   class(psb_i_base_vect_type), intent(in), optional   :: imold
   ! Local variables
+  type(psb_dspmat_type)                               :: c 
   type(psb_dspmat_type)      :: atmp
   type(psb_d_coo_sparse_mat), target :: acoo
 #if defined(IPK4) && defined(LPK8)

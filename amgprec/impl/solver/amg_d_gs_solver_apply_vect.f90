@@ -60,6 +60,7 @@ subroutine amg_d_gs_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   integer(psb_ipk_)   :: np, me, i, err_act
   character           :: trans_, init_
   character(len=20)   :: name='d_gs_solver_apply'
+  logical, parameter  :: log_dbg=.false.
 
   call psb_erractionsave(err_act)
   ctxt = desc_data%get_ctxt()
@@ -133,7 +134,12 @@ subroutine amg_d_gs_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
     select case (init_)
     case('Z') 
       call psb_geaxpby(done,x,dzero,tw,desc_data,info)
+      if (log_dbg) write(0,*) 'gs 1:',&
+             & psb_genrm2(tw,desc_data,info)
+      
       call psb_spsm(done,sv%l,tw,dzero,xit,desc_data,info)
+      if (log_dbg) write(0,*) 'gs 2:',&
+             & psb_genrm2(xit,desc_data,info)
       itxst = 2
     case('Y')
       call psb_geaxpby(done,y,dzero,xit,desc_data,info)
@@ -159,13 +165,23 @@ subroutine amg_d_gs_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
         !
         do itx=itxst,sv%sweeps
           call psb_geaxpby(done,x,dzero,tw,desc_data,info)
+          if (log_dbg) write(0,*) 'gs 3:',&
+               & psb_genrm2(tw,desc_data,info)
           ! Update with U. The off-diagonal block is taken care
           ! from the Jacobi smoother, hence this is purely local. 
           call psb_spmm(-done,sv%u,xit,done,tw,desc_data,info,doswap=.false.)
+          if (log_dbg) write(0,*) 'gs 4:',&
+             & psb_genrm2(xit,desc_data,info)
+
           call psb_spsm(done,sv%l,tw,dzero,xit,desc_data,info)
+          if (log_dbg) write(0,*) 'gs 5:',&
+             & psb_genrm2(xit,desc_data,info)
+
         end do
 
         call psb_geaxpby(alpha,xit,beta,y,desc_data,info)
+        if (log_dbg) write(0,*) 'gs 6:',&
+             & psb_genrm2(y,desc_data,info)
 
       else
         !

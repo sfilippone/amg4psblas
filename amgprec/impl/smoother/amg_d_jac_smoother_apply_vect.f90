@@ -64,6 +64,7 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   character           :: trans_, init_
   real(psb_dpk_)      :: res, resdenum
   character(len=20)   :: name='d_jac_smoother_apply_v'
+  logical, parameter  :: log_dbg=.false.
 
   call psb_erractionsave(err_act)
 
@@ -159,6 +160,8 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
                & a_err='wrong  init to smoother_apply')
           goto 9999
         end select
+        if (log_dbg) write(0,*) 'smoother jac 1 :',&
+             & psb_genrm2(ty,desc_data,info) 
 
         do i=1, sweeps-1
           !
