@@ -310,7 +310,7 @@ subroutine amg_d_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
             if (disjoint) then
               locnaggr(kk)     = locnaggr(kk) + 1
               itmp = (bnds(kk)-1+locnaggr(kk))*nths+kk
-              if (itmp < (bnds(kk)-1+locnaggr(kk))) then
+              if (itmp < (bnds(kk)-1_psb_lpk_+locnaggr(kk))) then
                 !$omp atomic update
                 info = max(12345678,info)
                 !$omp end atomic
