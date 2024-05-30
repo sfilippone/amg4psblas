@@ -73,7 +73,7 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
     #endif
 
 // Rimosso per tornare al vecchio matching #define OMP
-#ifdef OMP
+#ifdef OPENMP
 				fprintf(stderr,"Warning: using buggy OpenMP matching!\n");
         dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(NLVer, NLEdge,
 							   verLocPtr, verLocInd, edgeLocWeight,

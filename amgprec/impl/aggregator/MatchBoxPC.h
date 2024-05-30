@@ -59,7 +59,7 @@
 #include <assert.h>
 #include <map>
 #include <vector>
-#ifdef OMP
+#ifdef OPENMP
 // OpenMP is included and used if and only if the OpenMP version of the matching
 // is required
 #include "omp.h"
@@ -178,7 +178,7 @@ extern "C"
 #define MilanRealMin MINUS_INFINITY
 #endif
 
-#ifdef OMP
+#ifdef OPENMP
 /* These functions are only used in the experimental OMP implementation, if that
 is disabled there is no reason to actually compile or reference them. */
 
@@ -431,7 +431,7 @@ is disabled there is no reason to actually compile or reference them. */
 #endif
 
 
-#ifndef OMP
+#ifndef OPENMP
    //Function of find the owner of a ghost vertex using binary search:
    inline MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
                                         MilanInt myRank, MilanInt numProcs);
