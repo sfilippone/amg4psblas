@@ -17,8 +17,6 @@ void queuesTransfer(vector<MilanLongInt> &U,
         U.insert(U.end(), privateU.begin(), privateU.end());
     }
 
-    privateU.clear();
-
 #pragma omp critical(sendMessageTransfer)
     {
 
@@ -28,6 +26,7 @@ void queuesTransfer(vector<MilanLongInt> &U,
         QOwner.insert(QOwner.end(), privateQOwner.begin(), privateQOwner.end());
     }
 
+    privateU.clear();
     privateQLocalVtx.clear();
     privateQGhostVtx.clear();
     privateQMsgType.clear();
