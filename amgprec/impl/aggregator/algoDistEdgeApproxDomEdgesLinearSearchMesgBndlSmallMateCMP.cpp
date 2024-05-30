@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OMP
+#ifdef OPENMP
 // ***********************************************************************
 //
 //        MatchboxP: A C++ library for approximate weighted matching

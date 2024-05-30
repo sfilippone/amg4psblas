@@ -72,8 +72,7 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
         double tmr = MPI_Wtime();
     #endif
 
-#define OMP
-#ifdef OMP
+#ifdef OPENMP
         dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(NLVer, NLEdge,
 							   verLocPtr, verLocInd, edgeLocWeight,
 							   verDistance,  Mate,
