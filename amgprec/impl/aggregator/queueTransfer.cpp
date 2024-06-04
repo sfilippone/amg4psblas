@@ -15,11 +15,9 @@ void queuesTransfer(vector<MilanLongInt> &U,
 #pragma omp critical(U)
     {
         U.insert(U.end(), privateU.begin(), privateU.end());
-    }
 
-#pragma omp critical(sendMessageTransfer)
-    {
-
+    //#pragma omp critical(sendMessageTransfer)
+    //{
         QLocalVtx.insert(QLocalVtx.end(), privateQLocalVtx.begin(), privateQLocalVtx.end());
         QGhostVtx.insert(QGhostVtx.end(), privateQGhostVtx.begin(), privateQGhostVtx.end());
         QMsgType.insert(QMsgType.end(), privateQMsgType.begin(), privateQMsgType.end());

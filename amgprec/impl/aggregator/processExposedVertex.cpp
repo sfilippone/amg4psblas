@@ -62,58 +62,41 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
             fflush(stdout);
 #endif
             // If found a dominating edge:
-            if (w >= 0)
-            {
-
-#pragma omp critical(processExposed)
-                {
-                    if (isAlreadyMatched(verLocInd[k], StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) {
-		      w = computeCandidateMate(verLocPtr[v],
-					       verLocPtr[v + 1],
-					       edgeLocWeight, 0,
-					       verLocInd,
-					       StartIndex,
-					       EndIndex,
-					       GMate,
-					       Mate,
-					       Ghost2LocalMap);
-		      candidateMate[v] = w;
-                    }
-
-                    if (w >= 0) {
-		      (*myCard)++;
-		      if ((w < StartIndex) || (w > EndIndex)) { // w is a ghost vertex
-			option = 2;
-			if (candidateMate[NLVer + Ghost2LocalMap[w]] == v + StartIndex) {
-			  option = 1;
-			  Mate[v] = w;
-			  GMate[Ghost2LocalMap[w]] = v + StartIndex; // w is a Ghost
-
-			} // End of if CandidateMate[w] = v
-
-		      } // End of if a Ghost Vertex
-		      else  { // w is a local vertex
-
-			if (candidateMate[w - StartIndex] == (v + StartIndex)) {
-			  option = 3;
-			  Mate[v] = w;                           // v is local
-			  Mate[w - StartIndex] = v + StartIndex; // w is local
-
+            if (w >= 0) {
+#pragma omp critical(Matching)
+	      {
+		if (isAlreadyMatched(verLocInd[k], StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) {
+		  w = computeCandidateMate(verLocPtr[v], verLocPtr[v + 1], edgeLocWeight, 0,
+					   verLocInd, StartIndex, EndIndex,
+					   GMate,  Mate,  Ghost2LocalMap);
+		  candidateMate[v] = w;
+		}
+	      }
+	      if (w >= 0) {
+		(*myCard)++;
+		if ((w < StartIndex) || (w > EndIndex)) { // w is a ghost vertex
+		  option = 2;
+		  if (candidateMate[NLVer + Ghost2LocalMap[w]] == v + StartIndex) {
+		    option = 1;
+		    Mate[v] = w;
+		    GMate[Ghost2LocalMap[w]] = v + StartIndex; // w is a Ghost
+		  } // End of if CandidateMate[w] = v		  
+		} // End of if a Ghost Vertex
+		else  { // w is a local vertex
+		  if (candidateMate[w - StartIndex] == (v + StartIndex)) {
+		    option = 3;
+		    Mate[v] = w;                           // v is local
+		    Mate[w - StartIndex] = v + StartIndex; // w is local
 #ifdef PRINT_DEBUG_INFO_
-			  cout << "\n(" << myRank << ")MATCH: (" << v + StartIndex << "," << w << ") ";
-			  fflush(stdout);
+		    cout << "\n(" << myRank << ")MATCH: (" << v + StartIndex << "," << w << ") ";
+		    fflush(stdout);
 #endif
-
-			} // End of if ( candidateMate[w-StartIndex] == (v+StartIndex) )
-		      }     // End of Else
-
-                    } // End of second if
-
-                } // End critical processExposed
-
+		  } // End of if ( candidateMate[w-StartIndex] == (v+StartIndex) )
+		}     // End of Else
+	      } // End of second if
             } // End of if(w >=0)
             else  {
-#pragma omp critical(adjuse)
+	      //#pragma omp critical(adjuse)
 	      {
 		// This piece of code is executed a really small number of times
 		adj11 = verLocPtr[v];
@@ -132,6 +115,7 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
 		    ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
 		    // assert(ghostOwner != -1);
 		    // assert(ghostOwner != myRank);
+#pragma omp atomic
 		    PCounter[ghostOwner]++;
 		    
 		    privateQLocalVtx.push_back(v + StartIndex);
@@ -144,23 +128,23 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
 	      }
             }
             // End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-
+	    
             switch (option)
-            {
-            case -1:
+	      {
+	      case -1:
                 break;
-            case 1:
+	      case 1:
                 privateU.push_back(v + StartIndex);
                 privateU.push_back(w);
-
+		
 #ifdef PRINT_DEBUG_INFO_
                 cout << "\n(" << myRank << ")MATCH: (" << v + StartIndex << "," << w << ")";
                 fflush(stdout);
 #endif
-
+		
                 //  Decrement the counter:
                 PROCESS_CROSS_EDGE(&Counter[Ghost2LocalMap[w]], S);
-            case 2:
+	      case 2:
 #ifdef PRINT_DEBUG_INFO_
                 cout << "\n(" << myRank << ")Sending a request message (291):";
                 cout << "\n(" << myRank << ")Local is: " << v + StartIndex << " Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs) << endl;
@@ -171,29 +155,30 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                 ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
                 // assert(ghostOwner != -1);
                 // assert(ghostOwner != myRank);
+#pragma omp atomic
                 PCounter[ghostOwner]++;
-
+		
                 privateQLocalVtx.push_back(v + StartIndex);
                 privateQGhostVtx.push_back(w);
                 privateQMsgType.push_back(REQUEST);
                 privateQOwner.push_back(ghostOwner);
                 break;
-            case 3:
-            default:
+	      case 3:
+	      default:
                 privateU.push_back(v + StartIndex);
                 privateU.push_back(w);
                 break;
-            }
-
+	      }
+	    
         } // End of for ( v=0; v < NLVer; v++ )
-
+	
         queuesTransfer(U, privateU, QLocalVtx,
                        QGhostVtx,
                        QMsgType, QOwner, privateQLocalVtx,
                        privateQGhostVtx,
                        privateQMsgType,
                        privateQOwner);
-
+	
     } // End of parallel region
 }
 #endif
