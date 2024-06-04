@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OMP
+#ifdef OPENMP
 void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                 MilanLongInt StartIndex, MilanLongInt EndIndex,
                 MilanLongInt *numGhostEdges,

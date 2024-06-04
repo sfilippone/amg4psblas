@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OMP
+#ifdef OPENMP
 void processMatchedVertices(
     MilanLongInt NLVer,
     vector<MilanLongInt> &UChunkBeingProcessed,
