@@ -275,7 +275,8 @@ subroutine amg_c_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
             disjoint = all(ilaggr(icol(1:ip)) == -(nr+1)).or.(ip==0)
             if (disjoint) then
               locnaggr(kk)     = locnaggr(kk) + 1
-              itmp = (bnds(kk)-1+locnaggr(kk))*nths+kk
+              itmp = (bnds(kk)-1+locnaggr(kk)) !be careful about overflow
+              itmp = itmp*nths+kk
               if (itmp < (bnds(kk)-1+locnaggr(kk))) then
                 !$omp atomic update
                 info = max(12345678,info)

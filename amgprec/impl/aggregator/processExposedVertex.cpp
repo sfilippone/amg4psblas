@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OMP
+#ifdef OPENMP
 void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                                        MilanLongInt *candidateMate,
                                        MilanLongInt *verLocInd,
@@ -113,32 +113,35 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
 
             } // End of if(w >=0)
             else  {
-	      // This piece of code is executed a really small amount of times
-	      adj11 = verLocPtr[v];
-	      adj12 = verLocPtr[v + 1];
-	      for (k1 = adj11; k1 < adj12; k1++) {
-		w = verLocInd[k1];
-		if ((w < StartIndex) || (w > EndIndex)) { // A ghost
-
+#pragma omp critical(adjuse)
+	      {
+		// This piece of code is executed a really small number of times
+		adj11 = verLocPtr[v];
+		adj12 = verLocPtr[v + 1];
+		for (k1 = adj11; k1 < adj12; k1++) {
+		  w = verLocInd[k1];
+		  if ((w < StartIndex) || (w > EndIndex)) { // A ghost
+		    
 #ifdef PRINT_DEBUG_INFO_
-		  cout << "\n(" << myRank << ")Sending a failure message: ";
-		  cout << "\n(" << myRank << ")Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs);
-		  fflush(stdout);
+		    cout << "\n(" << myRank << ")Sending a failure message: ";
+		    cout << "\n(" << myRank << ")Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs);
+		    fflush(stdout);
 #endif
-		  (*msgInd)++;
-		  (*NumMessagesBundled)++;
-		  ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
-		  // assert(ghostOwner != -1);
-		  // assert(ghostOwner != myRank);
-		  PCounter[ghostOwner]++;
-
-		  privateQLocalVtx.push_back(v + StartIndex);
-		  privateQGhostVtx.push_back(w);
-		  privateQMsgType.push_back(FAILURE);
-		  privateQOwner.push_back(ghostOwner);
-
-		} // End of if(GHOST)
-	      }     // End of for loop
+		    (*msgInd)++;
+		    (*NumMessagesBundled)++;
+		    ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
+		    // assert(ghostOwner != -1);
+		    // assert(ghostOwner != myRank);
+		    PCounter[ghostOwner]++;
+		    
+		    privateQLocalVtx.push_back(v + StartIndex);
+		    privateQGhostVtx.push_back(w);
+		    privateQMsgType.push_back(FAILURE);
+		    privateQOwner.push_back(ghostOwner);
+		    
+		  } // End of if(GHOST)
+		}     // End of for loop
+	      }
             }
             // End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
 

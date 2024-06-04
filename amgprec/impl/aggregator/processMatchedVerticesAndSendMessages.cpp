@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OMP
+#ifdef OPENMP
 //#define DEBUG_HANG_
 void processMatchedVerticesAndSendMessages(
 					   MilanLongInt NLVer,

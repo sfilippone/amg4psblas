@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OMP
+#ifdef OPENMP
 // ***********************************************************************
 //
 //        MatchboxP: A C++ library for approximate weighted matching
@@ -126,8 +126,10 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     fflush(stdout);
 #endif
 
-    MilanLongInt StartIndex = verDistance[myRank];       // The starting vertex owned by the current rank
-    MilanLongInt EndIndex   = verDistance[myRank + 1] - 1; // The ending vertex owned by the current rank
+    // The starting vertex owned by the current rank
+    MilanLongInt StartIndex = verDistance[myRank];
+    // The ending vertex owned by the current rank
+    MilanLongInt EndIndex   = verDistance[myRank + 1] - 1;
 
     MPI_Status computeStatus;
 
@@ -145,7 +147,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     // only one message will be sent in the initialization phase -
     // one of: REQUEST/FAILURE/SUCCESS
     vector<MilanLongInt> QLocalVtx, QGhostVtx, QMsgType;
-    vector<MilanInt> QOwner; // Changed by Fabio to be an integer, addresses needs to be integers!
+    // Changed by Fabio to be an integer, addresses needs to be integers!
+    vector<MilanInt> QOwner; 
 
     MilanLongInt *PCounter = new MilanLongInt[numProcs];
     for (int i = 0; i < numProcs; i++)
@@ -153,7 +156,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 
     MilanLongInt NumMessagesBundled = 0;
     // TODO when the last computational section will be refactored this could be eliminated
-    MilanInt ghostOwner = 0; // Changed by Fabio to be an integer, addresses needs to be integers!
+    // Changed by Fabio to be an integer, addresses needs to be integers!
+    MilanInt ghostOwner = 0; 
     MilanLongInt *candidateMate = nullptr;
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << ")NV: " << NLVer << "  Edges: " << NLEdge;
@@ -168,9 +172,12 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     MilanLongInt myCard = 0;
 
     // Build the Ghost Vertex Set: Vg
-    map<MilanLongInt, MilanLongInt> Ghost2LocalMap;       // Map each ghost vertex to a local vertex
-    vector<MilanLongInt> Counter;                         // Store the edge count for each ghost vertex
-    MilanLongInt numGhostVertices = 0, numGhostEdges = 0; // Number of Ghost vertices
+    // Map each ghost vertex to a local vertex
+    map<MilanLongInt, MilanLongInt> Ghost2LocalMap;
+    // Store the edge count for each ghost vertex
+    vector<MilanLongInt> Counter;
+    // Number of Ghost vertices
+    MilanLongInt numGhostVertices = 0, numGhostEdges = 0; 
 
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << ")About to compute Ghost Vertices...";

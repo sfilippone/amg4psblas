@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OMP
+#ifdef OPENMP
 void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
                                               MilanLongInt *verLocPtr,
                                               MilanLongInt *verLocInd,

@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OMP
+#ifdef OPENMP
 /**
  * Execute the research fr the Candidate Mate without controlling if the vertices are already matched.
  * Returns the vertices with the highest weight

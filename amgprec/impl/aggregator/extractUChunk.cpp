@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OMP
+#ifdef OPENMP
 void extractUChunk(
     vector<MilanLongInt> &UChunkBeingProcessed,
     vector<MilanLongInt> &U,
