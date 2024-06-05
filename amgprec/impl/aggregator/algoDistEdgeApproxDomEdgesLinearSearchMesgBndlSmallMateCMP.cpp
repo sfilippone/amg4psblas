@@ -1,5 +1,4 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
 // ***********************************************************************
 //
 //        MatchboxP: A C++ library for approximate weighted matching
@@ -244,7 +243,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
      * PARALLEL_COMPUTE_CANDIDATE_MATE_B is now totally parallel.
      */
 
-    PARALLEL_COMPUTE_CANDIDATE_MATE_B(NLVer,
+    PARALLEL_COMPUTE_CANDIDATE_MATE_BD(NLVer,
                                       verLocPtr,
                                       verLocInd,
                                       myRank,
@@ -321,7 +320,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     vector<MilanLongInt> UChunkBeingProcessed;
     UChunkBeingProcessed.reserve(UCHUNK);
 
-    processMatchedVertices(NLVer,
+    processMatchedVerticesD(NLVer,
                            UChunkBeingProcessed,
                            U,
                            privateU,
@@ -430,7 +429,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         /////////////////////////// PROCESS MATCHED VERTICES //////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////
 
-      processMatchedVerticesAndSendMessages(NLVer,
+      processMatchedVerticesAndSendMessagesD(NLVer,
 					    UChunkBeingProcessed,
 					    U,
 					    privateU,
@@ -491,7 +490,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         /////////////////////////// PROCESS MESSAGES //////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////
 
-        processMessages(NLVer,
+        processMessagesD(NLVer,
                         Mate,
                         candidateMate,
                         Ghost2LocalMap,
@@ -558,5 +557,4 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 // End of algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMate
 #endif
 
-#endif
 #endif

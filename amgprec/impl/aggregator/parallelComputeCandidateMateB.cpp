@@ -1,6 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
-void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
+void PARALLEL_COMPUTE_CANDIDATE_MATE_BD(MilanLongInt NLVer,
                                               MilanLongInt *verLocPtr,
                                               MilanLongInt *verLocInd,
                                               MilanInt myRank,
@@ -20,9 +19,9 @@ void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
             fflush(stdout);
 #endif
             // Start: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
-            candidateMate[v] = firstComputeCandidateMate(verLocPtr[v], verLocPtr[v + 1], verLocInd, edgeLocWeight);
+            candidateMate[v] = firstComputeCandidateMateD(verLocPtr[v], verLocPtr[v + 1],
+							 verLocInd, edgeLocWeight);
             // End: PARALLEL_COMPUTE_CANDIDATE_MATE_B(v)
         }
     }
 }
-#endif

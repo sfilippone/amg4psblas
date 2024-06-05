@@ -1,7 +1,6 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
 //#define DEBUG_HANG_
-void processMatchedVerticesAndSendMessages(
+void processMatchedVerticesAndSendMessagesD(
 					   MilanLongInt NLVer,
 					   vector<MilanLongInt> &UChunkBeingProcessed,
 					   vector<MilanLongInt> &U,
@@ -103,7 +102,7 @@ void processMatchedVerticesAndSendMessages(
 			
 			if (candidateMate[v - StartIndex] == u)  {
 			  // Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-			  w = computeCandidateMate(verLocPtr[v - StartIndex],
+			  w = computeCandidateMateD(verLocPtr[v - StartIndex],
 						   verLocPtr[v - StartIndex + 1],
 						   edgeLocWeight, 0,
 						   verLocInd, StartIndex, EndIndex,
@@ -293,4 +292,3 @@ void processMatchedVerticesAndSendMessages(
     cout << myRank<<" Done sending messages"<<endl;
 #endif
 }
-#endif

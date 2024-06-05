@@ -1,5 +1,4 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
 /**
  * Execute the research fr the Candidate Mate without controlling if the vertices are already matched.
  * Returns the vertices with the highest weight
@@ -9,7 +8,7 @@
  * @param edgeLocWeight
  * @return
  */
-MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
+MilanLongInt firstComputeCandidateMateD(MilanLongInt adj1,
                                        MilanLongInt adj2,
                                        MilanLongInt *verLocInd,
                                        MilanReal *edgeLocWeight)
@@ -42,7 +41,7 @@ MilanLongInt firstComputeCandidateMate(MilanLongInt adj1,
  * @param Ghost2LocalMap
  * @return
  */
-MilanLongInt computeCandidateMate(MilanLongInt adj1,
+MilanLongInt computeCandidateMateD(MilanLongInt adj1,
                                   MilanLongInt adj2,
                                   MilanReal *edgeLocWeight,
                                   MilanLongInt k,
@@ -71,4 +70,3 @@ MilanLongInt computeCandidateMate(MilanLongInt adj1,
 
     return w;
 }
-#endif

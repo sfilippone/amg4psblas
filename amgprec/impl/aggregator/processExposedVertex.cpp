@@ -1,5 +1,4 @@
-#include "MatchBoxPC.h"
-#ifdef OPENMP
+#include "MatchBoxPC.h" 
 void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
                                        MilanLongInt *candidateMate,
                                        MilanLongInt *verLocInd,
@@ -66,7 +65,7 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
 #pragma omp critical(Matching)
 	      {
 		if (isAlreadyMatched(verLocInd[k], StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap)) {
-		  w = computeCandidateMate(verLocPtr[v], verLocPtr[v + 1], edgeLocWeight, 0,
+		  w = computeCandidateMateD(verLocPtr[v], verLocPtr[v + 1], edgeLocWeight, 0,
 					   verLocInd, StartIndex, EndIndex,
 					   GMate,  Mate,  Ghost2LocalMap);
 		  candidateMate[v] = w;
@@ -181,4 +180,3 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
 	
     } // End of parallel region
 }
-#endif

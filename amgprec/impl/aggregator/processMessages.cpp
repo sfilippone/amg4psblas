@@ -1,8 +1,7 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
 //#define DEBUG_HANG_
 
-void processMessages(
+void processMessagesD(
     MilanLongInt NLVer,
     MilanLongInt *Mate,
     MilanLongInt *candidateMate,
@@ -212,7 +211,7 @@ void processMessages(
 	    // Process only if not already matched ( v is local)
 	    if (candidateMate[v - StartIndex] == u)  {
 	      // Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-	      w = computeCandidateMate(verLocPtr[v - StartIndex], verLocPtr[v - StartIndex + 1], edgeLocWeight, k,
+	      w = computeCandidateMateD(verLocPtr[v - StartIndex], verLocPtr[v - StartIndex + 1], edgeLocWeight, k,
 				       verLocInd, StartIndex, EndIndex, GMate, Mate, Ghost2LocalMap);
 	      candidateMate[v - StartIndex] = w;
 #ifdef PRINT_DEBUG_INFO_
@@ -314,4 +313,3 @@ void processMessages(
 
     return;
 }
-#endif

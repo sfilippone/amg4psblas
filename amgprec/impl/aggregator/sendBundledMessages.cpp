@@ -1,5 +1,4 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
 void sendBundledMessages(MilanLongInt *numGhostEdges,
                                 MilanInt *BufferSize,
                                 MilanLongInt *Buffer,
@@ -207,4 +206,3 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
 }
 }
 }
-#endif

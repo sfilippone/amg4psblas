@@ -1,6 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
-void processMatchedVertices(
+void processMatchedVerticesD(
     MilanLongInt NLVer,
     vector<MilanLongInt> &UChunkBeingProcessed,
     vector<MilanLongInt> &U,
@@ -98,7 +97,7 @@ void processMatchedVertices(
 			
 			if (candidateMate[v - StartIndex] == u) {
 			  // Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-			  w = computeCandidateMate(verLocPtr[v - StartIndex],
+			  w = computeCandidateMateD(verLocPtr[v - StartIndex],
 						   verLocPtr[v - StartIndex + 1],
 						   edgeLocWeight, 0,
 						   verLocInd, StartIndex, EndIndex,
@@ -290,4 +289,3 @@ void processMatchedVertices(
 #endif
     } // End of parallel region
 }
-#endif

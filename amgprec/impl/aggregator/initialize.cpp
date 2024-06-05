@@ -1,5 +1,4 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
 void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                 MilanLongInt StartIndex, MilanLongInt EndIndex,
                 MilanLongInt *numGhostEdges,
@@ -302,4 +301,3 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
         } // End of single region
     }     // End of parallel region
 }
-#endif
