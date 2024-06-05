@@ -266,7 +266,7 @@ is disabled there is no reason to actually compile or reference them. */
 					 MilanReal *edgeLocWeight,
 					 MilanLongInt *candidateMate);
   
-  void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
+  void PARALLEL_PROCESS_EXPOSED_VERTEX_BD(MilanLongInt NLVer,
 					 MilanLongInt *candidateMate,
 					 MilanLongInt *verLocInd,
 					 MilanLongInt *verLocPtr,

@@ -268,7 +268,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
      * TODO: Test when it's actually more efficient to execute this code
      *       in parallel.
      */
-    PARALLEL_PROCESS_EXPOSED_VERTEX_B(NLVer,
+    PARALLEL_PROCESS_EXPOSED_VERTEX_BD(NLVer,
                                       candidateMate,
                                       verLocInd,
                                       verLocPtr,
