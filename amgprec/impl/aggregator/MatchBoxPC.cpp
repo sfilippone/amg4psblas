@@ -68,9 +68,9 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 
 
 #define TIME_TRACKER
-    #ifdef TIME_TRACKER
-        double tmr = MPI_Wtime();
-    #endif
+#ifdef TIME_TRACKER
+  double tmr = MPI_Wtime();
+#endif
 
 #if 1
 	//	defined(OPENMP)
@@ -93,11 +93,11 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 #endif
 
 
-  #ifdef TIME_TRACKER
-    tmr = MPI_Wtime() - tmr;
-    fprintf(stderr, "Elaboration time: %f for %ld nodes\n", tmr, NLVer);
-  #endif
-
+#ifdef TIME_TRACKER
+	tmr = MPI_Wtime() - tmr;
+	fprintf(stderr, "Elaboration time: %f for %ld nodes\n", tmr, NLVer);
+#endif
+	
 #endif
 }
 
@@ -115,13 +115,25 @@ void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
   fprintf(stderr,"MatchBoxPC: rank %d nlver %ld nledge %ld [ %ld %ld ]\n",
 	  myRank,NLVer, NLEdge,verDistance[0],verDistance[1]);
 #endif
+#if 1
+	//	defined(OPENMP)
+	//fprintf(stderr,"Warning: using buggy OpenMP matching!\n");
+  salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(NLVer, NLEdge,
+							      verLocPtr, verLocInd, edgeLocWeight,
+							      verDistance,  Mate,
+							      myRank, numProcs, C_comm,
+							      msgIndSent, msgActualSent, msgPercent,
+							      ph0_time, ph1_time, ph2_time,
+							      ph1_card, ph2_card );
+#else
   salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(NLVer, NLEdge,
-							   verLocPtr, verLocInd, edgeLocWeight,
-							   verDistance,  Mate,
-							   myRank, numProcs, C_comm,
-							   msgIndSent, msgActualSent, msgPercent,
-							   ph0_time, ph1_time, ph2_time,
-							   ph1_card, ph2_card );
+							    verLocPtr, verLocInd, edgeLocWeight,
+							    verDistance,  Mate,
+							    myRank, numProcs, C_comm,
+							    msgIndSent, msgActualSent, msgPercent,
+							    ph0_time, ph1_time, ph2_time,
+							    ph1_card, ph2_card );
+#endif
 #endif
 }
 
