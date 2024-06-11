@@ -272,9 +272,7 @@ contains
           write(0,*) 'Impossible: mate(k) > nc'
           cycle
         else
-
           if (ilaggr(k) == ilaggr_neginit) then
-
             wk   = w(k)
             widx = w(idx)
             wmax = max(abs(wk),abs(widx))
