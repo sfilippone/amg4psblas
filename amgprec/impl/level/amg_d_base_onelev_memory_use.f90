@@ -98,7 +98,7 @@ subroutine amg_d_base_onelev_memory_use(lv,il,nl,ilmin,info,iout,verbosity,prefi
     prefix_ = ""
   end if
 
-  if (me == 0)   write(iout_,*) trim(prefix_)
+  if ((me == 0).or.(verbosity_>0)) write(iout_,*) trim(prefix_)
 
   if (global_) then
     allocate(sz(6))
