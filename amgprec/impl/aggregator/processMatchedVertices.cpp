@@ -91,57 +91,57 @@ void processMatchedVertices(
 		  if (mateVal < 0)  {
 #pragma omp critical
 		    {
-		      if (candidateMate[v - StartIndex] == u) {
+#pragma omp atomic read
+		      mateVal = Mate[v - StartIndex];
+		      // If the current vertex is pointing to a matched vertex and is not matched
+		      if (mateVal < 0)  {
+			
+			if (candidateMate[v - StartIndex] == u) {
 			  // Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-			w = computeCandidateMate(verLocPtr[v - StartIndex],
-						 verLocPtr[v - StartIndex + 1],
-						 edgeLocWeight, 0,
-						 verLocInd,
-						 StartIndex,
-						 EndIndex,
-						 GMate,
-						 Mate,
-						 Ghost2LocalMap);
-
-			candidateMate[v - StartIndex] = w;
-
+			  w = computeCandidateMate(verLocPtr[v - StartIndex],
+						   verLocPtr[v - StartIndex + 1],
+						   edgeLocWeight, 0,
+						   verLocInd, StartIndex, EndIndex,
+						   GMate, Mate, Ghost2LocalMap);
+			  candidateMate[v - StartIndex] = w;
 #ifdef PRINT_DEBUG_INFO_
-			cout << "\n(" << myRank << ")" << v << " Points to: " << w;
-			fflush(stdout);
+			  cout << "\n(" << myRank << ")" << v << " Points to: " << w;
+			  fflush(stdout);
 #endif
-			// If found a dominating edge:
-			if (w >= 0)   {
-			  if ((w < StartIndex) || (w > EndIndex))  { // A ghost
+			  // If found a dominating edge:
+			  if (w >= 0)   {
+			    if ((w < StartIndex) || (w > EndIndex))  { // A ghost
 #ifdef PRINT_DEBUG_INFO_
-			    cout << "\n(" << myRank << ")Sending a request message:";
-			    cout << "\n(" << myRank << ")Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs);
+			      cout << "\n(" << myRank << ")Sending a request message:";
+			      cout << "\n(" << myRank << ")Ghost is " << w << " Owner is: " << findOwnerOfGhost(w, verDistance, myRank, numProcs);
 #endif
-			    option = 2;
-
-			    if (candidateMate[NLVer + Ghost2LocalMap[w]] == v)  {
-			      option = 1;
-			      Mate[v - StartIndex] = w;     // v is a local vertex
-			      GMate[Ghost2LocalMap[w]] = v; // w is a ghost vertex
-
-			    } // End of if CandidateMate[w] = v
-			  }     // End of if a Ghost Vertex
-			  else    { // w is a local vertex
-			    if (candidateMate[w - StartIndex] == v)  {
-			      option = 3;
-			      Mate[v - StartIndex] = w; // v is a local vertex
-			      Mate[w - StartIndex] = v; // w is a local vertex
-
+			      option = 2;
+			      
+			      if (candidateMate[NLVer + Ghost2LocalMap[w]] == v)  {
+				option = 1;
+				Mate[v - StartIndex] = w;     // v is a local vertex
+				GMate[Ghost2LocalMap[w]] = v; // w is a ghost vertex
+				
+			      } // End of if CandidateMate[w] = v
+			    }     // End of if a Ghost Vertex
+			    else    { // w is a local vertex
+			      if (candidateMate[w - StartIndex] == v)  {
+				option = 3;
+				Mate[v - StartIndex] = w; // v is a local vertex
+				Mate[w - StartIndex] = v; // w is a local vertex
+				
 #ifdef PRINT_DEBUG_INFO_
-			      cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") ";
-			      fflush(stdout);
+				cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") ";
+				fflush(stdout);
 #endif
-			    } // End of if(CandidateMate(w) = v
-			  }     // End of Else
-			}         // End of if(w >=0)
-			else
-			  option = 4; // End of Else: w == -1
-			// End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
-		      } // End of If (candidateMate[v-StartIndex] == u
+			      } // End of if(CandidateMate(w) = v
+			    }     // End of Else
+			  }         // End of if(w >=0)
+			  else
+			    option = 4; // End of Else: w == -1
+			  // End:   PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
+			} // End of If (candidateMate[v-StartIndex] == u
+		      }
 		    }     // End of task
 		  }         // mateval < 0
 		}             // End of if ( (v >= StartIndex) && (v <= EndIndex) ) //If Local Vertex:
@@ -179,6 +179,7 @@ void processMatchedVertices(
 		    ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
 		    // assert(ghostOwner != -1);
 		    // assert(ghostOwner != myRank);
+#pragma omp atomic		    
 		    PCounter[ghostOwner]++;
 		    (*NumMessagesBundled)++;
 		    (*msgInd)++;
@@ -211,7 +212,7 @@ void processMatchedVertices(
 			ghostOwner = findOwnerOfGhost(w, verDistance, myRank, numProcs);
 			// assert(ghostOwner != -1);
 			// assert(ghostOwner != myRank);
-
+#pragma omp atomic		    
 			PCounter[ghostOwner]++;
 			(*NumMessagesBundled)++;
 			(*msgInd)++;
@@ -248,7 +249,6 @@ void processMatchedVertices(
 
 		    break;
 		  } // End of switch
-
 	      } // End of inner for
 	    }
 	  } // End of outer for
@@ -265,17 +265,15 @@ void processMatchedVertices(
 	    U.insert(U.end(), privateU.begin(), privateU.end());
 	  }
 
-	  privateU.clear();
-
 #pragma omp critical(sendMessageTransfer)
 	  {
-
 	    QLocalVtx.insert(QLocalVtx.end(), privateQLocalVtx.begin(), privateQLocalVtx.end());
 	    QGhostVtx.insert(QGhostVtx.end(), privateQGhostVtx.begin(), privateQGhostVtx.end());
 	    QMsgType.insert(QMsgType.end(), privateQMsgType.begin(), privateQMsgType.end());
 	    QOwner.insert(QOwner.end(), privateQOwner.begin(), privateQOwner.end());
 	  }
 
+	  privateU.clear();
 	  privateQLocalVtx.clear();
 	  privateQGhostVtx.clear();
 	  privateQMsgType.clear();
