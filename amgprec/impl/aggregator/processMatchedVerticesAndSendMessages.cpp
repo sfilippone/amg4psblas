@@ -51,15 +51,16 @@ void processMatchedVerticesAndSendMessagesD(
     MilanLongInt localVertices = 0;
 #endif
     //#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option) \
-    firstprivate(Message, privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx,\
-		 privateQMsgType, privateQOwner, UChunkBeingProcessed) default(shared) \
-        num_threads(NUM_THREAD)                                                        \
-            reduction(+                                                                \
-                      : msgInd[:1], PCounter                                           \
-                      [:numProcs], myCard                                              \
-                      [:1], NumMessagesBundled                                         \
-                      [:1], msgActual                                                  \
-                      [:1])
+  firstprivate(Message, privateU, StartIndex, EndIndex, privateQLocalVtx, \
+	       privateQGhostVtx, privateQMsgType, privateQOwner, UChunkBeingProcessed) \
+  default(shared)							\
+      num_threads(NUM_THREAD)						\
+  reduction(+								\
+	    : msgInd[:1], PCounter					\
+	    [:numProcs], myCard						\
+	    [:1], NumMessagesBundled					\
+	    [:1], msgActual						\
+	    [:1])
     {
 
         while (!U.empty()) {

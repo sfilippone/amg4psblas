@@ -724,6 +724,7 @@ contains
            & vnl, mate, iam, np,ictxt,&
            & msgis,msgas,msgprc,ph0t,ph1t,ph2t,ph1crd,ph2crd,info,display_inp)
       if (do_timings) call psb_toc(idx_cmboxp)
+      if (iam==0) write(0,*) iam,' buildmatching from PMatchBox:', info,ph0t,ph1t,ph2t
       if (debug) write(0,*) iam,' buildmatching from PMatchBox:', info
       if (debug_sync) then
         call psb_max(ictxt,info)

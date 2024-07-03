@@ -30,15 +30,16 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_BD(MilanLongInt NLVer,
                                        vector<MilanInt> &privateQOwner)
 {
 
-    MilanLongInt v = -1, k = -1, w = -1, adj11 = 0, adj12 = 0, k1 = 0;
+  MilanLongInt v = -1, k = -1, w = -1, adj11 = 0, adj12 = 0, k1 = 0;
     MilanInt ghostOwner = 0, option, igw;
 
-    //#pragma omp parallel private(option, k, w, v, k1, adj11, adj12, ghostOwner) \
-    firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) \
-     default(shared)   num_threads(NUM_THREAD)
+#pragma omp parallel private(option, k, w, v, k1, adj11, adj12, ghostOwner) \
+  firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx,	\
+	       privateQGhostVtx, privateQMsgType, privateQOwner)	\
+  default(shared)   num_threads(NUM_THREAD)
 
     {
-      //#pragma omp for reduction(+			\
+      #pragma omp for reduction(+			\
                           : PCounter[:numProcs], myCard \
                           [:1], msgInd                  \
                           [:1], NumMessagesBundled      \
@@ -216,17 +217,18 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_BS(MilanLongInt NLVer,
     MilanLongInt v = -1, k = -1, w = -1, adj11 = 0, adj12 = 0, k1 = 0;
     MilanInt ghostOwner = 0, option, igw;
 
-    //#pragma omp parallel private(option, k, w, v, k1, adj11, adj12, ghostOwner) \
-    firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) \
+#pragma omp parallel private(option, k, w, v, k1, adj11, adj12, ghostOwner) \
+    firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, \
+		 privateQGhostVtx, privateQMsgType, privateQOwner) \
      default(shared)   num_threads(NUM_THREAD)
 
     {
-      //#pragma omp for reduction(+			\
+#pragma omp for reduction(+				\
                           : PCounter[:numProcs], myCard \
                           [:1], msgInd                  \
                           [:1], NumMessagesBundled      \
-                          [:1]) \
-        schedule(static)
+                          [:1])				\
+  schedule(static)
         for (v = 0; v < NLVer; v++) {
             option = -1;
             // Start: PARALLEL_PROCESS_EXPOSED_VERTEX_B(v)
