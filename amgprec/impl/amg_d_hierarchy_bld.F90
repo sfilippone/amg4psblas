@@ -35,9 +35,9 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-! File: amg_s_hierarchy_bld.f90
+! File: amg_d_hierarchy_bld.f90
 !
-! Subroutine: amg_s_hierarchy_bld
+! Subroutine: amg_d_hierarchy_bld
 ! Version:    real
 !
 !  This routine builds the preconditioner according to the requirements made by
@@ -51,30 +51,30 @@
 ! 
 !
 ! Arguments:
-!    a       -  type(psb_sspmat_type).
+!    a       -  type(psb_dspmat_type).
 !               The sparse matrix structure containing the local part of the
 !               matrix to be preconditioned.
 !    desc_a  -  type(psb_desc_type), input.
 !               The communication descriptor of a.
-!    p       -  type(amg_sprec_type), input/output.
+!    p       -  type(amg_dprec_type), input/output.
 !               The preconditioner data structure; upon exit it contains 
 !               the multilevel hierarchy of prolongators, restrictors
 !               and coarse matrices.
 !    info    -  integer, output.
 !               Error code.              
 !  
-subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
+subroutine amg_d_hierarchy_bld(a,desc_a,prec,info)
 
   use psb_base_mod
-  use amg_s_inner_mod
-  use amg_s_prec_mod, amg_protect_name => amg_s_hierarchy_bld
+  use amg_d_inner_mod
+  use amg_d_prec_mod, amg_protect_name => amg_d_hierarchy_bld
 
   Implicit None
 
   ! Arguments
-  type(psb_sspmat_type),intent(in), target             :: a
+  type(psb_dspmat_type),intent(in), target             :: a
   type(psb_desc_type), intent(inout), target           :: desc_a
-  class(amg_sprec_type),intent(inout),target           :: prec
+  class(amg_dprec_type),intent(inout),target           :: prec
   integer(psb_ipk_), intent(out)                       :: info
 
   ! Local Variables
@@ -83,14 +83,14 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
   integer(psb_ipk_)   :: err,i,k, err_act, iszv, newsz,&
        & nplevs, mxplevs
   integer(psb_lpk_) :: iaggsize, casize, mncsize, mncszpp
-  real(psb_spk_)     :: mnaggratio, sizeratio, athresh, aomega
-  class(amg_s_base_smoother_type), allocatable :: coarse_sm, med_sm, &
+  real(psb_dpk_)     :: mnaggratio, sizeratio, athresh, aomega
+  class(amg_d_base_smoother_type), allocatable :: coarse_sm, med_sm, &
        & med_sm2, coarse_sm2
-  class(amg_s_base_aggregator_type), allocatable :: tmp_aggr
-  type(amg_sml_parms)              :: medparms, coarseparms
+  class(amg_d_base_aggregator_type), allocatable :: tmp_aggr
+  type(amg_dml_parms)              :: medparms, coarseparms
   integer(psb_lpk_), allocatable   :: ilaggr(:), nlaggr(:)
-  type(psb_lsspmat_type)            :: op_prol
-  type(amg_s_onelev_type), allocatable :: tprecv(:)    
+  type(psb_ldspmat_type)            :: op_prol
+  type(amg_d_onelev_type), allocatable :: tprecv(:)    
   integer(psb_ipk_)  :: debug_level, debug_unit
   character(len=20)  :: name, ch_err
   integer(psb_ipk_), save  :: idx_bldtp=-1, idx_matasb=-1
@@ -105,7 +105,7 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  name = 'amg_s_hierarchy_bld'
+  name = 'amg_d_hierarchy_bld'
   info = psb_success_
   ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
@@ -120,7 +120,7 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
   !
 
   if (.not.allocated(prec%precv)) then 
-    !! Error: should have called amg_sprecinit
+    !! Error: should have called amg_dprecinit
     info=3111
     call psb_errpush(info,name)
     goto 9999
@@ -507,9 +507,74 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
   return
 
 contains
+
+#if ( __GNUC__ == 13 && __GNUC_MINOR__ == 3) 
+  ! gfortran 13.3.0 generates a strange error here with MOLD
+  ! moving to SOURCE but only for this version, since it's heavier
   subroutine save_smoothers(level,save1, save2,info)
-    type(amg_s_onelev_type), intent(inout) :: level
-    class(amg_s_base_smoother_type), allocatable , intent(inout) :: save1, save2
+    type(amg_d_onelev_type), intent(inout) :: level
+    class(amg_d_base_smoother_type), allocatable , intent(inout) :: save1, save2
+    integer(psb_ipk_), intent(out) :: info
+
+    info  = 0 
+    if (allocated(save1)) then
+      call save1%free(info)
+      if (info  == 0) deallocate(save1,stat=info)
+      if (info /= 0) return
+    end if
+    if (allocated(save2)) then
+      call save2%free(info)
+      if (info  == 0) deallocate(save2,stat=info)
+      if (info /= 0) return
+    end if
+    allocate(save1, source=level%sm,stat=info)
+    if (info == 0) call level%sm%clone_settings(save1,info)
+    if ((info == 0).and.allocated(level%sm2a)) then
+      allocate(save2, source=level%sm2a,stat=info) 
+      if (info == 0) call level%sm2a%clone_settings(save2,info)
+    end if
+
+    return
+  end subroutine save_smoothers
+
+  subroutine restore_smoothers(level,save1, save2,info)
+    type(amg_d_onelev_type), intent(inout), target :: level
+    class(amg_d_base_smoother_type), allocatable, intent(inout) :: save1, save2
+    integer(psb_ipk_), intent(out) :: info
+
+    info  = 0
+
+    if (allocated(level%sm)) then
+      if (info  == 0) call level%sm%free(info)
+      if (info  == 0) deallocate(level%sm,stat=info)
+    end if
+    if (allocated(save1)) then
+      if (info  == 0) allocate(level%sm,source=save1,stat=info)
+      if (info == 0) call save1%clone_settings(level%sm,info)
+    end if
+
+    if (info /= 0) return
+
+    if (allocated(level%sm2a)) then
+      if (info  == 0) call level%sm2a%free(info)
+      if (info  == 0) deallocate(level%sm2a,stat=info)
+    end if
+    if (allocated(save2)) then
+      if (info  == 0) allocate(level%sm2a,source=save2,stat=info)
+      if (info == 0) call save2%clone_settings(level%sm2a,info)
+      if (info  == 0) level%sm2 => level%sm2a
+    else
+      if (allocated(level%sm)) level%sm2 => level%sm
+    end if
+
+    return
+  end subroutine restore_smoothers
+
+#else
+
+  subroutine save_smoothers(level,save1, save2,info)
+    type(amg_d_onelev_type), intent(inout) :: level
+    class(amg_d_base_smoother_type), allocatable , intent(inout) :: save1, save2
     integer(psb_ipk_), intent(out) :: info
 
     info  = 0 
@@ -534,8 +599,8 @@ contains
   end subroutine save_smoothers
 
   subroutine restore_smoothers(level,save1, save2,info)
-    type(amg_s_onelev_type), intent(inout), target :: level
-    class(amg_s_base_smoother_type), allocatable, intent(inout) :: save1, save2
+    type(amg_d_onelev_type), intent(inout), target :: level
+    class(amg_d_base_smoother_type), allocatable, intent(inout) :: save1, save2
     integer(psb_ipk_), intent(out) :: info
 
     info  = 0
@@ -565,5 +630,5 @@ contains
 
     return
   end subroutine restore_smoothers
-
-end subroutine amg_s_hierarchy_bld
+#endif
+end subroutine amg_d_hierarchy_bld
