@@ -34,12 +34,12 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_B(MilanLongInt NLVer,
     MilanLongInt v = -1, k = -1, w = -1, adj11 = 0, adj12 = 0, k1 = 0;
     MilanInt ghostOwner = 0, option, igw;
 
-#pragma omp parallel private(option, k, w, v, k1, adj11, adj12, ghostOwner)    \
+    //#pragma omp parallel private(option, k, w, v, k1, adj11, adj12, ghostOwner) \
     firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, privateQMsgType, privateQOwner) \
      default(shared)   num_threads(NUM_THREAD)
 
     {
-#pragma omp for reduction(+                             \
+      //#pragma omp for reduction(+			\
                           : PCounter[:numProcs], myCard \
                           [:1], msgInd                  \
                           [:1], NumMessagesBundled      \
