@@ -1,24 +1,23 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
 void sendBundledMessages(MilanLongInt *numGhostEdges,
-                                MilanInt *BufferSize,
-                                MilanLongInt *Buffer,
-                                vector<MilanLongInt> &PCumulative,
-                                vector<MilanLongInt> &PMessageBundle,
-                                vector<MilanLongInt> &PSizeInfoMessages,
-                                MilanLongInt *PCounter,
-                                MilanLongInt NumMessagesBundled,
-                                MilanLongInt *msgActual,
-                                MilanLongInt *msgInd,
-                                MilanInt numProcs,
-                                MilanInt myRank,
-                                MPI_Comm comm,
-                                vector<MilanLongInt> &QLocalVtx,
-                                vector<MilanLongInt> &QGhostVtx,
-                                vector<MilanLongInt> &QMsgType,
-                                vector<MilanInt> &QOwner,
-                                vector<MPI_Request> &SRequest,
-                                vector<MPI_Status> &SStatus)
+			 MilanInt *BufferSize,
+			 MilanLongInt *Buffer,
+			 vector<MilanLongInt> &PCumulative,
+			 vector<MilanLongInt> &PMessageBundle,
+			 vector<MilanLongInt> &PSizeInfoMessages,
+			 MilanLongInt *PCounter,
+			 MilanLongInt NumMessagesBundled,
+			 MilanLongInt *msgActual,
+			 MilanLongInt *msgInd,
+			 MilanInt numProcs,
+			 MilanInt myRank,
+			 MPI_Comm comm,
+			 vector<MilanLongInt> &QLocalVtx,
+			 vector<MilanLongInt> &QGhostVtx,
+			 vector<MilanLongInt> &QMsgType,
+			 vector<MilanInt> &QOwner,
+			 vector<MPI_Request> &SRequest,
+			 vector<MPI_Status> &SStatus)
 {
 
     MilanLongInt myIndex = 0, numMessagesToSend;
@@ -207,4 +206,3 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
 }
 }
 }
-#endif

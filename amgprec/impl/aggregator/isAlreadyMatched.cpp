@@ -1,5 +1,4 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
 /**
  * //TODO documentation
  * @param k
@@ -44,4 +43,3 @@ bool isAlreadyMatched(MilanLongInt node,
 
     return val >= 0; // Already matched
 }
-#endif

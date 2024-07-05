@@ -1303,16 +1303,16 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
 // SINGLE PRECISION VERSION
 
 void salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
-                                                              MilanLongInt NLVer, MilanLongInt NLEdge,
-                                                              MilanLongInt* verLocPtr, MilanLongInt* verLocInd,
-							      MilanFloat* edgeLocWeight,
-                                                              MilanLongInt* verDistance,
-                                                              MilanLongInt* Mate,
-                                                              MilanInt myRank, MilanInt numProcs, MPI_Comm comm,
-                                                              MilanLongInt* msgIndSent, MilanLongInt* msgActualSent,
-							      MilanReal* msgPercent,
-                                                              MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
-                                                              MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
+      MilanLongInt NLVer, MilanLongInt NLEdge,
+      MilanLongInt* verLocPtr, MilanLongInt* verLocInd,
+      MilanFloat* edgeLocWeight,
+      MilanLongInt* verDistance,
+      MilanLongInt* Mate,
+      MilanInt myRank, MilanInt numProcs, MPI_Comm comm,
+      MilanLongInt* msgIndSent, MilanLongInt* msgActualSent,
+      MilanReal* msgPercent,
+      MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
+      MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
 #if !defined(SERIAL_MPI)
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")Within algoEdgeApproxDominatingEdgesLinearSearchMessageBundling()"; fflush(stdout);
