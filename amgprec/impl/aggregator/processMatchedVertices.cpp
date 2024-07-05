@@ -338,7 +338,7 @@ void processMatchedVerticesS(
 #ifdef COUNT_LOCAL_VERTEX
     MilanLongInt localVertices = 0;
 #endif
-#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option) \
+    //#pragma omp parallel private(k, w, v, k1, adj1, adj2, adj11, adj12, ghostOwner, option) \
     firstprivate(privateU, StartIndex, EndIndex, privateQLocalVtx, privateQGhostVtx, \
        privateQMsgType, privateQOwner, UChunkBeingProcessed) \
        default(shared)  num_threads(NUM_THREAD)   \

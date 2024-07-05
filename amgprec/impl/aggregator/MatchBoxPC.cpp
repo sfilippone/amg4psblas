@@ -67,7 +67,7 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 #endif
 
 
-#define TIME_TRACKER
+#undef TIME_TRACKER
 #ifdef TIME_TRACKER
   double tmr = MPI_Wtime();
 #endif
