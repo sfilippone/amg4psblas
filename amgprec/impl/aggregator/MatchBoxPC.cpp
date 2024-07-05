@@ -72,8 +72,7 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
   double tmr = MPI_Wtime();
 #endif
 
-#if 1
-	//	defined(OPENMP)
+#if defined(OPENMP)
 	//fprintf(stderr,"Warning: using buggy OpenMP matching!\n");
         dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(NLVer, NLEdge,
 							   verLocPtr, verLocInd, edgeLocWeight,
@@ -115,8 +114,7 @@ void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
   fprintf(stderr,"MatchBoxPC: rank %d nlver %ld nledge %ld [ %ld %ld ]\n",
 	  myRank,NLVer, NLEdge,verDistance[0],verDistance[1]);
 #endif
-#if 1
-	//	defined(OPENMP)
+#if defined(OPENMP)
 	//fprintf(stderr,"Warning: using buggy OpenMP matching!\n");
   salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(NLVer, NLEdge,
 							      verLocPtr, verLocInd, edgeLocWeight,
