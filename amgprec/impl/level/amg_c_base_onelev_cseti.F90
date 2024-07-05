@@ -164,7 +164,7 @@ subroutine amg_c_base_onelev_cseti(lv,what,val,info,pos,idx)
     case (amg_bwgs_)
       call lv%set(amg_c_bwgs_solver_mold,info,pos=pos)
 
-    case (psb_ilu_n_,psb_milu_n_,psb_ilu_t_)
+    case (amg_ilu_n_,amg_milu_n_,amg_ilu_t_)
       call lv%set(amg_c_ilu_solver_mold,info,pos=pos)
       if (info == 0) then
         if ((ipos_==amg_smooth_pre_) .or.(ipos_==amg_smooth_both_)) then

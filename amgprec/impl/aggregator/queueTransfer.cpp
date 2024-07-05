@@ -1,5 +1,4 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
 void queuesTransfer(vector<MilanLongInt> &U,
                     vector<MilanLongInt> &privateU,
                     vector<MilanLongInt> &QLocalVtx,

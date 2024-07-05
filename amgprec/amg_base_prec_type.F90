@@ -215,7 +215,8 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_fbgs_     = 6
   integer(psb_ipk_), parameter :: amg_l1_gs_    = 7
   integer(psb_ipk_), parameter :: amg_l1_fbgs_  = 8
-  integer(psb_ipk_), parameter :: amg_max_prec_ = 8
+  integer(psb_ipk_), parameter :: amg_poly_     = 9
+  integer(psb_ipk_), parameter :: amg_max_prec_ = 9
   !
   ! Constants for pre/post signaling. Now only used internally
   !
@@ -233,9 +234,9 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_diag_scale_    = amg_slv_delta_+1
   integer(psb_ipk_), parameter :: amg_l1_diag_scale_ = amg_slv_delta_+2
   integer(psb_ipk_), parameter :: amg_gs_            = amg_slv_delta_+3
-  ! !$  integer(psb_ipk_), parameter :: amg_ilu_n_         = amg_slv_delta_+4
-  ! !$  integer(psb_ipk_), parameter :: amg_milu_n_        = amg_slv_delta_+5
-  ! !$  integer(psb_ipk_), parameter :: amg_ilu_t_         = amg_slv_delta_+6
+  integer(psb_ipk_), parameter :: amg_ilu_n_         = amg_slv_delta_+4
+  integer(psb_ipk_), parameter :: amg_milu_n_        = amg_slv_delta_+5
+  integer(psb_ipk_), parameter :: amg_ilu_t_         = amg_slv_delta_+6
   integer(psb_ipk_), parameter :: amg_slu_           = amg_slv_delta_+7
   integer(psb_ipk_), parameter :: amg_umf_           = amg_slv_delta_+8
   integer(psb_ipk_), parameter :: amg_sludist_       = amg_slv_delta_+9
@@ -320,6 +321,16 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_repl_mat_       = 1
   integer(psb_ipk_), parameter :: amg_max_coarse_mat_ = amg_repl_mat_
   !
+  ! Legal values for entry: amg_poly_variant_
+  !
+  integer(psb_ipk_), parameter :: amg_poly_lottes_      = 0
+  integer(psb_ipk_), parameter :: amg_poly_lottes_beta_ = 1
+  integer(psb_ipk_), parameter :: amg_poly_new_         = 2
+  integer(psb_ipk_), parameter :: amg_poly_dbg_         = 8
+  
+  integer(psb_ipk_), parameter :: amg_poly_rho_est_power_ = 0
+
+  !
   ! Legal values for entry: amg_prec_status_
   !
   integer(psb_ipk_), parameter :: amg_prec_built_ = 98765
@@ -390,12 +401,12 @@ module amg_base_prec_type
        &  ml_names(0:7)=(/'none          ','additive      ',&
        &  'multiplicative', 'VCycle        ','WCycle        ',&
        &  'KCycle        ','KCycleSym     ','new ML        '/)
-  character(len=15), parameter :: &
+  character(len=16), parameter :: &
        &  amg_fact_names(0:amg_max_sub_solve_)=(/&
        & 'none          ','Jacobi        ',&
        & 'L1-Jacobi     ','none          ','none          ',&
        & 'none          ','none          ','L1-GS         ',&
-       & 'L1-FBGS       ','none          ','Point Jacobi  ',&
+       & 'L1-FBGS       ','Polynomial    ','none          ','Point Jacobi  ',&
        & 'L1-Jacobi     ','Gauss-Seidel  ','ILU(n)        ',&
        & 'MILU(n)       ','ILU(t,n)      ',&
        & 'SuperLU       ','UMFPACK LU    ',&
@@ -457,12 +468,12 @@ contains
     character(len=*), parameter :: name='amg_stringval'
   ! Local variable
     integer :: index_tab
-    character(len=15) ::string2
+    character(len=128) ::string2
     index_tab=index(string,char(9))
     if (index_tab.NE.0)  then
-       string2=string(1:index_tab-1)
+      string2=string(1:index_tab-1)
     else
-       string2=string
+      string2=string
     endif
     select case(psb_toupper(trim(string2)))
     case('NONE')
@@ -482,11 +493,11 @@ contains
     case('BGS','BWGS')
       val = amg_bwgs_
     case('ILU')
-      val = psb_ilu_n_
+      val = amg_ilu_n_
     case('MILU')
-      val = psb_milu_n_
+      val = amg_milu_n_
     case('ILUT')
-      val = psb_ilu_t_
+      val = amg_ilu_t_
     case('MUMPS')
       val = amg_mumps_
     case('UMF')
@@ -557,6 +568,18 @@ contains
       val = amg_krm_
     case('AS')
       val = amg_as_
+    case('POLY')
+      val = amg_poly_
+    case('POLY_LOTTES')
+      val = amg_poly_lottes_
+    case('POLY_LOTTES_BETA')
+      val = amg_poly_lottes_beta_
+    case('POLY_NEW')
+      val = amg_poly_new_
+    case('POLY_DBG')
+      val = amg_poly_dbg_
+    case('POLY_RHO_EST_POWER')
+      val =  amg_poly_rho_est_power_
     case('A_NORMI')
       val = amg_max_norm_
     case('USER_CHOICE')
@@ -667,10 +690,10 @@ contains
            &   ml_names(pm%ml_cycle)
       select case (pm%ml_cycle)
       case (amg_add_ml_)
-        write(iout,*) '  Number of smoother sweeps : ',&
+        write(iout,*) '  Number of smoother sweeps/degree : ',&
              & pm%sweeps_pre
       case (amg_mult_ml_,amg_vcycle_ml_, amg_wcycle_ml_, amg_kcycle_ml_, amg_kcyclesym_ml_)
-        write(iout,*) '  Number of smoother sweeps : pre: ',&
+        write(iout,*) '  Number of smoother sweeps/degree : pre: ',&
              &  pm%sweeps_pre ,'  post: ', pm%sweeps_post
       end select
 
@@ -1036,8 +1059,8 @@ contains
     integer(psb_ipk_), intent(in) :: ip
     logical             :: is_legal_ilu_fact
 
-    is_legal_ilu_fact = ((ip==psb_ilu_n_).or.&
-         & (ip==psb_milu_n_).or.(ip==psb_ilu_t_))
+    is_legal_ilu_fact = ((ip==amg_ilu_n_).or.&
+         & (ip==amg_milu_n_).or.(ip==amg_ilu_t_))
     return
   end function is_legal_ilu_fact
   function is_legal_d_omega(ip)

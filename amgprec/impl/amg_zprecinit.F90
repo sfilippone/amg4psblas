@@ -98,6 +98,7 @@ subroutine amg_zprecinit(ctxt,prec,ptype,info)
   use amg_z_diag_solver
   use amg_z_ilu_solver
   use amg_z_gs_solver
+
 #if defined(HAVE_UMF_)
   use amg_z_umf_solver
 #endif
@@ -155,7 +156,6 @@ subroutine amg_zprecinit(ctxt,prec,ptype,info)
     if (info /= psb_success_) return
     allocate(amg_z_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
-
   case ('L1-DIAG','L1-JACOBI','L1_DIAG','L1_JACOBI')
     nlev_ = 1
     ilev_ = 1

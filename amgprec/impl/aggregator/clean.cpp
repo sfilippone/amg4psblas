@@ -1,5 +1,4 @@
 #include "MatchBoxPC.h"
-
 // TODO comment
 #if !defined(SERIAL_MPI)
 

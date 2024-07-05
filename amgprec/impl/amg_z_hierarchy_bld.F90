@@ -507,6 +507,71 @@ subroutine amg_z_hierarchy_bld(a,desc_a,prec,info)
   return
 
 contains
+
+#if ( __GNUC__ == 13 && __GNUC_MINOR__ == 3) 
+  ! gfortran 13.3.0 generates a strange error here with MOLD
+  ! moving to SOURCE but only for this version, since it's heavier
+  subroutine save_smoothers(level,save1, save2,info)
+    type(amg_z_onelev_type), intent(inout) :: level
+    class(amg_z_base_smoother_type), allocatable , intent(inout) :: save1, save2
+    integer(psb_ipk_), intent(out) :: info
+
+    info  = 0 
+    if (allocated(save1)) then
+      call save1%free(info)
+      if (info  == 0) deallocate(save1,stat=info)
+      if (info /= 0) return
+    end if
+    if (allocated(save2)) then
+      call save2%free(info)
+      if (info  == 0) deallocate(save2,stat=info)
+      if (info /= 0) return
+    end if
+    allocate(save1, source=level%sm,stat=info)
+    if (info == 0) call level%sm%clone_settings(save1,info)
+    if ((info == 0).and.allocated(level%sm2a)) then
+      allocate(save2, source=level%sm2a,stat=info) 
+      if (info == 0) call level%sm2a%clone_settings(save2,info)
+    end if
+
+    return
+  end subroutine save_smoothers
+
+  subroutine restore_smoothers(level,save1, save2,info)
+    type(amg_z_onelev_type), intent(inout), target :: level
+    class(amg_z_base_smoother_type), allocatable, intent(inout) :: save1, save2
+    integer(psb_ipk_), intent(out) :: info
+
+    info  = 0
+
+    if (allocated(level%sm)) then
+      if (info  == 0) call level%sm%free(info)
+      if (info  == 0) deallocate(level%sm,stat=info)
+    end if
+    if (allocated(save1)) then
+      if (info  == 0) allocate(level%sm,source=save1,stat=info)
+      if (info == 0) call save1%clone_settings(level%sm,info)
+    end if
+
+    if (info /= 0) return
+
+    if (allocated(level%sm2a)) then
+      if (info  == 0) call level%sm2a%free(info)
+      if (info  == 0) deallocate(level%sm2a,stat=info)
+    end if
+    if (allocated(save2)) then
+      if (info  == 0) allocate(level%sm2a,source=save2,stat=info)
+      if (info == 0) call save2%clone_settings(level%sm2a,info)
+      if (info  == 0) level%sm2 => level%sm2a
+    else
+      if (allocated(level%sm)) level%sm2 => level%sm
+    end if
+
+    return
+  end subroutine restore_smoothers
+
+#else
+
   subroutine save_smoothers(level,save1, save2,info)
     type(amg_z_onelev_type), intent(inout) :: level
     class(amg_z_base_smoother_type), allocatable , intent(inout) :: save1, save2
@@ -565,5 +630,5 @@ contains
 
     return
   end subroutine restore_smoothers
-
+#endif
 end subroutine amg_z_hierarchy_bld

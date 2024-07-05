@@ -234,7 +234,7 @@ contains
     ! Arguments
     class(amg_s_ilu_solver_type), intent(inout) :: sv
 
-    sv%fact_type = psb_ilu_n_
+    sv%fact_type = amg_ilu_n_
     sv%fill_in   = 0
     sv%thresh    = szero
 
@@ -255,13 +255,13 @@ contains
     info = psb_success_
 
     call amg_check_def(sv%fact_type,&
-         & 'Factorization',psb_ilu_n_,is_legal_ilu_fact)
+         & 'Factorization',amg_ilu_n_,is_legal_ilu_fact)
 
     select case(sv%fact_type)
-    case(psb_ilu_n_,psb_milu_n_)      
+    case(amg_ilu_n_,amg_milu_n_)      
       call amg_check_def(sv%fill_in,&
            & 'Level',izero,is_int_non_negative)
-    case(psb_ilu_t_)                 
+    case(amg_ilu_t_)                 
       call amg_check_def(sv%thresh,&
            & 'Eps',szero,is_legal_s_fact_thrs)
     end select
@@ -439,9 +439,9 @@ contains
     write(iout_,*) trim(prefix_), '  Incomplete factorization solver: ',&
          &  amg_fact_names(sv%fact_type)
     select case(sv%fact_type)
-    case(psb_ilu_n_,psb_milu_n_)      
+    case(amg_ilu_n_,amg_milu_n_)      
       write(iout_,*) trim(prefix_), '  Fill level:',sv%fill_in
-    case(psb_ilu_t_)         
+    case(amg_ilu_t_)         
       write(iout_,*) trim(prefix_), '  Fill level:',sv%fill_in
       write(iout_,*) trim(prefix_), '  Fill threshold :',sv%thresh
     end select
@@ -496,7 +496,7 @@ contains
     implicit none 
     integer(psb_ipk_)  :: val
     
-    val = psb_ilu_n_
+    val = amg_ilu_n_
   end function s_ilu_solver_get_id
 
   function s_ilu_solver_get_wrksize() result(val)

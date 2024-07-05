@@ -1,5 +1,4 @@
 #include "MatchBoxPC.h"
-
 void extractUChunk(
     vector<MilanLongInt> &UChunkBeingProcessed,
     vector<MilanLongInt> &U,

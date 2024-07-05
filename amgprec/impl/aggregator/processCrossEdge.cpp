@@ -1,5 +1,4 @@
 #include "MatchBoxPC.h"
-
 void PROCESS_CROSS_EDGE(MilanLongInt *edge,
                         MilanLongInt *S)
 {

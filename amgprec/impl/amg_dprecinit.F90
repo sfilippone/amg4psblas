@@ -98,6 +98,8 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
   use amg_d_diag_solver
   use amg_d_ilu_solver
   use amg_d_gs_solver
+  use amg_d_poly_smoother
+
 #if defined(HAVE_UMF_)
   use amg_d_umf_solver
 #endif
@@ -155,7 +157,14 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
     if (info /= psb_success_) return
     allocate(amg_d_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
-
+  case ('POLY')
+    nlev_ = 1
+    ilev_ = 1
+    allocate(prec%precv(nlev_),stat=info)
+    allocate(amg_d_poly_smoother_type :: prec%precv(ilev_)%sm, stat=info)
+    if (info /= psb_success_) return
+    allocate(amg_d_l1_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
+    call prec%precv(ilev_)%default()
   case ('L1-DIAG','L1-JACOBI','L1_DIAG','L1_JACOBI')
     nlev_ = 1
     ilev_ = 1

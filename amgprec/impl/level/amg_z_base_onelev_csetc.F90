@@ -43,7 +43,6 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_z_dec_aggregator_mod
   use amg_z_symdec_aggregator_mod
 #if !defined(SERIAL_MPI)
-#endif
   use amg_z_jac_smoother
   use amg_z_as_smoother
   use amg_z_diag_solver
@@ -202,16 +201,11 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
     case ('NONE','NOPREC','FACT_NONE')
       call lv%set(amg_z_id_solver_mold,info,pos=pos)
 
-    case ('DIAG')
+    case ('DIAG','JACOBI')
       call lv%set(amg_z_diag_solver_mold,info,pos=pos)
 
-    case ('JACOBI')
-      call lv%set(amg_z_jac_solver_mold,info,pos=pos)
-
-    case ('L1-DIAG')
+    case ('L1-DIAG','L1-JACOBI')
       call lv%set(amg_z_l1_diag_solver_mold,info,pos=pos)
-    case ('L1-JACOBI')
-      call lv%set(amg_z_l1_jac_solver_mold,info,pos=pos)
 
     case ('GS','FGS','FWGS')
       call lv%set(amg_z_gs_solver_mold,info,pos=pos)

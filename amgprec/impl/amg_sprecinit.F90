@@ -98,6 +98,8 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   use amg_s_diag_solver
   use amg_s_ilu_solver
   use amg_s_gs_solver
+  use amg_s_poly_smoother
+
 #if defined(HAVE_SLU_)
   use amg_s_slu_solver
 #endif
@@ -152,7 +154,14 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
     if (info /= psb_success_) return
     allocate(amg_s_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
-
+  case ('POLY')
+    nlev_ = 1
+    ilev_ = 1
+    allocate(prec%precv(nlev_),stat=info)
+    allocate(amg_s_poly_smoother_type :: prec%precv(ilev_)%sm, stat=info)
+    if (info /= psb_success_) return
+    allocate(amg_s_l1_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
+    call prec%precv(ilev_)%default()
   case ('L1-DIAG','L1-JACOBI','L1_DIAG','L1_JACOBI')
     nlev_ = 1
     ilev_ = 1

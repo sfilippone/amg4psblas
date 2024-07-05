@@ -15,6 +15,7 @@ amg_c_base_onelev_csetc.o \
 amg_c_base_onelev_cseti.o \
 amg_c_base_onelev_csetr.o \
 amg_c_base_onelev_descr.o \
+amg_c_base_onelev_memory_use.o \
 amg_c_base_onelev_dump.o \
 amg_c_base_onelev_free.o \
 amg_c_base_onelev_free_smoothers.o \
@@ -31,6 +32,7 @@ amg_d_base_onelev_csetc.o \
 amg_d_base_onelev_cseti.o \
 amg_d_base_onelev_csetr.o \
 amg_d_base_onelev_descr.o \
+amg_d_base_onelev_memory_use.o \
 amg_d_base_onelev_dump.o \
 amg_d_base_onelev_free.o \
 amg_d_base_onelev_free_smoothers.o \
@@ -47,6 +49,7 @@ amg_s_base_onelev_csetc.o \
 amg_s_base_onelev_cseti.o \
 amg_s_base_onelev_csetr.o \
 amg_s_base_onelev_descr.o \
+amg_s_base_onelev_memory_use.o \
 amg_s_base_onelev_dump.o \
 amg_s_base_onelev_free.o \
 amg_s_base_onelev_free_smoothers.o \
@@ -63,6 +66,7 @@ amg_z_base_onelev_csetc.o \
 amg_z_base_onelev_cseti.o \
 amg_z_base_onelev_csetr.o \
 amg_z_base_onelev_descr.o \
+amg_z_base_onelev_memory_use.o \
 amg_z_base_onelev_dump.o \
 amg_z_base_onelev_free.o \
 amg_z_base_onelev_free_smoothers.o \

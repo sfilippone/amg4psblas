@@ -1,24 +1,23 @@
 #include "MatchBoxPC.h"
-#if !defined(SERIAL_MPI)
 void sendBundledMessages(MilanLongInt *numGhostEdges,
-                                MilanInt *BufferSize,
-                                MilanLongInt *Buffer,
-                                vector<MilanLongInt> &PCumulative,
-                                vector<MilanLongInt> &PMessageBundle,
-                                vector<MilanLongInt> &PSizeInfoMessages,
-                                MilanLongInt *PCounter,
-                                MilanLongInt NumMessagesBundled,
-                                MilanLongInt *msgActual,
-                                MilanLongInt *msgInd,
-                                MilanInt numProcs,
-                                MilanInt myRank,
-                                MPI_Comm comm,
-                                vector<MilanLongInt> &QLocalVtx,
-                                vector<MilanLongInt> &QGhostVtx,
-                                vector<MilanLongInt> &QMsgType,
-                                vector<MilanInt> &QOwner,
-                                vector<MPI_Request> &SRequest,
-                                vector<MPI_Status> &SStatus)
+			 MilanInt *BufferSize,
+			 MilanLongInt *Buffer,
+			 vector<MilanLongInt> &PCumulative,
+			 vector<MilanLongInt> &PMessageBundle,
+			 vector<MilanLongInt> &PSizeInfoMessages,
+			 MilanLongInt *PCounter,
+			 MilanLongInt NumMessagesBundled,
+			 MilanLongInt *msgActual,
+			 MilanLongInt *msgInd,
+			 MilanInt numProcs,
+			 MilanInt myRank,
+			 MPI_Comm comm,
+			 vector<MilanLongInt> &QLocalVtx,
+			 vector<MilanLongInt> &QGhostVtx,
+			 vector<MilanLongInt> &QMsgType,
+			 vector<MilanInt> &QOwner,
+			 vector<MPI_Request> &SRequest,
+			 vector<MPI_Status> &SStatus)
 {
 
     MilanLongInt myIndex = 0, numMessagesToSend;
@@ -62,7 +61,7 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
 	      for (i = 0; i < numProcs; i++)
 		PCumulative[i + 1] = PCumulative[i] + PCounter[i];
 	    }
-	    
+
 #pragma omp task depend(inout \
                         : PCounter)
 	    {
@@ -84,7 +83,7 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
     PCounter[QOwner[i]]++;
   }
  }
- 
+
 // Send the Bundled Messages: Use ISend
 #pragma omp task depend(out \
                         : SRequest, SStatus)
@@ -101,7 +100,7 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
        exit(1);
      }
  }
- 
+
 // Send the Messages
 #pragma omp task depend(inout                                                  \
                         : SRequest, PSizeInfoMessages, PCumulative) depend(out \
