@@ -77,17 +77,17 @@ subroutine amg_d_poly_smoother_descr(sm,info,iout,coarse,prefix)
 
   write(iout_,*) trim(prefix_), '  Polynomial smoother   '
   select case(sm%variant)
-  case(amg_poly_lottes_)
-    write(iout_,*) trim(prefix_), '        variant:        ','POLY_LOTTES'
+  case(amg_cheb_4_)
+    write(iout_,*) trim(prefix_), '        variant:        ','CHEB_4'
     write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
     write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
-  case(amg_poly_lottes_beta_)
-    write(iout_,*) trim(prefix_), '        variant:        ','POLY_LOTTES_BETA'
+  case(amg_cheb_4_opt_)
+    write(iout_,*) trim(prefix_), '        variant:        ','CHEB_4_OPT'
     write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
     write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
     if (allocated(sm%poly_beta)) write(iout_,*) trim(prefix_), '   Coefficients:        ',sm%poly_beta(1:sm%pdegree)
-  case(amg_poly_new_)
-    write(iout_,*) trim(prefix_), '        variant:        ','POLY_NEW'
+  case(amg_cheb_1_opt_)
+    write(iout_,*) trim(prefix_), '        variant:        ','CHEB_1_OPT'
     write(iout_,*) trim(prefix_), '         Degree:        ',sm%pdegree
     write(iout_,*) trim(prefix_), '         rho_ba:        ',sm%rho_ba
     write(iout_,*) trim(prefix_), '    Coefficient:        ',sm%cf_a

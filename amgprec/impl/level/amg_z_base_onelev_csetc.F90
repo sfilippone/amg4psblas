@@ -42,7 +42,6 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_z_base_aggregator_mod
   use amg_z_dec_aggregator_mod
   use amg_z_symdec_aggregator_mod
-#if !defined(SERIAL_MPI)
   use amg_z_jac_smoother
   use amg_z_as_smoother
   use amg_z_diag_solver

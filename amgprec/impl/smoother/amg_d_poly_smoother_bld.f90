@@ -75,9 +75,9 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
   nrow_a = a%get_nrows()
   nztota = a%get_nzeros()
   select case(sm%variant)
-  case(amg_poly_lottes_)
+  case(amg_cheb_4_)
     ! do nothing
-  case(amg_poly_lottes_beta_)
+  case(amg_cheb_4_opt_)
     if ((1<=sm%pdegree).and.(sm%pdegree<=30)) then
       call psb_realloc(sm%pdegree,sm%poly_beta,info)
       sm%poly_beta(1:sm%pdegree) = amg_d_poly_beta_mat(1:sm%pdegree,sm%pdegree)
@@ -87,7 +87,7 @@ subroutine amg_d_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
            & a_err='invalid sm%degree for poly_beta')
       goto 9999
     end if
-  case(amg_poly_new_)
+  case(amg_cheb_1_opt_)
 
     if ((1<=sm%pdegree).and.(sm%pdegree<=30)) then
       !Ok

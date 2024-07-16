@@ -53,4 +53,4 @@ void PARALLEL_COMPUTE_CANDIDATE_MATE_BS(MilanLongInt NLVer,
         }
     }
 }
-#endif
+

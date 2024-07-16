@@ -44,6 +44,7 @@ subroutine amg_d_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_d_symdec_aggregator_mod
 #if !defined(SERIAL_MPI)
   use amg_d_parmatch_aggregator_mod
+#endif
   use amg_d_poly_smoother
   use amg_d_jac_smoother
   use amg_d_as_smoother

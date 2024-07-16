@@ -206,4 +206,3 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
 }
 }
 }
-#endif

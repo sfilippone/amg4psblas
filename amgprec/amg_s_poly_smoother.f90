@@ -322,7 +322,7 @@ contains
     !
     sm%pdegree      = 1
     sm%rho_ba       = -sone
-    sm%variant      = amg_poly_lottes_
+    sm%variant      = amg_cheb_4_
     sm%rho_estimate = amg_poly_rho_est_power_
     sm%rho_estimate_iterations = 20
     if (allocated(sm%sv)) then

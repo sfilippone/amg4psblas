@@ -582,4 +582,4 @@ void processMatchedVerticesS(
 #endif
     } // End of parallel region
 }
-#endif
+

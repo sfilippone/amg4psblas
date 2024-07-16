@@ -27,7 +27,7 @@ ML                        ! Preconditioner type: NONE JACOBI GS FBGS BJAC AS ML 
 FBGS                        ! Smoother type JACOBI FBGS GS BWGS BJAC AS POLY  r 1-level, repeats previous.
 6                           ! Number of sweeps for smoother
 1                           ! degree for polynomial smoother
-POLY_LOTTES_BETA            ! Polynomial variant
+CHEB_4_OPT            ! Polynomial variant
 %  Fields to be added for POLY
 %    POLY_RHO_ESTIMATE             Currently only POLY_RHO_EST_POWER
 %    POLY_RHO_ESTIMATE_ITERATIONS  default = 20
@@ -47,7 +47,7 @@ LLK                         ! AINV variant
 NONE                        ! Second (post) smoother, ignored if NONE
 6                           ! Number of sweeps for (post) smoother
 1                           ! degree for polynomial smoother
-POLY_LOTTES_BETA                 ! Polynomial variant
+CHEB_4_OPT                 ! Polynomial variant
 0                           ! Number of overlap layers for AS preconditioner
 HALO                        ! AS restriction operator: NONE HALO
 NONE                        ! AS prolongation operator: NONE SUM AVG

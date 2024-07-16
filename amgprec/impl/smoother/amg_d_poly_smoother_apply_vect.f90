@@ -140,7 +140,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
     call tz%zero()
 
     select case(sm%variant)
-    case(amg_poly_lottes_)
+    case(amg_cheb_4_)
       if (do_timings) call psb_tic(poly_1)
       block
         real(psb_dpk_)      :: cz, cr
@@ -172,7 +172,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
       end block
       if (do_timings) call psb_toc(poly_1)
 
-    case(amg_poly_lottes_beta_)
+    case(amg_cheb_4_opt_)
       if (do_timings) call psb_tic(poly_2)
       block
         real(psb_dpk_)      :: cz, cr
@@ -209,7 +209,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
         if (do_timings) call psb_toc(poly_vect)
       end block
       if (do_timings) call psb_toc(poly_2)
-    case(amg_poly_new_)
+    case(amg_cheb_1_opt_)
       if (do_timings) call psb_tic(poly_3)
       block
         real(psb_dpk_)      :: sigma, theta, delta, rho_old, rho

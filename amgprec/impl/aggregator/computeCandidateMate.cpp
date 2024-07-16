@@ -135,4 +135,4 @@ MilanLongInt computeCandidateMateS(MilanLongInt adj1,
 
     return w;
 }
-#endif
+

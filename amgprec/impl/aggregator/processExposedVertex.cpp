@@ -366,4 +366,4 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_BS(MilanLongInt NLVer,
 	
     } // End of parallel region
 }
-#endif
+

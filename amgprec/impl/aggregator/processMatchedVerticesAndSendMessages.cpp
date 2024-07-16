@@ -588,4 +588,4 @@ void processMatchedVerticesAndSendMessagesS(
     cout << myRank<<" Done sending messages"<<endl;
 #endif
 }
-#endif
+

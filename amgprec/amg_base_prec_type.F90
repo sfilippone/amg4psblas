@@ -323,10 +323,10 @@ module amg_base_prec_type
   !
   ! Legal values for entry: amg_poly_variant_
   !
-  integer(psb_ipk_), parameter :: amg_poly_lottes_      = 0
-  integer(psb_ipk_), parameter :: amg_poly_lottes_beta_ = 1
-  integer(psb_ipk_), parameter :: amg_poly_new_         = 2
-  integer(psb_ipk_), parameter :: amg_poly_dbg_         = 8
+  integer(psb_ipk_), parameter :: amg_cheb_4_     = 0
+  integer(psb_ipk_), parameter :: amg_cheb_4_opt_ = 1
+  integer(psb_ipk_), parameter :: amg_cheb_1_opt_ = 2
+  integer(psb_ipk_), parameter :: amg_poly_dbg_   = 8
   
   integer(psb_ipk_), parameter :: amg_poly_rho_est_power_ = 0
 
@@ -570,12 +570,12 @@ contains
       val = amg_as_
     case('POLY')
       val = amg_poly_
-    case('POLY_LOTTES')
-      val = amg_poly_lottes_
-    case('POLY_LOTTES_BETA')
-      val = amg_poly_lottes_beta_
-    case('POLY_NEW')
-      val = amg_poly_new_
+    case('CHEB_4')
+      val = amg_cheb_4_
+    case('CHEB_4_OPT')
+      val = amg_cheb_4_opt_
+    case('CHEB_1_OPT')
+      val = amg_cheb_1_opt_
     case('POLY_DBG')
       val = amg_poly_dbg_
     case('POLY_RHO_EST_POWER')
