@@ -162,6 +162,8 @@ program amg_s_pde2d
     integer(psb_ipk_)  :: jsweeps2     ! post-smoother sweeps
     integer(psb_ipk_)  :: degree2      ! degree for polynomial smoother
     character(len=32)  :: pvariant2    ! polynomial  variant
+    character(len=32)  :: prhovariant2 ! how to estimate rho(M^{-1}A)
+    real(psb_spk_)     :: prhovalue2   ! if previous is set value, we set it from this one
     integer(psb_ipk_)  :: novr2        ! number of overlap layers
     character(len=32)  :: restr2       ! restriction  over application of AS
     character(len=32)  :: prol2        ! prolongation over application of AS
@@ -344,7 +346,12 @@ program amg_s_pde2d
     call prec%set('smoother_sweeps', p_choice%jsweeps,    info)
     call prec%set('poly_degree',     p_choice%degree,    info)
     call prec%set('poly_variant',    p_choice%pvariant,  info)
-    
+    if (p_choice%prhovalue > szero ) then
+            call prec%set('poly_rho_ba', p_choice%prhovalue, info)
+    else
+            call prec%set('poly_rho_estimate', p_choice%prhovariant, info)
+    end if
+
     select case (psb_toupper(p_choice%smther))
     case ('GS','BWGS','FBGS','JACOBI','L1-JACOBI','L1-FBGS')
       ! do nothing
@@ -376,6 +383,12 @@ program amg_s_pde2d
       call prec%set('smoother_sweeps', p_choice%jsweeps2,  info,pos='post')
       call prec%set('poly_degree',     p_choice%degree2,   info,pos='post')
       call prec%set('poly_variant',    p_choice%pvariant2, info,pos='post')
+      if (p_choice%prhovalue > szero ) then
+         call prec%set('poly_rho_ba', p_choice%prhovalue2, info,pos='post')
+      else
+         call prec%set('poly_rho_estimate', p_choice%prhovariant2, info,pos='post')
+      end if
+
       select case (psb_toupper(p_choice%smther2))
       case ('GS','BWGS','FBGS','JACOBI','L1-JACOBI','L1-FBGS')
         ! do nothing
@@ -592,7 +605,9 @@ contains
       call read_data(prec%smther,inp_unit)     ! smoother type
       call read_data(prec%jsweeps,inp_unit)    ! (pre-)smoother / 1-lev prec sweeps
       call read_data(prec%degree,inp_unit)     ! (pre-)smoother / 1-lev prec sweeps
-      call read_data(prec%pvariant,inp_unit)   ! 
+      call read_data(prec%pvariant,inp_unit)   !
+      call read_data(prec%prhovariant,inp_unit)! how to estimate rho(M^{-1}A)
+      call read_data(prec%prhovalue,inp_unit)  ! if previous is set value, we set it from this one
       call read_data(prec%novr,inp_unit)       ! number of overlap layers
       call read_data(prec%restr,inp_unit)      ! restriction  over application of AS
       call read_data(prec%prol,inp_unit)       ! prolongation over application of AS
@@ -607,6 +622,8 @@ contains
       call read_data(prec%jsweeps2,inp_unit)    ! (post-)smoother sweeps
       call read_data(prec%degree2,inp_unit)    ! (post-)smoother sweeps
       call read_data(prec%pvariant2,inp_unit)   !
+      call read_data(prec%prhovariant2,inp_unit)! how to estimate rho(M^{-1}A)
+      call read_data(prec%prhovalue2,inp_unit)  ! if previous is set value, we set it from this one
       call read_data(prec%novr2,inp_unit)       ! number of overlap layers
       call read_data(prec%restr2,inp_unit)      ! restriction  over application of AS
       call read_data(prec%prol2,inp_unit)       ! prolongation over application of AS
