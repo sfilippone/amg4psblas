@@ -155,7 +155,7 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           cz = (2*i*sone-3)/(2*i*sone+sone)
           cr = (8*i*sone-4)/((2*i*sone+sone)*sm%rho_ba)
           if (do_timings) call psb_tic(poly_vect)
-          call psb_abgdxyz(cr,cz,sone,sone,ty,tz,tx,desc_data,info) ! zk = cz * zk-1 + cr * rk-1 
+          call psb_upd_xyz(cr,cz,sone,sone,ty,tz,tx,desc_data,info) ! zk = cz * zk-1 + cr * rk-1 
           if (do_timings) call psb_toc(poly_vect)
           if (do_timings) call psb_tic(poly_mv)
           call psb_spmm(-sone,sm%pa,tz,sone,r,desc_data,info,work=aux,trans=trans_)
@@ -167,7 +167,7 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
         cz = (2*sm%pdegree*sone-3)/(2*sm%pdegree*sone+sone)
         cr = (8*sm%pdegree*sone-4)/((2*sm%pdegree*sone+sone)*sm%rho_ba)
         if (do_timings) call psb_tic(poly_vect)
-        call psb_abgdxyz(cr,cz,sone,sone,ty,tz,tx,desc_data,info)
+        call psb_upd_xyz(cr,cz,sone,sone,ty,tz,tx,desc_data,info)
         if (do_timings) call psb_toc(poly_vect)
       end block
       if (do_timings) call psb_toc(poly_1)
@@ -195,7 +195,7 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           cz = (2*i*sone-3)/(2*i*sone+sone)
           cr = (8*i*sone-4)/((2*i*sone+sone)*sm%rho_ba)
           if (do_timings) call psb_tic(poly_vect)
-          call psb_abgdxyz(cr,cz,sm%poly_beta(i),sone,ty,tz,tx,desc_data,info)
+          call psb_upd_xyz(cr,cz,sm%poly_beta(i),sone,ty,tz,tx,desc_data,info)
           if (do_timings) call psb_toc(poly_vect)
           if (do_timings) call psb_tic(poly_mv)
           call psb_spmm(-sone,sm%pa,tz,sone,r,desc_data,info,work=aux,trans=trans_)
@@ -205,7 +205,7 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
         cz = (2*sm%pdegree*sone-3)/(2*sm%pdegree*sone+sone)
         cr = (8*sm%pdegree*sone-4)/((2*sm%pdegree*sone+sone)*sm%rho_ba)
         if (do_timings) call psb_tic(poly_vect)
-        call psb_abgdxyz(cr,cz,sm%poly_beta(sm%pdegree),sone,ty,tz,tx,desc_data,info)
+        call psb_upd_xyz(cr,cz,sm%poly_beta(sm%pdegree),sone,ty,tz,tx,desc_data,info)
         if (do_timings) call psb_toc(poly_vect)
       end block
       if (do_timings) call psb_toc(poly_2)
@@ -226,7 +226,7 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
         if (do_timings) call psb_toc(poly_sv)
         call psb_geaxpby((sone/sm%rho_ba),ty,szero,r,desc_data,info)
         if (do_timings) call psb_tic(poly_vect)
-        call psb_abgdxyz((sone/theta),szero,sone,sone,r,tz,tx,desc_data,info)
+        call psb_upd_xyz((sone/theta),szero,sone,sone,r,tz,tx,desc_data,info)
         if (do_timings) call psb_toc(poly_vect)
 
         ! tz == d
@@ -244,7 +244,7 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           ! d_{k+1} = (rho rho_old) d_k + 2(rho/delta) r_{k+1}
           rho = sone/(2*sigma - rho_old)
           if (do_timings) call psb_tic(poly_vect)
-          call psb_abgdxyz((2*rho/delta),(rho*rho_old),sone,sone,r,tz,tx,desc_data,info)
+          call psb_upd_xyz((2*rho/delta),(rho*rho_old),sone,sone,r,tz,tx,desc_data,info)
           if (do_timings) call psb_toc(poly_vect)
           rho_old = rho
         end do
