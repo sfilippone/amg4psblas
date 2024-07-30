@@ -147,6 +147,8 @@ program amg_s_pde3d
     integer(psb_ipk_)  :: jsweeps      ! (pre-)smoother / 1-lev prec. sweeps
     integer(psb_ipk_)  :: degree       ! degree for polynomial smoother
     character(len=32)  :: pvariant     ! polynomial  variant
+    character(len=32)  :: prhovariant  ! how to estimate rho(M^{-1}A)
+    real(psb_spk_)     :: prhovalue    ! if previous is set value, we set it from this one
     integer(psb_ipk_)  :: novr         ! number of overlap layers
     character(len=32)  :: restr        ! restriction over application of AS
     character(len=32)  :: prol         ! prolongation over application of AS
@@ -700,6 +702,8 @@ contains
     call psb_bcast(ctxt,prec%jsweeps)
     call psb_bcast(ctxt,prec%degree)
     call psb_bcast(ctxt,prec%pvariant)
+    call psb_bcast(ctxt,prec%prhovariant)
+    call psb_bcast(ctxt,prec%prhovalue)  
     call psb_bcast(ctxt,prec%novr)
     call psb_bcast(ctxt,prec%restr)
     call psb_bcast(ctxt,prec%prol)
@@ -714,6 +718,8 @@ contains
     call psb_bcast(ctxt,prec%jsweeps2)
     call psb_bcast(ctxt,prec%degree2)
     call psb_bcast(ctxt,prec%pvariant2)
+    call psb_bcast(ctxt,prec%prhovariant2)
+    call psb_bcast(ctxt,prec%prhovalue2)  
     call psb_bcast(ctxt,prec%novr2)
     call psb_bcast(ctxt,prec%restr2)
     call psb_bcast(ctxt,prec%prol2)
