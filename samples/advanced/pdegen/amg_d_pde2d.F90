@@ -70,7 +70,6 @@ program amg_d_pde2d
   use psb_util_mod
   use data_input
   use amg_d_pde2d_poisson_mod
-  use amg_d_pde2d_const_mod
   use amg_d_pde2d_exp_mod
   use amg_d_pde2d_box_mod
   use amg_d_pde2d_gauss_mod
@@ -254,19 +253,18 @@ program amg_d_pde2d
     call amg_gen_pde2d(ctxt,idim,a,b,x,desc_a,afmt,&
          & a1_poisson,a2_poisson,&
          & b1_poisson,b2_poisson,c_poisson,g_poisson,info)
-  case("CONST")
-    call amg_gen_pde2d(ctxt,idim,a,b,x,desc_a,afmt,&
-         & a1_const,a2_const,&
-         & b1_const,b2_const,c_const,g_const,info)
   case("EXP")
     call amg_gen_pde2d(ctxt,idim,a,b,x,desc_a,afmt,&
-        & a1_exp,a2_exp,b1_exp,b2_exp,c_exp,g_exp,info)
+         & a1_exp,a2_exp,&
+         & b1_exp,b2_exp,c_exp,g_exp,info)
   case("BOX")
     call amg_gen_pde2d(ctxt,idim,a,b,x,desc_a,afmt,&
-        & a1_box,a2_box,b1_box,b2_box,c_box,g_box,info)
+         & a1_box,a2_box,&
+         & b1_box,b2_box,c_box,g_box,info)
   case("GAUSS")
     call amg_gen_pde2d(ctxt,idim,a,b,x,desc_a,afmt,&
-        & a1_gauss,a2_gauss,b1_gauss,b2_gauss,c_gauss,g_gauss,info)
+         & a1_gauss,a2_gauss,&
+         & b1_gauss,b2_gauss,c_gauss,g_gauss,info)
   case default
     info=psb_err_from_subroutine_
     ch_err='amg_gen_pdecoeff'

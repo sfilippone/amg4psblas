@@ -71,7 +71,6 @@ program amg_d_pde3d
   use psb_util_mod
   use data_input
   use amg_d_pde3d_poisson_mod
-  use amg_d_pde3d_const_mod
   use amg_d_pde3d_exp_mod
   use amg_d_pde3d_box_mod
   use amg_d_pde3d_gauss_mod
@@ -256,19 +255,18 @@ program amg_d_pde3d
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
          & a1_poisson,a2_poisson,a3_poisson,&
          & b1_poisson,b2_poisson,b3_poisson,c_poisson,g_poisson,info)
-  case("CONST")
-    call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
-       & a1_const,a2_const,a3_const,&
-       & b1_const,b2_const,b3_const,c_const,g_const,info)
   case("EXP")
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
-        & a1_exp,a2_exp,a3_exp,b1_exp,b2_exp,b3_exp,c_exp,g_exp,info)
+         & a1_exp,a2_exp,a3_exp,&
+         & b1_exp,b2_exp,b3_exp,c_exp,g_exp,info)
   case("BOX")
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
-        & a1_box,a2_box,a3_box,b1_box,b2_box,b3_box,c_box,g_box,info)
+         & a1_box,a2_box,a3_box,&
+         & b1_box,b2_box,b3_box,c_box,g_box,info)
   case("GAUSS")
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
-        & a1_gauss,a2_gauss,a3_gauss,b1_gauss,b2_gauss,b3_gauss,c_gauss,g_gauss,info)
+         & a1_gauss,a2_gauss,a3_gauss,&
+         & b1_gauss,b2_gauss,b3_gauss,c_gauss,g_gauss,info)
   case default
     info=psb_err_from_subroutine_
     ch_err='amg_gen_pdecoeff'
