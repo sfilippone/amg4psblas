@@ -1,8 +1,10 @@
 %%%%%%%%%%%  General  arguments % Lines starting with % are ignored.
 CSR                         ! Storage format CSR COO JAD
 0150                        ! IDIM; domain size. Linear system size is IDIM**3
-CONST                       ! PDECOEFF: CONST, EXP, BOX, GAUSS Coefficients of the PDE
-CG                          ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES
+POISSON                     ! PDECOEFF: POISSON, CONST, EXP, BOX, GAUSS
+%                           ! Coefficients of the PDE
+CG                          ! Iterative method:
+%                           !    BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES
 2                           ! ISTOPC
 00008                       ! ITMAX
 1                           ! ITRACE
@@ -13,9 +15,9 @@ ML-VBM-VCYCLE-FBGS-D-BJAC       ! Longer descriptive name for preconditioner (up
 ML                        ! Preconditioner type: NONE JACOBI GS FBGS BJAC AS ML POLY
 %
 %%%%%%%%%%%  First smoother (for all levels but coarsest) %%%%%%%%%%%%%%%%
-FBGS                        ! Smoother type JACOBI FBGS GS BWGS BJAC AS POLY  r 1-level, repeats previous.
+POLY                        ! Smoother type JACOBI FBGS GS BWGS BJAC AS POLY  r 1-level, repeats previous.
 6                           ! Number of sweeps for smoother
-1                           ! degree for polynomial smoother
+6                           ! degree for polynomial smoother
 CHEB_4_OPT            ! Polynomial variant
 %  Fields to be added for POLY
 POLY_RHO_EST_POWER     %    POLY_RHO_ESTIMATE             Currently only POLY_RHO_EST_POWER
