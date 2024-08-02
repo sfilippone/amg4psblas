@@ -250,9 +250,13 @@ program amg_s_pde3d
   call psb_barrier(ctxt)
   t1 = psb_wtime()
   select case(psb_toupper(trim(pdecoeff)))
-  case("CONST")
+  case("POISSON")
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
-        & a1_base,a2_base,a3_base,b1_base,b2_base,b3_base,c_base,g_base,info)
+         & a1_poisson,a2_poisson,a3_poisson,&
+         & b1_poisson,b2_poisson,b3_poisson,c_poisson,g_poisson,info)
+  case("CONST") call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
+       & a1_const,a2_const,a3_const,&
+       & b1_const,b2_const,b3_const,c_const,g_const,info)
   case("EXP")
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
         & a1_exp,a2_exp,a3_exp,b1_exp,b2_exp,b3_exp,c_exp,g_exp,info)

@@ -69,7 +69,8 @@ program amg_s_pde2d
   use psb_krylov_mod
   use psb_util_mod
   use data_input
-  use amg_s_pde2d_base_mod
+  use amg_s_pde2d_poisson_mod
+  use amg_s_pde2d_const_mod
   use amg_s_pde2d_exp_mod
   use amg_s_pde2d_box_mod
   use amg_s_pde2d_gauss_mod
@@ -248,9 +249,14 @@ program amg_s_pde2d
   call psb_barrier(ctxt)
   t1 = psb_wtime()
   select case(psb_toupper(trim(pdecoeff)))
+  case("POISSON")
+    call amg_gen_pde2d(ctxt,idim,a,b,x,desc_a,afmt,&
+         & a1_poisson,a2_poisson,&
+         & b1_poisson,b2_poisson,c_poisson,g_poisson,info)
   case("CONST")
     call amg_gen_pde2d(ctxt,idim,a,b,x,desc_a,afmt,&
-        & a1_base,a2_base,b1_base,b2_base,c_base,g_base,info)
+         & a1_const,a2_const,&
+         & b1_const,b2_const,c_const,g_const,info)
   case("EXP")
     call amg_gen_pde2d(ctxt,idim,a,b,x,desc_a,afmt,&
         & a1_exp,a2_exp,b1_exp,b2_exp,c_exp,g_exp,info)

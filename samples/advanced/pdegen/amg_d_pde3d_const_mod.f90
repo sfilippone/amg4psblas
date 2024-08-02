@@ -34,56 +34,68 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-module amg_s_pde2d_base_mod
-  use psb_base_mod, only : psb_spk_, szero, sone
-  real(psb_spk_), save, private :: epsilon=sone/80
+module amg_d_pde3d_base_mod
+  use psb_base_mod, only : psb_dpk_, done, dzero
+  real(psb_dpk_), save, private :: epsilon=done/80
 contains
-  subroutine pde_set_parm2d_base(dat)
-    real(psb_spk_), intent(in) :: dat
+  subroutine pde_set_parm3d_base(dat)
+    real(psb_dpk_), intent(in) :: dat
     epsilon = dat
-  end subroutine pde_set_parm2d_base
+  end subroutine pde_set_parm3d_base
   !
   ! functions parametrizing the differential equation
   !
-  function b1_base(x,y)
+  function b1_base(x,y,z)
     implicit none 
-    real(psb_spk_) :: b1_base
-    real(psb_spk_), intent(in) :: x,y
-    b1_base = szero/1.414_psb_spk_
+    real(psb_dpk_) :: b1_base
+    real(psb_dpk_), intent(in) :: x,y,z
+    b1_base=done/sqrt(3.0_psb_dpk_)
   end function b1_base
-  function b2_base(x,y)
+  function b2_base(x,y,z)
     implicit none 
-    real(psb_spk_) ::  b2_base
-    real(psb_spk_), intent(in) :: x,y
-    b2_base = szero/1.414_psb_spk_
+    real(psb_dpk_) ::  b2_base
+    real(psb_dpk_), intent(in) :: x,y,z
+    b2_base=done/sqrt(3.0_psb_dpk_)
   end function b2_base
-  function c_base(x,y)
+  function b3_base(x,y,z)
     implicit none 
-    real(psb_spk_) ::  c_base
-    real(psb_spk_), intent(in) :: x,y
-    c_base = szero
+    real(psb_dpk_) ::  b3_base
+    real(psb_dpk_), intent(in) :: x,y,z
+    b3_base=dzero/sqrt(3.0_psb_dpk_)
+  end function b3_base
+  function c_base(x,y,z)
+    implicit none 
+    real(psb_dpk_) ::  c_base
+    real(psb_dpk_), intent(in) :: x,y,z
+    c_base=dzero
   end function c_base
-  function a1_base(x,y)
+  function a1_base(x,y,z)
     implicit none 
-    real(psb_spk_) ::  a1_base
-    real(psb_spk_), intent(in) :: x,y
-    a1_base=sone*epsilon
+    real(psb_dpk_) ::  a1_base
+    real(psb_dpk_), intent(in) :: x,y,z
+    a1_base=epsilon
   end function a1_base
-  function a2_base(x,y)
+  function a2_base(x,y,z)
     implicit none 
-    real(psb_spk_) ::  a2_base
-    real(psb_spk_), intent(in) :: x,y
-    a2_base=sone*epsilon
+    real(psb_dpk_) ::  a2_base
+    real(psb_dpk_), intent(in) :: x,y,z
+    a2_base=epsilon
   end function a2_base
-  function g_base(x,y)
+  function a3_base(x,y,z)
     implicit none 
-    real(psb_spk_) ::  g_base
-    real(psb_spk_), intent(in) :: x,y
-    g_base = szero
-    if (x == sone) then
-      g_base = sone
-    else if (x == szero) then
-      g_base = sone
+    real(psb_dpk_) ::  a3_base
+    real(psb_dpk_), intent(in) :: x,y,z
+    a3_base=epsilon
+  end function a3_base
+  function g_base(x,y,z)
+    implicit none 
+    real(psb_dpk_) ::  g_base
+    real(psb_dpk_), intent(in) :: x,y,z
+    g_base = dzero
+    if (x == done) then
+      g_base = done
+    else if (x == dzero) then
+      g_base = done
     end if
   end function g_base
-end module amg_s_pde2d_base_mod
+end module amg_d_pde3d_base_mod

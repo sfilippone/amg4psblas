@@ -8,10 +8,14 @@ FINCLUDES=$(FMFLAG). $(FMFLAG)$(AMGMODDIR) $(FMFLAG)$(AMGINCDIR) $(PSBLAS_INCLUD
 
 LINKOPT=
 EXEDIR=./runs
-DGEN2D=amg_d_pde2d_base_mod.o amg_d_pde2d_exp_mod.o amg_d_pde2d_gauss_mod.o amg_d_pde2d_box_mod.o
-DGEN3D=amg_d_pde3d_base_mod.o amg_d_pde3d_exp_mod.o amg_d_pde3d_gauss_mod.o amg_d_pde3d_box_mod.o 	
-SGEN2D=amg_s_pde2d_base_mod.o amg_s_pde2d_exp_mod.o amg_s_pde2d_gauss_mod.o amg_s_pde2d_box_mod.o
-SGEN3D=amg_s_pde3d_base_mod.o amg_s_pde3d_exp_mod.o amg_s_pde3d_gauss_mod.o amg_s_pde3d_box_mod.o 	
+DGEN2D=amg_d_pde2d_poisson_mod.o amg_d_pde2d_const_mod.o amg_d_pde2d_exp_mod.o \
+  amg_d_pde2d_gauss_mod.o amg_d_pde2d_box_mod.o
+DGEN3D=amg_d_pde3d_poisson_mod.o amg_d_pde3d_const_mod.o amg_d_pde3d_exp_mod.o \
+  amg_d_pde3d_gauss_mod.o amg_d_pde3d_box_mod.o 	
+SGEN2D=amg_s_pde2d_poisson_mod.o amg_s_pde2d_const_mod.o amg_s_pde2d_exp_mod.o \
+  amg_s_pde2d_gauss_mod.o amg_s_pde2d_box_mod.o
+SGEN3D=amg_s_pde3d_poisson_mod.o amg_s_pde3d_const_mod.o amg_s_pde3d_exp_mod.o \
+  amg_s_pde3d_gauss_mod.o amg_s_pde3d_box_mod.o 	
 
 all: amg_s_pde3d amg_d_pde3d amg_s_pde2d amg_d_pde2d
 

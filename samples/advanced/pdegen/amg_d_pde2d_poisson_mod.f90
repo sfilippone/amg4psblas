@@ -34,68 +34,56 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-module amg_d_pde3d_base_mod
-  use psb_base_mod, only : psb_dpk_, done, dzero
+module amg_d_pde2d_poisson_mod
+  use psb_base_mod, only : psb_dpk_, dzero, done
   real(psb_dpk_), save, private :: epsilon=done/80
 contains
-  subroutine pde_set_parm3d_base(dat)
+  subroutine pde_set_parm2d_poisson(dat)
     real(psb_dpk_), intent(in) :: dat
     epsilon = dat
-  end subroutine pde_set_parm3d_base
+  end subroutine pde_set_parm2d_poisson
   !
   ! functions parametrizing the differential equation
   !
-  function b1_base(x,y,z)
+  function b1_poisson(x,y)
     implicit none 
-    real(psb_dpk_) :: b1_base
-    real(psb_dpk_), intent(in) :: x,y,z
-    b1_base=dzero/sqrt(3.0_psb_dpk_)
-  end function b1_base
-  function b2_base(x,y,z)
+    real(psb_dpk_) :: b1_poisson
+    real(psb_dpk_), intent(in) :: x,y
+    b1_poisson = dzero
+  end function b1_poisson
+  function b2_poisson(x,y)
     implicit none 
-    real(psb_dpk_) ::  b2_base
-    real(psb_dpk_), intent(in) :: x,y,z
-    b2_base=dzero/sqrt(3.0_psb_dpk_)
-  end function b2_base
-  function b3_base(x,y,z)
+    real(psb_dpk_) ::  b2_poisson
+    real(psb_dpk_), intent(in) :: x,y
+    b2_poisson = dzero
+  end function b2_poisson
+  function c_poisson(x,y)
     implicit none 
-    real(psb_dpk_) ::  b3_base
-    real(psb_dpk_), intent(in) :: x,y,z
-    b3_base=dzero/sqrt(3.0_psb_dpk_)
-  end function b3_base
-  function c_base(x,y,z)
+    real(psb_dpk_) ::  c_poisson
+    real(psb_dpk_), intent(in) :: x,y
+    c_poisson = dzero
+  end function c_poisson
+  function a1_poisson(x,y)
     implicit none 
-    real(psb_dpk_) ::  c_base
-    real(psb_dpk_), intent(in) :: x,y,z
-    c_base=dzero
-  end function c_base
-  function a1_base(x,y,z)
+    real(psb_dpk_) ::  a1_poisson
+    real(psb_dpk_), intent(in) :: x,y
+    a1_poisson=done*epsilon
+  end function a1_poisson
+  function a2_poisson(x,y)
     implicit none 
-    real(psb_dpk_) ::  a1_base
-    real(psb_dpk_), intent(in) :: x,y,z
-    a1_base=epsilon
-  end function a1_base
-  function a2_base(x,y,z)
+    real(psb_dpk_) ::  a2_poisson
+    real(psb_dpk_), intent(in) :: x,y
+    a2_poisson=done*epsilon
+  end function a2_poisson
+  function g_poisson(x,y)
     implicit none 
-    real(psb_dpk_) ::  a2_base
-    real(psb_dpk_), intent(in) :: x,y,z
-    a2_base=epsilon
-  end function a2_base
-  function a3_base(x,y,z)
-    implicit none 
-    real(psb_dpk_) ::  a3_base
-    real(psb_dpk_), intent(in) :: x,y,z
-    a3_base=epsilon
-  end function a3_base
-  function g_base(x,y,z)
-    implicit none 
-    real(psb_dpk_) ::  g_base
-    real(psb_dpk_), intent(in) :: x,y,z
-    g_base = dzero
+    real(psb_dpk_) ::  g_poisson
+    real(psb_dpk_), intent(in) :: x,y
+    g_poisson = dzero
     if (x == done) then
-      g_base = done
+      g_poisson = done
     else if (x == dzero) then
-      g_base = done
+      g_poisson = done
     end if
-  end function g_base
-end module amg_d_pde3d_base_mod
+  end function g_poisson
+end module amg_d_pde2d_poisson_mod
