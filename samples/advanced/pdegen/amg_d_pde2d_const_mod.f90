@@ -49,7 +49,7 @@ contains
     implicit none 
     real(psb_dpk_) :: b1_const
     real(psb_dpk_), intent(in) :: x,y
-    b1_const = @ROONE@/1.414_psb_dpk_
+    b1_const = done/1.414_psb_dpk_
   end function b1_const
   function b2_const(x,y)
     implicit none 

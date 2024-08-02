@@ -82,7 +82,8 @@ program amg_s_pde2d
 
   ! input parameters
   character(len=20) :: kmethd, ptype
-  character(len=5)  :: afmt, pdecoeff
+  character(len=5)  :: afmt
+  character(len=32)  :: pdecoeff
   integer(psb_ipk_) :: idim
   integer(psb_epk_) :: system_size
 

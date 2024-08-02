@@ -70,7 +70,8 @@ program amg_d_pde3d
   use psb_krylov_mod
   use psb_util_mod
   use data_input
-  use amg_d_pde3d_base_mod
+  use amg_d_pde3d_poisson_mod
+  use amg_d_pde3d_const_mod
   use amg_d_pde3d_exp_mod
   use amg_d_pde3d_box_mod
   use amg_d_pde3d_gauss_mod
@@ -82,7 +83,8 @@ program amg_d_pde3d
 
   ! input parameters
   character(len=20) :: kmethd, ptype
-  character(len=5)  :: afmt, pdecoeff
+  character(len=5)  :: afmt
+  character(len=32)  :: pdecoeff
   integer(psb_ipk_) :: idim
   integer(psb_epk_) :: system_size
 
@@ -254,7 +256,8 @@ program amg_d_pde3d
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
          & a1_poisson,a2_poisson,a3_poisson,&
          & b1_poisson,b2_poisson,b3_poisson,c_poisson,g_poisson,info)
-  case("CONST") call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
+  case("CONST")
+    call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
        & a1_const,a2_const,a3_const,&
        & b1_const,b2_const,b3_const,c_const,g_const,info)
   case("EXP")
