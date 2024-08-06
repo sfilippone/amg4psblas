@@ -451,11 +451,16 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
     if (.not.associated(prec%precv(1)%base_desc,desc_a)) then
       prec%precv(1)%base_desc => prec%precv(1)%desc_ac
     end if
-    do i=2, iszv 
+    do i=2, iszv
       prec%precv(i)%base_a       => prec%precv(i)%ac
       prec%precv(i)%base_desc    => prec%precv(i)%desc_ac
-      prec%precv(i)%linmap%p_desc_U => prec%precv(i-1)%base_desc
-      prec%precv(i)%linmap%p_desc_V => prec%precv(i)%base_desc
+      ! This is needed when the linmap object has been built
+      ! reusing the base_desc descriptor through a pointer.
+      ! With PSBLAS 4 we will have a better solution
+      if (associated(prec%precv(i)%linmap%p_desc_U)) &
+           & prec%precv(i)%linmap%p_desc_U => prec%precv(i-1)%base_desc
+      if (associated(prec%precv(i)%linmap%p_desc_V))&
+           & prec%precv(i)%linmap%p_desc_V => prec%precv(i)%base_desc
     end do
   end if
 
