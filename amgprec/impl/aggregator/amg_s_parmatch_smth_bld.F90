@@ -246,7 +246,7 @@ subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
 
       enddo
       if (jd == -1) then
-        write(0,*) 'Wrong input: we need the diagonal!!!!', i
+        write(0,*) name,': Warning: there is no diagonal element', i
       else
         acsrf%val(jd)=acsrf%val(jd)-tmp
       end if

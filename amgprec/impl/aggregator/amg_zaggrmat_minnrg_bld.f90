@@ -300,7 +300,7 @@ subroutine amg_zaggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
 !!$        endif
 !!$      enddo
 !!$      if (jd == -1) then 
-!!$        write(0,*) 'Wrong input: we need the diagonal!!!!', i
+!!$                write(0,*) name,': Warning: there is no diagonal element', i
 !!$      else
 !!$        acsrf%val(jd)=acsrf%val(jd)-tmp
 !!$      end if
