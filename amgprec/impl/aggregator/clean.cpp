@@ -1,6 +1,7 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
+
 // TODO comment
+#if !defined(SERIAL_MPI)
 
 void clean(MilanLongInt NLVer,
            MilanInt myRank,

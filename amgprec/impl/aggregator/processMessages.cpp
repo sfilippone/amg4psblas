@@ -1,6 +1,6 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
 //#define DEBUG_HANG_
+#if !defined(SERIAL_MPI)
 
 void processMessages(
     MilanLongInt NLVer,
@@ -139,12 +139,12 @@ void processMessages(
       if (!ReceiveBuffer.empty())
 	ReceiveBuffer.clear();            // Empty it out first
       ReceiveBuffer.resize(bundleSize, -1); // Initialize
-
+      
       ReceiveBuffer[0] = Message[0]; // u
       ReceiveBuffer[1] = Message[1]; // v
       ReceiveBuffer[2] = Message[2]; // message_type
     }
-
+    
 #ifdef DEBUG_GHOST_
     if ((v < StartIndex) || (v > EndIndex)) {
       cout << "\n(" << myRank << ") From ReceiveBuffer: This should not happen: u= " << u << " v= " << v << " Type= " << message_type << " StartIndex " << StartIndex << " EndIndex " << EndIndex << endl;
@@ -161,7 +161,7 @@ void processMessages(
       u = ReceiveBuffer[bundleCounter - 3];            // GHOST
       v = ReceiveBuffer[bundleCounter - 2];            // LOCAL
       message_type = ReceiveBuffer[bundleCounter - 1]; // TYPE
-
+      
       // CASE I: REQUEST
       if (message_type == REQUEST)  {
 #ifdef PRINT_DEBUG_INFO_
@@ -189,7 +189,7 @@ void processMessages(
 	    cout << "\n(" << myRank << ")MATCH: (" << v << "," << u << ") " << endl;
 	    fflush(stdout);
 #endif
-
+	    
 	    PROCESS_CROSS_EDGE(&Counter[Ghost2LocalMap[u]], S);
 	  } // End of if ( candidateMate[v-StartIndex] == u )e
 	}     // End of if ( Mate[v] == -1 )
@@ -250,7 +250,7 @@ void processMessages(
 		    cout << "\n(" << myRank << ")MATCH: (" << v << "," << w << ") " << endl;
 		    fflush(stdout);
 #endif
-
+		    
 		    PROCESS_CROSS_EDGE(&Counter[Ghost2LocalMap[w]], S);
 		  } // End of if CandidateMate[w] = v
 		}     // End of if a Ghost Vertex
@@ -311,7 +311,7 @@ void processMessages(
 	}                                                       // End of else: CASE III
       }                                                           // End of else: CASE I
     }
-
+    
     return;
 }
 #endif

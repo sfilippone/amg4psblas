@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
+#if !defined(SERIAL_MPI)
 void sendBundledMessages(MilanLongInt *numGhostEdges,
                                 MilanInt *BufferSize,
                                 MilanLongInt *Buffer,
@@ -62,7 +62,7 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
 	      for (i = 0; i < numProcs; i++)
 		PCumulative[i + 1] = PCumulative[i] + PCounter[i];
 	    }
-
+	    
 #pragma omp task depend(inout \
                         : PCounter)
 	    {
@@ -84,7 +84,7 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
     PCounter[QOwner[i]]++;
   }
  }
-
+ 
 // Send the Bundled Messages: Use ISend
 #pragma omp task depend(out \
                         : SRequest, SStatus)
@@ -101,7 +101,7 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
        exit(1);
      }
  }
-
+ 
 // Send the Messages
 #pragma omp task depend(inout                                                  \
                         : SRequest, PSizeInfoMessages, PCumulative) depend(out \

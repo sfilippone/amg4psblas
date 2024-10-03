@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
+
 void extractUChunk(
     vector<MilanLongInt> &UChunkBeingProcessed,
     vector<MilanLongInt> &U,
@@ -29,4 +29,3 @@ void extractUChunk(
 
     } // End of critical U // End of critical U
 }
-#endif

@@ -1,5 +1,5 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
+
 // ***********************************************************************
 //
 //        MatchboxP: A C++ library for approximate weighted matching
@@ -126,10 +126,8 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     fflush(stdout);
 #endif
 
-    // The starting vertex owned by the current rank
-    MilanLongInt StartIndex = verDistance[myRank];
-    // The ending vertex owned by the current rank
-    MilanLongInt EndIndex   = verDistance[myRank + 1] - 1;
+    MilanLongInt StartIndex = verDistance[myRank];       // The starting vertex owned by the current rank
+    MilanLongInt EndIndex   = verDistance[myRank + 1] - 1; // The ending vertex owned by the current rank
 
     MPI_Status computeStatus;
 
@@ -147,8 +145,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     // only one message will be sent in the initialization phase -
     // one of: REQUEST/FAILURE/SUCCESS
     vector<MilanLongInt> QLocalVtx, QGhostVtx, QMsgType;
-    // Changed by Fabio to be an integer, addresses needs to be integers!
-    vector<MilanInt> QOwner; 
+    vector<MilanInt> QOwner; // Changed by Fabio to be an integer, addresses needs to be integers!
 
     MilanLongInt *PCounter = new MilanLongInt[numProcs];
     for (int i = 0; i < numProcs; i++)
@@ -156,8 +153,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 
     MilanLongInt NumMessagesBundled = 0;
     // TODO when the last computational section will be refactored this could be eliminated
-    // Changed by Fabio to be an integer, addresses needs to be integers!
-    MilanInt ghostOwner = 0; 
+    MilanInt ghostOwner = 0; // Changed by Fabio to be an integer, addresses needs to be integers!
     MilanLongInt *candidateMate = nullptr;
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << ")NV: " << NLVer << "  Edges: " << NLEdge;
@@ -172,12 +168,9 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     MilanLongInt myCard = 0;
 
     // Build the Ghost Vertex Set: Vg
-    // Map each ghost vertex to a local vertex
-    map<MilanLongInt, MilanLongInt> Ghost2LocalMap;
-    // Store the edge count for each ghost vertex
-    vector<MilanLongInt> Counter;
-    // Number of Ghost vertices
-    MilanLongInt numGhostVertices = 0, numGhostEdges = 0; 
+    map<MilanLongInt, MilanLongInt> Ghost2LocalMap;       // Map each ghost vertex to a local vertex
+    vector<MilanLongInt> Counter;                         // Store the edge count for each ghost vertex
+    MilanLongInt numGhostVertices = 0, numGhostEdges = 0; // Number of Ghost vertices
 
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << ")About to compute Ghost Vertices...";
@@ -229,7 +222,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     cout << myRank << " Finished initialization" << endl;
     fflush(stdout);
 #endif
-
+   
     startTime = MPI_Wtime();
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -398,7 +391,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
     cout << myRank << " Finished sendBundles" << endl;
     fflush(stdout);
 #endif
-
+ 
     *ph1_card = myCard;                 // Cardinality at the end of Phase-1
     startTime = MPI_Wtime();
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -429,7 +422,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
         ///////////////////////////////////////////////////////////////////////////////////
         /////////////////////////// PROCESS MATCHED VERTICES //////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////
-
+      
       processMatchedVerticesAndSendMessages(NLVer,
 					    UChunkBeingProcessed,
 					    U,
@@ -463,7 +456,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 					    comm,
 					    &msgActual,
 					    Message);
-
+      
       ///////////////////////// END OF PROCESS MATCHED VERTICES /////////////////////////
 
         //// BREAK IF NO MESSAGES EXPECTED /////////
@@ -558,5 +551,4 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
 // End of algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMate
 #endif
 
-#endif
 #endif

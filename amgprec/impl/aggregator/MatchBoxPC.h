@@ -59,11 +59,7 @@
 #include <assert.h>
 #include <map>
 #include <vector>
-#ifdef OPENMP
-// OpenMP is included and used if and only if the OpenMP version of the matching
-// is required
 #include "omp.h"
-#endif
 #include "primitiveDataTypeDefinitions.h"
 #include "dataStrStaticQueue.h"
 
@@ -82,6 +78,8 @@ const int BundleTag = 9;  // Predefined tag
 
 static vector<MilanLongInt> DEFAULT_VECTOR;
 
+#if !defined(SERIAL_MPI)
+
 // MPI type map
 template <typename T>
 MPI_Datatype TypeMap();
@@ -93,6 +91,7 @@ template <>
 inline MPI_Datatype TypeMap<double>() { return MPI_DOUBLE; }
 template <>
 inline MPI_Datatype TypeMap<float>() { return MPI_FLOAT; }
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -177,10 +176,6 @@ extern "C"
 #define MilanRealMax PLUS_INFINITY
 #define MilanRealMin MINUS_INFINITY
 #endif
-
-#ifdef OPENMP
-/* These functions are only used in the experimental OMP implementation, if that
-is disabled there is no reason to actually compile or reference them. */
 
     // Function of find the owner of a ghost vertex using binary search:
     MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
@@ -428,14 +423,6 @@ is disabled there is no reason to actually compile or reference them. */
         MilanLongInt *msgIndSent, MilanLongInt *msgActualSent, MilanReal *msgPercent,
         MilanReal *ph0_time, MilanReal *ph1_time, MilanReal *ph2_time,
         MilanLongInt *ph1_card, MilanLongInt *ph2_card);
-#endif
-
-
-#ifndef OPENMP
-   //Function of find the owner of a ghost vertex using binary search:
-   inline MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
-                                        MilanInt myRank, MilanInt numProcs);
-#endif
 
     void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
         MilanLongInt NLVer, MilanLongInt NLEdge,

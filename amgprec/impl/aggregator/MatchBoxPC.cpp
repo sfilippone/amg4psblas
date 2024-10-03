@@ -42,7 +42,6 @@
 #include <stdlib.h>
 #if !defined(SERIAL_MPI)
 #include <mpi.h>
-#endif
 
 #include "MatchBoxPC.h"
 #ifdef __cplusplus
@@ -72,9 +71,8 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
         double tmr = MPI_Wtime();
     #endif
 
-// Rimosso per tornare al vecchio matching #define OMP
-#ifdef OPENMP
-	//fprintf(stderr,"Warning: using buggy OpenMP matching!\n");
+#define OMP
+#ifdef OMP
         dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(NLVer, NLEdge,
 							   verLocPtr, verLocInd, edgeLocWeight,
 							   verDistance,  Mate,
@@ -127,4 +125,5 @@ void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 
 #ifdef __cplusplus
 }
+#endif
 #endif

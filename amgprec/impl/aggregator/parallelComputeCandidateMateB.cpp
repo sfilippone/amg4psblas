@@ -1,5 +1,6 @@
 #include "MatchBoxPC.h"
-#ifdef OPENMP
+#if !defined(SERIAL_MPI)
+
 void PARALLEL_COMPUTE_CANDIDATE_MATE_B(MilanLongInt NLVer,
                                               MilanLongInt *verLocPtr,
                                               MilanLongInt *verLocInd,
