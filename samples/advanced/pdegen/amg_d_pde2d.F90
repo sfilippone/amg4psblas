@@ -126,7 +126,7 @@ program amg_d_pde2d
     ! AMG cycles for ML
     ! general AMG data
     character(len=32)  :: mlcycle      ! AMG cycle type
-    integer(psb_ipk_)  :: maxlevs      ! maximum number of levels in AMG preconditioner
+    integer(psb_ipk_)  :: maxlevs     ! maximum number of levels in AMG preconditioner
 
     ! AMG aggregation
     character(len=32)  :: aggr_prol    ! aggregation type: SMOOTHED, NONSMOOTHED
@@ -174,15 +174,15 @@ program amg_d_pde2d
     real(psb_dpk_)      :: thr2         ! threshold for ILUT factorization
 
     ! coarsest-level solver
-    character(len=32)  :: cmat         ! coarsest matrix layout: REPL, DIST
-    character(len=32)  :: csolve       ! coarsest-lev solver: BJAC, SLUDIST (distr.
-                                       ! mat.); UMF, MUMPS, SLU, ILU, ILUT, MILU
-                                       ! (repl. mat.)
-    character(len=32)  :: csbsolve     ! coarsest-lev local subsolver: ILU, ILUT,
-                                       ! MILU, UMF, MUMPS, SLU
-    integer(psb_ipk_)  :: cfill        ! fill-in for incomplete LU factorization
-    real(psb_dpk_)     :: cthres        ! threshold for ILUT factorization
-    integer(psb_ipk_)  :: cjswp        ! sweeps for GS or JAC coarsest-lev subsolver
+    character(len=32)  :: cmat        ! coarsest matrix layout: REPL, DIST
+    character(len=32)  :: csolve      ! coarsest-lev solver: BJAC, SLUDIST (distr.
+                                      ! mat.); UMF, MUMPS, SLU, ILU, ILUT, MILU
+                                      ! (repl. mat.)
+    character(len=32)  :: csbsolve    ! coarsest-lev local subsolver: ILU, ILUT,
+                                      ! MILU, UMF, MUMPS, SLU
+    integer(psb_ipk_)  :: cfill       ! fill-in for incomplete LU factorization
+    real(psb_dpk_)     :: cthres      ! threshold for ILUT factorization
+    integer(psb_ipk_)  :: cjswp       ! sweeps for GS or JAC coarsest-lev subsolver
 
     ! Dump data
     logical            :: dump = .false.

@@ -1,10 +1,10 @@
 %%%%%%%%%%%  General  arguments % Lines starting with % are ignored.
 CSR                         ! Storage format CSR COO JAD
-0150                        ! IDIM; domain size. Linear system size is IDIM**3
-CONST                       ! PDECOEFF: CONST, EXP, BOX, GAUSS Coefficients of the PDE
+0040                        ! IDIM; domain size. Linear system size is IDIM**3
+CONST                       ! PDECOEFF: CONST, EXP, GAUSS Coefficients of the PDE
 CG                          ! Iterative method: BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES
 2                           ! ISTOPC
-00500                       ! ITMAX
+00008                       ! ITMAX
 1                           ! ITRACE
 30                          ! IRST (restart for RGMRES and BiCGSTABL)
 1.d-6                       ! EPS

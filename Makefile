@@ -3,9 +3,9 @@ include Make.inc
 
 all:  objs lib
 
-objs: amgp cbnd
+objs: libdir amgp cbnd
 
-lib: libdir objs
+lib:  objs
 	cd amgprec && $(MAKE) lib
 	cd cbind && $(MAKE)  lib
 

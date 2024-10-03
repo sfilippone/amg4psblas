@@ -126,16 +126,16 @@ program amg_s_pde2d
     ! AMG cycles for ML
     ! general AMG data
     character(len=32)  :: mlcycle      ! AMG cycle type
-    integer(psb_ipk_)  :: maxlevs      ! maximum number of levels in AMG preconditioner
+    integer(psb_ipk_)  :: maxlevs     ! maximum number of levels in AMG preconditioner
 
     ! AMG aggregation
     character(len=32)  :: aggr_prol    ! aggregation type: SMOOTHED, NONSMOOTHED
     character(len=32)  :: par_aggr_alg ! parallel aggregation algorithm: DEC, SYMDEC
-    character(len=32)  :: aggr_type    ! Type of aggregation SOC1, SOC2, MATCHBOXP
-    integer(psb_ipk_)  :: aggr_size    ! Requested size of the aggregates for MATCHBOXP
-    character(len=32)  :: aggr_ord     ! ordering for aggregation: NATURAL, DEGREE
-    character(len=32)  :: aggr_filter  ! filtering: FILTER, NO_FILTER
-    real(psb_spk_)      :: mncrratio    ! minimum aggregation ratio
+    character(len=32)  :: aggr_type   ! Type of aggregation SOC1, SOC2, MATCHBOXP
+    integer(psb_ipk_)  :: aggr_size   ! Requested size of the aggregates for MATCHBOXP
+    character(len=32)  :: aggr_ord    ! ordering for aggregation: NATURAL, DEGREE
+    character(len=32)  :: aggr_filter ! filtering: FILTER, NO_FILTER
+    real(psb_spk_)     :: mncrratio  ! minimum aggregation ratio
     real(psb_spk_), allocatable :: athresv(:) ! smoothed aggregation threshold vector
     integer(psb_ipk_)  :: thrvsz       ! size of threshold vector
     real(psb_spk_)      :: athres       ! smoothed aggregation threshold
@@ -174,15 +174,15 @@ program amg_s_pde2d
     real(psb_spk_)      :: thr2         ! threshold for ILUT factorization
 
     ! coarsest-level solver
-    character(len=32)  :: cmat         ! coarsest matrix layout: REPL, DIST
-    character(len=32)  :: csolve       ! coarsest-lev solver: BJAC, SLUDIST (distr.
-                                       ! mat.); UMF, MUMPS, SLU, ILU, ILUT, MILU
-                                       ! (repl. mat.)
-    character(len=32)  :: csbsolve     ! coarsest-lev local subsolver: ILU, ILUT,
-                                       ! MILU, UMF, MUMPS, SLU
-    integer(psb_ipk_)  :: cfill        ! fill-in for incomplete LU factorization
-    real(psb_spk_)     :: cthres        ! threshold for ILUT factorization
-    integer(psb_ipk_)  :: cjswp        ! sweeps for GS or JAC coarsest-lev subsolver
+    character(len=32)  :: cmat        ! coarsest matrix layout: REPL, DIST
+    character(len=32)  :: csolve      ! coarsest-lev solver: BJAC, SLUDIST (distr.
+                                      ! mat.); UMF, MUMPS, SLU, ILU, ILUT, MILU
+                                      ! (repl. mat.)
+    character(len=32)  :: csbsolve    ! coarsest-lev local subsolver: ILU, ILUT,
+                                      ! MILU, UMF, MUMPS, SLU
+    integer(psb_ipk_)  :: cfill       ! fill-in for incomplete LU factorization
+    real(psb_spk_)     :: cthres      ! threshold for ILUT factorization
+    integer(psb_ipk_)  :: cjswp       ! sweeps for GS or JAC coarsest-lev subsolver
 
     ! Dump data
     logical            :: dump = .false.
