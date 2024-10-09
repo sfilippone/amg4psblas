@@ -184,20 +184,23 @@ subroutine  amg_s_parmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
   !
   select case (parms%aggr_prol)
   case (amg_no_smooth_)
-    call amg_s_parmatch_unsmth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
-         & ac,desc_ac,op_prol,op_restr,t_prol,info)
+    call amg_s_parmatch_unsmth_bld(parms%aggr_prol,ag,a,desc_a,&
+            ilaggr,nlaggr,parms,ac,desc_ac,op_prol,op_restr,&
+            t_prol,info)
 
-  case(amg_smooth_prol_)
-    call amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
-         & ac,desc_ac,op_prol,op_restr,t_prol,info)
+  case(amg_smooth_prol_,amg_l1_smooth_prol_)
+    call amg_s_parmatch_smth_bld(parms%aggr_prol,ag,a,desc_a,&
+            ilaggr,nlaggr,parms,ac,desc_ac,op_prol,op_restr,&
+            t_prol,info)
 
 !!$  case(amg_biz_prol_)
 !!$    call amg_saggrmat_biz_bld(a,desc_a,ilaggr,nlaggr, &
 !!$         & parms,ac,desc_ac,op_prol,op_restr,info)
 
   case(amg_min_energy_)
-    call amg_saggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr, &
-         & parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
+    call amg_saggrmat_minnrg_bld(parms%aggr_prol,a,desc_a,&
+            ilaggr,nlaggr,parms,ac,desc_ac,op_prol,op_restr,&
+            t_prol,info)
 
   case default
     info = psb_err_internal_error_

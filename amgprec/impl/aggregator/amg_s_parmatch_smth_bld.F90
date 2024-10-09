@@ -69,6 +69,8 @@
 !
 !
 ! Arguments:
+!    dol1smoothing - Select between l1-Jacobi and Jacobi as smoother for the
+!                  tentative prolongator
 !    a          -  type(psb_sspmat_type), input.
 !                  The sparse matrix structure containing the local part of
 !                  the fine-level matrix.
@@ -102,8 +104,8 @@
 !    info       -  integer, output.
 !                  Error code.
 !
-subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
-     & ac,desc_ac,op_prol,op_restr,t_prol,info)
+subroutine amg_s_parmatch_smth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
+                parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
   use amg_base_prec_type
   use amg_s_inner_mod
@@ -116,6 +118,7 @@ subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
   implicit none
 
   ! Arguments
+  integer(psb_ipk_), intent(in)            :: dol1smoothing
   class(amg_s_parmatch_aggregator_type), target, intent(inout) :: ag
   type(psb_sspmat_type), intent(in)      :: a
   type(psb_desc_type), intent(inout)     :: desc_a
@@ -137,7 +140,7 @@ subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
   type(psb_s_coo_sparse_mat)  :: coo_prol, coo_restr
   type(psb_s_csr_sparse_mat)  :: acsrf, csr_prol, acsr, tcsr
   real(psb_spk_), allocatable :: adiag(:)
-  real(psb_spk_), allocatable :: arwsum(:)
+  real(psb_spk_), allocatable :: arwsum(:),l1rwsum(:)
   logical            :: filter_mat
   integer(psb_ipk_)            :: debug_level, debug_unit, err_act
   integer(psb_ipk_), parameter :: ncmax=16
@@ -145,6 +148,7 @@ subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
   logical, parameter :: debug_new=.false., dump_r=.false., dump_p=.false., debug=.false.
   character(len=80) :: filename
   logical, parameter :: do_timings=.false.
+  logical :: do_l1correction=.false.
   integer(psb_ipk_), save :: idx_spspmm=-1, idx_phase1=-1, idx_gtrans=-1, idx_phase2=-1, idx_refine=-1, idx_phase3=-1
   integer(psb_ipk_), save :: idx_cdasb=-1, idx_ptap=-1
 
@@ -166,6 +170,10 @@ subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
   ncol  = desc_a%get_local_cols()
 
   theta = parms%aggr_thresh
+  ! Check if we have to perform l1-Jacobi or Jacobi as smoother
+  if(dol1smoothing.eq.amg_l1_smooth_prol_) do_l1correction=.true.
+
+
   !write(0,*) me,' ',trim(name),' Start ',idx_spspmm
   if ((do_timings).and.(idx_spspmm==-1)) &
        & idx_spspmm = psb_get_timer_idx("PMC_SMTH_BLD: par_spspmm")
@@ -217,6 +225,19 @@ subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
   if (info == psb_success_) &
        & call psb_halo(adiag,desc_a,info)
   if (info == psb_success_) call a%cp_to(acsr)
+  ! Get the l1-diagonal of D
+  if (do_l1correction) then
+    allocate(l1rwsum(nrow))
+    call acsr%arwsum(l1rwsum)
+    if (info == psb_success_) &
+      & call psb_realloc(ncol,l1rwsum,info)
+    if (info == psb_success_) &
+      & call psb_halo(l1rwsum,desc_a,info)
+    ! \tilde{D}_{i,i} = \sum_{j \ne i} |a_{i,j}|
+    do i=1,size(adiag)
+      adiag(i) = adiag(i) + l1rwsum(i) - abs(adiag(i))
+    end do
+  end if
 
   if(info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='sp_getdiag')
@@ -267,7 +288,10 @@ subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
 
   if (parms%aggr_omega_alg == amg_eig_est_) then
 
-    if (parms%aggr_eig == amg_max_norm_) then
+    if (do_l1correction) then
+      ! For l1-Jacobi this can be estimated with 1
+      parms%aggr_omega_val = done
+    else if (parms%aggr_eig == amg_max_norm_) then
       allocate(arwsum(nrow))
       call acsr%arwsum(arwsum)
       anorm = maxval(abs(adiag(1:nrow)*arwsum(1:nrow)))
@@ -373,6 +397,7 @@ subroutine amg_s_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
 
     end block
   end if
+  if (allocated(l1rwsum)) deallocate(l1rwsum)
   if (do_timings) call psb_toc(idx_phase2)
 
   if (debug_level >= psb_debug_outer_) &

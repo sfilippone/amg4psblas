@@ -68,6 +68,8 @@
 !
 !
 ! Arguments:
+!    dol1smoothing - this not actually used inside unsmoothed aggregation, it
+!                  is used just to perform a check
 !    a          -  type(psb_dspmat_type), input.
 !                  The sparse matrix structure containing the local part of
 !                  the fine-level matrix.
@@ -101,8 +103,8 @@
 !    info       -  integer, output.
 !                  Error code.
 !
-subroutine amg_d_parmatch_unsmth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
-     & ac,desc_ac,op_prol,op_restr,t_prol,info)
+subroutine amg_d_parmatch_unsmth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
+                parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
   use amg_base_prec_type
   use amg_d_inner_mod
@@ -115,6 +117,7 @@ subroutine amg_d_parmatch_unsmth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
   implicit none
 
   ! Arguments
+  integer(psb_ipk_), intent(in) :: dol1smoothing
   class(amg_d_parmatch_aggregator_type), target, intent(inout) :: ag
   type(psb_dspmat_type), intent(in)      :: a
   type(psb_desc_type), intent(inout)     :: desc_a
@@ -159,6 +162,11 @@ subroutine amg_d_parmatch_unsmth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
   ictxt = desc_a%get_context()
 
   call psb_info(ictxt, me, np)
+  if (dol1smoothing.ne.amg_no_smooth_) then
+    info=psb_err_fatal_;         
+    call psb_errpush(info,name,a_err='Are you trying to smooth an unsmoothed aggregation?')
+    goto 9999
+  end if
 
 #if !defined(SERIAL_MPI)
   nglob = desc_a%get_global_rows()

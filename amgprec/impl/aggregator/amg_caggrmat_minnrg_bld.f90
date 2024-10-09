@@ -69,6 +69,7 @@
 !
 !
 ! Arguments:
+!    dol1smoothing - fictitious integer argument, it is not used inside
 !    a          -  type(psb_cspmat_type), input.     
 !                  The sparse matrix structure containing the local part of
 !                  the fine-level matrix.
@@ -104,8 +105,8 @@
 !                  Error code.
 !
 !
-subroutine amg_caggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
-     & ac,desc_ac,op_prol,op_restr,t_prol,info)
+subroutine amg_caggrmat_minnrg_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,&
+                parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
   use amg_base_prec_type
   use amg_c_inner_mod, amg_protect_name => amg_caggrmat_minnrg_bld
@@ -113,6 +114,7 @@ subroutine amg_caggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
   implicit none
 
   ! Arguments
+  integer(psb_ipk_), intent(in)                 :: dol1smoothing
   type(psb_cspmat_type), intent(in)           :: a
   type(psb_desc_type), intent(inout)            :: desc_a
   integer(psb_lpk_), intent(inout)              :: ilaggr(:), nlaggr(:)
@@ -170,6 +172,13 @@ subroutine amg_caggrmat_minnrg_bld(a,desc_a,ilaggr,nlaggr,parms,&
   naggrp1 = sum(nlaggr(1:me+1))
 
   filter_mat = (parms%aggr_filter == amg_filter_mat_)
+
+  if (dol1smoothing.ne.amg_no_smooth_) then
+    info=psb_err_fatal_; 
+    call psb_errpush(info,name,a_err='Are you trying to smooth an unsmoothed aggregation?')
+    goto 9999
+  end if
+
 
   !NEEDS TO BE REWORKED !!
   

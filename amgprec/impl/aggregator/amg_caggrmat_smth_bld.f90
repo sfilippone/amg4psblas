@@ -69,6 +69,8 @@
 !
 !
 ! Arguments:
+!    dol1smooth -  Integer taking the type of smoother that has to be used
+!                  on the tentative prolongator
 !    a          -  type(psb_cspmat_type), input.     
 !                  The sparse matrix structure containing the local part of
 !                  the fine-level matrix.
@@ -102,8 +104,8 @@
 !    info       -  integer, output.
 !                  Error code.
 !
-subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
-     & ac,desc_ac,op_prol,op_restr,t_prol,info)
+subroutine amg_caggrmat_smth_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,&
+                parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
   use amg_base_prec_type
   use amg_c_inner_mod, amg_protect_name => amg_caggrmat_smth_bld
@@ -112,6 +114,7 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   implicit none
 
   ! Arguments
+  integer(psb_ipk_), intent(in)            :: dol1smoothing
   type(psb_cspmat_type), intent(in)      :: a
   type(psb_desc_type), intent(inout)       :: desc_a
   integer(psb_lpk_), intent(inout)         :: ilaggr(:), nlaggr(:)
@@ -132,7 +135,7 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   type(psb_c_coo_sparse_mat) :: coo_prol, coo_restr
   type(psb_c_csr_sparse_mat) :: acsr1,  acsrf, csr_prol, acsr
   complex(psb_spk_), allocatable :: adiag(:)
-  real(psb_spk_), allocatable :: arwsum(:)
+  real(psb_spk_), allocatable :: arwsum(:),l1rwsum(:)
   integer(psb_ipk_)  :: ierr(5)
   logical            :: filter_mat
   integer(psb_ipk_)            :: debug_level, debug_unit, err_act
@@ -141,6 +144,7 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   logical, parameter :: debug_new=.false.
   character(len=80) :: filename
   logical, parameter :: do_timings=.false.
+  logical :: do_l1correction=.false.
   integer(psb_ipk_), save :: idx_spspmm=-1, idx_phase1=-1, idx_gtrans=-1, idx_phase2=-1, idx_refine=-1
   integer(psb_ipk_), save :: idx_phase3=-1, idx_cdasb=-1, idx_ptap=-1
 
@@ -173,6 +177,9 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   if ((do_timings).and.(idx_ptap==-1)) &
        & idx_ptap = psb_get_timer_idx("DEC_SMTH_BLD: ptap_bld  ")
 
+  ! check if we have to use Jacobi or l1-Jacobi to smooth the tentative prolongator
+  if (dol1smoothing.eq.amg_l1_smooth_prol_) do_l1correction=.true.
+
 
   nglob = desc_a%get_global_rows()
   nrow  = desc_a%get_local_rows()
@@ -200,6 +207,24 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   if (info == psb_success_) &
        & call psb_halo(adiag,desc_a,info)
   if (info == psb_success_) call a%cp_to(acsr)
+  !
+  ! Do the l1-correction on the diagonal if it is requested
+  !
+  if (do_l1correction) then
+    allocate(l1rwsum(nrow))
+    call acsr%arwsum(l1rwsum)
+    if (info == psb_success_) &
+      & call psb_realloc(ncol,l1rwsum,info)
+    if (info == psb_success_) &
+      & call psb_halo(l1rwsum,desc_a,info)
+    ! \tilde{D}_{i,i} = \sum_{j \ne i} |a_{i,j}|
+    !$OMP parallel do private(i) schedule(static)
+    do i=1,size(adiag)
+      adiag(i) = adiag(i) + l1rwsum(i) - abs(adiag(i))
+    end do
+    !$OMP end parallel do
+  end if
+
 
   if(info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='sp_getdiag')
@@ -230,7 +255,7 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
 
       enddo
       if (jd == -1) then 
-        write(0,*) name,': Warning: there is no diagonal element', i
+        if (.not.do_l1correction) write(0,*) 'Wrong input: we need the diagonal!!!!', i
       else
         acsrf%val(jd)=acsrf%val(jd)-tmp
       end if
@@ -252,14 +277,16 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   !$OMP end parallel do 
   if (parms%aggr_omega_alg == amg_eig_est_) then 
 
-    if (parms%aggr_eig == amg_max_norm_) then 
+    if (do_l1correction) then
+      ! For l1-Jacobi this can be estimated with 1
+      parms%aggr_omega_val = done
+    else if (parms%aggr_eig == amg_max_norm_) then 
       allocate(arwsum(nrow))
       call acsr%arwsum(arwsum)      
       anorm = maxval(abs(adiag(1:nrow)*arwsum(1:nrow)))
       call psb_amx(ctxt,anorm)
       omega = 4.d0/(3.d0*anorm)
       parms%aggr_omega_val = omega 
-
     else 
       info = psb_err_internal_error_
       call psb_errpush(info,name,a_err='invalid amg_aggr_eig_')
@@ -322,6 +349,7 @@ subroutine amg_caggrmat_smth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Done smooth_aggregate '
+  if (allocated(l1rwsum)) deallocate(l1rwsum)
   call psb_erractionrestore(err_act)
   return
 

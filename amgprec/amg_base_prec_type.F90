@@ -288,11 +288,12 @@ module amg_base_prec_type
   !
   ! Legal values for entry: amg_aggr_prol_
   !
-  integer(psb_ipk_), parameter :: amg_no_smooth_   = 0
-  integer(psb_ipk_), parameter :: amg_smooth_prol_ = 1
-  integer(psb_ipk_), parameter :: amg_min_energy_  = 2
+  integer(psb_ipk_), parameter :: amg_no_smooth_      = 0
+  integer(psb_ipk_), parameter :: amg_smooth_prol_    = 1
+  integer(psb_ipk_), parameter :: amg_l1_smooth_prol_ = 2
+  integer(psb_ipk_), parameter :: amg_min_energy_     = 3
   ! Disabling min_energy  for the time being.
-  integer(psb_ipk_), parameter :: amg_max_aggr_prol_=amg_smooth_prol_
+  integer(psb_ipk_), parameter :: amg_max_aggr_prol_= amg_l1_smooth_prol_
   !
   ! Legal values for entry: amg_aggr_filter_
   !
@@ -376,8 +377,8 @@ module amg_base_prec_type
   character(len=19), parameter, private :: &
        &  eigen_estimates(0:0)=(/'infinity norm     '/)
   character(len=15), parameter, private :: &
-       &  aggr_prols(0:3)=(/'unsmoothed    ','smoothed      ',&
-       &           'min energy    ','bizr. smoothed'/)
+       &  aggr_prols(0:4)=(/'unsmoothed    ','smoothed      ',&
+       &  'l1-smoothed   ','min energy    ','bizr. smoothed'/)
   character(len=15), parameter, private :: &
        &  aggr_filters(0:1)=(/'no filtering  ','filtering     '/)
   character(len=15), parameter, private :: &
@@ -548,6 +549,8 @@ contains
       val = amg_no_smooth_
     case('SMOOTHED')
       val = amg_smooth_prol_
+    case('L1-SMOOTHED','L1SMOOTHED')
+      val = amg_l1_smooth_prol_
     case('MINENERGY')
       val = amg_min_energy_
     case('NOPREC')
