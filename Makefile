@@ -46,6 +46,7 @@ cleanlib:
 
 veryclean: cleanlib
 	(cd amgprec && $(MAKE) veryclean)
+	(cd cbind && $(MAKE) veryclean)
 	(cd samples/simple/fileread && $(MAKE) clean)
 	(cd samples/simple/pdegen && $(MAKE) clean)
 	(cd samples/advanced/fileread && $(MAKE) clean)
@@ -56,3 +57,4 @@ check: all
 
 clean:
 	(cd amgprec && $(MAKE) clean)
+	(cd cbind && $(MAKE) clean)
