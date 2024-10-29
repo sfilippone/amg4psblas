@@ -255,7 +255,8 @@ subroutine amg_caggrmat_smth_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,&
 
       enddo
       if (jd == -1) then 
-        if (.not.do_l1correction) write(0,*) 'Wrong input: we need the diagonal!!!!', i
+        ! if (.not.do_l1correction) 
+        write(0,*) 'Wrong input: we need the diagonal!!!!', i
       else
         acsrf%val(jd)=acsrf%val(jd)-tmp
       end if
@@ -277,10 +278,11 @@ subroutine amg_caggrmat_smth_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,&
   !$OMP end parallel do 
   if (parms%aggr_omega_alg == amg_eig_est_) then 
 
-    if (do_l1correction) then
-      ! For l1-Jacobi this can be estimated with 1
-      parms%aggr_omega_val = done
-    else if (parms%aggr_eig == amg_max_norm_) then 
+    !if (do_l1correction) then
+    !  ! For l1-Jacobi this can be estimated with 1
+    !  parms%aggr_omega_val = done
+    !
+    if (parms%aggr_eig == amg_max_norm_) then 
       allocate(arwsum(nrow))
       call acsr%arwsum(arwsum)      
       anorm = maxval(abs(adiag(1:nrow)*arwsum(1:nrow)))
