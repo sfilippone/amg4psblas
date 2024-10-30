@@ -77,11 +77,9 @@ subroutine amg_d_poly_smoother_dmp(sm,desc,level,info,prefix,head,smoother,solve
   end if
   lname = len_trim(prefix_)
   fname = trim(prefix_)
-  write(fname(lname+1:lname+5),'(a,i3.3)') '_poly',iam
+  write(fname(lname+1:lname+8),'(a,i3.3)') '_poly',iam
   lname = lname + 8
   ! to be completed
-  
-
 
   ! At base level do nothing for the smoother
   if (allocated(sm%sv)) &
