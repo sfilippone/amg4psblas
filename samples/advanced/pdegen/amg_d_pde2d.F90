@@ -472,9 +472,16 @@ program amg_d_pde2d
   !
   call psb_barrier(ctxt)
   t1 = psb_wtime()
-  call psb_krylov(s_choice%kmethd,a,prec,b,x,s_choice%eps,&
-       & desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,itrace=s_choice%itrace,&
-       & istop=s_choice%istopc,irst=s_choice%irst)
+  if (psb_toupper(trim(s_choice%kmethd)) == 'RICHARDSON') then
+    call psb_richardson(a,prec,b,x,s_choice%eps,&
+         & desc_a,info,itmax=s_choice%itmax,iter=iter,&
+         & err=err,itrace=s_choice%itrace,&
+         & istop=s_choice%istopc)
+  else
+    call psb_krylov(s_choice%kmethd,a,prec,b,x,s_choice%eps,&
+         & desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,itrace=s_choice%itrace,&
+         & istop=s_choice%istopc,irst=s_choice%irst)
+  end if
   call psb_barrier(ctxt)
   tslv = psb_wtime() - t1
 
