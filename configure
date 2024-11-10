@@ -7417,7 +7417,7 @@ then
    FIFLAG="-I"
    BASEMODNAME=PSB_BASE_MOD
    PRECMODNAME=PSB_PREC_MOD
-   METHDMODNAME=PSB_KRYLOV_MOD
+   METHDMODNAME=PSB_LINSOLVE_MOD
    UTILMODNAME=PSB_UTIL_MOD
 
 else
@@ -7550,7 +7550,7 @@ printf "%s\n" "$ax_cv_f90_modflag" >&6; }
    FIFLAG=-I
    BASEMODNAME=psb_base_mod
    PRECMODNAME=psb_prec_mod
-   METHDMODNAME=psb_krylov_mod
+   METHDMODNAME=psb_linsolve_mod
    UTILMODNAME=psb_util_mod
 fi
 
@@ -7683,7 +7683,7 @@ save_LDFLAGS=$LDFLAGS;
 ## dnl AC_MSG_NOTICE([psblas dir $pac_cv_psblas_dir])
 ##  PSBLAS_LIBS="-L$pac_cv_psblas_dir/lib"
 ## fi
-PSBLAS_LIBS="-lpsb_krylov -lpsb_prec -lpsb_util -lpsb_base -L$PSBLAS_LIBDIR"
+PSBLAS_LIBS="-lpsb_linsolve -lpsb_prec -lpsb_util -lpsb_base -L$PSBLAS_LIBDIR"
 LDFLAGS=" $PSBLAS_LIBS $save_LDFLAGS"
 
 ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS conftest.$ac_ext $LDFLAGS $LIBS  1>&5'
@@ -7787,7 +7787,7 @@ elif test "x$pac_cv_psblas_dir" != "x"; then
  PSBLAS_INCLUDES="$FMFLAG$pac_cv_psblas_dir/modules $PSBLAS_INCLUDES"
 fi
 FCFLAGS=" $PSBLAS_INCLUDES $save_FCFLAGS"
-PSBLAS_LIBS="-lpsb_krylov -lpsb_prec -lpsb_util -lpsb_base $PSBLAS_LIBS"
+PSBLAS_LIBS="-lpsb_linsolve -lpsb_prec -lpsb_util -lpsb_base $PSBLAS_LIBS"
 LDFLAGS=" $PSBLAS_LIBS $save_LDFLAGS"
 
 

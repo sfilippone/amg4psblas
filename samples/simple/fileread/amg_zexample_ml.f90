@@ -62,7 +62,7 @@
 program amg_zexample_ml
   use psb_base_mod
   use amg_prec_mod
-  use psb_krylov_mod
+  use psb_linsolve_mod
   use psb_util_mod
   use data_input
 

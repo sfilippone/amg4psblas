@@ -40,7 +40,7 @@ subroutine amg_z_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 
   use psb_base_mod
   use amg_z_diag_solver
-  use psb_base_krylov_conv_mod, only : log_conv
+  use psb_base_linsolve_conv_mod, only : log_conv
   use amg_z_jac_smoother, amg_protect_name => amg_z_jac_smoother_apply_vect
   implicit none
   type(psb_desc_type), intent(in)                 :: desc_data

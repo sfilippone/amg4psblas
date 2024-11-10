@@ -409,7 +409,7 @@ save_LDFLAGS=$LDFLAGS;
 ## dnl AC_MSG_NOTICE([psblas dir $pac_cv_psblas_dir])
 ##  PSBLAS_LIBS="-L$pac_cv_psblas_dir/lib"
 ## fi
-PSBLAS_LIBS="-lpsb_krylov -lpsb_prec -lpsb_util -lpsb_base -L$PSBLAS_LIBDIR"
+PSBLAS_LIBS="-lpsb_linsolve -lpsb_prec -lpsb_util -lpsb_base -L$PSBLAS_LIBDIR"
 LDFLAGS=" $PSBLAS_LIBS $save_LDFLAGS"
 
 dnl ac_compile='${MPIFC-$FC} -c -o conftest${ac_objext} $FMFLAG$PSBLAS_DIR/include $FMFLAG$PSBLAS_DIR/lib conftest.$ac_ext  1>&5'
@@ -484,7 +484,7 @@ dnl AC_MSG_NOTICE([psblas dir $pac_cv_psblas_dir])
  PSBLAS_INCLUDES="$FMFLAG$pac_cv_psblas_dir/modules $PSBLAS_INCLUDES"
 fi
 FCFLAGS=" $PSBLAS_INCLUDES $save_FCFLAGS"
-PSBLAS_LIBS="-lpsb_krylov -lpsb_prec -lpsb_util -lpsb_base $PSBLAS_LIBS"
+PSBLAS_LIBS="-lpsb_linsolve -lpsb_prec -lpsb_util -lpsb_base $PSBLAS_LIBS"
 LDFLAGS=" $PSBLAS_LIBS $save_LDFLAGS"
 
 dnl ac_compile='${MPIFC-$FC} -c -o conftest${ac_objext} $FMFLAG$PSBLAS_DIR/include $FMFLAG$PSBLAS_DIR/lib conftest.$ac_ext  1>&5'
