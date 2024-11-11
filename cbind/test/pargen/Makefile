@@ -9,8 +9,8 @@ HERE=.
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(LIBDIR) $(FMFLAG)$(PSBLAS_INCDIR)
 #PSBLAS_LIBS= -L$(PSBLAS_LIBDIR) -L$(LIBDIR)  $(CPSBLAS_LIB) $(PSBLAS_LIB)
 # -lpsb_krylov_cbind -lpsb_prec_cbind -lpsb_base_cbind 
-PSBC_LIBS= -L$(PSBLAS_LIBDIR) -lpsb_cbind  -lpsb_krylov -lpsb_prec 
-MLDC_LIBS=-L$(LIBDIR) -lmld_cbind  -lmld_prec 
+PSBC_LIBS= -L$(PSBLAS_LIBDIR) -lpsb_cbind  -lpsb_linsolve -lpsb_prec 
+AMGC_LIBS=-L$(LIBDIR) -lamg_cbind  -lamg_prec 
 #
 # Compilers and such
 #
@@ -23,15 +23,15 @@ EXEDIR=./runs
 #UMFLIBS=-lumfpack -lamd -lcholmod -lcolamd -lcamd -lccolamd -L/usr/include/suitesparse
 #UMFFLAGS=-DHave_UMF_ -I/usr/include/suitesparse
 
- all:  mldec
+ all:  amgec
 
-mldec: mldec.o
-	$(MPFC) mldec.o  -o mldec $(MLDC_LIBS)  $(PSBC_LIBS) $(PSBCLDLIBS) $(PSBLAS_LIBS) \
+amgec: amgec.o
+	$(MPFC) amgec.o  -o amgec $(AMGC_LIBS)  $(PSBC_LIBS) $(PSBCLDLIBS) $(PSBLAS_LIBS) \
 	  $(UMFLIBS) $(PSBLDLIBS) $(LDLIBS) -lm -lgfortran
 # \
 #	-lifcore -lifcoremt -lguide -limf -lirc -lintlc -lcxaguard -L/opt/intel/fc/10.0.023/lib/ -lm
 
-	/bin/mv mldec $(EXEDIR)
+	/bin/mv amgec $(EXEDIR)
 
 .f90.o:
 	$(MPFC) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
@@ -40,13 +40,13 @@ mldec: mldec.o
 
 
 clean: 
-	/bin/rm -f mldec.o  $(EXEDIR)/mldec
+	/bin/rm -f amgec.o  $(EXEDIR)/amgec
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:
 	(cd ../../; make library)
 
 tests: all
-	cd runs ; ./mldec < mlde.inp
+	cd runs ; ./amgec < amge.inp
 
 

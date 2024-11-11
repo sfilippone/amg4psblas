@@ -77,7 +77,7 @@
 #include <math.h>
 
 #include "psb_base_cbind.h"
-#include "mld_cbind.h"
+#include "amg_cbind.h"
 
 
 double  a1(double x, double y, double  z)
@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
   char methd[40], ptype[40], afmt[8];
   psb_i_t nparms;
   psb_i_t idim,info,istop,itmax,itrace,irst,iter,ret;
-  mld_c_dprec *ph;
+  amg_c_dprec *ph;
   psb_c_dspmat *ah;
   psb_c_dvector *bh, *xh, *rh; 
   psb_i_t nb,nlr, nl;
@@ -343,16 +343,16 @@ int main(int argc, char *argv[])
   }    
   psb_c_barrier(ictxt);
   /* Set up the preconditioner */ 
-  ph  = mld_c_dprec_new();
-  mld_c_dprecinit(ictxt,ph,ptype);
-  mld_c_dprecseti(ph,"SMOOTHER_SWEEPS",2);
-  mld_c_dprecseti(ph,"SUB_FILLIN",1);
-  mld_c_dprecsetc(ph,"COARSE_SOLVE","BJAC");
-  mld_c_dprecsetc(ph,"COARSE_SUBSOLVE","ILU");
-  mld_c_dprecseti(ph,"COARSE_FILLIN",0);
-  if ((ret=mld_c_dhierarchy_build(ah,cdh,ph))!=0)
+  ph  = amg_c_dprec_new();
+  amg_c_dprecinit(ictxt,ph,ptype);
+  amg_c_dprecseti(ph,"SMOOTHER_SWEEPS",2);
+  amg_c_dprecseti(ph,"SUB_FILLIN",1);
+  amg_c_dprecsetc(ph,"COARSE_SOLVE","BJAC");
+  amg_c_dprecsetc(ph,"COARSE_SUBSOLVE","ILU");
+  amg_c_dprecseti(ph,"COARSE_FILLIN",0);
+  if ((ret=amg_c_dhierarchy_build(ah,cdh,ph))!=0)
     fprintf(stderr,"From hierarchy_build: %d\n",ret);
-  if ((ret=mld_c_dsmoothers_build(ah,cdh,ph))!=0)
+  if ((ret=amg_c_dsmoothers_build(ah,cdh,ph))!=0)
     fprintf(stderr,"From smoothers_build: %d\n",ret);
 
   psb_c_barrier(ictxt);
@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
   options.istop  = istop;
   psb_c_seterraction_ret();
   t1=psb_c_wtime();
-  ret=mld_c_dkrylov(methd,ah,ph,bh,xh,cdh,&options); 
+  ret=amg_c_dkrylov(methd,ah,ph,bh,xh,cdh,&options); 
   t2=psb_c_wtime();
   iter = options.iter;
   err  = options.err;
