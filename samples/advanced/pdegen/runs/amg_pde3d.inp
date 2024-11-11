@@ -11,7 +11,7 @@ CG                          ! Iterative method:
 30                          ! IRST (restart for RGMRES and BiCGSTABL)
 1.d-6                       ! EPS
 %%%%%%%%%%%  Main preconditioner choices %%%%%%%%%%%%%%%%
-ML-VBM-VCYCLE-FBGS-D-BJAC       ! Longer descriptive name for preconditioner (up to 20 chars)
+ML-VBM-VCYC-POLY-L1-D-BJAC       ! Longer descriptive name for preconditioner (up to 20 chars)
 ML                        ! Preconditioner type: NONE JACOBI GS FBGS BJAC AS ML POLY
 %
 %%%%%%%%%%%  First smoother (for all levels but coarsest) %%%%%%%%%%%%%%%%
