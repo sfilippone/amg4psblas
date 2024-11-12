@@ -250,7 +250,7 @@ subroutine amg_s_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
               ! we will not reset. 
               if (j>nr) cycle step1
               if (ilaggr(j) > 0) cycle step1
-              if (abs(val(k)) > theta*sqrt(abs(diag(i)*diag(j)))) then
+              if ((abs(val(k)) > theta*sqrt(abs(diag(i)*diag(j)))).and.(diag(i).ne.szero)) then
                 ip = ip + 1
                 icol(ip) = icol(k)
               end if
@@ -357,7 +357,7 @@ subroutine amg_s_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
       do k=1, nz
         j   = icol(k)
         if ((1<=j).and.(j<=nr)) then 
-          if (abs(val(k)) > theta*sqrt(abs(diag(i)*diag(j)))) then
+          if ((abs(val(k)) > theta*sqrt(abs(diag(i)*diag(j)))).and.(diag(i).ne.szero)) then
             ip = ip + 1
             icol(ip) = icol(k)
           end if
@@ -545,4 +545,3 @@ subroutine amg_s_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   return
 
 end subroutine amg_s_soc1_map_bld
-
