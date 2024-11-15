@@ -13,7 +13,7 @@ AMG4PSBLAS has been designed to provide scalable and easy-to-use preconditioners
 
 AMG4PSBLAS enables the user to easily specify different features of an algebraic multilevel preconditioner, thus allowing to experiment with different preconditioners for the problem and parallel computers at hand.
 
-The package employs object-oriented design techniques in Fortran 2003, with interfaces to additional third party libraries such as MUMPS, UMFPACK, SuperLU, and SuperLU_Dist, which can be exploited in building multilevel preconditioners. The parallel implementation is based on a Single Program Multiple Data (SPMD) paradigm; the inter-process communication is based on MPI and is managed mainly through PSBLAS.
+The package employs object-oriented design techniques in Fortran 2008, with interfaces to additional third party libraries such as MUMPS, UMFPACK, SuperLU, and SuperLU_Dist, which can be exploited in building multilevel preconditioners. The parallel implementation is based on a Single Program Multiple Data (SPMD) paradigm; the inter-process communication is based on MPI and is managed mainly through PSBLAS.
 
 ## Main refrerences:
 
