@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 79--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 96--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu3.html" ><span 
 class="cmr-12">next</span></a><span 
@@ -31,24 +31,25 @@ class="cmr-12">] </span></p></div>
 class="cmr-12">3.2   </span></span> <a 
  id="x10-90003.2"></a><span 
 class="cmr-12">Optional third party libraries</span></h4>
-<!--l. 81--><p class="noindent" ><span 
+<!--l. 98--><p class="noindent" ><span 
 class="cmr-12">We provide interfaces to the following third-party software libraries; note that these are</span>
 <span 
 class="cmr-12">optional, but if you enable them some defaults for multilevel preconditioners may</span>
 <span 
 class="cmr-12">change to reflect their presence.</span>
-<!--l. 85--><p class="indent" >
+<!--l. 102--><p class="indent" >
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-12">UMFPACK</span> </dt><dd 
-class="description"><span class="cite"><span 
+class="description">
+     <!--l. 103--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli5.html#XUMFPACK"><span 
-class="cmr-12">15</span></a><span 
+class="cmr-12">16</span></a><span 
 class="cmr-12">]</span></span> <span 
-class="cmr-12">A sparse LU factorization package included in the SuiteSparse</span>
+class="cmr-12">A sparse LU factorization package included in the SuiteSparse library,</span>
      <span 
-class="cmr-12">library, available from </span><a 
+class="cmr-12">available  from  </span><a 
 href="faculty.cse.tamu.edu/davis/suitesparse.html" class="url" ><span 
 class="cmtt-12">faculty.cse.tamu.edu/davis/suitesparse.html</span></a><span 
 class="cmr-12">;</span>
@@ -60,36 +61,38 @@ class="cmr-12">double   precision   real   and   complex   data.   We   tested  
 class="cmr-12">of   SuiteSparse.   Note   that   for   configuring   SuiteSparse   you   should</span>
      <span 
 class="cmr-12">provide  the  right  path  to  the  BLAS  and  LAPACK  libraries  in  the</span>
-     <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">SuiteSparse_config/SuiteSparse_config.mk</span></span></span> <span 
+     <span class="obeylines-h"><code class="verb">SuiteSparse_config/SuiteSparse_config.mk</code></span> <span 
 class="cmr-12">file.</span>
      </dd><dt class="description">
 <span 
 class="cmbx-12">MUMPS</span> </dt><dd 
-class="description"><span class="cite"><span 
+class="description">
+     <!--l. 110--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli5.html#XMUMPS"><span 
 class="cmr-12">2</span></a><span 
-class="cmr-12">]</span></span>    <span 
-class="cmr-12">A    sparse    LU    factorization    package    available    from</span>
-     <a 
+class="cmr-12">]</span></span> <span 
+class="cmr-12">A sparse LU factorization package available from </span><a 
 href="mumps.enseeiht.fr" class="url" ><span 
 class="cmtt-12">mumps.enseeiht.fr</span></a><span 
-class="cmr-12">; it provides sequential and parallel factorizations and</span>
+class="cmr-12">;</span>
      <span 
-class="cmr-12">triangular system solution for single and double precision, real and complex</span>
+class="cmr-12">it  provides  sequential  and  parallel  factorizations  and  triangular  system</span>
      <span 
-class="cmr-12">data. We tested versions 4.10.0 and 5.0.1.</span>
+class="cmr-12">solution for single and double precision, real and complex data. We tested</span>
+     <span 
+class="cmr-12">versions 4.10.0 and 5.0.1.</span>
      </dd><dt class="description">
 <span 
 class="cmbx-12">SuperLU</span> </dt><dd 
-class="description"><span class="cite"><span 
+class="description">
+     <!--l. 115--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli5.html#XSUPERLU"><span 
-class="cmr-12">16</span></a><span 
+class="cmr-12">17</span></a><span 
 class="cmr-12">]</span></span>    <span 
-class="cmr-12">A    sparse    LU    factorization    package    available    from</span>
-     <a 
+class="cmr-12">A    sparse    LU    factorization    package    available    from    </span>
+<a 
 href="crd.lbl.gov/~xiaoye/SuperLU/" class="url" ><span 
 class="cmtt-12">crd.lbl.gov/</span><span 
 class="cmtt-12">~</span><span 
@@ -105,35 +108,37 @@ class="cmr-12">remember to define the BLASLIB variable in the make.inc file.</sp
 <span 
 class="cmbx-12">SuperLU</span><span 
 class="cmbx-12">_Dist</span> </dt><dd 
-class="description"><span class="cite"><span 
+class="description">
+     <!--l. 121--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli5.html#XSUPERLUDIST"><span 
-class="cmr-12">26</span></a><span 
-class="cmr-12">]</span></span> <span 
-class="cmr-12">A sparse LU factorization package available from the same</span>
+class="cmr-12">28</span></a><span 
+class="cmr-12">]</span></span>  <span 
+class="cmr-12">A  sparse  LU  factorization  package  available  from  the  same  site  as</span>
      <span 
-class="cmr-12">site as SuperLU; it provides parallel factorization and triangular system</span>
+class="cmr-12">SuperLU; it provides parallel factorization and triangular system solution</span>
      <span 
-class="cmr-12">solution  for  double  precision  real  and  complex  data.  We  tested  versions</span>
+class="cmr-12">for  double  precision  real  and  complex  data.  We  tested  versions  3.3  and</span>
      <span 
-class="cmr-12">3.3 and 4.2. If you installed BLAS from ATLAS, remember to define the</span>
+class="cmr-12">4.2. If you installed BLAS from ATLAS, remember to define the BLASLIB</span>
+                                                                               
+
+                                                                               
      <span 
-class="cmr-12">BLASLIB variable in the make.inc file and to add the </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">-std=c99</span></span></span> <span 
-class="cmr-12">option to</span>
+class="cmr-12">variable  in  the  make.inc  file  and  to  add  the  </span><span class="obeylines-h"><code class="verb">-std=c99</code></span> <span 
+class="cmr-12">option  to  the  C</span>
      <span 
-class="cmr-12">the C compiler options. Note that this library requires the ParMETIS library</span>
+class="cmr-12">compiler options. Note that this library requires the ParMETIS library for</span>
      <span 
-class="cmr-12">for parallel graph partitioning and fill-reducing matrix ordering, available</span>
-     <span 
-class="cmr-12">from </span><a 
+class="cmr-12">parallel graph partitioning and fill-reducing matrix ordering, available from</span>
+     <a 
 href="glaros.dtc.umn.edu/gkhome/metis/parmetis/overview" class="url" ><span 
 class="cmtt-12">glaros.dtc.umn.edu/gkhome/metis/parmetis/overview</span></a><span 
 class="cmr-12">.</span></dd></dl>
                                                                                
 
                                                                                
-   <!--l. 116--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 133--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu3.html" ><span 
 class="cmr-12">next</span></a><span 
@@ -150,6 +155,6 @@ class="cmr-12">] [</span><a
 href="userhtmlse3.html#userhtmlsu2.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
-<!--l. 116--><p class="indent" >   <a 
+<!--l. 133--><p class="indent" >   <a 
  id="tailuserhtmlsu2.html"></a>  
 </body></html> 
