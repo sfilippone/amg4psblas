@@ -20,7 +20,7 @@ The package employs object-oriented design techniques in Fortran 2008, with inte
 The main reference for this project is
 > D'Ambra, P., Durastante, F., & Filippone, S. (2021). AMG preconditioners for linear solvers towards extreme scale. SIAM Journal on Scientific Computing, 43(5), S679-S703.
 
-AMG4PSBLAS contains the suite of preconditioners for the Parallel Sparse Computation Toolkit ([PSCToolkit](https://psctoolkit.github.io/)) suite of libraries. See the paper:
+AMG4PSBLAS is the suite of preconditioners for the Parallel Sparse Computation Toolkit ([PSCToolkit](https://psctoolkit.github.io/)) suite of libraries. See the paper:
 > D’Ambra, P., Durastante, F., & Filippone, S. (2023). Parallel Sparse Computation Toolkit. Software Impacts, 15, 100463.
 
 The main reference for features inherited from MLD2P4 is
