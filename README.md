@@ -70,6 +70,6 @@ In the European project “Energy oriented Center of Excellence: toward exascale
 
 ## The AMG4PSBLAS team. 
 
-- Salvatore Filippone    (University of Rome Tor Vergata and IAC-CNR)
 - Pasqua D'Ambra         (IAC-CNR, Naples, IT)
 - Fabio Durastante       (University of Pisa and IAC-CNR, IT)
+- Salvatore Filippone    (University of Rome Tor Vergata and IAC-CNR)
