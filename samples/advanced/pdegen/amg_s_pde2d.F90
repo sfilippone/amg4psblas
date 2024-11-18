@@ -105,9 +105,9 @@ program amg_s_pde2d
   integer(psb_epk_) :: amatsize, precsize, descsize
   real(psb_spk_)   :: err, resmx, resmxp
 
-  ! Krylov solver data
+  !  Solver data
   type solverdata
-    character(len=40)  :: kmethd      ! Krylov solver
+    character(len=40)  :: kmethd      ! Iterative solver
     integer(psb_ipk_)  :: istopc      ! stopping criterion
     integer(psb_ipk_)  :: itmax       ! maximum number of iterations
     integer(psb_ipk_)  :: itrace      ! tracing
@@ -472,16 +472,22 @@ program amg_s_pde2d
   !
   call psb_barrier(ctxt)
   t1 = psb_wtime()
-  if (psb_toupper(trim(s_choice%kmethd)) == 'RICHARDSON') then
+  select case(psb_toupper(trim(s_choice%kmethd)))
+  case('RICHARDSON')
     call psb_richardson(a,prec,b,x,s_choice%eps,&
          & desc_a,info,itmax=s_choice%itmax,iter=iter,&
          & err=err,itrace=s_choice%itrace,&
          & istop=s_choice%istopc)
-  else
+  case('BICGSTAB','BICGSTABL','BICG','CG','CGS','FCG','GCR','RGMRES')
     call psb_krylov(s_choice%kmethd,a,prec,b,x,s_choice%eps,&
          & desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,itrace=s_choice%itrace,&
          & istop=s_choice%istopc,irst=s_choice%irst)
-  end if
+  case default
+    write(psb_err_unit,*) 'Unknown method :"',trim(s_choice%kmethd),'"'
+    info=psb_err_invalid_input_
+    call psb_errpush(info,name)
+    goto 9999
+  end select
   call psb_barrier(ctxt)
   tslv = psb_wtime() - t1
 

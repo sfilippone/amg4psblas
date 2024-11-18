@@ -4,7 +4,7 @@ CSR                         ! Storage format CSR COO JAD
 POISSON                     ! PDECOEFF: POISSON, EXP, BOX, GAUSS
 %                           ! Coefficients of the PDE
 CG                          ! Iterative method:
-%                           !    BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES
+%                           !    BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES RICHARDSON
 2                           ! ISTOPC
 00500                       ! ITMAX
 1                           ! ITRACE
