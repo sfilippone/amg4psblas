@@ -147,7 +147,7 @@ default values, is given in Tables~\ref{tab:p_cycle}-\ref{tab:p_smoother_1}.\\
 
 \textbf{Remark 2.} A smoother is usually obtained by combining two objects:
 a smoother (\fortinline|'SMOOTHER_TYPE'|) and a local solver (\fortinline|'SUB_SOLVE'|),
-as specified in Tables~\ref{tab:p_smoother}-\ref{tab:p_smoother_1}.
+as specified in Tables~\ref{tab:p_smoother}-\ref{tab:p_smoother_2}.
 For example, the block-Jacobi smoother using
 ILU(0) on the blocks is obtained by combining the block-Jacobi smoother
 object with the ILU(0) solver object. Similarly,
@@ -176,7 +176,16 @@ Similar considerations apply to the point-Jacobi, Gauss-Seidel and block-Jacobi
 coarsest-level solvers, and shortcuts are available
 in this case too (see Table~\ref{tab:p_coarse_1}). \\
 
-\textbf{Remark 3.} Many of the coarsest-level solvers apply to a
+\textbf{Remark 3.} The polynomial-accelerated smoother described in Tables~\ref{tab:p_smoother}
+and~\ref{tab:p_smoother_2} redefines a sweep or iteration as corresponding to the degree of 
+the polynomial used. Consequently, the \fortinline|'SMOOTHER_SWEEPS'| option is overridden by 
+the \fortinline|'POLY_DEGREE'| option. This smoother is paired with a base smoother 
+object, whose iterations are accelerated using the specified polynomial smoothing technique. 
+By default, the $\ell_1$-Jacobi smoother serves as the base smoother, offering theoretical 
+guarantees on the resulting convergence factor~\cite{DDFMT2024,LOTTES}. Alternative combinations 
+are experimental and lack established guarantees.\\
+
+\textbf{Remark 4.} Many of the coarsest-level solvers apply to a
 specific coarsest-matrix layout; 
 therefore, setting the solver after the layout may change the layout
 to either distributed or replicated.
@@ -425,7 +434,7 @@ the parameter \texttt{ilev}.} \\
                            distributed, \texttt{MUMPS} can be used with either
                            a replicated or a distributed matrix. When any of the previous
                            solvers is specified, the matrix layout is set to a default
-                           value which allows the use of the solver (see Remark 3, p.~24).
+                           value which allows the use of the solver (see Remark 4, p.~21).
                            Note also that UMFPACK and SuperLU\_Dist
                            are available only in double precision. \\\hline%
 \ifpdf
@@ -578,7 +587,7 @@ level (continued).\label{tab:p_coarse_1}}
                          & Type of smoother used in the multilevel preconditioner:
                             point-Jacobi, hybrid (forward) Gauss-Seidel,
 			    hybrid backward Gauss-Seidel, block-Jacobi, $\ell_1$-Jacobi, $\ell_1$--hybrid (forward) Gauss-Seidel, $\ell_1$-point-Jacobi  and
-                            Additive Schwarz, polynomial accelerators; see~\cite{DDFMT2024} \par
+                            Additive Schwarz, polynomial accelerators; see~\cite{DDFMT2024} and Remark~3 (p.~21).\par
                             It is ignored by one-level preconditioners. \\ \hline
 \fortinline|'SUB_SOLVE'|  & \fortinline|character(len=*)|
                          & \fortinline|'JACOBI'|
