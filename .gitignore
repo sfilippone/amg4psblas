@@ -20,3 +20,5 @@ autom4te.cache
 # the executable from tests
 runs
 
+# Documentation temporary files
+docs/src/userguide.pdf

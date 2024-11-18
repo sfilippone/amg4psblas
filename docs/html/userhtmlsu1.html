@@ -33,29 +33,29 @@ class="cmr-12">The following base libraries are needed:</span>
      <dl class="description"><dt class="description">
 <span 
 class="cmbx-12">BLAS</span> </dt><dd 
-class="description"><span class="cite"><span 
+class="description">
+     <!--l. 34--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli5.html#Xblas3"><span 
-class="cmr-12">17</span></a><span 
-class="cmr-12">,</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlli5.html#Xblas2"><span 
 class="cmr-12">18</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
+href="userhtmlli5.html#Xblas2"><span 
+class="cmr-12">19</span></a><span 
+class="cmr-12">,</span><span 
+class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli5.html#Xblas1"><span 
-class="cmr-12">25</span></a><span 
-class="cmr-12">]</span></span> <span 
-class="cmr-12">Many vendors provide optimized versions of BLAS; if no</span>
+class="cmr-12">26</span></a><span 
+class="cmr-12">]</span></span>  <span 
+class="cmr-12">Many  vendors  provide  optimized  versions  of  BLAS;  if  no</span>
      <span 
-class="cmr-12">vendor  version  is  available  for  a  given  platform,  the  ATLAS  software</span>
-     <span 
-class="cmr-12">(</span><a 
+class="cmr-12">vendor  version  is  available  for  a  given  platform,  the  ATLAS  software  (</span>
+     <a 
 href="http://math-atlas.sourceforge.net" ><span 
 class="cmr-12">math-atlas.sourceforge .net</span></a><span 
 class="cmr-12">) may be employed. The reference BLAS from</span>
      <span 
-class="cmr-12">Netlib (</span><a 
+class="cmr-12">Netlib ( </span><a 
 href="http://www.netlib.org/blas" ><span 
 class="cmr-12">www.netlib.org/blas</span></a><span 
 class="cmr-12">) are meant to define the standard behaviour of</span>
@@ -74,7 +74,7 @@ class="cmr-12">our experience is that configuring ATLAS for building full LAPACK
      <span 
 class="cmr-12">not always work in the expected way. Our advice is first to download the</span>
      <span 
-class="cmr-12">LAPACK tarfile from </span><a 
+class="cmr-12">LAPACK tarfile from  </span><a 
 href="http://www.netlib.org/lapack" ><span 
 class="cmr-12">www.netlib.org/lapack</span></a> <span 
 class="cmr-12">and install it independently of</span>
@@ -87,14 +87,15 @@ class="cmr-12">library.</span>
      </dd><dt class="description">
 <span 
 class="cmbx-12">MPI</span> </dt><dd 
-class="description"><span class="cite"><span 
+class="description">
+     <!--l. 51--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli5.html#XMPI2"><span 
-class="cmr-12">24</span></a><span 
+class="cmr-12">25</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli5.html#XMPI1"><span 
-class="cmr-12">30</span></a><span 
+class="cmr-12">32</span></a><span 
 class="cmr-12">]</span></span> <span 
 class="cmr-12">A version of MPI is available on most high-performance computing</span>
      <span 
@@ -102,22 +103,26 @@ class="cmr-12">systems.</span>
      </dd><dt class="description">
 <span 
 class="cmbx-12">PSBLAS</span> </dt><dd 
-class="description"><span class="cite"><span 
+class="description">
+     <!--l. 53--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli5.html#XPSBLASGUIDE"><span 
-class="cmr-12">20</span></a><span 
+class="cmr-12">21</span></a><span 
 class="cmr-12">,</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlli5.html#Xpsblas_00"><span 
-class="cmr-12">22</span></a><span 
-class="cmr-12">]</span></span>   <span 
-class="cmr-12">Parallel   Sparse   BLAS   (PSBLAS)   is   available   from</span>
-     <a 
+class="cmr-12">23</span></a><span 
+class="cmr-12">]</span></span>                                   <span 
+class="cmr-12">Parallel                                   Sparse</span>
+     <span 
+class="cmr-12">BLAS (PSBLAS) is available from  </span><a 
 href="https://psctoolkit.github.io/products/psblas/" ><span 
 class="cmr-12">psctoolkit.github.io/ products/psblas/</span></a><span 
-class="cmr-12">; version 3.7.0 (or later) is required.</span>
+class="cmr-12">;</span>
      <span 
-class="cmr-12">Indeed, all the prerequisites listed so far are also prerequisites of PSBLAS.</span></dd></dl>
+class="cmr-12">version 3.7.0 (or later) is required. Indeed, all the prerequisites listed so far</span>
+     <span 
+class="cmr-12">are also prerequisites of PSBLAS.</span></dd></dl>
 <!--l. 60--><p class="noindent" ><span 
 class="cmr-12">Please note that the four previous libraries must have Fortran interfaces compatible with</span>
 <span 
@@ -127,27 +132,26 @@ class="cmr-12">compiler being used for AMG4PSBLAS.</span>
 <!--l. 64--><p class="indent" >   <span 
 class="cmr-12">If you want to use the PSBLAS support for NVIDIA GPUs, you will also</span>
 <span 
-class="cmr-12">need:</span>
-     <dl class="description"><dt class="description">
+class="cmr-12">need a working version of the CUDA Toolkit that is compatible with the</span>
 <span 
-class="cmbx-12">PSBLAS-EXT</span> </dt><dd 
-class="description"><span 
-class="cmr-12">Parallel  Sparse  BLAS  (PSBLAS)  Extensions,  available  from</span>
-     <a 
-href="https://psctoolkit.github.io/products/psblasext/" ><span 
-class="cmr-12">psctoolkit.github.io/products/psblasext/</span></a><span 
-class="cmr-12">; version 1.3.0 (or later).</span>
-     </dd><dt class="description">
+class="cmr-12">compiler choice made to compile PSBLAS and AMG4PSBLAS. After that</span>
 <span 
-class="cmbx-12">SPGPU</span> </dt><dd 
-class="description"><span 
-class="cmr-12">Sparse CUDA kernels for NVIDIA GPUs; available from GitHub, see</span>
-     <span 
-class="cmr-12">also </span><a 
-href="https://psctoolkit.github.io/products/psblasext/" ><span 
-class="cmr-12">psctoolkit.github.io/products/psblasext/</span></a><span 
-class="cmr-12">.</span></dd></dl>
-<!--l. 76--><p class="noindent" ><span 
+class="cmr-12">you will need to have configured and compiled the PSBLAS library with the</span>
+<span 
+class="cmr-12">options:</span>
+                                                                               
+
+                                                                               
+   <pre class="verbatim" id="verbatim-2">
+./configure&#x00A0;--enable-cuda&#x00A0;--with-cudadir=${CUDA_HOME}&#x00A0;--with-cudacc=xx,yy,zz&#x00A0;&#x00A0;
+</pre>
+<!--l. 89--><p class="nopar" > <span 
+class="cmr-12">Previous versions required you to have the auxiliary libraries SPGPU and</span>
+<span 
+class="cmr-12">PSBLAS-EXT compiled, this is no longer necessary because they have been integrated</span>
+<span 
+class="cmr-12">into PSBLAS and are compiled by activating the previous flags during configuration.</span>
+<span 
 class="cmr-12">See also Sec</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlsu7.html#x16-150004.2"><span 
@@ -156,7 +160,7 @@ class="cmr-12">.</span>
                                                                                
 
                                                                                
-   <!--l. 79--><div class="crosslinks"><p class="noindent"><span 
+   <!--l. 96--><div class="crosslinks"><p class="noindent"><span 
 class="cmr-12">[</span><a 
 href="userhtmlsu2.html" ><span 
 class="cmr-12">next</span></a><span 
@@ -167,6 +171,6 @@ class="cmr-12">] [</span><a
 href="userhtmlse3.html#userhtmlsu1.html" ><span 
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
-<!--l. 79--><p class="indent" >   <a 
+<!--l. 96--><p class="indent" >   <a 
  id="tailuserhtmlsu1.html"></a>  
 </body></html> 

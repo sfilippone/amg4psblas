@@ -33,28 +33,20 @@ class="cmr-12">5   </span></span> <a
 class="cmr-12">User Interface</span></h3>
 <!--l. 5--><p class="noindent" ><span 
 class="cmr-12">The basic user interface of AMG4PBLAS consists of eight methods. The six methods</span>
-<span class="lstinline"></span><span 
-class="cmtt-12">init</span><span 
-class="cmr-12">, </span><span class="lstinline"></span><span 
-class="cmtt-12">set</span><span 
-class="cmr-12">, </span><span class="lstinline"></span><span 
-class="cmtt-12">build</span><span 
-class="cmr-12">, </span><span class="lstinline"></span><span 
-class="cmtt-12">hierarchy_build</span><span 
-class="cmr-12">, </span><span class="lstinline"></span><span 
-class="cmtt-12">smoothers_build</span> <span 
-class="cmr-12">and </span><span class="lstinline"></span><span 
-class="cmtt-12">apply</span> <span 
+<code class="lstinline"><span style="color:#000000">init</span></code><span 
+class="cmr-12">, </span><code class="lstinline"><span style="color:#000000">set</span></code><span 
+class="cmr-12">, </span><code class="lstinline"><span style="color:#000000">build</span></code><span 
+class="cmr-12">, </span><code class="lstinline"><span style="color:#000000">hierarchy_build</span></code><span 
+class="cmr-12">, </span><code class="lstinline"><span style="color:#000000">smoothers_build</span></code> <span 
+class="cmr-12">and </span><code class="lstinline"><span style="color:#000000">apply</span></code> <span 
 class="cmr-12">encapsulate all the</span>
 <span 
 class="cmr-12">functionalities for the setup and the application of any multilevel and one-level</span>
 <span 
-class="cmr-12">preconditioner implemented in the package. The method </span><span class="lstinline"></span><span 
-class="cmtt-12">free</span> <span 
+class="cmr-12">preconditioner implemented in the package. The method </span><code class="lstinline"><span style="color:#000000">free</span></code> <span 
 class="cmr-12">deallocates the</span>
 <span 
-class="cmr-12">preconditioner data structure, while </span><span class="lstinline"></span><span 
-class="cmtt-12">descr</span> <span 
+class="cmr-12">preconditioner data structure, while </span><code class="lstinline"><span style="color:#000000">descr</span></code> <span 
 class="cmr-12">prints a description of the preconditioner</span>
 <span 
 class="cmr-12">setup by the user. For backward compatibility, methods are also accessible as</span>
@@ -67,53 +59,44 @@ class="cmr-12">real/complex and single/double precision data; arguments with app
 <span 
 class="cmr-12">must be passed to the method, i.e.,</span>
      <ul class="itemize1">
-     <li class="itemize"><span 
+     <li class="itemize">
+     <!--l. 20--><p class="noindent" ><span 
 class="cmr-12">the sparse matrix data structure, containing the matrix to be preconditioned,</span>
      <span 
-class="cmr-12">must be of type </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">psb_</span></span></span><span 
-class="cmti-12">x</span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">spmat_type</span></span></span> <span 
+class="cmr-12">must be of type </span><span class="obeylines-h"><code class="verb">psb_</code></span><span 
+class="cmti-12">x</span><span class="obeylines-h"><code class="verb">spmat_type</code></span> <span 
 class="cmr-12">with </span><span 
 class="cmti-12">x  </span><span 
-class="cmr-12">= </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">s</span></span></span> <span 
+class="cmr-12">= </span><span class="obeylines-h"><code class="verb">s</code></span> <span 
 class="cmr-12">for real single precision, </span><span 
 class="cmti-12">x</span>
      <span 
-class="cmr-12">= </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">d</span></span></span> <span 
+class="cmr-12">= </span><span class="obeylines-h"><code class="verb">d</code></span> <span 
 class="cmr-12">for real double precision, </span><span 
 class="cmti-12">x </span><span 
-class="cmr-12">= </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">c</span></span></span> <span 
+class="cmr-12">= </span><span class="obeylines-h"><code class="verb">c</code></span> <span 
 class="cmr-12">for complex single precision, </span><span 
 class="cmti-12">x </span><span 
-class="cmr-12">= </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">z</span></span></span> <span 
+class="cmr-12">= </span><span class="obeylines-h"><code class="verb">z</code></span> <span 
 class="cmr-12">for</span>
      <span 
 class="cmr-12">complex double precision;</span>
      </li>
-     <li class="itemize"><span 
-class="cmr-12">the preconditioner data structure must be of type </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">amg_</span></span></span><span 
-class="cmti-12">x</span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">prec_type</span></span></span><span 
+     <li class="itemize">
+     <!--l. 25--><p class="noindent" ><span 
+class="cmr-12">the preconditioner data structure must be of type </span><span class="obeylines-h"><code class="verb">amg_</code></span><span 
+class="cmti-12">x</span><span class="obeylines-h"><code class="verb">prec_type</code></span><span 
 class="cmr-12">, with </span><span 
 class="cmti-12">x</span>
      <span 
-class="cmr-12">= </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">s</span></span></span><span 
-class="cmr-12">, </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">d</span></span></span><span 
-class="cmr-12">, </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">c</span></span></span><span 
-class="cmr-12">, </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">z</span></span></span><span 
+class="cmr-12">= </span><span class="obeylines-h"><code class="verb">s</code></span><span 
+class="cmr-12">, </span><span class="obeylines-h"><code class="verb">d</code></span><span 
+class="cmr-12">, </span><span class="obeylines-h"><code class="verb">c</code></span><span 
+class="cmr-12">, </span><span class="obeylines-h"><code class="verb">z</code></span><span 
 class="cmr-12">, according to the sparse matrix data structure;</span>
      </li>
-     <li class="itemize"><span 
+     <li class="itemize">
+     <!--l. 29--><p class="noindent" ><span 
 class="cmr-12">the arrays containing the vectors </span><span 
 class="cmmi-12">v </span><span 
 class="cmr-12">and </span><span 
@@ -127,24 +110,19 @@ class="cmmi-12">B</span><sup><span
 class="cmsy-8">-</span><span 
 class="cmr-8">1</span></sup><span 
 class="cmmi-12">v </span><span 
-class="cmr-12">must be of type </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">psb_</span></span></span><span 
-class="cmti-12">x</span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">vect_type</span></span></span> <span 
+class="cmr-12">must be of type </span><span class="obeylines-h"><code class="verb">psb_</code></span><span 
+class="cmti-12">x</span><span class="obeylines-h"><code class="verb">vect_type</code></span> <span 
 class="cmr-12">with </span><span 
 class="cmti-12">x </span><span 
-class="cmr-12">= </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">s</span></span></span><span 
-class="cmr-12">, </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">d</span></span></span><span 
-class="cmr-12">, </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">c</span></span></span><span 
+class="cmr-12">= </span><span class="obeylines-h"><code class="verb">s</code></span><span 
+class="cmr-12">, </span><span class="obeylines-h"><code class="verb">d</code></span><span 
+class="cmr-12">, </span><span class="obeylines-h"><code class="verb">c</code></span><span 
 class="cmr-12">,</span>
-     <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">z</span></span></span><span 
+     <span class="obeylines-h"><code class="verb">z</code></span><span 
 class="cmr-12">, in a manner completely analogous to the sparse matrix type;</span>
      </li>
-     <li class="itemize"><span 
+     <li class="itemize">
+     <!--l. 34--><p class="noindent" ><span 
 class="cmr-12">real parameters defining the preconditioner must be declared according to</span>
      <span 
 class="cmr-12">the precision of the sparse matrix and preconditioner data structures (see</span>
@@ -160,81 +138,62 @@ class="cmr-12">A description of each method is given in the remainder of this se
 
                                                                                
    <div class="subsectionTOCS">
-   <span 
-class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+   <span class="subsectionToc" ><span 
 class="cmr-12">5.1 </span><a 
 href="userhtmlsu8.html#x18-170005.1"><span 
 class="cmr-12">Method init</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+<br />   <span class="subsectionToc" ><span 
 class="cmr-12">5.2 </span><a 
 href="userhtmlsu9.html#x19-180005.2"><span 
 class="cmr-12">Method set</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+<br />   <span class="subsectionToc" ><span 
 class="cmr-12">5.3 </span><a 
 href="userhtmlsu10.html#x20-190005.3"><span 
 class="cmr-12">Method hierarchy</span><span 
 class="cmr-12">_build</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+<br />   <span class="subsectionToc" ><span 
 class="cmr-12">5.4 </span><a 
 href="userhtmlsu11.html#x21-200005.4"><span 
 class="cmr-12">Method smoothers</span><span 
 class="cmr-12">_build</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+<br />   <span class="subsectionToc" ><span 
 class="cmr-12">5.5 </span><a 
 href="userhtmlsu12.html#x22-210005.5"><span 
 class="cmr-12">Method build</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+<br />   <span class="subsectionToc" ><span 
 class="cmr-12">5.6 </span><a 
 href="userhtmlsu13.html#x23-220005.6"><span 
 class="cmr-12">Method apply</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+<br />   <span class="subsectionToc" ><span 
 class="cmr-12">5.7 </span><a 
 href="userhtmlsu14.html#x24-230005.7"><span 
 class="cmr-12">Method free</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+<br />   <span class="subsectionToc" ><span 
 class="cmr-12">5.8 </span><a 
 href="userhtmlsu15.html#x25-240005.8"><span 
 class="cmr-12">Method descr</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span class="subsectionToc" ><span 
+<br />   <span class="subsectionToc" ><span 
 class="cmr-12">5.9 </span><a 
 href="userhtmlsu16.html#x26-250005.9"><span 
 class="cmr-12">Auxiliary Methods</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span 
-class="cmr-12">&#x00A0;</span><span class="subsubsectionToc" ><span 
+<br />   <span class="subsubsectionToc" ><span 
 class="cmr-12">5.9.1 </span><a 
 href="userhtmlsu16.html#x26-260005.9.1"><span 
 class="cmr-12">Method: dump</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span 
-class="cmr-12">&#x00A0;</span><span class="subsubsectionToc" ><span 
+<br />   <span class="subsubsectionToc" ><span 
 class="cmr-12">5.9.2 </span><a 
 href="userhtmlsu16.html#x26-270005.9.2"><span 
 class="cmr-12">Method: clone</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span 
-class="cmr-12">&#x00A0;</span><span class="subsubsectionToc" ><span 
+<br />   <span class="subsubsectionToc" ><span 
 class="cmr-12">5.9.3 </span><a 
 href="userhtmlsu16.html#x26-280005.9.3"><span 
 class="cmr-12">Method: sizeof</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span 
-class="cmr-12">&#x00A0;</span><span class="subsubsectionToc" ><span 
+<br />   <span class="subsubsectionToc" ><span 
 class="cmr-12">5.9.4 </span><a 
 href="userhtmlsu16.html#x26-290005.9.4"><span 
 class="cmr-12">Method: allocate</span><span 
 class="cmr-12">_wrk</span></a></span>
-<br />   <span 
-class="cmr-12">&#x00A0;</span><span 
-class="cmr-12">&#x00A0;</span><span class="subsubsectionToc" ><span 
+<br />   <span class="subsubsectionToc" ><span 
 class="cmr-12">5.9.5 </span><a 
 href="userhtmlsu16.html#x26-300005.9.5"><span 
 class="cmr-12">Method: free</span><span 

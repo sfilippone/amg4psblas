@@ -15,7 +15,13 @@ AMG4PSBLAS enables the user to easily specify different features of an algebraic
 
 The package employs object-oriented design techniques in Fortran 2008, with interfaces to additional third party libraries such as MUMPS, UMFPACK, SuperLU, and SuperLU_Dist, which can be exploited in building multilevel preconditioners. The parallel implementation is based on a Single Program Multiple Data (SPMD) paradigm; the inter-process communication is based on MPI and is managed mainly through PSBLAS.
 
-## Main refrerences:
+## Main Refrerences:
+
+The main reference for this project is
+> D'Ambra, P., Durastante, F., & Filippone, S. (2021). AMG preconditioners for linear solvers towards extreme scale. SIAM Journal on Scientific Computing, 43(5), S679-S703.
+
+AMG4PSBLAS is the suite of preconditioners for the Parallel Sparse Computation Toolkit ([PSCToolkit](https://psctoolkit.github.io/)) suite of libraries. See the paper:
+> D’Ambra, P., Durastante, F., & Filippone, S. (2023). Parallel Sparse Computation Toolkit. Software Impacts, 15, 100463.
 
 The main reference for features inherited from MLD2P4 is
 > P. D'Ambra, D. di Serafino, S. Filippone,
@@ -23,12 +29,6 @@ The main reference for features inherited from MLD2P4 is
 > Preconditioners in Fortran 95,
 > ACM Transactions on Mathematical Software, 37 (3), 2010, art. 30,
 > doi: 10.1145/1824801.1824808.
-
-The new features introduced and which led to the library's name change are described in the article
-> D'Ambra, P., Durastante, F., & Filippone, S. (2021). AMG preconditioners for linear solvers towards extreme scale. SIAM Journal on Scientific Computing, 43(5), S679-S703.
-
-AMG4PSBLAS contains the suite of preconditioners for the Parallel Sparse Computation Toolkit ([PSCToolkit](https://psctoolkit.github.io/)) suite of libraries. See the paper:
-> D’Ambra, P., Durastante, F., & Filippone, S. (2023). Parallel Sparse Computation Toolkit. Software Impacts, 15, 100463.
 
 ## Installing
 
@@ -72,4 +72,5 @@ In the European project “Energy oriented Center of Excellence: toward exascale
 
 - Pasqua D'Ambra         (IAC-CNR, Naples, IT)
 - Fabio Durastante       (University of Pisa and IAC-CNR, IT)
-- Salvatore Filippone    (University of Rome Tor Vergata and IAC-CNR)
+- Salvatore Filippone    (University of Rome Tor Vergata and IAC-CNR, IT)
+

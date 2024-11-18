@@ -38,31 +38,19 @@ class="cmr-12">(see Table</span><span
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse4.html#x14-13015r1"><span 
 class="cmr-12">1</span><!--tex4ht:ref: tab:precinit --></a><span 
-class="cmr-12">). This preconditioner is chosen by simply specifying </span><span class="lstinline"></span><span 
-class="cmtt-12">&#8217;</span><span 
-class="cmtt-12">ML</span><span 
-class="cmtt-12">&#8217;</span> <span 
+class="cmr-12">). This preconditioner is chosen by simply specifying </span><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ML</span><span style="color:#000000">&#8217;</span></code> <span 
 class="cmr-12">as the</span>
 <span 
-class="cmr-12">second argument of </span><span class="lstinline"></span><span 
-class="cmtt-12">P</span><span 
-class="cmtt-12">%</span><span 
-class="cmtt-12">init</span> <span 
-class="cmr-12">(a call to </span><span class="lstinline"></span><span 
-class="cmtt-12">P</span><span 
-class="cmtt-12">%</span><span 
-class="cmtt-12">set</span> <span 
+class="cmr-12">second argument of </span><code class="lstinline"><span style="color:#000000">P</span><span style="color:#000000">%</span><span style="color:#000000">init</span></code> <span 
+class="cmr-12">(a call to </span><code class="lstinline"><span style="color:#000000">P</span><span style="color:#000000">%</span><span style="color:#000000">set</span></code> <span 
 class="cmr-12">is not needed) and is applied</span>
 <span 
 class="cmr-12">with the CG solver provided by PSBLAS (the matrix of the system to be</span>
 <span 
 class="cmr-12">solved is assumed to be positive definite). As previously observed, the modules</span>
-<span class="lstinline"></span><span 
-class="cmtt-12">psb_base_mod</span><span 
-class="cmr-12">, </span><span class="lstinline"></span><span 
-class="cmtt-12">amg_prec_mod</span> <span 
-class="cmr-12">and </span><span class="lstinline"></span><span 
-class="cmtt-12">psb_krylov_mod</span> <span 
+<code class="lstinline"><span style="color:#000000">psb_base_mod</span></code><span 
+class="cmr-12">, </span><code class="lstinline"><span style="color:#000000">amg_prec_mod</span></code> <span 
+class="cmr-12">and </span><code class="lstinline"><span style="color:#000000">psb_krylov_mod</span></code> <span 
 class="cmr-12">must be used by the example</span>
 <span 
 class="cmr-12">program.</span>
@@ -75,12 +63,9 @@ class="cmr-12">through the PSBLAS routines for sparse matrix and vector manageme
 <span 
 class="cmr-12">is not reported here for the sake of conciseness. The complete code can be</span>
 <span 
-class="cmr-12">found in the example program file </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">amg_dexample_ml.f90</span></span></span><span 
+class="cmr-12">found in the example program file </span><span class="obeylines-h"><code class="verb">amg_dexample_ml.f90</code></span><span 
 class="cmr-12">, in the directory</span>
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">samples/simple/file</span></span></span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">read</span></span></span> <span 
+<span class="obeylines-h"><code class="verb">samples/simple/file</code></span><span class="obeylines-h"><code class="verb">read</code></span> <span 
 class="cmr-12">of the AMG4PSBLAS implementation (see Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlsu5.html#x13-120003.5"><span 
@@ -88,15 +73,14 @@ class="cmr-12">3.5</span><!--tex4ht:ref: sec:ex_and_test --></a><span
 class="cmr-12">). A</span>
 <span 
 class="cmr-12">sample test problem along with the relevant input data is available in</span>
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">samples/simple/fileread/runs</span></span></span><span 
+<span class="obeylines-h"><code class="verb">samples/simple/fileread/runs</code></span><span 
 class="cmr-12">. For details on the use of the PSBLAS routines, see</span>
 <span 
 class="cmr-12">the PSBLAS User&#8217;s Guide</span><span 
 class="cmr-12">&#x00A0;</span><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli5.html#XPSBLASGUIDE"><span 
-class="cmr-12">20</span></a><span 
+class="cmr-12">21</span></a><span 
 class="cmr-12">]</span></span><span 
 class="cmr-12">.</span>
                                                                                
@@ -114,9 +98,7 @@ class="cmr-12">5</span><!--tex4ht:ref: sec:userinterface --></a> <span
 class="cmr-12">for</span>
 <span 
 class="cmr-12">details). If these versions are installed, the corresponding codes are available in</span>
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">samples/simple/file</span></span></span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">read</span></span></span><span 
+<span class="obeylines-h"><code class="verb">samples/simple/file</code></span><span class="obeylines-h"><code class="verb">read</code></span><span 
 class="cmr-12">.</span>
                                                                                
 
@@ -133,7 +115,7 @@ class="cmr-12">.</span>
                                                                                
 
                                                                                
-<div class="minipage"><pre class="verbatim" id="verbatim-6">
+<div class="minipage"><pre class="verbatim" id="verbatim-7">
 &#x00A0;&#x00A0;use&#x00A0;psb_base_mod
 &#x00A0;&#x00A0;use&#x00A0;amg_prec_mod
 &#x00A0;&#x00A0;use&#x00A0;psb_krylov_mod
@@ -167,6 +149,7 @@ class="cmr-12">.</span>
 !&#x00A0;build&#x00A0;the&#x00A0;preconditioner
 &#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
 &#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
+
 !
 !&#x00A0;set&#x00A0;the&#x00A0;solver&#x00A0;parameters&#x00A0;and&#x00A0;the&#x00A0;initial&#x00A0;guess
 &#x00A0;&#x00A0;...&#x00A0;...
@@ -185,10 +168,10 @@ class="cmr-12">.</span>
 &#x00A0;&#x00A0;call&#x00A0;psb_exit(ctxt)
 &#x00A0;&#x00A0;stop
 </pre>
-<!--l. 255--><p class="nopar" >                                                                               
+<!--l. 255--><p class="nopar" >                                                                       </div>
+                                                                               
 
                                                                                
-</div>
 <br /> <div class="caption" 
 ><span class="id">Listing 1: </span><span  
 class="content">setup and application of the default multilevel preconditioner (example 1).
@@ -216,10 +199,7 @@ class="cmr-12">sweeps. Note that the ILU(0) factorization (plus triangular solve
 class="cmr-12">local solver for the block-Jacobi sweeps, since this is the default associated</span>
 <span 
 class="cmr-12">with block-Jacobi and set by</span><span 
-class="cmr-12">&#x00A0;</span><span class="lstinline"></span><span 
-class="cmtt-12">P</span><span 
-class="cmtt-12">%</span><span 
-class="cmtt-12">init</span><span 
+class="cmr-12">&#x00A0;</span><code class="lstinline"><span style="color:#000000">P</span><span style="color:#000000">%</span><span style="color:#000000">init</span></code><span 
 class="cmr-12">. Furthermore, specifying block-Jacobi as</span>
 <span 
 class="cmr-12">coarsest-level solver implies that the coarsest-level matrix is distributed among</span>
@@ -255,8 +235,7 @@ href="#x15-14003r3"><span
 class="cmr-12">3</span><!--tex4ht:ref: fig:ex3 --></a> <span 
 class="cmr-12">are included in the example program</span>
 <span 
-class="cmr-12">file </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">amg_dexample_ml.f90</span></span></span> <span 
+class="cmr-12">file </span><span class="obeylines-h"><code class="verb">amg_dexample_ml.f90</code></span> <span 
 class="cmr-12">too.</span>
 <!--l. 294--><p class="indent" >   <span 
 class="cmr-12">Finally, Figure</span><span 
@@ -270,16 +249,14 @@ class="cmr-12">i.e., RAS with overlap 2. Note also that a Krylov method differen
 class="cmr-12">must be used to solve the preconditioned system, since the preconditione in</span>
 <span 
 class="cmr-12">nonsymmetric. The corresponding example program is available in the file</span>
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">amg_dexample_1lev.f90</span></span></span><span 
+<span class="obeylines-h"><code class="verb">amg_dexample_1lev.f90</code></span><span 
 class="cmr-12">.</span>
 <!--l. 301--><p class="indent" >   <span 
 class="cmr-12">For all the previous preconditioners, example programs where the sparse matrix</span>
 <span 
 class="cmr-12">and the right-hand side are generated by discretizing a PDE with Dirichlet</span>
 <span 
-class="cmr-12">boundary conditions are also available in the directory </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">samples/simple/pdegen</span></span></span><span 
+class="cmr-12">boundary conditions are also available in the directory </span><span class="obeylines-h"><code class="verb">samples/simple/pdegen</code></span><span 
 class="cmr-12">.</span>
                                                                                
 
@@ -293,7 +270,7 @@ class="cmr-12">.</span>
 <div class="center" 
 >
 <!--l. 318--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-7">
+<div class="minipage"><pre class="verbatim" id="verbatim-8">
 ...&#x00A0;...
 !&#x00A0;build&#x00A0;a&#x00A0;V-cycle&#x00A0;preconditioner&#x00A0;with&#x00A0;1&#x00A0;block-Jacobi&#x00A0;sweep&#x00A0;(with
 !&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;blocks)&#x00A0;as&#x00A0;pre-&#x00A0;and&#x00A0;post-smoother,&#x00A0;and&#x00A0;8&#x00A0;&#x00A0;block-Jacobi
@@ -306,7 +283,7 @@ class="cmr-12">.</span>
 &#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
 ...&#x00A0;...
 </pre>
-<!--l. 333--><p class="nopar" ></div></div>
+<!--l. 333--><p class="nopar" >                                                                       </div></div>
 <br /><div class="caption" 
 ><span class="id">Listing 2: </span><span  
 class="content">setup of a multilevel preconditioner based on the default decoupled coarsening</span></div><!--tex4ht:label?: x15-14002r2 -->
@@ -326,7 +303,7 @@ class="content">setup of a multilevel preconditioner based on the default decoup
 <div class="center" 
 >
 <!--l. 362--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-8">
+<div class="minipage"><pre class="verbatim" id="verbatim-9">
 ...&#x00A0;...
 !&#x00A0;build&#x00A0;a&#x00A0;W-cycle&#x00A0;preconditioner&#x00A0;with&#x00A0;2&#x00A0;hybrid&#x00A0;Gauss-Seidel&#x00A0;sweeps
 !&#x00A0;as&#x00A0;pre-&#x00A0;and&#x00A0;post-smoother,&#x00A0;a&#x00A0;distributed&#x00A0;coarsest
@@ -345,7 +322,7 @@ class="content">setup of a multilevel preconditioner based on the default decoup
 &#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
 ...&#x00A0;...
 </pre>
-<!--l. 383--><p class="nopar" ></div></div>
+<!--l. 383--><p class="nopar" >                                                                       </div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 3: </span><span  
 class="content">setup of a multilevel preconditioner based on the coupled coarsening using
@@ -366,7 +343,7 @@ weighted matching</span></div><!--tex4ht:label?: x15-14003r3 -->
 <div class="center" 
 >
 <!--l. 402--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-9">
+<div class="minipage"><pre class="verbatim" id="verbatim-10">
 ...&#x00A0;...
 !&#x00A0;set&#x00A0;RAS&#x00A0;with&#x00A0;overlap&#x00A0;2&#x00A0;and&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;local&#x00A0;blocks
 &#x00A0;&#x00A0;call&#x00A0;P%init(ctxt,&#8217;AS&#8217;,info)
@@ -376,7 +353,7 @@ weighted matching</span></div><!--tex4ht:label?: x15-14003r3 -->
 !&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;BiCGSTAB
 &#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;BICGSTAB&#8217;,A,P,b,x,tol,desc_A,info)
 </pre>
-<!--l. 414--><p class="nopar" ></div></div>
+<!--l. 414--><p class="nopar" >                                                                       </div></div>
 <br /> <div class="caption" 
 ><span class="id">Listing 4: </span><span  
 class="content">setup of a one-level Schwarz preconditioner.</span></div><!--tex4ht:label?: x15-14004r4 -->

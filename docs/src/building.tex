@@ -62,20 +62,37 @@ interfaces compatible with AMG4PSBLAS; usually this means that they
 should all be built with the same compiler being used for  AMG4PSBLAS.
 
 If you want to use the PSBLAS support for NVIDIA GPUs, you will also
-need:
-\begingroup
-\sloppy
-\begin{description}
- \item[PSBLAS-EXT] Parallel Sparse BLAS (PSBLAS) Extensions, 
-  available from
-  \href{https://psctoolkit.github.io/products/psblasext/}{psctoolkit.github.io/products/psblasext/}; version   1.3.0  (or later). 
- \item[SPGPU] Sparse CUDA kernels for NVIDIA GPUs; available from
-   GitHub, see also
-   \href{https://psctoolkit.github.io/products/psblasext/}{psctoolkit.github.io/products/psblasext/}.
- \end{description}
- See also Sec~\ref{sec:gpu-example}.
-\endgroup
-
+need a working version of the CUDA Toolkit that is compatible with the 
+compiler choice made to compile PSBLAS and AMG4PSBLAS. 
+After that you will need to have configured and compiled the PSBLAS library 
+with the options:
+%\begingroup
+%\sloppy
+%\begin{description}
+% \item[PSBLAS-EXT] Parallel Sparse BLAS (PSBLAS) Extensions, 
+%  available from
+%  \href{https://psctoolkit.github.io/products/psblasext/}{psctoolkit.github.io/products/psblasext/}; version   1.3.0  (or later). 
+% \item[SPGPU] Sparse CUDA kernels for NVIDIA GPUs; available from
+%   GitHub, see also
+%   \href{https://psctoolkit.github.io/products/psblasext/}{psctoolkit.github.io/products/psblasext/}.
+% \end{description}
+%
+%\endgroup
+\ifpdf
+\begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
+./configure --enable-cuda --with-cudadir=${CUDA_HOME} --with-cudacc=xx,yy,zz
+\end{minted}
+\else
+{\small
+\begin{verbatim}
+./configure --enable-cuda --with-cudadir=${CUDA_HOME} --with-cudacc=xx,yy,zz		
+\end{verbatim}
+}	
+\fi
+Previous versions required you to have the auxiliary libraries SPGPU and PSBLAS-EXT compiled, 
+this is no longer necessary because they have been integrated into PSBLAS and are compiled 
+by activating the previous flags during configuration. See also Sec~\ref{sec:gpu-example}. 
+ 
 \subsection{Optional third party libraries\label{sec:third-party}}
 
 We provide interfaces to the following third-party software libraries;
