@@ -110,6 +110,7 @@ subroutine amg_caggrmat_smth_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,&
   use amg_base_prec_type
   use amg_c_inner_mod, amg_protect_name => amg_caggrmat_smth_bld
   use amg_c_base_aggregator_mod
+!  use, intrinsic :: ieee_arithmetic
 
   implicit none
 
@@ -192,7 +193,7 @@ subroutine amg_caggrmat_smth_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,&
 
   naggrm1 = sum(nlaggr(1:me))
   naggrp1 = sum(nlaggr(1:me+1))
-  filter_mat = (parms%aggr_filter == amg_filter_mat_)
+  filter_mat = (parms%aggr_filter == amg_filter_mat_).or.(parms%aggr_filter == amg_filter_prow_mat_)
 
   !
   ! naggr: number of local aggregates
@@ -220,7 +221,7 @@ subroutine amg_caggrmat_smth_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,&
     ! \tilde{D}_{i,i} = \sum_{j \ne i} |a_{i,j}|
     !$OMP parallel do private(i) schedule(static)
     do i=1,size(adiag)
-      adiag(i) = adiag(i) + l1rwsum(i) - abs(adiag(i))
+        adiag(i) = adiag(i) + l1rwsum(i) - abs(adiag(i))
     end do
     !$OMP end parallel do
   end if
@@ -257,15 +258,19 @@ subroutine amg_caggrmat_smth_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,&
       if (jd == -1) then 
         ! if (.not.do_l1correction) 
         write(0,*) 'Wrong input: we need the diagonal!!!!', i
-      else
+      else if (parms%aggr_filter == amg_filter_mat_) then
+        ! We perform filtering in the standard way assuming that A is an M-matrix
         acsrf%val(jd)=acsrf%val(jd)-tmp
+      else if (parms%aggr_filter == amg_filter_prow_mat_) then
+        ! We are probably doing l1-correction, hence we want to preserve the
+        ! row sum of the matrix: note the change in sign
+        acsrf%val(jd)=acsrf%val(jd)+tmp
       end if
     enddo
     !$OMP end parallel do 
     ! Take out zeroed terms 
     call acsrf%clean_zeros(info)
   end if
-
 
   !$OMP parallel do private(i) schedule(static)
   do i=1,size(adiag)
@@ -278,11 +283,11 @@ subroutine amg_caggrmat_smth_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,&
   !$OMP end parallel do 
   if (parms%aggr_omega_alg == amg_eig_est_) then 
 
-    !if (do_l1correction) then
-    !  ! For l1-Jacobi this can be estimated with 1
-    !  parms%aggr_omega_val = done
-    !
-    if (parms%aggr_eig == amg_max_norm_) then 
+    if ( (parms%aggr_filter == amg_filter_prow_mat_).and.(do_l1correction) ) then
+      ! For l1-Jacobi this can be estimated with 1:
+      ! this makes sense only if we are preserving the row-sum!
+      parms%aggr_omega_val = done
+    else if (parms%aggr_eig == amg_max_norm_) then 
       allocate(arwsum(nrow))
       call acsr%arwsum(arwsum)      
       anorm = maxval(abs(adiag(1:nrow)*arwsum(1:nrow)))
