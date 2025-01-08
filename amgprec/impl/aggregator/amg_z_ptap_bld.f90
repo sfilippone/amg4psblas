@@ -216,6 +216,7 @@ subroutine amg_z_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
 
   call ac_csr%set_nrows(desc_ac%get_local_rows())
   call ac_csr%set_ncols(desc_ac%get_local_cols())
+  call ac_csr%clean_zeros(info)
   call ac%mv_from(ac_csr)
   call ac%set_asb()
 
@@ -420,6 +421,7 @@ subroutine amg_z_lz_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
 
   call ac_csr%set_nrows(desc_ac%get_local_rows())
   call ac_csr%set_ncols(desc_ac%get_local_cols())
+  call ac_csr%clean_zeros(info)
   call ac%mv_from(ac_csr)
   call ac%set_asb()
 
@@ -629,6 +631,7 @@ subroutine amg_lz_ptap_bld(a_csr,desc_a,nlaggr,parms,ac,&
 
   call ac_csr%set_nrows(desc_ac%get_local_rows())
   call ac_csr%set_ncols(desc_ac%get_local_cols())
+  call ac_csr%clean_zeros(info)
   call ac%mv_from(ac_csr)
   call ac%set_asb()
 
