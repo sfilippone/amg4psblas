@@ -129,7 +129,7 @@ subroutine amg_c_base_onelev_descr(lv,il,nl,ilmin,info,iout,verbosity,prefix)
                & '                          avg:', &
                & lv%linmap%nagavg
         end if
-        write(iout_,'(a,1xa,1x,f14.2)') trim(prefix_),&
+        write(iout_,'(a,1x,a,1x,f14.2)') trim(prefix_),&
              & '          Aggregation   ratio: ', &
              &  lv%szratio
       end if
