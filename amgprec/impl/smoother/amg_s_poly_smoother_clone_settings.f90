@@ -41,7 +41,7 @@ subroutine amg_s_poly_smoother_clone_settings(sm,smout,info)
   use amg_s_poly_smoother, amg_protect_name =>  amg_s_poly_smoother_clone_settings
   Implicit None
   ! Arguments
-  class(amg_s_poly_smoother_type), intent(inout)              :: sm
+  class(amg_s_poly_smoother_type), intent(inout) :: sm
   class(amg_s_base_smoother_type), intent(inout) :: smout
   integer(psb_ipk_), intent(out)                 :: info
   integer(psb_ipk_)  :: err_act

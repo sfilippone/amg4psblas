@@ -79,9 +79,9 @@ module amg_s_invt_solver
       import :: psb_desc_type, psb_sspmat_type,  psb_s_base_sparse_mat, &
        & amg_s_base_solver_type, psb_spk_, amg_s_invt_solver_type, psb_ipk_
       Implicit None
-      class(amg_s_invt_solver_type), intent(inout)              :: sv
-      class(amg_s_base_solver_type), allocatable, intent(inout) :: svout
-      integer(psb_ipk_), intent(out)                            :: info
+      class(amg_s_invt_solver_type), intent(inout) :: sv
+      class(amg_s_base_solver_type), intent(inout) :: svout
+      integer(psb_ipk_), intent(out)                 :: info
     end subroutine amg_s_invt_solver_clone_settings
   end interface
 

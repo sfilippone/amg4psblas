@@ -79,9 +79,9 @@ module amg_z_invk_solver
       import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
        & amg_z_base_solver_type, psb_dpk_, amg_z_invk_solver_type, psb_ipk_
       Implicit None
-      class(amg_z_invk_solver_type), intent(inout)              :: sv
-      class(amg_z_base_solver_type), allocatable, intent(inout) :: svout
-      integer(psb_ipk_), intent(out)                            :: info
+      class(amg_z_invk_solver_type), intent(inout) :: sv
+      class(amg_z_base_solver_type), intent(inout) :: svout
+      integer(psb_ipk_), intent(out)                 :: info
     end subroutine amg_z_invk_solver_clone_settings
   end interface
 
