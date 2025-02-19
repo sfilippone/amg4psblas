@@ -203,8 +203,8 @@ module amg_d_jac_smoother
     subroutine amg_d_jac_smoother_clone_settings(sm,smout,info)
       import :: amg_d_jac_smoother_type, psb_dpk_, &
            & amg_d_base_smoother_type, psb_ipk_
-      class(amg_d_jac_smoother_type), intent(inout)               :: sm
-      class(amg_d_base_smoother_type), allocatable, intent(inout) :: smout
+      class(amg_d_jac_smoother_type), intent(inout)  :: sm
+      class(amg_d_base_smoother_type), intent(inout) :: smout
       integer(psb_ipk_), intent(out)                :: info
     end subroutine amg_d_jac_smoother_clone_settings
   end interface

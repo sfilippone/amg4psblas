@@ -3,7 +3,7 @@ MLDINCDIR=$(MLDDIR)/include
 include $(MLDINCDIR)/Make.inc.amg4psblas
 MLDMODDIR=$(MLDDIR)/modules
 MLDLIBDIR=$(MLDDIR)/lib
-MLD_LIBS=-L$(MLDLIBDIR) -lpsb_krylov -lmld_prec -lpsb_prec
+MLD_LIBS=-L$(MLDLIBDIR) -lpsb_linsolve -lmld_prec -lpsb_prec
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MLDMODDIR) $(FMFLAG)$(MLDINCDIR) $(PSBLAS_INCLUDES) $(FIFLAG).
 
 PD3DOBJS=mld_pde3d_newslv.o  data_input.o mld_d_tlu_solver.o mld_d_tlu_solver_impl.o

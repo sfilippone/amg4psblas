@@ -525,7 +525,7 @@ then
    FIFLAG="-I"
    BASEMODNAME=PSB_BASE_MOD
    PRECMODNAME=PSB_PREC_MOD
-   METHDMODNAME=PSB_KRYLOV_MOD
+   METHDMODNAME=PSB_LINSOLVE_MOD
    UTILMODNAME=PSB_UTIL_MOD
 
 else 
@@ -536,7 +536,7 @@ else
    FIFLAG=-I
    BASEMODNAME=psb_base_mod
    PRECMODNAME=psb_prec_mod
-   METHDMODNAME=psb_krylov_mod
+   METHDMODNAME=psb_linsolve_mod
    UTILMODNAME=psb_util_mod
 fi
 

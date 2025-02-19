@@ -264,7 +264,7 @@ contains
        & ah,ph,bh,xh,cdh,options) bind(c) result(res)
     use psb_base_mod
     use psb_prec_mod
-    use psb_krylov_mod
+    use psb_linsolve_mod
     use psb_prec_cbind_mod
     use psb_dkrylov_cbind_mod
     implicit none
@@ -285,7 +285,7 @@ contains
        & ah,ph,bh,xh,eps,cdh,itmax,iter,err,itrace,irst,istop) bind(c) result(res)
     use psb_base_mod
     use psb_prec_mod
-    use psb_krylov_mod
+    use psb_linsolve_mod
     use psb_objhandle_mod
     use psb_prec_cbind_mod
     use psb_base_string_cbind_mod

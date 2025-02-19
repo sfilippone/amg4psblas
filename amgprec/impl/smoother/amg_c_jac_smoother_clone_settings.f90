@@ -41,7 +41,7 @@ subroutine amg_c_jac_smoother_clone_settings(sm,smout,info)
   use amg_c_jac_smoother, amg_protect_name =>  amg_c_jac_smoother_clone_settings
   Implicit None
   ! Arguments
-  class(amg_c_jac_smoother_type), intent(inout)              :: sm
+  class(amg_c_jac_smoother_type), intent(inout)  :: sm
   class(amg_c_base_smoother_type), intent(inout) :: smout
   integer(psb_ipk_), intent(out)                 :: info
   integer(psb_ipk_)  :: err_act

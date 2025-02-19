@@ -29,7 +29,7 @@ class="cmr-12">up</span></a><span
 class="cmr-12">] </span></p></div>
    <h3 class="sectionHead"><span class="titlemark"><span 
 class="cmr-12">6   </span></span> <a 
- id="x27-310006"></a><span 
+ id="x9-310006"></a><span 
 class="cmr-12">Adding new smoother and solver objects to AMG4PSBLAS</span></h3>
 <!--l. 6--><p class="noindent" ><span 
 class="cmr-12">Developers can add completely new smoother and/or solver classes derived from the</span>
@@ -37,7 +37,7 @@ class="cmr-12">Developers can add completely new smoother and/or solver classes 
 class="cmr-12">base objects in the library (see Remark</span><span 
 class="cmr-12">&#x00A0;2 in Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="userhtmlsu9.html#x19-180005.2"><span 
+href="userhtmlse5.html#x8-180005.2"><span 
 class="cmr-12">5.2</span><!--tex4ht:ref: sec:precset --></a><span 
 class="cmr-12">), without recompiling the</span>
 <span 
@@ -63,57 +63,29 @@ class="cmr-12">Once the new smoother/solver class has been developed, to use it 
 <span 
 class="cmr-12">the multilevel preconditioners it is necessary to:</span>
      <ul class="itemize1">
-     <li class="itemize"><span 
+     <li class="itemize">
+     <!--l. 23--><p class="noindent" ><span 
 class="cmr-12">declare in the application program a variable of the new type;</span>
      </li>
-     <li class="itemize"><span 
+     <li class="itemize">
+     <!--l. 24--><p class="noindent" ><span 
 class="cmr-12">pass that variable as the argument to the </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">set</span></span></span> <span 
 class="cmr-12">routine as in the following:</span>
      <div class="center" 
 >
 <!--l. 26--><p class="noindent" >
-<!--l. 27--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">call</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">p</span><span 
-class="cmtt-12">%</span><span 
-class="cmtt-12">set</span><span 
-class="cmtt-12">(</span><span 
-class="cmtt-12">smoother</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">info</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">[,</span><span 
-class="cmtt-12">ilev</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">ilmax</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">pos</span><span 
-class="cmtt-12">])</span><br />
-<span class="lstinline"></span><span 
-class="cmtt-12">call</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">p</span><span 
-class="cmtt-12">%</span><span 
-class="cmtt-12">set</span><span 
-class="cmtt-12">(</span><span 
-class="cmtt-12">solver</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">info</span><span 
-class="cmtt-12">&#x00A0;</span><span 
-class="cmtt-12">[,</span><span 
-class="cmtt-12">ilev</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">ilmax</span><span 
-class="cmtt-12">,</span><span 
-class="cmtt-12">pos</span><span 
-class="cmtt-12">])</span></div>
+<!--l. 27--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">set</span><span style="color:#000000">(</span><span style="color:#000000">smoother</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000"> </span><span style="color:#000000">[,</span><span style="color:#000000">ilev</span><span style="color:#000000">,</span><span style="color:#000000">ilmax</span><span style="color:#000000">,</span><span style="color:#000000">pos</span><span style="color:#000000">])</span></code><br />
+<code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">set</span><span style="color:#000000">(</span><span style="color:#000000">solver</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000"> </span><span style="color:#000000">[,</span><span style="color:#000000">ilev</span><span style="color:#000000">,</span><span style="color:#000000">ilmax</span><span style="color:#000000">,</span><span style="color:#000000">pos</span><span style="color:#000000">])</span></code></div>
      </li>
-     <li class="itemize"><span 
+     <li class="itemize">
+     <!--l. 30--><p class="noindent" ><span 
 class="cmr-12">link the code implementing the various methods into the application</span>
      <span 
 class="cmr-12">executable.</span></li></ul>
+                                                                               
+
+                                                                               
 <!--l. 32--><p class="noindent" ><span 
 class="cmr-12">The new solver object is then dynamically included in the preconditioner structure,</span>
 <span 
@@ -124,9 +96,6 @@ class="cmr-12">to which the preconditioner will conform, even though</span>
 class="cmr-12">the AMG4PSBLAS library has not been modified to account for this new</span>
 <span 
 class="cmr-12">development.</span>
-                                                                               
-
-                                                                               
 <!--l. 37--><p class="indent" >   <span 
 class="cmr-12">It is possible to define new values for the keyword </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">WHAT</span></span></span> <span 
@@ -165,44 +134,34 @@ class="cmr-12">The interfaces for the calls shown above are defined using</span>
 <div class="center" 
 >
 <!--l. 56--><p class="noindent" >
-<div class="tabular"> <table id="TBL-22" class="tabular" 
-cellspacing="0" cellpadding="0"  
-><colgroup id="TBL-22-1g"><col 
-id="TBL-22-1"><col 
-id="TBL-22-2"></colgroup><tr  
- style="vertical-align:baseline;" id="TBL-22-1-"><td  style="white-space:normal; text-align:left;" id="TBL-22-1-1"  
-class="td11"><!--l. 58--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">smoother</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-22-1-2"  
-class="td11"><!--l. 58--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">class</span><span 
-class="cmtt-12">(</span><span 
-class="cmtt-12">amg_x_base_smoother_type</span><span 
-class="cmtt-12">)</span>                        </td>
+<div class="tabular"> <table id="TBL-23" class="tabular" 
+ 
+><colgroup id="TBL-23-1g"><col 
+id="TBL-23-1"><col 
+id="TBL-23-2"></colgroup><tr  
+ style="vertical-align:baseline;" id="TBL-23-1-"><td  style="white-space:normal; text-align:left;" id="TBL-23-1-1"  
+class="td11"><!--l. 58--><p class="noindent" ><code class="lstinline"><span style="color:#000000">smoother</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-23-1-2"  
+class="td11"><!--l. 58--><p class="noindent" ><code class="lstinline"><span style="color:#000000">class</span><span style="color:#000000">(</span><span style="color:#000000">amg_x_base_smoother_type</span><span style="color:#000000">)</span></code>                        </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-22-2-"><td  style="white-space:normal; text-align:left;" id="TBL-22-2-1"  
-class="td11"><!--l. 59--><p class="noindent" >       </td><td  style="white-space:normal; text-align:left;" id="TBL-22-2-2"  
+ style="vertical-align:baseline;" id="TBL-23-2-"><td  style="white-space:normal; text-align:left;" id="TBL-23-2-1"  
+class="td11"><!--l. 59--><p class="noindent" >       </td><td  style="white-space:normal; text-align:left;" id="TBL-23-2-2"  
 class="td11"><!--l. 59--><p class="noindent" ><span 
 class="cmr-12">The   user-defined   new   smoother   to   be   employed   in   the</span>
 <span 
 class="cmr-12">preconditioner.</span>                                                                    </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-22-3-"><td  style="white-space:normal; text-align:left;" id="TBL-22-3-1"  
-class="td11"><!--l. 61--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">solver</span> </td><td  style="white-space:normal; text-align:left;" id="TBL-22-3-2"  
-class="td11"><!--l. 61--><p class="noindent" ><span class="lstinline"></span><span 
-class="cmtt-12">class</span><span 
-class="cmtt-12">(</span><span 
-class="cmtt-12">amg_x_base_solver_type</span><span 
-class="cmtt-12">)</span>                          </td>
+ style="vertical-align:baseline;" id="TBL-23-3-"><td  style="white-space:normal; text-align:left;" id="TBL-23-3-1"  
+class="td11"><!--l. 61--><p class="noindent" ><code class="lstinline"><span style="color:#000000">solver</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-23-3-2"  
+class="td11"><!--l. 61--><p class="noindent" ><code class="lstinline"><span style="color:#000000">class</span><span style="color:#000000">(</span><span style="color:#000000">amg_x_base_solver_type</span><span style="color:#000000">)</span></code>                          </td>
 </tr><tr  
- style="vertical-align:baseline;" id="TBL-22-4-"><td  style="white-space:normal; text-align:left;" id="TBL-22-4-1"  
-class="td11"><!--l. 62--><p class="noindent" >       </td><td  style="white-space:normal; text-align:left;" id="TBL-22-4-2"  
+ style="vertical-align:baseline;" id="TBL-23-4-"><td  style="white-space:normal; text-align:left;" id="TBL-23-4-1"  
+class="td11"><!--l. 62--><p class="noindent" >       </td><td  style="white-space:normal; text-align:left;" id="TBL-23-4-2"  
 class="td11"><!--l. 62--><p class="noindent" ><span 
-class="cmr-12">The user-defined new solver to be employed in the preconditioner.</span></td></tr></table></div></div>
+class="cmr-12">The user-defined new solver to be employed in the preconditioner.</span></td></tr></table> </div></div>
 <!--l. 66--><p class="noindent" ><span 
 class="cmr-12">The other arguments are defined in the way described in Sec.</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="userhtmlsu9.html#x19-180005.2"><span 
+href="userhtmlse5.html#x8-180005.2"><span 
 class="cmr-12">5.2</span><!--tex4ht:ref: sec:precset --></a><span 
 class="cmr-12">. As an example, in the</span>
 <span class="obeylines-h"><span class="verb"><span 
@@ -215,11 +174,13 @@ class="cmr-12">pass it as follows:</span>
                                                                                
 
                                                                                
-   <pre class="verbatim" id="verbatim-13">
+   <pre class="verbatim" id="verbatim-14">
+
 &#x00A0;&#x00A0;!&#x00A0;sparse&#x00A0;matrix&#x00A0;and&#x00A0;preconditioner
 &#x00A0;&#x00A0;type(psb_dspmat_type)&#x00A0;::&#x00A0;a
 &#x00A0;&#x00A0;type(amg_dprec_type)&#x00A0;&#x00A0;::&#x00A0;prec
 &#x00A0;&#x00A0;type(amg_d_tlu_solver_type)&#x00A0;::&#x00A0;tlusv
+
 ......
 &#x00A0;&#x00A0;!
 &#x00A0;&#x00A0;!&#x00A0;&#x00A0;prepare&#x00A0;the&#x00A0;preconditioner:&#x00A0;an&#x00A0;ML&#x00A0;with&#x00A0;defaults,&#x00A0;but&#x00A0;with&#x00A0;TLU&#x00A0;solver&#x00A0;at
@@ -230,8 +191,12 @@ class="cmr-12">pass it as follows:</span>
 &#x00A0;&#x00A0;nlv&#x00A0;=&#x00A0;prec%get_nlevs()
 &#x00A0;&#x00A0;call&#x00A0;prec%set(tlusv,&#x00A0;&#x00A0;&#x00A0;info,ilev=1,ilmax=max(1,nlv-1))
 &#x00A0;&#x00A0;call&#x00A0;prec%smoothers_build(a,desc_a,info)
+
 </pre>
 <!--l. 107--><p class="nopar" >
+                                                                               
+
+                                                                               
                                                                                
 
                                                                                

@@ -127,8 +127,7 @@ subroutine amg_s_base_onelev_dump(lv,level,info,prefix,head,ac,rp,&
         ivr = lv%linmap%p_desc_U%get_global_indices(owned=.false.)
         write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_tprol.mtx'
         !
-        !  This is not implemented yet.
-        !call lv%tprol%print(fname,head=head,ivr=ivr)
+        call lv%tprol%print(fname,head=head,ivr=ivr)
       end if
     end if
   else
@@ -151,8 +150,7 @@ subroutine amg_s_base_onelev_dump(lv,level,info,prefix,head,ac,rp,&
       if (tprol_) then 
         write(fname(lname+1:),'(a,i3.3,a)')'_l',level,'_tprol.mtx'
         !
-        !  This is not implemented yet.
-        !call lv%tprol%print(fname,head=head)
+        call lv%tprol%print(fname,head=head)
       end if
     end if
   end if

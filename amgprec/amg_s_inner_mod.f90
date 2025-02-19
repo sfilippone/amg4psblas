@@ -109,11 +109,12 @@ module amg_s_inner_mod
   end interface amg_map_to_tprol
 
   abstract interface
-    subroutine amg_saggrmat_var_bld(a,desc_a,ilaggr,nlaggr,parms,&
+    subroutine amg_saggrmat_var_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,parms,&
          & ac,desc_ac,op_prol,op_restr,t_prol,info)
       import :: psb_sspmat_type, psb_desc_type, psb_spk_, psb_ipk_, psb_lpk_, psb_lsspmat_type
       import ::  amg_s_onelev_type, amg_sml_parms
       implicit none 
+      integer(psb_ipk_), intent(in)               :: dol1smoothing
       type(psb_sspmat_type), intent(in)         :: a
       type(psb_desc_type), intent(inout)          :: desc_a
       integer(psb_lpk_), intent(inout)            :: ilaggr(:), nlaggr(:)

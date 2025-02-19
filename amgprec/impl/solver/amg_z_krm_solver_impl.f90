@@ -169,7 +169,7 @@ subroutine amg_z_krm_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
      & trans,work,wv,info,init,initu)
 
   use psb_base_mod
-  use psb_krylov_mod
+  use psb_linsolve_mod
   use amg_z_krm_solver, amg_protect_name => amg_z_krm_solver_apply_vect
 
   Implicit None

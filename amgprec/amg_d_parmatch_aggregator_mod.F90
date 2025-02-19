@@ -244,11 +244,12 @@ module amg_d_parmatch_aggregator_mod
   end interface
 
   interface
-    subroutine amg_d_parmatch_unsmth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
+    subroutine amg_d_parmatch_unsmth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,parms,&
          & ac,desc_ac,op_prol,op_restr,t_prol,info)
       import :: amg_d_parmatch_aggregator_type, psb_desc_type, psb_dspmat_type,&
            & psb_ldspmat_type, psb_dpk_, psb_ipk_, psb_lpk_, amg_dml_parms, amg_daggr_data
       implicit none
+      integer(psb_ipk_), intent(in) :: dol1smoothing
       class(amg_d_parmatch_aggregator_type), target, intent(inout) :: ag
       type(psb_dspmat_type), intent(in)       :: a
       type(psb_desc_type), intent(inout)      :: desc_a
@@ -262,11 +263,12 @@ module amg_d_parmatch_aggregator_mod
   end interface
 
   interface
-    subroutine amg_d_parmatch_smth_bld(ag,a,desc_a,ilaggr,nlaggr,parms,&
+    subroutine amg_d_parmatch_smth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,parms,&
          & ac,desc_ac,op_prol,op_restr,t_prol,info)
       import :: amg_d_parmatch_aggregator_type, psb_desc_type, psb_dspmat_type,&
            & psb_ldspmat_type, psb_dpk_, psb_ipk_, psb_lpk_, amg_dml_parms, amg_daggr_data
       implicit none
+      integer(psb_ipk_), intent(in) :: dol1smoothing
       class(amg_d_parmatch_aggregator_type), target, intent(inout) :: ag
       type(psb_dspmat_type), intent(in)       :: a
       type(psb_desc_type), intent(inout)      :: desc_a

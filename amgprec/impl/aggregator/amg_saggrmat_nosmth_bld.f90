@@ -94,10 +94,11 @@
 !               
 !    info       -  integer, output.
 !                  Error code.
+!    dol1smoothing - optional, this is here just for interfacing reasons. It is not used by the
+!                    code
 !
-!
-subroutine amg_saggrmat_nosmth_bld(a,desc_a,ilaggr,nlaggr,parms,&
-     & ac,desc_ac,op_prol,op_restr,t_prol,info)
+subroutine amg_saggrmat_nosmth_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,&
+                parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
   use amg_base_prec_type
   use amg_s_inner_mod, amg_protect_name => amg_saggrmat_nosmth_bld
@@ -105,6 +106,7 @@ subroutine amg_saggrmat_nosmth_bld(a,desc_a,ilaggr,nlaggr,parms,&
   implicit none
 
   ! Arguments
+  integer(psb_ipk_), intent(in)              :: dol1smoothing 
   type(psb_sspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(inout)         :: desc_a
   integer(psb_lpk_), intent(inout)           :: ilaggr(:), nlaggr(:)
@@ -137,6 +139,12 @@ subroutine amg_saggrmat_nosmth_bld(a,desc_a,ilaggr,nlaggr,parms,&
 
   ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
+  if (dol1smoothing.ne.amg_no_smooth_) then
+    info=psb_err_fatal_;         
+    call psb_errpush(info,name,a_err='Are you trying to smooth an unsmoothed aggregation?')
+    goto 9999
+  end if
+
   nglob = desc_a%get_global_rows()
   nrow  = desc_a%get_local_rows()
   ncol  = desc_a%get_local_cols()

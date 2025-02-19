@@ -77,7 +77,7 @@
 #include <math.h>
 
 #include "psb_base_cbind.h"
-#include "mld_cbind.h"
+#include "amg_cbind.h"
 
 
 double  a1(double x, double y, double  z)
@@ -123,7 +123,7 @@ double g(double x, double y, double z)
 
 #define NBMAX       20
 
-psb_i_t matgen(psb_i_t ictxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
+psb_i_t matgen(psb_c_ctxt cctxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
 	       psb_c_dspmat *ah,psb_c_descriptor *cdh,
 	       psb_c_dvector *xh, psb_c_dvector *bh, psb_c_dvector *rh)
 {
@@ -135,7 +135,7 @@ psb_i_t matgen(psb_i_t ictxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
   psb_l_t irow[10*NBMAX], icol[10*NBMAX];
 
   info = 0;
-  psb_c_info(ictxt,&iam,&np);
+  psb_c_info(cctxt,&iam,&np);
   deltah = (double) 1.0/(idim+1);
   sqdeltah = deltah*deltah;
   deltah2  = 2.0* deltah;
@@ -253,11 +253,12 @@ void get_hparm(FILE *fp, char *val)
 
 int main(int argc, char *argv[])
 {
-  psb_i_t ictxt, iam, np;
+  psb_c_ctxt *cctxt;
+  psb_i_t iam, np;
   char methd[40], ptype[40], afmt[8];
   psb_i_t nparms;
   psb_i_t idim,info,istop,itmax,itrace,irst,iter,ret;
-  mld_c_dprec *ph;
+  amg_c_dprec *ph;
   psb_c_dspmat *ah;
   psb_c_dvector *bh, *xh, *rh; 
   psb_i_t nb,nlr, nl;
@@ -269,12 +270,13 @@ int main(int argc, char *argv[])
   psb_c_descriptor *cdh;
   FILE *vectfile;
   
-  ictxt = psb_c_init();
-  psb_c_info(ictxt,&iam,&np);
+  cctxt = psb_c_new_ctxt();
+  psb_c_init(cctxt);
+  psb_c_info(*cctxt,&iam,&np);
   fprintf(stdout,"Initialization: am %d of %d\n",iam,np);
 
   fflush(stdout);
-  psb_c_barrier(ictxt);
+  psb_c_barrier(*cctxt);
   if (iam == 0) {
     get_iparm(stdin,&nparms);
     get_hparm(stdin,methd);
@@ -287,17 +289,17 @@ int main(int argc, char *argv[])
     get_iparm(stdin,&irst);
   } 
   /* Now broadcast the values, and check they're OK */
-  psb_c_ibcast(ictxt,1,&nparms,0);
-  psb_c_hbcast(ictxt,methd,0);
-  psb_c_hbcast(ictxt,ptype,0);
-  psb_c_hbcast(ictxt,afmt,0);
-  psb_c_ibcast(ictxt,1,&idim,0);
-  psb_c_ibcast(ictxt,1,&istop,0);
-  psb_c_ibcast(ictxt,1,&itmax,0);
-  psb_c_ibcast(ictxt,1,&itrace,0);
-  psb_c_ibcast(ictxt,1,&irst,0);
+  psb_c_ibcast(*cctxt,1,&nparms,0);
+  psb_c_hbcast(*cctxt,methd,0);
+  psb_c_hbcast(*cctxt,ptype,0);
+  psb_c_hbcast(*cctxt,afmt,0);
+  psb_c_ibcast(*cctxt,1,&idim,0);
+  psb_c_ibcast(*cctxt,1,&istop,0);
+  psb_c_ibcast(*cctxt,1,&itmax,0);
+  psb_c_ibcast(*cctxt,1,&itrace,0);
+  psb_c_ibcast(*cctxt,1,&irst,0);
   
-  psb_c_barrier(ictxt);
+  psb_c_barrier(*cctxt);
 
   cdh=psb_c_new_descriptor();
   psb_c_set_index_base(0);
@@ -310,15 +312,15 @@ int main(int argc, char *argv[])
   fprintf(stderr,"%d: Input data %d %ld %d %d\n",iam,idim,ng,nb, nl);
   if ((vl=malloc(nb*sizeof(psb_l_t)))==NULL) {
     fprintf(stderr,"On %d: malloc failure\n",iam);
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }
   i = ((psb_l_t)iam) * nb;
   for (k=0; k<nl; k++)
     vl[k] = i+k; 
 
-  if ((info=psb_c_cdall_vl(nl,vl,ictxt,cdh))!=0) {
+  if ((info=psb_c_cdall_vl(nl,vl,*cctxt,cdh))!=0) {
     fprintf(stderr,"From cdall: %d\nBailing out\n",info);
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }
 
   bh  = psb_c_new_dvector();
@@ -337,25 +339,25 @@ int main(int argc, char *argv[])
 
   
   /* Matrix generation  */
-  if (matgen(ictxt,nl,idim,vl,ah,cdh,xh,bh,rh) != 0) {
+  if (matgen(*cctxt,nl,idim,vl,ah,cdh,xh,bh,rh) != 0) {
     fprintf(stderr,"Error during matrix build loop\n");
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }    
-  psb_c_barrier(ictxt);
+  psb_c_barrier(*cctxt);
   /* Set up the preconditioner */ 
-  ph  = mld_c_dprec_new();
-  mld_c_dprecinit(ictxt,ph,ptype);
-  mld_c_dprecseti(ph,"SMOOTHER_SWEEPS",2);
-  mld_c_dprecseti(ph,"SUB_FILLIN",1);
-  mld_c_dprecsetc(ph,"COARSE_SOLVE","BJAC");
-  mld_c_dprecsetc(ph,"COARSE_SUBSOLVE","ILU");
-  mld_c_dprecseti(ph,"COARSE_FILLIN",0);
-  if ((ret=mld_c_dhierarchy_build(ah,cdh,ph))!=0)
+  ph  = amg_c_dprec_new();
+  amg_c_dprecinit(*cctxt,ph,ptype);
+  amg_c_dprecseti(ph,"SMOOTHER_SWEEPS",2);
+  amg_c_dprecseti(ph,"SUB_FILLIN",1);
+  amg_c_dprecsetc(ph,"COARSE_SOLVE","BJAC");
+  amg_c_dprecsetc(ph,"COARSE_SUBSOLVE","ILU");
+  amg_c_dprecseti(ph,"COARSE_FILLIN",0);
+  if ((ret=amg_c_dhierarchy_build(ah,cdh,ph))!=0)
     fprintf(stderr,"From hierarchy_build: %d\n",ret);
-  if ((ret=mld_c_dsmoothers_build(ah,cdh,ph))!=0)
+  if ((ret=amg_c_dsmoothers_build(ah,cdh,ph))!=0)
     fprintf(stderr,"From smoothers_build: %d\n",ret);
 
-  psb_c_barrier(ictxt);
+  psb_c_barrier(*cctxt);
   /* Set up the solver options */ 
   psb_c_DefaultSolverOptions(&options);
   options.eps    = 1.e-6;
@@ -365,7 +367,7 @@ int main(int argc, char *argv[])
   options.istop  = istop;
   psb_c_seterraction_ret();
   t1=psb_c_wtime();
-  ret=mld_c_dkrylov(methd,ah,ph,bh,xh,cdh,&options); 
+  ret=amg_c_dkrylov(methd,ah,ph,bh,xh,cdh,&options); 
   t2=psb_c_wtime();
   iter = options.iter;
   err  = options.err;
@@ -413,20 +415,20 @@ int main(int argc, char *argv[])
   /* Clean up memory */ 
   if ((info=psb_c_dgefree(xh,cdh))!=0) {
     fprintf(stderr,"From dgefree: %d\nBailing out\n",info);
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }
   if ((info=psb_c_dgefree(bh,cdh))!=0) {
     fprintf(stderr,"From dgefree: %d\nBailing out\n",info);
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }
   if ((info=psb_c_dgefree(rh,cdh))!=0) {
     fprintf(stderr,"From dgefree: %d\nBailing out\n",info);
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }
 
   if ((info=psb_c_cdfree(cdh))!=0) {
     fprintf(stderr,"From cdfree: %d\nBailing out\n",info);
-    psb_c_abort(ictxt);
+    psb_c_abort(*cctxt);
   }
   //fprintf(stderr,"pointer  from cdfree: %p\n",cdh->descriptor);
  
@@ -440,6 +442,7 @@ int main(int argc, char *argv[])
 
   if (iam == 0) fprintf(stderr,"program completed successfully\n");
 
-  psb_c_barrier(ictxt);
-  psb_c_exit(ictxt);
+  psb_c_barrier(*cctxt);
+  psb_c_exit(*cctxt);
+  free(cctxt);
 }
