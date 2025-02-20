@@ -44,9 +44,10 @@ cleanlib:
 	(cd include; /bin/rm -f *.a *$(.mod) *$(.fh))
 	(cd modules; /bin/rm -f *.a *$(.mod) *$(.fh))
 
-veryclean: cleanlib
-	(cd amgprec && $(MAKE) veryclean)
-	(cd cbind && $(MAKE) veryclean)
+distclean: clean samplesclean
+	/bin/rm -fr Make.inc
+
+samplesclean: clean
 	(cd samples/simple/fileread && $(MAKE) clean)
 	(cd samples/simple/pdegen && $(MAKE) clean)
 	(cd samples/advanced/fileread && $(MAKE) clean)
@@ -55,6 +56,6 @@ veryclean: cleanlib
 check: all
 	make check -C samples/advanced/pdegen
 
-clean:
+clean:  cleanlib
 	(cd amgprec && $(MAKE) clean)
 	(cd cbind && $(MAKE) clean)
