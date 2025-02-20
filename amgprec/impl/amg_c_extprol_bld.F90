@@ -40,8 +40,8 @@
 ! Subroutine: amg_c_extprol_bld
 ! Version:    real
 !
-!  This routine builds the preconditioner according to the requirements made by
-!  the user trough the subroutines amg_precinit and amg_precset.
+!  Builds an AMG hierarchy according to a set of prolongators/restrictors      
+!  provided by the user.
 !  
 !  A multilevel preconditioner is regarded as an array of 'one-level' data structures,
 !  each containing the part of the preconditioner associated to a certain level,
