@@ -1267,6 +1267,16 @@ program amg_dexample_cuda
   ! solve Ax=b with preconditioned Krylov method
 
   call psb_barrier(ctxt)
+  !
+  ! Most preconditioners require auxiliary storage. When running
+  ! on the HOST side, allocation/deallocation are usually very cheap
+  ! and can be performed for every invocation of prec%apply.
+  ! However when running on the DEVICE side, such memory management
+  ! operations are global synchronization points, hence very costly.
+  ! Thus the two methods below that preallocate the memory space
+  ! prior to the invocation of the Krylov method, and release memory
+  ! after the method has completed.
+  !
   call prec%allocate_wrk(info,vmold=vmold)
   t1 = psb_wtime()
 
