@@ -55,7 +55,7 @@ in isolation and without these features.
 
 ### CUDA, OpeMP, OpenACC
 
-CUDA, OpenMP and OpenACC features are transparently inherited by PSBLAS installation. If PSBLAS has been configured (and installed) with these supports then AMG4PSBLAS will transparently inherit them. It will then be possible to move the computation to GPU accelerator simply by selecting the appropriate variable types. If these have not been activated or installed for PSBLAS then they will not be available for AMG4PSBLAS either and the operation will be purely on CPU/MPI.
+CUDA, OpenMP and OpenACC features are transparently inherited by PSBLAS installation. If PSBLAS has been configured (and installed) with these supports then AMG4PSBLAS will transparently inherit them. It will then be possible to move the computation to GPU accelerator simply by selecting the appropriate variable types. If these have not been activated or installed for PSBLAS then they will not be available for AMG4PSBLAS either and the operation will be purely on CPU/MPI. See also the samples/cuda folder.
 
 ### EoCoE - Software as service portal
 
