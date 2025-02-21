@@ -1312,6 +1312,8 @@ program amg_dexample_cuda
     write(*,'("Total memory occupation for A      : ",i12)')amatsize
     write(*,'("Total memory occupation for DESC_A : ",i12)')descsize
     write(*,'("Total memory occupation for PREC   : ",i12)')precsize
+    write(*,'("Storage format for                A: ",a)')   trim(a%get_fmt())
+    write(*,'("Storage format for           DESC_A: ",a)')   trim(desc_a%get_fmt())
   end if
 
   call psb_gefree(b, desc_A,info)

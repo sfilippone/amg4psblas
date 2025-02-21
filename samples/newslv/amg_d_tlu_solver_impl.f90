@@ -44,7 +44,7 @@
 !  we are simply giving a new name to  ILU(0).
 !
 !
-subroutine amg_d_tlu_solver_bld(a,desc_a,sv,info,b,amold,vmold)
+subroutine amg_d_tlu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
   use psb_base_mod
   use amg_d_tlu_solver, amg_protect_name => amg_d_tlu_solver_bld
@@ -59,6 +59,8 @@ subroutine amg_d_tlu_solver_bld(a,desc_a,sv,info,b,amold,vmold)
   type(psb_dspmat_type), intent(in), target, optional :: b
   class(psb_d_base_sparse_mat), intent(in), optional  :: amold
   class(psb_d_base_vect_type), intent(in), optional   :: vmold
+  class(psb_i_base_vect_type), intent(in), optional     :: imold
+  
   ! Local variables
   integer :: n_row,n_col, nrow_a, nztota
   integer :: np,me,i, err_act, debug_unit, debug_level
