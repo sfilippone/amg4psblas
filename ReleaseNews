@@ -1,5 +1,19 @@
 WHAT'S NEW
 
+AMG4PSBLAS
+Version 1.2
+   1. New polynomial smoothers.
+   2. Introduced L1-variants
+   3. Reorganization of sample programs.
+   
+Version 1.1
+   1. Reworked approximate inverse solvers.
+   
+
+Version 1.0
+   1. Transitioned from MLD2P4
+
+MLD2P4
 Version 2.1
    1. The multigrid preconditioner now include fully general V- and
       W-cycles. We also support K-cycles, both for symmetric and 
