@@ -1,10 +1,10 @@
   
    
-                             AMG4PSBLAS version 1.1
+                             AMG4PSBLAS version 1.2
     Algebraic Multigrid Package
-               based on PSBLAS (Parallel Sparse BLAS version 3.8)
+               based on PSBLAS (Parallel Sparse BLAS version 3.9)
     
-    (C) Copyright 2022
+    (C) Copyright 2025
   
         Salvatore Filippone  
         Pasqua D'Ambra   
