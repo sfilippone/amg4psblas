@@ -76,6 +76,12 @@ This sample program `amg_[s/d/c/z]example_1lev.f90` solves a linear system using
 ##### Input Data  
 The matrix and the right-hand side (RHS) are read from files. If an RHS is not available, a **unit RHS** is set.
 
+## newlsv
+This folder contains a simple program to demonstrate how to define a new **solver** object. The actual code is simply a copy of the **ILU(0)** solver, but it demonstrates the integration process, which can be achieved even at the level of the user program without touching the main library. The program solves a simple discretization of the Poisson equation with Dirichlet boundary conditions
+
+## cuda
+This folder contains a simple program to demonstrate how to integrate CUDA-enabled data structures in your application, if available. The program will compile and run even if the main PSBLAS library has been compiled without CUDA support; it builds the same problem as in the **newslv** folder.
+
 ## advanced
 
 This folder contains more complicated examples where you can choose, by setting them from the input files, most of the options available inside the AMG4PSBLAS library, it is a good starting point to test the different combinations on a finite difference discretization of a simple differential equation or on matrices read from files.
