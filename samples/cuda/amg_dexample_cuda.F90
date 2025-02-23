@@ -1285,7 +1285,7 @@ program amg_dexample_cuda
 
   t2 = psb_wtime() - t1
   call psb_amx(ctxt,t2)
-  call prec%free_wrk(info)
+  call prec%deallocate_wrk(info)
 
   call psb_geall(r,desc_A,info)
   call r%zero()
