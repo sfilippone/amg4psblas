@@ -147,8 +147,58 @@ target_link_libraries(amgprec
 
 
 
+
+
+
+include(${CMAKE_CURRENT_LIST_DIR}/cbind/CMakeLists.txt)  # include amgprec_source_files and amgprec_source_C_files source files
+
+
+foreach(path IN LISTS amgcbind_header_C_files)
+  # Copy the header file to the include directory
+  file(COPY "${path}" DESTINATION "${CMAKE_BINARY_DIR}/include")
+endforeach()
+
+
+add_library(amgcbind_C OBJECT ${amgprec_source_C_files})
+
+target_link_libraries(amgcbind_C
+  #PUBLIC ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${LAPACK95_LIBRARIES}
+  #PUBLIC ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${BLAS95_LIBRARIES}
+  psblas::util psblas::linsolve psblas::prec psblas::ext psblas::cbind psblas::base)  #TODO  check actual libraries needed
+
+add_library(amgcbind ${amgprec_source_files} $<TARGET_OBJECTS:amgcbind_C>)
+
+set_target_properties(amgcbind
+  PROPERTIES
+  Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/modules"  
+  POSITION_INDEPENDENT_CODE TRUE
+  OUTPUT_NAME psb_amgcbind
+  LINKER_LANGUAGE Fortran
+  )
+
+target_include_directories(amgcbind PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules> 
+  $<INSTALL_INTERFACE:modules>)
+
+message(STATUS "include dir := ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
+
+#target_include_directories(base PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
+
+target_include_directories(amgcbind PUBLIC ${INCDIR} ${MODDIR})
+target_link_libraries(amgcbind
+  #PUBLIC ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${LAPACK95_LIBRARIES}
+  #PUBLIC ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${BLAS95_LIBRARIES}
+  PUBLIC amgprec psblas::util psblas::linsolve psblas::prec psblas::ext psblas::cbind psblas::base)  #TODO  check actual libraries needed
+
+
+
+
+
+
+
+
 # Install the library
-install(TARGETS amgprec
+install(TARGETS amgprec amgcbind
     DESTINATION lib
 )
 
