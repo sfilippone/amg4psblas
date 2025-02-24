@@ -34,11 +34,11 @@ dnl NOTE : odd configurations like ifc + gcc still await in the mist of the unkn
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([AMG4PSBLAS],1.1.0, [https://github.com/sfilippone/amg4psblas/issues])
+AC_INIT([AMG4PSBLAS],1.2.0, [https://github.com/sfilippone/amg4psblas/issues])
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-amg4psblas_cv_version="1.1.0"
+amg4psblas_cv_version="1.2.0"
 
 # A sample source file
 AC_CONFIG_SRCDIR([amgprec/amg_prec_type.f90])
