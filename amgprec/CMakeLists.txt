@@ -189,7 +189,7 @@ set(AMG_amgprec_source_files
 #  impl/solver/amg_d_ainv_solver_seti.f90
   impl/solver/amg_z_ainv_solver_clone.f90
   impl/solver/amg_d_base_ainv_solver_free.f90
-  impl/solver/amg_c_invk_solver_seti.f90
+#  impl/solver/amg_c_invk_solver_seti.f90
   impl/solver/amg_s_ilu_solver_dmp.f90
   impl/solver/amg_z_base_solver_apply.f90
   impl/solver/amg_d_ilu_solver_apply_vect.f90
@@ -274,7 +274,7 @@ set(AMG_amgprec_source_files
   impl/solver/amg_z_invt_solver_check.f90
   impl/solver/amg_c_base_solver_cseti.f90
   impl/solver/amg_s_jac_solver_dmp.f90
-  impl/solver/amg_s_invk_solver_seti.f90
+#  impl/solver/amg_s_invk_solver_seti.f90
   impl/solver/amg_s_ainv_solver_check.f90
   impl/solver/amg_d_base_solver_clear_data.f90
   impl/solver/amg_z_gs_solver_clone_settings.f90
@@ -393,7 +393,7 @@ set(AMG_amgprec_source_files
   impl/solver/amg_c_base_solver_clone_settings.f90
   impl/solver/amg_z_gs_solver_cnv.f90
   impl/solver/amg_s_invt_solver_clone.f90
-  impl/solver/amg_z_invk_solver_seti.f90
+#  impl/solver/amg_z_invk_solver_seti.f90
   impl/solver/amg_c_ainv_solver_csetr.f90
   impl/solver/amg_c_jac_solver_apply.f90
   impl/solver/amg_c_gs_solver_dmp.f90
@@ -441,7 +441,7 @@ set(AMG_amgprec_source_files
   impl/solver/amg_s_jac_solver_cnv.f90
   impl/solver/amg_z_bwgs_solver_apply.f90
   impl/solver/amg_s_bwgs_solver_apply_vect.f90
-  impl/solver/amg_d_invk_solver_seti.f90
+#  impl/solver/amg_d_invk_solver_seti.f90
   impl/solver/amg_d_ilu_solver_cnv.f90
   impl/solver/amg_s_mumps_solver_bld.F90
   impl/solver/amg_s_gs_solver_clone_settings.f90
