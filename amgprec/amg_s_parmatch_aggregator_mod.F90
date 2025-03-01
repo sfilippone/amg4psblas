@@ -400,6 +400,7 @@ contains
     integer(psb_ipk_), intent(out) :: info
     character(len=*), intent(in), optional  :: prefix
     character(1024)    :: prefix_
+    info = psb_success_
     if (present(prefix)) then
       prefix_ = prefix
     else
@@ -451,6 +452,7 @@ contains
     class(amg_s_base_aggregator_type), target, intent(inout) :: agnext
     integer(psb_ipk_), intent(out)       :: info
 
+    info = psb_success_
     !
     !
     select type(agnext)
@@ -590,7 +592,7 @@ contains
     class(amg_s_parmatch_aggregator_type), intent(inout) :: ag
     integer(psb_ipk_), intent(out)       :: info
 
-    info = 0
+    info = psb_success_
     if ((info == 0).and.allocated(ag%w)) deallocate(ag%w,stat=info)
     if ((info == 0).and.allocated(ag%w_nxt)) deallocate(ag%w_nxt,stat=info)
     if ((info == 0).and.allocated(ag%prol)) then
@@ -629,7 +631,7 @@ contains
     class(amg_s_base_aggregator_type), allocatable, intent(inout) :: agnext
     integer(psb_ipk_), intent(out)       :: info
 
-    info = 0
+    info = psb_success_
     if (allocated(agnext)) then
       call agnext%free(info)
       if (info == 0) deallocate(agnext,stat=info)
@@ -658,6 +660,7 @@ contains
     integer(psb_ipk_) :: err_act
     character(len=20) :: name='s_parmatch_aggregator_bld_map'
 
+    info = psb_success_
     call psb_erractionsave(err_act)
     !
     ! Copy the prolongation/restriction matrices into the descriptor map.
@@ -675,11 +678,6 @@ contains
       map = psb_linmap(psb_map_gen_linear_,desc_a,&
            & desc_ac,op_restr,op_prol,ilaggr,nlaggr)
     end if
-    if(info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='sp_Free')
-      goto 9999
-    end if
-
     call psb_erractionrestore(err_act)
     return
 
