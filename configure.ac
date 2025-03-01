@@ -129,10 +129,10 @@ dnl We set our own FC flags, ignore those from AC_PROG_FC but not those from the
 dnl environment variable. Same for C
 dnl 
 save_FCFLAGS="$FCFLAGS";
-AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran])
+AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifx ifort ifc  nagfor gfortran])
 FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
-AC_PROG_CC([cc xlc pgcc icc gcc ])
+AC_PROG_CC([cc xlc pgcc icx icc gcc ])
 if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
    AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
 else
@@ -140,7 +140,7 @@ else
 fi	
 CFLAGS="$save_CFLAGS";
 save_CXXFLAGS="$CXXFLAGS";
-AC_PROG_CXX([CC xlc++  icpc g++])
+AC_PROG_CXX([CC xlc++ icpx icpc g++])
 CXXFLAGS="$save_CXXFLAGS";
 dnl AC_PROG_CXX
 
@@ -191,7 +191,7 @@ else
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPICC],[mpxlc mpiicc mpcc mpicc cc])
+    AC_CHECK_PROGS([MPICC],[mpxlc mpiicx mpiicc mpcc mpicc cc])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
 
@@ -200,14 +200,14 @@ AC_LANG([Fortran])
 
 if test "X$MPIFC" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90  mpiifort mpf95 mpf90 mpifort mpif95 mpif90 ftn ])
+    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpiifx mpiifort mpf95 mpf90 mpifort mpif95 mpif90 ftn ])
 fi
 
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
 AC_LANG([C++])
 if test "X$MPICXX" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpc  mpicxx])
+    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpx mpiicpc  mpicxx])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C++]])])
 AC_LANG([Fortran])
