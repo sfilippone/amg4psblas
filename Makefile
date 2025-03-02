@@ -57,5 +57,5 @@ check: all
 	make check -C samples/advanced/pdegen
 
 clean:  cleanlib
-	(cd amgprec && $(MAKE) clean)
-	(cd cbind && $(MAKE) clean)
+	(cd amgprec && $(MAKE) veryclean)
+	(cd cbind && $(MAKE) veryclean)
