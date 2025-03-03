@@ -10,16 +10,16 @@ if(NOT DEFINED PSBLAS_INSTALL_DIR)
 endif()
 
 # Set the include and library directories based on the provided path
-set(INSTALLDIR "${PSBLAS_INSTALL_DIR}")
-set(INCDIR "${INSTALLDIR}/include")
-set(MODDIR "${INSTALLDIR}/modules")
-set(LIBDIR "${INSTALLDIR}/lib")
+set(TEST_INSTALLDIR "${PSBLAS_INSTALL_DIR}")
+set(INCDIR "${TEST_INSTALLDIR}/include")
+set(MODDIR "${TEST_INSTALLDIR}/modules")
+set(LIBDIR "${TEST_INSTALLDIR}/lib")
 
 
 message(STATUS "PSBLAS DIRECTORY INC ${INCDIR}; MOD ${MODDIR}; LIB ${LIBDIR};")
 
 # Find the psblas package
-find_package(psblas REQUIRED PATHS ${INSTALLDIR})
+find_package(psblas REQUIRED PATHS ${TEST_INSTALLDIR})
 
 if(NOT psblas_FOUND)
     message(FATAL_ERROR "PSBLAS not found!")
@@ -36,9 +36,13 @@ include_directories(${INCDIR} ${MODDIR} ${LIBDIR})
 
 
 
+# Specify the installation directory
 
-
-
+set(${CMAKE_INSTALL_LIBDIR} "lib")
+message(STATUS "\t\t install libdir ${CMAKE_INSTALL_LIBDIR};")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/${${CMAKE_PROJECT_NAME}_dist_string}-tests")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 
 
 
@@ -102,6 +106,66 @@ endif()
   
 
 
+#-----------------------------------------------------
+# Publicize installed location to other CMake projects
+#-----------------------------------------------------
+#install(EXPORT ${CMAKE_PROJECT_NAME}-targets
+#  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake"
+#)
+
+
+message(STATUS "NAME project ${CMAKE_PROJECT_NAME};")
+
+install(EXPORT ${CMAKE_PROJECT_NAME}-targets
+  FILE ${CMAKE_PROJECT_NAME}Config.cmake
+  NAMESPACE ${CMAKE_PROJECT_NAME}::
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake"
+)
+
+
+include(CMakePackageConfigHelpers) # standard CMake module
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
+  VERSION "${amg4psblas_VERSION}"
+  COMPATIBILITY SameMajorVersion
+  )
+
+configure_file("${CMAKE_SOURCE_DIR}/cmake/pkg/${CMAKE_PROJECT_NAME}Config.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${CMAKE_PROJECT_NAME}Config.cmake" @ONLY)
+
+install(
+  FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${CMAKE_PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
+  DESTINATION
+    "${CMAKE_INSTALL_LIBDIR}/cmake/amg4psblas"
+)
+
+#------------------------------------------
+# Add portable unistall command to makefile
+#------------------------------------------
+# Adapted from the CMake Wiki FAQ
+configure_file ( "${CMAKE_SOURCE_DIR}/cmake/uninstall.cmake.in" "${CMAKE_BINARY_DIR}/uninstall.cmake"
+  @ONLY)
+
+add_custom_target ( uninstall
+  COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/uninstall.cmake" )
+
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure)
+# See JSON-Fortran's CMakeLists.txt file to find out how to get the check target to depend
+# on the test executables
+
+#----------------------------------
+# Determine if we're using Open MPI
+#---------------------------------
+if(MPI_FOUND)
+  execute_process(COMMAND ${MPIEXEC} --version
+    OUTPUT_VARIABLE mpi_version_out)
+  if (mpi_version_out MATCHES "[Oo]pen[ -][Mm][Pp][Ii]")
+    message( STATUS "OpenMPI detected")
+    set ( openmpi true )
+  endif()
+endif()
 
 
 
@@ -195,14 +259,65 @@ target_link_libraries(amgcbind
 
 
 
+install(DIRECTORY "${CMAKE_BINARY_DIR}/include" DESTINATION "include"
+  FILES_MATCHING PATTERN "*.h")
+
+install(DIRECTORY "${CMAKE_BINARY_DIR}/modules" DESTINATION "modules"
+  FILES_MATCHING PATTERN "*.mod")
+
+
+
+
 
 
 # Install the library
 install(TARGETS amgprec amgcbind
-    DESTINATION lib
+  EXPORT ${CMAKE_PROJECT_NAME}-targets
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )
 
-# Optionally, you can install the headers
-install(DIRECTORY include/
-    DESTINATION include
+
+
+if(WIN32) #TODO
+#  install(TARGETS psb_base_C
+#    EXPORT ${CMAKE_PROJECT_NAME}-targets
+#    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+#    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+#    )
+#  if(METIS_FOUND)
+#    install(TARGETS psb_util_C
+#      EXPORT ${CMAKE_PROJECT_NAME}-targets
+#      DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+#      LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+#      )
+#  endif()
+endif()
+
+# Step 2: Create the configuration file from the template
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/amg4psblasConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/amg4psblasConfig.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/amg4psblas"
 )
+
+# Step 3: Install the generated config files
+install(FILES 
+  "${CMAKE_CURRENT_BINARY_DIR}/amg4psblasConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/amg4psblasConfigVersion.cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/amg4psblas"
+)
+
+# Step 4: Export targets so that the build directory can be used directly
+export(
+  EXPORT ${CMAKE_PROJECT_NAME}-targets
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/amg4psblasTargets.cmake"
+    NAMESPACE psblas::
+)
+		
+ 
+
+# Optionally, you can install the headers
+#install(DIRECTORY include/
+#    DESTINATION include
+#)
