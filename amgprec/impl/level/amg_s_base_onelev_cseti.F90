@@ -50,10 +50,10 @@ subroutine amg_s_base_onelev_cseti(lv,what,val,info,pos,idx)
   use amg_s_ilu_solver
   use amg_s_id_solver
   use amg_s_gs_solver
-#if defined(HAVE_SLU_)
+#if defined(PSB_HAVE_SLU)
   use amg_s_slu_solver
 #endif
-#if defined(HAVE_MUMPS_)
+#if defined(PSB_HAVE_MUMPS)
   use amg_s_mumps_solver
 #endif
 
@@ -79,10 +79,10 @@ subroutine amg_s_base_onelev_cseti(lv,what,val,info,pos,idx)
   type(amg_s_id_solver_type)       ::  amg_s_id_solver_mold
   type(amg_s_gs_solver_type)       ::  amg_s_gs_solver_mold
   type(amg_s_bwgs_solver_type)     ::  amg_s_bwgs_solver_mold
-#if defined(HAVE_SLU_)
+#if defined(PSB_HAVE_SLU)
   type(amg_s_slu_solver_type)   ::  amg_s_slu_solver_mold
 #endif
-#if defined(HAVE_MUMPS_)
+#if defined(PSB_HAVE_MUMPS)
   type(amg_s_mumps_solver_type) ::  amg_s_mumps_solver_mold
 #endif
 
@@ -175,11 +175,11 @@ subroutine amg_s_base_onelev_cseti(lv,what,val,info,pos,idx)
           if (allocated(lv%sm2a)) call lv%sm2a%sv%set('SUB_SOLVE',val,info)
         end if
       end if
-#ifdef HAVE_SLU_
+#ifdef PSB_HAVE_SLU
     case (amg_slu_)
       call lv%set(amg_s_slu_solver_mold,info,pos=pos)
 #endif
-#ifdef HAVE_MUMPS_
+#ifdef PSB_HAVE_MUMPS
     case (amg_mumps_)
       call lv%set(amg_s_mumps_solver_mold,info,pos=pos)
 #endif

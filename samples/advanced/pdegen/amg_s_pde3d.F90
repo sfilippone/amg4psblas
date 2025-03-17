@@ -75,7 +75,7 @@ program amg_s_pde3d
   use amg_s_pde3d_box_mod
   use amg_s_pde3d_gauss_mod
   use amg_s_genpde_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib
 #endif
   implicit none
@@ -213,7 +213,7 @@ program amg_s_pde3d
 
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   !$OMP parallel shared(nth)
   !$OMP master
   nth = omp_get_num_threads()

@@ -135,7 +135,7 @@ subroutine  amg_d_parmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
   use psb_base_mod
   use amg_d_inner_mod
   use amg_base_prec_type
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
     use amg_d_parmatch_aggregator_mod
 #else
   use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_aggregator_mat_bld
@@ -176,7 +176,7 @@ subroutine  amg_d_parmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
   ! algorithm specified by
   !
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
   call clean_shortcuts(ag)
   !
   ! When requesting smoothed aggregation we cannot use the
@@ -219,7 +219,7 @@ subroutine  amg_d_parmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
 9999 call psb_error_handler(err_act)
   return
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 
 contains
   subroutine clean_shortcuts(ag)

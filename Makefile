@@ -45,7 +45,7 @@ cleanlib:
 	(cd modules; /bin/rm -f *.a *$(.mod) *$(.fh))
 
 distclean: clean samplesclean
-	/bin/rm -fr Make.inc
+	/bin/rm -fr Make.inc amgprec/amg_config.h
 
 samplesclean: clean
 	(cd samples/simple/fileread && $(MAKE) clean)

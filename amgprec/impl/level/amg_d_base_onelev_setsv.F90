@@ -81,11 +81,7 @@ subroutine amg_d_base_onelev_setsv(lev,val,info,pos)
       end if
       
       if (.not.allocated(lev%sm%sv)) then 
-#ifdef HAVE_MOLD 
         allocate(lev%sm%sv,mold=val,stat=info) 
-#else
-        allocate(lev%sm%sv,source=val,stat=info) 
-#endif
         if (info /= 0) then
           info = 3111
           return
@@ -125,11 +121,7 @@ subroutine amg_d_base_onelev_setsv(lev,val,info,pos)
         end if
       end if
       if (.not.allocated(lev%sm2a%sv)) then 
-#ifdef HAVE_MOLD 
         allocate(lev%sm2a%sv,mold=val,stat=info) 
-#else
-        allocate(lev%sm2a%sv,source=val,stat=info) 
-#endif
         if (info /= 0) then
           info = 3111
           return

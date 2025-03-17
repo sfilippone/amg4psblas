@@ -4,6 +4,8 @@
 #define AMG_VALID_PRECONDITIONER_STRINGS "NONE","DIAG","BJAC","ML","AS"
 #define AMG_VALID_PRECONDITIONER_STRING  "NONE DIAG BJAC ML AS"
 
+#include "amg_config.h"
+#include "psb_types.h"
 #include "amg_const.h"
 #include "amg_c_dprec.h"
 

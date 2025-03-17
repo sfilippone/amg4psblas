@@ -88,13 +88,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 
-#ifdef Have_SLUDist_
+#include "amg_config.h"
+#ifdef AMG_HAVE_SLUDIST
 #include <math.h>
 #include "superlu_ddefs.h"
 
 #define HANDLE_SIZE  8
 
-#if (SLUD_VERSION_>=63) 
+#if (AMG_SLUD_VERSION>=63) 
 typedef struct {
   SuperMatrix *A;
   dLUstruct_t *LUstruct;
@@ -131,11 +132,11 @@ int amg_dsludist_fact(int n, int nl, int nnzl, int ffstr,
  *
  */
  
-#ifdef Have_SLUDist_
+#ifdef AMG_HAVE_SLUDIST
     SuperMatrix *A;
     NRformat_loc *Astore;
 
-#if (SLUD_VERSION_>=63)
+#if (AMG_SLUD_VERSION>=63)
     dScalePermstruct_t *ScalePermstruct;
     dLUstruct_t *LUstruct;
     dSOLVEstruct_t SOLVEstruct;
@@ -148,9 +149,9 @@ int amg_dsludist_fact(int n, int nl, int nnzl, int ffstr,
     int      i, panel_size, permc_spec, relax, info;
     trans_t  trans;
     double   drop_tol = 0.0, b[1], berr[1];
-#if (SLUD_VERSION_>=50)
+#if (AMG_SLUD_VERSION>=50)
     superlu_dist_options_t options;
-#elif (SLUD_VERSION_>=30)
+#elif (AMG_SLUD_VERSION>=30)
     superlu_options_t options;
 #else
     choke_on_me;
@@ -174,7 +175,7 @@ int amg_dsludist_fact(int n, int nl, int nnzl, int ffstr,
 				   SLU_NR_loc, SLU_D, SLU_GE);
     
     /* Initialize ScalePermstruct and LUstruct. */
-#if (SLUD_VERSION_>=63) 
+#if (AMG_SLUD_VERSION>=63) 
     ScalePermstruct = (dScalePermstruct_t *) SUPERLU_MALLOC(sizeof(dScalePermstruct_t));
     LUstruct = (dLUstruct_t *) SUPERLU_MALLOC(sizeof(dLUstruct_t));
     dScalePermstructInit(n,n, ScalePermstruct);
@@ -183,11 +184,11 @@ int amg_dsludist_fact(int n, int nl, int nnzl, int ffstr,
     LUstruct = (LUstruct_t *) SUPERLU_MALLOC(sizeof(LUstruct_t));
     ScalePermstructInit(n,n, ScalePermstruct);
 #endif
-#if (SLUD_VERSION_>=63) 
+#if (AMG_SLUD_VERSION>=63) 
     dLUstructInit(n, LUstruct);
-#elif (SLUD_VERSION_>=40) 
+#elif (AMG_SLUD_VERSION>=40) 
     LUstructInit(n, LUstruct);
-#elif (SLUD_VERSION_>=30)
+#elif (AMG_SLUD_VERSION>=30)
     LUstructInit(n,n, LUstruct);
 #else
     choke_on_me;
@@ -243,9 +244,9 @@ int amg_dsludist_solve(int itrans, int n, int nrhs,
  *      performs triangular solve
  *
  */
-#ifdef Have_SLUDist_ 
+#ifdef AMG_HAVE_SLUDIST 
     SuperMatrix *A;
-#if (SLUD_VERSION_>=63) 
+#if (AMG_SLUD_VERSION>=63) 
     dScalePermstruct_t *ScalePermstruct;
     dLUstruct_t *LUstruct;
     dSOLVEstruct_t SOLVEstruct;
@@ -259,9 +260,9 @@ int amg_dsludist_solve(int itrans, int n, int nrhs,
     trans_t  trans;
     double   drop_tol = 0.0;
     double *berr;
-#if (SLUD_VERSION_>=50) 
+#if (AMG_SLUD_VERSION>=50) 
     superlu_dist_options_t options;
-#elif (SLUD_VERSION_>=30)
+#elif (AMG_SLUD_VERSION>=30)
     superlu_options_t options;
 #else
     choke_on_me;
@@ -329,9 +330,9 @@ int amg_dsludist_free(void *f_factors)
  *      free all storage in the end
 *
  */
-#ifdef Have_SLUDist_ 
+#ifdef AMG_HAVE_SLUDIST 
     SuperMatrix *A;
-#if (SLUD_VERSION_>=63)
+#if (AMG_SLUD_VERSION>=63)
     dScalePermstruct_t *ScalePermstruct;
     dLUstruct_t *LUstruct;
     dSOLVEstruct_t SOLVEstruct;
@@ -345,9 +346,9 @@ int amg_dsludist_free(void *f_factors)
     trans_t  trans;
     double   drop_tol = 0.0;
     double *berr;
-#if (SLUD_VERSION_>=50) 
+#if (AMG_SLUD_VERSION>=50) 
     superlu_dist_options_t options;
-#elif (SLUD_VERSION_>=30)
+#elif (AMG_SLUD_VERSION>=30)
     superlu_options_t options;
 #else
     choke_on_me;
@@ -368,7 +369,7 @@ int amg_dsludist_free(void *f_factors)
     // we either have a leak or a segfault here.
     // To be investigated further. 
     //Destroy_CompRowLoc_Matrix_dist(A);
-#if (SLUD_VERSION_>=63)
+#if (AMG_SLUD_VERSION>=63)
     dScalePermstructFree(ScalePermstruct);
     dLUstructFree(LUstruct);
 #else

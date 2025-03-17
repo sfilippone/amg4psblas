@@ -72,7 +72,7 @@ subroutine amg_s_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   use psb_base_mod
   use amg_base_prec_type
   use amg_s_inner_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib
 #endif
   implicit none
@@ -172,7 +172,7 @@ subroutine amg_s_soc1_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   ! Phase one: Start with disjoint groups.
   ! 
   naggr = 0
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   block
     integer(psb_ipk_), allocatable  :: bnds(:), locnaggr(:)
     integer(psb_ipk_) :: myth,nths, kk

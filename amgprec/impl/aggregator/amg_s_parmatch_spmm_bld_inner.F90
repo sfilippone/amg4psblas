@@ -99,7 +99,7 @@ subroutine amg_s_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
      & ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
   use amg_s_inner_mod
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
     use amg_s_parmatch_aggregator_mod
 #else
   use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_spmm_bld_inner
@@ -163,7 +163,7 @@ subroutine amg_s_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
   naggrm1 = sum(nlaggr(1:me))
   naggrp1 = sum(nlaggr(1:me+1))
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
   !
   ! Here T_PROL should be arriving with GLOBAL indices on the cols
   ! and LOCAL indices on the rows.

@@ -73,10 +73,9 @@ Availability:
     http://www.cise.ufl.edu/research/sparse/umfpack
 
 */
-
-
 #include <stdio.h>
-#ifdef Have_UMF_		 
+#include "amg_config.h"
+#ifdef AMG_HAVE_UMF
 #include "umfpack.h"
 #endif
 
@@ -88,7 +87,7 @@ int amg_dumf_fact(int n, int nnz,
 
 {
  
-#ifdef Have_UMF_
+#ifdef AMG_HAVE_UMF
   double Info [UMFPACK_INFO], Control [UMFPACK_CONTROL];
   void *Symbolic, *Numeric ;
   int i, info;
@@ -146,7 +145,7 @@ int amg_dumf_solve(int itrans, int n,
 		 void *numptr)
 
 {
-#ifdef Have_UMF_ 
+#ifdef AMG_HAVE_UMF 
   double Info [UMFPACK_INFO], Control [UMFPACK_CONTROL];
   void *Symbolic, *Numeric ;
   int i,trans, info;
@@ -178,7 +177,7 @@ int amg_dumf_solve(int itrans, int n,
 int amg_dumf_free(void *symptr,	 void *numptr)
 
 {
-#ifdef Have_UMF_ 
+#ifdef AMG_HAVE_UMF 
   void *Symbolic, *Numeric ;
   Symbolic = symptr;
   Numeric  = numptr;

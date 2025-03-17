@@ -51,7 +51,7 @@ module amg_z_umf_solver
   use iso_c_binding
   use amg_z_base_solver_mod
 
-#if defined(IPK8)
+#if defined(PSB_IPK8)
   type, extends(amg_z_base_solver_type) :: amg_z_umf_solver_type
 
   end type amg_z_umf_solver_type

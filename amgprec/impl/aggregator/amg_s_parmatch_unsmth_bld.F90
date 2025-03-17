@@ -109,7 +109,7 @@ subroutine amg_s_parmatch_unsmth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
   use amg_base_prec_type
   use amg_s_inner_mod
   use amg_s_base_aggregator_mod
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
     use amg_s_parmatch_aggregator_mod
 #else
   use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_unsmth_bld
@@ -168,7 +168,7 @@ subroutine amg_s_parmatch_unsmth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
     goto 9999
   end if
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
   nglob = desc_a%get_global_rows()
   nrow  = desc_a%get_local_rows()
   ncol  = desc_a%get_local_cols()

@@ -98,7 +98,7 @@ subroutine  amg_d_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
      & ac,desc_ac, op_prol,op_restr,info)
   use psb_base_mod
   use amg_base_prec_type
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
     use amg_d_parmatch_aggregator_mod
 #else
   use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_aggregator_mat_asb
@@ -136,7 +136,7 @@ subroutine  amg_d_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
   end if
 
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
   if (debug) write(0,*) me,' ',trim(name),' Start:',&
        & allocated(ag%ac),allocated(ag%desc_ac), allocated(ag%prol),allocated(ag%restr)
 

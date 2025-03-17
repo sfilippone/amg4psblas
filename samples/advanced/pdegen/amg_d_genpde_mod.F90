@@ -93,7 +93,7 @@ contains
        & a1,a2,a3,b1,b2,b3,c,g,info,f,amold,vmold,partition, nrl,iv)
     use psb_base_mod
     use psb_util_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     use omp_lib
 #endif
     !
@@ -262,7 +262,7 @@ contains
 
       ! A nifty MPI function will split the process list
       npdims = 0
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
       npdims = 1
 #else 
       call mpi_dims_create(np,3,npdims,info)
@@ -379,7 +379,7 @@ contains
       integer(psb_lpk_), allocatable :: irow(:),icol(:)
       real(psb_dpk_), allocatable :: val(:)
       real(psb_dpk_)     :: x,y,z, zt(nb)
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       nth = omp_get_num_threads()
       ith = omp_get_thread_num()
 #else
@@ -566,7 +566,7 @@ contains
        & a1,a2,b1,b2,c,g,info,f,amold,vmold,partition, nrl,iv)
     use psb_base_mod
     use psb_util_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     use omp_lib
 #endif
     !
@@ -725,7 +725,7 @@ contains
 
       ! A nifty MPI function will split the process list
       npdims = 0
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
       npdims = 1
 #else 
       call mpi_dims_create(np,2,npdims,info)
@@ -836,7 +836,7 @@ contains
       integer(psb_lpk_), allocatable :: irow(:),icol(:)
       real(psb_dpk_), allocatable :: val(:)
       real(psb_dpk_)     :: x,y,z, zt(nb)
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       nth = omp_get_num_threads()
       ith = omp_get_thread_num()
 #else

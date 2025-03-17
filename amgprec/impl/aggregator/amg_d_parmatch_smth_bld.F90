@@ -110,7 +110,7 @@ subroutine amg_d_parmatch_smth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
   use amg_base_prec_type
   use amg_d_inner_mod
   use amg_d_base_aggregator_mod
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
     use amg_d_parmatch_aggregator_mod
 #else
   use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_smth_bld
@@ -194,7 +194,7 @@ subroutine amg_d_parmatch_smth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
 
   if (do_timings) call psb_tic(idx_phase1)
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 
   naggr  = nlaggr(me+1)
   ntaggr = sum(nlaggr)

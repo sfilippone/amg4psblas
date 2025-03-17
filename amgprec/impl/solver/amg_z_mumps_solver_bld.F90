@@ -58,7 +58,7 @@ subroutine z_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   ! Local variables
   type(psb_zspmat_type)      :: atmp
   type(psb_z_coo_sparse_mat), target :: acoo
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
   integer(psb_lpk_), allocatable :: gia(:), gja(:)
 #endif
   integer(psb_ipk_)  :: n_row,n_col, nrow_a, nza, npr, npc
@@ -69,7 +69,7 @@ subroutine z_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   integer(psb_ipk_)  :: np, iam, me, i, err_act, debug_unit, debug_level
   character(len=20)  :: name='z_mumps_solver_bld', ch_err
 
-#if defined(HAVE_MUMPS_) 
+#if defined(AMG_HAVE_MUMPS) 
 
   info=psb_success_
 
@@ -165,7 +165,7 @@ subroutine z_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
   ! switch to global numbering
   if (sv%ipar(1) == amg_global_solver_ ) then
-#if defined(IPK4) && defined(LPK8)
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
     !
     ! Strategy here is as follows: because a call to MUMPS
     ! as a gobal solver is mostly done  at the coarsest level,

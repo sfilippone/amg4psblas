@@ -1085,7 +1085,7 @@ program amg_dexample_cuda
   use amg_prec_mod
   use psb_linsolve_mod
   use psb_util_mod
-#if defined(HAVE_CUDA)
+#if defined(PSB_HAVE_CUDA)
   use psb_cuda_mod
 #endif
   use data_input
@@ -1110,7 +1110,7 @@ program amg_dexample_cuda
   type(psb_d_csr_sparse_mat), target   :: acsr
   type(psb_d_base_vect_type), target   :: dvect
   type(psb_i_base_vect_type), target   :: ivect
-#if defined(HAVE_CUDA)
+#if defined(PSB_HAVE_CUDA)
   type(psb_d_cuda_hlg_sparse_mat), target   :: ahlg
   type(psb_d_cuda_hdiag_sparse_mat), target :: ahdiag
   type(psb_d_vect_cuda), target         :: dvgpu
@@ -1147,7 +1147,7 @@ program amg_dexample_cuda
 
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
-#if defined(HAVE_CUDA)
+#if defined(PSB_HAVE_CUDA)
   !
   ! BEWARE: if you have NGPUS  per node, the default is to
   ! attach to mod(IAM,NGPUS)
@@ -1172,7 +1172,7 @@ program amg_dexample_cuda
     write(*,*) 'Welcome to AMG4PSBLAS version: ',amg_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
   end if
-#if defined(HAVE_CUDA)
+#if defined(PSB_HAVE_CUDA)
   write(*,*) 'Process ',iam,' running on device: ', psb_cuda_getDevice(),' out of', psb_cuda_getDeviceCount()
   write(*,*) 'Process ',iam,' device ', psb_cuda_getDevice(),' is a: ', trim(psb_cuda_DeviceName())  
 #endif
@@ -1331,7 +1331,7 @@ program amg_dexample_cuda
   call psb_spfree(A, desc_A,info)
   call prec%free(info)
   call psb_cdfree(desc_A,info)
-#if defined(HAVVE_CUDA)
+#if defined(PSB_HAVE_CUDA)
   call psb_cuda_exit()
 #endif
   call psb_exit(ctxt)
