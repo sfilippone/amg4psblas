@@ -8,7 +8,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 if(NOT DEFINED PSBLAS_INSTALL_DIR)
     message(FATAL_ERROR "Please specify the path to the psblas installation directory using -DPSBLAS_INSTALL_DIR=<path>")
 endif()
-
+message(STATUS "psblas directory is ${PSBLAS_INSTALL_DIR};;")
 # Set the include and library directories based on the provided path
 set(TEST_INSTALLDIR "${PSBLAS_INSTALL_DIR}")
 set(INCDIR "${TEST_INSTALLDIR}/include")
@@ -38,11 +38,19 @@ include_directories(${INCDIR} ${MODDIR} ${LIBDIR})
 
 # Specify the installation directory
 
-set(${CMAKE_INSTALL_LIBDIR} "lib")
-message(STATUS "\t\t install libdir ${CMAKE_INSTALL_LIBDIR};")
+#set(${CMAKE_INSTALL_LIBDIR} "lib")
+#message(STATUS "\t\t install libdir ${CMAKE_INSTALL_LIBDIR};")
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/${${CMAKE_PROJECT_NAME}_dist_string}-tests")
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/${${CMAKE_PROJECT_NAME}_dist_string}-tests")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+set(CMAKE_INSTALL_LIBDIR "lib" CACHE STRING "Library install directory")
+set(CMAKE_INSTALL_INCLUDEDIR "include" CACHE STRING "Include directory")
+set(CMAKE_INSTALL_MODULDIR "modules" CACHE STRING "Module directory")
 
 
 
@@ -137,9 +145,16 @@ install(
   FILES
     "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${CMAKE_PROJECT_NAME}Config.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Targets.cmake"
   DESTINATION
-    "${CMAKE_INSTALL_LIBDIR}/cmake/amg4psblas"
+    "${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME}"
 )
+
+
+
+
+
+
 
 #------------------------------------------
 # Add portable unistall command to makefile
@@ -294,26 +309,41 @@ if(WIN32) #TODO
 #  endif()
 endif()
 
+
+message(STATUS "install directory is ${CMAKE_INSTALL_LIBDIR};;;")
+
 # Step 2: Create the configuration file from the template
-configure_package_config_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/amg4psblasConfig.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/amg4psblasConfig.cmake"
-  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/amg4psblas"
-)
+#configure_package_config_file(
+#  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/amg4psblasConfig.cmake.in"
+#  "${CMAKE_CURRENT_BINARY_DIR}/amg4psblasConfig.cmake"
+#  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/amg4psblas"
+#)
 
 # Step 3: Install the generated config files
-install(FILES 
-  "${CMAKE_CURRENT_BINARY_DIR}/amg4psblasConfig.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/amg4psblasConfigVersion.cmake"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/amg4psblas"
-)
+#install(FILES 
+#  "${CMAKE_CURRENT_BINARY_DIR}/amg4psblasConfig.cmake"
+#  "${CMAKE_CURRENT_BINARY_DIR}/amg4psblasConfigVersion.cmake"
+#  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/amg4psblas"
+#)
 
 # Step 4: Export targets so that the build directory can be used directly
+#export(
+#  EXPORT ${CMAKE_PROJECT_NAME}-targets
+#  FILE "${CMAKE_CURRENT_BINARY_DIR}/amg4psblasTargets.cmake"
+#    NAMESPACE psblas::
+#)
 export(
   EXPORT ${CMAKE_PROJECT_NAME}-targets
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/amg4psblasTargets.cmake"
-    NAMESPACE psblas::
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/psblasTargets.cmake"
+    NAMESPACE ${CMAKE_PROJECT_NAME}::
 )
+
+export(
+  EXPORT ${CMAKE_PROJECT_NAME}-targets
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Targets.cmake"
+    NAMESPACE ${CMAKE_PROJECT_NAME}::
+)
+
 		
  
 
@@ -321,3 +351,10 @@ export(
 #install(DIRECTORY include/
 #    DESTINATION include
 #)
+
+
+message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX};")
+message(STATUS "CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR};")
+message(STATUS "CMAKE_INSTALL_INCLUDEDIR: ${CMAKE_INSTALL_INCLUDEDIR};")
+message(STATUS "CMAKE_INSTALL_MODULDIR: ${CMAKE_INSTALL_MODULDIR};")
+
