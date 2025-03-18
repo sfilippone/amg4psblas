@@ -52,7 +52,7 @@ module amg_z_sludist_solver
   use iso_c_binding
   use amg_z_base_solver_mod
 
-#if (!defined(PSB_HAVE_SLUDIST)) || defined(PSB_IPK8) 
+#if (!defined(AMG_HAVE_SLUDIST)) || defined(PSB_IPK8) 
 
   type, extends(amg_z_base_solver_type) :: amg_z_sludist_solver_type
 

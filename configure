@@ -10843,8 +10843,8 @@ printf "%s\n" "$as_me: Configuring with SuperLU_DIST version flag $pac_sludist_v
    SLUDIST_FLAGS=""
    SLUDIST_FLAGS="$SLUDIST_INCLUDES"
    FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_SLUDIST $FDEFINES"
-   CHAVESLUDIST="#define  AMG_HAVE_SLUDISST"
-   CSLUDISTVERSION="#define AMG_SLUD_VERSION $pac_sludist_version"
+   CHAVESLUDIST="#define  AMG_HAVE_SLUDIST"
+   CSLUDISTVERSION="#define  AMG_SLUD_VERSION $pac_sludist_version"
 else
    SLUDIST_FLAGS=""
 fi

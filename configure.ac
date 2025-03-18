@@ -805,8 +805,8 @@ if test "x$amg4psblas_cv_have_superludist" == "xyes" ; then
    SLUDIST_FLAGS=""	       
    SLUDIST_FLAGS="$SLUDIST_INCLUDES"
    FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_SLUDIST $FDEFINES"
-   CHAVESLUDIST="#define  AMG_HAVE_SLUDISST"
-   CSLUDISTVERSION="#define AMG_SLUD_VERSION $pac_sludist_version"
+   CHAVESLUDIST="#define  AMG_HAVE_SLUDIST"
+   CSLUDISTVERSION="#define  AMG_SLUD_VERSION $pac_sludist_version"
 else
    SLUDIST_FLAGS=""
 fi

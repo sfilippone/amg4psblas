@@ -57,7 +57,7 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_s_ainv_solver
   use amg_s_invk_solver
   use amg_s_invt_solver
-#if defined(PSB_HAVE_SLU)
+#if defined(AMG_HAVE_SLU)
   use amg_s_slu_solver
 #endif
 #if defined(PSB_HAVE_MUMPS)
@@ -93,7 +93,7 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
   type(amg_s_invk_solver_type)     ::  amg_s_invk_solver_mold
   type(amg_s_invt_solver_type)     ::  amg_s_invt_solver_mold
   type(amg_s_poly_smoother_type)   ::  amg_s_poly_smoother_mold
-#if defined(PSB_HAVE_SLU)
+#if defined(AMG_HAVE_SLU)
   type(amg_s_slu_solver_type)   ::  amg_s_slu_solver_mold
 #endif
 #if defined(PSB_HAVE_MUMPS)
@@ -224,7 +224,7 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
           if (allocated(lv%sm2a)) call lv%sm2a%sv%set('SUB_SOLVE',val,info)
         end if
       end if
-#ifdef PSB_HAVE_SLU
+#ifdef AMG_HAVE_SLU
     case ('SLU')
       call lv%set(amg_s_slu_solver_mold,info,pos=pos)
 #endif

@@ -53,13 +53,13 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_z_ainv_solver
   use amg_z_invk_solver
   use amg_z_invt_solver
-#if defined(PSB_HAVE_UMF)
+#if defined(AMG_HAVE_UMF)
   use amg_z_umf_solver
 #endif
-#if defined(PSB_HAVE_SLUDIST)
+#if defined(AMG_HAVE_SLUDIST)
   use amg_z_sludist_solver
 #endif
-#if defined(PSB_HAVE_SLU)
+#if defined(AMG_HAVE_SLU)
   use amg_z_slu_solver
 #endif
 #if defined(PSB_HAVE_MUMPS)
@@ -94,13 +94,13 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
   type(amg_z_ainv_solver_type)     ::  amg_z_ainv_solver_mold
   type(amg_z_invk_solver_type)     ::  amg_z_invk_solver_mold
   type(amg_z_invt_solver_type)     ::  amg_z_invt_solver_mold
-#if defined(PSB_HAVE_UMF)
+#if defined(AMG_HAVE_UMF)
   type(amg_z_umf_solver_type)     ::  amg_z_umf_solver_mold
 #endif
-#if defined(PSB_HAVE_SLUDIST)
+#if defined(AMG_HAVE_SLUDIST)
   type(amg_z_sludist_solver_type) ::  amg_z_sludist_solver_mold
 #endif
-#if defined(PSB_HAVE_SLU)
+#if defined(AMG_HAVE_SLU)
   type(amg_z_slu_solver_type)   ::  amg_z_slu_solver_mold
 #endif
 #if defined(PSB_HAVE_MUMPS)
@@ -228,7 +228,7 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
           if (allocated(lv%sm2a)) call lv%sm2a%sv%set('SUB_SOLVE',val,info)
         end if
       end if
-#ifdef PSB_HAVE_SLU
+#ifdef AMG_HAVE_SLU
     case ('SLU')
       call lv%set(amg_z_slu_solver_mold,info,pos=pos)
 #endif
@@ -236,11 +236,11 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
     case ('MUMPS')
       call lv%set(amg_z_mumps_solver_mold,info,pos=pos)
 #endif
-#ifdef PSB_HAVE_SLUDIST
+#ifdef AMG_HAVE_SLUDIST
     case ('SLUDIST')
       call lv%set(amg_z_sludist_solver_mold,info,pos=pos)
 #endif
-#ifdef PSB_HAVE_UMF
+#ifdef AMG_HAVE_UMF
     case ('UMF')
       call lv%set(amg_z_umf_solver_mold,info,pos=pos)
 #endif

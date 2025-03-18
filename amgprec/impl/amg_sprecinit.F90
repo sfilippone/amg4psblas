@@ -100,7 +100,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   use amg_s_gs_solver
   use amg_s_poly_smoother
 
-#if defined(PSB_HAVE_SLU)
+#if defined(AMG_HAVE_SLU)
   use amg_s_slu_solver
 #endif
 
@@ -241,7 +241,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
     call prec%set('SMOOTHER_TYPE','FBGS',info)
 #if  defined(PSB_HAVE_MUMPS)
     call prec%set('COARSE_SOLVE','MUMPS',info)
-#elif defined(PSB_HAVE_SLU)
+#elif defined(AMG_HAVE_SLU)
     call prec%set('COARSE_SOLVE','SLU',info)
 #else
     call prec%set('COARSE_SOLVE','ILU',info)
