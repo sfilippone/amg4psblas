@@ -239,7 +239,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
     end do
     call prec%set('ML_CYCLE','VCYCLE',info)
     call prec%set('SMOOTHER_TYPE','FBGS',info)
-#if  defined(PSB_HAVE_MUMPS)
+#if  defined(AMG_HAVE_MUMPS)
     call prec%set('COARSE_SOLVE','MUMPS',info)
 #elif defined(AMG_HAVE_SLU)
     call prec%set('COARSE_SOLVE','SLU',info)

@@ -93,7 +93,7 @@ subroutine amg_ccprecseti(p,what,val,info,ilev,ilmax,pos,idx)
 #if defined(AMG_HAVE_SLU)
   use amg_c_slu_solver
 #endif
-#if defined(PSB_HAVE_MUMPS)
+#if defined(AMG_HAVE_MUMPS)
   use amg_c_mumps_solver
 #endif
 
@@ -332,7 +332,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
 #if defined(AMG_HAVE_SLU)
   use amg_c_slu_solver
 #endif
-#if defined(PSB_HAVE_MUMPS)
+#if defined(AMG_HAVE_MUMPS)
   use amg_c_mumps_solver
 #endif
   use amg_c_krm_solver, only : amg_c_krm_solver_type
@@ -482,7 +482,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
             call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
 #if defined(AMG_HAVE_SLU)
             call p%precv(nlev_)%set('SUB_SOLVE',amg_slu_,info,pos=pos)
-#elif defined(PSB_HAVE_MUMPS)
+#elif defined(AMG_HAVE_MUMPS)
             call p%precv(nlev_)%set('SUB_SOLVE',amg_mumps_,info,pos=pos)
 #else
             call p%precv(nlev_)%set('SUB_SOLVE',amg_ilu_n_,info,pos=pos)
@@ -496,7 +496,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
             call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_l1_bjac_,info,pos=pos)
 #if defined(AMG_HAVE_SLU)
             call p%precv(nlev_)%set('SUB_SOLVE',amg_slu_,info,pos=pos)
-#elif defined(PSB_HAVE_MUMPS)
+#elif defined(AMG_HAVE_MUMPS)
             call p%precv(nlev_)%set('SUB_SOLVE',amg_mumps_,info,pos=pos)
 #else
             call p%precv(nlev_)%set('SUB_SOLVE',amg_ilu_n_,info,pos=pos)
@@ -513,7 +513,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
                  & call amg_warn_coarse_mat(p%precv(nlev_)%parms%get_coarse_mat(),&
                  & amg_repl_mat_)
             call p%precv(nlev_)%set('COARSE_MAT',amg_repl_mat_,info,pos=pos)
-#elif defined(PSB_HAVE_MUMPS)
+#elif defined(AMG_HAVE_MUMPS)
             call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
             call p%precv(nlev_)%set('SUB_SOLVE',amg_mumps_,info,pos=pos)
             if (hier_asb) &
@@ -550,7 +550,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
                  & amg_repl_mat_)
             call p%precv(nlev_)%set('COARSE_MAT',amg_repl_mat_,info,pos=pos)
           case('MUMPS')
-#if defined(PSB_HAVE_MUMPS)
+#if defined(AMG_HAVE_MUMPS)
             call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
             call p%precv(nlev_)%set('SUB_SOLVE',amg_mumps_,info,pos=pos)
             if (hier_asb) &
@@ -573,7 +573,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
                  & call amg_warn_coarse_mat(p%precv(nlev_)%parms%get_coarse_mat(),&
                  & amg_repl_mat_)
             call p%precv(nlev_)%set('COARSE_MAT',amg_repl_mat_,info,pos=pos)
-#elif defined(PSB_HAVE_MUMPS)
+#elif defined(AMG_HAVE_MUMPS)
             call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
             call p%precv(nlev_)%set('SUB_SOLVE',amg_mumps_,info,pos=pos)
             if (hier_asb) &
@@ -597,7 +597,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
                  & call amg_warn_coarse_mat(p%precv(nlev_)%parms%get_coarse_mat(),&
                  & amg_repl_mat_)
             call p%precv(nlev_)%set('COARSE_MAT',amg_repl_mat_,info,pos=pos)
-#elif defined(PSB_HAVE_MUMPS)
+#elif defined(AMG_HAVE_MUMPS)
             call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
             call p%precv(nlev_)%set('SUB_SOLVE',amg_mumps_,info,pos=pos)
             if (hier_asb) &
@@ -711,7 +711,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
           call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
 #if defined(AMG_HAVE_SLU)
           call p%precv(nlev_)%set('SUB_SOLVE',amg_slu_,info,pos=pos)
-#elif defined(PSB_HAVE_MUMPS)
+#elif defined(AMG_HAVE_MUMPS)
           call p%precv(nlev_)%set('SUB_SOLVE',amg_mumps_,info,pos=pos)
 #else
           call p%precv(nlev_)%set('SUB_SOLVE',amg_ilu_n_,info,pos=pos)
@@ -724,7 +724,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
           call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_l1_bjac_,info,pos=pos)
 #if defined(AMG_HAVE_SLU)
           call p%precv(nlev_)%set('SUB_SOLVE',amg_slu_,info,pos=pos)
-#elif defined(PSB_HAVE_MUMPS)
+#elif defined(AMG_HAVE_MUMPS)
           call p%precv(nlev_)%set('SUB_SOLVE',amg_mumps_,info,pos=pos)
 #else
           call p%precv(nlev_)%set('SUB_SOLVE',amg_ilu_n_,info,pos=pos)
@@ -741,7 +741,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
                & call amg_warn_coarse_mat(p%precv(nlev_)%parms%get_coarse_mat(),&
                & amg_repl_mat_)
           call p%precv(nlev_)%set('COARSE_MAT',amg_repl_mat_,info,pos=pos)
-#elif defined(PSB_HAVE_MUMPS)
+#elif defined(AMG_HAVE_MUMPS)
           call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
           call p%precv(nlev_)%set('SUB_SOLVE',amg_mumps_,info,pos=pos)
           if (hier_asb) &
@@ -778,7 +778,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
                & amg_repl_mat_)
           call p%precv(nlev_)%set('COARSE_MAT',amg_repl_mat_,info,pos=pos)
         case('MUMPS')
-#if defined(PSB_HAVE_MUMPS)
+#if defined(AMG_HAVE_MUMPS)
           call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
           call p%precv(nlev_)%set('SUB_SOLVE',amg_mumps_,info,pos=pos)
           if (hier_asb) &
@@ -801,7 +801,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
                & call amg_warn_coarse_mat(p%precv(nlev_)%parms%get_coarse_mat(),&
                & amg_repl_mat_)
           call p%precv(nlev_)%set('COARSE_MAT',amg_repl_mat_,info,pos=pos)
-#elif defined(PSB_HAVE_MUMPS)
+#elif defined(AMG_HAVE_MUMPS)
           call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
           call p%precv(nlev_)%set('SUB_SOLVE',amg_mumps_,info,pos=pos)
           if (hier_asb) &
@@ -825,7 +825,7 @@ subroutine amg_ccprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
                & call amg_warn_coarse_mat(p%precv(nlev_)%parms%get_coarse_mat(),&
                & amg_repl_mat_)
           call p%precv(nlev_)%set('COARSE_MAT',amg_repl_mat_,info,pos=pos)
-#elif defined(PSB_HAVE_MUMPS)
+#elif defined(AMG_HAVE_MUMPS)
           call p%precv(nlev_)%set('SMOOTHER_TYPE',amg_bjac_,info,pos=pos)
           call p%precv(nlev_)%set('SUB_SOLVE',amg_mumps_,info,pos=pos)
           if (hier_asb) &

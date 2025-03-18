@@ -60,7 +60,7 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
 #if defined(AMG_HAVE_SLU)
   use amg_s_slu_solver
 #endif
-#if defined(PSB_HAVE_MUMPS)
+#if defined(AMG_HAVE_MUMPS)
   use amg_s_mumps_solver
 #endif
 
@@ -96,7 +96,7 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
 #if defined(AMG_HAVE_SLU)
   type(amg_s_slu_solver_type)   ::  amg_s_slu_solver_mold
 #endif
-#if defined(PSB_HAVE_MUMPS)
+#if defined(AMG_HAVE_MUMPS)
   type(amg_s_mumps_solver_type) ::  amg_s_mumps_solver_mold
 #endif
 
@@ -228,7 +228,7 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
     case ('SLU')
       call lv%set(amg_s_slu_solver_mold,info,pos=pos)
 #endif
-#ifdef PSB_HAVE_MUMPS
+#ifdef AMG_HAVE_MUMPS 
     case ('MUMPS')
       call lv%set(amg_s_mumps_solver_mold,info,pos=pos)
 #endif

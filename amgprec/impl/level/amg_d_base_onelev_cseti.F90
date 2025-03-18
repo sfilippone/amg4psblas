@@ -59,7 +59,7 @@ subroutine amg_d_base_onelev_cseti(lv,what,val,info,pos,idx)
 #if defined(AMG_HAVE_SLU)
   use amg_d_slu_solver
 #endif
-#if defined(PSB_HAVE_MUMPS)
+#if defined(AMG_HAVE_MUMPS)
   use amg_d_mumps_solver
 #endif
 
@@ -94,7 +94,7 @@ subroutine amg_d_base_onelev_cseti(lv,what,val,info,pos,idx)
 #if defined(AMG_HAVE_SLU)
   type(amg_d_slu_solver_type)   ::  amg_d_slu_solver_mold
 #endif
-#if defined(PSB_HAVE_MUMPS)
+#if defined(AMG_HAVE_MUMPS)
   type(amg_d_mumps_solver_type) ::  amg_d_mumps_solver_mold
 #endif
 
@@ -191,7 +191,7 @@ subroutine amg_d_base_onelev_cseti(lv,what,val,info,pos,idx)
     case (amg_slu_)
       call lv%set(amg_d_slu_solver_mold,info,pos=pos)
 #endif
-#ifdef PSB_HAVE_MUMPS
+#ifdef AMG_HAVE_MUMPS
     case (amg_mumps_)
       call lv%set(amg_d_mumps_solver_mold,info,pos=pos)
 #endif
