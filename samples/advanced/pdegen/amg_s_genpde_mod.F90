@@ -371,7 +371,8 @@ contains
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
-    !$omp parallel shared(deltah,myidx,a,desc_a)
+    ! Disable OMP here for the time being 
+    ! $ o m p parallel shared(deltah,myidx,a,desc_a)
     !
     block 
       integer(psb_ipk_) :: i,j,k,ii,ib,icoeff, ix,iy,iz, ith,nth
@@ -394,7 +395,7 @@ contains
         !goto 9999
       endif
 
-      !$omp  do schedule(dynamic)
+      ! $ o m p  do schedule(dynamic)
       !     
       do ii=1, nlr, nb
         if (info /= psb_success_) cycle
@@ -486,11 +487,11 @@ contains
         call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
         if(info /= psb_success_) cycle
       end do
-      !$omp end do
+      ! $ o m p end do
 
       deallocate(val,irow,icol)
     end block
-    !$omp end parallel
+    ! $ o m p end parallel
 
     tgen = psb_wtime()-t1
     if(info /= psb_success_) then
@@ -828,7 +829,8 @@ contains
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
-    !$omp parallel shared(deltah,myidx,a,desc_a)
+    ! Disable OMP here for the time being
+    ! $ o m p parallel shared(deltah,myidx,a,desc_a)
     !
     block 
       integer(psb_ipk_) :: i,j,k,ii,ib,icoeff, ix,iy,iz, ith,nth
@@ -853,7 +855,7 @@ contains
 
       ! loop over rows belonging to current process in a block
       ! distribution.
-      !$omp  do schedule(dynamic)
+      ! $ o m p  do schedule(dynamic)
       !     
       do ii=1, nlr,nb
         ib = min(nb,nlr-ii+1)
@@ -924,11 +926,11 @@ contains
         call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
         if(info /= psb_success_) cycle
       end do
-      !$omp end do
+      ! $ o m p end do
 
       deallocate(val,irow,icol)
     end block
-    !$omp end parallel
+    ! $ o m p end parallel
 
     tgen = psb_wtime()-t1
     if(info /= psb_success_) then
