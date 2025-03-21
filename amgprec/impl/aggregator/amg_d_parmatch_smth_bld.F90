@@ -110,11 +110,7 @@ subroutine amg_d_parmatch_smth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
   use amg_base_prec_type
   use amg_d_inner_mod
   use amg_d_base_aggregator_mod
-#if defined(PSB_SERIAL_MPI)
-    use amg_d_parmatch_aggregator_mod
-#else
   use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_smth_bld
-#endif
   implicit none
 
   ! Arguments
@@ -193,8 +189,6 @@ subroutine amg_d_parmatch_smth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
        & idx_ptap = psb_get_timer_idx("PMC_SMTH_BLD: ptap_bld  ")
 
   if (do_timings) call psb_tic(idx_phase1)
-
-#if !defined(PSB_SERIAL_MPI)
 
   naggr  = nlaggr(me+1)
   ntaggr = sum(nlaggr)
@@ -403,7 +397,7 @@ subroutine amg_d_parmatch_smth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Done smooth_aggregate '
-#endif
+
   call psb_erractionrestore(err_act)
   return
 

@@ -1,6 +1,7 @@
+#include "amg_config.h"
+#if !defined(PSB_SERIAL_MPI)
 #include "MatchBoxPC.h"
 //#define DEBUG_HANG_
-#if !defined(SERIAL_MPI)
 
 void processMessagesD(
     MilanLongInt NLVer,

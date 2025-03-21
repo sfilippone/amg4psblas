@@ -1,4 +1,7 @@
+#include "amg_config.h"
 #include "MatchBoxPC.h"
+#if !defined(PSB_SERIAL_MPI)
+
 void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
                 MilanLongInt StartIndex, MilanLongInt EndIndex,
                 MilanLongInt *numGhostEdges,
@@ -301,3 +304,4 @@ void initialize(MilanLongInt NLVer, MilanLongInt NLEdge,
         } // End of single region
     }     // End of parallel region
 }
+#endif

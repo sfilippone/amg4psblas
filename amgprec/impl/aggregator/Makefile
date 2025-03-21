@@ -5,7 +5,8 @@ MODDIR=../../../modules
 HERE=../..
 
 FINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR) $(PSBLAS_INCLUDES)
-CXXINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(INCDIR) $(FMFLAG)/.
+CXXINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(INCDIR) $(FMFLAG)/. -I$(PSBLAS_INCDIR)
+CINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(INCDIR) $(FMFLAG)/. -I$(PSBLAS_INCDIR)
 
 #CINCLUDES= -I${SUPERLU_INCDIR} -I${HSL_INCDIR}  -I${SPRAL_INCDIR} -I/home/users/pasqua/Ambra/BootCMatch/include -lBCM -L/home/users/pasqua/Ambra/BootCMatch/lib  -lm
 
@@ -61,7 +62,8 @@ amg_s_parmatch_unsmth_bld.o \
 amg_s_parmatch_smth_bld.o \
 amg_s_parmatch_spmm_bld_inner.o
 
-MPCOBJS=MatchBoxPC.o \
+MPCOBJS=Matching.o \
+MatchBoxPC.o \
 sendBundledMessages.o \
 initialize.o \
 extractUChunk.o \
