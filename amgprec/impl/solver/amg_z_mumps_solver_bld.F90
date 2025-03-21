@@ -227,7 +227,7 @@ subroutine z_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
     call psb_sum(ctxt,sv%id%nnz)
   end if
   !call psb_barrier(ctxt)
-  write(*,*)iam, ' calling mumps N,nz,nz_loc',sv%id%n,sv%id%nnz,sv%id%nnz_loc
+  !write(*,*)iam, ' calling mumps N,nz,nz_loc',sv%id%n,sv%id%nnz,sv%id%nnz_loc
   call zmumps(sv%id)
   !call psb_barrier(ctxt)
   info = sv%id%infog(1)
