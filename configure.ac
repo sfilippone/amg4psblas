@@ -764,8 +764,8 @@ if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
        CHAVEMUMPSMODULES="#define  AMG_HAVE_MUMPS_MODULES"
        
    elif test "x$pac_mumps_fincs_ok" == "xyes" ; then
-      FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_MUMPS_ $amg_cv_define_prepend-DAMG_HAVE_MUMPS_INCLUDES $MUMPS_FINCLUDES $FDEFINES"
-       MUMPS_FLAGS="-DAMG_HAVE_MUMPS $MUMPS_INCLUDES"
+      FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_MUMPS $amg_cv_define_prepend-DAMG_HAVE_MUMPS_INCLUDES $MUMPS_FINCLUDES $FDEFINES"
+       MUMPS_FLAGS="-DAMG_HAVE_MUMPS $MUMPS_FINCLUDES"
        CHAVEMUMPS="#define  AMG_HAVE_MUMPS"
        CHAVEMUMPSINCLUDES="#define  AMG_HAVE_MUMPS_INCLUDES"	
    else

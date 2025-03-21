@@ -9979,8 +9979,8 @@ printf "%s\n" "$as_me: PSBLAS defines PSB_LPK_ as $pac_cv_psblas_lpk. MUMPS inte
        CHAVEMUMPSMODULES="#define  AMG_HAVE_MUMPS_MODULES"
 
    elif test "x$pac_mumps_fincs_ok" == "xyes" ; then
-      FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_MUMPS_ $amg_cv_define_prepend-DAMG_HAVE_MUMPS_INCLUDES $MUMPS_FINCLUDES $FDEFINES"
-       MUMPS_FLAGS="-DAMG_HAVE_MUMPS $MUMPS_INCLUDES"
+      FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_MUMPS $amg_cv_define_prepend-DAMG_HAVE_MUMPS_INCLUDES $MUMPS_FINCLUDES $FDEFINES"
+       MUMPS_FLAGS="-DAMG_HAVE_MUMPS $MUMPS_FINCLUDES"
        CHAVEMUMPS="#define  AMG_HAVE_MUMPS"
        CHAVEMUMPSINCLUDES="#define  AMG_HAVE_MUMPS_INCLUDES"
    else
