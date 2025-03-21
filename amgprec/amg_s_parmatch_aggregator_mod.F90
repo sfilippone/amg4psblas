@@ -119,10 +119,6 @@
 module amg_s_parmatch_aggregator_mod
   use amg_s_base_aggregator_mod
   use amg_s_matchboxp_mod
-#if defined(PSB_SERIAL_MPI)
-  type, extends(amg_s_base_aggregator_type) :: amg_s_parmatch_aggregator_type
-  end type amg_s_parmatch_aggregator_type
-#else 
   type, extends(amg_s_base_aggregator_type) :: amg_s_parmatch_aggregator_type
     integer(psb_ipk_) :: matching_alg
     integer(psb_ipk_) :: n_sweeps   ! When n_sweeps >1 we need an auxiliary descriptor
@@ -685,5 +681,4 @@ contains
 
     return
   end subroutine amg_s_parmatch_aggregator_bld_map
-#endif
 end module amg_s_parmatch_aggregator_mod

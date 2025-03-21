@@ -41,6 +41,8 @@
 
 #ifndef _preprocessor_Directives_
 #define _preprocessor_Directives_
+#include "amg_config.h"
+#if !defined(PSB_SERIAL_MPI)
 
 //I/O
 #include <iostream>
@@ -72,10 +74,10 @@
 #include <map>
 
 //MPI:
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 #include "mpi.h"
 #endif
 
 
-
+#endif
 #endif

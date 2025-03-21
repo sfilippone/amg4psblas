@@ -272,15 +272,9 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
       allocate(amg_z_dec_aggregator_type :: lv%aggr, stat=info)
     case('SYMDEC')
       allocate(amg_z_symdec_aggregator_type :: lv%aggr, stat=info)
-#if !defined(PSB_SERIAL_MPI)
-#endif
   case default
       info =  psb_err_internal_error_
-#if !defined(PSB_SERIAL_MPI)
       call psb_errpush(info,name,a_err='Unsupported PAR_AGGR_ALG')
-#else
-      call psb_errpush(info,name,a_err='PAR_AGGR_ALG unsupported (PSB_SERIAL_MPI on)')
-#endif
       goto 9999
     end select
     if (info == psb_success_) call lv%aggr%default()

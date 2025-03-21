@@ -41,6 +41,8 @@
 
 #ifndef _primitiveDataType_Definition_
 #define _primitiveDataType_Definition_
+#include "amg_config.h"
+#if !defined(PSB_SERIAL_MPI)
 
 #include "preProcessorDirectives.h"
 
@@ -152,5 +154,5 @@ const float FMINUS_INFINITY = -FPLUS_INFINITY;
 
 
 #endif
-
+#endif
 #endif

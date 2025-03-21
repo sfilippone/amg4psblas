@@ -99,11 +99,7 @@ subroutine amg_s_parmatch_spmm_bld_ov(a,desc_a,ilaggr,nlaggr,parms,&
      & ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
   use amg_s_inner_mod
-#if defined(PSB_SERIAL_MPI)
-    use amg_s_parmatch_aggregator_mod
-#else
   use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_spmm_bld_ov
-#endif
   implicit none
 
   ! Arguments
@@ -141,8 +137,6 @@ subroutine amg_s_parmatch_spmm_bld_ov(a,desc_a,ilaggr,nlaggr,parms,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-#if !defined(PSB_SERIAL_MPI)
-
   call a%mv_to(acsr)
 
   call  amg_s_parmatch_spmm_bld_inner(acsr,desc_a,ilaggr,nlaggr,parms,&
@@ -158,7 +152,6 @@ subroutine amg_s_parmatch_spmm_bld_ov(a,desc_a,ilaggr,nlaggr,parms,&
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Done spmm_bld '
-#endif
   call psb_erractionrestore(err_act)
   return
 

@@ -42,9 +42,7 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_s_base_aggregator_mod
   use amg_s_dec_aggregator_mod
   use amg_s_symdec_aggregator_mod
-#if !defined(PSB_SERIAL_MPI)
   use amg_s_parmatch_aggregator_mod
-#endif
   use amg_s_poly_smoother
   use amg_s_jac_smoother
   use amg_s_as_smoother
@@ -260,17 +258,11 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
       allocate(amg_s_dec_aggregator_type :: lv%aggr, stat=info)
     case('SYMDEC')
       allocate(amg_s_symdec_aggregator_type :: lv%aggr, stat=info)
-#if !defined(PSB_SERIAL_MPI)
     case('COUP','COUPLED')
       allocate(amg_s_parmatch_aggregator_type :: lv%aggr, stat=info)
-#endif
   case default
       info =  psb_err_internal_error_
-#if !defined(PSB_SERIAL_MPI)
       call psb_errpush(info,name,a_err='Unsupported PAR_AGGR_ALG')
-#else
-      call psb_errpush(info,name,a_err='PAR_AGGR_ALG unsupported (PSB_SERIAL_MPI on)')
-#endif
       goto 9999
     end select
     if (info == psb_success_) call lv%aggr%default()

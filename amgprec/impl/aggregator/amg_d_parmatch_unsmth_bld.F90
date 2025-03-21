@@ -109,11 +109,7 @@ subroutine amg_d_parmatch_unsmth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
   use amg_base_prec_type
   use amg_d_inner_mod
   use amg_d_base_aggregator_mod
-#if defined(PSB_SERIAL_MPI)
-    use amg_d_parmatch_aggregator_mod
-#else
   use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_unsmth_bld
-#endif
   implicit none
 
   ! Arguments
@@ -168,7 +164,6 @@ subroutine amg_d_parmatch_unsmth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
     goto 9999
   end if
 
-#if !defined(PSB_SERIAL_MPI)
   nglob = desc_a%get_global_rows()
   nrow  = desc_a%get_local_rows()
   ncol  = desc_a%get_local_cols()
@@ -209,7 +204,8 @@ subroutine amg_d_parmatch_unsmth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
   call op_prol%mv_from(coo_prol)
 
   if (debug) write(0,*)  me,' ',trim(name),' After  mv_from',psb_get_errstatus()
-  if (debug) write(0,*)  me,' ',trim(name),' ',ac%get_fmt(),ac%get_nrows(),ac%get_ncols(),ac%get_nzeros(),naggr,ntaggr
+  if (debug) write(0,*)  me,' ',trim(name),' ',ac%get_fmt(),ac%get_nrows(),&
+       & ac%get_ncols(),ac%get_nzeros(),naggr,ntaggr
   ! write(0,*)  me,' ',trim(name),' Final AC newstyle ',ac%get_fmt(),ac%get_nrows(),ac%get_ncols(),ac%get_nzeros()
 
   if (debug) then
@@ -236,7 +232,6 @@ subroutine amg_d_parmatch_unsmth_bld(dol1smoothing,ag,a,desc_a,ilaggr,nlaggr,&
     goto 9999
   end if
 
-#endif
   call psb_erractionrestore(err_act)
   return
 

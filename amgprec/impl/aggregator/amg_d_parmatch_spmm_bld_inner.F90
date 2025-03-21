@@ -99,11 +99,7 @@ subroutine amg_d_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
      & ac,desc_ac,op_prol,op_restr,t_prol,info)
   use psb_base_mod
   use amg_d_inner_mod
-#if defined(PSB_SERIAL_MPI)
-    use amg_d_parmatch_aggregator_mod
-#else
   use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_spmm_bld_inner
-#endif
   implicit none
 
   ! Arguments
@@ -139,7 +135,6 @@ subroutine amg_d_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
   info=psb_success_
   call psb_erractionsave(err_act)
 
-
   ictxt = desc_a%get_context()
   call psb_info(ictxt, me, np)
   debug_unit  = psb_get_debug_unit()
@@ -163,7 +158,6 @@ subroutine amg_d_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
   naggrm1 = sum(nlaggr(1:me))
   naggrp1 = sum(nlaggr(1:me+1))
 
-#if !defined(PSB_SERIAL_MPI)
   !
   ! Here T_PROL should be arriving with GLOBAL indices on the cols
   ! and LOCAL indices on the rows.
@@ -203,11 +197,10 @@ subroutine amg_d_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
     goto 9999
   end if
 
-
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Done smooth_aggregate '
-#endif
+
   call psb_erractionrestore(err_act)
   return
 

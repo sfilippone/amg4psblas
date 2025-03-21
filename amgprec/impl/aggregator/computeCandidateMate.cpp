@@ -8,6 +8,7 @@
  * @param edgeLocWeight
  * @return
  */
+#if !defined(PSB_SERIAL_MPI)
 
 MilanLongInt firstComputeCandidateMateD(MilanLongInt adj1,
                                        MilanLongInt adj2,
@@ -136,3 +137,4 @@ MilanLongInt computeCandidateMateS(MilanLongInt adj1,
     return w;
 }
 
+#endif

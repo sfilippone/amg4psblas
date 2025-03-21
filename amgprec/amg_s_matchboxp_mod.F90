@@ -73,6 +73,22 @@ module amg_s_matchboxp_mod
   use iso_c_binding
   use psb_base_cbind_mod
 
+#if defined(PSB_SERIAL_MPI)
+  interface MatchingC
+    subroutine sMatchingC(nlver,nledge,verlocptr,verlocind,edgelocweight,&
+         & verdistance, mate) bind(c,name='sMatching')
+      use iso_c_binding
+      import :: psb_c_ipk_, psb_c_lpk_
+      implicit none
+
+      integer(psb_c_lpk_), value :: nlver,nledge
+      integer(psb_c_lpk_) :: verlocptr(*),verlocind(*), verdistance(*)
+      integer(psb_c_lpk_) :: mate(*)
+      real(c_float) :: edgelocweight(*)
+    end subroutine sMatchingC
+  end interface MatchingC
+
+#else
   interface MatchBoxPC
     subroutine sMatchBoxPC(nlver,nledge,verlocptr,verlocind,edgelocweight,&
          & verdistance, mate, myrank, numprocs, icomm,&
@@ -93,7 +109,7 @@ module amg_s_matchboxp_mod
       real(c_double)     :: msgpercent(*)
     end subroutine sMatchBoxPC
   end interface MatchBoxPC
-
+#endif
   interface amg_i_aggr_assign
     module procedure amg_i_s_aggr_assign
   end interface amg_i_aggr_assign
@@ -1129,11 +1145,15 @@ contains
       call psb_barrier(ictxt)
       if (me == 0) write(0,*)' Calling MatchBoxP '
     end if
-
+#if defined(PSB_SERIAL_MPI)
+    call MatchingC(nlver,nledge,verlocptr,verlocind,edgelocweight,&
+         & verdistance, mate)
+#else
     call MatchBoxPC(nlver,nledge,verlocptr,verlocind,edgelocweight,&
          & verdistance, mate, mrank, mnp, icomm,&
          & msgindsent,msgactualsent,msgpercent,&
          & ph0_time, ph1_time, ph2_time, ph1_card, ph2_card)
+#endif
     verlocptr(:)   = verlocptr(:)  + 1
     verlocind(:)   = verlocind(:) + 1
     verdistance(:) = verdistance(:) + 1

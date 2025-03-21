@@ -1,3 +1,5 @@
+#include "amg_config.h"
+#if !defined(PSB_SERIAL_MPI)
 #include "MatchBoxPC.h"
 void processMatchedVerticesD(
     MilanLongInt NLVer,
@@ -583,3 +585,4 @@ void processMatchedVerticesS(
     } // End of parallel region
 }
 
+#endif

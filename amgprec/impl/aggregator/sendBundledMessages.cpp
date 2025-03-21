@@ -1,3 +1,5 @@
+#include "amg_config.h"
+#if !defined(PSB_SERIAL_MPI)
 #include "MatchBoxPC.h"
 void sendBundledMessages(MilanLongInt *numGhostEdges,
 			 MilanInt *BufferSize,
@@ -154,7 +156,7 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
 
 #pragma omp task depend(inout : OneMessageSize, *BufferSize) depend(out : numMessagesToSend) depend(in : *numGhostEdges)
 {
-
+  
 #ifdef PRINT_DEBUG_INFO_
   cout << "\n(" << myRank << ")Number of Ghost edges = " << *numGhostEdges;
   cout << "\n(" << myRank << ")Total number of potential message X 2 = " << *numGhostEdges * 2;
@@ -206,3 +208,4 @@ void sendBundledMessages(MilanLongInt *numGhostEdges,
 }
 }
 }
+#endif

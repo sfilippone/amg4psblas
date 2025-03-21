@@ -40,15 +40,17 @@
 // ************************************************************************
 #include <stdio.h>
 #include <stdlib.h>
-#if !defined(SERIAL_MPI)
+#include "amg_config.h"
+#include "MatchBoxPC.h"
+#if !defined(PSB_SERIAL_MPI)
 #include <mpi.h>
 #endif
 
-#include "MatchBoxPC.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#if !defined(PSB_SERIAL_MPI)
 
 void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 		MilanLongInt* verLocPtr, MilanLongInt* verLocInd, MilanReal* edgeLocWeight,
@@ -58,7 +60,6 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 		MilanLongInt* msgIndSent, MilanLongInt* msgActualSent, MilanReal* msgPercent,
 		MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
 		MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
-#if !defined(SERIAL_MPI)
   MPI_Comm C_comm=MPI_Comm_f2c(icomm);
 
 #ifdef DEBUG
@@ -72,7 +73,7 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
   double tmr = MPI_Wtime();
 #endif
 
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
 	//fprintf(stderr,"Warning: using buggy OpenMP matching!\n");
         dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(NLVer, NLEdge,
 							   verLocPtr, verLocInd, edgeLocWeight,
@@ -97,7 +98,6 @@ void dMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 	fprintf(stderr, "Elaboration time: %f for %ld nodes\n", tmr, NLVer);
 #endif
 	
-#endif
 }
 
 void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
@@ -108,13 +108,12 @@ void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 		MilanLongInt* msgIndSent, MilanLongInt* msgActualSent, MilanReal* msgPercent,
 		MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
 		MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
-#if !defined(SERIAL_MPI)
   MPI_Comm C_comm=MPI_Comm_f2c(icomm);
 #ifdef DEBUG
   fprintf(stderr,"MatchBoxPC: rank %d nlver %ld nledge %ld [ %ld %ld ]\n",
 	  myRank,NLVer, NLEdge,verDistance[0],verDistance[1]);
 #endif
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
 	//fprintf(stderr,"Warning: using buggy OpenMP matching!\n");
   salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(NLVer, NLEdge,
 							      verLocPtr, verLocInd, edgeLocWeight,
@@ -132,9 +131,10 @@ void sMatchBoxPC(MilanLongInt NLVer, MilanLongInt NLEdge,
 							    ph0_time, ph1_time, ph2_time,
 							    ph1_card, ph2_card );
 #endif
-#endif
 }
 
+#endif
+  
 #ifdef __cplusplus
 }
 #endif

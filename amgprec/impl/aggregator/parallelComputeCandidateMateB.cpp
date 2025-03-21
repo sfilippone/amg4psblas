@@ -1,4 +1,6 @@
+#include "amg_config.h"
 #include "MatchBoxPC.h"
+#if !defined(PSB_SERIAL_MPI)
 
 void PARALLEL_COMPUTE_CANDIDATE_MATE_BD(MilanLongInt NLVer,
                                               MilanLongInt *verLocPtr,
@@ -53,4 +55,4 @@ void PARALLEL_COMPUTE_CANDIDATE_MATE_BS(MilanLongInt NLVer,
         }
     }
 }
-
+#endif
