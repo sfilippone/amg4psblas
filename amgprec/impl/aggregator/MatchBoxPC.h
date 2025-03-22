@@ -117,7 +117,7 @@ extern "C"
 // Regular long integer:
 #ifndef LONG_INT_H
 #define LONG_INT_H
-#ifdef BIT64
+#ifdef AMG_MATCHBOXP_BIT64
     typedef int64_t MilanLongInt;
     typedef MPI_LONG MilanMpiLongInt;
 #else
@@ -163,7 +163,7 @@ extern "C"
 #define MilanIntMax INT32_MAX
 #define MilanIntMin INT32_MIN
 
-#ifdef BIT64
+#ifdef AMG_MATCHBOXP_BIT64
 #define MilanLongIntMax INT64_MAX
 #define MilanLongIntMin -INT64_MAX
 #else

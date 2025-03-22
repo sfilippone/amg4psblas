@@ -595,7 +595,7 @@ fi
 PAC_FORTRAN_PSBLAS_INTEGER_SIZES()
 AC_MSG_NOTICE([PSBLAS size of LPK "$pac_cv_psblas_lpk".])
 if test x"$pac_cv_psblas_lpk" == x8"" ; then
-  CXXDEFINES="$CXXDEFINES";
+   CXXMATCHBOXBIT="#define AMG_MATCHBOXP_BIT64"
 fi
 
 ###############################################################################
@@ -853,7 +853,7 @@ AC_SUBST(CSLUDISTVERSION)
 AC_SUBST(CHAVEMUMPS)
 AC_SUBST(CHAVEMUMPSMODULES)
 AC_SUBST(CHAVEMUMPSINCLUDES)
-
+AC_SUBST(CXXMATCHBOXBIT)
 
 
 AC_SUBST(EXTRA_LIBS)

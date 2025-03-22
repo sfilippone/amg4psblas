@@ -667,6 +667,7 @@ SLU_FLAGS
 MUMPS_LIBS
 MUMPS_FLAGS
 EXTRA_LIBS
+CXXMATCHBOXBIT
 CHAVEMUMPSINCLUDES
 CHAVEMUMPSMODULES
 CHAVEMUMPS
@@ -7858,7 +7859,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: PSBLAS size of LPK \"$pac_cv_psblas_lpk\"." >&5
 printf "%s\n" "$as_me: PSBLAS size of LPK \"$pac_cv_psblas_lpk\"." >&6;}
 if test x"$pac_cv_psblas_lpk" == x8"" ; then
-  CXXDEFINES="$CXXDEFINES";
+   CXXMATCHBOXBIT="#define AMG_MATCHBOXP_BIT64"
 fi
 
 ###############################################################################
