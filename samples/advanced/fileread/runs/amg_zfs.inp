@@ -18,7 +18,7 @@ AS                          ! Preconditioner type: NONE JACOBI GS FBGS BJAC AS M
 %%%%%%%%%%%  First smoother (for all levels but coarsest) %%%%%%%%%%%%%%%%
 AS                        ! Smoother type JACOBI FBGS GS BWGS BJAC AS. For 1-level, repeats previous. 
 1                           ! Number of sweeps for smoother
-8                           ! Number of overlap layers for AS preconditioner
+2                           ! Number of overlap layers for AS preconditioner
 HALO                        ! AS restriction operator: NONE HALO 
 SUM                         ! AS prolongation operator: NONE SUM AVG
 ILU                         ! Subdomain solver for BJAC/AS: JACOBI GS BGS ILU ILUT MILU MUMPS SLU UMF
