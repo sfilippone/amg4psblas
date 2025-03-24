@@ -551,6 +551,7 @@ program amg_s_pde2d
     write(psb_out_unit,'("Computed solution on ",i8," process(es)")')  np
     write(psb_out_unit,'("Number of threads                  : ",i12)') nth
     write(psb_out_unit,'("Total number of tasks              : ",i12)') nth*np
+    write(psb_out_unit,'("Discretization domain size         : ",i12)') idim
     write(psb_out_unit,'("Linear system size                 : ",i12)') system_size
     write(psb_out_unit,'("PDE Coefficients                   : ",a)') trim(pdecoeff)
     write(psb_out_unit,'("Krylov method                      : ",a)') trim(s_choice%kmethd)
