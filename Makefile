@@ -21,7 +21,7 @@ amgp:
 cbnd: amgp
 	cd cbind && $(MAKE)  objs
 
-install: lib
+install: all
 	mkdir -p $(INSTALL_LIBDIR) &&\
 	   $(INSTALL_DATA) lib/*.a  $(INSTALL_LIBDIR)
 	mkdir -p  $(INSTALL_INCLUDEDIR) &&\
