@@ -127,7 +127,7 @@ subroutine amg_s_parmatch_spmm_bld_inner(a_csr,desc_a,ilaggr,nlaggr,parms,&
        &  nzt, naggrm1, naggrp1, i, k
   integer(psb_lpk_), allocatable :: ia(:),ja(:)
   !integer(psb_lpk_) ::  nrsave, ncsave, nzsave, nza, nrpsave, ncpsave, nzpsave
-  logical, parameter :: do_timings=.true., oldstyle=.false., debug=.false.
+  logical, parameter :: do_timings=.false., oldstyle=.false., debug=.false.
   integer(psb_ipk_), save :: idx_spspmm=-1, idx_prolcnv=-1, idx_proltrans=-1, idx_asb=-1
 
   name='amg_parmatch_spmm_bld_inner'

@@ -57,7 +57,7 @@ subroutine amg_z_bwgs_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   integer(psb_ipk_)   :: np, me, i, err_act, debug_unit, debug_level
   character(len=20)   :: name='d_bwgs_solver_bld', ch_err
   integer(psb_ipk_), save :: idx_tril=-1
-  logical, parameter      :: do_timings=.true.
+  logical, parameter      :: do_timings=.false.
 
   info=psb_success_
   call psb_erractionsave(err_act)

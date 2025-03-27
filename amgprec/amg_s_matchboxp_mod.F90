@@ -161,7 +161,7 @@ contains
     logical, parameter  :: dump=.false., debug=.false., dump_mate=.false., &
          & debug_ilaggr=.false., debug_sync=.false., debug_mate=.false.
     integer(psb_ipk_), save :: idx_bldmtc=-1, idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
-    logical, parameter :: do_timings=.true.
+    logical, parameter :: do_timings=.false.
     integer, parameter :: ilaggr_neginit=-1, ilaggr_nonlocal=-2
 
     ictxt = desc_a%get_ctxt()
@@ -624,7 +624,7 @@ contains
     logical, parameter :: old_style=.false., sort_minp=.true.
     character(len=40) :: name='build_matching', fname
     integer(psb_ipk_), save :: idx_cmboxp=-1, idx_bldahat=-1, idx_phase2=-1, idx_phase3=-1
-    logical, parameter :: do_timings=.true.
+    logical, parameter :: do_timings=.false.
 
     ictxt = desc_a%get_ctxt()
     call psb_info(ictxt,iam,np)
@@ -826,7 +826,7 @@ contains
     character(len=80) :: aname
     real(psb_spk_), parameter :: eps=epsilon(1.d0)
     integer(psb_ipk_), save   :: idx_glbt=-1, idx_phase1=-1, idx_phase2=-1
-    logical, parameter :: do_timings=.true.
+    logical, parameter :: do_timings=.false.
     logical, parameter :: debug_symmetry = .false., check_size=.false.
     logical, parameter :: unroll_logtrans=.false.
 

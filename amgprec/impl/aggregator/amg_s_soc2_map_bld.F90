@@ -104,7 +104,7 @@ subroutine amg_s_soc2_map_bld(iorder,theta,clean_zeros,a,desc_a,nlaggr,ilaggr,in
   character(len=20)  :: name, ch_err
   integer(psb_ipk_), save :: idx_soc2_p1=-1, idx_soc2_p2=-1, idx_soc2_p3=-1
   integer(psb_ipk_), save :: idx_soc2_p0=-1
-  logical, parameter      :: do_timings=.true.
+  logical, parameter      :: do_timings=.false.
 
   info=psb_success_
   name = 'amg_soc2_map_bld'
