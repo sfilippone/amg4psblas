@@ -88,7 +88,7 @@ program amg_s_pde3d
   integer(psb_epk_) :: system_size
 
   ! miscellaneous
-  real(psb_dpk_) :: t1, t2, tprec, thier, tslv
+  real(psb_dpk_) :: t1, t2, tprec, thier, tslv, tsmth, tpgen
 
   ! sparse matrix and preconditioner
   type(psb_sspmat_type) :: a
@@ -287,7 +287,7 @@ program amg_s_pde3d
 
 
   call psb_barrier(ctxt)
-  t2 = psb_wtime() - t1
+  tpgen = psb_wtime() - t1
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='amg_gen_pde3d'
@@ -298,7 +298,7 @@ program amg_s_pde3d
   if (iam == psb_root_) &
        & write(psb_out_unit,'("PDE Coefficients             : ",a)')pdecoeff
   if (iam == psb_root_) &
-       & write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
+       & write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')tpgen
   if (iam == psb_root_) &
        & write(psb_out_unit,'(" ")')
   !
@@ -473,7 +473,7 @@ program amg_s_pde3d
   call psb_barrier(ctxt)
   t1 = psb_wtime()
   call prec%smoothers_build(a,desc_a,info)
-  tprec = psb_wtime()-t1
+  tsmth = psb_wtime()-t1
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_smoothers_bld')
     goto 9999
@@ -558,14 +558,15 @@ program amg_s_pde3d
     write(psb_out_unit,'("Discretization domain size         : ",i12)') idim
     write(psb_out_unit,'("Linear system size                 : ",i12)') system_size
     write(psb_out_unit,'("PDE Coefficients                   : ",a)') trim(pdecoeff)
+    write(psb_out_unit,'("Problem setup time                 : ",es12.5)') tpgen
     write(psb_out_unit,'("Krylov method                      : ",a)') trim(s_choice%kmethd)
     write(psb_out_unit,'("Preconditioner                     : ",a)') trim(p_choice%descr)
     write(psb_out_unit,'("Iterations to convergence          : ",i12)')    iter
     write(psb_out_unit,'("Relative error estimate on exit    : ",es12.5)') err
     write(psb_out_unit,'("Number of levels in hierarchy      : ",i12)')    prec%get_nlevs()
     write(psb_out_unit,'("Time to build hierarchy            : ",es12.5)') thier
-    write(psb_out_unit,'("Time to build smoothers            : ",es12.5)') tprec
-    write(psb_out_unit,'("Total time for preconditioner      : ",es12.5)') tprec+thier
+    write(psb_out_unit,'("Time to build smoothers            : ",es12.5)') tsmth
+    write(psb_out_unit,'("Total preconditioner setup time    : ",es12.5)') tsmth+thier
     write(psb_out_unit,'("Time to solve system               : ",es12.5)') tslv
     write(psb_out_unit,'("Time per iteration                 : ",es12.5)') tslv/iter
     write(psb_out_unit,'("Total time                         : ",es12.5)') tslv+tprec+thier
@@ -581,7 +582,7 @@ program amg_s_pde3d
     write(psb_out_unit,'("Storage format for DESC_A          : ",a  )') desc_a%get_fmt()
 
   end if
-  call psb_print_timers(ctxt)
+! call psb_print_timers(ctxt)
   !
   !  cleanup storage and exit
   !
