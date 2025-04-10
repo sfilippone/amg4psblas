@@ -66,7 +66,7 @@ LIBNAME=libamg_prec.a
 all: objs impld
 
 objs: $(OBJS)
-	/bin/cp -p amg_const.h $(INCDIR)
+	/bin/cp -p amg_const.h amg_config.h $(INCDIR)
 	/bin/cp -p *$(.mod) $(MODDIR)
 
 impld: objs

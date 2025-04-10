@@ -56,7 +56,7 @@ subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   character, intent(in), optional                :: init
   type(psb_s_vect_type),intent(inout), optional   :: initu
   ! Timers
-  logical, parameter  :: do_timings=.true.
+  logical, parameter  :: do_timings=.false.
   integer(psb_ipk_), save  :: poly_1=-1, poly_2=-1, poly_3=-1
   integer(psb_ipk_), save  :: poly_mv=-1, poly_sv=-1, poly_vect=-1
   !

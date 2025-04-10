@@ -98,11 +98,7 @@ subroutine  amg_s_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
      & ac,desc_ac, op_prol,op_restr,info)
   use psb_base_mod
   use amg_base_prec_type
-#if defined(SERIAL_MPI)
-    use amg_s_parmatch_aggregator_mod
-#else
   use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_aggregator_mat_asb
-#endif
   implicit none
   class(amg_s_parmatch_aggregator_type), target, intent(inout) :: ag
   type(amg_sml_parms), intent(inout)    :: parms
@@ -135,8 +131,6 @@ subroutine  amg_s_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
     return
   end if
 
-
-#if !defined(SERIAL_MPI)
   if (debug) write(0,*) me,' ',trim(name),' Start:',&
        & allocated(ag%ac),allocated(ag%desc_ac), allocated(ag%prol),allocated(ag%restr)
 
@@ -199,7 +193,7 @@ subroutine  amg_s_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
     call psb_errpush(info,name,a_err='invalid amg_coarse_mat_')
     goto 9999
   end select
-#endif
+
   call psb_erractionrestore(err_act)
   return
 

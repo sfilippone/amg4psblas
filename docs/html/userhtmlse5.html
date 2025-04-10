@@ -2713,14 +2713,16 @@ class="cmmi-12">op </span><span
 class="cmr-12">denotes the preconditioner itself or its transpose, according to the</span>
 <span 
 class="cmr-12">value of </span><code class="lstinline"><span style="color:#000000">trans</span></code><span 
-class="cmr-12">. Note that, when AMG4PSBLAS is used with a Krylov solver from</span>
+class="cmr-12">. Note that, when AMG4PSBLAS is used with am iterative solver from</span>
 <span 
 class="cmr-12">PSBLAS, </span><code class="lstinline"><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">apply</span></code> <span 
 class="cmr-12">is called within the PSBLAS method </span><code class="lstinline"><span style="color:#000000">psb_krylov</span></code> <span 
-class="cmr-12">and hence it is</span>
+class="cmr-12">and</span>
 <span 
-class="cmr-12">completely transparent to the user.</span>
-<!--l. 852--><p class="noindent" ><span 
+class="cmr-12">hence it is completely transparent to the user, who will almost never invoke it</span>
+<span 
+class="cmr-12">directly.</span>
+<!--l. 853--><p class="noindent" ><span 
 class="cmbx-12">Arguments</span>
    <div class="tabular"> <table id="TBL-15" class="tabular" 
  
@@ -2728,14 +2730,14 @@ class="cmbx-12">Arguments</span>
 id="TBL-15-1"><col 
 id="TBL-15-2"></colgroup><tr  
  style="vertical-align:baseline;" id="TBL-15-1-"><td  style="white-space:normal; text-align:left;" id="TBL-15-1-1"  
-class="td11"><!--l. 855--><p class="noindent" ><code class="lstinline"><span style="color:#000000">x</span></code>     </td><td  style="white-space:normal; text-align:left;" id="TBL-15-1-2"  
-class="td11"><!--l. 855--><p class="noindent" ><span 
+class="td11"><!--l. 856--><p class="noindent" ><code class="lstinline"><span style="color:#000000">x</span></code>     </td><td  style="white-space:normal; text-align:left;" id="TBL-15-1-2"  
+class="td11"><!--l. 856--><p class="noindent" ><span 
 class="cmti-12">type</span><code class="lstinline"><span style="color:#000000">(</span><span style="color:#000000">kind_parameter</span><span style="color:#000000">)</span></code><span 
 class="cmr-12">, dimension(:), intent(in)&#8212;.</span>                    </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-15-2-"><td  style="white-space:normal; text-align:left;" id="TBL-15-2-1"  
-class="td11"><!--l. 856--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-15-2-2"  
-class="td11"><!--l. 856--><p class="noindent" ><span 
+class="td11"><!--l. 857--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-15-2-2"  
+class="td11"><!--l. 857--><p class="noindent" ><span 
 class="cmr-12">The local part of the vector </span><span 
 class="cmmi-12">x</span><span 
 class="cmr-12">. Note that </span><span 
@@ -2751,14 +2753,14 @@ class="cmr-12">,  single/double</span>
 class="cmr-12">precision version of AMG4PSBLAS under use.</span>                          </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-15-3-"><td  style="white-space:normal; text-align:left;" id="TBL-15-3-1"  
-class="td11"><!--l. 859--><p class="noindent" ><code class="lstinline"><span style="color:#000000">y</span></code>     </td><td  style="white-space:normal; text-align:left;" id="TBL-15-3-2"  
-class="td11"><!--l. 859--><p class="noindent" ><span 
+class="td11"><!--l. 860--><p class="noindent" ><code class="lstinline"><span style="color:#000000">y</span></code>     </td><td  style="white-space:normal; text-align:left;" id="TBL-15-3-2"  
+class="td11"><!--l. 860--><p class="noindent" ><span 
 class="cmti-12">type</span><code class="lstinline"><span style="color:#000000">(</span><span style="color:#000000">kind_parameter</span><span style="color:#000000">)</span></code><span 
 class="cmr-12">, dimension(:), intent(out)&#8212;.</span>                  </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-15-4-"><td  style="white-space:normal; text-align:left;" id="TBL-15-4-1"  
-class="td11"><!--l. 860--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-15-4-2"  
-class="td11"><!--l. 860--><p class="noindent" ><span 
+class="td11"><!--l. 861--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-15-4-2"  
+class="td11"><!--l. 861--><p class="noindent" ><span 
 class="cmr-12">The local part of the vector </span><span 
 class="cmmi-12">y</span><span 
 class="cmr-12">. Note that </span><span 
@@ -2774,25 +2776,25 @@ class="cmr-12">,  single/double</span>
 class="cmr-12">precision version of AMG4PSBLAS under use.</span>                          </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-15-5-"><td  style="white-space:normal; text-align:left;" id="TBL-15-5-1"  
-class="td11"><!--l. 863--><p class="noindent" ><code class="lstinline"><span style="color:#000000">desc_a</span></code></td><td  style="white-space:normal; text-align:left;" id="TBL-15-5-2"  
-class="td11"><!--l. 863--><p class="noindent" ><code class="lstinline"><span style="color:#000000">type</span><span style="color:#000000">(</span><span style="color:#000000">psb_desc_type</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">)</span></code><span 
+class="td11"><!--l. 864--><p class="noindent" ><code class="lstinline"><span style="color:#000000">desc_a</span></code></td><td  style="white-space:normal; text-align:left;" id="TBL-15-5-2"  
+class="td11"><!--l. 864--><p class="noindent" ><code class="lstinline"><span style="color:#000000">type</span><span style="color:#000000">(</span><span style="color:#000000">psb_desc_type</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">)</span></code><span 
 class="cmr-12">.</span>                                       </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-15-6-"><td  style="white-space:normal; text-align:left;" id="TBL-15-6-1"  
-class="td11"><!--l. 864--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-15-6-2"  
-class="td11"><!--l. 864--><p class="noindent" ><span 
+class="td11"><!--l. 865--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-15-6-2"  
+class="td11"><!--l. 865--><p class="noindent" ><span 
 class="cmr-12">The  communication  descriptor  associated  to  the  matrix  to  be</span>
 <span 
 class="cmr-12">preconditioned.</span>                                                                   </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-15-7-"><td  style="white-space:normal; text-align:left;" id="TBL-15-7-1"  
-class="td11"><!--l. 866--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-15-7-2"  
-class="td11"><!--l. 866--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
+class="td11"><!--l. 867--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-15-7-2"  
+class="td11"><!--l. 867--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
 class="cmr-12">.</span>                                                        </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-15-8-"><td  style="white-space:normal; text-align:left;" id="TBL-15-8-1"  
-class="td11"><!--l. 867--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-15-8-2"  
-class="td11"><!--l. 867--><p class="noindent" ><span 
+class="td11"><!--l. 868--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-15-8-2"  
+class="td11"><!--l. 868--><p class="noindent" ><span 
 class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse7.html#x10-320007"><span 
@@ -2800,12 +2802,12 @@ class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span
 class="cmr-12">for details.</span>     </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-15-9-"><td  style="white-space:normal; text-align:left;" id="TBL-15-9-1"  
-class="td11"><!--l. 868--><p class="noindent" ><code class="lstinline"><span style="color:#000000">trans</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-15-9-2"  
-class="td11"><!--l. 868--><p class="noindent" ><code class="lstinline"><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=1),</span><span style="color:#000000"> </span><span style="color:#000000">optional</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">).</span></code>                  </td>
+class="td11"><!--l. 869--><p class="noindent" ><code class="lstinline"><span style="color:#000000">trans</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-15-9-2"  
+class="td11"><!--l. 869--><p class="noindent" ><code class="lstinline"><span style="color:#000000">character</span><span style="color:#000000">(</span><span style="color:#000000">len</span><span style="color:#000000">=1),</span><span style="color:#000000"> </span><span style="color:#000000">optional</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">).</span></code>                  </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-15-10-"><td  style="white-space:normal; text-align:left;" id="TBL-15-10-1"  
-class="td11"><!--l. 869--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-15-10-2"  
-class="td11"><!--l. 869--><p class="noindent" ><span 
+class="td11"><!--l. 870--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-15-10-2"  
+class="td11"><!--l. 870--><p class="noindent" ><span 
 class="cmr-12">If </span><code class="lstinline"><span style="color:#000000">trans</span></code> <span 
 class="cmr-12">= </span><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">N</span><span style="color:#000000">&#8217;</span><span style="color:#000000">,</span><span style="color:#000000">&#8217;</span><span style="color:#000000">n</span><span style="color:#000000">&#8217;</span></code> <span 
 class="cmr-12">then </span><span 
@@ -2855,14 +2857,14 @@ class="cmr-8">1</span></sup><span
 class="cmr-12">).</span>                           </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-15-11-"><td  style="white-space:normal; text-align:left;" id="TBL-15-11-1"  
-class="td11"><!--l. 873--><p class="noindent" ><code class="lstinline"><span style="color:#000000">work</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-15-11-2"  
-class="td11"><!--l. 873--><p class="noindent" ><span 
+class="td11"><!--l. 874--><p class="noindent" ><code class="lstinline"><span style="color:#000000">work</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-15-11-2"  
+class="td11"><!--l. 874--><p class="noindent" ><span 
 class="cmti-12">type</span><code class="lstinline"><span style="color:#000000">(</span><span style="color:#000000">kind_parameter</span><span style="color:#000000">)</span></code><span 
 class="cmr-12">, dimension(:), optional, target&#8212;.</span>            </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-15-12-"><td  style="white-space:normal; text-align:left;" id="TBL-15-12-1"  
-class="td11"><!--l. 874--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-15-12-2"  
-class="td11"><!--l. 874--><p class="noindent" ><span 
+class="td11"><!--l. 875--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-15-12-2"  
+class="td11"><!--l. 875--><p class="noindent" ><span 
 class="cmr-12">Workspace.  Its  size  should  be  at  least  </span><code class="lstinline"><span style="color:#000000">4</span><span style="color:#000000"> </span><span style="color:#000000">*</span><span style="color:#000000"> </span><span style="color:#000000">psb_cd_get_local_</span></code>
 <code class="lstinline"><span style="color:#000000">cols</span><span style="color:#000000">(</span><span style="color:#000000">desc_a</span><span style="color:#000000">)</span></code> <span 
 class="cmr-12">(see the PSBLAS User&#8217;s Guide). Note that </span><span 
@@ -2888,13 +2890,13 @@ class="cmr-12">5.7   </span></span> <a
 class="cmr-12">Method free</span></h4>
 <div class="center" 
 >
-<!--l. 885--><p class="noindent" >
-<!--l. 886--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">free</span><span style="color:#000000">(</span><span style="color:#000000">p</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code><br />
+<!--l. 886--><p class="noindent" >
+<!--l. 887--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">free</span><span style="color:#000000">(</span><span style="color:#000000">p</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code><br />
 </div>
-<!--l. 889--><p class="noindent" ><span 
+<!--l. 890--><p class="noindent" ><span 
 class="cmr-12">This method deallocates the preconditioner data structure </span><code class="lstinline"><span style="color:#000000">p</span></code><span 
 class="cmr-12">.</span>
-<!--l. 892--><p class="noindent" ><span 
+<!--l. 893--><p class="noindent" ><span 
 class="cmbx-12">Arguments</span>
    <div class="tabular"> <table id="TBL-16" class="tabular" 
  
@@ -2902,13 +2904,13 @@ class="cmbx-12">Arguments</span>
 id="TBL-16-1"><col 
 id="TBL-16-2"></colgroup><tr  
  style="vertical-align:baseline;" id="TBL-16-1-"><td  style="white-space:normal; text-align:left;" id="TBL-16-1-1"  
-class="td11"><!--l. 895--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-16-1-2"  
-class="td11"><!--l. 895--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
+class="td11"><!--l. 896--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-16-1-2"  
+class="td11"><!--l. 896--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
 class="cmr-12">.</span>                                             </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-16-2-"><td  style="white-space:normal; text-align:left;" id="TBL-16-2-1"  
-class="td11"><!--l. 896--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-16-2-2"  
-class="td11"><!--l. 896--><p class="noindent" ><span 
+class="td11"><!--l. 897--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-16-2-2"  
+class="td11"><!--l. 897--><p class="noindent" ><span 
 class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse7.html#x10-320007"><span 
@@ -2928,10 +2930,10 @@ class="cmr-12">5.8   </span></span> <a
 class="cmr-12">Method descr</span></h4>
 <div class="center" 
 >
-<!--l. 904--><p class="noindent" >
-<!--l. 905--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">descr</span><span style="color:#000000">(</span><span style="color:#000000">info</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">[</span><span style="color:#000000">iout</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">root</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">verbosity</span><span style="color:#000000">])</span></code><br />
+<!--l. 905--><p class="noindent" >
+<!--l. 906--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">descr</span><span style="color:#000000">(</span><span style="color:#000000">info</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">[</span><span style="color:#000000">iout</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">root</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">verbosity</span><span style="color:#000000">])</span></code><br />
 </div>
-<!--l. 908--><p class="noindent" ><span 
+<!--l. 909--><p class="noindent" ><span 
 class="cmr-12">This method prints a description of the preconditioner </span><code class="lstinline"><span style="color:#000000">p</span></code> <span 
 class="cmr-12">to the standard output or to a</span>
 <span 
@@ -2941,7 +2943,7 @@ class="cmr-12">, or </span><code class="lstinline"><span style="color:#000000">b
 class="cmr-12">, have</span>
 <span 
 class="cmr-12">been called.</span>
-<!--l. 913--><p class="noindent" ><span 
+<!--l. 914--><p class="noindent" ><span 
 class="cmbx-12">Arguments</span>
    <div class="tabular"> <table id="TBL-17" class="tabular" 
  
@@ -2949,13 +2951,13 @@ class="cmbx-12">Arguments</span>
 id="TBL-17-1"><col 
 id="TBL-17-2"></colgroup><tr  
  style="vertical-align:baseline;" id="TBL-17-1-"><td  style="white-space:normal; text-align:left;" id="TBL-17-1-1"  
-class="td11"><!--l. 916--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>      </td><td  style="white-space:normal; text-align:left;" id="TBL-17-1-2"  
-class="td11"><!--l. 916--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
+class="td11"><!--l. 917--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>      </td><td  style="white-space:normal; text-align:left;" id="TBL-17-1-2"  
+class="td11"><!--l. 917--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
 class="cmr-12">.</span>                                                 </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-17-2-"><td  style="white-space:normal; text-align:left;" id="TBL-17-2-1"  
-class="td11"><!--l. 917--><p class="noindent" >           </td><td  style="white-space:normal; text-align:left;" id="TBL-17-2-2"  
-class="td11"><!--l. 917--><p class="noindent" ><span 
+class="td11"><!--l. 918--><p class="noindent" >           </td><td  style="white-space:normal; text-align:left;" id="TBL-17-2-2"  
+class="td11"><!--l. 918--><p class="noindent" ><span 
 class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse7.html#x10-320007"><span 
@@ -2963,38 +2965,38 @@ class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span
 class="cmr-12">for details.</span></td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-17-3-"><td  style="white-space:normal; text-align:left;" id="TBL-17-3-1"  
-class="td11"><!--l. 918--><p class="noindent" ><code class="lstinline"><span style="color:#000000">iout</span></code>       </td><td  style="white-space:normal; text-align:left;" id="TBL-17-3-2"  
-class="td11"><!--l. 918--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">optional</span></code><span 
+class="td11"><!--l. 919--><p class="noindent" ><code class="lstinline"><span style="color:#000000">iout</span></code>       </td><td  style="white-space:normal; text-align:left;" id="TBL-17-3-2"  
+class="td11"><!--l. 919--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">optional</span></code><span 
 class="cmr-12">.</span>                                     </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-17-4-"><td  style="white-space:normal; text-align:left;" id="TBL-17-4-1"  
-class="td11"><!--l. 919--><p class="noindent" >           </td><td  style="white-space:normal; text-align:left;" id="TBL-17-4-2"  
-class="td11"><!--l. 919--><p class="noindent" ><span 
+class="td11"><!--l. 920--><p class="noindent" >           </td><td  style="white-space:normal; text-align:left;" id="TBL-17-4-2"  
+class="td11"><!--l. 920--><p class="noindent" ><span 
 class="cmr-12">The id of the file where the preconditioner description will be</span>
 <span 
 class="cmr-12">printed; the default is the standard output.</span>                       </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-17-5-"><td  style="white-space:normal; text-align:left;" id="TBL-17-5-1"  
-class="td11"><!--l. 921--><p class="noindent" ><code class="lstinline"><span style="color:#000000">root</span></code>       </td><td  style="white-space:normal; text-align:left;" id="TBL-17-5-2"  
-class="td11"><!--l. 921--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">optional</span></code><span 
+class="td11"><!--l. 922--><p class="noindent" ><code class="lstinline"><span style="color:#000000">root</span></code>       </td><td  style="white-space:normal; text-align:left;" id="TBL-17-5-2"  
+class="td11"><!--l. 922--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">optional</span></code><span 
 class="cmr-12">.</span>                                     </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-17-6-"><td  style="white-space:normal; text-align:left;" id="TBL-17-6-1"  
-class="td11"><!--l. 922--><p class="noindent" >           </td><td  style="white-space:normal; text-align:left;" id="TBL-17-6-2"  
-class="td11"><!--l. 922--><p class="noindent" ><span 
+class="td11"><!--l. 923--><p class="noindent" >           </td><td  style="white-space:normal; text-align:left;" id="TBL-17-6-2"  
+class="td11"><!--l. 923--><p class="noindent" ><span 
 class="cmr-12">The id of the process where the preconditioner description</span>
 <span 
 class="cmr-12">will be printed; the default is </span><code class="lstinline"><span style="color:#000000">psb_root_</span></code><span 
 class="cmr-12">.</span>                          </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-17-7-"><td  style="white-space:normal; text-align:left;" id="TBL-17-7-1"  
-class="td11"><!--l. 924--><p class="noindent" ><code class="lstinline"><span style="color:#000000">verbosity</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-17-7-2"  
-class="td11"><!--l. 924--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">optional</span></code><span 
+class="td11"><!--l. 925--><p class="noindent" ><code class="lstinline"><span style="color:#000000">verbosity</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-17-7-2"  
+class="td11"><!--l. 925--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">optional</span></code><span 
 class="cmr-12">.</span>                                     </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-17-8-"><td  style="white-space:normal; text-align:left;" id="TBL-17-8-1"  
-class="td11"><!--l. 925--><p class="noindent" >           </td><td  style="white-space:normal; text-align:left;" id="TBL-17-8-2"  
-class="td11"><!--l. 925--><p class="noindent" ><span 
+class="td11"><!--l. 926--><p class="noindent" >           </td><td  style="white-space:normal; text-align:left;" id="TBL-17-8-2"  
+class="td11"><!--l. 926--><p class="noindent" ><span 
 class="cmr-12">The verbosity level of the description. Default value is 0. For</span>
 <span 
 class="cmr-12">values higher than 0, it prints out further information, e.g., for</span>
@@ -3005,31 +3007,31 @@ class="cmr-12">matrices on every process.</span>                                
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-17-9-"><td  style="white-space:normal; text-align:left;" id="TBL-17-9-1"  
 class="td11">           </td> </tr></table>                                                      </div>
-<!--l. 932--><p class="noindent" >
+<!--l. 933--><p class="noindent" >
    <h4 class="subsectionHead"><span class="titlemark"><span 
 class="cmr-12">5.9   </span></span> <a 
  id="x8-250005.9"></a><span 
 class="cmr-12">Auxiliary Methods</span></h4>
-<!--l. 933--><p class="noindent" ><span 
+<!--l. 934--><p class="noindent" ><span 
 class="cmr-12">Various functionalities are implemented as additional methods of the preconditioner</span>
 <span 
 class="cmr-12">object.</span>
-<!--l. 936--><p class="noindent" >
+<!--l. 937--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark"><span 
 class="cmr-12">5.9.1   </span></span> <a 
  id="x8-260005.9.1"></a><span 
 class="cmr-12">Method: dump</span></h5>
 <div class="center" 
 >
-<!--l. 938--><p class="noindent" >
-<!--l. 939--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">dump</span><span style="color:#000000">(</span><span style="color:#000000">info</span><span style="color:#000000">[,</span><span style="color:#000000">istart</span><span style="color:#000000">,</span><span style="color:#000000">iend</span><span style="color:#000000">,</span><span style="color:#000000">prefix</span><span style="color:#000000">,</span><span style="color:#000000">head</span><span style="color:#000000">,</span><span style="color:#000000">ac</span><span style="color:#000000">,</span><span style="color:#000000">rp</span><span style="color:#000000">,</span><span style="color:#000000">smoother</span><span style="color:#000000">,</span><span style="color:#000000">solver</span><span style="color:#000000">,</span><span style="color:#000000">global_num</span><span style="color:#000000">])</span></code><br />
+<!--l. 939--><p class="noindent" >
+<!--l. 940--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">dump</span><span style="color:#000000">(</span><span style="color:#000000">info</span><span style="color:#000000">[,</span><span style="color:#000000">istart</span><span style="color:#000000">,</span><span style="color:#000000">iend</span><span style="color:#000000">,</span><span style="color:#000000">prefix</span><span style="color:#000000">,</span><span style="color:#000000">head</span><span style="color:#000000">,</span><span style="color:#000000">ac</span><span style="color:#000000">,</span><span style="color:#000000">rp</span><span style="color:#000000">,</span><span style="color:#000000">smoother</span><span style="color:#000000">,</span><span style="color:#000000">solver</span><span style="color:#000000">,</span><span style="color:#000000">global_num</span><span style="color:#000000">])</span></code><br />
 </div>
                                                                                
 
                                                                                
-<!--l. 942--><p class="noindent" ><span 
+<!--l. 943--><p class="noindent" ><span 
 class="cmr-12">Dump on file.</span>
-<!--l. 945--><p class="noindent" ><span 
+<!--l. 946--><p class="noindent" ><span 
 class="cmbx-12">Arguments</span>
    <div class="tabular"> <table id="TBL-18" class="tabular" 
  
@@ -3037,13 +3039,13 @@ class="cmbx-12">Arguments</span>
 id="TBL-18-1"><col 
 id="TBL-18-2"></colgroup><tr  
  style="vertical-align:baseline;" id="TBL-18-1-"><td  style="white-space:normal; text-align:left;" id="TBL-18-1-1"  
-class="td11"><!--l. 948--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-18-1-2"  
-class="td11"><!--l. 948--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
+class="td11"><!--l. 949--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-18-1-2"  
+class="td11"><!--l. 949--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
 class="cmr-12">.</span>                                                        </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-18-2-"><td  style="white-space:normal; text-align:left;" id="TBL-18-2-1"  
-class="td11"><!--l. 949--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-18-2-2"  
-class="td11"><!--l. 949--><p class="noindent" ><span 
+class="td11"><!--l. 950--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-18-2-2"  
+class="td11"><!--l. 950--><p class="noindent" ><span 
 class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse7.html#x10-320007"><span 
@@ -3051,14 +3053,14 @@ class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span
 class="cmr-12">for details.</span>     </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-18-3-"><td  style="white-space:normal; text-align:left;" id="TBL-18-3-1"  
-class="td11"><!--l. 950--><p class="noindent" ><code class="lstinline"><span style="color:#000000">amold</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-18-3-2"  
-class="td11"><!--l. 950--><p class="noindent" ><code class="lstinline"><span style="color:#000000">class</span><span style="color:#000000">(</span><span style="color:#000000">psb_</span></code><span 
+class="td11"><!--l. 951--><p class="noindent" ><code class="lstinline"><span style="color:#000000">amold</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-18-3-2"  
+class="td11"><!--l. 951--><p class="noindent" ><code class="lstinline"><span style="color:#000000">class</span><span style="color:#000000">(</span><span style="color:#000000">psb_</span></code><span 
 class="cmti-12">x</span><code class="lstinline"><span style="color:#000000">_base_sparse_mat</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">optional</span></code><span 
 class="cmr-12">.</span>          </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-18-4-"><td  style="white-space:normal; text-align:left;" id="TBL-18-4-1"  
-class="td11"><!--l. 951--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-18-4-2"  
-class="td11"><!--l. 951--><p class="noindent" ><span 
+class="td11"><!--l. 952--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-18-4-2"  
+class="td11"><!--l. 952--><p class="noindent" ><span 
 class="cmr-12">The  desired  dynamic  type  for  internal  matrix  components;  this</span>
 <span 
 class="cmr-12">allows  e.g.  running  on  GPUs;  it  needs  not  be  the  same  on  all</span>
@@ -3072,19 +3074,19 @@ class="cmr-12">.</span>             </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-18-5-"><td  style="white-space:normal; text-align:left;" id="TBL-18-5-1"  
 class="td11">      </td> </tr></table>                                                           </div>
-<!--l. 958--><p class="noindent" >
+<!--l. 959--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark"><span 
 class="cmr-12">5.9.2   </span></span> <a 
  id="x8-270005.9.2"></a><span 
 class="cmr-12">Method: clone</span></h5>
 <div class="center" 
 >
-<!--l. 960--><p class="noindent" >
-<!--l. 961--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">clone</span><span style="color:#000000">(</span><span style="color:#000000">pout</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code><br />
+<!--l. 961--><p class="noindent" >
+<!--l. 962--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">clone</span><span style="color:#000000">(</span><span style="color:#000000">pout</span><span style="color:#000000">,</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code><br />
 </div>
-<!--l. 964--><p class="noindent" ><span 
+<!--l. 965--><p class="noindent" ><span 
 class="cmr-12">Create a (deep) copy of the preconditioner object.</span>
-<!--l. 967--><p class="noindent" ><span 
+<!--l. 968--><p class="noindent" ><span 
 class="cmbx-12">Arguments</span>
    <div class="tabular"> <table id="TBL-19" class="tabular" 
  
@@ -3092,14 +3094,14 @@ class="cmbx-12">Arguments</span>
 id="TBL-19-1"><col 
 id="TBL-19-2"></colgroup><tr  
  style="vertical-align:baseline;" id="TBL-19-1-"><td  style="white-space:normal; text-align:left;" id="TBL-19-1-1"  
-class="td11"><!--l. 970--><p class="noindent" ><code class="lstinline"><span style="color:#000000">pout</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-19-1-2"  
-class="td11"><!--l. 970--><p class="noindent" ><code class="lstinline"><span style="color:#000000">type</span><span style="color:#000000">(</span><span style="color:#000000">amg_</span></code><span 
+class="td11"><!--l. 971--><p class="noindent" ><code class="lstinline"><span style="color:#000000">pout</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-19-1-2"  
+class="td11"><!--l. 971--><p class="noindent" ><code class="lstinline"><span style="color:#000000">type</span><span style="color:#000000">(</span><span style="color:#000000">amg_</span></code><span 
 class="cmti-12">x</span><code class="lstinline"><span style="color:#000000">prec_type</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
 class="cmr-12">.</span>                                    </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-19-2-"><td  style="white-space:normal; text-align:left;" id="TBL-19-2-1"  
-class="td11"><!--l. 971--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-19-2-2"  
-class="td11"><!--l. 971--><p class="noindent" ><span 
+class="td11"><!--l. 972--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-19-2-2"  
+class="td11"><!--l. 972--><p class="noindent" ><span 
 class="cmr-12">The copy of the preconditioner data structure. Note that </span><span 
 class="cmti-12">x </span><span 
 class="cmr-12">must</span>
@@ -3111,13 +3113,13 @@ class="cmr-12">, single/double precision</span>
 class="cmr-12">version of AMG4PSBLAS under use.</span>                                       </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-19-3-"><td  style="white-space:normal; text-align:left;" id="TBL-19-3-1"  
-class="td11"><!--l. 974--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-19-3-2"  
-class="td11"><!--l. 974--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
+class="td11"><!--l. 975--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-19-3-2"  
+class="td11"><!--l. 975--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
 class="cmr-12">.</span>                                                        </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-19-4-"><td  style="white-space:normal; text-align:left;" id="TBL-19-4-1"  
-class="td11"><!--l. 975--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-19-4-2"  
-class="td11"><!--l. 975--><p class="noindent" ><span 
+class="td11"><!--l. 976--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-19-4-2"  
+class="td11"><!--l. 976--><p class="noindent" ><span 
 class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse7.html#x10-320007"><span 
@@ -3126,15 +3128,15 @@ class="cmr-12">for details.</span>     </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-19-5-"><td  style="white-space:normal; text-align:left;" id="TBL-19-5-1"  
 class="td11">      </td> </tr></table>                                                           </div>
-<!--l. 980--><p class="noindent" >
+<!--l. 981--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark"><span 
 class="cmr-12">5.9.3   </span></span> <a 
  id="x8-280005.9.3"></a><span 
 class="cmr-12">Method: sizeof</span></h5>
 <div class="center" 
 >
-<!--l. 982--><p class="noindent" >
-<!--l. 983--><p class="noindent" ><code class="lstinline"><span style="color:#000000">sz</span><span style="color:#000000"> </span><span style="color:#000000">=</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">sizeof</span><span style="color:#000000">([</span><span style="color:#000000">global</span><span style="color:#000000">])</span></code><br />
+<!--l. 983--><p class="noindent" >
+<!--l. 984--><p class="noindent" ><code class="lstinline"><span style="color:#000000">sz</span><span style="color:#000000"> </span><span style="color:#000000">=</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">sizeof</span><span style="color:#000000">([</span><span style="color:#000000">global</span><span style="color:#000000">])</span></code><br />
 </div>
    <div class="tabular"> <table id="TBL-20" class="tabular" 
  
@@ -3142,13 +3144,13 @@ class="cmr-12">Method: sizeof</span></h5>
 id="TBL-20-1"><col 
 id="TBL-20-2"></colgroup><tr  
  style="vertical-align:baseline;" id="TBL-20-1-"><td  style="white-space:normal; text-align:left;" id="TBL-20-1-1"  
-class="td11"><!--l. 987--><p class="noindent" ><code class="lstinline"><span style="color:#000000">global</span></code> </td> <td  style="white-space:normal; text-align:left;" id="TBL-20-1-2"  
-class="td11"><!--l. 987--><p class="noindent" ><code class="lstinline"><span style="color:#000000">logical</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">optional</span></code><span 
+class="td11"><!--l. 988--><p class="noindent" ><code class="lstinline"><span style="color:#000000">global</span></code> </td> <td  style="white-space:normal; text-align:left;" id="TBL-20-1-2"  
+class="td11"><!--l. 988--><p class="noindent" ><code class="lstinline"><span style="color:#000000">logical</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">optional</span></code><span 
 class="cmr-12">.</span>                                                             </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-20-2-"><td  style="white-space:normal; text-align:left;" id="TBL-20-2-1"  
-class="td11"><!--l. 988--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-20-2-2"  
-class="td11"><!--l. 988--><p class="noindent" ><span 
+class="td11"><!--l. 989--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-20-2-2"  
+class="td11"><!--l. 989--><p class="noindent" ><span 
 class="cmr-12">Whether the global or local preconditioner memory occupation is</span>
 <span 
 class="cmr-12">desired. Default: </span><code class="lstinline"><span style="color:#000000">.</span><span style="color:#000000">false</span><span style="color:#000000">.</span></code><span 
@@ -3161,7 +3163,7 @@ class="cmr-12">Return memory footprint in bytes.</span>
                                                                                
 
                                                                                
-<!--l. 995--><p class="noindent" >
+<!--l. 996--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark"><span 
 class="cmr-12">5.9.4   </span></span> <a 
  id="x8-290005.9.4"></a><span 
@@ -3169,23 +3171,23 @@ class="cmr-12">Method: allocate</span><span
 class="cmr-12">_wrk</span></h5>
 <div class="center" 
 >
-<!--l. 997--><p class="noindent" >
-<!--l. 998--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">allocate_wrk</span><span style="color:#000000">(</span><span style="color:#000000">info</span><span style="color:#000000">[,</span><span style="color:#000000"> </span><span style="color:#000000">vmold</span><span style="color:#000000">])</span></code><br />
+<!--l. 998--><p class="noindent" >
+<!--l. 999--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">allocate_wrk</span><span style="color:#000000">(</span><span style="color:#000000">info</span><span style="color:#000000">[,</span><span style="color:#000000"> </span><span style="color:#000000">vmold</span><span style="color:#000000">])</span></code><br />
 </div>
-<!--l. 1001--><p class="noindent" ><span 
+<!--l. 1002--><p class="noindent" ><span 
 class="cmr-12">Allocate internal work vectors. Each application of the preconditioner uses a number of</span>
 <span 
 class="cmr-12">work vectors which are allocated internally as necessary; therefore allocation and</span>
 <span 
-class="cmr-12">deallocation of memory occurs multiple times during the execution of a Krylov method.</span>
+class="cmr-12">deallocation of memory occurs multiple times during the execution of an iterative</span>
 <span 
-class="cmr-12">In most cases this strategy is perfectly acceptable, but on some platforms, most</span>
+class="cmr-12">method. In most cases this strategy is perfectly acceptable, but on some platforms,</span>
 <span 
-class="cmr-12">notably GPUs, memory allocation is a slow operation, and the default behaviour would</span>
+class="cmr-12">most notably GPUs, memory allocation is a slow operation, and the default behaviour</span>
 <span 
-class="cmr-12">lead to a slowdown. This method allows to trade space for time by preallocating</span>
+class="cmr-12">would lead to a slowdown. This method allows to trade space for time by preallocating</span>
 <span 
-class="cmr-12">the internal workspace outside of the invocation of a Krylov method. When</span>
+class="cmr-12">the internal workspace outside of the invocation of a linear solver method. When</span>
 <span 
 class="cmr-12">using GPUs or other specialized devices, the </span><code class="lstinline"><span style="color:#000000">vmold</span></code> <span 
 class="cmr-12">argument is also necessary</span>
@@ -3198,7 +3200,7 @@ class="cmr-12">taken care of based on the dynamic type of the </span><code class
 class="cmr-12">argument to the </span><code class="lstinline"><span style="color:#000000">apply</span></code>
 <span 
 class="cmr-12">method.</span>
-<!--l. 1017--><p class="noindent" ><span 
+<!--l. 1018--><p class="noindent" ><span 
 class="cmbx-12">Arguments</span>
    <div class="tabular"> <table id="TBL-21" class="tabular" 
  
@@ -3206,13 +3208,13 @@ class="cmbx-12">Arguments</span>
 id="TBL-21-1"><col 
 id="TBL-21-2"></colgroup><tr  
  style="vertical-align:baseline;" id="TBL-21-1-"><td  style="white-space:normal; text-align:left;" id="TBL-21-1-1"  
-class="td11"><!--l. 1020--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-21-1-2"  
-class="td11"><!--l. 1020--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
+class="td11"><!--l. 1021--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-21-1-2"  
+class="td11"><!--l. 1021--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
 class="cmr-12">.</span>                                                        </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-21-2-"><td  style="white-space:normal; text-align:left;" id="TBL-21-2-1"  
-class="td11"><!--l. 1021--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-21-2-2"  
-class="td11"><!--l. 1021--><p class="noindent" ><span 
+class="td11"><!--l. 1022--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-21-2-2"  
+class="td11"><!--l. 1022--><p class="noindent" ><span 
 class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse7.html#x10-320007"><span 
@@ -3220,37 +3222,38 @@ class="cmr-12">7</span><!--tex4ht:ref: sec:errors --></a> <span
 class="cmr-12">for details.</span>     </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-21-3-"><td  style="white-space:normal; text-align:left;" id="TBL-21-3-1"  
-class="td11"><!--l. 1022--><p class="noindent" ><code class="lstinline"><span style="color:#000000">vmold</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-21-3-2"  
-class="td11"><!--l. 1022--><p class="noindent" ><code class="lstinline"><span style="color:#000000">class</span><span style="color:#000000">(</span><span style="color:#000000">psb_</span></code><span 
+class="td11"><!--l. 1023--><p class="noindent" ><code class="lstinline"><span style="color:#000000">vmold</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-21-3-2"  
+class="td11"><!--l. 1023--><p class="noindent" ><code class="lstinline"><span style="color:#000000">class</span><span style="color:#000000">(</span><span style="color:#000000">psb_</span></code><span 
 class="cmti-12">x</span><code class="lstinline"><span style="color:#000000">_base_vect_type</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">in</span><span style="color:#000000">),</span><span style="color:#000000"> </span><span style="color:#000000">optional</span></code><span 
 class="cmr-12">.</span>            </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-21-4-"><td  style="white-space:normal; text-align:left;" id="TBL-21-4-1"  
-class="td11"><!--l. 1023--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-21-4-2"  
-class="td11"><!--l. 1023--><p class="noindent" ><span 
+class="td11"><!--l. 1024--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-21-4-2"  
+class="td11"><!--l. 1024--><p class="noindent" ><span 
 class="cmr-12">The  desired  dynamic  type  for  internal  vector  components;  this</span>
 <span 
 class="cmr-12">allows e.g. running on GPUs.</span>                                                 </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-21-5-"><td  style="white-space:normal; text-align:left;" id="TBL-21-5-1"  
 class="td11">      </td> </tr></table>                                                           </div>
-<!--l. 1029--><p class="noindent" >
+<!--l. 1030--><p class="noindent" >
    <h5 class="subsubsectionHead"><span class="titlemark"><span 
 class="cmr-12">5.9.5   </span></span> <a 
  id="x8-300005.9.5"></a><span 
-class="cmr-12">Method: free</span><span 
+class="cmr-12">Method: deallocate</span><span 
 class="cmr-12">_wrk</span></h5>
 <div class="center" 
 >
-<!--l. 1031--><p class="noindent" >
-<!--l. 1032--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">free_wrk</span><span style="color:#000000">(</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code><br />
+<!--l. 1032--><p class="noindent" >
+<!--l. 1033--><p class="noindent" ><code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">deallocate_wrk</span><span style="color:#000000">(</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code><br />
+<code class="lstinline"><span style="color:#000000">call</span><span style="color:#000000"> </span><span style="color:#000000">p</span><span style="color:#000000">%</span><span style="color:#000000">free_wrk</span><span style="color:#000000">(</span><span style="color:#000000">info</span><span style="color:#000000">)</span></code><br />
 </div>
                                                                                
 
                                                                                
-<!--l. 1035--><p class="noindent" ><span 
+<!--l. 1037--><p class="noindent" ><span 
 class="cmr-12">Deallocate internal work vectors.</span>
-<!--l. 1038--><p class="noindent" ><span 
+<!--l. 1040--><p class="noindent" ><span 
 class="cmbx-12">Arguments</span>
    <div class="tabular"> <table id="TBL-22" class="tabular" 
  
@@ -3258,13 +3261,13 @@ class="cmbx-12">Arguments</span>
 id="TBL-22-1"><col 
 id="TBL-22-2"></colgroup><tr  
  style="vertical-align:baseline;" id="TBL-22-1-"><td  style="white-space:normal; text-align:left;" id="TBL-22-1-1"  
-class="td11"><!--l. 1041--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-22-1-2"  
-class="td11"><!--l. 1041--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
+class="td11"><!--l. 1043--><p class="noindent" ><code class="lstinline"><span style="color:#000000">info</span></code>  </td><td  style="white-space:normal; text-align:left;" id="TBL-22-1-2"  
+class="td11"><!--l. 1043--><p class="noindent" ><code class="lstinline"><span style="color:#000000">integer</span><span style="color:#000000">,</span><span style="color:#000000"> </span><span style="color:#000000">intent</span><span style="color:#000000">(</span><span style="color:#000000">out</span><span style="color:#000000">)</span></code><span 
 class="cmr-12">.</span>                                                        </td>
 </tr><tr  
  style="vertical-align:baseline;" id="TBL-22-2-"><td  style="white-space:normal; text-align:left;" id="TBL-22-2-1"  
-class="td11"><!--l. 1042--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-22-2-2"  
-class="td11"><!--l. 1042--><p class="noindent" ><span 
+class="td11"><!--l. 1044--><p class="noindent" >      </td><td  style="white-space:normal; text-align:left;" id="TBL-22-2-2"  
+class="td11"><!--l. 1044--><p class="noindent" ><span 
 class="cmr-12">Error code. If no error, 0 is returned. See Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
 href="userhtmlse7.html#x10-320007"><span 

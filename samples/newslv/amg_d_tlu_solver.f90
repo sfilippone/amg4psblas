@@ -1,15 +1,15 @@
-!  
-!   
-!                             MLD2P4  version 2.2
-!    MultiLevel Domain Decomposition Parallel Preconditioners Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
-!    
-!    (C) Copyright 2008-2018 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Daniela di Serafino   
-!   
+!
+!
+!                             AMG4PSBLAS version 1.0
+!    Algebraic Multigrid Package
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
+!
+!    (C) Copyright 2021
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -18,14 +18,14 @@
 !      2. Redistributions in binary form must reproduce the above copyright
 !         notice, this list of conditions, and the following disclaimer in the
 !         documentation and/or other materials provided with the distribution.
-!      3. The name of the MLD2P4 group or the names of its contributors may
+!      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MLD2P4 GROUP OR ITS CONTRIBUTORS
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
 !    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 !    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 !    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -33,23 +33,22 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
 !
 !
-! File: mld_d_tlu_solver_mod.f90
 !
-! Module: mld_d_tlu_solver_mod
+! File: amg_d_tlu_solver_mod.f90
+!
+! Module: amg_d_tlu_solver_mod
 !
 !  This module serves as an example of how to define a new solver and integrate
-!  it in MLD2P4 via the P%SET(sv,info) method.
+!  it in AMG4PSBLAS via the P%SET(sv,info) method.
 !  In this example we are extending the ILU solver by implementing a new factorization algorithm.
 !  In actual reality, we are just giving a new name to ILU(0), but this should be sufficient to show
 !  the basics.
 !
 !  The code is divided in two files:
 !  1. The interface file (this one)
-!  2. The implementation file (mld_d_tlu_solver_impl.f90)
+!  2. The implementation file (amg_d_tlu_solver_impl.f90)
 !  
 !  The separation between interface and implementation is an essential part of the
 !  object-oriented design. The most appropriate tool would be to have the implementation
@@ -59,12 +58,12 @@
 !
 !
 
-module mld_d_tlu_solver
+module amg_d_tlu_solver
 
-  use mld_d_ilu_solver
-  !  use mld_d_ilu_fact_mod
+  use amg_d_ilu_solver
+  !  use amg_d_ilu_fact_mod
 
-  type, extends(mld_d_ilu_solver_type) :: mld_d_tlu_solver_type
+  type, extends(amg_d_ilu_solver_type) :: amg_d_tlu_solver_type
     !
     ! These are already defined in the ILU solver type; since we
     ! are supposedly implementing a new factorization strategy, the
@@ -82,12 +81,12 @@ module mld_d_tlu_solver
     ! in common among all possible ILU factorizations
     ! 
     ! 
-    !procedure, pass(sv) :: dump    => mld_d_tlu_solver_dmp 
+    !procedure, pass(sv) :: dump    => amg_d_tlu_solver_dmp 
     !procedure, pass(sv) :: ccheck  => d_tlu_solver_check
-    !procedure, pass(sv) :: clone   => mld_d_tlu_solver_clone
-    !procedure, pass(sv) :: cnv     => mld_d_tlu_solver_cnv
-    !procedure, pass(sv) :: apply_v => mld_d_tlu_solver_apply_vect
-    !procedure, pass(sv) :: apply_a => mld_d_tlu_solver_apply
+    !procedure, pass(sv) :: clone   => amg_d_tlu_solver_clone
+    !procedure, pass(sv) :: cnv     => amg_d_tlu_solver_cnv
+    !procedure, pass(sv) :: apply_v => amg_d_tlu_solver_apply_vect
+    !procedure, pass(sv) :: apply_a => amg_d_tlu_solver_apply
     !procedure, pass(sv) :: free    => d_tlu_solver_free
     !procedure, pass(sv) :: seti    => d_tlu_solver_seti
     !procedure, pass(sv) :: setc    => d_tlu_solver_setc
@@ -106,28 +105,28 @@ module mld_d_tlu_solver
     ! 
     procedure, pass(sv) :: descr   => d_tlu_solver_descr    
     procedure, pass(sv) :: default => d_tlu_solver_default
-    procedure, pass(sv) :: build   => mld_d_tlu_solver_bld
+    procedure, pass(sv) :: build   => amg_d_tlu_solver_bld
     procedure, nopass   :: get_fmt => d_tlu_solver_get_fmt
-  end type mld_d_tlu_solver_type
+  end type amg_d_tlu_solver_type
 
 
   private ::  d_tlu_solver_get_fmt, d_tlu_solver_descr, d_tlu_solver_default
 
   interface 
-    subroutine mld_d_tlu_solver_bld(a,desc_a,sv,info,b,amold,vmold, imold)
-      import :: psb_desc_type, mld_d_tlu_solver_type, psb_d_vect_type, psb_dpk_, &
+    subroutine amg_d_tlu_solver_bld(a,desc_a,sv,info,b,amold,vmold, imold)
+      import :: psb_desc_type, amg_d_tlu_solver_type, psb_d_vect_type, psb_dpk_, &
            & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type,&
            & psb_ipk_, psb_i_base_vect_type
       implicit none 
       type(psb_dspmat_type), intent(in), target           :: a
-      Type(psb_desc_type), Intent(in)                     :: desc_a 
-      class(mld_d_tlu_solver_type), intent(inout)         :: sv
+      Type(psb_desc_type), Intent(inout)                  :: desc_a 
+      class(amg_d_tlu_solver_type), intent(inout)         :: sv
       integer(psb_ipk_), intent(out)                      :: info
       type(psb_dspmat_type), intent(in), target, optional :: b
       class(psb_d_base_sparse_mat), intent(in), optional  :: amold
       class(psb_d_base_vect_type), intent(in), optional   :: vmold
       class(psb_i_base_vect_type), intent(in), optional   :: imold
-    end subroutine mld_d_tlu_solver_bld
+    end subroutine amg_d_tlu_solver_bld
   end interface
 
 contains
@@ -141,9 +140,9 @@ contains
     Implicit None
 
     ! Arguments
-    class(mld_d_tlu_solver_type), intent(inout) :: sv
+    class(amg_d_tlu_solver_type), intent(inout) :: sv
 
-    sv%fact_type = mld_ilu_n_
+    sv%fact_type = amg_ilu_n_
     sv%fill_in   = 0
     sv%thresh    = dzero
 
@@ -157,20 +156,22 @@ contains
     val = "TLU solver"
   end function d_tlu_solver_get_fmt
 
-  subroutine d_tlu_solver_descr(sv,info,iout,coarse)
+  subroutine d_tlu_solver_descr(sv,info,iout,coarse,prefix)
 
     Implicit None
 
     ! Arguments
-    class(mld_d_tlu_solver_type), intent(in) :: sv
+    class(amg_d_tlu_solver_type), intent(in) :: sv
     integer(psb_ipk_), intent(out)             :: info
     integer(psb_ipk_), intent(in), optional    :: iout
     logical, intent(in), optional       :: coarse
+    character(len=*), intent(in), optional  :: prefix
 
     ! Local variables
     integer(psb_ipk_)      :: err_act
-    character(len=20), parameter :: name='mld_d_tlu_solver_descr'
+    character(len=20), parameter :: name='amg_d_tlu_solver_descr'
     integer(psb_ipk_) :: iout_
+    character(1024)    :: prefix_
 
     call psb_erractionsave(err_act)
     info = psb_success_
@@ -179,14 +180,20 @@ contains
     else
       iout_ = psb_out_unit
     endif
+    if (present(prefix)) then
+      prefix_ = prefix
+    else
+      prefix_ = ""
+    end if
 
-    write(iout_,*) '  Incomplete factorization solver: New Factorization TLU '
+
+    write(iout_,*) trim(prefix_), '  Incomplete factorization solver: New Factorization TLU '
     select case(sv%fact_type)
-    case(mld_ilu_n_,mld_milu_n_)      
-      write(iout_,*) '  Fill level:',sv%fill_in
-    case(mld_ilu_t_)         
-      write(iout_,*) '  Fill level:',sv%fill_in
-      write(iout_,*) '  Fill threshold :',sv%thresh
+    case(amg_ilu_n_,amg_milu_n_)      
+      write(iout_,*) trim(prefix_), '  Fill level:',sv%fill_in
+    case(amg_ilu_t_)         
+      write(iout_,*) trim(prefix_), '  Fill level:',sv%fill_in
+      write(iout_,*) trim(prefix_), '  Fill threshold :',sv%thresh
     end select
 
     call psb_erractionrestore(err_act)
@@ -196,4 +203,4 @@ contains
     return
   end subroutine d_tlu_solver_descr
   
-end module mld_d_tlu_solver
+end module amg_d_tlu_solver

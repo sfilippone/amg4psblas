@@ -100,10 +100,10 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
   use amg_d_gs_solver
   use amg_d_poly_smoother
 
-#if defined(HAVE_UMF_)
+#if defined(AMG_HAVE_UMF)
   use amg_d_umf_solver
 #endif
-#if defined(HAVE_SLU_)
+#if defined(AMG_HAVE_SLU)
   use amg_d_slu_solver
 #endif
 
@@ -242,11 +242,11 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
     end do
     call prec%set('ML_CYCLE','VCYCLE',info)
     call prec%set('SMOOTHER_TYPE','FBGS',info)
-#if defined(HAVE_UMF_)
+#if defined(AMG_HAVE_UMF)
     call prec%set('COARSE_SOLVE','UMF',info)
-#elif defined(HAVE_MUMPS_)
+#elif defined(AMG_HAVE_MUMPS)
     call prec%set('COARSE_SOLVE','MUMPS',info)
-#elif defined(HAVE_SLU_)
+#elif defined(AMG_HAVE_SLU)
     call prec%set('COARSE_SOLVE','SLU',info)
 #else
     call prec%set('COARSE_SOLVE','ILU',info)

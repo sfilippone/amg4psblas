@@ -87,8 +87,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * October 15, 2003
  *
  */
-
-#ifdef Have_SLU_
+#include "amg_config.h"
+#ifdef AMG_HAVE_SLU
 #include "slu_zdefs.h"
 #define HANDLE_SIZE  8
 
@@ -109,7 +109,7 @@ typedef struct {
 
 
 int  amg_zslu_fact(int n, int nnz, 
-#ifdef HAVE_SLU_
+#ifdef AMG_HAVE_SLU
 	      doublecomplex *values,
 #else
 	      void *values,
@@ -127,7 +127,7 @@ int  amg_zslu_fact(int n, int nnz,
  *
  */
  
-#ifdef Have_SLU_
+#ifdef AMG_HAVE_SLU
     SuperMatrix A, AC;
     SuperMatrix *L, *U;
     int *perm_r; /* row permutations from partial pivoting */
@@ -176,10 +176,10 @@ int  amg_zslu_fact(int n, int nnz,
     
     panel_size = sp_ienv(1);
     relax = sp_ienv(2);
-#if defined(SLU_VERSION_5)
+#if defined(AMG_SLU_VERSION_5)
     zgstrf(&options, &AC, relax, panel_size, etree,
 	   NULL, 0, perm_c, perm_r, L, U, &Glu, &stat, &info);
-#elif defined(SLU_VERSION_4)
+#elif defined(AMG_SLU_VERSION_4)
     zgstrf(&options, &AC, relax, panel_size, etree,
 	   NULL, 0, perm_c, perm_r, L, U, &stat, &info);
 #else
@@ -228,7 +228,7 @@ int  amg_zslu_fact(int n, int nnz,
 
 
 int amg_zslu_solve(int itrans, int n, int nrhs,
-#ifdef HAVE_SLU_
+#ifdef AMG_HAVE_SLU
 		   doublecomplex *b,
 #else
 		   void *b,

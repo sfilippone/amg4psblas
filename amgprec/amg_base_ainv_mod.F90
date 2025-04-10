@@ -55,10 +55,6 @@ module amg_base_ainv_mod
   integer, parameter   :: amg_ainv_llk_noth_ = amg_ainv_s_ft_llk_  + 1
   integer, parameter   :: amg_ainv_mlk_      = amg_ainv_llk_noth_  + 1
   integer, parameter   :: amg_ainv_lmx_      = amg_ainv_mlk_
-#if defined(HAVE_TUMA_SAINV)
-  integer, parameter   :: amg_ainv_s_tuma_    = amg_ainv_lmx_  + 1
-  integer, parameter   :: amg_ainv_l_tuma_    = amg_ainv_s_tuma_  + 1
-#endif
 
 
 end module amg_base_ainv_mod

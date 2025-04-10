@@ -1,4 +1,6 @@
+#include "amg_config.h"
 #include "MatchBoxPC.h"
+#if !defined(PSB_SERIAL_MPI)
 /// Find the owner of a ghost node:
 MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
                           MilanInt myRank, MilanInt numProcs)
@@ -26,3 +28,4 @@ MilanInt findOwnerOfGhost(MilanLongInt vtxIndex, MilanLongInt *mVerDistance,
 
   return Current;
 } // End of findOwnerOfGhost()
+#endif

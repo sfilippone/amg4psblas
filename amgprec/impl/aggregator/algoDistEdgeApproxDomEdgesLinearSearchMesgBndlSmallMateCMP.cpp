@@ -70,7 +70,7 @@
  Statistics: ph1_card, ph2_card : Size: |P| number of processes in the comm-world (number of matched edges in Phase 1 and Phase 2)
  */
 //#define DEBUG_HANG_
-#ifdef SERIAL_MPI
+#ifdef PSB_SERIAL_MPI
 #else
 
 // DOUBLE PRECISION VERSION
@@ -102,7 +102,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
      *            i+1-th value is the position of the first element on the i+1-th row
      */
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << ")Within algoEdgeApproxDominatingEdgesLinearSearchMessageBundling()";
     fflush(stdout);
@@ -583,7 +583,7 @@ void salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP(
      *            i+1-th value is the position of the first element on the i+1-th row
      */
 
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 #ifdef PRINT_DEBUG_INFO_
     cout << "\n(" << myRank << ")Within algoEdgeApproxDominatingEdgesLinearSearchMessageBundling()";
     fflush(stdout);

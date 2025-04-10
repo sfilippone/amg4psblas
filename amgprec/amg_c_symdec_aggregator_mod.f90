@@ -97,7 +97,7 @@ contains
     character(len=*), intent(in), optional  :: prefix
 
     character(1024)    :: prefix_
-
+    info = psb_success_
     if (present(prefix)) then
       prefix_ = prefix
     else

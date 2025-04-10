@@ -5,6 +5,7 @@
 
 # header files generated
 cbind/*.h
+amgprec/amg_config.h
 
 # Make.inc generated
 /Make.inc

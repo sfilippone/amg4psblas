@@ -66,7 +66,7 @@ subroutine s_mumps_solver_apply(alpha,sv,x,beta,y,desc_data,&
 
   call psb_erractionsave(err_act)
 
-#if defined(HAVE_MUMPS_) 
+#if defined(AMG_HAVE_MUMPS) 
   info = psb_success_
   trans_ = psb_toupper(trans)
   select case(trans_)

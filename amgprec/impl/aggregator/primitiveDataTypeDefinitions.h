@@ -41,14 +41,16 @@
 
 #ifndef _primitiveDataType_Definition_
 #define _primitiveDataType_Definition_
+#include "amg_config.h"
+#if !defined(PSB_SERIAL_MPI)
 
 #include "preProcessorDirectives.h"
 
 using namespace std;
 
 //Comment out these if you do not need 64 bits.
-//#ifndef BIT64
-//	#define BIT64
+//#ifndef AMG_MATCHBOXP_BIT64
+//	#define AMG_MATCHBOXP_BIT64
 //#endif
 
 //Regular integer:
@@ -61,7 +63,7 @@ using namespace std;
 //Regular long Integer:
 #ifndef LONG_INT_H
 #define LONG_INT_H
-	#ifdef BIT64
+	#ifdef AMG_MATCHBOXP_BIT64
 	typedef int64_t MilanLongInt;
 //	typedef MPI_LONG MilanMpiLongInt;
 	#else
@@ -106,7 +108,7 @@ using namespace std;
 #define MilanIntMax INT_MAX
 #define MilanIntMin INT_MIN
 
-#ifdef BIT64
+#ifdef AMG_MATCHBOXP_BIT64
 	#define MilanLongIntMax LONG_MAX
 	#define MilanLongIntMin -LONG_MAX
 #else
@@ -152,5 +154,5 @@ const float FMINUS_INFINITY = -FPLUS_INFINITY;
 
 
 #endif
-
+#endif
 #endif

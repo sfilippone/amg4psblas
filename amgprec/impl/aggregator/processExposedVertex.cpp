@@ -1,3 +1,5 @@
+#include "amg_config.h"
+#if !defined(PSB_SERIAL_MPI)
 #include "MatchBoxPC.h" 
 void PARALLEL_PROCESS_EXPOSED_VERTEX_BD(MilanLongInt NLVer,
                                        MilanLongInt *candidateMate,
@@ -367,3 +369,4 @@ void PARALLEL_PROCESS_EXPOSED_VERTEX_BS(MilanLongInt NLVer,
     } // End of parallel region
 }
 
+#endif

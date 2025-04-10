@@ -150,7 +150,7 @@ contains
     class(amg_z_dec_aggregator_type), intent(inout) :: ag
     type(amg_dml_parms), intent(in)   :: parms
     integer(psb_ipk_), intent(out) :: info
-
+    info = psb_success_
     select case(parms%aggr_type)
     case (amg_noalg_)
       ag%soc_map_bld => null()
@@ -192,6 +192,7 @@ contains
     integer(psb_ipk_), intent(out) :: info
     character(len=*), intent(in), optional  :: prefix
     character(1024)    :: prefix_
+    info = psb_success_
     if (present(prefix)) then
       prefix_ = prefix
     else

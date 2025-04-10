@@ -302,7 +302,7 @@ contains
     integer(psb_ipk_), intent(out) :: info
 
     ! Do nothing
-    
+    info = psb_success_    
     return
   end subroutine amg_z_base_aggregator_set_aggr_type
 
@@ -486,6 +486,7 @@ contains
     integer(psb_ipk_) :: err_act
     character(len=20) :: name='z_base_aggregator_bld_map'
 
+    info = psb_success_
     call psb_erractionsave(err_act)
     !
     ! Copy the prolongation/restriction matrices into the descriptor map.

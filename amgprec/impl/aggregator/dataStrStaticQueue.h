@@ -41,7 +41,10 @@
 
 #ifndef _static_Queue_
 #define _static_Queue_
+#include "amg_config.h"
 
+
+#if !defined(PSB_SERIAL_MPI)
 #include "primitiveDataTypeDefinitions.h"
 #include "preProcessorDirectives.h"
 
@@ -198,4 +201,5 @@ class staticQueue
 
 };
 
+#endif
 #endif
