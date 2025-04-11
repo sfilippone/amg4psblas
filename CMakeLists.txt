@@ -39,6 +39,16 @@ include_directories(${INCDIR} ${MODDIR} ${LIBDIR})
 
 
 
+message(STATUS "Using IPK size: ${PSB_IPK_SIZE}")
+message(STATUS "Using LPK size: ${PSB_LPK_SIZE}")
+
+
+add_compile_options(-DPSB_IPK${PSB_IPK_SIZE})
+add_compile_options(-DPSB_LPK${PSB_LPK_SIZE})
+
+
+
+
 # Specify the installation directory
 
 #set(${CMAKE_INSTALL_LIBDIR} "lib")
@@ -140,8 +150,8 @@ if(TRUE )#NOT ${WIN32})
   CHECK_TYPE_SIZE("long" LONG_SIZE LANGUAGE C)
   message(STATUS "INT SIZE ${INT_SIZE}")
 
-  add_compile_options(-DIPK${INT_SIZE})
-  add_compile_options(-DLPK${LONG_SIZE})
+  #add_compile_options(-DIPK${INT_SIZE})
+  #add_compile_options(-DLPK${LONG_SIZE})
 
   
 endif()
