@@ -1,15 +1,15 @@
-!  
-!   
-!                             MLD2P4  version 2.2
-!    MultiLevel Domain Decomposition Parallel Preconditioners Package
-!               based on PSBLAS (Parallel Sparse BLAS version 3.5)
-!    
-!    (C) Copyright 2008-2018 
-!  
-!        Salvatore Filippone  
-!        Pasqua D'Ambra   
-!        Daniela di Serafino   
-!   
+!
+!
+!                             AMG4PSBLAS version 1.0
+!    Algebraic Multigrid Package
+!               based on PSBLAS (Parallel Sparse BLAS version 3.7)
+!
+!    (C) Copyright 2021
+!
+!        Salvatore Filippone
+!        Pasqua D'Ambra
+!        Fabio Durastante
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -18,14 +18,14 @@
 !      2. Redistributions in binary form must reproduce the above copyright
 !         notice, this list of conditions, and the following disclaimer in the
 !         documentation and/or other materials provided with the distribution.
-!      3. The name of the MLD2P4 group or the names of its contributors may
+!      3. The name of the AMG4PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
 !         software without specific written permission.
-!   
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MLD2P4 GROUP OR ITS CONTRIBUTORS
+!    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AMG4PSBLAS GROUP OR ITS CONTRIBUTORS
 !    BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 !    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 !    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -33,36 +33,38 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!  
-! File: mld_d_tlu_solver_impl.f90
 !
-!  This is the implementation file corresponding to mld_d_tlu_solver_mod.
+!  
+! File: amg_d_tlu_solver_impl.f90
+!
+!  This is the implementation file corresponding to amg_d_tlu_solver_mod.
 !
 !  In this example we are extending the ILU solver; we pretend to have a new
 !  factorization method, but since we are only interested in the interfacing,
 !  we are simply giving a new name to  ILU(0).
 !
 !
-subroutine mld_d_tlu_solver_bld(a,desc_a,sv,info,b,amold,vmold)
+subroutine amg_d_tlu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
   use psb_base_mod
-  use mld_d_tlu_solver, mld_protect_name => mld_d_tlu_solver_bld
-  use mld_d_ilu_fact_mod
+  use amg_d_tlu_solver, amg_protect_name => amg_d_tlu_solver_bld
 
   Implicit None
 
   ! Arguments
   type(psb_dspmat_type), intent(in), target           :: a
-  Type(psb_desc_type), Intent(in)                     :: desc_a 
-  class(mld_d_tlu_solver_type), intent(inout)         :: sv
+  Type(psb_desc_type), Intent(inout)                  :: desc_a 
+  class(amg_d_tlu_solver_type), intent(inout)         :: sv
   integer, intent(out)                                :: info
   type(psb_dspmat_type), intent(in), target, optional :: b
   class(psb_d_base_sparse_mat), intent(in), optional  :: amold
   class(psb_d_base_vect_type), intent(in), optional   :: vmold
+  class(psb_i_base_vect_type), intent(in), optional     :: imold
+  
   ! Local variables
   integer :: n_row,n_col, nrow_a, nztota
-  integer :: ctxt,np,me,i, err_act, debug_unit, debug_level
+  integer :: np,me,i, err_act, debug_unit, debug_level
+  type(psb_ctxt_type) :: ctxt
   character(len=20)  :: name='d_tlu_solver_bld', ch_err
 
   info=psb_success_
@@ -105,7 +107,7 @@ subroutine mld_d_tlu_solver_bld(a,desc_a,sv,info,b,amold,vmold)
   
   
   ! Fill-in 0, simple implementation.
-  call mld_ilu0_fact(sv%fact_type,a,sv%l,sv%u,&
+  call psb_ilu0_fact(sv%fact_type,a,sv%l,sv%u,&
        & sv%d,info,blck=b)
 
   call sv%l%set_asb()
@@ -128,5 +130,5 @@ subroutine mld_d_tlu_solver_bld(a,desc_a,sv,info,b,amold,vmold)
 9999 call psb_error_handler(err_act)
 
   return
-end subroutine mld_d_tlu_solver_bld
+end subroutine amg_d_tlu_solver_bld
 

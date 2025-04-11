@@ -845,9 +845,10 @@ This method computes $y = op(B^{-1})\, x$, where $B$ is a previously built
 preconditioner, stored into \fortinline|p|, and $op$
 denotes the preconditioner itself or its transpose, according to
 the value of \fortinline|trans|.
-Note that, when AMG4PSBLAS is used with a Krylov solver from PSBLAS,
+Note that, when AMG4PSBLAS is used with am iterative solver from PSBLAS,
 \fortinline|p%apply| is called within the PSBLAS method \fortinline|psb_krylov|
-and hence it is completely transparent to the user.
+and hence it is completely transparent to the user, who will almost
+never invoke it directly.
 
 {\vskip1.5\baselineskip\noindent\large\bfseries Arguments} \smallskip
 
@@ -1002,12 +1003,12 @@ Return memory footprint in bytes.
 Allocate internal work vectors. Each application of the preconditioner
 uses a number of  work vectors which are allocated internally as
 necessary; therefore allocation and deallocation of memory occurs
-multiple times during the execution of a Krylov method. In most cases
+multiple times during the execution of an iterative method. In most cases
 this strategy is perfectly acceptable, but
 on some platforms, most notably GPUs, memory allocation is
 a slow  operation, and the default behaviour would lead to a
 slowdown.  This method allows to trade space for time by preallocating
-the internal workspace outside of the invocation of a Krylov
+the internal workspace outside of the invocation of a linear solver
 method. When using GPUs or other specialized devices, the \fortinline|vmold|
 argument is also necessary to ensure the internal work vectors are of
 the appropriate dynamic type to exploit the accelerator hardware; when
@@ -1026,10 +1027,11 @@ type of the \fortinline|x| argument to the \fortinline|apply| method.
 
 
 
-\subsubsection{Method: free\_wrk}
+\subsubsection{Method: deallocate\_wrk}
 
 \begin{center}
-\fortinline|call p%free_wrk(info)|\\
+  \fortinline|call p%deallocate_wrk(info)|\\
+  \fortinline|call p%free_wrk(info)|\\
 \end{center}
 
 \noindent

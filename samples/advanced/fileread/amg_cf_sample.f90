@@ -116,7 +116,17 @@ program amg_cf_sample
     integer(psb_ipk_)  :: cfill       ! fill-in for incomplete LU factorization
     real(psb_spk_)     :: cthres      ! threshold for ILUT factorization
     integer(psb_ipk_)  :: cjswp       ! sweeps for GS or JAC coarsest-lev subsolver
-
+    ! settings for the Krylov method
+    character(len=16)  :: krm_method  ! Krylov method for coarsest level
+    character(len=16)  :: krm_prec    ! Preconditioner for coarsest level
+    character(len=16)  :: krm_subsolve ! Subsolver for coarsest level
+    character(len=16)  :: krm_global  ! Is the solver global or local? TRUE or FALSE
+    real(psb_spk_)      :: krm_eps     ! Stopping tolerance
+    integer(psb_ipk_)  :: krm_irst    ! Restart for Krylov method 
+    integer(psb_ipk_)  :: krm_istop   ! Stopping criterion
+    integer(psb_ipk_)  :: krm_itmax   ! Maximum number of iterations
+    integer(psb_ipk_)  :: krm_itrace  ! Trace of the lower Krylov iterations
+    integer(psb_ipk_)  :: krm_fillin  ! Fill-in for incomplete LU factorization
   end type precdata
   type(precdata)       :: p_choice
 
@@ -457,13 +467,26 @@ program amg_cf_sample
     end if
 
     call prec%set('coarse_solve',    p_choice%csolve,    info)
-    if (psb_toupper(p_choice%csolve) == 'BJAC') &
-         &  call prec%set('coarse_subsolve', p_choice%csbsolve,  info)
     call prec%set('coarse_mat',      p_choice%cmat,      info)
-    call prec%set('coarse_fillin',   p_choice%cfill,     info)
-    call prec%set('coarse_iluthrs',  p_choice%cthres,    info)
-    call prec%set('coarse_sweeps',   p_choice%cjswp,     info)
-
+    ! Set for the case of a KRM solver
+    if (psb_toupper(p_choice%csolve) == 'KRM') then
+      call prec%set('krm_method', p_choice%krm_method, info)
+      call prec%set('krm_kprec', p_choice%krm_prec,   info)
+      call prec%set('krm_sub_solve', p_choice%krm_subsolve, info)
+      call prec%set('krm_global', p_choice%krm_global, info)
+      call prec%set('krm_eps',   p_choice%krm_eps,   info)
+      call prec%set('krm_irst',   p_choice%krm_irst,   info)
+      call prec%set('krm_istopc',  p_choice%krm_istop,  info)
+      call prec%set('krm_itmax',  p_choice%krm_itmax,  info)
+      call prec%set('krm_itrace', p_choice%krm_itrace, info)
+      call prec%set('krm_fillin', p_choice%krm_fillin, info)
+    else
+      if (psb_toupper(p_choice%csolve) == 'BJAC') &
+        &  call prec%set('coarse_subsolve', p_choice%csbsolve,  info)
+      call prec%set('coarse_fillin',   p_choice%cfill,     info)
+      call prec%set('coarse_iluthrs',  p_choice%cthres,    info)
+      call prec%set('coarse_sweeps',   p_choice%cjswp,     info)
+    end if
   end select
   
   ! build the preconditioner
@@ -701,6 +724,17 @@ contains
       call read_data(prec%cfill,inp_unit)       ! fill-in for incompl LU
       call read_data(prec%cthres,inp_unit)      ! Threshold for ILUT
       call read_data(prec%cjswp,inp_unit)       ! sweeps for GS/JAC subsolver
+      ! Krylov method for coarsest level
+      call read_data(prec%krm_method,inp_unit)  ! Krylov method for coarsest level
+      call read_data(prec%krm_prec,inp_unit)    ! Preconditioner for coarsest level
+      call read_data(prec%krm_subsolve,inp_unit) ! Subsolver for coarsest level
+      call read_data(prec%krm_global,inp_unit)  ! Is the solver global or local? TRUE or FALSE
+      call read_data(prec%krm_eps,inp_unit)     ! Stopping tolerance
+      call read_data(prec%krm_irst,inp_unit)    ! Restart for Krylov method
+      call read_data(prec%krm_istop,inp_unit)   ! Stopping criterion
+      call read_data(prec%krm_itmax,inp_unit)   ! Maximum number of iterations
+      call read_data(prec%krm_itrace,inp_unit)  ! Trace of the lower Krylov iterations
+      call read_data(prec%krm_fillin,inp_unit)  ! Fill-in for incomplete LU factorization
       if (inp_unit /= psb_inp_unit) then
         close(inp_unit)
       end if     
@@ -767,6 +801,17 @@ contains
     call psb_bcast(ctxt,prec%cfill)
     call psb_bcast(ctxt,prec%cthres)
     call psb_bcast(ctxt,prec%cjswp)
+    ! Krylov method for coarsest level (broadcast)
+    call psb_bcast(ctxt,prec%krm_method)
+    call psb_bcast(ctxt,prec%krm_prec)
+    call psb_bcast(ctxt,prec%krm_subsolve)
+    call psb_bcast(ctxt,prec%krm_global)
+    call psb_bcast(ctxt,prec%krm_eps)
+    call psb_bcast(ctxt,prec%krm_irst)
+    call psb_bcast(ctxt,prec%krm_istop)
+    call psb_bcast(ctxt,prec%krm_itmax)
+    call psb_bcast(ctxt,prec%krm_itrace)
+    call psb_bcast(ctxt,prec%krm_fillin)
 
 
   end subroutine get_parms

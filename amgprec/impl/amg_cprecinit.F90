@@ -99,7 +99,7 @@ subroutine amg_cprecinit(ctxt,prec,ptype,info)
   use amg_c_ilu_solver
   use amg_c_gs_solver
 
-#if defined(HAVE_SLU_)
+#if defined(AMG_HAVE_SLU)
   use amg_c_slu_solver
 #endif
 
@@ -230,9 +230,9 @@ subroutine amg_cprecinit(ctxt,prec,ptype,info)
     end do
     call prec%set('ML_CYCLE','VCYCLE',info)
     call prec%set('SMOOTHER_TYPE','FBGS',info)
-#if  defined(HAVE_MUMPS_)
+#if  defined(AMG_HAVE_MUMPS)
     call prec%set('COARSE_SOLVE','MUMPS',info)
-#elif defined(HAVE_SLU_)
+#elif defined(AMG_HAVE_SLU)
     call prec%set('COARSE_SOLVE','SLU',info)
 #else
     call prec%set('COARSE_SOLVE','ILU',info)

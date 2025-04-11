@@ -1,4 +1,7 @@
+#include "amg_config.h"
 #include "MatchBoxPC.h"
+#if !defined(PSB_SERIAL_MPI)
+
 /**
  * //TODO documentation
  * @param k
@@ -43,3 +46,4 @@ bool isAlreadyMatched(MilanLongInt node,
 
     return val >= 0; // Already matched
 }
+#endif

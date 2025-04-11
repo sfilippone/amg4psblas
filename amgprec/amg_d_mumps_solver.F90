@@ -52,10 +52,10 @@
 !
 module amg_d_mumps_solver
   use amg_d_base_solver_mod
-#if defined(HAVE_MUMPS_) && defined(HAVE_MUMPS_MODULES_)
+#if defined(AMG_HAVE_MUMPS) && defined(AMG_HAVE_MUMPS_MODULES)
   use dmumps_struc_def
 #endif
-#if defined(HAVE_MUMPS_) && defined(HAVE_MUMPS_INCLUDES_)
+#if defined(AMG_HAVE_MUMPS) && defined(AMG_HAVE_MUMPS_INCLUDES)
   include 'dmumps_struc.h'
 #endif  
   
@@ -68,7 +68,7 @@ module amg_d_mumps_solver
   end type amg_d_mumps_rcntl_item
 
   type, extends(amg_d_base_solver_type) :: amg_d_mumps_solver_type
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
     type(dmumps_struc), allocatable  :: id
 #else
     integer, allocatable :: id
@@ -189,7 +189,7 @@ contains
 
     info = 0
 
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
     
     call psb_erractionsave(err_act)
 
@@ -239,7 +239,7 @@ contains
     character(len=20)  :: name='d_mumps_solver_clear_data'
 
     info = 0
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
     call psb_erractionsave(err_act)
     if (allocated(sv%id)) then      
       if (sv%built) then 
@@ -279,7 +279,7 @@ contains
     character(len=20)  :: name='d_mumps_solver_free'
 
     info = 0
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
     call psb_erractionsave(err_act)
     call sv%clear_data(info)
     if ((info == 0).and.allocated(sv%icntl)) deallocate(sv%icntl,stat=info)
@@ -383,7 +383,7 @@ subroutine d_mumps_solver_csetc(sv,what,val,info,idx)
 
 
   select case(psb_toupper(trim(what)))
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
   case('MUMPS_LOC_GLOB')
     sv%ipar(1) = sv%stringval(psb_toupper(trim(val)))
 #endif
@@ -421,7 +421,7 @@ subroutine d_mumps_solver_cseti(sv,what,val,info,idx)
   call psb_erractionsave(err_act)
 
   select case(psb_toupper(what))
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
   case('MUMPS_LOC_GLOB')
     sv%ipar(1) = val
   case('MUMPS_PRINT_ERR')
@@ -467,7 +467,7 @@ subroutine d_mumps_solver_csetr(sv,what,val,info,idx)
   call psb_erractionsave(err_act)
 
   select case(psb_toupper(what))
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
   case('MUMPS_RPAR_ENTRY')
     if(present(idx)) then 
       ! Note: this will allocate %item
@@ -504,7 +504,7 @@ subroutine d_mumps_solver_default(sv)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
   if (.not.allocated(sv%id)) then 
     allocate(sv%id,stat=info)
     if (info /= psb_success_) then
@@ -561,7 +561,7 @@ function d_mumps_solver_sizeof(sv) result(val)
   class(amg_d_mumps_solver_type), intent(in) :: sv
   integer(psb_epk_) :: val
   integer             :: i
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
   val = (sv%id%INFOG(22)+sv%id%INFOG(32))*1d+6
 #else
   val = 0 

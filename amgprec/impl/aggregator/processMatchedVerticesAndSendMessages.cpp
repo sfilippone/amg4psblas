@@ -1,3 +1,5 @@
+#include "amg_config.h"
+#if !defined(PSB_SERIAL_MPI)
 #include "MatchBoxPC.h"
 //#define DEBUG_HANG_
 void processMatchedVerticesAndSendMessagesD(
@@ -589,3 +591,4 @@ void processMatchedVerticesAndSendMessagesS(
 #endif
 }
 
+#endif

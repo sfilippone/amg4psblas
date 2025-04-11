@@ -135,11 +135,7 @@ subroutine  amg_d_parmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
   use psb_base_mod
   use amg_d_inner_mod
   use amg_base_prec_type
-#if defined(SERIAL_MPI)
-    use amg_d_parmatch_aggregator_mod
-#else
   use amg_d_parmatch_aggregator_mod, amg_protect_name => amg_d_parmatch_aggregator_mat_bld
-#endif
   implicit none
 
   class(amg_d_parmatch_aggregator_type), target, intent(inout) :: ag
@@ -176,7 +172,6 @@ subroutine  amg_d_parmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
   ! algorithm specified by
   !
 
-#if !defined(SERIAL_MPI)
   call clean_shortcuts(ag)
   !
   ! When requesting smoothed aggregation we cannot use the
@@ -212,14 +207,12 @@ subroutine  amg_d_parmatch_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
     call psb_errpush(psb_err_from_subroutine_,name,a_err='Inner aggrmat asb')
     goto 9999
   end if
-#endif
   call psb_erractionrestore(err_act)
   return
 
 9999 call psb_error_handler(err_act)
   return
 
-#if !defined(SERIAL_MPI)
 
 contains
   subroutine clean_shortcuts(ag)
@@ -248,5 +241,4 @@ contains
       end if
     end if
   end subroutine clean_shortcuts
-#endif
 end subroutine amg_d_parmatch_aggregator_mat_bld

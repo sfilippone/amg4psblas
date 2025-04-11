@@ -53,3 +53,14 @@ REPL                        ! Coarsest-level matrix distribution: DIST  REPL
 1                           ! Coarsest-level fillin P for ILU(P) and ILU(T,P)
 1.d-4                       ! Coarsest-level threshold T for ILU(T,P) 
 1                           ! Number of sweeps for JACOBI/GS/BJAC coarsest-level solver
+%%%%%%%%%% Krylov coarse solver options %%%%%%%%%%
+GMRES                       ! Krylov method for coarsest level
+BJAC                        ! Preconditioner for coarsest level
+ILU                         ! Subsolver for coarsest level
+FALSE                       ! Is the solver global (TRUE) or local (FALSE)?
+1.d-4                       ! Tolerance
+-1                          ! Restart for Krylov method 
+2                           ! Stopping criterion
+30                          ! Maximum number of iterations
+-1                          ! Trace of the lower Krylov iterations
+0                           ! Fill-in for incomplete LU factorization

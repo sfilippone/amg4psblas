@@ -93,7 +93,7 @@ contains
        & a1,a2,a3,b1,b2,b3,c,g,info,f,amold,vmold,partition, nrl,iv)
     use psb_base_mod
     use psb_util_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     use omp_lib
 #endif
     !
@@ -227,6 +227,7 @@ contains
       ! contiguous rows
       !
       call psb_cdall(ctxt,desc_a,info,nl=nr)
+      if (info /=0) goto 9999
       myidx = desc_a%get_global_indices()
       nlr = size(myidx)
 
@@ -254,6 +255,7 @@ contains
       ! process that owns it
       !
       call psb_cdall(ctxt,desc_a,info,vg=iv)
+      if (info /=0) goto 9999
       myidx = desc_a%get_global_indices()
       nlr = size(myidx)
 
@@ -262,7 +264,7 @@ contains
 
       ! A nifty MPI function will split the process list
       npdims = 0
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
       npdims = 1
 #else 
       call mpi_dims_create(np,3,npdims,info)
@@ -308,6 +310,7 @@ contains
       ! the set of global indices it owns.
       !
       call psb_cdall(ctxt,desc_a,info,vl=myidx)
+      if (info /=0) goto 9999
 
       !
       ! Specify process topology
@@ -371,7 +374,8 @@ contains
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
-    !$omp parallel shared(deltah,myidx,a,desc_a)
+    ! Disable OMP here for the time being 
+    ! $ o m p parallel shared(deltah,myidx,a,desc_a)
     !
     block 
       integer(psb_ipk_) :: i,j,k,ii,ib,icoeff, ix,iy,iz, ith,nth
@@ -379,7 +383,7 @@ contains
       integer(psb_lpk_), allocatable :: irow(:),icol(:)
       real(psb_spk_), allocatable :: val(:)
       real(psb_spk_)     :: x,y,z, zt(nb)
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       nth = omp_get_num_threads()
       ith = omp_get_thread_num()
 #else
@@ -394,7 +398,7 @@ contains
         !goto 9999
       endif
 
-      !$omp  do schedule(dynamic)
+      ! $ o m p  do schedule(dynamic)
       !     
       do ii=1, nlr, nb
         if (info /= psb_success_) cycle
@@ -486,11 +490,11 @@ contains
         call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
         if(info /= psb_success_) cycle
       end do
-      !$omp end do
+      ! $ o m p end do
 
       deallocate(val,irow,icol)
     end block
-    !$omp end parallel
+    ! $ o m p end parallel
 
     tgen = psb_wtime()-t1
     if(info /= psb_success_) then
@@ -566,7 +570,7 @@ contains
        & a1,a2,b1,b2,c,g,info,f,amold,vmold,partition, nrl,iv)
     use psb_base_mod
     use psb_util_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
     use omp_lib
 #endif
     !
@@ -690,6 +694,7 @@ contains
       ! contiguous rows
       !
       call psb_cdall(ctxt,desc_a,info,nl=nr)
+      if (info /=0) goto 9999
       myidx = desc_a%get_global_indices()
       nlr = size(myidx)
 
@@ -717,6 +722,7 @@ contains
       ! process that owns it
       !
       call psb_cdall(ctxt,desc_a,info,vg=iv)
+      if (info /=0) goto 9999
       myidx = desc_a%get_global_indices()
       nlr = size(myidx)
 
@@ -725,7 +731,7 @@ contains
 
       ! A nifty MPI function will split the process list
       npdims = 0
-#if defined(SERIAL_MPI)
+#if defined(PSB_SERIAL_MPI)
       npdims = 1
 #else 
       call mpi_dims_create(np,2,npdims,info)
@@ -766,6 +772,7 @@ contains
       ! the set of global indices it owns.
       !
       call psb_cdall(ctxt,desc_a,info,vl=myidx)
+      if (info /=0) goto 9999
 
       !
       ! Specify process topology
@@ -828,7 +835,8 @@ contains
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
-    !$omp parallel shared(deltah,myidx,a,desc_a)
+    ! Disable OMP here for the time being
+    ! $ o m p parallel shared(deltah,myidx,a,desc_a)
     !
     block 
       integer(psb_ipk_) :: i,j,k,ii,ib,icoeff, ix,iy,iz, ith,nth
@@ -836,7 +844,7 @@ contains
       integer(psb_lpk_), allocatable :: irow(:),icol(:)
       real(psb_spk_), allocatable :: val(:)
       real(psb_spk_)     :: x,y,z, zt(nb)
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
       nth = omp_get_num_threads()
       ith = omp_get_thread_num()
 #else
@@ -853,7 +861,7 @@ contains
 
       ! loop over rows belonging to current process in a block
       ! distribution.
-      !$omp  do schedule(dynamic)
+      ! $ o m p  do schedule(dynamic)
       !     
       do ii=1, nlr,nb
         ib = min(nb,nlr-ii+1)
@@ -924,11 +932,11 @@ contains
         call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
         if(info /= psb_success_) cycle
       end do
-      !$omp end do
+      ! $ o m p end do
 
       deallocate(val,irow,icol)
     end block
-    !$omp end parallel
+    ! $ o m p end parallel
 
     tgen = psb_wtime()-t1
     if(info /= psb_success_) then

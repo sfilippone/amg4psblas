@@ -74,7 +74,7 @@ program amg_d_pde2d
   use amg_d_pde2d_box_mod
   use amg_d_pde2d_gauss_mod
   use amg_d_genpde_mod
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   use omp_lib
 #endif
   implicit none
@@ -87,7 +87,7 @@ program amg_d_pde2d
   integer(psb_epk_) :: system_size
 
   ! miscellaneous
-  real(psb_dpk_) :: t1, t2, tprec, thier, tslv
+  real(psb_dpk_) :: t1, t2, tprec, thier, tslv, tsmth, tpgen
 
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a
@@ -102,7 +102,7 @@ program amg_d_pde2d
 
   ! solver parameters
   integer(psb_ipk_)        :: iter, itmax,itrace, istopc, irst, nlv
-  integer(psb_epk_) :: amatsize, precsize, descsize
+  integer(psb_epk_) :: amatsize, precsize, descsize, vecsize
   real(psb_dpk_)   :: err, resmx, resmxp
 
   !  Solver data
@@ -188,6 +188,17 @@ program amg_d_pde2d
     integer(psb_ipk_)  :: cfill        ! fill-in for incomplete LU factorization
     real(psb_dpk_)     :: cthres        ! threshold for ILUT factorization
     integer(psb_ipk_)  :: cjswp        ! sweeps for GS or JAC coarsest-lev subsolver
+    ! settings for the Krylov method
+    character(len=16)  :: krm_method  ! Krylov method for coarsest level
+    character(len=16)  :: krm_prec    ! Preconditioner for coarsest level
+    character(len=16)  :: krm_subsolve ! Subsolver for coarsest level
+    character(len=16)  :: krm_global  ! Is the solver global or local? TRUE or FALSE
+    real(psb_dpk_)      :: krm_eps     ! Stopping tolerance
+    integer(psb_ipk_)  :: krm_irst    ! Restart for Krylov method 
+    integer(psb_ipk_)  :: krm_istop   ! Stopping criterion
+    integer(psb_ipk_)  :: krm_itmax   ! Maximum number of iterations
+    integer(psb_ipk_)  :: krm_itrace  ! Trace of the lower Krylov iterations
+    integer(psb_ipk_)  :: krm_fillin  ! Fill-in for incomplete LU factorization
 
     ! Dump data
     logical            :: dump = .false.
@@ -212,7 +223,7 @@ program amg_d_pde2d
 
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
-#if defined(OPENMP)
+#if defined(PSB_OPENMP)
   !$OMP parallel shared(nth)
   !$OMP master
   nth = omp_get_num_threads()
@@ -272,7 +283,7 @@ program amg_d_pde2d
     goto 9999
   end select
   call psb_barrier(ctxt)
-  t2 = psb_wtime() - t1
+  tpgen = psb_wtime() - t1
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
     ch_err='amg_gen_pde2d'
@@ -283,7 +294,7 @@ program amg_d_pde2d
   if (iam == psb_root_) &
        & write(psb_out_unit,'("PDE Coefficients             : ",a)')pdecoeff
   if (iam == psb_root_) &
-       & write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
+       & write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')tpgen
   if (iam == psb_root_) &
        & write(psb_out_unit,'(" ")')
   !
@@ -424,13 +435,26 @@ program amg_d_pde2d
     end if
 
     call prec%set('coarse_solve',    p_choice%csolve,    info)
-    if (psb_toupper(p_choice%csolve) == 'BJAC') &
-         &  call prec%set('coarse_subsolve', p_choice%csbsolve,  info)
     call prec%set('coarse_mat',      p_choice%cmat,      info)
-    call prec%set('coarse_fillin',   p_choice%cfill,     info)
-    call prec%set('coarse_iluthrs',  p_choice%cthres,    info)
-    call prec%set('coarse_sweeps',   p_choice%cjswp,     info)
-
+     ! Set for the case of a KRM solver
+    if (psb_toupper(p_choice%csolve) == 'KRM') then
+      call prec%set('krm_method', p_choice%krm_method, info)
+      call prec%set('krm_kprec', p_choice%krm_prec,   info)
+      call prec%set('krm_sub_solve', p_choice%krm_subsolve, info)
+      call prec%set('krm_global', p_choice%krm_global, info)
+      call prec%set('krm_eps',   p_choice%krm_eps,   info)
+      call prec%set('krm_irst',   p_choice%krm_irst,   info)
+      call prec%set('krm_istopc',  p_choice%krm_istop,  info)
+      call prec%set('krm_itmax',  p_choice%krm_itmax,  info)
+      call prec%set('krm_itrace', p_choice%krm_itrace, info)
+      call prec%set('krm_fillin', p_choice%krm_fillin, info)
+    else
+      if (psb_toupper(p_choice%csolve) == 'BJAC') &
+        &  call prec%set('coarse_subsolve', p_choice%csbsolve,  info)
+      call prec%set('coarse_fillin',   p_choice%cfill,     info)
+      call prec%set('coarse_iluthrs',  p_choice%cthres,    info)
+      call prec%set('coarse_sweeps',   p_choice%cjswp,     info)
+    end if
   end select
 
   ! build the preconditioner
@@ -445,7 +469,7 @@ program amg_d_pde2d
   call psb_barrier(ctxt)
   t1 = psb_wtime()
   call prec%smoothers_build(a,desc_a,info)
-  tprec = psb_wtime()-t1
+  tsmth = psb_wtime()-t1
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_smoothers_bld')
     goto 9999
@@ -513,10 +537,12 @@ program amg_d_pde2d
   resmx  = psb_genrm2(r,desc_a,info)
   resmxp = psb_geamax(r,desc_a,info)
 
+  vecsize = x%sizeof()
   amatsize = a%sizeof()
   descsize = desc_a%sizeof()
   precsize = prec%sizeof()
   system_size = desc_a%get_global_rows()
+  call psb_sum(ctxt,vecsize)
   call psb_sum(ctxt,amatsize)
   call psb_sum(ctxt,descsize)
   call psb_sum(ctxt,precsize)
@@ -525,24 +551,29 @@ program amg_d_pde2d
     write(psb_out_unit,'("Computed solution on ",i8," process(es)")')  np
     write(psb_out_unit,'("Number of threads                  : ",i12)') nth
     write(psb_out_unit,'("Total number of tasks              : ",i12)') nth*np
+    write(psb_out_unit,'("Discretization domain size         : ",i12)') idim
     write(psb_out_unit,'("Linear system size                 : ",i12)') system_size
     write(psb_out_unit,'("PDE Coefficients                   : ",a)') trim(pdecoeff)
+    write(psb_out_unit,'("Problem setup time                 : ",es12.5)') tpgen
     write(psb_out_unit,'("Krylov method                      : ",a)') trim(s_choice%kmethd)
     write(psb_out_unit,'("Preconditioner                     : ",a)') trim(p_choice%descr)
     write(psb_out_unit,'("Iterations to convergence          : ",i12)')    iter
     write(psb_out_unit,'("Relative error estimate on exit    : ",es12.5)') err
     write(psb_out_unit,'("Number of levels in hierarchy      : ",i12)')    prec%get_nlevs()
     write(psb_out_unit,'("Time to build hierarchy            : ",es12.5)') thier
-    write(psb_out_unit,'("Time to build smoothers            : ",es12.5)') tprec
-    write(psb_out_unit,'("Total time for preconditioner      : ",es12.5)') tprec+thier
+    write(psb_out_unit,'("Time to build smoothers            : ",es12.5)') tsmth
+    write(psb_out_unit,'("Total preconditioner setup time    : ",es12.5)') tsmth+thier
     write(psb_out_unit,'("Time to solve system               : ",es12.5)') tslv
     write(psb_out_unit,'("Time per iteration                 : ",es12.5)') tslv/iter
     write(psb_out_unit,'("Total time                         : ",es12.5)') tslv+tprec+thier
     write(psb_out_unit,'("Residual 2-norm                    : ",es12.5)') resmx
     write(psb_out_unit,'("Residual inf-norm                  : ",es12.5)') resmxp
+    write(psb_out_unit,'("Total memory occupation for X      : ",i12)') vecsize
     write(psb_out_unit,'("Total memory occupation for A      : ",i12)') amatsize
     write(psb_out_unit,'("Total memory occupation for DESC_A : ",i12)') descsize
     write(psb_out_unit,'("Total memory occupation for PREC   : ",i12)') precsize
+    write(psb_out_unit,'("Total memory occupation            : ",i12)') &
+         & amatsize + descsize+precsize+2*vecsize    
     write(psb_out_unit,'("Storage format for A               : ",a  )') a%get_fmt()
     write(psb_out_unit,'("Storage format for DESC_A          : ",a  )') desc_a%get_fmt()
 
@@ -681,6 +712,17 @@ contains
       call read_data(prec%cfill,inp_unit)       ! fill-in for incompl LU
       call read_data(prec%cthres,inp_unit)      ! Threshold for ILUT
       call read_data(prec%cjswp,inp_unit)       ! sweeps for GS/JAC subsolver
+      ! Krylov method for coarsest level
+      call read_data(prec%krm_method,inp_unit)  ! Krylov method for coarsest level
+      call read_data(prec%krm_prec,inp_unit)    ! Preconditioner for coarsest level
+      call read_data(prec%krm_subsolve,inp_unit) ! Subsolver for coarsest level
+      call read_data(prec%krm_global,inp_unit)  ! Is the solver global or local? TRUE or FALSE
+      call read_data(prec%krm_eps,inp_unit)     ! Stopping tolerance
+      call read_data(prec%krm_irst,inp_unit)    ! Restart for Krylov method
+      call read_data(prec%krm_istop,inp_unit)   ! Stopping criterion
+      call read_data(prec%krm_itmax,inp_unit)   ! Maximum number of iterations
+      call read_data(prec%krm_itrace,inp_unit)  ! Trace of the lower Krylov iterations
+      call read_data(prec%krm_fillin,inp_unit)  ! Fill-in for incomplete LU factorization
       ! dump 
       call read_data(prec%dump,inp_unit)       ! Dump on file?
       call read_data(prec%dlmin,inp_unit)      ! Minimum level to dump
@@ -770,6 +812,17 @@ contains
     call psb_bcast(ctxt,prec%cfill)
     call psb_bcast(ctxt,prec%cthres)
     call psb_bcast(ctxt,prec%cjswp)
+    ! Krylov method for coarsest level (broadcast)
+    call psb_bcast(ctxt,prec%krm_method)
+    call psb_bcast(ctxt,prec%krm_prec)
+    call psb_bcast(ctxt,prec%krm_subsolve)
+    call psb_bcast(ctxt,prec%krm_global)
+    call psb_bcast(ctxt,prec%krm_eps)
+    call psb_bcast(ctxt,prec%krm_irst)
+    call psb_bcast(ctxt,prec%krm_istop)
+    call psb_bcast(ctxt,prec%krm_itmax)
+    call psb_bcast(ctxt,prec%krm_itrace)
+    call psb_bcast(ctxt,prec%krm_fillin)
     ! dump
     call psb_bcast(ctxt,prec%dump)
     call psb_bcast(ctxt,prec%dlmin)

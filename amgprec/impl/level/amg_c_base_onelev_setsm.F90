@@ -84,11 +84,7 @@ subroutine amg_c_base_onelev_setsm(lev,val,info,pos)
       end if
     endif
     if (.not.allocated(lev%sm)) then
-#ifdef HAVE_MOLD 
       allocate(lev%sm,mold=val) 
-#else
-      allocate(lev%sm,source=val) 
-#endif
     end if
     call lev%sm%default()        
     if (ipos_ ==  amg_smooth_both_) lev%sm2 => lev%sm
@@ -100,11 +96,7 @@ subroutine amg_c_base_onelev_setsm(lev,val,info,pos)
       endif
     end if
     if (.not.allocated(lev%sm2a)) then
-#ifdef HAVE_MOLD 
       allocate(lev%sm2a,mold=val) 
-#else
-      allocate(lev%sm2a,source=val) 
-#endif
     end if
     call lev%sm2a%default()
     lev%sm2 => lev%sm2a

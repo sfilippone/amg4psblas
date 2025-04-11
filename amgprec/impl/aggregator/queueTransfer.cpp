@@ -1,3 +1,5 @@
+#include "amg_config.h"
+#if !defined(PSB_SERIAL_MPI)
 #include "MatchBoxPC.h"
 void queuesTransfer(vector<MilanLongInt> &U,
                     vector<MilanLongInt> &privateU,
@@ -31,3 +33,4 @@ void queuesTransfer(vector<MilanLongInt> &U,
 
 }
 
+#endif

@@ -40,8 +40,8 @@
 ! Subroutine: amg_c_extprol_bld
 ! Version:    real
 !
-!  This routine builds the preconditioner according to the requirements made by
-!  the user trough the subroutines amg_precinit and amg_precset.
+!  Builds an AMG hierarchy according to a set of prolongators/restrictors      
+!  provided by the user.
 !  
 !  A multilevel preconditioner is regarded as an array of 'one-level' data structures,
 !  each containing the part of the preconditioner associated to a certain level,
@@ -127,9 +127,9 @@ subroutine amg_c_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & 'Entering '
-#if defined(LPK8)
+#if defined(PSB_LPK8)
   info=psb_err_internal_error_
-  call psb_errpush(info,name,a_err='Need fix for LPK8')
+  call psb_errpush(info,name,a_err='Need fix for PSB_LPK8')
   goto 9999
 #else
   
@@ -373,9 +373,9 @@ contains
     info = psb_success_
     ctxt = desc_a%get_context()
     call psb_info(ctxt,me,np)
-#if defined(LPK8)
+#if defined(PSB_LPK8)
     info=psb_err_internal_error_
-    call psb_errpush(info,name,a_err='Need fix for LPK8')
+    call psb_errpush(info,name,a_err='Need fix for PSB_LPK8')
     goto 9999
 #else
     allocate(nlaggr(np),ilaggr(1))

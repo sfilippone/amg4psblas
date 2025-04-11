@@ -62,9 +62,6 @@ module amg_z_ainv_solver
     procedure, pass(sv) :: cseti   => amg_z_ainv_solver_cseti
     procedure, pass(sv) :: csetc   => amg_z_ainv_solver_csetc
     procedure, pass(sv) :: csetr   => amg_z_ainv_solver_csetr
-!!$    procedure, pass(sv) :: seti    => amg_z_ainv_solver_seti
-!!$    procedure, pass(sv) :: setc    => amg_z_ainv_solver_setc
-!!$    procedure, pass(sv) :: setr    => amg_z_ainv_solver_setr
     procedure, pass(sv) :: descr   => amg_z_ainv_solver_descr
     procedure, pass(sv) :: default => z_ainv_solver_default
     procedure, nopass   :: stringval  => z_ainv_stringval

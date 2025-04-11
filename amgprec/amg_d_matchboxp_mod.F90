@@ -73,6 +73,22 @@ module amg_d_matchboxp_mod
   use iso_c_binding
   use psb_base_cbind_mod
 
+#if defined(PSB_SERIAL_MPI)
+  interface MatchingC
+    subroutine dMatchingC(nlver,nledge,verlocptr,verlocind,edgelocweight,&
+         & verdistance, mate) bind(c,name='dMatching')
+      use iso_c_binding
+      import :: psb_c_ipk_, psb_c_lpk_
+      implicit none
+
+      integer(psb_c_lpk_), value :: nlver,nledge
+      integer(psb_c_lpk_) :: verlocptr(*),verlocind(*), verdistance(*)
+      integer(psb_c_lpk_) :: mate(*)
+      real(c_double) :: edgelocweight(*)
+    end subroutine dMatchingC
+  end interface MatchingC
+
+#else
   interface MatchBoxPC
     subroutine dMatchBoxPC(nlver,nledge,verlocptr,verlocind,edgelocweight,&
          & verdistance, mate, myrank, numprocs, icomm,&
@@ -93,7 +109,7 @@ module amg_d_matchboxp_mod
       real(c_double)     :: msgpercent(*)
     end subroutine dMatchBoxPC
   end interface MatchBoxPC
-
+#endif
   interface amg_i_aggr_assign
     module procedure amg_i_d_aggr_assign
   end interface amg_i_aggr_assign
@@ -145,7 +161,7 @@ contains
     logical, parameter  :: dump=.false., debug=.false., dump_mate=.false., &
          & debug_ilaggr=.false., debug_sync=.false., debug_mate=.false.
     integer(psb_ipk_), save :: idx_bldmtc=-1, idx_phase1=-1, idx_phase2=-1, idx_phase3=-1
-    logical, parameter :: do_timings=.true.
+    logical, parameter :: do_timings=.false.
     integer, parameter :: ilaggr_neginit=-1, ilaggr_nonlocal=-2
 
     ictxt = desc_a%get_ctxt()
@@ -608,7 +624,7 @@ contains
     logical, parameter :: old_style=.false., sort_minp=.true.
     character(len=40) :: name='build_matching', fname
     integer(psb_ipk_), save :: idx_cmboxp=-1, idx_bldahat=-1, idx_phase2=-1, idx_phase3=-1
-    logical, parameter :: do_timings=.true.
+    logical, parameter :: do_timings=.false.
 
     ictxt = desc_a%get_ctxt()
     call psb_info(ictxt,iam,np)
@@ -810,7 +826,7 @@ contains
     character(len=80) :: aname
     real(psb_dpk_), parameter :: eps=epsilon(1.d0)
     integer(psb_ipk_), save   :: idx_glbt=-1, idx_phase1=-1, idx_phase2=-1
-    logical, parameter :: do_timings=.true.
+    logical, parameter :: do_timings=.false.
     logical, parameter :: debug_symmetry = .false., check_size=.false.
     logical, parameter :: unroll_logtrans=.false.
 
@@ -1129,11 +1145,15 @@ contains
       call psb_barrier(ictxt)
       if (me == 0) write(0,*)' Calling MatchBoxP '
     end if
-
+#if defined(PSB_SERIAL_MPI)
+    call MatchingC(nlver,nledge,verlocptr,verlocind,edgelocweight,&
+         & verdistance, mate)
+#else
     call MatchBoxPC(nlver,nledge,verlocptr,verlocind,edgelocweight,&
          & verdistance, mate, mrank, mnp, icomm,&
          & msgindsent,msgactualsent,msgpercent,&
          & ph0_time, ph1_time, ph2_time, ph1_card, ph2_card)
+#endif
     verlocptr(:)   = verlocptr(:)  + 1
     verlocind(:)   = verlocind(:) + 1
     verdistance(:) = verdistance(:) + 1

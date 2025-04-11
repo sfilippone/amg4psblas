@@ -47,11 +47,7 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
   use psb_base_mod
   use amg_base_prec_type
   use amg_s_inner_mod
-#if defined(SERIAL_MPI)
-  use amg_s_parmatch_aggregator_mod
-#else
   use amg_s_parmatch_aggregator_mod, amg_protect_name => amg_s_parmatch_aggregator_build_tprol
-#endif
   use iso_c_binding
   implicit none
   class(amg_s_parmatch_aggregator_type), target, intent(inout) :: ag
@@ -88,7 +84,7 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
   type(psb_lsspmat_type)              :: tmp_prol, tmp_pg, tmp_restr
   type(psb_desc_type)                 :: tmp_desc_ac, tmp_desc_ax, tmp_desc_p
   integer(psb_ipk_), save             :: idx_mboxp=-1, idx_spmmbld=-1, idx_sweeps_mult=-1
-  logical, parameter :: dump=.false., do_timings=.true., debug=.false., &
+  logical, parameter :: dump=.false., do_timings=.false., debug=.false., &
        & dump_prol_restr=.false.
 
   name='s_parmatch_tprol'
@@ -119,8 +115,6 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
   call amg_check_def(parms%aggr_ord,'Ordering',&
        &   amg_aggr_ord_nat_,is_legal_ml_aggr_ord)
   call amg_check_def(parms%aggr_thresh,'Aggr_Thresh',szero,is_legal_s_aggr_thrs)
-
-#if !defined(SERIAL_MPI)
 
   match_algorithm = ag%matching_alg
   n_sweeps        = ag%n_sweeps
@@ -466,7 +460,7 @@ subroutine  amg_s_parmatch_aggregator_build_tprol(ag,parms,ag_data,&
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_bootCMatch_if')
     goto 9999
   end if
-#endif
+
   call psb_erractionrestore(err_act)
   return
 

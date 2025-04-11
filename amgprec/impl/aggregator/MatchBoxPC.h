@@ -59,7 +59,10 @@
 #include <assert.h>
 #include <map>
 #include <vector>
-#ifdef OPENMP
+#include "amg_config.h"
+#if !defined(PSB_SERIAL_MPI)
+
+#ifdef PSB_OPENMP
 // OpenMP is included and used if and only if the OpenMP version of the matching
 // is required
 #include "omp.h"
@@ -82,7 +85,6 @@ const int BundleTag = 9;  // Predefined tag
 
 static vector<MilanLongInt> DEFAULT_VECTOR;
 
-#if !defined(SERIAL_MPI)
 
 // MPI type map
 template <typename T>
@@ -95,14 +97,12 @@ template <>
 inline MPI_Datatype TypeMap<double>() { return MPI_DOUBLE; }
 template <>
 inline MPI_Datatype TypeMap<float>() { return MPI_FLOAT; }
-#endif
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#if !defined(SERIAL_MPI)
 
 #define MilanMpiLongInt MPI_LONG_LONG
 
@@ -117,7 +117,7 @@ extern "C"
 // Regular long integer:
 #ifndef LONG_INT_H
 #define LONG_INT_H
-#ifdef BIT64
+#ifdef AMG_MATCHBOXP_BIT64
     typedef int64_t MilanLongInt;
     typedef MPI_LONG MilanMpiLongInt;
 #else
@@ -163,7 +163,7 @@ extern "C"
 #define MilanIntMax INT32_MAX
 #define MilanIntMin INT32_MIN
 
-#ifdef BIT64
+#ifdef AMG_MATCHBOXP_BIT64
 #define MilanLongIntMax INT64_MAX
 #define MilanLongIntMin -INT64_MAX
 #else
@@ -630,8 +630,9 @@ is disabled there is no reason to actually compile or reference them. */
                      MilanReal *ph0_time, MilanReal *ph1_time, MilanReal *ph2_time,
                      MilanLongInt *ph1_card, MilanLongInt *ph2_card);
 
-#endif
+
 #ifdef __cplusplus
 }
+#endif
 #endif
 #endif

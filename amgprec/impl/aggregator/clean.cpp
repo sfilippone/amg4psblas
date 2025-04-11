@@ -1,6 +1,6 @@
 #include "MatchBoxPC.h"
 // TODO comment
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 
 void clean(MilanLongInt NLVer,
            MilanInt myRank,

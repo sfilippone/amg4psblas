@@ -1,4 +1,8 @@
+#include "amg_config.h"
 #include "MatchBoxPC.h"
+
+#if !defined(PSB_SERIAL_MPI)
+
 void extractUChunk(
     vector<MilanLongInt> &UChunkBeingProcessed,
     vector<MilanLongInt> &U,
@@ -28,3 +32,4 @@ void extractUChunk(
 
     } // End of critical U // End of critical U
 }
+#endif

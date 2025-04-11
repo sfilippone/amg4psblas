@@ -42,9 +42,7 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_s_base_aggregator_mod
   use amg_s_dec_aggregator_mod
   use amg_s_symdec_aggregator_mod
-#if !defined(SERIAL_MPI)
   use amg_s_parmatch_aggregator_mod
-#endif
   use amg_s_poly_smoother
   use amg_s_jac_smoother
   use amg_s_as_smoother
@@ -57,10 +55,10 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_s_ainv_solver
   use amg_s_invk_solver
   use amg_s_invt_solver
-#if defined(HAVE_SLU_)
+#if defined(AMG_HAVE_SLU)
   use amg_s_slu_solver
 #endif
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
   use amg_s_mumps_solver
 #endif
 
@@ -93,10 +91,10 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
   type(amg_s_invk_solver_type)     ::  amg_s_invk_solver_mold
   type(amg_s_invt_solver_type)     ::  amg_s_invt_solver_mold
   type(amg_s_poly_smoother_type)   ::  amg_s_poly_smoother_mold
-#if defined(HAVE_SLU_)
+#if defined(AMG_HAVE_SLU)
   type(amg_s_slu_solver_type)   ::  amg_s_slu_solver_mold
 #endif
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
   type(amg_s_mumps_solver_type) ::  amg_s_mumps_solver_mold
 #endif
 
@@ -224,11 +222,11 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
           if (allocated(lv%sm2a)) call lv%sm2a%sv%set('SUB_SOLVE',val,info)
         end if
       end if
-#ifdef HAVE_SLU_
+#ifdef AMG_HAVE_SLU
     case ('SLU')
       call lv%set(amg_s_slu_solver_mold,info,pos=pos)
 #endif
-#ifdef HAVE_MUMPS_
+#ifdef AMG_HAVE_MUMPS 
     case ('MUMPS')
       call lv%set(amg_s_mumps_solver_mold,info,pos=pos)
 #endif
@@ -260,17 +258,11 @@ subroutine amg_s_base_onelev_csetc(lv,what,val,info,pos,idx)
       allocate(amg_s_dec_aggregator_type :: lv%aggr, stat=info)
     case('SYMDEC')
       allocate(amg_s_symdec_aggregator_type :: lv%aggr, stat=info)
-#if !defined(SERIAL_MPI)
     case('COUP','COUPLED')
       allocate(amg_s_parmatch_aggregator_type :: lv%aggr, stat=info)
-#endif
   case default
       info =  psb_err_internal_error_
-#if !defined(SERIAL_MPI)
       call psb_errpush(info,name,a_err='Unsupported PAR_AGGR_ALG')
-#else
-      call psb_errpush(info,name,a_err='PAR_AGGR_ALG unsupported (SERIAL_MPI on)')
-#endif
       goto 9999
     end select
     if (info == psb_success_) call lv%aggr%default()

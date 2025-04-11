@@ -51,7 +51,7 @@ module amg_c_slu_solver
   use iso_c_binding
   use amg_c_base_solver_mod
 
-#if defined(IPK8)
+#if defined(PSB_IPK8)
 
   type, extends(amg_c_base_solver_type) :: amg_c_slu_solver_type
 

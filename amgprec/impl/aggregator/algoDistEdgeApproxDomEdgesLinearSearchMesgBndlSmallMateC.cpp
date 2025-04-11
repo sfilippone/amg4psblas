@@ -70,7 +70,7 @@
  Statistics: ph1_card, ph2_card : Size: |P| number of processes in the comm-world (number of matched edges in Phase 1 and Phase 2)
  */
 
-#ifdef SERIAL_MPI
+#ifdef PSB_SERIAL_MPI
 #else
 
 // DOUBLE PRECISION VERSION
@@ -86,7 +86,7 @@ void dalgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
 							      MilanReal* msgPercent,
                                                               MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
                                                               MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")Within algoEdgeApproxDominatingEdgesLinearSearchMessageBundling()"; fflush(stdout);
 #endif
@@ -1313,7 +1313,7 @@ void salgoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC(
       MilanReal* msgPercent,
       MilanReal* ph0_time, MilanReal* ph1_time, MilanReal* ph2_time,
       MilanLongInt* ph1_card, MilanLongInt* ph2_card ) {
-#if !defined(SERIAL_MPI)
+#if !defined(PSB_SERIAL_MPI)
 #ifdef PRINT_DEBUG_INFO_
     cout<<"\n("<<myRank<<")Within algoEdgeApproxDominatingEdgesLinearSearchMessageBundling()"; fflush(stdout);
 #endif

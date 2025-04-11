@@ -53,16 +53,16 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
   use amg_z_ainv_solver
   use amg_z_invk_solver
   use amg_z_invt_solver
-#if defined(HAVE_UMF_)
+#if defined(AMG_HAVE_UMF)
   use amg_z_umf_solver
 #endif
-#if defined(HAVE_SLUDIST_)
+#if defined(AMG_HAVE_SLUDIST)
   use amg_z_sludist_solver
 #endif
-#if defined(HAVE_SLU_)
+#if defined(AMG_HAVE_SLU)
   use amg_z_slu_solver
 #endif
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
   use amg_z_mumps_solver
 #endif
 
@@ -94,16 +94,16 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
   type(amg_z_ainv_solver_type)     ::  amg_z_ainv_solver_mold
   type(amg_z_invk_solver_type)     ::  amg_z_invk_solver_mold
   type(amg_z_invt_solver_type)     ::  amg_z_invt_solver_mold
-#if defined(HAVE_UMF_)
+#if defined(AMG_HAVE_UMF)
   type(amg_z_umf_solver_type)     ::  amg_z_umf_solver_mold
 #endif
-#if defined(HAVE_SLUDIST_)
+#if defined(AMG_HAVE_SLUDIST)
   type(amg_z_sludist_solver_type) ::  amg_z_sludist_solver_mold
 #endif
-#if defined(HAVE_SLU_)
+#if defined(AMG_HAVE_SLU)
   type(amg_z_slu_solver_type)   ::  amg_z_slu_solver_mold
 #endif
-#if defined(HAVE_MUMPS_)
+#if defined(AMG_HAVE_MUMPS)
   type(amg_z_mumps_solver_type) ::  amg_z_mumps_solver_mold
 #endif
 
@@ -228,19 +228,19 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
           if (allocated(lv%sm2a)) call lv%sm2a%sv%set('SUB_SOLVE',val,info)
         end if
       end if
-#ifdef HAVE_SLU_
+#ifdef AMG_HAVE_SLU
     case ('SLU')
       call lv%set(amg_z_slu_solver_mold,info,pos=pos)
 #endif
-#ifdef HAVE_MUMPS_
+#ifdef AMG_HAVE_MUMPS 
     case ('MUMPS')
       call lv%set(amg_z_mumps_solver_mold,info,pos=pos)
 #endif
-#ifdef HAVE_SLUDIST_
+#ifdef AMG_HAVE_SLUDIST
     case ('SLUDIST')
       call lv%set(amg_z_sludist_solver_mold,info,pos=pos)
 #endif
-#ifdef HAVE_UMF_
+#ifdef AMG_HAVE_UMF
     case ('UMF')
       call lv%set(amg_z_umf_solver_mold,info,pos=pos)
 #endif
@@ -272,15 +272,9 @@ subroutine amg_z_base_onelev_csetc(lv,what,val,info,pos,idx)
       allocate(amg_z_dec_aggregator_type :: lv%aggr, stat=info)
     case('SYMDEC')
       allocate(amg_z_symdec_aggregator_type :: lv%aggr, stat=info)
-#if !defined(SERIAL_MPI)
-#endif
   case default
       info =  psb_err_internal_error_
-#if !defined(SERIAL_MPI)
       call psb_errpush(info,name,a_err='Unsupported PAR_AGGR_ALG')
-#else
-      call psb_errpush(info,name,a_err='PAR_AGGR_ALG unsupported (SERIAL_MPI on)')
-#endif
       goto 9999
     end select
     if (info == psb_success_) call lv%aggr%default()

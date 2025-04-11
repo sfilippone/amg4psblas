@@ -87,8 +87,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * October 15, 2003
  *
  */
-
-#ifdef Have_SLU_
+#include "amg_config.h"
+#ifdef AMG_HAVE_SLU
 #include "slu_ddefs.h"
 
 #define HANDLE_SIZE  8
@@ -122,7 +122,7 @@ int amg_dslu_fact(int n, int nnz, double *values,
  *
  */
  
-#ifdef Have_SLU_
+#ifdef AMG_HAVE_SLU
     SuperMatrix A, AC;
     SuperMatrix *L, *U;
     int *perm_r; /* row permutations from partial pivoting */
@@ -171,10 +171,10 @@ int amg_dslu_fact(int n, int nnz, double *values,
     
     panel_size = sp_ienv(1);
     relax = sp_ienv(2);
-#if defined(SLU_VERSION_5)
+#if defined(AMG_SLU_VERSION_5)
     dgstrf(&options, &AC, relax, panel_size, etree,
 	   NULL, 0, perm_c, perm_r, L, U, &Glu, &stat, &info);
-#elif defined(SLU_VERSION_4)
+#elif defined(AMG_SLU_VERSION_4)
     dgstrf(&options, &AC, relax, panel_size, etree,
 	   NULL, 0, perm_c, perm_r, L, U, &stat, &info);
 #else
@@ -231,7 +231,7 @@ int amg_dslu_solve(int itrans, int n, int nrhs, double *b, int ldb,
    *
    */
   int info;
-#ifdef Have_SLU_ 
+#ifdef AMG_HAVE_SLU 
   SuperMatrix B;
   SuperMatrix *L, *U;
   int *perm_r; /* row permutations from partial pivoting */
@@ -285,7 +285,7 @@ int amg_dslu_free(void *f_factors)
    *      free all storage in the end
    *
    */
-#ifdef Have_SLU_ 
+#ifdef AMG_HAVE_SLU 
   factors_t *LUfactors; 
   
   /* Free the LU factors in the factors handle */

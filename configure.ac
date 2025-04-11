@@ -34,11 +34,11 @@ dnl NOTE : odd configurations like ifc + gcc still await in the mist of the unkn
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([AMG4PSBLAS],1.1.0, [https://github.com/sfilippone/amg4psblas/issues])
+AC_INIT([AMG4PSBLAS],1.2.0, [https://github.com/sfilippone/amg4psblas/issues])
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-amg4psblas_cv_version="1.1.0"
+amg4psblas_cv_version="1.2.0"
 
 # A sample source file
 AC_CONFIG_SRCDIR([amgprec/amg_prec_type.f90])
@@ -66,7 +66,7 @@ PSBLAS_DIR="$pac_cv_psblas_dir";
 PSBLAS_INCDIR="$pac_cv_psblas_incdir";
 PSBLAS_MODDIR="$pac_cv_psblas_moddir";
 PSBLAS_LIBDIR="$pac_cv_psblas_libdir";
-AC_MSG_CHECKING([for PSBLAS install dir])
+AC_MSG_CHECKING([for PSBLAS install dir])	
 if test "X$PSBLAS_DIR" != "X" ; then 
    case $PSBLAS_DIR in 
    	  /*) ;; 
@@ -129,10 +129,10 @@ dnl We set our own FC flags, ignore those from AC_PROG_FC but not those from the
 dnl environment variable. Same for C
 dnl 
 save_FCFLAGS="$FCFLAGS";
-AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran])
+AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifx ifort ifc  nagfor gfortran])
 FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
-AC_PROG_CC([cc xlc pgcc icc gcc ])
+AC_PROG_CC([cc xlc pgcc icx icc gcc ])
 if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
    AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
 else
@@ -140,7 +140,7 @@ else
 fi	
 CFLAGS="$save_CFLAGS";
 save_CXXFLAGS="$CXXFLAGS";
-AC_PROG_CXX([CC xlc++  icpc g++])
+AC_PROG_CXX([CC xlc++ icpx icpc g++])
 CXXFLAGS="$save_CXXFLAGS";
 dnl AC_PROG_CXX
 
@@ -185,13 +185,13 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    MPIFC="$FC";
    MPICC="$CC";
    MPICXX="$CXX";	
-   CXXDEFINES="-DSERIAL_MPI $CXXDEFINES";
+   CXXDEFINES="$CXXDEFINES";
 
 else 
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPICC],[mpxlc mpiicc mpcc mpicc cc])
+    AC_CHECK_PROGS([MPICC],[mpxlc mpiicx mpiicc mpcc mpicc cc])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
 
@@ -200,14 +200,14 @@ AC_LANG([Fortran])
 
 if test "X$MPIFC" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90  mpiifort mpf95 mpf90 mpifort mpif95 mpif90 ftn ])
+    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpiifx mpiifort mpf95 mpf90 mpifort mpif95 mpif90 ftn ])
 fi
 
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
 AC_LANG([C++])
 if test "X$MPICXX" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpc  mpicxx])
+    AC_CHECK_PROGS([MPICXX],[mpxlc++ mpiicpx mpiicpc  mpicxx])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C++]])])
 AC_LANG([Fortran])
@@ -339,7 +339,7 @@ AC_LANG([C])
 AC_CHECK_SIZEOF(void *)
 # Define for platforms with 64 bit (void *     ) pointers
 if test X"$ac_cv_sizeof_void_p" == X"8" ; then
-  CDEFINES="-DPtr64Bits $CDEFINES"
+  CDEFINES="$CDEFINES"
 fi
 AC_LANG([Fortran])
 __AC_FC_NAME_MANGLING
@@ -392,7 +392,7 @@ else
    pac_f_c_names="-DUNKNOWN"   
 dnl   AC_MSG_NOTICE([Fortran name mangling unknown case])	
 fi
-CDEFINES="$pac_f_c_names $CDEFINES"
+CDEFINES="$CDEFINES"
 
 AC_MSG_RESULT([ $pac_f_c_names ])
 
@@ -553,20 +553,20 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
 else 
  PAC_FORTRAN_CHECK_HAVE_MPI_MOD_F08()
  if test x"$pac_cv_mpi_f08" == x"yes" ; then
-dnl    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD_F08 $FDEFINES";
-    FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+dnl    FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_MOD_F08 $FDEFINES";
+    FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES";
   else					     	     
     PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
- 	  [FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"],
-	  [FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"])	  
+ 	  [FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES"],
+	  [FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_H $FDEFINES"])	  
  fi
 fi
 
 FLINK="$MPIFC"
 PAC_ARG_OPENMP()
 if test x"$pac_cv_openmp" == x"yes" ; then
-   FDEFINES="$psblas_cv_define_prepend-DOPENMP $FDEFINES";
-   CDEFINES="-DOPENMP $CDEFINES";	
+   FDEFINES="$psblas_cv_define_prepend-DPSB_OPENMP $FDEFINES";
+   CDEFINES="$CDEFINES";	
    FCOPT="$FCOPT $pac_cv_openmp_fcopt";
    CCOPT="$CCOPT $pac_cv_openmp_ccopt";
    FLINK="$FLINK $pac_cv_openmp_fcopt";
@@ -595,7 +595,7 @@ fi
 PAC_FORTRAN_PSBLAS_INTEGER_SIZES()
 AC_MSG_NOTICE([PSBLAS size of LPK "$pac_cv_psblas_lpk".])
 if test x"$pac_cv_psblas_lpk" == x8"" ; then
-  CXXDEFINES="-DBIT64 $CXXDEFINES";
+   CXXMATCHBOXBIT="#define AMG_MATCHBOXP_BIT64"
 fi
 
 ###############################################################################
@@ -611,7 +611,7 @@ if test "X$RANLIB" == "X" ; then
 fi
 
 # This should be portable
-AR="${AR} -cur"
+AR="${AR} -cDr"
 
 
 ###############################################################################
@@ -626,11 +626,11 @@ AR="${AR} -cur"
 ###############################################################################
 # Custom test : do we have a module or include for MPI Fortran interface?
 if test x"$pac_cv_serial_mpi" == x"yes" ; then
-   FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+   FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES";
 else 
     PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
- 	  [FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"],
-	  [FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"])	  
+ 	  [FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_MOD $FDEFINES"],
+	  [FDEFINES="$psblas_cv_define_prepend-DPSB_MPI_H $FDEFINES"])	  
 fi
 
 #
@@ -692,24 +692,30 @@ PAC_FORTRAN_TEST_FINAL(
 
 PAC_FORTRAN_TEST_GENERICS( 
 	[],
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_BUGGY_GENERICS $FDEFINES"]
+	[FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_BUGGY_GENERICS $FDEFINES"]
 )
 
 PAC_FORTRAN_TEST_FLUSH( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FLUSH_STMT $FDEFINES"],
+	[FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_FLUSH_STMT $FDEFINES"],
 )
 
 
 PAC_FORTRAN_TEST_SAME_TYPE( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_SAME_TYPE_AS $FDEFINES"],
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for SAME_TYPE_AS. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
 )
 
 PAC_FORTRAN_TEST_EXTENDS_TYPE( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_EXTENDS_TYPE_OF $FDEFINES"],
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for EXTENDS_TYPE_OF. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
 )
 
 PAC_FORTRAN_TEST_MOLD( 
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_MOLD $FDEFINES"],
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for MOLD= allocation. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
 )
 
 ###############################################################################
@@ -725,7 +731,7 @@ PAC_FORTRAN_TEST_MOLD(
 AC_LANG([Fortran])
 PAC_BLAS([], [AC_MSG_ERROR([[Cannot find BLAS library, specify a path using --with-blas=DIR/LIB (for example --with-blas=/usr/path/lib/libcxml.a)]])])
 PAC_LAPACK(
-[FDEFINES="$psblas_cv_define_prepend-DHAVE_LAPACK $FDEFINES"],
+[FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_LAPACK $FDEFINES"],
 )
 AC_LANG([C])
 ###############################################################################
@@ -752,11 +758,16 @@ if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
       AC_MSG_NOTICE([PSBLAS defines PSB_LPK_ as $pac_cv_psblas_lpk. MUMPS interfacing will fail when called in global mode on very large matrices. ])
    fi	
    if test "x$pac_mumps_fmods_ok" == "xyes" ; then 
-      FDEFINES="$amg_cv_define_prepend-DHAVE_MUMPS_ $amg_cv_define_prepend-DHAVE_MUMPS_MODULES_ $MUMPS_MODULES $FDEFINES"
-       MUMPS_FLAGS="-DHave_MUMPS_ $MUMPS_MODULES"
+      FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_MUMPS $amg_cv_define_prepend-DAMG_HAVE_MUMPS_MODULES $MUMPS_MODULES $FDEFINES"
+       MUMPS_FLAGS="-DAMG_HAVE_MUMPS $MUMPS_MODULES"
+       CHAVEMUMPS="#define  AMG_HAVE_MUMPS"
+       CHAVEMUMPSMODULES="#define  AMG_HAVE_MUMPS_MODULES"
+       
    elif test "x$pac_mumps_fincs_ok" == "xyes" ; then
-      FDEFINES="$amg_cv_define_prepend-DHAVE_MUMPS_ $amg_cv_define_prepend-DHAVE_MUMPS_INCLUDES_ $MUMPS_FINCLUDES $FDEFINES"
-       MUMPS_FLAGS="-DHave_MUMPS_ $MUMPS_INCLUDES"
+      FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_MUMPS $amg_cv_define_prepend-DAMG_HAVE_MUMPS_INCLUDES $MUMPS_FINCLUDES $FDEFINES"
+       MUMPS_FLAGS="-DAMG_HAVE_MUMPS $MUMPS_FINCLUDES"
+       CHAVEMUMPS="#define  AMG_HAVE_MUMPS"
+       CHAVEMUMPSINCLUDES="#define  AMG_HAVE_MUMPS_INCLUDES"	
    else
       # This should not happen
       MUMPS_FLAGS=""
@@ -769,16 +780,19 @@ fi
 
 PAC_CHECK_UMFPACK
 if test "x$amg4psblas_cv_have_umfpack" == "xyes" ; then 
-   UMF_FLAGS="-DHave_UMF_ $UMF_INCLUDES"
-   FDEFINES="$amg_cv_define_prepend-DHAVE_UMF_ $FDEFINES"
+   UMF_FLAGS="$UMF_INCLUDES"
+   FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_UMF $FDEFINES"
+   CHAVEUMF="#define  AMG_HAVE_UMF"
 else
    UMF_FLAGS=""
 fi
 
 PAC_CHECK_SUPERLU
 if test "x$amg4psblas_cv_have_superlu" == "xyes" ; then 
-   SLU_FLAGS="-DHave_SLU_ -DSLU_VERSION_$pac_slu_version $SLU_INCLUDES"
-   FDEFINES="$amg_cv_define_prepend-DHAVE_SLU_ $FDEFINES"
+   SLU_FLAGS="-DAMG_SLU_VERSION_$pac_slu_version $SLU_INCLUDES"
+   FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_SLU $FDEFINES"
+   CHAVESLU="#define  AMG_HAVE_SLU"
+   CSLUVERSION="#define  AMG_SLU_VERSION_$pac_slu_version"	
 else
    SLU_FLAGS=""
 fi
@@ -789,8 +803,10 @@ if test "x$amg4psblas_cv_have_superludist" == "xyes" ; then
    pac_sludist_version="$amg4psblas_cv_superludist_major$amg4psblas_cv_superludist_minor";  
    AC_MSG_NOTICE([Configuring with SuperLU_DIST version flag $pac_sludist_version])
    SLUDIST_FLAGS=""	       
-   SLUDIST_FLAGS="-DHave_SLUDist_ -DSLUD_VERSION_="$pac_sludist_version" $SLUDIST_INCLUDES"
-   FDEFINES="$amg_cv_define_prepend-DHAVE_SLUDIST_ $FDEFINES"
+   SLUDIST_FLAGS="$SLUDIST_INCLUDES"
+   FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_SLUDIST $FDEFINES"
+   CHAVESLUDIST="#define  AMG_HAVE_SLUDIST"
+   CSLUDISTVERSION="#define  AMG_SLUD_VERSION $pac_sludist_version"
 else
    SLUDIST_FLAGS=""
 fi
@@ -829,6 +845,17 @@ AC_SUBST(INSTALL_MODULESDIR)
 AC_SUBST(INSTALL_DOCSDIR)
 AC_SUBST(INSTALL_SAMPLESDIR)
 
+AC_SUBST(CHAVEUMF)
+AC_SUBST(CHAVESLU)
+AC_SUBST(CSLUVERSION)
+AC_SUBST(CHAVESLUDIST)
+AC_SUBST(CSLUDISTVERSION)
+AC_SUBST(CHAVEMUMPS)
+AC_SUBST(CHAVEMUMPSMODULES)
+AC_SUBST(CHAVEMUMPSINCLUDES)
+AC_SUBST(CXXMATCHBOXBIT)
+
+
 AC_SUBST(EXTRA_LIBS)
 AC_SUBST(MUMPS_FLAGS)
 AC_SUBST(MUMPS_LIBS)
@@ -847,6 +874,7 @@ AC_SUBST(COMPILERULES)
 # the following files will be created by Automake
 
 AC_CONFIG_FILES([Make.inc])
+AC_CONFIG_FILES([amgprec/amg_config.h])
 AC_OUTPUT()
 
 ###############################################################################
