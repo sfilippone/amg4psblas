@@ -9,11 +9,6 @@ if(NOT DEFINED PSBLAS_INSTALL_DIR)
     message(FATAL_ERROR "Please specify the path to the psblas installation directory using -DPSBLAS_INSTALL_DIR=<path>")
 endif()
 message(STATUS "psblas directory is ${PSBLAS_INSTALL_DIR};;")
-# Set the include and library directories based on the provided path
-#set(TEST_INSTALLDIR "${PSBLAS_INSTALL_DIR}")
-set(INCDIR "${PSBLAS_INSTALL_DIR}/include")
-set(MODDIR "${PSBLAS_INSTALL_DIR}/modules")
-set(LIBDIR "${PSBLAS_INSTALL_DIR}/lib")
 
 
 message(STATUS "PSBLAS DIRECTORY INC ${INCDIR}; MOD ${MODDIR}; LIB ${LIBDIR};")
@@ -26,6 +21,14 @@ if(NOT psblas_FOUND)
 else()
     message(STATUS "Found PSBLAS: ${psblas_LIBRARIES}")
 endif()
+
+
+# Set the include and library directories based on the provided path
+#set(TEST_INSTALLDIR "${PSBLAS_INSTALL_DIR}")
+set(INCDIR "${PSBLAS_INSTALL_DIR}/${PSB_CMAKE_INSTALL_INCLUDEDIR}")
+set(MODDIR "${PSBLAS_INSTALL_DIR}/${PSB_CMAKE_INSTALL_MODULDIR}")
+set(LIBDIR "${PSBLAS_INSTALL_DIR}/${PSB_CMAKE_INSTALL_LIBDIR}")
+
 
 # Include directories for the project
 include_directories(${PSBLAS_INSTALL_DIR})
@@ -218,6 +221,22 @@ endif()
 
 
 
+#------------------------------------------
+# Configure the amg_config.h file
+#------------------------------------------
+
+message(STATUS "bin dir ${CMAKE_CURRENT_BINARY_DIR}; source dir ${CMAKE_CURRENT_SOURCE_DIR};;")
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/amgprec/amg_config.h.in 
+    ${CMAKE_CURRENT_BINARY_DIR}/include/amg_config.h 	
+    @ONLY  # Replace variables only
+)
+
+
+
+#---------------------------------------
+# Add the AMG libraries
+#---------------------------------------
 
 
 
@@ -225,6 +244,8 @@ endif()
 
 
 include(${CMAKE_CURRENT_LIST_DIR}/amgprec/CMakeLists.txt)  # include amgprec_source_files and amgprec_source_C_files source files
+
+include_directories("${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
 
 add_library(amgprec_C OBJECT ${amgprec_source_C_files})
 
@@ -308,10 +329,10 @@ target_link_libraries(amgcbind
 
 
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/include" DESTINATION "include"
+install(DIRECTORY "${CMAKE_BINARY_DIR}/include" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
   FILES_MATCHING PATTERN "*.h")
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/modules" DESTINATION "modules"
+install(DIRECTORY "${CMAKE_BINARY_DIR}/modules" DESTINATION "${CMAKE_INSTALL_MODULDIR}"
   FILES_MATCHING PATTERN "*.mod")
 
 

@@ -7,7 +7,7 @@ set(AMG_amgprec_source_files
   amg_d_ilu_fact_mod.f90
 #  amg_z_hybrid_aggregator_mod.F90
   amg_c_base_smoother_mod.f90
-  amg_s_matchboxp_mod.f90
+  amg_s_matchboxp_mod.F90
   amg_c_gs_solver.f90
   amg_z_prec_type.f90
   amg_s_base_solver_mod.f90
@@ -764,7 +764,7 @@ set(AMG_amgprec_source_files
   amg_d_invt_solver.f90
   amg_c_id_solver.f90
   amg_base_ainv_mod.F90
-  amg_d_matchboxp_mod.f90
+  amg_d_matchboxp_mod.F90
   amg_z_base_smoother_mod.f90
   amg_s_invk_solver.f90
   amg_c_base_solver_mod.f90
