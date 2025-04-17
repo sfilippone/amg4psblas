@@ -4,10 +4,18 @@ project(amg4psblas VERSION 1.0 LANGUAGES C Fortran)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-# Check for the installation path for psblas
-if(NOT DEFINED PSBLAS_INSTALL_DIR)
-    message(FATAL_ERROR "Please specify the path to the psblas installation directory using -DPSBLAS_INSTALL_DIR=<path>")
+
+set(PSBLAS_INSTALL_DIR "" CACHE PATH "Path to the PSBLAS installation
+directory")
+if(PSBLAS_INSTALL_DIR STREQUAL "")
+     message(FATAL_ERROR "Please specify the path to the PSBLAS installation directory using -DPSBLAS_INSTALL_DIR=<path> or set it in ccmake.")
 endif()
+
+
+# Check for the installation path for psblas
+#if(NOT DEFINED PSBLAS_INSTALL_DIR)
+#    message(FATAL_ERROR "Please specify the path to the psblas installation directory using -DPSBLAS_INSTALL_DIR=<path>")
+#endif()
 message(STATUS "psblas directory is ${PSBLAS_INSTALL_DIR};;")
 
 
