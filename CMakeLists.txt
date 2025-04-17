@@ -104,57 +104,6 @@ endif()
 
 
 
-#TODO: what follow should be taken from psblas. We need to set in PSBLAS CMakeLists.txt the right variable to be used here
-#------------------------------------
-# Fortran name mangling introspection
-#------------------------------------
-include("${CMAKE_CURRENT_LIST_DIR}/cmake/CapitalizeString.cmake")
-include(FortranCInterface)
-CapitalizeString(${FortranCInterface_GLOBAL__CASE} fc_case)
-message(STATUS "Name mangling capitalization: ${fc_case}")
-message(STATUS "Name mangling fortran global suffix underscore: ${FortranCInterface_GLOBAL__SUFFIX}")
-if(FortranCInterface_GLOBAL__SUFFIX STREQUAL "")
-  add_compile_options("-D${fc_case}Case")
-elseif(FortranCInterface_GLOBAL__SUFFIX STREQUAL "_")
-  add_compile_options("-D${fc_case}Underscore")
-elseif(FortranCInterface_GLOBAL__SUFFIX STREQUAL "__")
-  add_compile_options("-D${fc_case}DoubleUnderscore")
-else()
-  message( FATAL_ERROR "Fortran name mangling suffix, \'${FortranCInterface_GLOBAL__SUFFIX}\', unknown to PSBLAS")
-endif()
-
-
-  message(STATUS "win? ${WIN32};")
-if(TRUE )#NOT ${WIN32})
-#previous check did not work if WIN32 is empty string
-  #----------------------------------------------
-  # Determine system endian-ness and pointer size
-  #----------------------------------------------
-  include(TestBigEndian)
-  TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
-  if(IS_BIG_ENDIAN)
-    message( STATUS "System appears to be big endian.")
-  else()
-    message( STATUS "System appears to be little endian.")
-    add_compile_options(-DLittleEndian)
-  endif()
-  include(CheckTypeSize)
-  CHECK_TYPE_SIZE("void *" VOID_P_SIZE LANGUAGE C)
-  if(${VOID_P_SIZE} EQUAL 8)
-    add_compile_options(-DPtr64Bits)
-  endif()
-  message(STATUS "Have 64bit pointers")
-  
-  #add define values for integer size (IPKx) and long size (LPKx)
-  CHECK_TYPE_SIZE("int" INT_SIZE LANGUAGE C)
-  CHECK_TYPE_SIZE("long" LONG_SIZE LANGUAGE C)
-  message(STATUS "INT SIZE ${INT_SIZE}")
-
-  #add_compile_options(-DIPK${INT_SIZE})
-  #add_compile_options(-DLPK${LONG_SIZE})
-
-  
-endif()
 
 
 
