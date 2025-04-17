@@ -43,8 +43,8 @@ message(STATUS "Using IPK size: ${PSB_IPK_SIZE}")
 message(STATUS "Using LPK size: ${PSB_LPK_SIZE}")
 
 # Add PSB_IPK/LPK flag only for fortran files.
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_IPK${IPK_SIZE}")
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_LPK${LPK_SIZE}")
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_IPK${PSB_IPK_SIZE}")
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_LPK${PSB_LPK_SIZE}")
 
 
 
