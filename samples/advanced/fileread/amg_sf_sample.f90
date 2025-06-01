@@ -342,7 +342,7 @@ program amg_sf_sample
       call build_mtpart(aux_a,lnp)
 
     endif
-    call distr_mtpart(psb_root_,ctxt)
+    call distr_mtpart(ione*psb_root_,ctxt)
     call getv_mtpart(ivg)
     call psb_matdist(aux_a, a, ctxt,desc_a,info,fmt=afmt,vg=ivg)
   case default
@@ -589,9 +589,9 @@ program amg_sf_sample
 
   end if
 
-  call psb_gather(x_col_glob,x_col,desc_a,info,root=psb_root_)
+  call psb_gather(x_col_glob,x_col,desc_a,info,root=ione*psb_root_)
   if (info == psb_success_) &
-       & call psb_gather(r_col_glob,r_col,desc_a,info,root=psb_root_)
+       & call psb_gather(r_col_glob,r_col,desc_a,info,root=ione*psb_root_)
   if (info /= psb_success_) goto 9999
   if (iam == psb_root_) then
     write(psb_err_unit,'(" ")')

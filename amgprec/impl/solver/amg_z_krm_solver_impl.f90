@@ -96,7 +96,8 @@ subroutine amg_z_krm_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   ! Local variables
   integer(psb_ipk_) :: n_row,n_col, nrow_a, nztota
   integer(psb_lpk_) :: lnr
-  integer(psb_ipk_) :: np,me,i, err_act, debug_unit, debug_level
+  integer(psb_ipk_) :: i, err_act, debug_unit, debug_level
+  integer(psb_mpk_) :: np,me
   type(psb_ctxt_type) :: ctxt, l_ctxt
   character(len=20)   :: name='@Z@_krm_solver_bld', ch_err
 
@@ -123,7 +124,7 @@ subroutine amg_z_krm_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
     call sv%prec%smoothers_build(a,desc_a,info,amold=amold,vmold=vmold)
     sv%a => a
   else
-    call psb_init(l_ctxt,np=1_psb_ipk_,basectxt=ctxt,ids=(/me/))
+    call psb_init(l_ctxt,np=1_psb_mpk_,basectxt=ctxt,ids=(/me/))
     n_row = desc_a%get_local_rows()
     lnr = n_row
     call psb_cdall(l_ctxt,sv%desc_local,info,mg=lnr,repl=.true.)
@@ -186,7 +187,8 @@ subroutine amg_z_krm_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   type(psb_z_vect_type),intent(inout), optional   :: initu
 
   type(psb_z_vect_type)   :: z
-  integer(psb_ipk_) :: np,me,i, err_act, debug_unit, debug_level
+  integer(psb_ipk_) :: i, err_act, debug_unit, debug_level
+  integer(psb_mpk_) :: np,me
   type(psb_ctxt_type) :: ctxt
   character(len=20) :: name='@Z@_krm_solver_apply_v', ch_err
 
@@ -247,7 +249,8 @@ subroutine amg_z_krm_solver_apply(alpha,sv,x,beta,y,desc_data,&
   character, intent(in), optional       :: init
   complex(psb_dpk_),intent(inout), optional :: initu(:)
   complex(psb_dpk_), allocatable    :: z(:)
-  integer(psb_ipk_) :: np,me,i, err_act, debug_unit, debug_level
+  integer(psb_ipk_) :: i, err_act, debug_unit, debug_level
+  integer(psb_mpk_) :: np,me
   type(psb_ctxt_type) :: ctxt
   character(len=20) :: name='@Z@_krm_solver_apply', ch_err
 

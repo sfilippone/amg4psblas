@@ -183,7 +183,7 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
             end if
             if ( res < sm%tol*resdenum ) then
               if( (sm%printres).and.(mod(sm%printiter,sm%checkiter)/=0) ) &
-               & call log_conv("BJAC",me,i,1,res,resdenum,sm%tol)
+               & call log_conv("BJAC",me,i,ione,res,resdenum,sm%tol)
               exit
             end if
           end if
@@ -275,7 +275,7 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
             end if
             if (res < sm%tol*resdenum ) then
               if( (sm%printres).and.( mod(sm%printiter,sm%checkiter) /=0 ) ) &
-                & call log_conv("BJAC",me,i,1,res,resdenum,sm%tol)
+                & call log_conv("BJAC",me,i,ione,res,resdenum,sm%tol)
               exit
             end if
           end if

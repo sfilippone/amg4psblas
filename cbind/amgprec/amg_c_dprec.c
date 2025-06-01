@@ -11,7 +11,7 @@ amg_c_dprec* amg_c_dprec_new()
 }
 
 
-int amg_c_dprec_delete(amg_c_dprec* p)
+psb_i_t amg_c_dprec_delete(amg_c_dprec* p)
 {
   int iret;
   iret=amg_c_dprecfree(p);

@@ -31,7 +31,7 @@ contains
     type(amg_c_dprec)    :: ph
     type(psb_c_object_type), value :: cctxt
     character(c_char)     :: ptype(*)
-    integer               :: info
+    integer(psb_ipk_)     :: info
     type(amg_dprec_type), pointer :: precp
     character(len=80)     :: fptype
 
@@ -64,7 +64,7 @@ contains
     type(psb_c_object_type) :: ph
     character(c_char)     :: what(*)
     integer(psb_c_ipk_), value :: val
-    integer               :: info
+    integer(psb_ipk_)     :: info
     character(len=80)     :: fwhat
     type(amg_dprec_type), pointer  :: precp
 
@@ -94,7 +94,7 @@ contains
     type(psb_c_object_type) :: ph
     character(c_char)     :: what(*)
     real(c_double), value :: val
-    integer               :: info
+    integer(psb_ipk_)     :: info
     character(len=80)     :: fwhat
     type(amg_dprec_type), pointer  :: precp
 
@@ -122,7 +122,7 @@ contains
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type) :: ph
     character(c_char)     :: what(*), val(*)
-    integer               :: info
+    integer(psb_ipk_)     :: info
     character(len=80)     :: fwhat,fval
     type(amg_dprec_type), pointer  :: precp
 
@@ -150,7 +150,7 @@ contains
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer               :: info
+    integer(psb_ipk_)     :: info
     type(amg_dprec_type), pointer  :: precp
     type(psb_dspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
@@ -189,7 +189,7 @@ contains
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer               :: info
+    integer(psb_ipk_)     :: info
     type(amg_dprec_type), pointer  :: precp
     type(psb_dspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
@@ -228,7 +228,7 @@ contains
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer               :: info
+    integer(psb_ipk_)     :: info
     type(amg_dprec_type), pointer  :: precp
     type(psb_dspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
@@ -302,7 +302,7 @@ contains
     type(amg_dprec_type), pointer  :: precp
     type(psb_d_vect_type), pointer :: xp, bp
 
-    integer               :: info,fitmax,fitrace,first,fistop,fiter
+    integer(psb_ipk_)     :: info,fitmax,fitrace,first,fistop,fiter
     character(len=20)     :: fmethd
     real(kind(1.d0))      :: feps,ferr
 
@@ -358,7 +358,7 @@ contains
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type) :: ph
-    integer               :: info
+    integer(psb_ipk_)     :: info
     type(amg_dprec_type), pointer :: precp
     character(len=80)     :: fptype
 

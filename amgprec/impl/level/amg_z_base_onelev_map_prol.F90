@@ -55,8 +55,8 @@ subroutine amg_z_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vt
 !!$    write(0,*) 'Remap handling '
     block
       type(psb_ctxt_type) :: ctxt, nctxt
-      integer(psb_ipk_) :: i,j,ip,idest, nsrc, nrl, nrc, kp
-      integer(psb_ipk_) :: me, np,  rme, rnp
+      integer(psb_mpk_) :: i,j,ip,idest, nsrc, nrl, nrc, kp
+      integer(psb_mpk_) :: me, np,  rme, rnp
       complex(psb_dpk_), allocatable :: rsnd(:), rrcv(:)
       type(psb_z_vect_type) :: tv
 
