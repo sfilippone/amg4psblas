@@ -81,17 +81,17 @@ program amg_sexample_1lev
 
   ! solver parameters
   real(psb_spk_)   :: tol, err
-  integer :: itmax, iter, itrace, istop
+  integer(psb_ipk_) :: itmax, iter, itrace, istop
 
   ! parallel environment parameters
   type(psb_ctxt_type) :: ctxt
-  integer             :: iam, np
+  integer(psb_ipk_)   :: iam, np
 
   ! other variables
-  integer            :: i,info,j
+  integer(psb_ipk_) :: i,info,j
   integer(psb_epk_) :: amatsize, precsize, descsize
   integer(psb_epk_) :: system_size
-  integer            :: idim, nlev, ierr, ircode
+  integer(psb_ipk_) :: idim, nlev, ierr, ircode
   real(psb_spk_) :: resmx, resmxp
   real(psb_dpk_) :: t1, t2, tprec
   character(len=5)   :: afmt='CSR'
@@ -110,7 +110,7 @@ program amg_sexample_1lev
   name='amg_sexample_ml'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
-  call psb_set_errverbosity(2)
+  call psb_set_errverbosity(itwo)
   !
   ! Hello world
   !
@@ -146,7 +146,7 @@ program amg_sexample_1lev
 
   ! set number of overlaps
 
-  call P%set('SUB_OVR',2,info)
+  call P%set('SUB_OVR',itwo,info)
 
   ! build the preconditioner
 
@@ -174,7 +174,7 @@ program amg_sexample_1lev
   call psb_barrier(ctxt)
   t1 = psb_wtime()
 
-  call psb_krylov(kmethod,A,P,b,x,tol,desc_A,info,itmax,iter,err,itrace=1,istop=2)
+  call psb_krylov(kmethod,A,P,b,x,tol,desc_A,info,itmax,iter,err,itrace=ione,istop=itwo)
 
   t2 = psb_wtime() - t1
   call psb_amx(ctxt,t2)
@@ -236,9 +236,10 @@ contains
     implicit none
 
     type(psb_ctxt_type) :: ctxt
-    integer             :: idim, itmax
+    integer(psb_ipk_)   :: idim, itmax
     real(psb_spk_)      :: tol
-    integer             :: iam, np, inp_unit
+    integer(psb_mpk_)   :: iam, np
+    integer(psb_ipk_)   :: inp_unit
     character(len=1024)   :: filename
 
     call psb_info(ctxt,iam,np)

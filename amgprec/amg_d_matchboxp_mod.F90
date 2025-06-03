@@ -879,7 +879,7 @@ contains
     nr = tcoo1%get_nrows()
     nc = tcoo1%get_ncols()
     nz = tcoo1%get_nzeros()
-    call tcoo2%allocate(nr,nc,int(1.25*nz))
+    call tcoo2%allocate(nr,nc,int(1.25*nz,psb_ipk_))
     k2 = 0
     !
     ! Build the entries of \^A for matching
@@ -1056,7 +1056,8 @@ contains
     integer(psb_c_lpk_) :: ph1_card(*),ph2_card(*)
     real(c_double)  :: edgelocweight(:)
     real(c_double)      :: msgpercent(*)
-    integer(psb_ipk_)   :: info, me, np
+    integer(psb_ipk_)   :: info
+    integer(psb_mpk_)   :: me, np
     integer(psb_c_mpk_) :: icomm, mrank, mnp
     logical, optional   :: display_inp
     !

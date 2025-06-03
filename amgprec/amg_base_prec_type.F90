@@ -621,9 +621,13 @@ contains
 
   subroutine amg_warn_coarse_mat(val,expected)
     integer(psb_ipk_) :: val, expected
+    integer(psb_mpk_) :: mval, mexp
     if (val /= expected) then
+      mval = val
+      mexp = expected
       write(0,*) 'Warning: resetting COARSE_MAT on an existing hierarchy from ',&
-           & amg_get_coarse_mat_name(val), ' to ',amg_get_coarse_mat_name(expected)
+           & amg_get_coarse_mat_name(mval), &
+           & ' to ',amg_get_coarse_mat_name(mexp)
     end if
   end subroutine amg_warn_coarse_mat
 
@@ -1207,7 +1211,7 @@ contains
     implicit none
     type(psb_ctxt_type), intent(in) :: ctxt
     type(amg_ml_parms), intent(inout)   :: dat
-    integer(psb_ipk_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
     call psb_bcast(ctxt,dat%sweeps_pre,root)
     call psb_bcast(ctxt,dat%sweeps_post,root)
@@ -1229,7 +1233,7 @@ contains
     implicit none
     type(psb_ctxt_type), intent(in) :: ctxt
     type(amg_sml_parms), intent(inout)   :: dat
-    integer(psb_ipk_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
     call psb_bcast(ctxt,dat%amg_ml_parms,root)
     call psb_bcast(ctxt,dat%aggr_omega_val,root)
@@ -1240,7 +1244,7 @@ contains
     implicit none
     type(psb_ctxt_type), intent(in) :: ctxt
     type(amg_dml_parms), intent(inout)   :: dat
-    integer(psb_ipk_), intent(in), optional :: root
+    integer(psb_mpk_), intent(in), optional :: root
 
     call psb_bcast(ctxt,dat%amg_ml_parms,root)
     call psb_bcast(ctxt,dat%aggr_omega_val,root)

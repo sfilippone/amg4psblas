@@ -108,7 +108,7 @@ subroutine  amg_s_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
   type(psb_desc_type), intent(inout)    :: desc_ac
   integer(psb_ipk_), intent(out)        :: info
   !
-  type(psb_ctxt_type)         :: ictxt
+  type(psb_ctxt_type)         :: ctxt
   integer(psb_ipk_)           :: np, me
   type(psb_ls_coo_sparse_mat) :: tmpcoo
   type(psb_lsspmat_type)      :: tmp_ac
@@ -124,8 +124,8 @@ subroutine  amg_s_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   info  = psb_success_
-  ictxt = desc_a%get_context()
-  call psb_info(ictxt,me,np)
+  ctxt = desc_a%get_context()
+  call psb_info(ctxt,me,np)
   if (psb_get_errstatus().ne.0) then
     write(0,*) me,' From:',trim(name),':',psb_get_errstatus()
     return
@@ -163,22 +163,21 @@ subroutine  amg_s_parmatch_aggregator_mat_asb(ag,parms,a,desc_a,&
     call op_prol%mv_to(tmpcoo)
     nzl = tmpcoo%get_nzeros()
     call psb_loc_to_glob(tmpcoo%ja(1:nzl),desc_ac,info,'I')
+    call tmpcoo%set_ncols(i_nr)
     call op_prol%mv_from(tmpcoo)
 
     call op_restr%mv_to(tmpcoo)
     nzl = tmpcoo%get_nzeros()
     call psb_loc_to_glob(tmpcoo%ia(1:nzl),desc_ac,info,'I')
+    call tmpcoo%set_nrows(i_nr)
     call op_restr%mv_from(tmpcoo)
-
-    call op_prol%set_ncols(i_nr)
-    call op_restr%set_nrows(i_nr)
 
     call psb_gather(tmp_ac,ac,desc_ac,info,root=-ione,&
          & dupl=psb_dupl_add_,keeploc=.false.)
     call tmp_ac%mv_to(tmpcoo)
     call ac%mv_from(tmpcoo)
 
-    call psb_cdall(ictxt,desc_ac,info,mg=ntaggr,repl=.true.)
+    call psb_cdall(ctxt,desc_ac,info,mg=ntaggr,repl=.true.)
     if (info == psb_success_) call psb_cdasb(desc_ac,info)
     !
     ! Now that we have the descriptors and the restrictor, we should
