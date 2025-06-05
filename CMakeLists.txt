@@ -369,10 +369,35 @@ export(
 		
  
 
-# Optionally, you can install the headers
-#install(DIRECTORY include/
-#    DESTINATION include
-#)
+# Set the installation directory for the test files
+set(INSTALL_TEST_DIR "${CMAKE_INSTALL_PREFIX}/test" CACHE PATH "Installation directory for test files")
+
+function(install_directory_recursive source_dir install_base_dir) # Function to install a directory and its subdirectories recursively
+    file(GLOB_RECURSE ALL_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/${source_dir}" "${source_dir}/*")
+
+    foreach(FILE_PATH IN LISTS ALL_FILES)
+        # Construct the full source and destination paths
+        set(FULL_SOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${source_dir}/${FILE_PATH}")
+        set(FULL_INSTALL_PATH "${install_base_dir}/${FILE_PATH}")
+
+        # Check if it's a directory
+        if(IS_DIRECTORY "${FULL_SOURCE_PATH}")
+            # Create the directory in the install destination
+            file(MAKE_DIRECTORY "${FULL_INSTALL_PATH}")
+        else()
+            # Install the file
+            install(FILES "${FULL_SOURCE_PATH}" DESTINATION "${install_base_dir}" RENAME "${FILE_PATH}")
+        endif()
+    endforeach()
+endfunction()
+
+
+
+# Install test/fileread directory
+install_directory_recursive(samples/simple "${INSTALL_TEST_DIR}/simple")
+
+# Install test/pdegen directory
+install_directory_recursive(samples/advanced "${INSTALL_TEST_DIR}/advanced")
 
 
 
