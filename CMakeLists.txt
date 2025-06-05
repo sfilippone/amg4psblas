@@ -4,10 +4,18 @@ project(amg4psblas VERSION 1.0 LANGUAGES C Fortran)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-# Check for the installation path for psblas
-if(NOT DEFINED PSBLAS_INSTALL_DIR)
-    message(FATAL_ERROR "Please specify the path to the psblas installation directory using -DPSBLAS_INSTALL_DIR=<path>")
+
+set(PSBLAS_INSTALL_DIR "" CACHE PATH "Path to the PSBLAS installation
+directory")
+if(PSBLAS_INSTALL_DIR STREQUAL "")
+     message(FATAL_ERROR "Please specify the path to the PSBLAS installation directory using -DPSBLAS_INSTALL_DIR=<path> or set it in ccmake.")
 endif()
+
+
+# Check for the installation path for psblas
+#if(NOT DEFINED PSBLAS_INSTALL_DIR)
+#    message(FATAL_ERROR "Please specify the path to the psblas installation directory using -DPSBLAS_INSTALL_DIR=<path>")
+#endif()
 message(STATUS "psblas directory is ${PSBLAS_INSTALL_DIR};;")
 
 
@@ -42,9 +50,9 @@ include_directories(${INCDIR} ${MODDIR} ${LIBDIR})
 message(STATUS "Using IPK size: ${PSB_IPK_SIZE}")
 message(STATUS "Using LPK size: ${PSB_LPK_SIZE}")
 
-
-add_compile_options(-DPSB_IPK${PSB_IPK_SIZE})
-add_compile_options(-DPSB_LPK${PSB_LPK_SIZE})
+# Add PSB_IPK/LPK flag only for fortran files.
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_IPK${PSB_IPK_SIZE}")
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_LPK${PSB_LPK_SIZE}")
 
 
 
@@ -104,57 +112,6 @@ endif()
 
 
 
-#TODO: what follow should be taken from psblas. We need to set in PSBLAS CMakeLists.txt the right variable to be used here
-#------------------------------------
-# Fortran name mangling introspection
-#------------------------------------
-include("${CMAKE_CURRENT_LIST_DIR}/cmake/CapitalizeString.cmake")
-include(FortranCInterface)
-CapitalizeString(${FortranCInterface_GLOBAL__CASE} fc_case)
-message(STATUS "Name mangling capitalization: ${fc_case}")
-message(STATUS "Name mangling fortran global suffix underscore: ${FortranCInterface_GLOBAL__SUFFIX}")
-if(FortranCInterface_GLOBAL__SUFFIX STREQUAL "")
-  add_compile_options("-D${fc_case}Case")
-elseif(FortranCInterface_GLOBAL__SUFFIX STREQUAL "_")
-  add_compile_options("-D${fc_case}Underscore")
-elseif(FortranCInterface_GLOBAL__SUFFIX STREQUAL "__")
-  add_compile_options("-D${fc_case}DoubleUnderscore")
-else()
-  message( FATAL_ERROR "Fortran name mangling suffix, \'${FortranCInterface_GLOBAL__SUFFIX}\', unknown to PSBLAS")
-endif()
-
-
-  message(STATUS "win? ${WIN32};")
-if(TRUE )#NOT ${WIN32})
-#previous check did not work if WIN32 is empty string
-  #----------------------------------------------
-  # Determine system endian-ness and pointer size
-  #----------------------------------------------
-  include(TestBigEndian)
-  TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
-  if(IS_BIG_ENDIAN)
-    message( STATUS "System appears to be big endian.")
-  else()
-    message( STATUS "System appears to be little endian.")
-    add_compile_options(-DLittleEndian)
-  endif()
-  include(CheckTypeSize)
-  CHECK_TYPE_SIZE("void *" VOID_P_SIZE LANGUAGE C)
-  if(${VOID_P_SIZE} EQUAL 8)
-    add_compile_options(-DPtr64Bits)
-  endif()
-  message(STATUS "Have 64bit pointers")
-  
-  #add define values for integer size (IPKx) and long size (LPKx)
-  CHECK_TYPE_SIZE("int" INT_SIZE LANGUAGE C)
-  CHECK_TYPE_SIZE("long" LONG_SIZE LANGUAGE C)
-  message(STATUS "INT SIZE ${INT_SIZE}")
-
-  #add_compile_options(-DIPK${INT_SIZE})
-  #add_compile_options(-DLPK${LONG_SIZE})
-
-  
-endif()
 
 
 
@@ -339,10 +296,10 @@ target_link_libraries(amgcbind
 
 
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/include" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+install(DIRECTORY ${CMAKE_BINARY_DIR}/include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
   FILES_MATCHING PATTERN "*.h")
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/modules" DESTINATION "${CMAKE_INSTALL_MODULDIR}"
+install(DIRECTORY ${CMAKE_BINARY_DIR}/modules/ DESTINATION "${CMAKE_INSTALL_MODULDIR}"
   FILES_MATCHING PATTERN "*.mod")
 
 
