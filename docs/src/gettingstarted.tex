@@ -477,11 +477,11 @@ program amg_dexample_gpu
 \end{listing}
 In this particular example we are choosing to employ a \verb|HLG| data
 structure for sparse matrices on GPUs; for more information please
-refer to the PSBLAS-EXT users' guide.
+refer to the PSBLAS users' guide.
 
 We then have to initialize the GPU environment, and pass the
 appropriate MOLD variables to the build methods (see also the PSBLAS
-and PSBLAS-EXT users' guides).
+users' guide).
 \begin{listing}[h!]
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
@@ -600,6 +600,7 @@ system solve kernels. Methods that satisfy this constraint include:
 \item \verb|INVT|
 \item \verb|AINV|
 \end{itemize}
+\item \verb|POLY|
 \end{itemize}
 and their $\ell_1$ variants. 
 
