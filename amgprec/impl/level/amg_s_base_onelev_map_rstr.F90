@@ -56,8 +56,8 @@ subroutine amg_s_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
 !!$    write(0,*) 'Remap handling not implemented yet '
     block
       type(psb_ctxt_type) :: ctxt, nctxt
-      integer(psb_ipk_) :: i,j,ip, idest, nsrc, nrl, kp
-      integer(psb_ipk_) :: me, np,  rme, rnp
+      integer(psb_mpk_) :: i,j,ip, idest, nsrc, nrl, kp
+      integer(psb_mpk_) :: me, np,  rme, rnp
       real(psb_spk_), allocatable :: rsnd(:), rrcv(:)
       type(psb_s_vect_type) :: tv
       

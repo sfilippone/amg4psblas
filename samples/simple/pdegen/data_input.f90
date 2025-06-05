@@ -33,7 +33,7 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 module data_input
-  
+  use psb_base_mod, only : psb_ipk_
   interface read_data
     module procedure read_char, read_int,&
          & read_double, read_single,&
@@ -51,7 +51,7 @@ contains
 
   subroutine read_char(val,file,marker)
     character(len=*), intent(out) :: val
-    integer, intent(in)           :: file
+    integer(psb_ipk_), intent(in)           :: file
     character(len=1), optional, intent(in) :: marker
 
     read(file,'(a)')charbuf
@@ -60,8 +60,8 @@ contains
   end subroutine read_char
 
   subroutine read_int(val,file,marker)
-    integer, intent(out) :: val
-    integer, intent(in)  :: file
+    integer(psb_ipk_), intent(out) :: val
+    integer(psb_ipk_), intent(in)  :: file
     character(len=1), optional, intent(in) :: marker
 
     read(file,'(a)')charbuf
@@ -71,7 +71,7 @@ contains
   subroutine read_single(val,file,marker)
     use psb_base_mod
     real(psb_spk_), intent(out) :: val
-    integer, intent(in)         :: file
+    integer(psb_ipk_), intent(in)         :: file
     character(len=1), optional, intent(in) :: marker
 
     read(file,'(a)')charbuf
@@ -81,7 +81,7 @@ contains
   subroutine read_double(val,file,marker)
     use psb_base_mod
     real(psb_dpk_), intent(out) :: val
-    integer, intent(in)         :: file
+    integer(psb_ipk_), intent(in)         :: file
     character(len=1), optional, intent(in) :: marker
 
     read(file,'(a)')charbuf
@@ -109,7 +109,7 @@ contains
   end subroutine string_read_char
 
   subroutine string_read_int(val,file,marker)
-    integer, intent(out) :: val
+    integer(psb_ipk_), intent(out) :: val
     character(len=*), intent(in)  :: file
     character(len=1), optional, intent(in) :: marker
     character(len=1)    :: marker_

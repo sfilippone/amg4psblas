@@ -55,15 +55,16 @@ subroutine amg_d_tlu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   type(psb_dspmat_type), intent(in), target           :: a
   Type(psb_desc_type), Intent(inout)                  :: desc_a 
   class(amg_d_tlu_solver_type), intent(inout)         :: sv
-  integer, intent(out)                                :: info
+  integer(psb_ipk_), intent(out)                      :: info
   type(psb_dspmat_type), intent(in), target, optional :: b
   class(psb_d_base_sparse_mat), intent(in), optional  :: amold
   class(psb_d_base_vect_type), intent(in), optional   :: vmold
   class(psb_i_base_vect_type), intent(in), optional     :: imold
   
   ! Local variables
-  integer :: n_row,n_col, nrow_a, nztota
-  integer :: np,me,i, err_act, debug_unit, debug_level
+  integer(psb_ipk_) :: n_row, n_col, nrow_a, nztota
+  integer(psb_ipk_) :: np,me
+  integer(psb_ipk_) :: i, err_act, debug_unit, debug_level
   type(psb_ctxt_type) :: ctxt
   character(len=20)  :: name='d_tlu_solver_bld', ch_err
 

@@ -74,3 +74,9 @@ In the European project “Energy oriented Center of Excellence: toward exascale
 - Fabio Durastante       (University of Pisa and IAC-CNR, IT)
 - Salvatore Filippone    (University of Rome Tor Vergata and IAC-CNR, IT)
 
+**Contributors** (_roughly reverse cronological order_):
+
+- Luca       Pepè Sciarria
+- Andea      Di Iorio
+- Ambra	     Abdullahi Hassan
+- Alfredo    Buttari

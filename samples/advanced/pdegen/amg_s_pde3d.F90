@@ -572,11 +572,11 @@ program amg_s_pde3d
     write(psb_out_unit,'("Total time                         : ",es12.5)') tslv+tprec+thier
     write(psb_out_unit,'("Residual 2-norm                    : ",es12.5)') resmx
     write(psb_out_unit,'("Residual inf-norm                  : ",es12.5)') resmxp
-    write(psb_out_unit,'("Total memory occupation for X      : ",i12)') vecsize
-    write(psb_out_unit,'("Total memory occupation for A      : ",i12)') amatsize
-    write(psb_out_unit,'("Total memory occupation for DESC_A : ",i12)') descsize
-    write(psb_out_unit,'("Total memory occupation for PREC   : ",i12)') precsize
-    write(psb_out_unit,'("Total memory occupation            : ",i12)') &
+    write(psb_out_unit,'("Total memory occupation for X      : ",i16)') vecsize
+    write(psb_out_unit,'("Total memory occupation for A      : ",i16)') amatsize
+    write(psb_out_unit,'("Total memory occupation for DESC_A : ",i16)') descsize
+    write(psb_out_unit,'("Total memory occupation for PREC   : ",i16)') precsize
+    write(psb_out_unit,'("Total memory occupation            : ",i16)') &
          & amatsize + descsize+precsize+2*vecsize    
     write(psb_out_unit,'("Storage format for A               : ",a  )') a%get_fmt()
     write(psb_out_unit,'("Storage format for DESC_A          : ",a  )') desc_a%get_fmt()

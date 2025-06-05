@@ -89,23 +89,23 @@ program amg_dexample_ml
 
   ! solver and preconditioner parameters
   real(psb_dpk_)   :: tol, err
-  integer          :: itmax, iter, istop
-  integer          :: nlev
+  integer(psb_ipk_) :: itmax, iter, istop
+  integer(psb_ipk_) :: nlev
 
   ! parallel environment parameters
   type(psb_ctxt_type) :: ctxt
-  integer             :: iam, np
+  integer(psb_ipk_)   :: iam, np
 
   ! other variables
-  integer              :: choice       
-  integer              :: i,info,j,m_problem
+  integer(psb_ipk_) :: choice       
+  integer(psb_ipk_) :: i,info,j,m_problem
   integer(psb_epk_) :: amatsize, precsize, descsize
-  integer              :: ierr, ircode
+  integer(psb_ipk_) :: ierr, ircode
   real(psb_dpk_)       :: resmx, resmxp
   real(psb_dpk_)       :: t1, t2, tprec
   character(len=20)    :: name
   character(len=20), parameter :: kmethod='FCG'
-  integer, parameter :: iunit=12
+  integer(psb_ipk_), parameter :: iunit=12
 
   ! initialize the parallel environment
 
@@ -121,7 +121,7 @@ program amg_dexample_ml
   name='amg_dexample_ml'
   if(psb_get_errstatus() /= 0) goto 9999
   info=psb_success_
-  call psb_set_errverbosity(2)
+  call psb_set_errverbosity(itwo)
   !
   ! Hello world
   !
@@ -170,14 +170,14 @@ program amg_dexample_ml
     call psb_bcast(ctxt,m_problem)
 
     ! At this point aux_b may still be unallocated
-    if (psb_size(aux_b,1) == m_problem) then
+    if (psb_size(aux_b,ione) == m_problem) then
       ! if any rhs were present, broadcast the first one
       write(0,'("Ok, got an rhs ")')
       b_glob =>aux_b(:,1)
     else
       write(*,'("Generating an rhs...")')
       write(*,'(" ")')
-      call psb_realloc(m_problem,1,aux_b,ircode)
+      call psb_realloc(m_problem,ione,aux_b,ircode)
       if (ircode /= 0) then
         call psb_errpush(psb_err_alloc_dealloc_,name)
         goto 9999
@@ -195,7 +195,7 @@ program amg_dexample_ml
   call psb_barrier(ctxt)
   if (iam == psb_root_) write(*,'("Partition type: block")')
   call psb_matdist(aux_A, A, ctxt, desc_A,info,parts=part_block)
-  call psb_scatter(b_glob,b,desc_a,info,root=psb_root_)
+  call psb_scatter(b_glob,b,desc_a,info,root=ione*psb_root_)
 
   t2 = psb_wtime() - t1
 
@@ -228,7 +228,7 @@ program amg_dexample_ml
     call P%set('SMOOTHER_TYPE','BJAC',info)
     call P%set('COARSE_SOLVE','BJAC',info)
     call P%set('COARSE_SUBSOLVE','ILU',info)
-    call P%set('COARSE_SWEEPS',8,info)
+    call P%set('COARSE_SWEEPS',8_psb_ipk_,info)
     
   case(3)
 
@@ -241,9 +241,9 @@ program amg_dexample_ml
     call P%init(ctxt,'ML',info)
     call P%set('PAR_AGGR_ALG','COUPLED',info)
     call P%set('AGGR_TYPE','MATCHBOXP',info)
-    call P%set('AGGR_SIZE',8,info)
+    call P%set('AGGR_SIZE',8_psb_ipk_,info)
     call P%set('ML_CYCLE','WCYCLE',info)
-    call P%set('SMOOTHER_SWEEPS',2,info)
+    call P%set('SMOOTHER_SWEEPS',itwo,info)
     call P%set('COARSE_SOLVE','KRM',info)
     call P%set('COARSE_MAT','DIST',info)
     call P%set('KRM_METHOD','FCG',info)
@@ -275,7 +275,7 @@ program amg_dexample_ml
   call psb_barrier(ctxt)
   t1 = psb_wtime()
 
-  call psb_krylov(kmethod,A,P,b,x,tol,desc_A,info,itmax,iter,err,itrace=1,istop=2)
+  call psb_krylov(kmethod,A,P,b,x,tol,desc_A,info,itmax,iter,err,itrace=ione,istop=itwo)
 
   t2 = psb_wtime() - t1
   call psb_amx(ctxt,t2)
@@ -313,9 +313,9 @@ program amg_dexample_ml
     write(*,'("Total memory occupation for PREC   : ",i12)')precsize
   end if
 
-  call psb_gather(x_glob,x,desc_a,info,root=psb_root_)
+  call psb_gather(x_glob,x,desc_a,info,root=ione*psb_root_)
   if (info == psb_success_) &
-       & call psb_gather(r_glob,r,desc_a,info,root=psb_root_)
+       & call psb_gather(r_glob,r,desc_a,info,root=ione*psb_root_)
   if (info /= psb_success_) goto 9999
   if (iam == psb_root_) then
     write(0,'(" ")')
@@ -356,10 +356,11 @@ contains
     implicit none
 
     type(psb_ctxt_type) :: ctxt
-    integer             :: choice, itmax
+    integer(psb_ipk_)   :: choice, itmax
     real(psb_dpk_)      :: tol
     character(len=*)    :: mtrx, rhs,filefmt
-    integer             :: iam, np, inp_unit
+    integer(psb_ipk_)   :: inp_unit
+    integer(psb_mpk_)   :: iam, np
     character(len=1024)   :: filename
 
     call psb_info(ctxt,iam,np)
