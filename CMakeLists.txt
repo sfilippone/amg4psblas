@@ -142,7 +142,7 @@ write_basic_package_version_file(
   COMPATIBILITY SameMajorVersion
   )
 
-configure_file("${CMAKE_SOURCE_DIR}/cmake/pkg/${CMAKE_PROJECT_NAME}Config.cmake.in"
+configure_file("${CMAKE_SOURCE_DIR}/cmake/${CMAKE_PROJECT_NAME}Config.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${CMAKE_PROJECT_NAME}Config.cmake" @ONLY)
 
 install(
@@ -356,15 +356,15 @@ message(STATUS "install directory is ${CMAKE_INSTALL_LIBDIR};;;")
 #)
 export(
   EXPORT ${CMAKE_PROJECT_NAME}-targets
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/psblasTargets.cmake"
-    NAMESPACE ${CMAKE_PROJECT_NAME}::
-)
-
-export(
-  EXPORT ${CMAKE_PROJECT_NAME}-targets
   FILE "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Targets.cmake"
     NAMESPACE ${CMAKE_PROJECT_NAME}::
 )
+
+#export(
+#  EXPORT ${CMAKE_PROJECT_NAME}-targets
+#  FILE "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Targets.cmake"
+#    NAMESPACE ${CMAKE_PROJECT_NAME}::
+#)
 
 		
  
