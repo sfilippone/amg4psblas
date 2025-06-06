@@ -14,6 +14,11 @@ if(NOT PSBLAS_INSTALL_DIR)
     message(FATAL_ERROR "PSBLAS_INSTALL_DIR must be set.  Use -DPSBLAS_INSTALL_DIR=/path/to/psblas when running CMake.")
 endif()
 
+
+find_package(psblas REQUIRED PATHS ${PSBLAS_INSTALL_DIR})
+find_package(amg4psblas REQUIRED PATHS ${AMG_INSTALL_DIR})
+
+
 # Include directories
 include_directories(
     "."
@@ -33,22 +38,24 @@ link_directories(
 )
 
 # Libraries
-set(AMG_LIBS psb_linsolve amg_prec psb_prec)
-set(PSBLAS_LIBS psb_util psb_linsolve psb_prec psb_base) 
+set(AMG_LIBS amg4psblas::amgprec)
+set(PSBLAS_LIBS  psblas::util psblas::linsolve psblas::prec psblas::base) 
 
 # Executable directory
 set(EXEDIR "${CMAKE_CURRENT_BINARY_DIR}/runs")
 file(MAKE_DIRECTORY "${EXEDIR}")
 
+set(COMMON_SOURCE data_input.f90)
+
 # Source files
-set(DMOBJS amg_dexample_ml.f90 data_input.f90)
-set(D1OBJS amg_dexample_1lev.f90 data_input.f90)
-set(ZMOBJS amg_zexample_ml.f90 data_input.f90)
-set(Z1OBJS amg_zexample_1lev.f90 data_input.f90)
-set(SMOBJS amg_sexample_ml.f90 data_input.f90)
-set(S1OBJS amg_sexample_1lev.f90 data_input.f90)
-set(CMOBJS amg_cexample_ml.f90 data_input.f90)
-set(C1OBJS amg_cexample_1lev.f90 data_input.f90)
+set(DMOBJS ${COMMON_SOURCE} amg_dexample_ml.f90)
+set(D1OBJS ${COMMON_SOURCE} amg_dexample_1lev.f90)
+set(ZMOBJS ${COMMON_SOURCE} amg_zexample_ml.f90)
+set(Z1OBJS ${COMMON_SOURCE} amg_zexample_1lev.f90)
+set(SMOBJS ${COMMON_SOURCE} amg_sexample_ml.f90)
+set(S1OBJS ${COMMON_SOURCE} amg_sexample_1lev.f90)
+set(CMOBJS ${COMMON_SOURCE} amg_cexample_ml.f90)
+set(C1OBJS ${COMMON_SOURCE} amg_cexample_1lev.f90)
 
 # Function to create executable
 macro(create_amg_executable target sources)
@@ -60,9 +67,12 @@ macro(create_amg_executable target sources)
     )
 
     # Move executable to EXEDIR (post-build)
-    add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E move $<TARGET_FILE:${target}> ${EXEDIR}
-    )
+    #add_custom_command(TARGET ${target} POST_BUILD
+    #    COMMAND ${CMAKE_COMMAND} -E move $<TARGET_FILE:${target}> ${EXEDIR}
+    #)
+    set_target_properties(${target} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${EXEDIR}
+        )
 endmacro()
 
 # Create executables
