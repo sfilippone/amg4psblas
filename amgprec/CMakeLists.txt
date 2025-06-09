@@ -875,6 +875,32 @@ list(APPEND AMG_amgprec_source_C_files  impl/amg_dslud_interface.c)
 list(APPEND AMG_amgprec_source_C_files  impl/amg_zumf_interface.c)
 list(APPEND AMG_amgprec_source_C_files  impl/amg_zslud_interface.c)
 
+
+set(AMG_amgprec_source_CPP_files
+impl/aggregator/computeCandidateMate.cpp
+impl/aggregator/processExposedVertex.cpp
+impl/aggregator/processMatchedVertices.cpp
+impl/aggregator/algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateCMP.cpp
+impl/aggregator/processCrossEdge.cpp
+impl/aggregator/findOwnerOfGhost.cpp
+impl/aggregator/MatchBoxPC.cpp
+impl/aggregator/queueTransfer.cpp
+impl/aggregator/clean.cpp
+impl/aggregator/algoDistEdgeApproxDomEdgesLinearSearchMesgBndlSmallMateC.cpp
+impl/aggregator/extractUChunk.cpp
+impl/aggregator/processMatchedVerticesAndSendMessages.cpp
+impl/aggregator/sendBundledMessages.cpp
+impl/aggregator/initialize.cpp
+impl/aggregator/isAlreadyMatched.cpp
+impl/aggregator/processMessages.cpp
+impl/aggregator/parallelComputeCandidateMateB.cpp
+)
+
 foreach(file IN LISTS AMG_amgprec_source_C_files)
   list(APPEND amgprec_source_C_files ${CMAKE_CURRENT_LIST_DIR}/${file})
+endforeach()
+
+
+foreach(file IN LISTS AMG_amgprec_source_CPP_files)
+  list(APPEND amgprec_source_CPP_files ${CMAKE_CURRENT_LIST_DIR}/${file})
 endforeach()
