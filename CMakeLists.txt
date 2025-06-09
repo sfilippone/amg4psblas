@@ -227,7 +227,7 @@ set_target_properties(amgprec
   PROPERTIES
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/modules"  
   POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME psb_amgprec
+  OUTPUT_NAME amg_prec
   LINKER_LANGUAGE Fortran
   )
 
@@ -273,7 +273,7 @@ set_target_properties(amgcbind
   PROPERTIES
   Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/modules"  
   POSITION_INDEPENDENT_CODE TRUE
-  OUTPUT_NAME psb_amgcbind
+  OUTPUT_NAME amg_cbind
   LINKER_LANGUAGE Fortran
   )
 
