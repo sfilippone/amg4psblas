@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 3.15)
 project(AMGExamples Fortran)
 
 # Installation directories (passed as CMake variables)
-set(AMG_INSTALL_DIR "" CACHE PATH "Path to AMG installation")
+set(AMG4PSBLAS_INSTALL_DIR "" CACHE PATH "Path to AMG installation")
 set(PSBLAS_INSTALL_DIR "" CACHE PATH "Path to PSBLAS installation")
 
 # Check if installation directories are set
-if(NOT AMG_INSTALL_DIR)
+if(NOT AMG4PSBLAS_INSTALL_DIR)
     message(FATAL_ERROR "AMG_INSTALL_DIR must be set.  Use -DAMG_INSTALL_DIR=/path/to/amg when running CMake.")
 endif()
 
