@@ -16,14 +16,14 @@ endif()
 
 
 find_package(psblas REQUIRED PATHS ${PSBLAS_INSTALL_DIR})
-find_package(amg4psblas REQUIRED PATHS ${AMG_INSTALL_DIR})
+find_package(amg4psblas REQUIRED PATHS ${AMG4PSBLAS_INSTALL_DIR})
 
 
 # Include directories
 include_directories(
     "."
-    "${AMG_INSTALL_DIR}/include"
-    "${AMG_INSTALL_DIR}/modules"
+    "${AMG4PSBLAS_INSTALL_DIR}/include"
+    "${AMG4PSBLAS_INSTALL_DIR}/modules"
     "${PSBLAS_INSTALL_DIR}/include" 
 )
 
@@ -33,7 +33,7 @@ set(FMFLAG "-I")
 
 # Library directories
 link_directories(
-    "${AMG_INSTALL_DIR}/lib"
+    "${AMG4PSBLAS_INSTALL_DIR}/lib"
     "${PSBLAS_INSTALL_DIR}/lib"
 )
 
