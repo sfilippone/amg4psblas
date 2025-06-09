@@ -8,7 +8,6 @@ AMG4PSBLAS is available from the web site
 \href{https://psctoolkit.github.io/products/amg4psblas/}{https://psctoolkit.github.io/products/amg4psblas/}
 \end{quotation}
 where contact points for further information can be also found.
-
 The software is available under a modified BSD license, as specified
 in Appendix~\ref{sec:license}; please note that some of the optional
 third party libraries may be licensed under a different and more
@@ -18,47 +17,70 @@ account when treating derived works.
 The library defines a version string with the
 constant
 \[ \verb|amg_version_string_|\]
-whose current value is \verb|1.0|.
+whose current value is \verb|1.2|.
 
-\subsection*{Contributors}
+\subsection*{Development team}
+The main development team for AMG4PSBLAS is:
 \begin{itemize}
 \item Pasqua D'Ambra, IAC-CNR, IT;			
 \item Fabio Durastante, University of Pisa and IAC-CNR, IT;
-\item Salvatore  Filippone, University of Rome Tor-Vergata and IAC-CNR, IT;				
+\item Salvatore  Filippone, University of Rome Tor-Vergata and IAC-CNR, IT;	
 \end{itemize}
-
+Other contributors:
+\begin{center}
+  \begin{minipage}{.48\textwidth}
+    \begin{itemize}
+    \item Luca       Pepè Sciarria;
+    \item Andea      Di Iorio;
+    \end{itemize}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{.48\textwidth}
+    \begin{itemize}
+    \item Zaak       Beekman;
+    \item Ambra      Abdullahi Hassan.
+    \end{itemize}
+  \end{minipage}
+\end{center}
 \subsection*{Citing AMG4PSBLAS}
-When use the library, please cite the following:
+When using the library, please cite the following:
+% \ifpdf
+% \begin{minted}[breakanywhere,fontsize=\small]{bibtex}
+% @article{DDF2021,
+%   author = {D'Ambra, Pasqua and Durastante, Fabio and Filippone, Salvatore},
+%   title = {{{AMG Preconditioners for Linear Solvers towards Extreme Scale}},
+%   journal = {arXiv e-preprints},
+%   eprint = {2006.16147v3},
+%   archivePrefix = {arXiv},
+%   year={2021}
+% }
 
-\ifpdf
-\begin{minted}[breakanywhere,fontsize=\small]{bibtex}
-@article{DDF2021,
-  author = {D'Ambra, Pasqua and Durastante, Fabio and Filippone, Salvatore},
-  title = {{{AMG Preconditioners for Linear Solvers towards Extreme Scale}},
-  journal = {arXiv e-preprints},
-  eprint = {2006.16147v3},
-  archivePrefix = {arXiv},
-  year={2021}
-}
-
-@Misc{psctoolkit-web-page,
-  author = {D'Ambra, Pasqua and Durastante, Fabio and Filippone, Salvatore},
-  title =  {{PSCToolkit} {W}eb page},
-  url =    {https://psctoolkit.github.io/},
-  howpublished = {\url{https://psctoolkit.github.io/}},
-  year = {2021}
-}
-\end{minted}
-\else
+% @Misc{psctoolkit-web-page,
+%   author = {D'Ambra, Pasqua and Durastante, Fabio and Filippone, Salvatore},
+%   title =  {{PSCToolkit} {W}eb page},
+%   url =    {https://psctoolkit.github.io/},
+%   howpublished = {\url{https://psctoolkit.github.io/}},
+%   year = {2021}
+% }
+% \end{minted}
+% \else
 \begin{verbatim}
-@article{DDF2021,
-       author = {D'Ambra, Pasqua and Durastante, Fabio and Filippone, Salvatore},
-       title = {{{AMG Preconditioners for Linear Solvers towards Extreme Scale}},
-       journal = {arXiv e-preprints},
-       eprint = {2006.16147v3},
-       archivePrefix = {arXiv},
-       year={2021}
-     }
+@article {MR4331965,
+     AUTHOR = {D'Ambra, Pasqua and Durastante, Fabio and Filippone, Salvatore},
+     TITLE = {A{MG} preconditioners for linear solvers towards extreme
+            scale},
+     JOURNAL = {SIAM J. Sci. Comput.},
+     FJOURNAL = {SIAM Journal on Scientific Computing},
+     VOLUME = {43},
+     YEAR = {2021},
+     NUMBER = {5},
+     PAGES = {S679--S703},
+     ISSN = {1064-8275,1095-7197},
+     MRCLASS = {65F50 (65F08 65F10 65N55 65Y05)},
+     MRNUMBER = {4331965},
+     MRREVIEWER = {Yongzhong\ Song},
+     DOI = {10.1137/20M134914X},
+}
 
 @Misc{psctoolkit-web-page,
        author = {D'Ambra, Pasqua and Durastante, Fabio and Filippone, Salvatore},
@@ -68,4 +90,14 @@ When use the library, please cite the following:
        year = {2021}
      }
 \end{verbatim}
-\fi
+%\fi
+% @article{DDF2021,
+%        author = {D'Ambra, Pasqua and Durastante, Fabio and Filippone, Salvatore},
+%        title = {{{AMG Preconditioners for Linear Solvers towards Extreme Scale}},
+%        journal = {arXiv e-preprints},
+%        eprint = {2006.16147v3},
+%        archivePrefix = {arXiv},
+%        year={2021}
+%      }
+
+
