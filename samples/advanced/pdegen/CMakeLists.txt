@@ -83,26 +83,26 @@ set(SGEN3D
 # Define executables and their sources
 set(amg_d_pde3d_SOURCES
     ${COMMON_SOURCE} 
-    amg_d_pde3d.f90
-    amg_d_genpde_mod.f90
+    amg_d_pde3d.F90
+    amg_d_genpde_mod.F90
     ${DGEN3D}
 )
 set(amg_s_pde3d_SOURCES
     ${COMMON_SOURCE} 
-    amg_s_pde3d.f90
-    amg_s_genpde_mod.f90
+    amg_s_pde3d.F90
+    amg_s_genpde_mod.F90
     ${SGEN3D}
 )
 set(amg_d_pde2d_SOURCES
     ${COMMON_SOURCE} 
-    amg_d_pde2d.f90
-    amg_d_genpde_mod.f90
+    amg_d_pde2d.F90
+    amg_d_genpde_mod.F90
     ${DGEN2D}
 )
 set(amg_s_pde2d_SOURCES
     ${COMMON_SOURCE} 
-    amg_s_pde2d.f90
-    amg_s_genpde_mod.f90
+    amg_s_pde2d.F90
+    amg_s_genpde_mod.F90
     ${SGEN2D}
 )
 
