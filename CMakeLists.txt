@@ -21,6 +21,9 @@ message(STATUS "psblas directory is ${PSBLAS_INSTALL_DIR};;")
 
 message(STATUS "PSBLAS DIRECTORY INC ${INCDIR}; MOD ${MODDIR}; LIB ${LIBDIR};")
 
+
+set(CMAKE_CXX_STANDARD 17) # Set cxx standard for the c++ part of the library
+
 # Find the psblas package
 find_package(psblas REQUIRED PATHS ${PSBLAS_INSTALL_DIR})
 
@@ -180,7 +183,7 @@ add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure)
 
 
 
-find_package( MPI REQUIRED Fortran )
+find_package( MPI REQUIRED Fortran C CXX )
 
 if(MPI_FOUND)
   #-----------------------------------------------
@@ -206,7 +209,7 @@ https://github.com/sourceryinstitute/OpenCoarrays/issues/317.
       
   endif()
 
-    message(STATUS "Found MPI: ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES}")
+    message(STATUS "Found MPI: ${MPI_C_LIBRARIES} - ${MPI_CXX_LIBRARIES} - ${MPI_Fortran_LIBRARIES}")
     
   #----------------
   # Setup MPI flags
@@ -235,7 +238,7 @@ else()
 endif()
 
 
-message(STATUS "++++++++++++++++++++++++++++++ MPI")
+
 if(MPI_FOUND)
   execute_process(COMMAND ${MPIEXEC} --version
     OUTPUT_VARIABLE mpi_version_out)
@@ -272,7 +275,7 @@ if(MPI_FOUND)
   # Add the created include directory to the project's include directories
   include_directories("${MPI_INCLUDE_DIR}")
 endif()
-message(STATUS "******************************** MPI")
+
 
 
 #------------------------------------------
@@ -293,7 +296,8 @@ configure_file(
 #---------------------------------------
 
 
-
+message(STATUS "MPI_LIBRARIES: ${MPI_LIBRARIES}")
+message(STATUS "MPI_CXX_LIBRARIES: ${MPI_CXX_LIBRARIES}")
 
 
 
@@ -313,7 +317,8 @@ target_link_libraries(amgprec_CPP
   #PUBLIC ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${LAPACK95_LIBRARIES}
   #PUBLIC ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${BLAS95_LIBRARIES}
   psblas::util psblas::linsolve psblas::prec psblas::ext psblas::cbind psblas::base
-  ${MPI_LIBRARIES} )  #TODO  check actual libraries needed
+  stdc++
+  ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} )  #TODO  check actual libraries needed
 
 add_library(amgprec ${amgprec_source_files} $<TARGET_OBJECTS:amgprec_C> $<TARGET_OBJECTS:amgprec_CPP>)
 
@@ -337,7 +342,8 @@ target_include_directories(amgprec PUBLIC ${INCDIR} ${MODDIR})
 target_link_libraries(amgprec
   #PUBLIC ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${LAPACK95_LIBRARIES}
   #PUBLIC ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${BLAS95_LIBRARIES}
-  psblas::util psblas::linsolve psblas::prec psblas::ext psblas::cbind psblas::base)  #TODO  check actual libraries needed
+  psblas::util psblas::linsolve psblas::prec psblas::ext psblas::cbind psblas::base
+  ${MPI_LIBRARIES})  #TODO  check actual libraries needed
 
 
 
