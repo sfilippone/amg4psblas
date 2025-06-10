@@ -73,10 +73,10 @@ macro(create_amg_executable target sources)
         )
 endmacro()
 # Create executables
-create_amg_executable(amg_dexample_ml ${DMOBJS})
-create_amg_executable(amg_dexample_1lev ${D1OBJS})
-create_amg_executable(amg_sexample_ml ${SMOBJS})
-create_amg_executable(amg_sexample_1lev ${S1OBJS})
+create_amg_executable(amg_dexample_ml "${DMOBJS}")
+create_amg_executable(amg_dexample_1lev "${D1OBJS}")
+create_amg_executable(amg_sexample_ml "${SMOBJS}")
+create_amg_executable(amg_sexample_1lev "${S1OBJS}")
 
 # Create "runs" directory (if it doesn't exist)
 add_custom_target(create_runs_dir

@@ -18,13 +18,15 @@ endif()
 find_package(psblas REQUIRED PATHS ${PSBLAS_INSTALL_DIR})
 find_package(amg4psblas REQUIRED PATHS ${AMG4PSBLAS_INSTALL_DIR})
 
+set(CMAKE_CXX_STANDARD 17)
 
 # Include directories
 include_directories(
     "."
     "${AMG4PSBLAS_INSTALL_DIR}/include"
     "${AMG4PSBLAS_INSTALL_DIR}/modules"
-    "${PSBLAS_INSTALL_DIR}/include" 
+    "${PSBLAS_INSTALL_DIR}/include"
+    "${PSBLAS_INSTALL_DIR}/modules"
 )
 
 # Fortran module directory
@@ -115,7 +117,7 @@ macro(create_amg_executable target sources)
     target_link_libraries(${target} PUBLIC
         ${AMG_LIBS}
         ${PSBLAS_LIBS}
-
+        stdc++
     )
 
     # Move executable to EXEDIR (post-build)
@@ -129,10 +131,10 @@ endmacro()
 
 
 # Create executables
-create_amg_executable(amg_d_pde3d ${amg_d_pde3d_SOURCES})
-create_amg_executable(amg_s_pde3d ${amg_s_pde3d_SOURCES})
-create_amg_executable(amg_d_pde2d ${amg_d_pde2d_SOURCES})
-create_amg_executable(amg_s_pde2d ${amg_s_pde2d_SOURCES})
+create_amg_executable(amg_d_pde3d "${amg_d_pde3d_SOURCES}")
+create_amg_executable(amg_s_pde3d "${amg_s_pde3d_SOURCES}")
+create_amg_executable(amg_d_pde2d "${amg_d_pde2d_SOURCES}")
+create_amg_executable(amg_s_pde2d "${amg_s_pde2d_SOURCES}")
 
 # Create "runs" directory (if it doesn't exist)
 add_custom_target(create_runs_dir

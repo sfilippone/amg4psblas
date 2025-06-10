@@ -75,10 +75,10 @@ endmacro()
 
 
 # Create executables
-create_amg_executable(amg_df_sample ${DFSOBJS})
-create_amg_executable(amg_sf_sample ${SFSOBJS})
-create_amg_executable(amg_cf_sample ${CFSOBJS})
-create_amg_executable(amg_zf_sample ${ZFSOBJS})
+create_amg_executable(amg_df_sample "${DFSOBJS}")
+create_amg_executable(amg_sf_sample "${SFSOBJS}")
+create_amg_executable(amg_cf_sample "${CFSOBJS}")
+create_amg_executable(amg_zf_sample "${ZFSOBJS}")
 
 # Create "runs" directory (if it doesn't exist)
 add_custom_target(create_runs_dir
