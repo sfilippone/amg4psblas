@@ -22,7 +22,8 @@ message(STATUS "psblas directory is ${PSBLAS_INSTALL_DIR};;")
 message(STATUS "PSBLAS DIRECTORY INC ${INCDIR}; MOD ${MODDIR}; LIB ${LIBDIR};")
 
 
-set(CMAKE_CXX_STANDARD 17) # Set cxx standard for the c++ part of the library
+#set(CMAKE_CXX_STANDARD 17) # Set cxx standard for the c++ part of the library
+
 
 # Find the psblas package
 find_package(psblas REQUIRED PATHS ${PSBLAS_INSTALL_DIR})
@@ -32,6 +33,19 @@ if(NOT psblas_FOUND)
 else()
     message(STATUS "Found PSBLAS: ${psblas_LIBRARIES}")
 endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # Add -g to the Fortran compiler flags.
+    # We use STRING(APPEND) to ensure we don't overwrite other important flags.
+    string(APPEND CMAKE_Fortran_FLAGS " -g")
+    string(APPEND CMAKE_CXX_FLAGS " -g")
+    message(STATUS "Fortran and CXX debug flags added: -g")
+endif()
+
+    string(APPEND CMAKE_Fortran_FLAGS " -O2")
+    string(APPEND CMAKE_CXX_FLAGS " -O2")
+    message(STATUS "Fortran and CXX optimization flags added: -O2")
+
 
 
 # Set the include and library directories based on the provided path
@@ -189,7 +203,7 @@ if(MPI_FOUND)
   #-----------------------------------------------
   # Work around an issue present on fedora systems
   #-----------------------------------------------
-  if( (MPI_C_LINK_FLAGS MATCHES "noexecstack") OR (MPI_Fortran_LINK_FLAGS MATCHES "noexecstack") )
+  if( (MPI_CXX_LINK_FLAGS MATCHES "noexecstack") OR (MPI_Fortran_LINK_FLAGS MATCHES "noexecstack") )
     message ( WARNING
       "The `noexecstack` linker flag was found in the MPI_<lang>_LINK_FLAGS variable. This is
 known to cause segmentation faults for some Fortran codes. See, e.g.,
@@ -199,9 +213,13 @@ https://github.com/sourceryinstitute/OpenCoarrays/issues/317.
 `noexecstack` is being replaced with `execstack`"
       )
     string(REPLACE "noexecstack"
+      "execstack" MPI_CXX_LINK_FLAGS_FIXED ${MPI_CXX_LINK_FLAGS})
+    string(REPLACE "noexecstack"
       "execstack" MPI_C_LINK_FLAGS_FIXED ${MPI_C_LINK_FLAGS})
     string(REPLACE "noexecstack"
       "execstack" MPI_Fortran_LINK_FLAGS_FIXED ${MPI_Fortran_LINK_FLAGS})
+    set(MPI_CXX_LINK_FLAGS "${MPI_CXX_LINK_FLAGS_FIXED}" CACHE STRING
+      "MPI CXX linking flags" FORCE)
     set(MPI_C_LINK_FLAGS "${MPI_C_LINK_FLAGS_FIXED}" CACHE STRING
       "MPI C linking flags" FORCE)
     set(MPI_Fortran_LINK_FLAGS "${MPI_Fortran_LINK_FLAGS_FIXED}" CACHE STRING
@@ -211,15 +229,25 @@ https://github.com/sourceryinstitute/OpenCoarrays/issues/317.
 
     message(STATUS "Found MPI: ${MPI_C_LIBRARIES} - ${MPI_CXX_LIBRARIES} - ${MPI_Fortran_LIBRARIES}")
     
+    
+  #----------------
+  # Setup MPI compilers
+  #----------------  
+  set(CMAKE_C_COMPILER ${MPI_C_COMPILER} CACHE FILEPATH "C compiler" FORCE)
+  set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER} CACHE FILEPATH "C++ compiler" FORCE)
+  set(CMAKE_Fortran_COMPILER ${MPI_Fortran_COMPILER} CACHE FILEPATH "Fortran compiler" FORCE)
+    
   #----------------
   # Setup MPI flags
   #----------------
   list(REMOVE_DUPLICATES MPI_Fortran_INCLUDE_PATH)
   set(CMAKE_C_COMPILE_FLAGS ${CMAKE_C_COMPILE_FLAGS} ${MPI_C_COMPILE_FLAGS})
   set(CMAKE_C_LINK_FLAGS ${CMAKE_C_LINK_FLAGS} ${MPI_C_LINK_FLAGS})
+  set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_CXX_COMPILE_FLAGS})
+  set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_CXX_LINK_FLAGS})
   set(CMAKE_Fortran_COMPILE_FLAGS ${CMAKE_Fortran_COMPILE_FLAGS} ${MPI_Fortran_COMPILE_FLAGS})
   set(CMAKE_Fortran_LINK_FLAGS ${CMAKE_Fortran_LINK_FLAGS} ${MPI_Fortran_LINK_FLAGS})
-  include_directories(BEFORE ${MPI_C_INCLUDE_PATH} ${MPI_Fortran_INCLUDE_PATH})
+  include_directories(BEFORE ${MPI_C_INCLUDE_PATH} ${MPI_CXX_INCLUDE_PATH} ${MPI_Fortran_INCLUDE_PATH})
 message(STATUS "${MPI_C_INCLUDE_PATH}; ${MPI_Fortran_INCLUDE_PATH};; ${CMAKE_Fortran_LINK_FLAGS} ;")
   if(MPI_Fortran_HAVE_F90_MODULE OR MPI_Fortran_HAVE_F08_MODULE)
     add_compile_options(-DPSB_MPI_MOD)
@@ -273,7 +301,7 @@ if(MPI_FOUND)
   endif()
 
   # Add the created include directory to the project's include directories
-  include_directories("${MPI_INCLUDE_DIR}")
+  #include_directories("${MPI_INCLUDE_DIR}")
 endif()
 
 
@@ -311,14 +339,16 @@ add_library(amgprec_CPP OBJECT ${amgprec_source_CPP_files})
 target_link_libraries(amgprec_C
   #PUBLIC ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${LAPACK95_LIBRARIES}
   #PUBLIC ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${BLAS95_LIBRARIES}
-  psblas::util psblas::linsolve psblas::prec psblas::ext psblas::cbind psblas::base)  #TODO  check actual libraries needed
+  psblas::util psblas::linsolve psblas::prec psblas::ext psblas::cbind psblas::base
+  #${MPI_C_LIBRARIES}
+  )  #TODO  check actual libraries needed
 
 target_link_libraries(amgprec_CPP
   #PUBLIC ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${LAPACK95_LIBRARIES}
   #PUBLIC ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${BLAS95_LIBRARIES}
   psblas::util psblas::linsolve psblas::prec psblas::ext psblas::cbind psblas::base
   stdc++
-  ${MPI_C_LIBRARIES} ${MPI_Fortran_LIBRARIES} )  #TODO  check actual libraries needed
+  ${MPI_CXX_LIBRARIES})  #TODO  check actual libraries needed
 
 add_library(amgprec ${amgprec_source_files} $<TARGET_OBJECTS:amgprec_C> $<TARGET_OBJECTS:amgprec_CPP>)
 
@@ -343,7 +373,8 @@ target_link_libraries(amgprec
   #PUBLIC ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${LAPACK95_LIBRARIES}
   #PUBLIC ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${BLAS95_LIBRARIES}
   psblas::util psblas::linsolve psblas::prec psblas::ext psblas::cbind psblas::base
-  ${MPI_LIBRARIES})  #TODO  check actual libraries needed
+  #${MPI_Fortran_LIBRARIES} ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES}
+  )  #TODO  check actual libraries needed
 
 
 
