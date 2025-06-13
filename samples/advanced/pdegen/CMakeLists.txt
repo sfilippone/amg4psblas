@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(AMGExamples Fortran)
+project(AMGExamples Fortran CXX)
 
 # Installation directories (passed as CMake variables)
 set(AMG4PSBLAS_INSTALL_DIR "" CACHE PATH "Path to AMG installation")
@@ -18,7 +18,54 @@ endif()
 find_package(psblas REQUIRED PATHS ${PSBLAS_INSTALL_DIR})
 find_package(amg4psblas REQUIRED PATHS ${AMG4PSBLAS_INSTALL_DIR})
 
-set(CMAKE_CXX_STANDARD 17)
+
+
+find_package(MPI REQUIRED Fortran CXX )
+
+if(MPI_FOUND)
+
+
+  if( (MPI_CXX_LINK_FLAGS MATCHES "noexecstack") OR (MPI_Fortran_LINK_FLAGS MATCHES "noexecstack") )
+    message ( WARNING
+      "The `noexecstack` linker flag was found in the MPI_<lang>_LINK_FLAGS variable. This is
+known to cause segmentation faults for some Fortran codes. See, e.g.,
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=71729 or
+https://github.com/sourceryinstitute/OpenCoarrays/issues/317.
+
+`noexecstack` is being replaced with `execstack`"
+      )
+    string(REPLACE "noexecstack"
+      "execstack" MPI_CXX_LINK_FLAGS_FIXED ${MPI_CXX_LINK_FLAGS})
+    string(REPLACE "noexecstack"
+      "execstack" MPI_C_LINK_FLAGS_FIXED ${MPI_C_LINK_FLAGS})
+    string(REPLACE "noexecstack"
+      "execstack" MPI_Fortran_LINK_FLAGS_FIXED ${MPI_Fortran_LINK_FLAGS})
+    set(MPI_CXX_LINK_FLAGS "${MPI_CXX_LINK_FLAGS_FIXED}" CACHE STRING
+      "MPI CXX linking flags" FORCE)
+    set(MPI_C_LINK_FLAGS "${MPI_C_LINK_FLAGS_FIXED}" CACHE STRING
+      "MPI C linking flags" FORCE)
+    set(MPI_Fortran_LINK_FLAGS "${MPI_Fortran_LINK_FLAGS_FIXED}" CACHE STRING
+      "MPI Fortran linking flags" FORCE)
+      
+  endif()
+
+    message(STATUS "Found MPI: ${MPI_C_LIBRARIES} - ${MPI_CXX_LIBRARIES} - ${MPI_Fortran_LIBRARIES}")
+    
+    
+  #----------------
+  # Setup MPI compiler
+  #----------------  
+  set(CMAKE_C_COMPILER ${MPI_C_COMPILER} CACHE FILEPATH "C compiler" FORCE)
+  set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER} CACHE FILEPATH "C++ compiler" FORCE)
+  set(CMAKE_Fortran_COMPILER ${MPI_Fortran_COMPILER} CACHE FILEPATH "Fortran compiler" FORCE)
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # Add -g to the Fortran compiler flags.
+    # We use STRING(APPEND) to ensure we don't overwrite other important flags.
+    string(APPEND CMAKE_Fortran_FLAGS " -g")
+    message(STATUS "Fortran debug flags added: -g")
+endif()
 
 # Include directories
 include_directories(
@@ -112,12 +159,12 @@ set(amg_s_pde2d_SOURCES
 
 
 # Function to create executable
-macro(create_amg_executable target sources)
+function(create_amg_executable target sources)
     add_executable(${target} ${sources})
     target_link_libraries(${target} PUBLIC
         ${AMG_LIBS}
         ${PSBLAS_LIBS}
-        stdc++
+        ${MPI_LIBRARIES}
     )
 
     # Move executable to EXEDIR (post-build)
@@ -126,8 +173,9 @@ macro(create_amg_executable target sources)
     #)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${EXEDIR}
+        LINKER_LANGUAGE Fortran
         )
-endmacro()
+endfunction()
 
 
 # Create executables
