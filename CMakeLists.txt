@@ -324,6 +324,8 @@ configure_file(
 # Add the AMG libraries
 #---------------------------------------
 
+# In your CMakeLists.txt
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-256")
 
 message(STATUS "MPI_LIBRARIES: ${MPI_LIBRARIES}")
 message(STATUS "MPI_CXX_LIBRARIES: ${MPI_CXX_LIBRARIES}")
