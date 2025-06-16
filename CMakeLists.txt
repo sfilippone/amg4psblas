@@ -265,7 +265,8 @@ else()
   set(CSERIALMPI "#define PSB_SERIAL_MPI")
 endif()
 
-
+add_compile_options(-O3)
+add_compile_options($<$<COMPILE_LANGUAGE:Fortran>:-frecursive>)
 
 if(MPI_FOUND)
   execute_process(COMMAND ${MPIEXEC} --version
@@ -350,7 +351,7 @@ target_link_libraries(amgprec_CPP
   stdc++
   ${MPI_CXX_LIBRARIES})  #TODO  check actual libraries needed
 
-add_library(amgprec ${amgprec_source_files} $<TARGET_OBJECTS:amgprec_C> $<TARGET_OBJECTS:amgprec_CPP>)
+add_library(amgprec ${amgprec_source_files} $<TARGET_OBJECTS:amgprec_CPP> $<TARGET_OBJECTS:amgprec_C> )
 
 set_target_properties(amgprec
   PROPERTIES
@@ -391,14 +392,14 @@ foreach(path IN LISTS amgcbind_header_C_files)
 endforeach()
 
 
-add_library(amgcbind_C OBJECT ${amgprec_source_C_files})
+add_library(amgcbind_C OBJECT ${amgcbind_source_C_files})
 
 target_link_libraries(amgcbind_C
   #PUBLIC ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${LAPACK95_LIBRARIES}
   #PUBLIC ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${BLAS95_LIBRARIES}
   psblas::util psblas::linsolve psblas::prec psblas::ext psblas::cbind psblas::base)  #TODO  check actual libraries needed
 
-add_library(amgcbind ${amgprec_source_files} $<TARGET_OBJECTS:amgcbind_C>)
+add_library(amgcbind ${amgcbind_source_files} $<TARGET_OBJECTS:amgcbind_C>)
 
 set_target_properties(amgcbind
   PROPERTIES
