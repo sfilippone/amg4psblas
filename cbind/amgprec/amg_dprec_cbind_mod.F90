@@ -21,17 +21,14 @@ contains
 !#define MLDC_ERR_FILTER(INFO) min(0,INFO)
 #define MLDC_ERR_FILTER(INFO) (INFO)
 #define MLDC_ERR_HANDLE(INFO) if(INFO/=amg_success_)MLDC_ERROR("ERROR!")
-
   function  amg_c_dprecinit(cctxt,ph,ptype) bind(c) result(res)
-    use psb_base_mod
-    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_)  :: res
     type(amg_c_dprec)    :: ph
     type(psb_c_object_type), value :: cctxt
     character(c_char)     :: ptype(*)
-    integer(psb_ipk_)     :: info
+    integer(psb_ipk_)     :: iret
     type(amg_dprec_type), pointer :: precp
     character(len=80)     :: fptype
 
@@ -41,30 +38,28 @@ contains
       return
     end if
 
-    allocate(precp,stat=info)
-    if (info /= 0) return
+    allocate(precp,stat=iret)
+    if (iret /= 0) return
 
     ph%item = c_loc(precp)
 
     call stringc2f(ptype,fptype)
 
-    call precp%init(psb_c2f_ctxt(cctxt),fptype,info)
+    call precp%init(psb_c2f_ctxt(cctxt),fptype,iret)
 
-    res = MLDC_ERR_FILTER(info)
+    res = MLDC_ERR_FILTER(iret)
     MLDC_ERR_HANDLE(res)
     return
   end function amg_c_dprecinit
 
   function  amg_c_dprecseti(ph,what,val) bind(c) result(res)
-    use psb_base_mod
-    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type) :: ph
     character(c_char)     :: what(*)
     integer(psb_c_ipk_), value :: val
-    integer(psb_ipk_)     :: info
+    integer(psb_ipk_)     :: iret
     character(len=80)     :: fwhat
     type(amg_dprec_type), pointer  :: precp
 
@@ -77,24 +72,22 @@ contains
 
     call stringc2f(what,fwhat)
 
-    call precp%set(fwhat,val,info)
+    call precp%set(fwhat,val,iret)
 
-    res = MLDC_ERR_FILTER(info)
+    res = MLDC_ERR_FILTER(iret)
     MLDC_ERR_HANDLE(res)
     return
   end function amg_c_dprecseti
 
 
   function  amg_c_dprecsetr(ph,what,val) bind(c) result(res)
-    use psb_base_mod
-    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type) :: ph
     character(c_char)     :: what(*)
     real(c_double), value :: val
-    integer(psb_ipk_)     :: info
+    integer(psb_ipk_)     :: iret
     character(len=80)     :: fwhat
     type(amg_dprec_type), pointer  :: precp
 
@@ -107,22 +100,20 @@ contains
 
     call stringc2f(what,fwhat)
 
-    call precp%set(fwhat,val,info)
+    call precp%set(fwhat,val,iret)
 
-    res = MLDC_ERR_FILTER(info)
+    res = MLDC_ERR_FILTER(iret)
     MLDC_ERR_HANDLE(res)
     return
   end function amg_c_dprecsetr
 
   function  amg_c_dprecsetc(ph,what,val) bind(c) result(res)
-    use psb_base_mod
-    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type) :: ph
     character(c_char)     :: what(*), val(*)
-    integer(psb_ipk_)     :: info
+    integer(psb_ipk_)     :: iret
     character(len=80)     :: fwhat,fval
     type(amg_dprec_type), pointer  :: precp
 
@@ -136,25 +127,23 @@ contains
     call stringc2f(what,fwhat)
     call stringc2f(val,fval)
 
-    call precp%set(fwhat,fval,info)
+    call precp%set(fwhat,fval,iret)
 
-    res = MLDC_ERR_FILTER(info)
+    res = MLDC_ERR_FILTER(iret)
     MLDC_ERR_HANDLE(res)
     return
   end function amg_c_dprecsetc
 
   function  amg_c_dprecbld(ah,cdh,ph) bind(c) result(res)
-    use psb_base_mod
-    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer(psb_ipk_)     :: info
     type(amg_dprec_type), pointer  :: precp
     type(psb_dspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
+    integer(psb_ipk_)     :: iret
 
     res = -1
 
@@ -174,22 +163,20 @@ contains
       return
     end if
 
-    call amg_precbld(ap,descp,precp,info)
+    call amg_precbld(ap,descp,precp,iret)
 
-    res = MLDC_ERR_FILTER(info)
+    res = MLDC_ERR_FILTER(iret)
     MLDC_ERR_HANDLE(res)
 
     return
   end function amg_c_dprecbld
 
   function  amg_c_dhierarchy_build(ah,cdh,ph) bind(c) result(res)
-    use psb_base_mod
-    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer(psb_ipk_)     :: info
+    integer(psb_ipk_)     :: iret
     type(amg_dprec_type), pointer  :: precp
     type(psb_dspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
@@ -213,26 +200,24 @@ contains
       return
     end if
 
-    call precp%hierarchy_build(ap,descp,info)
+    call precp%hierarchy_build(ap,descp,iret)
 
-    res = MLDC_ERR_FILTER(info)
+    res = MLDC_ERR_FILTER(iret)
     MLDC_ERR_HANDLE(res)
 
     return
   end function amg_c_dhierarchy_build
 
   function  amg_c_dsmoothers_build(ah,cdh,ph) bind(c) result(res)
-    use psb_base_mod
-    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer(psb_ipk_)     :: info
     type(amg_dprec_type), pointer  :: precp
     type(psb_dspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
+    integer(psb_ipk_)     :: iret
 
     res = -1
 
@@ -252,9 +237,9 @@ contains
       return
     end if
 
-    call precp%smoothers_build(ap,descp,info)
+    call precp%smoothers_build(ap,descp,iret)
 
-    res = MLDC_ERR_FILTER(info)
+    res = MLDC_ERR_FILTER(iret)
     MLDC_ERR_HANDLE(res)
 
     return
@@ -302,7 +287,7 @@ contains
     type(amg_dprec_type), pointer  :: precp
     type(psb_d_vect_type), pointer :: xp, bp
 
-    integer(psb_ipk_)     :: info,fitmax,fitrace,first,fistop,fiter
+    integer(psb_ipk_)     :: iret,fitmax,fitrace,first,fistop,fiter
     character(len=20)     :: fmethd
     real(kind(1.d0))      :: feps,ferr
 
@@ -342,23 +327,21 @@ contains
     fistop  = istop
 
     call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
-         & descp, info,&
+         & descp, iret,&
          & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
          & irst=first, err=ferr)
     iter = fiter
     err  = ferr
-    res = min(info,0)
+    res = min(iret,0)
 
   end function amg_c_dkrylov_opt
 
   function  amg_c_dprecfree(ph) bind(c) result(res)
-    use psb_base_mod
-    use amg_prec_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type) :: ph
-    integer(psb_ipk_)     :: info
+    integer(psb_ipk_)     :: iret
     type(amg_dprec_type), pointer :: precp
     character(len=80)     :: fptype
 
@@ -370,39 +353,37 @@ contains
     end if
 
 
-    call precp%free(info)
+    call precp%free(iret)
 
-    res = MLDC_ERR_FILTER(info)
+    res = MLDC_ERR_FILTER(iret)
     MLDC_ERR_HANDLE(res)
     return
   end function amg_c_dprecfree
 
   function amg_c_ddescr(ph) bind(c) result(res)
-   use psb_base_mod
-   use amg_prec_mod
-   implicit none
+    implicit none
 
-   integer(psb_c_ipk_) :: res
-   type(psb_c_object_type) :: ph
-   integer(psb_c_ipk_)     :: info
-   type(amg_dprec_type), pointer :: precp
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    integer(psb_c_ipk_)     :: iret
+    type(amg_dprec_type), pointer :: precp
 
-   res = -1
-   info = -1
-   if (c_associated(ph%item)) then
-     call c_f_pointer(ph%item,precp)
-   else
-     return
-   end if
+    res = -1
+    iret = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
 
 
-   call precp%descr(info)
-   call flush(psb_out_unit)
+    call precp%descr(iret)
+    call flush(psb_out_unit)
 
-   info = 0
-   res = MLDC_ERR_FILTER(info)
-   MLDC_ERR_HANDLE(res)
-   return
- end function amg_c_ddescr
+    iret = 0
+    res = MLDC_ERR_FILTER(iret)
+    MLDC_ERR_HANDLE(res)
+    return
+  end function amg_c_ddescr
 
 end module amg_dprec_cbind_mod

@@ -80,7 +80,7 @@ subroutine  amg_d_symdec_aggregator_build_tprol(ag,parms,ag_data,&
      & a,desc_a,ilaggr,nlaggr,op_prol,info)
   use psb_base_mod
   use amg_d_prec_type
-  use amg_d_symdec_aggregator_mod, amg_protect_name => amg_d_symdec_aggregator_build_tprol
+  use amg_d_symdec_aggregator_mod, only : amg_d_symdec_aggregator_type
   use amg_d_inner_mod
   implicit none
   class(amg_d_symdec_aggregator_type), target, intent(inout) :: ag
@@ -103,6 +103,16 @@ subroutine  amg_d_symdec_aggregator_build_tprol(ag,parms,ag_data,&
   integer(psb_ipk_)       :: debug_level, debug_unit
   logical                 :: clean_zeros
 
+!!$  interface 
+!!$    subroutine psb_daplusat(ain,aout,info)
+!!$      use psb_d_mat_mod, only : psb_dspmat_type
+!!$      import :: psb_ipk_
+!!$      implicit none
+!!$      type(psb_dspmat_type) :: ain, aout
+!!$      integer(psb_ipk_) :: info
+!!$    end subroutine psb_daplusat
+!!$  end interface 
+!!$
   name='amg_d_symdec_aggregator_tprol'
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
@@ -123,15 +133,11 @@ subroutine  amg_d_symdec_aggregator_build_tprol(ag,parms,ag_data,&
   call amg_check_def(parms%aggr_thresh,'Aggr_Thresh',dzero,is_legal_d_aggr_thrs)
 
   nr = a%get_nrows()
-  call a%csclip(atmp,info,imax=nr,jmax=nr,&
+  call a%csclip(atrans,info,imax=nr,jmax=nr,&
        & rscale=.false.,cscale=.false.)
-  call atmp%set_nrows(nr)
-  call atmp%set_ncols(nr)
-  if (info == psb_success_) call atmp%transp(atrans)
-  if (info == psb_success_) call atrans%cscnv(info,type='COO')
-  if (info == psb_success_) call psb_rwextd(nr,atmp,info,b=atrans,rowscale=.false.)
-  call atmp%set_nrows(nr)
-  call atmp%set_ncols(nr)
+  call atrans%set_nrows(nr)
+  call atrans%set_ncols(nr)
+  call psb_aplusat(atrans,atmp,info)
   if (info == psb_success_) call atrans%free()
   if (info == psb_success_) call atmp%cscnv(info,type='CSR')
 
