@@ -23,9 +23,11 @@ extern "C" {
   psb_i_t amg_c_zprecseti(amg_c_zprec *ph, const char *what, psb_i_t val);
   psb_i_t amg_c_zprecsetc(amg_c_zprec *ph, const char *what, const char *val);
   psb_i_t amg_c_zprecsetr(amg_c_zprec *ph, const char *what, double val);
-  psb_i_t amg_c_zprecbld(psb_c_dspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph);
-  psb_i_t amg_c_zhierarchy_build(psb_c_dspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph);
-  psb_i_t amg_c_zsmoothers_build(psb_c_dspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph);
+  psb_i_t amg_c_zprecbld(psb_c_zspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph);
+  psb_i_t amg_c_zhierarchy_build(psb_c_zspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph);
+  psb_i_t amg_c_zsmoothers_build(psb_c_zspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph);
+  psb_i_t amg_c_zprecapply(amg_c_zprec *ph, psb_c_zvector *x, psb_c_zvector *b, psb_c_descriptor *cdh);
+  psb_i_t amg_c_zprecapply_opt(amg_c_zprec *ph, psb_c_zvector *x, psb_c_zvector *b, psb_c_descriptor *cdh, const char *ctrans);
   psb_i_t amg_c_zprecfree(amg_c_zprec *ph);
   psb_i_t amg_c_zprecbld_opt(psb_c_zspmat *ah, psb_c_descriptor *cdh, 
 			  amg_c_zprec *ph, const char *afmt);

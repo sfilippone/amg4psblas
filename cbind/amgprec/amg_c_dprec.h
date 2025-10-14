@@ -26,6 +26,8 @@ extern "C" {
   psb_i_t amg_c_dprecbld(psb_c_dspmat *ah, psb_c_descriptor *cdh, amg_c_dprec *ph);
   psb_i_t amg_c_dhierarchy_build(psb_c_dspmat *ah, psb_c_descriptor *cdh, amg_c_dprec *ph);
   psb_i_t amg_c_dsmoothers_build(psb_c_dspmat *ah, psb_c_descriptor *cdh, amg_c_dprec *ph);
+  psb_i_t amg_c_dprecapply(amg_c_dprec *ph, psb_c_dvector *x, psb_c_dvector *b, psb_c_descriptor *cdh);
+  psb_i_t amg_c_dprecapply_opt(amg_c_dprec *ph, psb_c_dvector *x, psb_c_dvector *b, psb_c_descriptor *cdh, const char *ctrans);
   psb_i_t amg_c_dprecfree(amg_c_dprec *ph);
   psb_i_t amg_c_dprecbld_opt(psb_c_dspmat *ah, psb_c_descriptor *cdh, 
 			  amg_c_dprec *ph, const char *afmt);

@@ -358,6 +358,25 @@ int main(int argc, char *argv[])
     fprintf(stderr,"From smoothers_build: %d\n",ret);
 
   psb_c_barrier(*cctxt);
+  /* Do a dry run of the preconditioner */
+  info = amg_c_dprecapply(ph,bh,xh,cdh);
+  if (info != 0) {
+    fprintf(stderr,"From dprec_apply: %d\nBailing out\n",info);
+    psb_c_abort(*cctxt);
+  }
+  /* Do a dry run of the preconditioner with the option routine */
+  info = amg_c_dprecapply_opt(ph,bh,xh,cdh,"N");
+  if (info != 0) {
+    fprintf(stderr,"From dprec_apply_opt: %d\nBailing out\n",info);
+    psb_c_abort(*cctxt);
+  }
+  /*
+  info = amg_c_dprecapply_opt(ph,bh,xh,cdh,"T");
+    if (info != 0) {
+      fprintf(stderr,"From dprec_apply_opt: %d\nBailing out\n",info);
+      psb_c_abort(*cctxt);
+    }
+  */
   /* Set up the solver options */ 
   psb_c_DefaultSolverOptions(&options);
   options.eps    = 1.e-6;
