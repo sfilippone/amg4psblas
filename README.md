@@ -77,6 +77,6 @@ In the European project “Energy oriented Center of Excellence: toward exascale
 **Contributors** (_roughly reverse cronological order_):
 
 - Luca       Pepè Sciarria
-- Andea      Di Iorio
-- Ambra	     Abdullahi Hassan
+- Andrea     Di Iorio
+- Ambra	    Abdullahi Hassan
 - Alfredo    Buttari
