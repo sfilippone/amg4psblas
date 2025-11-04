@@ -99,7 +99,7 @@ Note that the module \fortinline|amg_prec_mod|, containing the definition of the
 preconditioner data type and the interfaces to the routines of AMG4PSBLAS,
 must be used in any program calling such routines.
 The modules \fortinline|psb_base_mod|, for the sparse matrix and communication descriptor
-data types, and \fortinline|psb_krylov_mod|, for interfacing with the
+data types, and \fortinline|psb_linsolve_mod|, for interfacing with the
 Krylov solvers, must be also used (see Section~\ref{sec:examples}). \\
 
 \textbf{Remark 1.} Coarsest-level solvers based on the LU factorization,
@@ -120,7 +120,7 @@ by simply specifying \fortinline|'ML'| as the second argument of \fortinline|P%i
 (a call to \fortinline|P%set| is not needed) and is applied with the CG
 solver provided by PSBLAS (the matrix of the system to be solved is
 assumed to be positive definite). As previously observed, the modules
-\fortinline|psb_base_mod|, \fortinline|amg_prec_mod| and \fortinline|psb_krylov_mod|
+\fortinline|psb_base_mod|, \fortinline|amg_prec_mod| and \fortinline|psb_linsolve_mod|
 must be used by the example program.
 
 The part of the code dealing with reading and assembling  the sparse
@@ -148,7 +148,7 @@ the corresponding codes are available in \verb|samples/simple/file|\-\verb|read|
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{fortran}
   use psb_base_mod
   use amg_prec_mod
-  use psb_krylov_mod
+  use psb_linsolve_mod
 ... ...
 !
 ! sparse matrix
@@ -203,7 +203,7 @@ stop
 \begin{verbatim}
   use psb_base_mod
   use amg_prec_mod
-  use psb_krylov_mod
+  use psb_linsolve_mod
 ... ...
 !
 ! sparse matrix
@@ -436,7 +436,7 @@ declare some auxiliary variables:
 program amg_dexample_gpu
   use psb_base_mod
   use amg_prec_mod
-  use psb_krylov_mod
+  use psb_linsolve_mod
   use psb_util_mod
   use psb_gpu_mod
   use data_input
@@ -456,7 +456,7 @@ program amg_dexample_gpu
 program amg_dexample_gpu
   use psb_base_mod
   use amg_prec_mod
-  use psb_krylov_mod
+  use psb_linsolve_mod
   use psb_util_mod
   use psb_gpu_mod
   use data_input

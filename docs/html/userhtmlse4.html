@@ -355,12 +355,12 @@ class="content">Preconditioner types, corresponding strings and default choices.
 class="cmr-12">Note that the module </span><code class="lstinline"><span style="color:#000000">amg_prec_mod</span></code><span 
 class="cmr-12">, containing the definition of the preconditioner</span>
 <span 
-class="cmr-12">data type and the interfaces to the routines of AMG4PSBLAS, must be used</span>
+class="cmr-12">data type and the interfaces to the routines of AMG4PSBLAS, must be used in any</span>
 <span 
-class="cmr-12">in any program calling such routines. The modules </span><code class="lstinline"><span style="color:#000000">psb_base_mod</span></code><span 
-class="cmr-12">, for the</span>
+class="cmr-12">program calling such routines. The modules </span><code class="lstinline"><span style="color:#000000">psb_base_mod</span></code><span 
+class="cmr-12">, for the sparse</span>
 <span 
-class="cmr-12">sparse matrix and communication descriptor data types, and </span><code class="lstinline"><span style="color:#000000">psb_krylov_mod</span></code><span 
+class="cmr-12">matrix and communication descriptor data types, and </span><code class="lstinline"><span style="color:#000000">psb_linsolve_mod</span></code><span 
 class="cmr-12">,</span>
 <span 
 class="cmr-12">for interfacing with the Krylov solvers, must be also used (see Section</span><span 
@@ -414,7 +414,7 @@ class="cmr-12">with the CG solver provided by PSBLAS (the matrix of the system t
 class="cmr-12">solved is assumed to be positive definite). As previously observed, the modules</span>
 <code class="lstinline"><span style="color:#000000">psb_base_mod</span></code><span 
 class="cmr-12">, </span><code class="lstinline"><span style="color:#000000">amg_prec_mod</span></code> <span 
-class="cmr-12">and </span><code class="lstinline"><span style="color:#000000">psb_krylov_mod</span></code> <span 
+class="cmr-12">and </span><code class="lstinline"><span style="color:#000000">psb_linsolve_mod</span></code> <span 
 class="cmr-12">must be used by the example</span>
 <span 
 class="cmr-12">program.</span>
@@ -485,7 +485,7 @@ class="cmr-12">.</span>
 <div class="minipage"><pre class="verbatim" id="verbatim-7">
 &#x00A0;&#x00A0;use&#x00A0;psb_base_mod
 &#x00A0;&#x00A0;use&#x00A0;amg_prec_mod
-&#x00A0;&#x00A0;use&#x00A0;psb_krylov_mod
+&#x00A0;&#x00A0;use&#x00A0;psb_linsolve_mod
 ...&#x00A0;...
 !
 !&#x00A0;sparse&#x00A0;matrix
@@ -763,7 +763,7 @@ class="cmr-12">variables:</span>
 program&#x00A0;amg_dexample_gpu
 &#x00A0;&#x00A0;use&#x00A0;psb_base_mod
 &#x00A0;&#x00A0;use&#x00A0;amg_prec_mod
-&#x00A0;&#x00A0;use&#x00A0;psb_krylov_mod
+&#x00A0;&#x00A0;use&#x00A0;psb_linsolve_mod
 &#x00A0;&#x00A0;use&#x00A0;psb_util_mod
 &#x00A0;&#x00A0;use&#x00A0;psb_gpu_mod
 &#x00A0;&#x00A0;use&#x00A0;data_input
