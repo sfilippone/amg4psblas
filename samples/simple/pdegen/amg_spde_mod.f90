@@ -230,7 +230,8 @@ contains
 
       ! A nifty MPI function will split the process list
       npdims = 0
-      call mpi_dims_create(np,3,npdims,info)
+      npp = np
+      call mpi_dims_create(npp,3,npdims,minfo)
       npx = npdims(1)
       npy = npdims(2)
       npz = npdims(3)

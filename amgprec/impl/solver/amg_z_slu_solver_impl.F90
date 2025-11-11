@@ -1,3 +1,4 @@
+#if !defined(PSB_IPK8)
 subroutine amg_z_slu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
   use psb_base_mod
@@ -19,7 +20,7 @@ subroutine amg_z_slu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   type(psb_z_coo_sparse_mat) :: acoo
   integer :: n_row,n_col, nrow_a, nztota
   type(psb_ctxt_type) :: ctxt
-  integer :: np,me,i, err_act, debug_unit, debug_level
+  integer(psb_ipk_)  :: np,me,i, err_act, debug_unit, debug_level
   character(len=20)  :: name='s_slu_solver_bld', ch_err
 
   info=psb_success_
@@ -87,7 +88,7 @@ subroutine amg_z_slu_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   character, intent(in), optional                :: init
   type(psb_z_vect_type),intent(inout), optional   :: initu
 
-  integer    :: err_act
+  integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='s_slu_solver_apply_vect'
 
   call psb_erractionsave(err_act)
@@ -127,10 +128,10 @@ subroutine amg_z_slu_solver_apply(alpha,sv,x,beta,y,desc_data,&
   character, intent(in), optional       :: init
   complex(psb_dpk_),intent(inout), optional :: initu(:)
 
-  integer    :: n_row,n_col
+  integer(psb_ipk_)  :: n_row,n_col
   complex(psb_dpk_), pointer :: ww(:)
   type(psb_ctxt_type) :: ctxt
-  integer    :: np,me,i, err_act
+  integer(psb_ipk_)   :: np,me,i, err_act
   character          :: trans_
   character(len=20)  :: name='s_slu_solver_apply'
 
@@ -200,3 +201,4 @@ subroutine amg_z_slu_solver_apply(alpha,sv,x,beta,y,desc_data,&
   return
 
 end subroutine amg_z_slu_solver_apply
+#endif

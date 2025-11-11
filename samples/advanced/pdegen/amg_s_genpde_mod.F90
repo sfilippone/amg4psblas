@@ -266,8 +266,9 @@ contains
       npdims = 0
 #if defined(PSB_SERIAL_MPI)
       npdims = 1
-#else 
-      call mpi_dims_create(np,3,npdims,info)
+#else
+      npp = np
+      call mpi_dims_create(npp,3,npdims,minfo)
 #endif
       npx = npdims(1)
       npy = npdims(2)
@@ -734,7 +735,8 @@ contains
 #if defined(PSB_SERIAL_MPI)
       npdims = 1
 #else 
-      call mpi_dims_create(np,2,npdims,info)
+      npp = np
+      call mpi_dims_create(npp,3,npdims,minfo)
 #endif
       npx = npdims(1)
       npy = npdims(2)
