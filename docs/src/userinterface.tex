@@ -253,7 +253,7 @@ be applied.
 \bsideways
 \begin{center}
 %\begin{tabular}{|p{5cm}|l|p{2.4cm}|p{2.5cm}|p{5cm}|}
-\begin{tabular}{|p{5.7cm}|l|p{2.3cm}|p{2.5cm}|p{6.9cm}|}
+\begin{tabular}{|p{5.7cm}|l|p{2.3cm}|p{2.0cm}|p{6.4cm}|}
 \hline
 \fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
@@ -292,8 +292,8 @@ be applied.
                          & Maximum number of levels. The aggregation stops
                            if the number of levels reaches this value (see Note). \\ \hline
 \fortinline|'PAR_AGGR_ALG'|  & \fortinline|character(len=*)| \hspace*{-3mm}
-& \texttt{'DEC'}, \texttt{'SYMDEC'}, \texttt{'COUPLED'}
-& \texttt{'DEC'}
+& \texttt{'DECOUPLED'}, \texttt{'SYMDEC'}, \texttt{'COUPLED'}
+& \texttt{'DECOUPLED'}
 & Parallel aggregation algorithm. \par the
 \fortinline|SYMDEC| option applies decoupled
 aggregation to  the sparsity pattern
@@ -445,13 +445,20 @@ the parameter \texttt{ilev}.} \\
 \bsideways
 \ContinuedFloat
 \begin{center}
-\begin{tabular}{|p{3.9cm}|l|p{1.7cm}|p{1.7cm}|p{8.6cm}|}
+\begin{tabular}{|p{3.6cm}|l|p{1.7cm}|p{1.7cm}|p{8.2cm}|}
 \hline
 \fi                           
 \fortinline|'COARSE_SUBSOLVE'| & \fortinline|character(len=*)|
-                         & \fortinline|'ILU'| \par \fortinline|'ILUT'| \par \fortinline|'MILU'| \par
-                            \fortinline|'MUMPS'| \par \fortinline|'SLU'| \par \fortinline|'UMF'| \par
-                            \fortinline|'INVT'| \par \fortinline|'INVK'| \par \fortinline|'AINV'|
+                         & \fortinline|'ILU'| \par
+                           \fortinline|'ILUT'| \par
+                           \fortinline|'MILU'| \par 
+                            \fortinline|'MUMPS'| \par
+                           \fortinline|'SLU'| \par
+                           \fortinline|'SLUDIST'| \par
+                           \fortinline|'UMF'| \par 
+                            \fortinline|'INVT'| \par
+                           \fortinline|'INVK'| \par
+                           \fortinline|'AINV'| 
                          & See~Note.
                          & Solver for the diagonal blocks of the coarsest matrix,
                            in case the block Jacobi solver
@@ -487,18 +494,18 @@ the parameter \texttt{ilev}.} \\
 \fortinline|what|              & \textsc{data type}        &  \fortinline|val|      &  \textsc{default}  &
 \textsc{comments} \\ \hline
 \fortinline|'COARSE_SWEEPS'| & \fortinline|integer|
-                         & Any integer \par number $> 0$
+                         & Any integer  number $> 0$
                          & 10
                          & Number of sweeps when \fortinline|JACOBI|, \fortinline|GS| or \fortinline|BJAC|
 			   is chosen as coarsest-level solver.\\ \hline
 \fortinline|'COARSE_FILLIN'| & \fortinline|integer|
-                         & Any integer \par number $\ge 0$
+                         & Any integer  number $\ge 0$
                          & 0
                          & Fill-in level $p$ of the ILU factorizations
                            and first fill-in for the approximate inverses. \\ \hline
 \fortinline|'COARSE_ILUTHRS'|
                          & \fortinline|real(kind_parameter)|
-                         & Any real \par number $\ge 0$
+                         & Any real  number $\ge 0$
                          & 0
                          & Drop tolerance $t$ in the ILU($p,t$)
                            factorization and first drop-tolerance for the approximate inverses. \\
@@ -542,7 +549,7 @@ level (continued).\label{tab:p_coarse_1}}
 \bsideways
 \ContinuedFloat
 \begin{center}
-\begin{tabular}{|p{3.9cm}|l|p{1.7cm}|p{1.7cm}|p{8.6cm}|}
+\begin{tabular}{|p{3.5cm}|l|p{1.7cm}|p{1.4cm}|p{8.6cm}|}
 \hline
 \fi     
 		\fortinline|'KRM_SUB_SOLVE'|  & \fortinline|character(len=*)| & Table~\ref{tab:p_coarse_1} & \fortinline|'ILU'| & Solver for the diagonal blocks of the coarsest matrix preconditioner,
