@@ -382,56 +382,6 @@ contains
     return
   end function amg_c_zprecapply
 
-    function amg_c_dprecapply(ph,bc,xc,cdh) bind(c,name="amg_c_dprecapply") result(res)
-    use psb_base_mod
-    use psb_prec_mod
-    implicit none
-
-    integer(psb_c_ipk_) :: res
-    type(psb_c_object_type) :: ph ! C handle to preconditioner
-    type(psb_c_object_type) :: bc ! C handle to rhs
-    type(psb_c_object_type) :: xc ! C handle to solution
-    type(psb_c_object_type) :: cdh ! C handle to descriptor
-
-    ! Fortran containers for preconditioner, lhs, rhs and descriptor
-    type(amg_dprec_type), pointer  :: precp
-    type(psb_d_vect_type), pointer :: xp, bp
-    type(psb_desc_type), pointer   :: descp
-    integer(psb_ipk_)     :: info
-
-    res = -1
-    ! Check descriptor
-    if (c_associated(cdh%item)) then
-      call c_f_pointer(cdh%item,descp)
-    else
-      return
-    end if
-    ! Check rhs and solution
-    if (c_associated(bc%item)) then
-      call c_f_pointer(bc%item,bp)
-    else
-      return
-    end if
-    if (c_associated(xc%item)) then
-      call c_f_pointer(xc%item,xp)
-    else
-      return
-    end if
-    ! Check preconditioner
-    if (c_associated(ph%item)) then
-      call c_f_pointer(ph%item,precp)
-    else
-      return
-    end if
-    ! Apply preconditioner
-    call precp%apply(bp,xp,descp,info)
-
-    ! Error handling and return
-    res = MLDC_ERR_FILTER(info)
-    MLDC_ERR_HANDLE(res)
-    return
-end function amg_c_dprecapply
-
   function amg_c_zprecapply_opt(ph,bc,xc,cdh,ctrans) bind(c,name="amg_c_zprecapply_opt") result(res)
     use psb_base_mod
     use psb_prec_mod
