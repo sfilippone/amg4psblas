@@ -889,6 +889,8 @@ AC_MSG_NOTICE([
 	SuperLU_Dist detected : ${amg4psblas_cv_have_superludist}
 	UMFPack detected      : ${amg4psblas_cv_have_umfpack}
 
+	INSTALL_DIR 	      : ${INSTALL_DIR}
+	
 	If you are satisfied, run 'make' to build ${PACKAGE_NAME} and its documentation; otherwise
 	type  ./configure --help=short for a complete list of configure options specific to ${PACKAGE_NAME}.
 dnl	To install the program and its documentation, run 'make install' if you are root,
