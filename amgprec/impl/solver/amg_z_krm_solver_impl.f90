@@ -99,7 +99,7 @@ subroutine amg_z_krm_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   integer(psb_ipk_) :: i, err_act, debug_unit, debug_level
   integer(psb_mpk_) :: np,me
   type(psb_ctxt_type) :: ctxt, l_ctxt
-  character(len=20)   :: name='@Z@_krm_solver_bld', ch_err
+  character(len=20)   :: name='z_krm_solver_bld', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -190,7 +190,7 @@ subroutine amg_z_krm_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   integer(psb_ipk_) :: i, err_act, debug_unit, debug_level
   integer(psb_mpk_) :: np,me
   type(psb_ctxt_type) :: ctxt
-  character(len=20) :: name='@Z@_krm_solver_apply_v', ch_err
+  character(len=20) :: name='z_krm_solver_apply_v', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -252,7 +252,7 @@ subroutine amg_z_krm_solver_apply(alpha,sv,x,beta,y,desc_data,&
   integer(psb_ipk_) :: i, err_act, debug_unit, debug_level
   integer(psb_mpk_) :: np,me
   type(psb_ctxt_type) :: ctxt
-  character(len=20) :: name='@Z@_krm_solver_apply', ch_err
+  character(len=20) :: name='z_krm_solver_apply', ch_err
 
   info=psb_success_
   call psb_erractionsave(err_act)
