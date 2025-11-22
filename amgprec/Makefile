@@ -58,23 +58,21 @@ MODOBJS=amg_base_prec_type.o amg_prec_type.o  amg_prec_mod.o \
 	$(SMODOBJS) $(DMODOBJS) $(CMODOBJS) $(ZMODOBJS)
 
 
-OBJS=$(MODOBJS)
-
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=libamg_prec.a
 
-all: objs impld
+all: mods  objs impld
 
-objs: $(OBJS)
+mods: $(MODOBJS)
 	/bin/cp -p amg_const.h amg_config.h $(INCDIR)
 	/bin/cp -p *$(.mod) $(MODDIR)
-
-impld: objs
+objs: mods impld
+impld: mods
 	cd impl && $(MAKE) 
 
-lib: $(OBJS) impld
+lib: mods impld
 	cd impl && $(MAKE) lib
-	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
+	$(AR) $(HERE)/$(LIBNAME) $(MODOBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
 
@@ -221,7 +219,7 @@ veryclean: clean
 	/bin/rm -f $(LIBNAME)
 
 clean: implclean
-	/bin/rm -f $(OBJS) $(LOCAL_MODS) *$(.mod)
+	/bin/rm -f $(MODOBJS) $(LOCAL_MODS) *$(.mod)
 
 implclean:
 	cd impl && $(MAKE) clean

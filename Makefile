@@ -1,10 +1,11 @@
 include Make.inc
 
 
-all:  objs lib
+all:  mods objs lib
 
-objs: libdir amgp cbnd
-
+objs: libdir mods amgobjs cbnd 
+mods: libdir
+	cd amgprec && $(MAKE) mods
 lib:  objs
 	cd amgprec && $(MAKE) lib
 	cd cbind && $(MAKE)  lib
@@ -15,10 +16,10 @@ libdir:
 	(if test ! -d modules ; then mkdir modules; fi;)	
 	($(INSTALL_DATA) Make.inc  include/Make.inc.amg4psblas)
         
-
-amgp:
+amgobjs: mods
 	cd amgprec && $(MAKE) objs
-cbnd: amgp
+
+cbnd: mods
 	cd cbind && $(MAKE)  objs
 
 install: all
