@@ -251,7 +251,7 @@ contains
     use psb_prec_mod
     use psb_linsolve_mod
     use psb_prec_cbind_mod
-    use psb_dkrylov_cbind_mod
+    use psb_dlinsolve_cbind_mod
     implicit none
     integer(psb_c_ipk_)          :: res
     type(psb_c_object_type) :: ah,cdh,ph,bh,xh

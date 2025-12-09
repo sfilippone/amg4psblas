@@ -4,7 +4,7 @@
 #include "amg_const.h"
 #include "psb_base_cbind.h"
 #include "psb_prec_cbind.h"
-#include "psb_krylov_cbind.h"
+#include "psb_linsolve_cbind.h"
 
 /* Object handle related routines */
 /* Note:  amg_get_XXX_handle returns:  <= 0  unsuccessful */

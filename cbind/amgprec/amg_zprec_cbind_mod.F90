@@ -250,7 +250,7 @@ contains
        & ah,ph,bh,xh,cdh,options) bind(c) result(res)
     use psb_linsolve_mod
     use psb_prec_cbind_mod
-    use psb_zkrylov_cbind_mod
+    use psb_zlinsolve_cbind_mod
     implicit none
     integer(psb_c_ipk_)          :: res
     type(psb_c_object_type) :: ah,cdh,ph,bh,xh
