@@ -320,7 +320,9 @@ contains
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
         end if
       else
-        inp_unit=psb_inp_unit
+        write(psb_err_unit,*) 'Usage: amg_dexample_ml ctrl-file '
+        call psb_abort(ctxt)
+        stop        
       end if
       ! read input parameters
       call read_data(choice,inp_unit)

@@ -736,7 +736,7 @@ contains
       npdims = 1
 #else 
       npp = np
-      call mpi_dims_create(npp,3,npdims,minfo)
+      call mpi_dims_create(npp,2,npdims,minfo)
 #endif
       npx = npdims(1)
       npy = npdims(2)
