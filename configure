@@ -10983,7 +10983,7 @@ if test "x$amg4psblas_cv_have_superlu" == "xyes" ; then
    SLU_FLAGS="-DAMG_SLU_VERSION_$pac_slu_version $SLU_INCLUDES"
    FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_SLU $FDEFINES"
    CHAVESLU="#define  AMG_HAVE_SLU"
-   CSLUVERSION="#define  AMG_SLU_VERSION_$pac_slu_version"
+   CSLUVERSION="#define  AMG_SLU_VERSION $pac_slu_version"
 else
    SLU_FLAGS=""
 fi

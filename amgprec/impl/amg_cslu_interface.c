@@ -112,7 +112,7 @@ typedef struct {
 
 int  amg_cslu_fact(int n, int nnz, 
 #ifdef AMG_HAVE_SLU
-#if defined(AMG_SLU_VERSION_7)
+#if (AMG_SLU_VERSION >= 7)
 		   singlecomplex *values,
 #else		   
 		   complex *values,
@@ -181,10 +181,10 @@ int  amg_cslu_fact(int n, int nnz,
     
     panel_size = sp_ienv(1);
     relax = sp_ienv(2);
-#if defined(AMG_SLU_VERSION_7) ||defined(AMG_SLU_VERSION_5) 
+#if (AMG_SLU_VERSION >= 7) ||  (AMG_SLU_VERSION == 5) 
     cgstrf(&options, &AC, relax, panel_size, etree,
 	   NULL, 0, perm_c, perm_r, L, U, &Glu, &stat, &info);
-#elif defined(AMG_SLU_VERSION_4)
+#elif (AMG_SLU_VERSION == 4)
     cgstrf(&options, &AC, relax, panel_size, etree,
 	   NULL, 0, perm_c, perm_r, L, U, &stat, &info);
 #else
@@ -234,7 +234,7 @@ int  amg_cslu_fact(int n, int nnz,
 
 int amg_cslu_solve(int itrans, int n, int nrhs,
 #ifdef AMG_HAVE_SLU
-#if defined(AMG_SLU_VERSION_7)
+#if (AMG_SLU_VERSION == 7)
 		   singlecomplex *b,
 #else		   
 		   complex *b,
