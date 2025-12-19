@@ -749,21 +749,40 @@ if test "x$pac_slu_header_ok" == "xyes" ; then
  AC_MSG_RESULT($pac_slu_lib_ok)
 fi
 if test "x$pac_slu_header_ok" == "xyes" ; then 
-   AC_MSG_CHECKING([for superlu version 5])
+   AC_MSG_CHECKING([for superlu version 7])
    AC_LANG_PUSH([C])
    AC_COMPILE_IFELSE(
-       [AC_LANG_SOURCE([[#include "slu_ddefs.h"
-			 int testdslu()
+       [AC_LANG_SOURCE([[#include "slu_cdefs.h"
+			 int testcslu()
 			 { SuperMatrix AC, *L, *U;
 			   int *perm_r, *perm_c,  *etree,  panel_size, permc_spec, relax, info;
 			   superlu_options_t options;   SuperLUStat_t stat;
+			   singlecomplex  *x;
 			   GlobalLU_t Glu;   
-			   dgstrf(&options, &AC, relax, panel_size, etree,
+			   cgstrf(&options, &AC, relax, panel_size, etree,
 				  NULL, 0, perm_c, perm_r, L, U, &Glu, &stat, &info);               
 			   
 			 }]])],
-       [ AC_MSG_RESULT([yes]);      pac_slu_version="5";],
-       [ AC_MSG_RESULT([no]);      pac_slu_version="4";])
+       [ AC_MSG_RESULT([yes]);      pac_slu_version="7";],
+       [ AC_MSG_RESULT([no]); pac_slu_version="";])
+   if test "x$pac_slu_version" == "x" ; then 
+      AC_MSG_CHECKING([for superlu version 5])
+      AC_LANG_PUSH([C])
+      AC_COMPILE_IFELSE(
+	  [AC_LANG_SOURCE([[#include "slu_ddefs.h"
+			    int testdslu()
+			    { SuperMatrix AC, *L, *U;
+			      int *perm_r, *perm_c,  *etree,  panel_size, permc_spec, relax, info;
+			      superlu_options_t options;   SuperLUStat_t stat;
+			      GlobalLU_t Glu;   
+			      dgstrf(&options, &AC, relax, panel_size, etree,
+				     NULL, 0, perm_c, perm_r, L, U, &Glu, &stat, &info);               
+			      
+			    }]])],
+	  [ AC_MSG_RESULT([yes]);      pac_slu_version="5";],
+	  [ AC_MSG_RESULT([no]);      pac_slu_version="4";])
+      AC_LANG_POP([C])
+      fi         
    AC_LANG_POP([C])
 fi   
 

@@ -10891,8 +10891,8 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 printf "%s\n" "$pac_slu_lib_ok" >&6; }
 fi
 if test "x$pac_slu_header_ok" == "xyes" ; then
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for superlu version 5" >&5
-printf %s "checking for superlu version 5... " >&6; }
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for superlu version 7" >&5
+printf %s "checking for superlu version 7... " >&6; }
    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -10901,16 +10901,49 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include "slu_ddefs.h"
-			 int testdslu()
+#include "slu_cdefs.h"
+			 int testcslu()
 			 { SuperMatrix AC, *L, *U;
 			   int *perm_r, *perm_c,  *etree,  panel_size, permc_spec, relax, info;
 			   superlu_options_t options;   SuperLUStat_t stat;
+			   singlecomplex  *x;
 			   GlobalLU_t Glu;
-			   dgstrf(&options, &AC, relax, panel_size, etree,
+			   cgstrf(&options, &AC, relax, panel_size, etree,
 				  NULL, 0, perm_c, perm_r, L, U, &Glu, &stat, &info);
 
 			 }
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; };      pac_slu_version="7";
+else case e in #(
+  e)  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }; pac_slu_version=""; ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+   if test "x$pac_slu_version" == "x" ; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for superlu version 5" >&5
+printf %s "checking for superlu version 5... " >&6; }
+      ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include "slu_ddefs.h"
+			    int testdslu()
+			    { SuperMatrix AC, *L, *U;
+			      int *perm_r, *perm_c,  *etree,  panel_size, permc_spec, relax, info;
+			      superlu_options_t options;   SuperLUStat_t stat;
+			      GlobalLU_t Glu;
+			      dgstrf(&options, &AC, relax, panel_size, etree,
+				     NULL, 0, perm_c, perm_r, L, U, &Glu, &stat, &info);
+
+			    }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"
 then :
@@ -10922,6 +10955,13 @@ printf "%s\n" "no" >&6; };      pac_slu_version="4"; ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+      ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+      fi
    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'

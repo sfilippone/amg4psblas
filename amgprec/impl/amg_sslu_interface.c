@@ -172,7 +172,7 @@ int amg_sslu_fact(int n, int nnz, float *values,
     
     panel_size = sp_ienv(1);
     relax = sp_ienv(2);
-#if defined(AMG_SLU_VERSION_5)
+#if defined(AMG_SLU_VERSION_7) ||defined(AMG_SLU_VERSION_5) 
     sgstrf(&options, &AC, relax, panel_size, 
 	   etree, NULL, 0, perm_c, perm_r, L, U, &Glu, &stat, &info);
 #elif defined(AMG_SLU_VERSION_4)
