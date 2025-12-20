@@ -8070,8 +8070,8 @@ if test "x$pac_cv_psblas_patchlevel" == "xunknown"; then
    as_fn_error $? "PSBLAS patchlevel \"$pac_cv_psblas_patchlevel\"." "$LINENO" 5
 fi
 if (( $pac_cv_psblas_major < 3 )) ||
-   (  (( $pac_cv_psblas_major == 3 )) && (( $pac_cv_psblas_minor < 8 ))) ; then
-  as_fn_error $? "I need at least PSBLAS version 3.8.0" "$LINENO" 5
+   (  (( $pac_cv_psblas_major == 3 )) && (( $pac_cv_psblas_minor < 9 ))) ; then
+  as_fn_error $? "I need at least PSBLAS version 3.9.0" "$LINENO" 5
 else
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Am configuring with PSBLAS version $pac_cv_psblas_major.$pac_cv_psblas_minor.$pac_cv_psblas_patchlevel." >&5
 printf "%s\n" "$as_me: Am configuring with PSBLAS version $pac_cv_psblas_major.$pac_cv_psblas_minor.$pac_cv_psblas_patchlevel." >&6;}
