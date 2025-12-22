@@ -88,10 +88,10 @@ cd build
 cmake -DPSBLAS_INSTALL_DIR=</path/to/psblas/installation> ..
 ```
 During this step, CMake will:
-• Search for the PSBLAS package in the provided path.
-• Detect and configure MPI (required for C, C++, and Fortran).
-• Set up include and module directories based on the PSBLAS configuration.
-• Configure integer sizes (IPK and LPK) to match the PSBLAS installation.
+- Search for the PSBLAS package in the provided path.
+- Detect and configure MPI (required for C, C++, and Fortran).
+- Set up include and module directories based on the PSBLAS configuration.
+- Configure integer sizes (IPK and LPK) to match the PSBLAS installation.
 ### 2.1. Customizing the Installation Path
 By default, the library will be installed in standard system locations. To install amg4psblas in a custom directory, use the CMAKE_INSTALL_PREFIX variable:
 ```
