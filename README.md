@@ -73,6 +73,45 @@ in isolation and without these features.
 >the corresponding preconditioner options will be available only from
 >the double precision version.
 
+## CMAKE 
+AMG4PSBLAS supports building with CMake. To configure the project, you must explicitly provide the path where PSBLAS is installed. If this path is not specified, the configuration will fail with a fatal error.
+
+From the root directory of the project, run:
+### 1. Create and enter the build directory
+```
+mkdir build
+cd build
+```
+
+### 2. Configure the project (MANDATORY: specify your PSBLAS path)
+```
+cmake -DPSBLAS_INSTALL_DIR=</path/to/psblas/installation> ..
+```
+During this step, CMake will:
+• Search for the PSBLAS package in the provided path.
+• Detect and configure MPI (required for C, C++, and Fortran).
+• Set up include and module directories based on the PSBLAS configuration.
+• Configure integer sizes (IPK and LPK) to match the PSBLAS installation.
+### 2.1. Customizing the Installation Path
+By default, the library will be installed in standard system locations. To install amg4psblas in a custom directory, use the CMAKE_INSTALL_PREFIX variable:
+```
+cmake -DPSBLAS_INSTALL_DIR=</path/to/psblas/installation> \
+      -DCMAKE_INSTALL_PREFIX=</path/to/amg4psblas_install> ..
+```
+
+### 3. Compiling and Installing
+Once configured, you can build the libraries (amg_prec and amg_cbind) and install them.
+#### Build the library
+```
+make
+```
+
+#### Install the library, modules, and samples
+```
+make install
+```
+
+
 ### CUDA, OpeMP, OpenACC
 
 CUDA, OpenMP and OpenACC features are transparently inherited by PSBLAS installation.
