@@ -58,9 +58,9 @@ class="cmr-12">. Most Fortran compilers provide this feature; in particular, thi
 <span 
 class="cmr-12">supported by the GNU Fortran compiler, for which we recommend to use at least</span>
 <span 
-class="cmr-12">version 4.8. The software defines data types and interfaces for real and complex data,</span>
+class="cmr-12">version 12. The software defines data types and interfaces for real and complex data, in</span>
 <span 
-class="cmr-12">in both single and double precision.</span>
+class="cmr-12">both single and double precision.</span>
 <!--l. 20--><p class="indent" >   <span 
 class="cmr-12">Building AMG4PSBLAS requires some base libraries (see Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
@@ -85,19 +85,19 @@ class="cmr-12">&#8220;developer&#8221; part; in order to build AMG4PSBLAS you ne
 class="cmr-12">the base and optional software used by AMG4PSBLAS is given in the next</span>
 <span 
 class="cmr-12">sections.</span>
-<!--l. 30--><p class="noindent" >
+<!--l. 31--><p class="noindent" >
    <h4 class="subsectionHead"><span class="titlemark"><span 
 class="cmr-12">3.1   </span></span> <a 
  id="x6-80003.1"></a><span 
 class="cmr-12">Prerequisites</span></h4>
-<!--l. 32--><p class="noindent" ><span 
+<!--l. 33--><p class="noindent" ><span 
 class="cmr-12">The following base libraries are needed:</span>
      <dl class="description"><dt class="description">
-     <!--l. 34--><p class="noindent" >
+     <!--l. 35--><p class="noindent" >
 <span 
 class="cmbx-12">BLAS</span> </dt><dd 
 class="description">
-     <!--l. 34--><p class="noindent" ><span class="cite"><span 
+     <!--l. 35--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli3.html#Xblas3"><span 
 class="cmr-12">18</span></a><span 
@@ -152,11 +152,11 @@ class="cmr-12">for including -fPIC compilation option in the make.inc file of th
      <span 
 class="cmr-12">library.</span>
      </dd><dt class="description">
-     <!--l. 51--><p class="noindent" >
+     <!--l. 52--><p class="noindent" >
 <span 
 class="cmbx-12">MPI</span> </dt><dd 
 class="description">
-     <!--l. 51--><p class="noindent" ><span class="cite"><span 
+     <!--l. 52--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli3.html#XMPI2"><span 
 class="cmr-12">25</span></a><span 
@@ -169,11 +169,11 @@ class="cmr-12">A version of MPI is available on most high-performance computing<
      <span 
 class="cmr-12">systems.</span>
      </dd><dt class="description">
-     <!--l. 53--><p class="noindent" >
+     <!--l. 54--><p class="noindent" >
 <span 
 class="cmbx-12">PSBLAS</span> </dt><dd 
 class="description">
-     <!--l. 53--><p class="noindent" ><span class="cite"><span 
+     <!--l. 54--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli3.html#XPSBLASGUIDE"><span 
 class="cmr-12">21</span></a><span 
@@ -192,13 +192,13 @@ class="cmr-12">; version</span>
 class="cmr-12">3.9.0 (or later) is required. Indeed, all the prerequisites listed so far are also</span>
      <span 
 class="cmr-12">prerequisites of PSBLAS.</span></dd></dl>
-<!--l. 60--><p class="noindent" ><span 
+<!--l. 61--><p class="noindent" ><span 
 class="cmr-12">Please note that the four previous libraries must have Fortran interfaces compatible with</span>
 <span 
 class="cmr-12">AMG4PSBLAS; usually this means that they should all be built with the same</span>
 <span 
 class="cmr-12">compiler being used for AMG4PSBLAS.</span>
-<!--l. 64--><p class="indent" >   <span 
+<!--l. 65--><p class="indent" >   <span 
 class="cmr-12">If you want to use the PSBLAS support for NVIDIA GPUs, you will also</span>
 <span 
 class="cmr-12">need a working version of the CUDA Toolkit that is compatible with the</span>
@@ -214,7 +214,7 @@ class="cmr-12">options:</span>
    <pre class="verbatim" id="verbatim-2">
 ./configure&#x00A0;--enable-cuda&#x00A0;--with-cudadir=${CUDA_HOME}&#x00A0;--with-cudacc=xx,yy,zz
 </pre>
-<!--l. 89--><p class="nopar" > <span 
+<!--l. 90--><p class="nopar" > <span 
 class="cmr-12">Previous versions required you to have the auxiliary libraries SPGPU and</span>
 <span 
 class="cmr-12">PSBLAS-EXT compiled, this is no longer necessary because they have been integrated</span>
@@ -226,24 +226,24 @@ class="cmr-12">&#x00A0;</span><a
 href="userhtmlse4.html#x7-150004.2"><span 
 class="cmr-12">4.2</span><!--tex4ht:ref: sec:gpu-example --></a><span 
 class="cmr-12">.</span>
-<!--l. 96--><p class="noindent" >
+<!--l. 97--><p class="noindent" >
    <h4 class="subsectionHead"><span class="titlemark"><span 
 class="cmr-12">3.2   </span></span> <a 
  id="x6-90003.2"></a><span 
 class="cmr-12">Optional third party libraries</span></h4>
-<!--l. 98--><p class="noindent" ><span 
+<!--l. 99--><p class="noindent" ><span 
 class="cmr-12">We provide interfaces to the following third-party software libraries; note that these are</span>
 <span 
 class="cmr-12">optional, but if you enable them some defaults for multilevel preconditioners may</span>
 <span 
 class="cmr-12">change to reflect their presence.</span>
-<!--l. 102--><p class="indent" >
+<!--l. 103--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 103--><p class="noindent" >
+     <!--l. 104--><p class="noindent" >
 <span 
 class="cmbx-12">UMFPACK</span> </dt><dd 
 class="description">
-     <!--l. 103--><p class="noindent" ><span class="cite"><span 
+     <!--l. 104--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli3.html#XUMFPACK"><span 
 class="cmr-12">16</span></a><span 
@@ -266,11 +266,11 @@ class="cmr-12">provide  the  right  path  to  the  BLAS  and  LAPACK  libraries 
 class="cmtt-12">SuiteSparse_config/SuiteSparse_config.mk</span></span></span> <span 
 class="cmr-12">file.</span>
      </dd><dt class="description">
-     <!--l. 110--><p class="noindent" >
+     <!--l. 111--><p class="noindent" >
 <span 
 class="cmbx-12">MUMPS</span> </dt><dd 
 class="description">
-     <!--l. 110--><p class="noindent" ><span class="cite"><span 
+     <!--l. 111--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli3.html#XMUMPS"><span 
 class="cmr-12">2</span></a><span 
@@ -286,14 +286,14 @@ class="cmr-12">solution for single and double precision, real and complex data. 
      <span 
 class="cmr-12">versions 4.10.0 and 5.0.1.</span>
      </dd><dt class="description">
-     <!--l. 115--><p class="noindent" >
+     <!--l. 116--><p class="noindent" >
 <span 
 class="cmbx-12">SuperLU</span> </dt><dd 
 class="description">
                                                                                
 
                                                                                
-     <!--l. 115--><p class="noindent" ><span class="cite"><span 
+     <!--l. 116--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli3.html#XSUPERLU"><span 
 class="cmr-12">17</span></a><span 
@@ -312,12 +312,12 @@ class="cmr-12">data. We tested versions 4.3 and 5.0. If you installed BLAS from 
      <span 
 class="cmr-12">remember to define the BLASLIB variable in the make.inc file.</span>
      </dd><dt class="description">
-     <!--l. 121--><p class="noindent" >
+     <!--l. 122--><p class="noindent" >
 <span 
 class="cmbx-12">SuperLU</span><span 
 class="cmbx-12">_Dist</span> </dt><dd 
 class="description">
-     <!--l. 121--><p class="noindent" ><span class="cite"><span 
+     <!--l. 122--><p class="noindent" ><span class="cite"><span 
 class="cmr-12">[</span><a 
 href="userhtmlli3.html#XSUPERLUDIST"><span 
 class="cmr-12">28</span></a><span 
@@ -341,18 +341,18 @@ class="cmr-12">parallel graph partitioning and fill-reducing matrix ordering, av
 href="glaros.dtc.umn.edu/gkhome/metis/parmetis/overview" class="url" ><span 
 class="cmtt-12">glaros.dtc.umn.edu/gkhome/metis/parmetis/overview</span></a><span 
 class="cmr-12">.</span></dd></dl>
-<!--l. 133--><p class="noindent" >
+<!--l. 134--><p class="noindent" >
    <h4 class="subsectionHead"><span class="titlemark"><span 
 class="cmr-12">3.3   </span></span> <a 
  id="x6-100003.3"></a><span 
 class="cmr-12">Configuration options</span></h4>
-<!--l. 135--><p class="noindent" ><span 
+<!--l. 136--><p class="noindent" ><span 
 class="cmr-12">In order to build AMG4PSBLAS, the first step is to use the </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">configure</span></span></span> <span 
 class="cmr-12">script in the</span>
 <span 
 class="cmr-12">main directory to generate the necessary makefile.</span>
-<!--l. 139--><p class="indent" >   <span 
+<!--l. 140--><p class="indent" >   <span 
 class="cmr-12">As a minimal example consider the following:</span>
                                                                                
 
@@ -360,7 +360,7 @@ class="cmr-12">As a minimal example consider the following:</span>
    <pre class="verbatim" id="verbatim-3">
 ./configure&#x00A0;--with-psblas=PSB-INSTALL-DIR
 </pre>
-<!--l. 147--><p class="nopar" > <span 
+<!--l. 148--><p class="nopar" > <span 
 class="cmr-12">which assumes that the various MPI compilers and support libraries are available in</span>
 <span 
 class="cmr-12">the standard directories on the system, and specifies only the PSBLAS install directory</span>
@@ -374,7 +374,7 @@ class="cmtt-12">./configure</span><span
 class="cmtt-12">&#x00A0;--help</span></span></span><span 
 class="cmr-12">, which</span>
 <span 
-class="cmr-12">produces:  </span><!--l. 158--><pre class="lstinputlisting" id="listing-1"><span class="label"><a 
+class="cmr-12">produces:  </span><!--l. 159--><pre class="lstinputlisting" id="listing-1"><span class="label"><a 
  id="x6-10002r1"></a></span><span style="color:#000000"><span 
 class="cmtt-12">&#8216;</span></span><span style="color:#000000"><span 
 class="cmtt-12">configure</span></span><span style="color:#000000"><span 
@@ -3910,8 +3910,8 @@ class="cmtt-12">/</span></span><span style="color:#000000"><span
 class="cmtt-12">issues</span></span><span style="color:#000000"><span 
 class="cmtt-12">&#x003E;.</span></span>
    </pre>
-<!--l. 160--><p class="noindent" ><span 
-class="cmr-12">For instance, if a user has built and installed PSBLAS 3.7 under the </span><span class="obeylines-h"><span class="verb"><span 
+<!--l. 161--><p class="noindent" ><span 
+class="cmr-12">For instance, if a user has built and installed PSBLAS 3.9 under the </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">/opt</span></span></span> <span 
 class="cmr-12">directory and is</span>
 <span 
@@ -3922,10 +3922,10 @@ class="cmr-12">might be configured with:</span>
 
                                                                                
    <pre class="verbatim" id="verbatim-4">
-./configure&#x00A0;--with-psblas=/opt/psblas-3.7/&#x00A0;\
+./configure&#x00A0;--with-psblas=/opt/psblas-3.9/&#x00A0;\
 --with-umfpackincdir=/usr/include/suitesparse/
 </pre>
-<!--l. 172--><p class="nopar" > <span 
+<!--l. 173--><p class="nopar" > <span 
 class="cmr-12">Once the configure script has completed execution, it will have generated the file</span>
 <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">Make.inc</span></span></span> <span 
@@ -3934,7 +3934,7 @@ class="cmr-12">which will then be used by all Makefiles in the directory tree; t
 class="cmr-12">copied in the install directory under the name </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">Make.inc.AMG4PSBLAS</span></span></span><span 
 class="cmr-12">.</span>
-<!--l. 179--><p class="indent" >   <span 
+<!--l. 180--><p class="indent" >   <span 
 class="cmr-12">To use the MUMPS solver package, the user has to add the appropriate options to</span>
 <span 
 class="cmr-12">the configure script; by default we are looking for the libraries </span><span class="obeylines-h"><span class="verb"><span 
@@ -3954,7 +3954,7 @@ class="cmtt-12">--with-extra-libs</span></span></span> <span
 class="cmr-12">configure</span>
 <span 
 class="cmr-12">option.</span>
-<!--l. 187--><p class="indent" >   <span 
+<!--l. 188--><p class="indent" >   <span 
 class="cmr-12">To build the library the user will now enter</span>
                                                                                
 
@@ -3962,7 +3962,7 @@ class="cmr-12">To build the library the user will now enter</span>
    <pre class="verbatim" id="verbatim-5">
 make
 </pre>
-<!--l. 195--><p class="nopar" > <span 
+<!--l. 196--><p class="nopar" > <span 
 class="cmr-12">followed (optionally) by</span>
                                                                                
 
@@ -3970,12 +3970,12 @@ class="cmr-12">followed (optionally) by</span>
    <pre class="verbatim" id="verbatim-6">
 make&#x00A0;install
 </pre>
-<!--l. 205--><p class="nopar" >
+<!--l. 206--><p class="nopar" >
    <h4 class="subsectionHead"><span class="titlemark"><span 
 class="cmr-12">3.4   </span></span> <a 
  id="x6-110003.4"></a><span 
 class="cmr-12">Bug reporting</span></h4>
-<!--l. 208--><p class="noindent" ><span 
+<!--l. 209--><p class="noindent" ><span 
 class="cmr-12">If you find any bugs in our codes, please report them through our issues page</span>
 <span 
 class="cmr-12">on</span><br 
@@ -3983,18 +3983,18 @@ class="newline" /> <a
 href="https://github.com/psctoolkit/psctoolkit/issues" class="url" ><span 
 class="cmtt-12">https://github.com/psctoolkit/psctoolkit/issues</span></a><br 
 class="newline" />
-<!--l. 212--><p class="indent" >   <span 
+<!--l. 213--><p class="indent" >   <span 
 class="cmr-12">To enable us to track the bug, please provide a log from the failing application, the</span>
 <span 
 class="cmr-12">test conditions, and ideally a self-contained test program reproducing the</span>
 <span 
 class="cmr-12">issue.</span>
-<!--l. 216--><p class="noindent" >
+<!--l. 217--><p class="noindent" >
    <h4 class="subsectionHead"><span class="titlemark"><span 
 class="cmr-12">3.5   </span></span> <a 
  id="x6-120003.5"></a><span 
 class="cmr-12">Example and test programs</span></h4>
-<!--l. 217--><p class="noindent" ><span 
+<!--l. 218--><p class="noindent" ><span 
 class="cmr-12">The package contains a </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">samples</span></span></span> <span 
 class="cmr-12">directory, divided in two subdirs </span><span class="obeylines-h"><span class="verb"><span 
@@ -4010,22 +4010,22 @@ class="cmr-12">subdirectories.</span>
 <span 
 class="cmr-12">Their purpose is as follows:</span>
      <dl class="description"><dt class="description">
-     <!--l. 222--><p class="noindent" >
+     <!--l. 223--><p class="noindent" >
 <span 
 class="cmtt-12">simple</span> </dt><dd 
 class="description">
-     <!--l. 222--><p class="noindent" ><span 
+     <!--l. 223--><p class="noindent" ><span 
 class="cmr-12">contains  a  set  of  simple  example  programs  with  a  predefined  choice  of</span>
      <span 
 class="cmr-12">preconditioners,  selectable  via  integer  values.  These  are  intended  to  get</span>
      <span 
 class="cmr-12">acquainted with the multilevel preconditioners available in AMG4PSBLAS.</span>
      </dd><dt class="description">
-     <!--l. 226--><p class="noindent" >
+     <!--l. 227--><p class="noindent" >
 <span 
 class="cmtt-12">advanced</span> </dt><dd 
 class="description">
-     <!--l. 226--><p class="noindent" ><span 
+     <!--l. 227--><p class="noindent" ><span 
 class="cmr-12">contains a set of more sophisticated examples that will allow the user, via</span>
      <span 
 class="cmr-12">the input files in the </span><span class="obeylines-h"><span class="verb"><span 
@@ -4033,7 +4033,7 @@ class="cmtt-12">runs</span></span></span> <span
 class="cmr-12">subdirectories, to experiment with the full range</span>
      <span 
 class="cmr-12">of preconditioners implemented in the package.</span></dd></dl>
-<!--l. 231--><p class="noindent" ><span 
+<!--l. 232--><p class="noindent" ><span 
 class="cmr-12">The </span><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-12">fileread</span></span></span> <span 
 class="cmr-12">directories contain sample programs that read sparse matrices from files,</span>

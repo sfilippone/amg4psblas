@@ -13,19 +13,20 @@ must support the Fortran~2003 standard plus the extension \verb|MOLD=|
 feature, which enhances the usability of \verb|ALLOCATE|.
 Most Fortran compilers provide  this feature; in particular, this is
 supported by the GNU Fortran compiler, for which we
-recommend to use at least version 4.8.
+recommend to use at least version 12.
 The software defines data types and interfaces for
 real and complex data, in both single and double precision.
 
 Building AMG4PSBLAS requires some base libraries (see
-Section~\ref{sec:prerequisites}); interfaces to optional third-party
+Section~\ref{sec:prerequisites}); interfaces to optional third-party 
 libraries, which extend the functionalities of AMG4PSBLAS (see
-Section~\ref{sec:third-party}), are also available.  A number of Linux
-distributions (e.g., Ubuntu, Fedora, CentOS) provide precompiled
+Section~\ref{sec:third-party}), are also available.  A number of Linux 
+distributions (e.g., Ubuntu, Fedora, CentOS) provide precompiled 
 packages for the prerequisite and optional software. In many cases
 these packages are split between a runtime part and a ``developer''
 part; in order to build AMG4PSBLAS you need both. A description of the
-base and optional software used by AMG4PSBLAS is given in the next sections.
+base and optional software used by AMG4PSBLAS is given in the next
+sections. 
 
 \subsection{Prerequisites\label{sec:prerequisites}}
 
@@ -157,17 +158,17 @@ The full set of options may be looked at by issuing the command
 \else
 \lstinputlisting{../configureout.txt}
 \fi
-For instance, if a user has built and installed PSBLAS 3.7 under the
+For instance, if a user has built and installed PSBLAS 3.9 under the
 \verb|/opt| directory and is
 using the SuiteSparse package (which includes UMFPACK), then AMG4PSBLAS
 might be configured with:
 \ifpdf
 \begin{minted}[breaklines=true,bgcolor=bg,fontsize=\small]{console}
-./configure --with-psblas=/opt/psblas-3.7/ --with-umfpackincdir=/usr/include/suitesparse/
+./configure --with-psblas=/opt/psblas-3.9/ --with-umfpackincdir=/usr/include/suitesparse/
 \end{minted}
 \else
 \begin{verbatim}
-./configure --with-psblas=/opt/psblas-3.7/ \
+./configure --with-psblas=/opt/psblas-3.9/ \
 --with-umfpackincdir=/usr/include/suitesparse/
 \end{verbatim}
 \fi

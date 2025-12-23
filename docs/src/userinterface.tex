@@ -160,7 +160,7 @@ the smoothers. However, for simplicity, shortcuts are
 provided to set all versions of point-Jacobi, hybrid (forward) Gauss-Seidel, and
 hybrid backward Gauss-Seidel, i.e., the previous smoothers can be defined
 just by setting \fortinline|'SMOOTHER_TYPE'| to certain specific
-values (see Tables~\ref{tab:p_smoother}), without the need to set
+values (see Table~\ref{tab:p_smoother}), without the need to set
 \fortinline|'SUB_SOLVE'| as well.
 
 The smoother and solver objects are arranged in a
@@ -182,47 +182,50 @@ the polynomial used. Consequently, the \fortinline|'SMOOTHER_SWEEPS'| option is 
 the \fortinline|'POLY_DEGREE'| option. This smoother is paired with a base smoother 
 object, whose iterations are accelerated using the specified polynomial smoothing technique. 
 By default, the $\ell_1$-Jacobi smoother serves as the base smoother, offering theoretical 
-guarantees on the resulting convergence factor~\cite{DDFMT2024,LOTTES}. Alternative combinations 
-are experimental and lack established guarantees.\\
+guarantees on the resulting convergence
+factor~\cite{DDFMT2024,LOTTES}. Alternative combinations are
+experimental.\\
+% and lack established guarantees.\\
 
 \textbf{Remark 4.} Many of the coarsest-level solvers apply to a
-specific coarsest-matrix layout; 
-therefore, setting the solver after the layout may change the layout
-to either distributed or replicated.
-Similarly, setting the layout after the solver may change the solver.
-
-More precisely, UMFPACK and SuperLU require the coarsest-level
-matrix to be replicated, while SuperLU\_Dist and KRM require it to be distributed.
-In these cases, setting the coarsest-level solver implies that
-the layout is redefined according to the solver, ovverriding any
+specific coarsest-matrix layout;  therefore, setting the solver after
+the layout may change the layout to either distributed or replicated,
+and similarly, setting the layout after the solver may change the
+solver. More specifically, UMFPACK and SuperLU require the coarsest-level
+matrix to be replicated, while SuperLU\_Dist and KRM require it to be
+distributed; therefore, setting the coarsest-level solver implies
+that the layout is redefined according to the solver, ovverriding any 
 previous settings. MUMPS,  point-Jacobi,
 hybrid Gauss-Seidel and block-Jacobi can be applied to
 replicated and distributed matrices, thus their choice
 does not modify any previously specified layout.
 It is worth noting that, when the matrix is replicated,
-the point-Jacobi, hybrid Gauss-Seidel and block-Jacobi solvers and their $\ell_1-$ versions
-reduce to the corresponding local solver objects (see Remark~2).
-For the point-Jacobi and Gauss-Seidel solvers, these objects
-correspond to a \emph{single} point-Jacobi sweep and a \emph{single}
-Gauss-Seidel sweep, respectively, which are very poor solvers.
+the point-Jacobi, hybrid Gauss-Seidel and block-Jacobi solvers and 
+their $\ell_1-$ versions reduce to the corresponding local solver
+objects (see Remark~2). For the point-Jacobi and Gauss-Seidel solvers,
+these objects correspond to a \emph{single} point-Jacobi sweep and a
+\emph{single} Gauss-Seidel sweep, respectively, which are very poor
+solvers. 
 
-On the other hand, the distributed layout can be used with any solver
-but UMFPACK and SuperLU; therefore, if any of these two solvers has already
-been selected, the coarsest-level solver is changed to block-Jacobi,
-with the previously chosen solver applied to the local blocks.
-Likewise, the replicated layout can be used with any solver but SuperLu\_Dist and KRM;
-therefore, if SuperLu\_Dist or KRM have been previously set, the coarsest-level
-solver is changed to the default sequential solver. 
+On the other hand, the distributed layout can be used with any solver 
+except and SuperLU; therefore, if any of these two solvers has
+already been selected, the coarsest-level solver is changed to
+block-Jacobi, with the previously chosen solver applied to the local
+blocks. Likewise, the replicated layout can be used with any solver
+but SuperLu\_Dist and KRM; therefore, if SuperLu\_Dist or KRM have
+been previously set, the coarsest-level solver is changed to the
+default sequential solver.  
 
-In a parallel setting with many cores, we suggest to the users to change the default
-coarsest solver for using the KRM choice, i.e. a parallel distributed iterative solution of the
-coarsest system based on Krylov methods.
+In a parallel setting with many cores, we suggest to the users to
+change the default coarsest solver for using the KRM choice, i.e. a
+parallel distributed iterative solution of the coarsest system based
+on Krylov methods. 
 
-\textbf{Remark 4.}  The argument \fortinline|idx| can be used to allow finer
-control for those solvers; for instance, by specifying the keyword
-\fortinline|'MUMPS_IPAR_ENTRY'| and an appropriate value for \fortinline|idx|, it is
-possible to set any entry in the MUMPS integer control array.
-See also Sec.~\ref{sec:adding}.
+\textbf{Remark 4.}  The argument \fortinline|idx| can be used to allow
+finer control for those solvers; for instance, by specifying the
+keyword \fortinline|'MUMPS_IPAR_ENTRY'| and an appropriate value for
+\fortinline|idx|, it is possible to set any entry in the MUMPS integer
+control array. See also Sec.~\ref{sec:adding}.
 %The \verb|what,val| pairs described here are those of the predefined
 %moother/solver objects; newly developed solvers may define new pairs
 %according to their needs.

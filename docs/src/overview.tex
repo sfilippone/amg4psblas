@@ -3,7 +3,9 @@
          {\textsc{\ref{sec:overview} General Overview}}
 
 The \textsc{Algebraic MultiGrid Preconditioners Package based on
-PSBLAS} (\textsc{AMG\-4\-PSBLAS}) provides parallel Algebraic MultiGrid (AMG) preconditioners (see, e.g., \cite{Briggs2000,Stuben_01}),
+PSBLAS} (\textsc{AMG\-4\-PSBLAS}) provides parallel Algebraic
+MultiGrid (AMG) preconditioners (see, e.g.,
+\cite{Briggs2000,Stuben_01}), 
 to be used in the iterative solution of  linear systems,
 \begin{equation}
 Ax=b,
@@ -18,12 +20,14 @@ where $A$ is a square, real or complex, sparse symmetric positive definite (s.p.
 
 The preconditioners implemented in AMG4PSBLAS are obtained by combining
 3 different types of AMG cycles with smoothers and coarsest-level
-solvers. Available multigrid cycles include the V-, W-, and a version of a Krylov-type cycle
+solvers. We provide a number of  multigrid cycles, including the V-,
+W-, and a version of a Krylov-type cycle 
 (K-cycle)~\cite{Briggs2000,Notay2008}; they can  be
 combined with Jacobi, hybrid 
 %\footnote{see Note 2 in Table~\ref{tab:p_coarse}, p.~28.}
 forward/backward Gauss-Seidel, block-Jacobi and additive Schwarz
-smoothers with various versions of local incomplete factorizations and approximate inverses 
+smoothers with various versions of local incomplete factorizations and
+approximate inverses  
 on the blocks. The Jacobi, block-Jacobi and
 Gauss-Seidel smoothers are also available in the $\ell_1$ version~\cite{DDF2020}.
 
@@ -41,7 +45,8 @@ two different coarsening strategies, based on aggregation, are available:
   and described in detail in~\cite{DDF2020};  
 \end{itemize}
 Either exact or approximate solvers can be used on the coarsest-level
-system. We provide interfaces to various parallel and sequential sparse LU factorizations from external 
+system. We provide interfaces to various parallel and sequential
+sparse LU factorizations from external  
 packages, sequential native incomplete LU and approximate inverse factorizations,
 parallel weighted Jacobi, hybrid Gauss-Seidel, block-Jacobi solvers and
 calls to preconditioned Krylov methods;  all 
@@ -74,36 +79,41 @@ important  revisions and extentions of the PSBLAS infrastructure.
 The inter-process comunication required by AMG4PSBLAS is encapsulated
 in the PSBLAS routines;
 therefore, AMG4PSBLAS can be run on any parallel machine where PSBLAS 
-implementations are available. In the most recent version of PSBLAS
-(release 3.7), a plug-in for GPU is included; it includes CUDA
+implementations are available.  The most recent version of PSBLAS 
+(release 3.9) includes  a plug-in for GPU; it contains CUDA
 versions of main vector operations and of sparse matrix-vector
 multiplication, so that Krylov methods coupled with AMG4PSBLAS
-preconditioners    relying on Jacobi and block-Jacobi smoothers with
-sparse approximate inverses on the blocks can be efficiently executed
+preconditioners    relying on Jacobi and block-Jacobi smoothers with 
+sparse approximate inverses on the blocks can be efficiently executed 
 on cluster of GPUs. 
 
-AMG4PSBLAS has a layered and modular software architecture where three main layers can be
-identified.  The lower layer consists of the PSBLAS kernels, the middle one implements
-the construction and application phases of the preconditioners, and the upper one
-provides a uniform interface to all the preconditioners.
-This architecture allows for different levels of use of the package:
-few black-box routines at the upper layer allow all users to easily
-build and apply any preconditioner available in AMG4PSBLAS;
-facilities are also available allowing expert users to extend the set of smoothers
-and solvers for building new versions of the preconditioners (see
-Section~\ref{sec:adding}).
+AMG4PSBLAS has a layered and modular software architecture where three
+main layers can be identified.  The lower layer consists of the PSBLAS
+kernels, the middle one implements the construction and application
+phases of the preconditioners, and the upper one provides a uniform
+interface to all the preconditioners. This architecture allows for
+different levels of use of the package: few black-box routines at the
+upper layer allow all users to easily build and apply any
+preconditioner available in AMG4PSBLAS; facilities are also available
+allowing expert users to extend the set of smoothers and solvers for
+building new versions of the preconditioners (see
+Section~\ref{sec:adding}). 
 
-This guide is organized as follows. General information on the distribution of the source
-code is reported in Section~\ref{sec:distribution}, while details on the configuration
-and installation of the package are given in Section~\ref{sec:building}. The basics for building and applying the
-preconditioners with the Krylov solvers implemented in PSBLAS are reported
-in~Section~\ref{sec:started}, where the Fortran codes of a few sample programs
-are also shown. A reference guide for the user interface routines is provided
-in Section~\ref{sec:userinterface}. Information on the extension of the package
-through the addition of new smoothers and solvers is reported in Section~\ref{sec:adding}.
-The error handling mechanism used by the package
-is briefly described in Section~\ref{sec:errors}. The copyright terms concerning the
-distribution and modification of AMG4PSBLAS are reported in Appendix~\ref{sec:license}.
+This guide is organized as follows. General information on the
+distribution of the source code is reported in
+Section~\ref{sec:distribution}, while details on the configuration and
+installation of the package are given in
+Section~\ref{sec:building}. The basics for building and applying the
+preconditioners with the Krylov solvers implemented in PSBLAS are
+reported in~Section~\ref{sec:started}, where the Fortran codes of a
+few sample programs are also shown. A reference guide for the user
+interface routines is provided in
+Section~\ref{sec:userinterface}. Information on the extension of the
+package through the addition of new smoothers and solvers is reported
+in Section~\ref{sec:adding}. The error handling mechanism used by the
+package is briefly described in Section~\ref{sec:errors}. The
+copyright terms concerning the distribution and modification of
+AMG4PSBLAS are reported in Appendix~\ref{sec:license}. 
 
 %%% Local Variables:
 %%% mode: latex
