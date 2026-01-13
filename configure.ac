@@ -129,10 +129,10 @@ dnl We set our own FC flags, ignore those from AC_PROG_FC but not those from the
 dnl environment variable. Same for C
 dnl 
 save_FCFLAGS="$FCFLAGS";
-AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifx ifort ifc  nagfor gfortran])
+AC_PROG_FC([ftn xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 flang ifx ifort ifc  nagfor gfortran])
 FCFLAGS="$save_FCFLAGS";
 save_CFLAGS="$CFLAGS";
-AC_PROG_CC([cc xlc pgcc icx icc gcc ])
+AC_PROG_CC([cc xlc pgcc clang icx icc gcc ])
 if test "x$ac_cv_prog_cc_stdc" == "xno" ; then
    AC_MSG_ERROR([Problem : Need a C99 compiler ! ])
 else
@@ -140,7 +140,7 @@ else
 fi	
 CFLAGS="$save_CFLAGS";
 save_CXXFLAGS="$CXXFLAGS";
-AC_PROG_CXX([CC xlc++ icpx icpc g++])
+AC_PROG_CXX([CC xlc++ clang++ icpx icpc g++])
 CXXFLAGS="$save_CXXFLAGS";
 dnl AC_PROG_CXX
 

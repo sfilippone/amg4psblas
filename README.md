@@ -129,6 +129,21 @@ available for AMG4PSBLAS either and the operation will be purely on CPU/MPI. See
   to production, storage and management of clean, decarbonized energy.
   Among them you have the possibility of running PSBLAS+AMG4PSBLAS on some test problems
   to become familiar with using the software.
+## MPI and Compilers
+ The library has been successfully compiled and tested with the same  compilers
+ and MPI implementations as PSBLAS 3.9, which include:
+ - MPICH 4.2.3, 4.3.0, 4.3.2
+ - OpenMPI 4.1.8. 5.0.7, 5.0.8, 5.0.9
+ 
+ combined with
+ 
+ - GNU compilers 10.5.0, 11.5.0, 12.5.0, 13.3.0, 14.2.0 14.3.0, 15.2.0
+ - LLVM  20.1.0 and 21.1.0 (except OpenMPI 4.1.8 which does not build with LLVM)
+ 
+ Moreover, it has been tested with the Intel OneAPI toolchain versions 2025.2 and 2025.3
+
+ As of this release, the NVIDIA compiler 25.7 fails to handle our code.
+ Cray, IBM and NAg compilers have been used for testing in the past, but not on this version.
 
 ## TODO and bugs
  
