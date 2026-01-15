@@ -43,7 +43,7 @@ contains
 
     ph%item = c_loc(precp)
 
-    call stringc2f(ptype,fptype)
+    call psb_stringc2f(ptype,fptype)
 
     call precp%init(psb_c2f_ctxt(cctxt),fptype,iret)
 
@@ -70,7 +70,7 @@ contains
       return
     end if
 
-    call stringc2f(what,fwhat)
+    call psb_stringc2f(what,fwhat)
 
     call precp%set(fwhat,val,iret)
 
@@ -98,7 +98,7 @@ contains
       return
     end if
 
-    call stringc2f(what,fwhat)
+    call psb_stringc2f(what,fwhat)
 
     call precp%set(fwhat,val,iret)
 
@@ -124,8 +124,8 @@ contains
       return
     end if
 
-    call stringc2f(what,fwhat)
-    call stringc2f(val,fval)
+    call psb_stringc2f(what,fwhat)
+    call psb_stringc2f(val,fval)
 
     call precp%set(fwhat,fval,iret)
 
@@ -319,7 +319,7 @@ contains
     end if
 
 
-    call stringc2f(methd,fmethd)
+    call psb_stringc2f(methd,fmethd)
     feps    = eps
     fitmax  = itmax
     fitrace = itrace
@@ -431,7 +431,7 @@ end function amg_c_dprecapply
     end if
 
     ! Convert transpose flag
-    call stringc2f(ctrans,ftrans)
+    call psb_stringc2f(ctrans,ftrans)
     
     ! Apply preconditioner
     call precp%apply(bp,xp,descp,info,trans=ftrans)
