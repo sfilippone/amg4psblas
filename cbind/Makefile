@@ -7,6 +7,8 @@ INCDIR=../include
 MODDIR=../modules/
 LIBNAME=$(CBINDLIBNAME)
 LIBNAME=libamg_cbind.a	
+AMGFDEFINES=-DPSB_HAVE_LAPACK -DPSB_HAVE_FLUSH_STMT -DPSB_MPI_MOD  $(PSBFDEFINES) $(FCUDEFINES)
+FDEFINES=$(AMGFDEFINES) 
 
 objs: amgprecd
 
@@ -26,3 +28,4 @@ clean:
 veryclean: clean
 	cd test/pargen && $(MAKE) clean
 	/bin/rm -f $(HERE)/$(LIBNAME) $(LIBMOD) *$(.mod) *.h
+

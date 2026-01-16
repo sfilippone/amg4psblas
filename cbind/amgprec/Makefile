@@ -8,6 +8,8 @@ DEST=../
 
 CINCLUDES=-I. -I$(INCDIR) -I$(PSBLAS_INCDIR)
 FINCLUDES=$(FMFLAG)$(HERE) $(FMFLAG)$(INCDIR) $(FMFLAG)$(MODDIR) $(PSBLAS_INCLUDES)
+AMGFDEFINES=-DPSB_HAVE_LAPACK -DPSB_HAVE_FLUSH_STMT -DPSB_MPI_MOD  $(PSBFDEFINES) $(FCUDEFINES)
+FDEFINES=$(AMGFDEFINES) 
 
 
 OBJS=amg_prec_cbind_mod.o amg_dprec_cbind_mod.o  amg_c_dprec.o amg_zprec_cbind_mod.o  amg_c_zprec.o
