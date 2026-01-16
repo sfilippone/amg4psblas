@@ -32,6 +32,7 @@ extern "C" {
   psb_i_t amg_c_dprecbld_opt(psb_c_dspmat *ah, psb_c_descriptor *cdh, 
 			  amg_c_dprec *ph, const char *afmt);
   psb_i_t amg_c_ddescr(amg_c_dprec *ph);
+  psb_i_t amg_c_dallocate_wrk(amg_c_dprec *ph, const char *chfmt);
 
   psb_i_t amg_c_dkrylov(const char *method, psb_c_dspmat *ah, amg_c_dprec *ph, 
 		  psb_c_dvector *bh, psb_c_dvector *xh,

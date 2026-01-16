@@ -487,4 +487,55 @@ contains
    return
  end function amg_c_zdescr
 
+   function amg_c_zallocate_wrk(ph,chfmt) bind(c, name="amg_c_zallocate_wrk") result(res)
+#if defined (PSB_HAVE_CUDA)
+    use psb_cuda_mod
+#endif
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: chfmt(*)
+    integer(psb_ipk_)     :: iret
+    type(amg_zprec_type), pointer :: precp
+    character(len=6)     :: fchfmt
+! Local variable
+    integer(psb_ipk_) :: info
+! Local mold variables
+#if defined (PSB_HAVE_CUDA)
+    type(psb_z_vect_cuda), target         :: zvgpu
+#endif
+    type(psb_z_base_vect_type), target         :: zvhost
+    class(psb_z_base_vect_type), pointer  :: vmold
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(chfmt,fchfmt)
+    select case (psb_toupper(fchfmt))
+    case('HOST','CPU')
+      vmold => zvhost
+#if defined (PSB_HAVE_CUDA)
+    case('GPU','DEVICE')
+      vmold => zvgpu
+#endif
+    case default
+      write(psb_err_unit,'(A)') 'amg_c_zallocate_wrk: Unknown format ', fchfmt, ' defaulting to HOST/CPU'
+      vmold => zvhost
+    end select
+
+    call precp%allocate_wrk(info,vmold=vmold)
+
+    iret = info
+
+    res = MLDC_ERR_FILTER(iret)
+    MLDC_ERR_HANDLE(res)
+    return
+
+  end function amg_c_zallocate_wrk
+
 end module amg_zprec_cbind_mod

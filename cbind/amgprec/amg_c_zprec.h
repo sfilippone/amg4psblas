@@ -33,6 +33,7 @@ extern "C" {
 			  amg_c_zprec *ph, const char *afmt);
 
   psb_i_t amg_c_zdescr(amg_c_zprec *ph);
+  psb_i_t amg_c_zallocate_wrk(amg_c_zprec *ph, const char *chfmt);
 
   psb_i_t amg_c_zkrylov(const char *method, psb_c_zspmat *ah, amg_c_zprec *ph, 
 		  psb_c_zvector *bh, psb_c_zvector *xh,
