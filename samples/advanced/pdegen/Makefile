@@ -21,7 +21,7 @@ all: amg_s_pde3d amg_d_pde3d amg_s_pde2d amg_d_pde2d
 
 amg_d_pde3d: amg_d_pde3d.o amg_d_genpde_mod.o $(DGEN3D) data_input.o
 	$(FLINK) $(LINKOPT) amg_d_pde3d.o  amg_d_genpde_mod.o $(DGEN3D) data_input.o \
-         -o amg_d_pde3d $(AMG_LIBS) $(PSBLAS_LIBS) $(LDLIBS)
+         -o amg_d_pde3d $(AMG_LIBS) $(PSBLAS_LIBS) $(AMG_LDLIBS) $(LDLIBS)
 	/bin/mv amg_d_pde3d $(EXEDIR)
 
 amg_s_pde3d: amg_s_pde3d.o amg_s_genpde_mod.o $(SGEN3D) data_input.o

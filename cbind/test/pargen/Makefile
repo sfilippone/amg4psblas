@@ -27,7 +27,7 @@ EXEDIR=./runs
 
 amgec: amgec.o
 	$(MPFC) amgec.o  -o amgec $(AMGC_LIBS)  $(PSBC_LIBS) $(PSBCLDLIBS) $(PSBLAS_LIBS) \
-	  $(UMFLIBS) $(PSBLDLIBS) $(LDLIBS) -lm -lgfortran
+	  $(UMFLIBS) $(PSBLDLIBS) $(AMGLDLIBS) $(PSBGPULDLIBS) $(LDLIBS) -lm -lgfortran
 # \
 #	-lifcore -lifcoremt -lguide -limf -lirc -lintlc -lcxaguard -L/opt/intel/fc/10.0.023/lib/ -lm
 

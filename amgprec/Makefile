@@ -58,7 +58,8 @@ MODOBJS=amg_base_prec_type.o amg_prec_type.o  amg_prec_mod.o \
 	$(SMODOBJS) $(DMODOBJS) $(CMODOBJS) $(ZMODOBJS)
 
 
-LOCAL_MODS=$(MODOBJS:.o=$(.mod))
+LOCAL_MODS=$(MODOBJS:.o=$(.mod)) amg_c_l1_diag_solver$(.mod) amg_s_l1_diag_solver$(.mod) \
+	amg_d_l1_diag_solver$(.mod) amg_z_l1_diag_solver$(.mod)
 LIBNAME=libamg_prec.a
 
 all: mods  objs impld
@@ -70,7 +71,7 @@ objs: mods impld
 impld: mods
 	cd impl && $(MAKE) 
 
-lib: mods impld
+lib: objs
 	cd impl && $(MAKE) lib
 	$(AR) $(HERE)/$(LIBNAME) $(MODOBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
