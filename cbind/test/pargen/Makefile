@@ -23,15 +23,20 @@ EXEDIR=./runs
 #UMFLIBS=-lumfpack -lamd -lcholmod -lcolamd -lcamd -lccolamd -L/usr/include/suitesparse
 #UMFFLAGS=-DHave_UMF_ -I/usr/include/suitesparse
 
- all:  amgec
+ all:  amgec amgecgpu
 
 amgec: amgec.o
 	$(MPFC) amgec.o  -o amgec $(AMGC_LIBS)  $(PSBC_LIBS) $(PSBCLDLIBS) $(PSBLAS_LIBS) \
-	  $(UMFLIBS) $(PSBLDLIBS) $(AMGLDLIBS) $(PSBGPULDLIBS) $(LDLIBS) -lm -lgfortran
+	  $(UMFLIBS) $(PSBLDLIBS) $(AMGLDLIBS) $(PSBGPULDLIBS) $(LDLIBS) -lm -lgfortran -fopenmp
 # \
 #	-lifcore -lifcoremt -lguide -limf -lirc -lintlc -lcxaguard -L/opt/intel/fc/10.0.023/lib/ -lm
 
 	/bin/mv amgec $(EXEDIR)
+
+amgecgpu: amgecgpu.o
+	$(MPFC) amgecgpu.o  -o amgecgpu $(AMGC_LIBS)  $(PSBC_LIBS) $(PSBCLDLIBS) $(PSBLAS_LIBS) \
+	  $(UMFLIBS) $(PSBLDLIBS) $(AMGLDLIBS) $(PSBGPULDLIBS) $(LDLIBS) -lm -lgfortran -fopenmp
+	/bin/mv amgecgpu $(EXEDIR)
 
 .f90.o:
 	$(MPFC) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
@@ -40,7 +45,7 @@ amgec: amgec.o
 
 
 clean: 
-	/bin/rm -f amgec.o  $(EXEDIR)/amgec
+	/bin/rm -f amgec.o  $(EXEDIR)/amgec $(EXEDIR)/amgecgpu
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:
@@ -48,5 +53,6 @@ lib:
 
 tests: all
 	cd runs ; ./amgec < amge.inp
+	cd runs ; ./amgecgpu < amgegpu.inp
 
 

@@ -1,0 +1,632 @@
+/*----------------------------------------------------------------------------------*/
+/*              Parallel Sparse BLAS  v2.2					    */
+/*    (C) Copyright 2007 Salvatore Filippone    University of Rome Tor Vergata      */
+/* 										    */
+/*  Redistribution and use in source and binary forms, with or without		    */
+/*  modification, are permitted provided that the following conditions		    */
+/*  are met:									    */
+/*    1. Redistributions of source code must retain the above copyright		    */
+/*       notice, this list of conditions and the following disclaimer.		    */
+/*    2. Redistributions in binary form must reproduce the above copyright	    */
+/*       notice, this list of conditions, and the following disclaimer in the	    */
+/*       documentation and/or other materials provided with the distribution.	    */
+/*    3. The name of the PSBLAS group or the names of its contributors may	    */
+/*       not be used to endorse or promote products derived from this		    */
+/*       software without specific written permission.				    */
+/* 										    */
+/*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS		    */
+/*  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED	    */
+/*  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR	    */
+/*  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS  */
+/*  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR	    */
+/*  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF	    */
+/*  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS	    */
+/*  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN	    */
+/*  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)	    */
+/*  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE	    */
+/*  POSSIBILITY OF SUCH DAMAGE.							    */
+/* 										    */
+/*  										    */
+/* File: ppdec.c   								    */
+/*										    */
+/* Program: ppdec 								    */
+/* This sample program shows how to build and solve a sparse linear		    */
+/*										    */
+/* The program  solves a linear system based on the partial differential	    */
+/* equation 									    */
+/*										    */
+/* 										    */
+/*										    */
+/* The equation generated is							    */
+/*										    */
+/*   b1 d d (u)  b2  d d (u)    a1 d (u))  a2 d (u)))   			    */
+/* -   ------   -    ------  +    ----- +  ------     + a3 u = 0		    */
+/*      dx dx         dy dy         dx        dy        			    */
+/*										    */
+/* 										    */
+/* with  Dirichlet boundary conditions on the unit cube 			    */
+/*										    */
+/*    0<=x,y,z<=1								    */
+/* 										    */
+/* The equation is discretized with finite differences and uniform stepsize;	    */
+/* the resulting  discrete  equation is						    */
+/*										    */
+/* ( u(x,y,z)(2b1+2b2+a1+a2)+u(x-1,y)(-b1-a1)+u(x,y-1)(-b2-a2)+			    */
+/*  -u(x+1,y)b1-u(x,y+1)b2)*(1/h**2)						    */
+/*										    */
+/* Example adapted from: C.T.Kelley						    */
+/*    Iterative Methods for Linear and Nonlinear Equations			    */
+/*    SIAM 1995									    */
+/*										    */
+/*										    */
+/* In this sample program the index space of the discretized			    */
+/* computational domain is first numbered sequentially in a standard way, 	    */
+/* then the corresponding vector is distributed according to an HPF BLOCK	    */
+/* distribution directive.							    */
+/*										    */
+/* Boundary conditions are set in a very simple way, by adding 			    */
+/* equations of the form							    */
+/*										    */
+/*   u(x,y) = rhs(x,y)								    */
+/*                                                                                  */
+/*----------------------------------------------------------------------------------*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+#include "psb_base_cbind.h"
+#include "amg_cbind.h"
+
+double a1(double x, double y, double z)
+{
+  return (1.0 / 80.0);
+}
+double a2(double x, double y, double z)
+{
+  return (1.0 / 80.0);
+}
+double a3(double x, double y, double z)
+{
+  return (1.0 / 80.0);
+}
+double c(double x, double y, double z)
+{
+  return (0.0);
+}
+double b1(double x, double y, double z)
+{
+  return (0.0 / sqrt(3.0));
+}
+double b2(double x, double y, double z)
+{
+  return (0.0 / sqrt(3.0));
+}
+double b3(double x, double y, double z)
+{
+  return (0.0 / sqrt(3.0));
+}
+
+double g(double x, double y, double z)
+{
+  if (x == 1.0)
+  {
+    return (1.0);
+  }
+  else if (x == 0.0)
+  {
+    return (exp(-y * y - z * z));
+  }
+  else
+  {
+    return (0.0);
+  }
+}
+
+#define NBMAX 20
+
+psb_i_t matgen(psb_c_ctxt cctxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
+               psb_c_dspmat *ah, const char *afmt,
+               psb_c_descriptor *cdh, const char *cdfmt,
+               psb_c_dvector *xh, psb_c_dvector *bh, psb_c_dvector *rh)
+{
+  psb_i_t iam, np;
+  psb_l_t ix, iy, iz, el, glob_row;
+  psb_i_t i, k, info, ret;
+  double x, y, z, deltah, sqdeltah, deltah2;
+  double val[10 * NBMAX], zt[NBMAX];
+  psb_l_t irow[10 * NBMAX], icol[10 * NBMAX];
+
+  info = 0;
+  psb_c_info(cctxt, &iam, &np);
+
+  if (iam == 0)
+  {
+    fprintf(stdout, "Starting matrix generation: local number of rows %d\n", nl);
+    fprintf(stdout, "Matrix format: %s\n", afmt);
+    fprintf(stdout, "Descriptor format: %s\n", cdfmt);
+    fflush(stdout);
+  }
+  fprintf(stderr, "Matrix generation: local number of rows %d on process %d\n", nl, iam);
+
+  deltah = (double)1.0 / (idim + 1);
+  sqdeltah = deltah * deltah;
+  deltah2 = 2.0 * deltah;
+  psb_c_set_index_base(0);
+  for (i = 0; i < nl; i++)
+  {
+    glob_row = vl[i];
+    // if ((i%100000 == 0)||(i<10)) fprintf(stderr,"%d: generation loop at %d %ld \n",iam,i,glob_row);
+    el = 0;
+    ix = glob_row / (idim * idim);
+    iy = (glob_row - ix * idim * idim) / idim;
+    iz = glob_row - ix * idim * idim - iy * idim;
+    x = (ix + 1) * deltah;
+    y = (iy + 1) * deltah;
+    z = (iz + 1) * deltah;
+    zt[0] = 0.0;
+    /*  internal point: build discretization */
+    /*  term depending on   (x-1,y,z)        */
+    val[el] = -a1(x, y, z) / sqdeltah - b1(x, y, z) / deltah2;
+    if (ix == 0)
+    {
+      zt[0] += g(0.0, y, z) * (-val[el]);
+    }
+    else
+    {
+      icol[el] = (ix - 1) * idim * idim + (iy)*idim + (iz);
+      el = el + 1;
+    }
+    /*  term depending on     (x,y-1,z) */
+    val[el] = -a2(x, y, z) / sqdeltah - b2(x, y, z) / deltah2;
+    if (iy == 0)
+    {
+      zt[0] += g(x, 0.0, z) * (-val[el]);
+    }
+    else
+    {
+      icol[el] = (ix)*idim * idim + (iy - 1) * idim + (iz);
+      el = el + 1;
+    }
+    /* term depending on     (x,y,z-1)*/
+    val[el] = -a3(x, y, z) / sqdeltah - b3(x, y, z) / deltah2;
+    if (iz == 0)
+    {
+      zt[0] += g(x, y, 0.0) * (-val[el]);
+    }
+    else
+    {
+      icol[el] = (ix)*idim * idim + (iy)*idim + (iz - 1);
+      el = el + 1;
+    }
+    /* term depending on     (x,y,z)*/
+    val[el] = 2.0 * (a1(x, y, z) + a2(x, y, z) + a3(x, y, z)) / sqdeltah + c(x, y, z);
+    icol[el] = (ix)*idim * idim + (iy)*idim + (iz);
+    el = el + 1;
+    /*  term depending on     (x,y,z+1) */
+    val[el] = -a3(x, y, z) / sqdeltah + b3(x, y, z) / deltah2;
+    if (iz == idim - 1)
+    {
+      zt[0] += g(x, y, 1.0) * (-val[el]);
+    }
+    else
+    {
+      icol[el] = (ix)*idim * idim + (iy)*idim + (iz + 1);
+      el = el + 1;
+    }
+    /* term depending on     (x,y+1,z) */
+    val[el] = -a2(x, y, z) / sqdeltah + b2(x, y, z) / deltah2;
+    if (iy == idim - 1)
+    {
+      zt[0] += g(x, 1.0, z) * (-val[el]);
+    }
+    else
+    {
+      icol[el] = (ix)*idim * idim + (iy + 1) * idim + (iz);
+      el = el + 1;
+    }
+    /*  term depending on     (x+1,y,z) */
+    val[el] = -a1(x, y, z) / sqdeltah + b1(x, y, z) / deltah2;
+    if (ix == idim - 1)
+    {
+      zt[0] += g(1.0, y, z) * (-val[el]);
+    }
+    else
+    {
+      icol[el] = (ix + 1) * idim * idim + (iy)*idim + (iz);
+      el = el + 1;
+    }
+    for (k = 0; k < el; k++)
+      irow[k] = glob_row;
+    if ((ret = psb_c_dspins(el, irow, icol, val, ah, cdh)) != 0)
+      fprintf(stderr, "From psb_c_dspins: %d\n", ret);
+    irow[0] = glob_row;
+    psb_c_dgeins(1, irow, zt, bh, cdh);
+    zt[0] = 0.0;
+    psb_c_dgeins(1, irow, zt, xh, cdh);
+  }
+
+#ifdef PSB_HAVE_CUDA
+  /* Execute assembly and final allocation on CUDA device */
+  info = psb_c_cdasb_format(cdh, cdfmt);
+  if (info != 0)
+  {
+    return (info);
+  }
+#ifdef DEBUG
+  else if (iam == 0)
+  {
+    fprintf(stdout, "Completed descriptor assembly format\n");
+    fflush(stdout);
+  }
+#endif
+  info = psb_c_dspasb_opt(ah, cdh, afmt, PSB_UPD_DFLT, PSB_DUPL_DEF);
+  if (info != 0)
+  {
+    return (info);
+  }
+#ifdef DEBUG 
+  else if (iam == 0)
+  {
+    fprintf(stdout, "Completed matrix assembly\n");
+    fflush(stdout);
+  }
+#endif
+  info = psb_c_dgeasb_options_format(xh, cdh, PSB_DUPL_ADD, cdfmt);
+  if (info != 0)
+  {
+    return (info);
+  }
+#ifdef DEBUG
+  else if (iam == 0)
+  {
+    fprintf(stdout, "Completed x vector assembly\n");
+    fflush(stdout);
+  }
+#endif
+  info = psb_c_dgeasb_options_format(bh, cdh, PSB_DUPL_ADD, cdfmt);
+  if (info != 0)
+  {
+    return (info);
+  }
+#ifdef DEBUG
+  else if (iam == 0)
+  {
+    fprintf(stdout, "Completed b vector assembly\n");
+    fflush(stdout);
+  }
+#endif
+  info = psb_c_dgeasb_options_format(rh, cdh, PSB_DUPL_ADD, cdfmt);
+  if (info != 0)
+  {
+    return (info);
+  }
+#ifdef DEBUG
+  else if (iam == 0)
+  {
+    fprintf(stdout, "Completed r vector assembly\n");
+    fflush(stdout);
+  }
+#endif
+#else
+  /* Execute assembly and final allocation HOST side */
+  if ((info = psb_c_cdasb(cdh)) != 0)
+    return (info);
+
+  if ((info = psb_c_dspasb(ah, cdh)) != 0)
+    return (info);
+
+  if ((info = psb_c_dgeasb(xh, cdh)) != 0)
+    return (info);
+  if ((info = psb_c_dgeasb(bh, cdh)) != 0)
+    return (info);
+  if ((info = psb_c_dgeasb(rh, cdh)) != 0)
+    return (info);
+  return (info);
+#endif
+}
+
+#define LINEBUFSIZE 1024
+static char buffer[LINEBUFSIZE + 1];
+int get_buffer(FILE *fp)
+{
+  while (!feof(fp))
+  {
+    fgets(buffer, LINEBUFSIZE, fp);
+    if (buffer[0] != '%')
+      break;
+  }
+}
+void get_iparm(FILE *fp, int *val)
+{
+  get_buffer(fp);
+  // fprintf(stderr,"Reading int parm: %s\n",buffer);
+  sscanf(buffer, "%d ", val);
+}
+void get_dparm(FILE *fp, double *val)
+{
+  get_buffer(fp);
+  sscanf(buffer, "%lf ", val);
+}
+void get_hparm(FILE *fp, char *val)
+{
+  get_buffer(fp);
+  sscanf(buffer, "%s ", val);
+}
+
+#define DUMPMATRIX 0
+
+int main(int argc, char *argv[])
+{
+  psb_c_ctxt *cctxt;
+  psb_i_t iam, np;
+  char methd[40], ptype[40], afmt[8], cdfmt[8];
+  psb_i_t nparms;
+  psb_i_t idim, info, istop, itmax, itrace, irst, iter, ret;
+  amg_c_dprec *ph;
+  psb_c_dspmat *ah;
+  psb_c_dvector *bh, *xh, *rh;
+  psb_i_t nb, nlr, nl;
+  psb_l_t i, ng, *vl, k;
+  double t1, t2, eps, err;
+  double *xv, *bv, *rv;
+  double one = 1.0, zero = 0.0, res2;
+  psb_c_SolverOptions options;
+  psb_c_descriptor *cdh;
+  FILE *vectfile;
+
+  cctxt = psb_c_new_ctxt();
+  psb_c_init(cctxt);
+#ifdef PSB_HAVE_CUDA
+  psb_c_cuda_init(cctxt);
+#endif
+  psb_c_info(*cctxt, &iam, &np);
+#ifdef PSB_HAVE_CUDA
+  if (iam == 0)
+  {
+    fprintf(stderr, "-- CUDA initialized --\n");
+    fprintf(stderr, "Number of available GPU devices: %d\n", psb_c_cuda_getDeviceCount());
+  }
+#endif
+  fprintf(stdout, "Initialization: am %d of %d\n", iam, np);
+
+  fflush(stdout);
+  psb_c_barrier(*cctxt);
+  if (iam == 0)
+  {
+    get_iparm(stdin, &nparms);
+    get_hparm(stdin, methd);
+    get_hparm(stdin, ptype);
+    get_hparm(stdin, afmt);
+    get_hparm(stdin, cdfmt);
+    get_iparm(stdin, &idim);
+    get_iparm(stdin, &istop);
+    get_iparm(stdin, &itmax);
+    get_iparm(stdin, &itrace);
+    get_iparm(stdin, &irst);
+
+    /* Display paremeters */
+    fprintf(stderr, "Input parameters:\n");
+    fprintf(stderr, " Number of parameters: %d\n", nparms);
+    fprintf(stderr, " Method: %s\n", methd);
+    fprintf(stderr, " Preconditioner type: %s\n", ptype);
+    fprintf(stderr, " Matrix format: %s\n", afmt);
+    fprintf(stderr, " Descriptor format: %s\n", cdfmt);
+    fprintf(stderr, " Problem dimension: %d\n", idim);
+    fprintf(stderr, " Stopping criterion: %d\n", istop);
+    fprintf(stderr, " Maximum iterations: %d\n", itmax);
+    fprintf(stderr, " Trace frequency: %d\n", itrace);
+    fprintf(stderr, " Restart depth: %d\n", irst);
+  }
+  /* Now broadcast the values, and check they're OK */
+  psb_c_ibcast(*cctxt, 1, &nparms, 0);
+  psb_c_hbcast(*cctxt, methd, 0);
+  psb_c_hbcast(*cctxt, ptype, 0);
+  psb_c_hbcast(*cctxt, afmt, 0);
+  psb_c_hbcast(*cctxt, cdfmt, 0);
+  psb_c_ibcast(*cctxt, 1, &idim, 0);
+  psb_c_ibcast(*cctxt, 1, &istop, 0);
+  psb_c_ibcast(*cctxt, 1, &itmax, 0);
+  psb_c_ibcast(*cctxt, 1, &itrace, 0);
+  psb_c_ibcast(*cctxt, 1, &irst, 0);
+
+  psb_c_barrier(*cctxt);
+
+  cdh = psb_c_new_descriptor();
+  psb_c_set_index_base(0);
+
+  /* Simple minded BLOCK data distribution */
+  ng = ((psb_l_t)idim) * idim * idim;
+  nb = (ng + np - 1) / np;
+  nl = nb;
+  if ((ng - iam * nb) < nl)
+    nl = ng - iam * nb;
+  fprintf(stderr, "%d: Input data %d %ld %d %d\n", iam, idim, ng, nb, nl);
+  if ((vl = malloc(nb * sizeof(psb_l_t))) == NULL)
+  {
+    fprintf(stderr, "On %d: malloc failure\n", iam);
+    psb_c_abort(*cctxt);
+  }
+  i = ((psb_l_t)iam) * nb;
+  for (k = 0; k < nl; k++)
+    vl[k] = i + k;
+
+  if ((info = psb_c_cdall_vl(nl, vl, *cctxt, cdh)) != 0)
+  {
+    fprintf(stderr, "From cdall: %d\nBailing out\n", info);
+    psb_c_abort(*cctxt);
+  }
+
+  bh = psb_c_new_dvector();
+  xh = psb_c_new_dvector();
+  rh = psb_c_new_dvector();
+  ah = psb_c_new_dspmat();
+  // fprintf(stderr,"From psb_c_new_dspmat: %p\n",ah);
+
+  /* Allocate mem space for sparse matrix and vectors */
+  ret = psb_c_dspall(ah, cdh);
+  // fprintf(stderr,"From psb_c_dspall: %d\n",ret);
+  psb_c_dgeall(bh, cdh);
+  psb_c_dgeall(xh, cdh);
+  psb_c_dgeall(rh, cdh);
+
+  if (iam == 0)
+  {
+    fprintf(stdout, "Matrix and vectors allocated\n");
+  }
+  psb_c_barrier(*cctxt);
+
+  /* Matrix generation  */
+  if (matgen(*cctxt, nl, idim, vl, ah, afmt, cdh, cdfmt, xh, bh, rh) != 0)
+  {
+    fprintf(stderr, "Error during matrix build loop\n");
+    psb_c_abort(*cctxt);
+  }
+  psb_c_barrier(*cctxt);
+  if (iam == 0)
+  {
+    fprintf(stdout, "Matrix and vectors generated\n");
+  }
+  fflush(stdout);
+  /* Set up the preconditioner */
+  ph = amg_c_dprec_new();
+  amg_c_dprecinit(*cctxt, ph, ptype);
+  amg_c_dprecsetc(ph, "", "L1-JACOBI");
+  amg_c_dprecseti(ph, "SMOOTHER_SWEEPS", 2);
+  amg_c_dprecsetc(ph, "COARSE_SOLVE", "BJAC");
+  amg_c_dprecsetc(ph, "COARSE_SUBSOLVE", "L1-JACOBI");
+  if ((ret = amg_c_dhierarchy_build(ah, cdh, ph)) != 0)
+    fprintf(stderr, "From hierarchy_build: %d\n", ret);
+  if ((ret = amg_c_dsmoothers_build(ah, cdh, ph)) != 0)
+    fprintf(stderr, "From smoothers_build: %d\n", ret);
+
+#ifdef PSB_HAVE_CUDA
+  /* Allocate work vectors for the preconditioner on the GPU */
+  info = amg_c_dallocate_wrk(ph, cdfmt);
+  if (info != 0)
+  {
+    fprintf(stderr, "From dallocate_wrk: %d\nBailing out\n", info);
+    psb_c_abort(*cctxt);
+  }
+#endif
+
+  psb_c_barrier(*cctxt);
+  /* Do a dry run of the preconditioner */
+  info = amg_c_dprecapply(ph, bh, xh, cdh);
+  if (info != 0)
+  {
+    fprintf(stderr, "From dprec_apply: %d\nBailing out\n", info);
+    psb_c_abort(*cctxt);
+  }
+  /* Do a dry run of the preconditioner with the option routine */
+  info = amg_c_dprecapply_opt(ph, bh, xh, cdh, "N");
+  if (info != 0)
+  {
+    fprintf(stderr, "From dprec_apply_opt: %d\nBailing out\n", info);
+    psb_c_abort(*cctxt);
+  }
+  /*
+  info = amg_c_dprecapply_opt(ph,bh,xh,cdh,"T");
+    if (info != 0) {
+      fprintf(stderr,"From dprec_apply_opt: %d\nBailing out\n",info);
+      psb_c_abort(*cctxt);
+    }
+  */
+  /* Set up the solver options */
+  psb_c_DefaultSolverOptions(&options);
+  options.eps = 1.e-6;
+  options.itmax = itmax;
+  options.irst = irst;
+  options.itrace = 1;
+  options.istop = istop;
+  psb_c_seterraction_ret();
+  t1 = psb_c_wtime();
+  ret = amg_c_dkrylov(methd, ah, ph, bh, xh, cdh, &options);
+  t2 = psb_c_wtime();
+  iter = options.iter;
+  err = options.err;
+  // fprintf(stderr,"From krylov: %d %lf, %d %d\n",iter,err,ret,psb_c_get_errstatus());
+  if (psb_c_get_errstatus() != 0)
+  {
+    psb_c_print_errmsg();
+  }
+  // fprintf(stderr,"After cleanup %d\n",psb_c_get_errstatus());
+  /* Check 2-norm of residual on exit */
+  psb_c_dgeaxpby(one, bh, zero, rh, cdh);
+  psb_c_dspmm(-one, ah, xh, one, rh, cdh);
+  res2 = psb_c_dgenrm2(rh, cdh);
+
+  if (iam == 0)
+  {
+    fprintf(stdout, "Time: %lf\n", (t2 - t1));
+    fprintf(stdout, "Iter: %d\n", iter);
+    fprintf(stdout, "Err: %lg\n", err);
+    fprintf(stdout, "||r||_2: %lg\n", res2);
+  }
+
+#if DUMPATRIX
+  psb_c_dmat_name_print(ah, "cbindmat.mtx");
+  nlr = psb_c_cd_get_local_rows(cdh);
+  bv = psb_c_dvect_get_cpy(bh);
+  vectfile = fopen("cbindb.mtx", "w");
+  for (i = 0; i < nlr; i++)
+    fprintf(vectfile, "%lf\n", bv[i]);
+  fclose(vectfile);
+
+  xv = psb_c_dvect_get_cpy(xh);
+  nlr = psb_c_cd_get_local_rows(cdh);
+  for (i = 0; i < nlr; i++)
+    fprintf(stdout, "SOL: %d %d %lf\n", iam, i, xv[i]);
+
+  rv = psb_c_dvect_get_cpy(rh);
+  nlr = psb_c_cd_get_local_rows(cdh);
+  for (i = 0; i < nlr; i++)
+    fprintf(stdout, "RES: %d %d %lf\n", iam, i, rv[i]);
+
+#endif
+
+  /* Clean up memory */
+  if ((info = psb_c_dgefree(xh, cdh)) != 0)
+  {
+    fprintf(stderr, "From dgefree: %d\nBailing out\n", info);
+    psb_c_abort(*cctxt);
+  }
+  fprintf(stderr, "after dgefree xh\n");
+  if ((info = psb_c_dgefree(bh, cdh)) != 0)
+  {
+    fprintf(stderr, "From dgefree: %d\nBailing out\n", info);
+    psb_c_abort(*cctxt);
+  }
+  fprintf(stderr, "after dgefree bh\n");
+  if ((info = psb_c_dgefree(rh, cdh)) != 0)
+  {
+    fprintf(stderr, "From dgefree: %d\nBailing out\n", info);
+    psb_c_abort(*cctxt);
+  }
+  fprintf(stderr, "after dgefree rh\n");
+  if ((info = psb_c_cdfree(cdh)) != 0)
+  {
+    fprintf(stderr, "From cdfree: %d\nBailing out\n", info);
+    psb_c_abort(*cctxt);
+  }
+  fprintf(stderr, "after cdfree\n");
+  // fprintf(stderr,"pointer  from cdfree: %p\n",cdh->descriptor);
+
+  /* Clean up object handles  */
+  free(ph);
+  free(xh);
+  free(bh);
+  free(ah);
+  free(cdh);
+
+  if (iam == 0)
+    fprintf(stderr, "program completed successfully\n");
+
+#ifdef PSB_HAVE_CUDA
+  psb_c_cuda_exit();
+#endif
+  psb_c_barrier(*cctxt);
+  psb_c_exit(*cctxt);
+  free(cctxt);
+}
