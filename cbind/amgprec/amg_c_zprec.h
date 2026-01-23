@@ -10,15 +10,17 @@
 /* Note:  amg_get_XXX_handle returns:  <= 0  unsuccessful */
 /*                                     >0    valid handle */
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-  typedef struct AMG_C_ZPREC {
+  typedef struct AMG_C_ZPREC
+  {
     void *dprec;
-  } amg_c_zprec; 
-  
-  amg_c_zprec* amg_c_zprec_new();
-  psb_i_t amg_c_zprec_delete(amg_c_zprec* p);
- 
+  } amg_c_zprec;
+
+  amg_c_zprec *amg_c_zprec_new();
+  psb_i_t amg_c_zprec_delete(amg_c_zprec *p);
+
   psb_i_t amg_c_zprecinit(psb_c_ctxt cctxt, amg_c_zprec *ph, const char *ptype);
   psb_i_t amg_c_zprecseti(amg_c_zprec *ph, const char *what, psb_i_t val);
   psb_i_t amg_c_zprecsetc(amg_c_zprec *ph, const char *what, const char *val);
@@ -26,19 +28,19 @@ extern "C" {
   psb_i_t amg_c_zprecbld(psb_c_zspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph);
   psb_i_t amg_c_zhierarchy_build(psb_c_zspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph);
   psb_i_t amg_c_zsmoothers_build(psb_c_zspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph);
+  psb_i_t amg_c_zsmoothers_build_opt(psb_c_zspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph, const char *afmt, const char *chfmt);
   psb_i_t amg_c_zprecapply(amg_c_zprec *ph, psb_c_zvector *x, psb_c_zvector *b, psb_c_descriptor *cdh);
   psb_i_t amg_c_zprecapply_opt(amg_c_zprec *ph, psb_c_zvector *x, psb_c_zvector *b, psb_c_descriptor *cdh, const char *ctrans);
   psb_i_t amg_c_zprecfree(amg_c_zprec *ph);
-  psb_i_t amg_c_zprecbld_opt(psb_c_zspmat *ah, psb_c_descriptor *cdh, 
-			  amg_c_zprec *ph, const char *afmt);
+  psb_i_t amg_c_zprecbld_opt(psb_c_zspmat *ah, psb_c_descriptor *cdh,
+                             amg_c_zprec *ph, const char *afmt);
 
   psb_i_t amg_c_zdescr(amg_c_zprec *ph);
   psb_i_t amg_c_zallocate_wrk(amg_c_zprec *ph, const char *chfmt);
 
-  psb_i_t amg_c_zkrylov(const char *method, psb_c_zspmat *ah, amg_c_zprec *ph, 
-		  psb_c_zvector *bh, psb_c_zvector *xh,
-		  psb_c_descriptor *cdh, psb_c_SolverOptions *opt);
-
+  psb_i_t amg_c_zkrylov(const char *method, psb_c_zspmat *ah, amg_c_zprec *ph,
+                        psb_c_zvector *bh, psb_c_zvector *xh,
+                        psb_c_descriptor *cdh, psb_c_SolverOptions *opt);
 
 #ifdef __cplusplus
 }

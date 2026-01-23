@@ -246,6 +246,114 @@ contains
     return
   end function amg_c_zsmoothers_build
 
+  function  amg_c_zsmoothers_build_format(ah,cdh,ph,afmt,cdfmt) bind(c) result(res)
+#if defined (PSB_HAVE_CUDA)
+    use psb_cuda_mod
+#endif
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type)  :: ph,ah,cdh
+    type(amg_zprec_type), pointer  :: precp
+    type(psb_zspmat_type), pointer :: ap
+    type(psb_desc_type), pointer   :: descp
+    character(c_char)     :: afmt(*), cdfmt(*)
+    character(len=80)     :: fptype
+    integer(psb_ipk_)     :: iret
+    ! Local variables for formats
+    character(len=10)     :: fafmt, fcdfmt
+#if defined (PSB_HAVE_CUDA)
+    type(psb_z_vect_cuda), target         :: dvgpu
+    type(psb_i_vect_cuda), target         :: ivgpu
+    ! GPU matrix molds
+    type(psb_z_cuda_hlg_sparse_mat), target   :: ahlg
+    type(psb_z_cuda_csrg_sparse_mat), target   :: acsrg
+    type(psb_z_cuda_elg_sparse_mat), target    :: aelg
+#endif
+    type(psb_z_base_vect_type), target    :: dvhost
+    type(psb_i_base_vect_type), target    :: ivhost
+    ! CPU matrix molds
+    type(psb_z_ell_sparse_mat), target    :: aell
+    type(psb_z_csr_sparse_mat), target   :: acsr
+    type(psb_z_coo_sparse_mat), target   :: acoo
+    type(psb_z_hll_sparse_mat), target    :: ahll
+    type(psb_z_dns_sparse_mat), target   :: adns
+
+    ! molding variables
+    class(psb_z_base_vect_type), pointer  :: vmold
+    class(psb_z_base_sparse_mat), pointer :: amold
+    class(psb_i_base_vect_type), pointer  :: imold
+
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+    ! Convert formats
+    call psb_stringc2f(afmt,fafmt)
+    call psb_stringc2f(cdfmt,fcdfmt)
+    ! Select matrix mold
+    select case (psb_toupper(fafmt))
+#if defined (PSB_HAVE_CUDA)
+    case('CSRG')
+      amold => acsrg
+    case('ELG')
+      amold => aelg
+    case('HLG')
+      amold => ahlg
+#endif
+    case('CSR')
+      amold => acsr
+    case('ELL')
+      amold => aell
+    case('COO')
+      amold => acoo
+    case('HLL')
+      amold => ahll
+    case('DNS')
+      amold => adns
+    case default
+      write(psb_err_unit,'(A)') 'amg_c_dsmoothers_build_format: Unknown format ', fafmt, ' defaulting to CSR'
+      amold => acsr
+    end select
+    ! Select vector mold
+    select case (psb_toupper(fcdfmt))
+#if defined (PSB_HAVE_CUDA)
+    case('GPU','DEVICE')
+      vmold => dvgpu
+      imold => ivgpu
+#endif
+    case('HOST','CPU')
+      vmold => dvhost
+      imold => ivhost
+    case default
+      write(psb_err_unit,'(A)') 'amg_c_dsmoothers_build_format: Unknown format ', fcdfmt, ' defaulting to HOST/CPU'
+      vmold => dvhost
+      imold => ivhost
+    end select
+
+
+    call precp%smoothers_build(ap,descp,iret,amold=amold,vmold=vmold,imold=imold)
+
+    res = MLDC_ERR_FILTER(iret)
+    MLDC_ERR_HANDLE(res)
+
+    return
+  end function amg_c_zsmoothers_build_format
+
   function  amg_c_zkrylov(methd,&
        & ah,ph,bh,xh,cdh,options) bind(c) result(res)
     use psb_linsolve_mod
