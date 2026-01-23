@@ -492,7 +492,7 @@ int main(int argc, char *argv[])
   /* Set up the preconditioner */
   ph = amg_c_dprec_new();
   amg_c_dprecinit(*cctxt, ph, ptype);
-  amg_c_dprecsetc(ph, "", "L1-JACOBI");
+  amg_c_dprecsetc(ph, "SMOOTHER_TYPE", "L1-JACOBI");
   amg_c_dprecseti(ph, "SMOOTHER_SWEEPS", 2);
   amg_c_dprecsetc(ph, "COARSE_SOLVE", "BJAC");
   amg_c_dprecsetc(ph, "COARSE_SUBSOLVE", "L1-JACOBI");
@@ -533,6 +533,17 @@ int main(int argc, char *argv[])
       psb_c_abort(*cctxt);
     }
   */
+  /* Print the information on the preconditioner */
+  if (iam == 0)
+  {
+    info = amg_c_ddescr(ph);
+    if (info != 0)
+    {
+      fprintf(stderr, "From ddescr: %d\nBailing out\n", info);
+      psb_c_abort(*cctxt);
+    }
+  }
+
   /* Set up the solver options */
   psb_c_DefaultSolverOptions(&options);
   options.eps = 1.e-6;
