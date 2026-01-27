@@ -74,7 +74,7 @@ subroutine amg_z_as_smoother_clone(sm,smout,info)
     if (info == psb_success_) &
          & call sm%desc_data%clone(smo%desc_data,info)    
     if ((info==psb_success_).and.(allocated(sm%sv))) then
-      allocate(smout%sv,mold=sm%sv,stat=info)
+      allocate(smo%sv,mold=sm%sv,stat=info)
       if (info == psb_success_) call sm%sv%clone(smo%sv,info)
     end if
     
