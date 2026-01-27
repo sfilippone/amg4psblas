@@ -496,10 +496,26 @@ int main(int argc, char *argv[])
   amg_c_dprecseti(ph, "SMOOTHER_SWEEPS", 2);
   amg_c_dprecsetc(ph, "COARSE_SOLVE", "BJAC");
   amg_c_dprecsetc(ph, "COARSE_SUBSOLVE", "L1-JACOBI");
-  if ((ret = amg_c_dhierarchy_build(ah, cdh, ph)) != 0)
+  amg_c_dprecsetc(ph, "AGGR_FILTER", "FILTER");
+  if ((ret = amg_c_dhierarchy_build(ah, cdh, ph)) != 0){
     fprintf(stderr, "From hierarchy_build: %d\n", ret);
+  }{
+    if (iam == 0) {
+      fprintf(stdout, "Hierarchy built\n");
+    }
+  }
+#if defined (PSB_HAVE_CUDA)
+  if ((ret = amg_c_dsmoothers_build_format(ah, cdh, ph, afmt, cdfmt)) != 0)
+    fprintf(stderr, "From smoothers_build_format: %d\n", ret);  
+#else 
   if ((ret = amg_c_dsmoothers_build(ah, cdh, ph)) != 0)
     fprintf(stderr, "From smoothers_build: %d\n", ret);
+#endif
+  if ( ret == 0){
+    if (iam == 0) {
+      fprintf(stdout, "Smoothers built\n");
+    }
+  }
 
 #ifdef PSB_HAVE_CUDA
   /* Allocate work vectors for the preconditioner on the GPU */
@@ -508,24 +524,28 @@ int main(int argc, char *argv[])
   {
     fprintf(stderr, "From dallocate_wrk: %d\nBailing out\n", info);
     psb_c_abort(*cctxt);
+  } else { 
+    if (iam == 0) {
+      fprintf(stdout, "Preconditioner work vectors allocated\n");
+    }
   }
 #endif
 
   psb_c_barrier(*cctxt);
   /* Do a dry run of the preconditioner */
-  info = amg_c_dprecapply(ph, bh, xh, cdh);
-  if (info != 0)
-  {
-    fprintf(stderr, "From dprec_apply: %d\nBailing out\n", info);
-    psb_c_abort(*cctxt);
-  }
-  /* Do a dry run of the preconditioner with the option routine */
-  info = amg_c_dprecapply_opt(ph, bh, xh, cdh, "N");
-  if (info != 0)
-  {
-    fprintf(stderr, "From dprec_apply_opt: %d\nBailing out\n", info);
-    psb_c_abort(*cctxt);
-  }
+  // info = amg_c_dprecapply(ph, bh, xh, cdh);
+  // if (info != 0)
+  // {
+  //   fprintf(stderr, "From dprec_apply: %d\nBailing out\n", info);
+  //   psb_c_abort(*cctxt);
+  // }
+  // /* Do a dry run of the preconditioner with the option routine */
+  // info = amg_c_dprecapply_opt(ph, bh, xh, cdh, "N");
+  // if (info != 0)
+  // {
+  //   fprintf(stderr, "From dprec_apply_opt: %d\nBailing out\n", info);
+  //   psb_c_abort(*cctxt);
+  // }
   /*
   info = amg_c_dprecapply_opt(ph,bh,xh,cdh,"T");
     if (info != 0) {
