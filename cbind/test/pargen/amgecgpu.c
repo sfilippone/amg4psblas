@@ -406,6 +406,7 @@ int main(int argc, char *argv[])
     get_iparm(stdin, &itrace);
     get_iparm(stdin, &irst);
 
+#if 0
     /* Display paremeters */
     fprintf(stderr, "Input parameters:\n");
     fprintf(stderr, " Number of parameters: %d\n", nparms);
@@ -418,6 +419,7 @@ int main(int argc, char *argv[])
     fprintf(stderr, " Maximum iterations: %d\n", itmax);
     fprintf(stderr, " Trace frequency: %d\n", itrace);
     fprintf(stderr, " Restart depth: %d\n", irst);
+#endif
   }
   /* Now broadcast the values, and check they're OK */
   psb_c_ibcast(*cctxt, 1, &nparms, 0);
@@ -484,10 +486,12 @@ int main(int argc, char *argv[])
     psb_c_abort(*cctxt);
   }
   psb_c_barrier(*cctxt);
+#if 0
   if (iam == 0)
   {
     fprintf(stdout, "Matrix and vectors generated\n");
   }
+#endif
   fflush(stdout);
   /* Set up the preconditioner */
   ph = amg_c_dprec_new();
@@ -500,9 +504,11 @@ int main(int argc, char *argv[])
   if ((ret = amg_c_dhierarchy_build(ah, cdh, ph)) != 0){
     fprintf(stderr, "From hierarchy_build: %d\n", ret);
   }{
+#if 0    
     if (iam == 0) {
       fprintf(stdout, "Hierarchy built\n");
     }
+#endif
   }
 #if defined (PSB_HAVE_CUDA)
   if ((ret = amg_c_dsmoothers_build_format(ah, cdh, ph, afmt, cdfmt)) != 0)
@@ -511,11 +517,13 @@ int main(int argc, char *argv[])
   if ((ret = amg_c_dsmoothers_build(ah, cdh, ph)) != 0)
     fprintf(stderr, "From smoothers_build: %d\n", ret);
 #endif
+#if 0
   if ( ret == 0){
     if (iam == 0) {
       fprintf(stdout, "Smoothers built\n");
     }
   }
+#endif
 
 #ifdef PSB_HAVE_CUDA
   /* Allocate work vectors for the preconditioner on the GPU */
@@ -533,19 +541,19 @@ int main(int argc, char *argv[])
 
   psb_c_barrier(*cctxt);
   /* Do a dry run of the preconditioner */
-  // info = amg_c_dprecapply(ph, bh, xh, cdh);
-  // if (info != 0)
-  // {
-  //   fprintf(stderr, "From dprec_apply: %d\nBailing out\n", info);
-  //   psb_c_abort(*cctxt);
-  // }
-  // /* Do a dry run of the preconditioner with the option routine */
-  // info = amg_c_dprecapply_opt(ph, bh, xh, cdh, "N");
-  // if (info != 0)
-  // {
-  //   fprintf(stderr, "From dprec_apply_opt: %d\nBailing out\n", info);
-  //   psb_c_abort(*cctxt);
-  // }
+  info = amg_c_dprecapply(ph, bh, xh, cdh);
+  if (info != 0)
+  {
+    fprintf(stderr, "From dprec_apply: %d\nBailing out\n", info);
+    psb_c_abort(*cctxt);
+  }
+  /* Do a dry run of the preconditioner with the option routine */
+  info = amg_c_dprecapply_opt(ph, bh, xh, cdh, "N");
+  if (info != 0)
+  {
+    fprintf(stderr, "From dprec_apply_opt: %d\nBailing out\n", info);
+    psb_c_abort(*cctxt);
+  }
   /*
   info = amg_c_dprecapply_opt(ph,bh,xh,cdh,"T");
     if (info != 0) {
@@ -623,25 +631,33 @@ int main(int argc, char *argv[])
     fprintf(stderr, "From dgefree: %d\nBailing out\n", info);
     psb_c_abort(*cctxt);
   }
+#if 0
   fprintf(stderr, "after dgefree xh\n");
+#endif
   if ((info = psb_c_dgefree(bh, cdh)) != 0)
   {
     fprintf(stderr, "From dgefree: %d\nBailing out\n", info);
     psb_c_abort(*cctxt);
   }
+#if 0
   fprintf(stderr, "after dgefree bh\n");
+#endif 
   if ((info = psb_c_dgefree(rh, cdh)) != 0)
   {
     fprintf(stderr, "From dgefree: %d\nBailing out\n", info);
     psb_c_abort(*cctxt);
   }
+#if 0
   fprintf(stderr, "after dgefree rh\n");
+#endif
   if ((info = psb_c_cdfree(cdh)) != 0)
   {
     fprintf(stderr, "From cdfree: %d\nBailing out\n", info);
     psb_c_abort(*cctxt);
   }
+#if 0
   fprintf(stderr, "after cdfree\n");
+#endif
   // fprintf(stderr,"pointer  from cdfree: %p\n",cdh->descriptor);
 
   /* Clean up object handles  */
