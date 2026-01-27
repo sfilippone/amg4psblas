@@ -505,7 +505,7 @@ int main(int argc, char *argv[])
     }
   }
 #if defined (PSB_HAVE_CUDA)
-  if ((ret = amg_c_dsmoothers_build_format(ah, cdh, ph, afmt, cdfmt)) != 0)
+  if ((ret = amg_c_dsmoothers_build_opt(ah, cdh, ph, afmt, cdfmt)) != 0)
     fprintf(stderr, "From smoothers_build_format: %d\n", ret);  
 #else 
   if ((ret = amg_c_dsmoothers_build(ah, cdh, ph)) != 0)

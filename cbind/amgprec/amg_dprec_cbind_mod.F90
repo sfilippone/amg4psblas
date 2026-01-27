@@ -245,7 +245,7 @@ contains
     return
   end function amg_c_dsmoothers_build
 
-  function  amg_c_dsmoothers_build_format(ah,cdh,ph,afmt,cdfmt) bind(c) result(res)
+  function  amg_c_dsmoothers_build_opt(ah,cdh,ph,afmt,cdfmt) bind(c) result(res)
 #if defined (PSB_HAVE_CUDA)
     use psb_cuda_mod
 #endif
@@ -357,7 +357,7 @@ contains
     MLDC_ERR_HANDLE(res)
 
     return
-  end function amg_c_dsmoothers_build_format
+  end function amg_c_dsmoothers_build_opt
 
   function  amg_c_dkrylov(methd,&
        & ah,ph,bh,xh,cdh,options) bind(c) result(res)
