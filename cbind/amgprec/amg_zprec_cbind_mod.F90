@@ -326,7 +326,7 @@ contains
     case('DNS')
       amold => adns
     case default
-      write(psb_err_unit,'(A)') 'amg_c_dsmoothers_build_format: Unknown format ', fafmt, ' defaulting to CSR'
+      write(psb_err_unit,'(A)') 'amg_c_zsmoothers_build_format: Unknown format ', fafmt, ' defaulting to CSR'
       amold => acsr
     end select
     ! Select vector mold
@@ -340,7 +340,7 @@ contains
       vmold => dvhost
       imold => ivhost
     case default
-      write(psb_err_unit,'(A)') 'amg_c_dsmoothers_build_format: Unknown format ', fcdfmt, ' defaulting to HOST/CPU'
+      write(psb_err_unit,'(A)') 'amg_c_zsmoothers_build_format: Unknown format ', fcdfmt, ' defaulting to HOST/CPU'
       vmold => dvhost
       imold => ivhost
     end select
