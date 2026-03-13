@@ -155,7 +155,7 @@ subroutine amg_zaggrmat_minnrg_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,&
   debug_level = psb_get_debug_level()
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
 
   call psb_info(ctxt, me, np)
 
