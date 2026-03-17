@@ -1,20 +1,20 @@
 #include <stdlib.h>
-#include "amg_c_dprec.h"
+#include "amg_c_zprec.h"
 
-amg_c_dprec* amg_c_new_dprec()
+amg_c_zprec* amg_c_new_zprec()
 {
-  amg_c_dprec* temp;
+  amg_c_zprec* temp;
   
-  temp=(amg_c_dprec *) malloc(sizeof(amg_c_dprec));
+  temp=(amg_c_zprec *) malloc(sizeof(amg_c_zprec));
   temp->dprec=NULL;
   return(temp);
 }
 
 
-psb_i_t amg_c_delete_dprec(amg_c_dprec* p)
+psb_i_t amg_c_delete_zprec(amg_c_zprec* p)
 {
   int iret;
-  iret=amg_c_dprecfree(p);
+  iret=amg_c_zprecfree(p);
   if (iret ==0) free(p);
   return(iret);
 }

@@ -65,7 +65,7 @@ LIBNAME=libamg_prec.a
 all: mods  objs impld
 
 mods: $(MODOBJS)
-	/bin/cp -p amg_const.h amg_config.h $(INCDIR)
+	/bin/cp -p amg_config.h $(INCDIR)
 	/bin/cp -p *$(.mod) $(MODDIR)
 objs: mods impld
 impld: mods
@@ -80,7 +80,7 @@ lib: objs
 
 $(MODOBJS): $(PSBLAS_MODDIR)/$(PSBBASEMODNAME)$(.mod)
 
-amg_base_prec_type.o: amg_const.h
+amg_base_prec_type.o: amg_config.h
 amg_s_prec_type.o amg_d_prec_type.o amg_c_prec_type.o amg_z_prec_type.o	: amg_base_prec_type.o
 amg_prec_type.o: amg_s_prec_type.o amg_d_prec_type.o amg_c_prec_type.o amg_z_prec_type.o
 amg_prec_mod.o: amg_prec_type.o amg_s_prec_mod.o amg_d_prec_mod.o amg_c_prec_mod.o amg_z_prec_mod.o

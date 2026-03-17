@@ -13,7 +13,7 @@ FDEFINES=$(AMGFDEFINES)
 
 
 OBJS=amg_prec_cbind_mod.o amg_dprec_cbind_mod.o  amg_c_dprec.o amg_zprec_cbind_mod.o  amg_c_zprec.o
-CMOD=amg_cbind.h amg_c_dprec.h  amg_c_zprec.h amg_const.h
+CMOD=amg_cbind.h amg_c_dprec.h  amg_c_zprec.h 
 
 
 LIBMOD=amg_prec_cbind_mod$(.mod) amg_dprec_cbind_mod$(.mod) amg_zprec_cbind_mod$(.mod)

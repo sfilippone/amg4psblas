@@ -1,7 +1,7 @@
 #ifndef AMG_C_DPREC_
 #define AMG_C_DPREC_
 
-#include "amg_const.h"
+#include "amg_config.h"
 #include "psb_base_cbind.h"
 #include "psb_prec_cbind.h"
 #include "psb_linsolve_cbind.h"
@@ -27,8 +27,8 @@ extern "C" {
   psb_i_t amg_c_dhierarchy_build(psb_c_dspmat *ah, psb_c_descriptor *cdh, amg_c_dprec *ph);
   psb_i_t amg_c_dsmoothers_build(psb_c_dspmat *ah, psb_c_descriptor *cdh, amg_c_dprec *ph);
   psb_i_t amg_c_dsmoothers_build_opt(psb_c_dspmat *ah, psb_c_descriptor *cdh, amg_c_dprec *ph, const char *afmt, const char *chfmt);
-  psb_i_t amg_c_dprecapply(amg_c_dprec *ph, psb_c_dvector *x, psb_c_dvector *b, psb_c_descriptor *cdh);
-  psb_i_t amg_c_dprecapply_opt(amg_c_dprec *ph, psb_c_dvector *x, psb_c_dvector *b, psb_c_descriptor *cdh, const char *ctrans);
+  psb_i_t amg_c_dprecapply(amg_c_dprec *ph, psb_c_dvector *bh, psb_c_dvector *xh, psb_c_descriptor *cdh);
+  psb_i_t amg_c_dprecapply_opt(amg_c_dprec *ph, psb_c_dvector *bh, psb_c_dvector *xh, psb_c_descriptor *cdh, const char *ctrans);
   psb_i_t amg_c_dprecfree(amg_c_dprec *ph);
   psb_i_t amg_c_dprecbld_opt(psb_c_dspmat *ah, psb_c_descriptor *cdh, 
 			  amg_c_dprec *ph, const char *afmt);
