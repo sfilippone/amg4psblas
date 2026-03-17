@@ -1,7 +1,7 @@
 #ifndef AMG_C_DPREC_
 #define AMG_C_DPREC_
 
-#include "amg_const.h"
+#include "amg_config.h"
 #include "psb_base_cbind.h"
 #include "psb_prec_cbind.h"
 #include "psb_linsolve_cbind.h"

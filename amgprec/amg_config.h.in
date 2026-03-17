@@ -3,6 +3,12 @@
 
 #include "psb_config.h"
 
+#define AMG_VERSION_MAJOR        @AMGMAJOR@
+#define AMG_VERSION_MINOR        @AMGMINOR@
+#define AMG_VERSION_PATCHLEVEL   @AMGPATCH@
+#define AMG_VERSION_STRING       @AMGSTRING@
+
+
 @CHAVEUMF@
 @CHAVESLU@
 @CSLUVERSION@

@@ -641,37 +641,43 @@ fi
 PAC_FORTRAN_TEST_EXTENDS( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for EXTENDS. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_CLASS_TBP( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for CLASS and type bound procedures. 
- Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_SOURCE( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for SOURCE= allocation. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_HAVE_MOVE_ALLOC(
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for MOVE_ALLOC. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_ISO_C_BIND( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for ISO_C_BINDING. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_ISO_FORTRAN_ENV(
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for ISO_FORTRAN_ENV. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
+)
+
+PAC_FORTRAN_TEST_SUBMODULES(
+	[],
+	[AC_MSG_ERROR([Sorry, cannot build without support for SUBMODULES.
+	Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])],
 )
 
 PAC_FORTRAN_TEST_VOLATILE(
@@ -703,20 +709,30 @@ PAC_FORTRAN_TEST_FLUSH(
 PAC_FORTRAN_TEST_SAME_TYPE( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for SAME_TYPE_AS. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_EXTENDS_TYPE( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for EXTENDS_TYPE_OF. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_MOLD( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for MOLD= allocation. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
+######################
+# Extract version data
+######################
+#PAC_EXTRACT_AMG_VERSION
+CFILE="amgprec/amg_base_prec_type.F90";
+AMGMAJOR=`cat $CFILE| grep version_major | $AWK '{print $6;}'`;
+AMGMINOR=`cat $CFILE| grep version_minor| $AWK '{print $6;}'`;
+AMGPATCH=`cat $CFILE| grep patchlevel| $AWK '{print $6;}'`;
+AMGSTRING=`cat $CFILE | grep version_string | $AWK '{print $6;}'`;
+AC_MSG_RESULT([ AMG version  $AMGSTRING])
 
 ###############################################################################
 #		BLAS  library presence checks
@@ -844,6 +860,11 @@ AC_SUBST(INSTALL_INCLUDEDIR)
 AC_SUBST(INSTALL_MODULESDIR)
 AC_SUBST(INSTALL_DOCSDIR)
 AC_SUBST(INSTALL_SAMPLESDIR)
+
+AC_SUBST(AMGMAJOR)
+AC_SUBST(AMGMINOR)
+AC_SUBST(AMGPATCH)
+AC_SUBST(AMGSTRING)
 
 AC_SUBST(CHAVEUMF)
 AC_SUBST(CHAVESLU)
