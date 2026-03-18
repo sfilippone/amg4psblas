@@ -187,7 +187,7 @@ program amg_sf_sample
   !
   if (iam == psb_root_) then 
     write(psb_out_unit,*) ' '
-    write(psb_out_unit,*) 'Welcome to MLD2P4 version: ',amg_version_string_
+    write(psb_out_unit,*) 'Welcome to AMG4PSBLAS version: ',amg_version_string_
     write(psb_out_unit,*) 'This is the ',trim(name),' sample test program'
     write(psb_out_unit,*) ' '
   end if
