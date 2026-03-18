@@ -11,16 +11,16 @@ module amg_dprec_cbind_mod
 contains
 
 #if 1
-#define MLDC_DEBUG(MSG) write(*,*) __FILE__,':',__LINE__,':',MSG
-#define MLDC_ERROR(MSG) write(*,*) __FILE__,':',__LINE__,':'," ERROR: ",MSG
+#define AMGC_DEBUG(MSG) write(*,*) __FILE__,':',__LINE__,':',MSG
+#define AMGC_ERROR(MSG) write(*,*) __FILE__,':',__LINE__,':'," ERROR: ",MSG
 #else
-#define MLDC_DEBUG(MSG)
-#define MLDC_ERROR(MSG)
+#define AMGC_DEBUG(MSG)
+#define AMGC_ERROR(MSG)
 #endif
 #define amg_success_ 0
-!#define MLDC_ERR_FILTER(INFO) min(0,INFO)
-#define MLDC_ERR_FILTER(INFO) (INFO)
-#define MLDC_ERR_HANDLE(INFO) if(INFO/=amg_success_)MLDC_ERROR("ERROR!")
+!#define AMGC_ERR_FILTER(INFO) min(0,INFO)
+#define AMGC_ERR_FILTER(INFO) (INFO)
+#define AMGC_ERR_HANDLE(INFO) if(INFO/=amg_success_)AMGC_ERROR("ERROR!")
   function  amg_c_dprecinit(cctxt,ph,ptype) bind(c) result(res)
     implicit none
 
@@ -47,8 +47,8 @@ contains
 
     call precp%init(psb_c2f_ctxt(cctxt),fptype,iret)
 
-    res = MLDC_ERR_FILTER(iret)
-    MLDC_ERR_HANDLE(res)
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
     return
   end function amg_c_dprecinit
 
@@ -74,8 +74,8 @@ contains
 
     call precp%set(fwhat,val,iret)
 
-    res = MLDC_ERR_FILTER(iret)
-    MLDC_ERR_HANDLE(res)
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
     return
   end function amg_c_dprecseti
 
@@ -102,8 +102,8 @@ contains
 
     call precp%set(fwhat,val,iret)
 
-    res = MLDC_ERR_FILTER(iret)
-    MLDC_ERR_HANDLE(res)
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
     return
   end function amg_c_dprecsetr
 
@@ -129,8 +129,8 @@ contains
 
     call precp%set(fwhat,fval,iret)
 
-    res = MLDC_ERR_FILTER(iret)
-    MLDC_ERR_HANDLE(res)
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
     return
   end function amg_c_dprecsetc
 
@@ -165,8 +165,8 @@ contains
 
     call amg_precbld(ap,descp,precp,iret)
 
-    res = MLDC_ERR_FILTER(iret)
-    MLDC_ERR_HANDLE(res)
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
 
     return
   end function amg_c_dprecbld
@@ -202,8 +202,8 @@ contains
 
     call precp%hierarchy_build(ap,descp,iret)
 
-    res = MLDC_ERR_FILTER(iret)
-    MLDC_ERR_HANDLE(res)
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
 
     return
   end function amg_c_dhierarchy_build
@@ -239,8 +239,8 @@ contains
 
     call precp%smoothers_build(ap,descp,iret)
 
-    res = MLDC_ERR_FILTER(iret)
-    MLDC_ERR_HANDLE(res)
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
 
     return
   end function amg_c_dsmoothers_build
@@ -494,8 +494,8 @@ contains
     call precp%apply(bp,xp,descp,info)
 
     ! Error handling and return
-    res = MLDC_ERR_FILTER(info)
-    MLDC_ERR_HANDLE(res)
+    res = AMGC_ERR_FILTER(info)
+    AMGC_ERR_HANDLE(res)
     return
 end function amg_c_dprecapply
 
@@ -550,8 +550,8 @@ end function amg_c_dprecapply
     call precp%apply(bp,xp,descp,info,trans=ftrans)
 
     ! Error handling and return
-    res = MLDC_ERR_FILTER(info)
-    MLDC_ERR_HANDLE(res)
+    res = AMGC_ERR_FILTER(info)
+    AMGC_ERR_HANDLE(res)
     return
 end function amg_c_dprecapply_opt
 
@@ -574,8 +574,8 @@ end function amg_c_dprecapply_opt
 
     call precp%free(iret)
 
-    res = MLDC_ERR_FILTER(iret)
-    MLDC_ERR_HANDLE(res)
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
     return
   end function amg_c_dprecfree
 
@@ -600,8 +600,8 @@ end function amg_c_dprecapply_opt
     call flush(psb_out_unit)
 
     iret = 0
-    res = MLDC_ERR_FILTER(iret)
-    MLDC_ERR_HANDLE(res)
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
     return
   end function amg_c_ddescr
 
