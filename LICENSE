@@ -4,11 +4,7 @@
     Algebraic Multigrid Package
                based on PSBLAS (Parallel Sparse BLAS version 3.9)
     
-    (C) Copyright 2025
-  
-        Salvatore Filippone  
-        Pasqua D'Ambra   
-        Fabio Durastante        
+    (C) Copyright 2025  Salvatore Filippone, Pasqua D'Ambra, Fabio Durastante  
    
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
@@ -20,7 +16,7 @@
          documentation and/or other materials provided with the distribution.
       3. The name of the AMG4PSBLAS group or the names of its contributors may
          not be used to endorse or promote products derived from this
-         software without specific written permission.
+         software without specific prior written permission.
    
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
     ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
