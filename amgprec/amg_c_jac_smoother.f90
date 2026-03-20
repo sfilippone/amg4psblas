@@ -151,7 +151,7 @@ module amg_c_jac_smoother
       import :: psb_desc_type, amg_c_jac_smoother_type, psb_c_vect_type, psb_spk_, &
            & psb_cspmat_type, psb_c_base_sparse_mat, psb_c_base_vect_type,&
            & psb_ipk_, psb_i_base_vect_type
-      type(psb_cspmat_type), intent(in), target           :: a
+      type(psb_cspmat_type), intent(inout), target        :: a
       Type(psb_desc_type), Intent(inout)                  :: desc_a
       class(amg_c_jac_smoother_type), intent(inout)       :: sm
       integer(psb_ipk_), intent(out)                      :: info
@@ -274,7 +274,7 @@ module amg_c_jac_smoother
       import :: psb_desc_type, amg_c_l1_jac_smoother_type, psb_c_vect_type, &
            & psb_cspmat_type, psb_c_base_sparse_mat, psb_c_base_vect_type,&
            & psb_ipk_, psb_i_base_vect_type
-      type(psb_cspmat_type), intent(in), target           :: a
+      type(psb_cspmat_type), intent(inout), target        :: a
       Type(psb_desc_type), Intent(inout)                  :: desc_a
       class(amg_c_l1_jac_smoother_type), intent(inout)       :: sm
       integer(psb_ipk_), intent(out)                      :: info

@@ -56,7 +56,7 @@ module amg_d_inner_mod
            & psb_dpk_, psb_d_base_sparse_mat, psb_d_base_vect_type, psb_ipk_
       import :: amg_dprec_type
       implicit none
-      type(psb_dspmat_type), intent(in), target          :: a
+      type(psb_dspmat_type), intent(inout), target       :: a
       type(psb_desc_type), intent(inout), target           :: desc_a
       type(amg_dprec_type), intent(inout), target        :: prec
       integer(psb_ipk_), intent(out)                       :: info

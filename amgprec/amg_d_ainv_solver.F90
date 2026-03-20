@@ -103,7 +103,7 @@ module amg_d_ainv_solver
       Implicit None
 
       ! Arguments
-      type(psb_dspmat_type), intent(in), target           :: a
+      type(psb_dspmat_type), intent(inout), target        :: a
       Type(psb_desc_type), Intent(inout)                  :: desc_a
       class(amg_d_ainv_solver_type), intent(inout)        :: sv
       integer(psb_ipk_), intent(out)                      :: info
@@ -225,7 +225,7 @@ module amg_d_ainv_solver
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, psb_ipk_
       implicit none
-      type(psb_dspmat_type), intent(in), target   :: a
+      type(psb_dspmat_type), intent(inout), target  :: a
       integer(psb_ipk_), intent(in)               :: fillin,alg
       real(psb_dpk_), intent(in)                  :: thresh
       type(psb_dspmat_type), intent(inout)        :: wmat, zmat

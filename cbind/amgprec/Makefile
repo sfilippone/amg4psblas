@@ -30,7 +30,7 @@ lib: objs $(CMOD)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(DEST)
 
 amg_prec_cbind_mod.o: amg_dprec_cbind_mod.o  amg_zprec_cbind_mod.o
-#amg_prec_cbind_mod.o: psb_prec_cbind_mod.o
+
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
 

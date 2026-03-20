@@ -19,7 +19,7 @@ libdir:
 amgobjs: mods
 	cd amgprec && $(MAKE) objs
 
-cbnd: mods
+cbnd: amgobjs
 	cd cbind && $(MAKE)  objs
 
 install: all

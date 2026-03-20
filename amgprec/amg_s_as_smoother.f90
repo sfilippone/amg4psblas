@@ -230,7 +230,7 @@ module amg_s_as_smoother
            & psb_desc_type, psb_s_base_sparse_mat, psb_ipk_,&
            & psb_i_base_vect_type
       implicit none 
-      type(psb_sspmat_type), intent(in), target        :: a
+      type(psb_sspmat_type), intent(inout), target     :: a
       Type(psb_desc_type), Intent(inout)                 :: desc_a 
       class(amg_s_as_smoother_type), intent(inout)       :: sm
       integer(psb_ipk_), intent(out)                     :: info

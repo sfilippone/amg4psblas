@@ -42,7 +42,7 @@ subroutine amg_c_base_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
   Implicit None
 
   ! Arguments
-  type(psb_cspmat_type), intent(in), target      :: a
+  type(psb_cspmat_type), intent(inout), target   :: a
   Type(psb_desc_type), Intent(inout)               :: desc_a 
   class(amg_c_base_smoother_type), intent(inout) :: sm 
   integer(psb_ipk_), intent(out)                   :: info

@@ -65,7 +65,7 @@ subroutine amg_dprecbld(a,desc_a,prec,info,amold,vmold,imold)
   Implicit None
 
   ! Arguments
-  type(psb_dspmat_type),intent(in), target           :: a
+  type(psb_dspmat_type),intent(inout), target        :: a
   type(psb_desc_type), intent(inout), target           :: desc_a
   class(amg_dprec_type),intent(inout), target         :: prec
   integer(psb_ipk_), intent(out)                               :: info

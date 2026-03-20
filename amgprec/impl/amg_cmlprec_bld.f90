@@ -85,7 +85,7 @@ subroutine amg_cmlprec_bld(a,desc_a,p,info,amold,vmold,imold)
   Implicit None
 
   ! Arguments
-  type(psb_cspmat_type),intent(in), target           :: a
+  type(psb_cspmat_type), intent(inout), target       :: a
   type(psb_desc_type), intent(inout), target           :: desc_a
   type(amg_cprec_type),intent(inout),target          :: p
   integer(psb_ipk_), intent(out)                       :: info

@@ -311,7 +311,7 @@ module amg_c_prec_type
            & psb_c_base_sparse_mat, psb_c_base_vect_type, &
            & psb_i_base_vect_type, amg_cprec_type, psb_ipk_
       implicit none
-      type(psb_cspmat_type), intent(in), target          :: a
+      type(psb_cspmat_type), intent(inout), target       :: a
       type(psb_desc_type), intent(inout), target           :: desc_a
       class(amg_cprec_type), intent(inout), target       :: prec
       integer(psb_ipk_), intent(out)                       :: info
@@ -323,14 +323,15 @@ module amg_c_prec_type
   end interface amg_precbld
 
   interface amg_hierarchy_bld
-    subroutine amg_c_hierarchy_bld(a,desc_a,prec,info)
+    subroutine amg_c_hierarchy_bld(a,desc_a,prec,info,cpymat)
       import :: psb_cspmat_type, psb_desc_type, psb_spk_, &
            & amg_cprec_type, psb_ipk_
       implicit none
-      type(psb_cspmat_type), intent(in), target          :: a
+      type(psb_cspmat_type), intent(inout), target       :: a
       type(psb_desc_type), intent(inout), target           :: desc_a
       class(amg_cprec_type), intent(inout), target        :: prec
       integer(psb_ipk_), intent(out)                       :: info
+      logical, intent(in), optional                        :: cpymat
       !      character, intent(in),optional             :: upd
     end subroutine amg_c_hierarchy_bld
   end interface amg_hierarchy_bld
@@ -1002,7 +1003,7 @@ contains
     integer(psb_ipk_), intent(out)        :: info
     class(psb_c_base_vect_type), intent(in), optional  :: vmold
     !
-    ! In MLD the DESC optional argument is ignored, since
+    ! In AMG the DESC optional argument is ignored, since
     ! the necessary info is contained in the various entries of the
     ! PRECV component.
     type(psb_desc_type), intent(in), optional  :: desc

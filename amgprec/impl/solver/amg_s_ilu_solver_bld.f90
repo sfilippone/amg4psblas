@@ -43,7 +43,7 @@ subroutine amg_s_ilu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   Implicit None
 
   ! Arguments
-  type(psb_sspmat_type), intent(in), target           :: a
+  type(psb_sspmat_type), intent(inout), target        :: a
   Type(psb_desc_type), Intent(inout)                  :: desc_a 
   class(amg_s_ilu_solver_type), intent(inout)         :: sv
   integer(psb_ipk_), intent(out)                      :: info

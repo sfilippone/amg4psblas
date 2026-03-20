@@ -170,7 +170,7 @@ module amg_s_base_solver_mod
       Implicit None
       
       ! Arguments
-      type(psb_sspmat_type), intent(in), target             :: a
+      type(psb_sspmat_type), intent(inout), target          :: a
       Type(psb_desc_type), Intent(inout)                    :: desc_a 
       class(amg_s_base_solver_type), intent(inout)          :: sv
       integer(psb_ipk_), intent(out)                        :: info

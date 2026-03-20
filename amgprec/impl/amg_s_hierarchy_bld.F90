@@ -63,7 +63,7 @@
 !    info    -  integer, output.
 !               Error code.              
 !  
-subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
+subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
 
   use psb_base_mod
   use amg_s_inner_mod
@@ -72,10 +72,11 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
   Implicit None
 
   ! Arguments
-  type(psb_sspmat_type),intent(in), target             :: a
+  type(psb_sspmat_type), intent(inout), target         :: a
   type(psb_desc_type), intent(inout), target           :: desc_a
   class(amg_sprec_type),intent(inout),target           :: prec
   integer(psb_ipk_), intent(out)                       :: info
+  logical, intent(in), optional                        :: cpymat
 
   ! Local Variables
   type(psb_ctxt_type) :: ctxt
@@ -90,7 +91,8 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
   type(amg_sml_parms)              :: medparms, coarseparms
   integer(psb_lpk_), allocatable   :: ilaggr(:), nlaggr(:)
   type(psb_lsspmat_type)            :: op_prol
-  type(amg_s_onelev_type), allocatable :: tprecv(:)    
+  type(amg_s_onelev_type), allocatable :: tprecv(:)
+  logical :: cpymat_
   integer(psb_ipk_)  :: debug_level, debug_unit
   character(len=20)  :: name, ch_err
   integer(psb_ipk_), save  :: idx_bldtp=-1, idx_matasb=-1
@@ -125,7 +127,9 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
     call psb_errpush(info,name)
     goto 9999
   end if
-
+  cpymat_ = .false.
+  if (present(cpymat)) cpymat_ = cpymat
+  
   !
   ! Check to ensure all procs have the same 
   !   
@@ -180,8 +184,15 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
     ! This is OK, since it may be called by the user even if there
     ! is only one level
     !
-    prec%precv(1)%base_a    => a
-    prec%precv(1)%base_desc => desc_a
+    if (cpymat_) then
+      call a%clone(prec%precv(1)%ac,info)
+      call desc_a%clone(prec%precv(1)%desc_ac,info)
+      prec%precv(1)%base_a    => prec%precv(1)%ac
+      prec%precv(1)%base_desc => prec%precv(1)%desc_ac
+    else
+      prec%precv(1)%base_a    => a
+      prec%precv(1)%base_desc => desc_a
+    end if
 
     call psb_erractionrestore(err_act)
     return
@@ -280,10 +291,16 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
   !
   ! Finest level first; create a GEN_BLOCK
   ! copy of the descriptor. 
-  ! 
-  prec%precv(1)%base_a    => a
+  !
+  if (cpymat_) then
+    call a%clone(prec%precv(1)%ac,info)
+    prec%precv(1)%base_a    => prec%precv(1)%ac
+  else
+    prec%precv(1)%base_a    => a
+  end if
   call psb_cd_renum_block(desc_a,prec%precv(1)%desc_ac,info)
   prec%precv(1)%base_desc => prec%precv(1)%desc_ac
+  
   newsz = 0
   array_build_loop: do i=2, iszv
     !
@@ -448,6 +465,9 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info)
     iszv = newsz
     ! Fix the pointers, but the level 1 should
     ! be treated differently
+    if (.not.associated(prec%precv(1)%base_a,a)) then
+      prec%precv(1)%base_a => prec%precv(1)%ac
+    end if
     if (.not.associated(prec%precv(1)%base_desc,desc_a)) then
       prec%precv(1)%base_desc => prec%precv(1)%desc_ac
     end if
