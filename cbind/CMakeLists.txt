@@ -18,7 +18,7 @@ foreach(file IN LISTS AMG_amgcbind_source_C_files)
 endforeach()
 
 set(AMG_amgcbind_header_C_files
-  amgprec/amg_const.h
+#  amgprec/amg_const.h
   amgprec/amg_c_dprec.h
   amgprec/amg_cbind.h
   amgprec/amg_c_zprec.h
