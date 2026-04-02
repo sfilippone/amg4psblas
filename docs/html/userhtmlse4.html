@@ -29,7 +29,7 @@ class="cmr-12">up</span></a><span
 class="cmr-12">] </span></p></div>
    <h3 class="sectionHead"><span class="titlemark"><span 
 class="cmr-12">4   </span></span> <a 
- id="x7-130004"></a><span 
+ id="x14-130004"></a><span 
 class="cmr-12">Getting Started</span></h3>
 <!--l. 5--><p class="noindent" ><span 
 class="cmr-12">This section describes the basics for building and applying AMG4PSBLAS one-level</span>
@@ -39,7 +39,7 @@ class="cmr-12">and multilevel (i.e., AMG) preconditioners with the Krylov solver
 class="cmr-12">PSBLAS</span><span 
 class="cmr-12">&#x00A0;</span><span class="cite"><span 
 class="cmr-12">[</span><a 
-href="userhtmlli3.html#XPSBLASGUIDE"><span 
+href="userhtmlli5.html#XPSBLASGUIDE"><span 
 class="cmr-12">21</span></a><span 
 class="cmr-12">]</span></span><span 
 class="cmr-12">.</span>
@@ -47,36 +47,25 @@ class="cmr-12">.</span>
 class="cmr-12">The following steps are required:</span>
      <ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x7-13002x1">
+  class="enumerate" id="x14-13002x1">
      <!--l. 11--><p class="noindent" ><span 
 class="cmti-12">Declare  the  preconditioner  data  structure</span><span 
 class="cmr-12">.  It  is  a  derived  data  type,</span>
-     <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">amg_</span></span></span><span 
-class="cmti-12">x</span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">prec_</span></span></span> <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">type</span></span></span><span 
+     <span class="obeylines-h"><code class="verb">amg_</code></span><span 
+class="cmti-12">x</span><span class="obeylines-h"><code class="verb">prec_</code></span> <span class="obeylines-h"><code class="verb">type</code></span><span 
 class="cmr-12">, where </span><span 
 class="cmti-12">x </span><span 
-class="cmr-12">may be </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">s</span></span></span><span 
-class="cmr-12">, </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">d</span></span></span><span 
-class="cmr-12">, </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">c</span></span></span> <span 
-class="cmr-12">or </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">z</span></span></span><span 
+class="cmr-12">may be </span><span class="obeylines-h"><code class="verb">s</code></span><span 
+class="cmr-12">, </span><span class="obeylines-h"><code class="verb">d</code></span><span 
+class="cmr-12">, </span><span class="obeylines-h"><code class="verb">c</code></span> <span 
+class="cmr-12">or </span><span class="obeylines-h"><code class="verb">z</code></span><span 
 class="cmr-12">, according to the basic data</span>
      <span 
-class="cmr-12">type of the sparse matrix (</span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">s</span></span></span> <span 
-class="cmr-12">= real single precision; </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">d</span></span></span> <span 
+class="cmr-12">type of the sparse matrix (</span><span class="obeylines-h"><code class="verb">s</code></span> <span 
+class="cmr-12">= real single precision; </span><span class="obeylines-h"><code class="verb">d</code></span> <span 
 class="cmr-12">= real double precision;</span>
-     <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">c</span></span></span> <span 
-class="cmr-12">= complex single precision; </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">z</span></span></span> <span 
+     <span class="obeylines-h"><code class="verb">c</code></span> <span 
+class="cmr-12">= complex single precision; </span><span class="obeylines-h"><code class="verb">z</code></span> <span 
 class="cmr-12">= complex double precision). This data</span>
      <span 
 class="cmr-12">structure is accessed by the user only through the AMG4PSBLAS routines,</span>
@@ -84,7 +73,7 @@ class="cmr-12">structure is accessed by the user only through the AMG4PSBLAS rou
 class="cmr-12">following an object-oriented approach.</span>
      </li>
 <li 
-  class="enumerate" id="x7-13004x2">
+  class="enumerate" id="x14-13004x2">
      <!--l. 19--><p class="noindent" ><span 
 class="cmti-12">Allocate  and  initialize  the  preconditioner  data  structure,  according  to  a</span>
      <span 
@@ -97,7 +86,7 @@ class="cmr-12">the user. The preconditioner types and the defaults associated wi
      <span 
 class="cmr-12">are  given  in  Table</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="#x7-13015r1"><span 
+href="#x14-13015r1"><span 
 class="cmr-12">1</span><!--tex4ht:ref: tab:precinit --></a><span 
 class="cmr-12">,  where  the  strings  used  by  </span><code class="lstinline"><span style="color:#000000">init</span></code> <span 
 class="cmr-12">to  identify  the</span>
@@ -107,7 +96,7 @@ class="cmr-12">preconditioner types are also given. Note that these strings are 
 class="cmr-12">uppercase letters are substituted by corresponding lowercase ones.</span>
      </li>
 <li 
-  class="enumerate" id="x7-13006x3">
+  class="enumerate" id="x14-13006x3">
      <!--l. 29--><p class="noindent" ><span 
 class="cmti-12">Modify the selected preconditioner type, by properly setting preconditioner</span>
      <span 
@@ -122,30 +111,30 @@ class="cmr-12">associated with the selected preconditioner type, to obtain a var
 class="cmr-12">preconditioner. Examples of use of </span><code class="lstinline"><span style="color:#000000">set</span></code> <span 
 class="cmr-12">are given in Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="#x7-140004.1"><span 
+href="userhtmlsu6.html#x15-140004.1"><span 
 class="cmr-12">4.1</span><!--tex4ht:ref: sec:examples --></a><span 
 class="cmr-12">; a complete</span>
+                                                                               
+
+                                                                               
      <span 
 class="cmr-12">list of all the preconditioner parameters and their allowed and default values</span>
      <span 
 class="cmr-12">is provided in Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="userhtmlse5.html#x8-160005"><span 
+href="userhtmlse5.html#x17-160005"><span 
 class="cmr-12">5</span><!--tex4ht:ref: sec:userinterface --></a><span 
 class="cmr-12">, Tables</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="userhtmlse5.html#x8-18009r2"><span 
+href="userhtmlsu9.html#x19-18009r2"><span 
 class="cmr-12">2</span><!--tex4ht:ref: tab:p_cycle --></a><span 
 class="cmr-12">-</span><a 
-href="userhtmlse5.html#x8-18015r8"><span 
+href="userhtmlsu9.html#x19-18015r8"><span 
 class="cmr-12">8</span><!--tex4ht:ref: tab:p_smoother_1 --></a><span 
 class="cmr-12">.</span>
-                                                                               
-
-                                                                               
      </li>
 <li 
-  class="enumerate" id="x7-13008x4">
+  class="enumerate" id="x14-13008x4">
      <!--l. 40--><p class="noindent" ><span 
 class="cmti-12">Build the preconditioner for a given matrix</span><span 
 class="cmr-12">. If the selected preconditioner is</span>
@@ -153,7 +142,7 @@ class="cmr-12">. If the selected preconditioner is</span>
 class="cmr-12">multilevel, then two steps must be performed, as specified next.</span>
           <ol  class="enumerate2" >
 <li 
-  class="enumerate" id="x7-13009x0">
+  class="enumerate" id="x14-13009x0">
           <!--l. 43--><p class="noindent" ><span 
 class="cmti-12">Build the AMG hierarchy for a given matrix. </span><span 
 class="cmr-12">This is performed by the</span>
@@ -162,7 +151,7 @@ class="cmr-12">routine </span><code class="lstinline"><span style="color:#000000
 class="cmr-12">.</span>
           </li>
 <li 
-  class="enumerate" id="x7-13010x0">
+  class="enumerate" id="x14-13010x0">
           <!--l. 45--><p class="noindent" ><span 
 class="cmti-12">Build the preconditioner for a given matrix. </span><span 
 class="cmr-12">This is performed by the</span>
@@ -176,7 +165,7 @@ class="cmr-12">the routine </span><code class="lstinline"><span style="color:#00
 class="cmr-12">.</span>
      </li>
 <li 
-  class="enumerate" id="x7-13012x5">
+  class="enumerate" id="x14-13012x5">
      <!--l. 50--><p class="noindent" ><span 
 class="cmti-12">Apply the preconditioner at each iteration of a Krylov solver. </span><span 
 class="cmr-12">This is performed by</span>
@@ -191,7 +180,7 @@ class="cmr-12">implementing the Krylov solver (</span><code class="lstinline"><s
 class="cmr-12">).</span>
      </li>
 <li 
-  class="enumerate" id="x7-13014x6">
+  class="enumerate" id="x14-13014x6">
      <!--l. 54--><p class="noindent" ><span 
 class="cmti-12">Free the preconditioner data structure</span><span 
 class="cmr-12">. This is performed by the routine </span><code class="lstinline"><span style="color:#000000">free</span></code><span 
@@ -205,13 +194,13 @@ class="cmr-12">All the previous routines are available as methods of the precond
 <span 
 class="cmr-12">detailed description of them is given in Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="userhtmlse5.html#x8-160005"><span 
+href="userhtmlse5.html#x17-160005"><span 
 class="cmr-12">5</span><!--tex4ht:ref: sec:userinterface --></a><span 
 class="cmr-12">. Examples showing the basic use of</span>
 <span 
 class="cmr-12">AMG4PSBLAS are reported in Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="#x7-140004.1"><span 
+href="userhtmlsu6.html#x15-140004.1"><span 
 class="cmr-12">4.1</span><!--tex4ht:ref: sec:examples --></a><span 
 class="cmr-12">.</span>
    <div class="table">
@@ -219,7 +208,7 @@ class="cmr-12">.</span>
 
                                                                                
 <!--l. 63--><p class="indent" >   <a 
- id="x7-13015r1"></a><hr class="float"><div class="float" 
+ id="x14-13015r1"></a><hr class="float"><div class="float" 
 >
                                                                                
 
@@ -235,21 +224,21 @@ id="TBL-1-2"></colgroup><colgroup id="TBL-1-3g"><col
 id="TBL-1-3"></colgroup><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-1-1"  
-class="td11"><span 
+class="td11"> <span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">t</span><span 
 class="small-caps">y</span><span 
 class="small-caps">p</span><span 
-class="small-caps">e</span>                        </span></td><td  style="white-space:normal; text-align:left;" id="TBL-1-1-2"  
-class="td11"><!--l. 68--><p class="noindent" ><span 
+class="small-caps">e</span>                         </span></td><td  style="white-space:normal; text-align:left;" id="TBL-1-1-2"  
+class="td11"> <!--l. 68--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">s</span><span 
 class="small-caps">t</span><span 
 class="small-caps">r</span><span 
 class="small-caps">i</span><span 
 class="small-caps">n</span><span 
-class="small-caps">g</span></span>     </td><td  style="white-space:normal; text-align:left;" id="TBL-1-1-3"  
-class="td11"><!--l. 68--><p class="noindent" ><span 
+class="small-caps">g</span></span>       </td><td  style="white-space:normal; text-align:left;" id="TBL-1-1-3"  
+class="td11"> <!--l. 68--><p class="noindent" ><span 
 class="cmcsc-10x-x-109"><span 
 class="small-caps">d</span><span 
 class="small-caps">e</span><span 
@@ -271,80 +260,101 @@ class="small-caps">i</span><span
 class="small-caps">o</span><span 
 class="small-caps">n</span><span 
 class="small-caps">e</span><span 
-class="small-caps">r</span></span>               </td></tr><tr 
+class="small-caps">r</span></span>                </td></tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-2-1"  
-class="td11">No preconditioner </td><td  style="white-space:normal; text-align:left;" id="TBL-1-2-2"  
-class="td11"><!--l. 69--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">NONE</span><span style="color:#000000">&#8217;</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-1-2-3"  
-class="td11"><!--l. 69--><p class="noindent" >Considered to use the PSBLAS Krylov
-solvers with no preconditioner.             </td>
+class="td11">
+ No preconditioner             </td><td  style="white-space:normal; text-align:left;" id="TBL-1-2-2"  
+class="td11"> <!--l. 69--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">NONE</span><span style="color:#000000">&#8217;</span></code>     
+</td><td  style="white-space:normal; text-align:left;" id="TBL-1-2-3"  
+class="td11"> <!--l. 69--><p class="noindent" >Considered to use the PSBLAS Krylov
+  solvers with no preconditioner.              
+</td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-3-1"  
-class="td11">Diagonal                       </td><td  style="white-space:normal; text-align:left;" id="TBL-1-3-2"  
-class="td11"><!--l. 71--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">DIAG</span><span style="color:#000000">&#8217;</span></code>,
-<code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">JACOBI</span><span style="color:#000000">&#8217;</span></code>,
-<code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">L1</span><span style="color:#000000">-</span><span style="color:#000000">JACOBI</span><span style="color:#000000">&#8217;</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-1-3-3"  
-class="td11"><!--l. 71--><p class="noindent" >Diagonal  preconditioner.  For  any  zero
-diagonal  entry  of  the  matrix  to  be
-preconditioned, the corresponding entry
-of the preconditioner is set to&#x00A0;1.          </td>
+class="td11">
+ Diagonal                         </td><td  style="white-space:normal; text-align:left;" id="TBL-1-3-2"  
+class="td11"> <!--l. 71--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">DIAG</span><span style="color:#000000">&#8217;</span></code>,
+  <code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">JACOBI</span><span style="color:#000000">&#8217;</span></code>,
+  <code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">L1</span><span style="color:#000000">-</span><span style="color:#000000">JACOBI</span><span style="color:#000000">&#8217;</span></code> 
+</td><td  style="white-space:normal; text-align:left;" id="TBL-1-3-3"  
+class="td11"> <!--l. 71--><p class="noindent" >Diagonal  preconditioner.  For  any  zero
+  diagonal  entry  of  the  matrix  to  be
+  preconditioned, the corresponding entry
+  of the preconditioner is set to&#x00A0;1.            
+</td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-4-1"  
-class="td11">Gauss-Seidel                  </td><td  style="white-space:normal; text-align:left;" id="TBL-1-4-2"  
-class="td11"><!--l. 74--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">GS</span><span style="color:#000000">&#8217;</span></code>,
-<code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">L1</span><span style="color:#000000">-</span><span style="color:#000000">GS</span><span style="color:#000000">&#8217;</span></code>   </td><td  style="white-space:normal; text-align:left;" id="TBL-1-4-3"  
-class="td11"><!--l. 74--><p class="noindent" >Hybrid Gauss-Seidel (forward), that is,
-global block Jacobi with Gauss-Seidel as
-local solver.                                      </td>
+class="td11">
+ Gauss-Seidel                    </td><td  style="white-space:normal; text-align:left;" id="TBL-1-4-2"  
+class="td11"> <!--l. 74--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">GS</span><span style="color:#000000">&#8217;</span></code>,
+  <code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">L1</span><span style="color:#000000">-</span><span style="color:#000000">GS</span><span style="color:#000000">&#8217;</span></code>    
+</td><td  style="white-space:normal; text-align:left;" id="TBL-1-4-3"  
+class="td11"> <!--l. 74--><p class="noindent" >Hybrid Gauss-Seidel (forward), that is,
+  global block Jacobi with Gauss-Seidel as
+  local solver.                                       
+</td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-5-1"  
-class="td11">Symmetrized Gauss-Seidel</td><td  style="white-space:normal; text-align:left;" id="TBL-1-5-2"  
-class="td11"><!--l. 77--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">FBGS</span><span style="color:#000000">&#8217;</span></code>,
-<code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">L1</span><span style="color:#000000">-</span><span style="color:#000000">FBGS</span><span style="color:#000000">&#8217;</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-1-5-3"  
-class="td11"><!--l. 77--><p class="noindent" >Symmetrized  hybrid  Gauss-Seidel,  that
-is,  forward  Gauss-Seidel  followed  by
-backward Gauss-Seidel.                      </td>
+class="td11">
+ Symmetrized Gauss-Seidel  </td><td  style="white-space:normal; text-align:left;" id="TBL-1-5-2"  
+class="td11"> <!--l. 77--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">FBGS</span><span style="color:#000000">&#8217;</span></code>,
+  <code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">L1</span><span style="color:#000000">-</span><span style="color:#000000">FBGS</span><span style="color:#000000">&#8217;</span></code>  
+</td><td  style="white-space:normal; text-align:left;" id="TBL-1-5-3"  
+class="td11"> <!--l. 77--><p class="noindent" >Symmetrized  hybrid  Gauss-Seidel,  that
+  is,  forward  Gauss-Seidel  followed  by
+  backward Gauss-Seidel.                        
+</td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-6-1"  
-class="td11">Block Jacobi                  </td><td  style="white-space:normal; text-align:left;" id="TBL-1-6-2"  
-class="td11"><!--l. 80--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">BJAC</span><span style="color:#000000">&#8217;</span></code>,
-<code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">L1</span><span style="color:#000000">-</span><span style="color:#000000">BJAC</span><span style="color:#000000">&#8217;</span></code> </td><td  style="white-space:normal; text-align:left;" id="TBL-1-6-3"  
-class="td11"><!--l. 80--><p class="noindent" >Block-Jacobi  with  ILU(0)  on  the  local
-blocks.                                            </td>
+class="td11">
+ Block Jacobi                   </td><td  style="white-space:normal; text-align:left;" id="TBL-1-6-2"  
+class="td11"> <!--l. 80--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">BJAC</span><span style="color:#000000">&#8217;</span></code>,
+  <code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">L1</span><span style="color:#000000">-</span><span style="color:#000000">BJAC</span><span style="color:#000000">&#8217;</span></code>  
+</td><td  style="white-space:normal; text-align:left;" id="TBL-1-6-3"  
+class="td11"> <!--l. 80--><p class="noindent" >Block-Jacobi  with  ILU(0)  on  the  local
+  blocks.                                              
+</td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-7-1"  
-class="td11">Additive Schwarz            </td><td  style="white-space:normal; text-align:left;" id="TBL-1-7-2"  
-class="td11"><!--l. 81--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">AS</span><span style="color:#000000">&#8217;</span></code>      </td><td  style="white-space:normal; text-align:left;" id="TBL-1-7-3"  
-class="td11"><!--l. 81--><p class="noindent" >Additive Schwarz (AS), with overlap&#x00A0;1
-and ILU(0) on the local blocks.            </td>
+class="td11">
+ Additive Schwarz             </td><td  style="white-space:normal; text-align:left;" id="TBL-1-7-2"  
+class="td11"> <!--l. 81--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">AS</span><span style="color:#000000">&#8217;</span></code>       
+</td><td  style="white-space:normal; text-align:left;" id="TBL-1-7-3"  
+class="td11"> <!--l. 81--><p class="noindent" >Additive Schwarz (AS), with overlap&#x00A0;1
+  and ILU(0) on the local blocks.             
+</td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-8-1"  
-class="td11">Multilevel                      </td><td  style="white-space:normal; text-align:left;" id="TBL-1-8-2"  
-class="td11"><!--l. 83--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ML</span><span style="color:#000000">&#8217;</span></code>      </td><td  style="white-space:normal; text-align:left;" id="TBL-1-8-3"  
-class="td11"><!--l. 83--><p class="noindent" >V-cycle        with        one        hybrid
-forward  Gauss-Seidel  (GS)  sweep  as
-pre-smoother and one hybrid backward
-GS  sweep  as  post-smoother,  decoupled
-smoothed   aggregation   as   coarsening
-algorithm, and LU (plus triangular solve)
-as coarsest-level solver. See the default
-values in Tables&#x00A0;<a 
-href="userhtmlse5.html#x8-18009r2">2<!--tex4ht:ref: tab:p_cycle --></a>-<a 
-href="userhtmlse5.html#x8-18015r8">8<!--tex4ht:ref: tab:p_smoother_1 --></a> for further details of
-the preconditioner.                            </td>
+class="td11">
+ Multilevel                       </td><td  style="white-space:normal; text-align:left;" id="TBL-1-8-2"  
+class="td11"> <!--l. 83--><p class="noindent" ><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ML</span><span style="color:#000000">&#8217;</span></code>       
+</td><td  style="white-space:normal; text-align:left;" id="TBL-1-8-3"  
+class="td11"> <!--l. 83--><p class="noindent" >V-cycle        with        one        hybrid
+  forward  Gauss-Seidel  (GS)  sweep  as
+  pre-smoother and one hybrid backward
+  GS  sweep  as  post-smoother,  decoupled
+  smoothed   aggregation   as   coarsening
+  algorithm, and LU (plus triangular solve)
+  as coarsest-level solver. See the default
+  values in Tables&#x00A0;<a 
+href="userhtmlsu9.html#x19-18009r2">2<!--tex4ht:ref: tab:p_cycle --></a>-<a 
+href="userhtmlsu9.html#x19-18015r8">8<!--tex4ht:ref: tab:p_smoother_1 --></a> for further details of
+  the preconditioner.                              
+</td>
 </tr><tr 
 class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
  style="vertical-align:baseline;" id="TBL-1-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-9-1"  
-class="td11">                      </td></tr></table>                                                     </div>
+class="td11">                        </td></tr></table>                                                         </div>
 <br /> <div class="caption" 
 ><span class="id">Table&#x00A0;1: </span><span  
-class="content">Preconditioner types, corresponding strings and default choices. </span></div><!--tex4ht:label?: x7-13015r1 -->
+class="content">Preconditioner types, corresponding strings and default choices. </span></div><!--tex4ht:label?: x14-13015r1 -->
 </div>
                                                                                
 
@@ -365,7 +375,7 @@ class="cmr-12">,</span>
 <span 
 class="cmr-12">for interfacing with the Krylov solvers, must be also used (see Section</span><span 
 class="cmr-12">&#x00A0;</span><a 
-href="#x7-140004.1"><span 
+href="userhtmlsu6.html#x15-140004.1"><span 
 class="cmr-12">4.1</span><!--tex4ht:ref: sec:examples --></a><span 
 class="cmr-12">).</span>
 <br 
@@ -391,559 +401,22 @@ class="cmr-12">Memory allocation on GPUs is a costly operation implying a</span>
 <span 
 class="cmr-12">synchronization; therefore, it is convenient to preallocate internal preconditioner</span>
 <span 
-class="cmr-12">workspace with the method </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">prec%allocate_wrk(info)</span></span></span> <span 
+class="cmr-12">workspace with the method </span><span class="obeylines-h"><code class="verb">prec%allocate_wrk(info)</code></span> <span 
 class="cmr-12">before invoking an iterative</span>
 <span 
-class="cmr-12">method, and release it upon exit with </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">prec%deallocate_wrk(info)</span></span></span><span 
+class="cmr-12">method, and release it upon exit with </span><span class="obeylines-h"><code class="verb">prec%deallocate_wrk(info)</code></span><span 
 class="cmr-12">.</span>
-   <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmr-12">4.1   </span></span> <a 
- id="x7-140004.1"></a><span 
-class="cmr-12">Examples</span></h4>
-<!--l. 121--><p class="noindent" ><span 
-class="cmr-12">The code reported in Figure</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="#x7-14001r1"><span 
-class="cmr-12">1</span><!--tex4ht:ref: fig:ex1 --></a> <span 
-class="cmr-12">shows how to set and apply the default multilevel</span>
-<span 
-class="cmr-12">preconditioner available in the real double precision version of AMG4PSBLAS</span>
-<span 
-class="cmr-12">(see Table</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="#x7-13015r1"><span 
-class="cmr-12">1</span><!--tex4ht:ref: tab:precinit --></a><span 
-class="cmr-12">). This preconditioner is chosen by simply specifying </span><code class="lstinline"><span style="color:#000000">&#8217;</span><span style="color:#000000">ML</span><span style="color:#000000">&#8217;</span></code> <span 
-class="cmr-12">as the</span>
-<span 
-class="cmr-12">second argument of </span><code class="lstinline"><span style="color:#000000">P</span><span style="color:#000000">%</span><span style="color:#000000">init</span></code> <span 
-class="cmr-12">(a call to </span><code class="lstinline"><span style="color:#000000">P</span><span style="color:#000000">%</span><span style="color:#000000">set</span></code> <span 
-class="cmr-12">is not needed) and is applied</span>
-<span 
-class="cmr-12">with the CG solver provided by PSBLAS (the matrix of the system to be</span>
-<span 
-class="cmr-12">solved is assumed to be positive definite). As previously observed, the modules</span>
-<code class="lstinline"><span style="color:#000000">psb_base_mod</span></code><span 
-class="cmr-12">, </span><code class="lstinline"><span style="color:#000000">amg_prec_mod</span></code> <span 
-class="cmr-12">and </span><code class="lstinline"><span style="color:#000000">psb_linsolve_mod</span></code> <span 
-class="cmr-12">must be used by the example</span>
-<span 
-class="cmr-12">program.</span>
-<!--l. 131--><p class="indent" >   <span 
-class="cmr-12">The part of the code dealing with reading and assembling the sparse matrix and the</span>
-<span 
-class="cmr-12">right-hand side vector and the deallocation of the relevant data structures, performed</span>
-<span 
-class="cmr-12">through the PSBLAS routines for sparse matrix and vector management,</span>
-<span 
-class="cmr-12">is not reported here for the sake of conciseness. The complete code can be</span>
-<span 
-class="cmr-12">found in the example program file </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">amg_dexample_ml.f90</span></span></span><span 
-class="cmr-12">, in the directory</span>
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">samples/simple/file</span></span></span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">read</span></span></span> <span 
-class="cmr-12">of the AMG4PSBLAS implementation (see Section</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlse3.html#x6-120003.5"><span 
-class="cmr-12">3.5</span><!--tex4ht:ref: sec:ex_and_test --></a><span 
-class="cmr-12">). A</span>
-<span 
-class="cmr-12">sample test problem along with the relevant input data is available in</span>
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">samples/simple/fileread/runs</span></span></span><span 
-class="cmr-12">. For details on the use of the PSBLAS routines, see</span>
-<span 
-class="cmr-12">the PSBLAS User&#8217;s Guide</span><span 
-class="cmr-12">&#x00A0;</span><span class="cite"><span 
-class="cmr-12">[</span><a 
-href="userhtmlli3.html#XPSBLASGUIDE"><span 
-class="cmr-12">21</span></a><span 
-class="cmr-12">]</span></span><span 
-class="cmr-12">.</span>
-<!--l. 143--><p class="indent" >   <span 
-class="cmr-12">The setup and application of the default multilevel preconditioner for the real single</span>
-<span 
-class="cmr-12">precision and the complex, single and double precision, versions are obtained</span>
-<span 
-class="cmr-12">with straightforward modifications of the previous example (see Section</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="userhtmlse5.html#x8-160005"><span 
-class="cmr-12">5</span><!--tex4ht:ref: sec:userinterface --></a> <span 
-class="cmr-12">for</span>
-                                                                               
+   <div class="subsectionTOCS">
+   <span class="subsectionToc" ><span 
+class="cmr-12">4.1 </span><a 
+href="userhtmlsu6.html#x15-140004.1"><span 
+class="cmr-12">Examples</span></a></span>
+<br />   <span class="subsectionToc" ><span 
+class="cmr-12">4.2 </span><a 
+href="userhtmlsu7.html#x16-150004.2"><span 
+class="cmr-12">GPU example</span></a></span>
+   </div>
 
-                                                                               
-<span 
-class="cmr-12">details). If these versions are installed, the corresponding codes are available in</span>
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">samples/simple/file</span></span></span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">read</span></span></span><span 
-class="cmr-12">.</span>
-                                                                               
-
-                                                                               
-<!--l. 148--><p class="indent" >   <a 
- id="x7-14001r1"></a><hr class="float"><div class="float" 
->
-                                                                               
-
-                                                                               
-<div class="center" 
->
-<!--l. 149--><p class="noindent" >
-                                                                               
-
-                                                                               
-<div class="minipage"><pre class="verbatim" id="verbatim-7">
-&#x00A0;&#x00A0;use&#x00A0;psb_base_mod
-&#x00A0;&#x00A0;use&#x00A0;amg_prec_mod
-&#x00A0;&#x00A0;use&#x00A0;psb_linsolve_mod
-...&#x00A0;...
-!
-!&#x00A0;sparse&#x00A0;matrix
-&#x00A0;&#x00A0;type(psb_dspmat_type)&#x00A0;::&#x00A0;A
-!&#x00A0;sparse&#x00A0;matrix&#x00A0;descriptor
-&#x00A0;&#x00A0;type(psb_desc_type)&#x00A0;&#x00A0;&#x00A0;::&#x00A0;desc_A
-!&#x00A0;preconditioner
-&#x00A0;&#x00A0;type(amg_dprec_type)&#x00A0;&#x00A0;::&#x00A0;P
-!&#x00A0;right-hand&#x00A0;side&#x00A0;and&#x00A0;solution&#x00A0;vectors
-&#x00A0;&#x00A0;type(psb_d_vect_type)&#x00A0;::&#x00A0;b,&#x00A0;x
-...&#x00A0;...
-!
-!&#x00A0;initialize&#x00A0;the&#x00A0;parallel&#x00A0;environment
-&#x00A0;&#x00A0;call&#x00A0;psb_init(ctxt)
-&#x00A0;&#x00A0;call&#x00A0;psb_info(ctxt,iam,np)
-...&#x00A0;...
-!
-!&#x00A0;read&#x00A0;and&#x00A0;assemble&#x00A0;the&#x00A0;spd&#x00A0;matrix&#x00A0;A&#x00A0;and&#x00A0;the&#x00A0;right-hand&#x00A0;side&#x00A0;b
-!&#x00A0;using&#x00A0;PSBLAS&#x00A0;routines&#x00A0;for&#x00A0;sparse&#x00A0;matrix&#x00A0;/&#x00A0;vector&#x00A0;management
-...&#x00A0;...
-!
-!&#x00A0;initialize&#x00A0;the&#x00A0;default&#x00A0;multilevel&#x00A0;preconditioner,&#x00A0;i.e.&#x00A0;V-cycle
-!&#x00A0;with&#x00A0;basic&#x00A0;smoothed&#x00A0;aggregation,&#x00A0;1&#x00A0;hybrid&#x00A0;forward/backward
-!&#x00A0;GS&#x00A0;sweep&#x00A0;as&#x00A0;pre/post-smoother&#x00A0;and&#x00A0;UMFPACK&#x00A0;as&#x00A0;coarsest-level
-!&#x00A0;solver
-&#x00A0;&#x00A0;call&#x00A0;P%init(ctxt,&#8217;ML&#8217;,info)
-!
-!&#x00A0;build&#x00A0;the&#x00A0;preconditioner
-&#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
-&#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
-
-!
-!&#x00A0;set&#x00A0;the&#x00A0;solver&#x00A0;parameters&#x00A0;and&#x00A0;the&#x00A0;initial&#x00A0;guess
-&#x00A0;&#x00A0;...&#x00A0;...
-!
-!&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;FCG
-&#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;FCG&#8217;,A,P,b,x,tol,desc_A,info)
-&#x00A0;&#x00A0;...&#x00A0;...
-!
-!&#x00A0;deallocate&#x00A0;the&#x00A0;preconditioner
-&#x00A0;&#x00A0;call&#x00A0;P%free(info)
-!
-!&#x00A0;deallocate&#x00A0;other&#x00A0;data&#x00A0;structures
-&#x00A0;&#x00A0;...&#x00A0;...
-!
-!&#x00A0;exit&#x00A0;the&#x00A0;parallel&#x00A0;environment
-&#x00A0;&#x00A0;call&#x00A0;psb_exit(ctxt)
-&#x00A0;&#x00A0;stop
-</pre>
-<!--l. 259--><p class="nopar" >                                                                       </div>
-                                                                               
-
-                                                                               
-<br /> <div class="caption" 
-><span class="id">Listing 1: </span><span  
-class="content">setup and application of the default multilevel preconditioner (example 1).
-</span></div><!--tex4ht:label?: x7-14001r1 -->
-</div>
-                                                                               
-
-                                                                               
-   </div><hr class="endfloat" />
-<!--l. 267--><p class="indent" >   <span 
-class="cmr-12">Different versions of the multilevel preconditioner can be obtained by changing the</span>
-<span 
-class="cmr-12">default values of the preconditioner parameters. The code reported in Figure</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="#x7-14002r2"><span 
-class="cmr-12">2</span><!--tex4ht:ref: fig:ex2 --></a> <span 
-class="cmr-12">shows</span>
-<span 
-class="cmr-12">how to set a V-cycle preconditioner which applies 1 block-Jacobi sweep as pre- and</span>
-<span 
-class="cmr-12">post-smoother, and solves the coarsest-level system with 8 block-Jacobi sweeps. Note</span>
-<span 
-class="cmr-12">that the ILU(0) factorization (plus triangular solve) is used as local solver for the</span>
-<span 
-class="cmr-12">block-Jacobi sweeps, since this is the default associated with block-Jacobi and set</span>
-<span 
-class="cmr-12">by</span><span 
-class="cmr-12">&#x00A0;</span><code class="lstinline"><span style="color:#000000">P</span><span style="color:#000000">%</span><span style="color:#000000">init</span></code><span 
-class="cmr-12">. Furthermore, specifying block-Jacobi as coarsest-level solver implies that</span>
-<span 
-class="cmr-12">the coarsest-level matrix is distributed among the processes. Figure</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="#x7-14003r3"><span 
-class="cmr-12">3</span><!--tex4ht:ref: fig:ex3 --></a> <span 
-class="cmr-12">shows how</span>
-<span 
-class="cmr-12">to set a W-cycle preconditioner using the Coarsening based on Compatible</span>
-<span 
-class="cmr-12">Weighted Matching, aggregates of size at most 8 and smoothed prolongators. It</span>
-<span 
-class="cmr-12">applies 2 hybrid Gauss-Seidel sweeps as pre- and post-smoother, and solves the</span>
-<span 
-class="cmr-12">coarsest-level system with the parallel flexible Conjugate Gradient method (KRM)</span>
-<span 
-class="cmr-12">coupled with the block-Jacobi preconditioner having ILU(0) on the blocks, with</span>
-<span 
-class="cmr-12">default parameters used for the coarsest solver. Note that specifying KRM as</span>
-<span 
-class="cmr-12">coarsest-level solver implies that the coarsest-level matrix is distributed among the</span>
-<span 
-class="cmr-12">processes.</span>
-<!--l. 299--><p class="indent" >   <span 
-class="cmr-12">The code fragments shown in Figures</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="#x7-14002r2"><span 
-class="cmr-12">2</span><!--tex4ht:ref: fig:ex2 --></a> <span 
-class="cmr-12">and </span><a 
-href="#x7-14003r3"><span 
-class="cmr-12">3</span><!--tex4ht:ref: fig:ex3 --></a> <span 
-class="cmr-12">are included in the example program</span>
-<span 
-class="cmr-12">file </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">amg_dexample_ml.f90</span></span></span> <span 
-class="cmr-12">too.</span>
-<!--l. 302--><p class="indent" >   <span 
-class="cmr-12">Finally, Figure</span><span 
-class="cmr-12">&#x00A0;</span><a 
-href="#x7-14004r4"><span 
-class="cmr-12">4</span><!--tex4ht:ref: fig:ex4 --></a> <span 
-class="cmr-12">shows the setup of a one-level additive Schwarz preconditioner,</span>
-<span 
-class="cmr-12">i.e., RAS with overlap 2. Note also that a Krylov method different from CG</span>
-<span 
-class="cmr-12">must be used to solve the preconditioned system, since the preconditione in</span>
-<span 
-class="cmr-12">nonsymmetric. The corresponding example program is available in the file</span>
-<span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">amg_dexample_1lev.f90</span></span></span><span 
-class="cmr-12">.</span>
-<!--l. 309--><p class="indent" >   <span 
-class="cmr-12">For all the previous preconditioners, example programs where the sparse matrix</span>
-<span 
-class="cmr-12">and the right-hand side are generated by discretizing a PDE with Dirichlet</span>
-<span 
-class="cmr-12">boundary conditions are also available in the directory </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">samples/simple/pdegen</span></span></span><span 
-class="cmr-12">.</span>
-                                                                               
-
-                                                                               
-<!--l. 312--><p class="indent" >   <a 
- id="x7-14002r2"></a><hr class="float"><div class="float" 
->
-                                                                               
-
-                                                                               
-<div class="center" 
->
-<!--l. 326--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-8">
-...&#x00A0;...
-!&#x00A0;build&#x00A0;a&#x00A0;V-cycle&#x00A0;preconditioner&#x00A0;with&#x00A0;1&#x00A0;block-Jacobi&#x00A0;sweep&#x00A0;(with
-!&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;blocks)&#x00A0;as&#x00A0;pre-&#x00A0;and&#x00A0;post-smoother,&#x00A0;and&#x00A0;8&#x00A0;&#x00A0;block-Jacobi
-!&#x00A0;sweeps&#x00A0;(with&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;blocks)&#x00A0;as&#x00A0;coarsest-level&#x00A0;solver
-&#x00A0;&#x00A0;call&#x00A0;P%init(ctxt,&#8217;ML&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_TYPE&#8217;,&#8217;BJAC&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SOLVE&#8217;,&#8217;BJAC&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SWEEPS&#8217;,8,info)
-&#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
-&#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
-...&#x00A0;...
-</pre>
-<!--l. 341--><p class="nopar" >                                                                       </div></div>
-<br /><div class="caption" 
-><span class="id">Listing 2: </span><span  
-class="content">setup of a multilevel preconditioner based on the default decoupled coarsening</span></div><!--tex4ht:label?: x7-14002r2 -->
-                                                                               
-
-                                                                               
-   </div><hr class="endfloat" />
-                                                                               
-
-                                                                               
-<!--l. 348--><p class="indent" >   <a 
- id="x7-14003r3"></a><hr class="float"><div class="float" 
->
-                                                                               
-
-                                                                               
-<div class="center" 
->
-<!--l. 370--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-9">
-...&#x00A0;...
-!&#x00A0;build&#x00A0;a&#x00A0;W-cycle&#x00A0;preconditioner&#x00A0;with&#x00A0;2&#x00A0;hybrid&#x00A0;Gauss-Seidel&#x00A0;sweeps
-!&#x00A0;as&#x00A0;pre-&#x00A0;and&#x00A0;post-smoother,&#x00A0;a&#x00A0;distributed&#x00A0;coarsest
-!&#x00A0;matrix,&#x00A0;and&#x00A0;MUMPS&#x00A0;as&#x00A0;coarsest-level&#x00A0;solver
-&#x00A0;&#x00A0;call&#x00A0;P%init(ctxt,&#8217;ML&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;PAR_AGGR_ALG&#8217;,&#8217;COUPLED&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;AGGR_TYPE&#8217;,&#8217;MATCHBOXP&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;AGGR_SIZE&#8217;,8,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;ML_CYCLE&#8217;,&#8217;WCYCLE&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_TYPE&#8217;,&#8217;FBGS&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SMOOTHER_SWEEPS&#8217;,2,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_SOLVE&#8217;,&#8217;KRM&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;COARSE_MAT&#8217;,&#8217;DIST&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;KRM_METHOD&#8217;,&#8217;FCG&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%hierarchy_build(A,desc_A,info)
-&#x00A0;&#x00A0;call&#x00A0;P%smoothers_build(A,desc_A,info)
-...&#x00A0;...
-</pre>
-<!--l. 391--><p class="nopar" >                                                                       </div></div>
-<br /> <div class="caption" 
-><span class="id">Listing 3: </span><span  
-class="content">setup of a multilevel preconditioner based on the coupled coarsening using
-weighted matching</span></div><!--tex4ht:label?: x7-14003r3 -->
-                                                                               
-
-                                                                               
-   </div><hr class="endfloat" />
-                                                                               
-
-                                                                               
-<!--l. 398--><p class="indent" >   <a 
- id="x7-14004r4"></a><hr class="float"><div class="float" 
->
-                                                                               
-
-                                                                               
-<div class="center" 
->
-<!--l. 410--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-10">
-...&#x00A0;...
-!&#x00A0;set&#x00A0;RAS&#x00A0;with&#x00A0;overlap&#x00A0;2&#x00A0;and&#x00A0;ILU(0)&#x00A0;on&#x00A0;the&#x00A0;local&#x00A0;blocks
-&#x00A0;&#x00A0;call&#x00A0;P%init(ctxt,&#8217;AS&#8217;,info)
-&#x00A0;&#x00A0;call&#x00A0;P%set(&#8217;SUB_OVR&#8217;,2,info)
-&#x00A0;&#x00A0;call&#x00A0;P%bld(A,desc_A,info)
-...&#x00A0;...
-!&#x00A0;solve&#x00A0;Ax=b&#x00A0;with&#x00A0;preconditioned&#x00A0;BiCGSTAB
-&#x00A0;&#x00A0;call&#x00A0;psb_krylov(&#8217;BICGSTAB&#8217;,A,P,b,x,tol,desc_A,info)
-</pre>
-<!--l. 422--><p class="nopar" >                                                                       </div></div>
-<br /> <div class="caption" 
-><span class="id">Listing 4: </span><span  
-class="content">setup of a one-level Schwarz preconditioner.</span></div><!--tex4ht:label?: x7-14004r4 -->
-                                                                               
-
-                                                                               
-   </div><hr class="endfloat" />
-   <h4 class="subsectionHead"><span class="titlemark"><span 
-class="cmr-12">4.2   </span></span> <a 
- id="x7-150004.2"></a><span 
-class="cmr-12">GPU example</span></h4>
-<!--l. 434--><p class="noindent" ><span 
-class="cmr-12">The code discussed here shows how to set up a program exploiting the combined GPU</span>
-<span 
-class="cmr-12">capabilities of PSBLAS and AMG4PSBLAS. The code example is available in the</span>
-<span 
-class="cmr-12">source distribution directory </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">amg4psblas/examples/gpu</span></span></span><span 
-class="cmr-12">.</span>
-<!--l. 439--><p class="indent" >   <span 
-class="cmr-12">First of all, we need to include the appropriate modules and declare some auxiliary</span>
-<span 
-class="cmr-12">variables:</span>
-                                                                               
-
-                                                                               
-<!--l. 441--><p class="indent" >   <a 
- id="x7-15001r5"></a><hr class="float"><div class="float" 
->
-                                                                               
-
-                                                                               
-<div class="center" 
->
-<!--l. 460--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-11">
-program&#x00A0;amg_dexample_gpu
-&#x00A0;&#x00A0;use&#x00A0;psb_base_mod
-&#x00A0;&#x00A0;use&#x00A0;amg_prec_mod
-&#x00A0;&#x00A0;use&#x00A0;psb_linsolve_mod
-&#x00A0;&#x00A0;use&#x00A0;psb_util_mod
-&#x00A0;&#x00A0;use&#x00A0;psb_gpu_mod
-&#x00A0;&#x00A0;use&#x00A0;data_input
-&#x00A0;&#x00A0;use&#x00A0;amg_d_pde_mod
-&#x00A0;&#x00A0;implicit&#x00A0;none
-&#x00A0;&#x00A0;.......
-&#x00A0;&#x00A0;!&#x00A0;GPU&#x00A0;variables
-&#x00A0;&#x00A0;type(psb_d_hlg_sparse_mat)&#x00A0;::&#x00A0;agmold
-&#x00A0;&#x00A0;type(psb_d_vect_gpu)&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;::&#x00A0;vgmold
-&#x00A0;&#x00A0;type(psb_i_vect_gpu)&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;::&#x00A0;igmold
-
-&#x00A0;
-</pre>
-<!--l. 479--><p class="nopar" >                                                                       </div></div>
-<br /> <div class="caption" 
-><span class="id">Listing 5: </span><span  
-class="content">setup of a GPU-enabled test program part one.</span></div><!--tex4ht:label?: x7-15001r5 -->
-                                                                               
-
-                                                                               
-   </div><hr class="endfloat" />
-<!--l. 486--><p class="indent" >   <span 
-class="cmr-12">In this particular example we are choosing to employ a </span><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">HLG</span></span></span> <span 
-class="cmr-12">data structure for</span>
-<span 
-class="cmr-12">sparse matrices on GPUs; for more information please refer to the PSBLAS users&#8217;</span>
-<span 
-class="cmr-12">guide.</span>
-<!--l. 490--><p class="indent" >   <span 
-class="cmr-12">We then have to initialize the GPU environment, and pass the appropriate MOLD</span>
-<span 
-class="cmr-12">variables to the build methods (see also the PSBLAS users&#8217; guide).</span>
-                                                                               
-
-                                                                               
-<!--l. 493--><p class="indent" >   <a 
- id="x7-15002r6"></a><hr class="float"><div class="float" 
->
-                                                                               
-
-                                                                               
-<div class="center" 
->
-<!--l. 509--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-12">
-&#x00A0;&#x00A0;call&#x00A0;psb_init(ctxt)
-&#x00A0;&#x00A0;call&#x00A0;psb_info(ctxt,iam,np)
-&#x00A0;&#x00A0;!
-&#x00A0;&#x00A0;!&#x00A0;BEWARE:&#x00A0;if&#x00A0;you&#x00A0;have&#x00A0;NGPUS&#x00A0;&#x00A0;per&#x00A0;node,&#x00A0;the&#x00A0;default&#x00A0;is&#x00A0;to
-&#x00A0;&#x00A0;!&#x00A0;attach&#x00A0;to&#x00A0;mod(IAM,NGPUS)
-&#x00A0;&#x00A0;!
-&#x00A0;&#x00A0;call&#x00A0;psb_gpu_init(ictxt)
-&#x00A0;&#x00A0;......
-&#x00A0;&#x00A0;t1&#x00A0;=&#x00A0;psb_wtime()
-&#x00A0;&#x00A0;call&#x00A0;prec%smoothers_build(a,desc_a,info,&#x00A0;amold=agmold,&#x00A0;vmold=vgmold,&#x00A0;imold=igmold)
-
-&#x00A0;
-</pre>
-<!--l. 524--><p class="nopar" >                                                                       </div></div>
-<br /> <div class="caption" 
-><span class="id">Listing 6: </span><span  
-class="content">setup of a GPU-enabled test program part two.</span></div><!--tex4ht:label?: x7-15002r6 -->
-                                                                               
-
-                                                                               
-   </div><hr class="endfloat" />
-<!--l. 531--><p class="indent" >   <span 
-class="cmr-12">Finally, we convert the input matrix, the descriptor and the vectors to use a</span>
-<span 
-class="cmr-12">GPU-enabled internal storage format. We then preallocate the preconditioner</span>
-<span 
-class="cmr-12">workspace before entering the Krylov method. At the end of the code, we close the</span>
-<span 
-class="cmr-12">GPU environment</span>
-                                                                               
-
-                                                                               
-<!--l. 535--><p class="indent" >   <a 
- id="x7-15003r7"></a><hr class="float"><div class="float" 
->
-                                                                               
-
-                                                                               
-<div class="center" 
->
-<!--l. 565--><p class="noindent" >
-<div class="minipage"><pre class="verbatim" id="verbatim-13">
-&#x00A0;&#x00A0;call&#x00A0;desc_a%cnv(mold=igmold)
-&#x00A0;&#x00A0;call&#x00A0;a%cscnv(info,mold=agmold)
-&#x00A0;&#x00A0;call&#x00A0;psb_geasb(x,desc_a,info,mold=vgmold)
-&#x00A0;&#x00A0;call&#x00A0;psb_geasb(b,desc_a,info,mold=vgmold)
-
-&#x00A0;&#x00A0;!
-&#x00A0;&#x00A0;!&#x00A0;iterative&#x00A0;method&#x00A0;parameters
-&#x00A0;&#x00A0;!
-&#x00A0;&#x00A0;call&#x00A0;psb_barrier(ctxt)
-&#x00A0;&#x00A0;call&#x00A0;prec%allocate_wrk(info)
-&#x00A0;&#x00A0;t1&#x00A0;=&#x00A0;psb_wtime()
-&#x00A0;&#x00A0;call&#x00A0;psb_krylov(s_choice%kmethd,a,prec,b,x,s_choice%eps,&amp;
-&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,itrace=s_choice%itrace,&amp;
-&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;istop=s_choice%istopc,irst=s_choice%irst)
-&#x00A0;&#x00A0;call&#x00A0;prec%deallocate_wrk(info)
-&#x00A0;&#x00A0;call&#x00A0;psb_barrier(ctxt)
-&#x00A0;&#x00A0;tslv&#x00A0;=&#x00A0;psb_wtime()&#x00A0;-&#x00A0;t1
-
-&#x00A0;&#x00A0;......
-&#x00A0;&#x00A0;call&#x00A0;psb_gpu_exit()
-&#x00A0;&#x00A0;call&#x00A0;psb_exit(ctxt)
-&#x00A0;&#x00A0;stop
-
-&#x00A0;
-</pre>
-<!--l. 592--><p class="nopar" >                                                                       </div></div>
-<br /> <div class="caption" 
-><span class="id">Listing 7: </span><span  
-class="content">setup of a GPU-enabled test program part three.</span></div><!--tex4ht:label?: x7-15003r7 -->
-                                                                               
-
-                                                                               
-   </div><hr class="endfloat" />
-<!--l. 600--><p class="indent" >   <span 
-class="cmr-12">It is very important to employ smoothers and coarsest solvers that are suited to the</span>
-<span 
-class="cmr-12">GPU, i.e. methods that do NOT employ triangular system solve kernels. Methods that</span>
-<span 
-class="cmr-12">satisfy this constraint include:</span>
-     <ul class="itemize1">
-     <li class="itemize">
-     <!--l. 604--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">JACOBI</span></span></span>
-     </li>
-     <li class="itemize">
-     <!--l. 605--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">BJAC</span></span></span> <span 
-class="cmr-12">with the following methods on the local blocks:</span>
-          <ul class="itemize2">
-          <li class="itemize">
-          <!--l. 607--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">INVK</span></span></span>
-          </li>
-          <li class="itemize">
-          <!--l. 608--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">INVT</span></span></span>
-          </li>
-          <li class="itemize">
-          <!--l. 609--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">AINV</span></span></span></li></ul>
-     </li>
-     <li class="itemize">
-     <!--l. 611--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
-class="cmtt-12">POLY</span></span></span></li></ul>
-<!--l. 613--><p class="noindent" ><span 
-class="cmr-12">and their </span><span 
-class="cmmi-12">&#x2113;</span><sub><span 
-class="cmr-8">1</span></sub> <span 
-class="cmr-12">variants.</span>
-                                                                               
-
-                                                                               
-                                                                               
-
-                                                                               
-                                                                               
-
-                                                                               
                                                                                
 
                                                                                
@@ -965,5 +438,5 @@ href="userhtml.html#userhtmlse4.html" ><span
 class="cmr-12">up</span></a><span 
 class="cmr-12">] </span></p></div>
 <!--l. 1--><p class="indent" >   <a 
- id="tailuserhtmlse4.html"></a>   
+ id="tailuserhtmlse4.html"></a>  
 </body></html> 
