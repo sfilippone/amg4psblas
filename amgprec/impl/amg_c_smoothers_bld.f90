@@ -101,7 +101,8 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
   real(psb_spk_)     :: mnaggratio
   integer(psb_ipk_)   :: coarse_solve_id
   integer(psb_ipk_)   :: debug_level, debug_unit
-  character(len=20)   :: name, ch_err
+  character(len=20)   :: name
+  character(len=40)   :: ch_err
 
   info=psb_success_
   err=0
@@ -296,7 +297,7 @@ subroutine amg_c_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
     call prec%precv(i)%bld(info,amold=amold,vmold=vmold,imold=imold,ilv=i)
 
     if (info /= psb_success_) then
-      write(ch_err,'(a,i7)') 'Error @ level',i
+      write(ch_err,'(a,i7)') 'Error @ level ',i
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err=ch_err)
       goto 9999

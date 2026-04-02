@@ -94,7 +94,8 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
   type(amg_s_onelev_type), allocatable :: tprecv(:)
   logical :: cpymat_
   integer(psb_ipk_)  :: debug_level, debug_unit
-  character(len=20)  :: name, ch_err
+  character(len=20)  :: name
+  character(len=40)  :: ch_err
   integer(psb_ipk_), save  :: idx_bldtp=-1, idx_matasb=-1
   logical, parameter :: do_timings=.false.
 
@@ -333,9 +334,10 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
          & prec%precv(i-1)%base_desc,&
          & ilaggr,nlaggr,op_prol,prec%ag_data,info)
     if (do_timings) call psb_toc(idx_bldtp)
-    if (info /= psb_success_) then 
+    if (info /= psb_success_) then
+      write(ch_err,'(a,i7)') 'Map bld fail @ level ',i
       call psb_errpush(psb_err_internal_error_,name,&
-           & a_err='Map build')
+           & a_err=ch_err)
       goto 9999
     endif
 
@@ -406,7 +408,7 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
            & coarse_sm,coarse_sm2,info)
       if (newsz < i) then
         !
-        ! We are going back and revisit a previous leve;
+        ! We are going back and revisit a previous level;
         ! recover the aggregation.
         !
         ilaggr = prec%precv(newsz)%linmap%iaggr
@@ -419,8 +421,9 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
            & ilaggr,nlaggr,op_prol,info)
       if (do_timings) call psb_toc(idx_matasb)      
       if (info /= 0) then 
+        write(ch_err,'(a,i7)') 'Mat asb fail @ level ',newsz
         call psb_errpush(psb_err_internal_error_,name,&
-             & a_err='Mat asb')
+             & a_err=ch_err)
         goto 9999
       endif
       exit array_build_loop
@@ -432,8 +435,9 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
       if (do_timings) call psb_toc(idx_matasb)      
     end if
     if (info /= psb_success_) then 
+      write(ch_err,'(a,i7)') 'Mat asb fail @ level ',i
       call psb_errpush(psb_err_internal_error_,name,&
-           & a_err='Map build')
+           & a_err=ch_err)
       goto 9999
     endif
     if (i<iszv) call prec%precv(i)%update_aggr(prec%precv(i+1),info)
