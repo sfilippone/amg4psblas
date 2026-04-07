@@ -305,6 +305,13 @@ if(MPI_FOUND)
   #include_directories("${MPI_INCLUDE_DIR}")
 endif()
 
+# Find AMG constants
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/readAMGConst.cmake)
+_amg_read_const()
+
+if ("${PSB_LPK_SIZE}" EQUAL 8) 
+   set(CXXMATCHBOXBIT "#define AMG_MATCHBOXP_BIT64")
+endif()
 
 
 #------------------------------------------
