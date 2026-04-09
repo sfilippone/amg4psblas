@@ -13,14 +13,9 @@ endif()
 
 
 # Check for the installation path for psblas
-#if(NOT DEFINED PSBLAS_INSTALL_DIR)
-#    message(FATAL_ERROR "Please specify the path to the psblas installation directory using -DPSBLAS_INSTALL_DIR=<path>")
-#endif()
-message(STATUS "psblas directory is ${PSBLAS_INSTALL_DIR};;")
-
+message(STATUS "psblas directory is ${PSBLAS_INSTALL_DIR};")
 
 message(STATUS "PSBLAS DIRECTORY INC ${INCDIR}; MOD ${MODDIR}; LIB ${LIBDIR};")
-
 
 #set(CMAKE_CXX_STANDARD 17) # Set cxx standard for the c++ part of the library
 
@@ -31,7 +26,7 @@ find_package(psblas REQUIRED PATHS ${PSBLAS_INSTALL_DIR})
 if(NOT psblas_FOUND)
     message(FATAL_ERROR "PSBLAS not found!")
 else()
-    message(STATUS "Found PSBLAS: ${psblas_LIBRARIES}")
+    message(STATUS "Found PSBLAS: ${PSBLAS_LIBRARIES}")
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -42,9 +37,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Fortran and CXX debug flags added: -g")
 endif()
 
-    string(APPEND CMAKE_Fortran_FLAGS " -O2")
-    string(APPEND CMAKE_CXX_FLAGS " -O2")
-    message(STATUS "Fortran and CXX optimization flags added: -O2")
+string(APPEND CMAKE_Fortran_FLAGS " -O2")
+string(APPEND CMAKE_CXX_FLAGS " -O2")
+message(STATUS "Fortran and CXX optimization flags added: -O2")
 
 
 
@@ -430,7 +425,9 @@ target_include_directories(amgcbind PUBLIC ${INCDIR} ${MODDIR})
 target_link_libraries(amgcbind
   #PUBLIC ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES} ${LAPACK95_LIBRARIES}
   #PUBLIC ${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES} ${BLAS95_LIBRARIES}
-  PUBLIC amgprec psblas::util psblas::linsolve psblas::prec psblas::ext psblas::cbind psblas::base)  #TODO  check actual libraries needed
+  PUBLIC amgprec psblas::util psblas::linsolve psblas::prec
+  psblas::ext psblas::cbind psblas::base)
+  #TODO  check actual libraries needed
 
 
 
