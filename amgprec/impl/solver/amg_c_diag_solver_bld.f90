@@ -91,6 +91,10 @@ subroutine amg_c_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
       sv%d(i) = cone/sv%d(i)
     end if
   end do
+  if (allocated(sv%dv)) then
+    call sv%dv%free(info)
+    deallocate(sv%dv)
+  end if
   allocate(sv%dv,stat=info) 
   if (info == psb_success_) then 
     call sv%dv%bld(sv%d)
@@ -172,6 +176,10 @@ subroutine amg_c_l1_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
       sv%d(i) = cone/sv%d(i)
     end if
   end do
+  if (allocated(sv%dv)) then
+    call sv%dv%free(info)
+    deallocate(sv%dv)
+  end if
   allocate(sv%dv,stat=info) 
   if (info == psb_success_) then 
     call sv%dv%bld(sv%d)
