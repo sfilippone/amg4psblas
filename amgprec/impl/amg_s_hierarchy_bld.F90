@@ -491,7 +491,7 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
 
   !write(0,*) 'Should we remap? '
   if (amg_get_do_remap().and.(np>=4)) then
-    write(0,*) 'Going for remapping '
+!!$    write(0,*) 'Going for remapping '
     if (.true.) then 
       associate(lv=>prec%precv(iszv), rmp => prec%precv(iszv)%remap_data)
         call lv%desc_ac%clone(rmp%desc_ac_pre_remap,info)
@@ -503,8 +503,8 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
           call psb_remap(np/2,rmp%desc_ac_pre_remap,rmp%ac_pre_remap,&
                & rmp%idest,rmp%isrc,rmp%nrsrc,rmp%naggr,lv%desc_ac,lv%ac,info)
         end if
-        write(0,*) me,' Out of remapping ',rmp%desc_ac_pre_remap%get_fmt(),' ',&
-             & lv%desc_ac%get_fmt(),sum(lv%linmap%naggr),sum(rmp%naggr)
+!!$        write(0,*) me,' Out of remapping ',rmp%desc_ac_pre_remap%get_fmt(),' ',&
+!!$             & lv%desc_ac%get_fmt(),sum(lv%linmap%naggr),sum(rmp%naggr)
         lv%linmap%naggr(:)    =  rmp%naggr(:)
         lv%linmap%p_desc_V => rmp%desc_ac_pre_remap
         lv%base_a          => lv%ac

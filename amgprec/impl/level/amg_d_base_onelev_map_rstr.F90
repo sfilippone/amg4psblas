@@ -119,7 +119,7 @@ subroutine amg_d_base_onelev_map_rstr_a(lv,alpha,u,beta,v,info,work)
     !
     ! Remap has happened, deal with it
     !
-    write(0,*) 'Remap handling not implemented yet '
+    write(0,*) 'Remap R handling not implemented yet for A'
   else
     ! Default transfer
     call lv%linmap%map_U2V(alpha,u,beta,v,info,&

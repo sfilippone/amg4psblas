@@ -125,7 +125,7 @@ subroutine amg_c_base_onelev_map_prol_a(lv,alpha,v,beta,u,info,work)
     !
     ! Remap has happened, deal with it
     !
-    write(0,*) 'Remap handling not implemented yet '
+    write(0,*) 'Remap P handling not implemented yet for A'
   else
     ! Default transfer
     call lv%linmap%map_V2U(alpha,v,beta,u,info,&
