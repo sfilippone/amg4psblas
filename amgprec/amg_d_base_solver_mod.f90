@@ -53,28 +53,30 @@
 module amg_d_base_solver_mod
 
   use amg_base_prec_type
-  use psb_base_mod, only : psb_dspmat_type, &
-       & psb_d_vect_type, psb_d_base_vect_type, psb_d_base_sparse_mat, &
-       & psb_dpk_, psb_i_base_vect_type, psb_erractionsave, psb_error_handler
+  use psb_base_mod, only : psb_desc_type, psb_dspmat_type, psb_d_base_sparse_mat, &
+                    & psb_d_vect_type, psb_d_base_vect_type, psb_i_base_vect_type, &
+                    & psb_d_multivect_type, psb_d_base_multivect_type, &
+                    & psb_dpk_, psb_epk_, psb_ipk_, &
+                    & psb_erractionsave, psb_error_handler
   !
   ! 
-  ! Type: amg_T_base_solver_type.
+  ! type: amg_T_base_solver_type.
   ! 
   !  It holds the local solver; it has no mandatory components. 
   !
   !  type  amg_T_base_solver_type
   !  end type amg_T_base_solver_type
   !
-  !    build      -   Compute the actual contents of the smoother; includes
+  !    build      -   Compute the actual contents of the solver; includes
   !                   invocation of the build method on the solver component. 
   !    free       -   Release memory
-  !    apply      -   Apply the smoother to a vector (or to an array); includes
+  !    apply      -   Apply the solver to a vector (or to an array); includes
   !                   invocation of the apply method on the solver component. 
   !    descr      -   Prints a description of the object.
   !    default    -   Set default values
   !    dump       -   Dump to file object contents
   !    set        -   Sets various parameters; when a request is unknown
-  !                   it is passed to the smoother object for further processing.
+  !                   it is passed to the solver object for further processing.
   !    check      -   Sanity checks.
   !    sizeof     -   Total memory occupation in bytes
   !    get_nzeros -   Number of nonzeros 
@@ -87,9 +89,12 @@ module amg_d_base_solver_mod
 
   type amg_d_base_solver_type
   contains
-    procedure, pass(sv) :: apply_v => amg_d_base_solver_apply_vect
-    procedure, pass(sv) :: apply_a => amg_d_base_solver_apply
-    generic, public     :: apply => apply_a, apply_v
+    procedure, pass(sv) :: apply_a      => amg_d_base_solver_apply
+    procedure, pass(sv) :: apply_v      => amg_d_base_solver_apply_vect
+    ! procedure, pass(sv) :: apply_mv     => amg_d_base_solver_apply_mvect
+    procedure, pass(sv) :: apply_mv_col => amg_d_base_solver_apply_mvect_col
+    generic, public     :: apply        => apply_a, apply_v, apply_mv_col
+
     procedure, pass(sv) :: check => amg_d_base_solver_check
     procedure, pass(sv) :: dump  => amg_d_base_solver_dmp
     procedure, pass(sv) :: clone => amg_d_base_solver_clone
@@ -114,52 +119,67 @@ module amg_d_base_solver_mod
     procedure, pass(sv) :: is_global => d_base_solver_is_global
   end type amg_d_base_solver_type
 
-  private :: d_base_solver_sizeof, d_base_solver_default,&
-       &  d_base_solver_get_nzeros, d_base_solver_get_fmt, &
-       &  d_base_solver_is_iterative, d_base_solver_get_id, &
-       &  d_base_solver_get_wrksize, d_base_solver_is_global
-
+  private :: d_base_solver_sizeof, d_base_solver_default, &
+       & d_base_solver_get_nzeros, d_base_solver_get_fmt, &
+       & d_base_solver_get_id, d_base_solver_get_wrksize, &
+       & d_base_solver_is_iterative, d_base_solver_is_global
 
   interface  
-    subroutine amg_d_base_solver_apply(alpha,sv,x,beta,y,desc_data,&
-         & trans,work,info,init,initu)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-       & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
-       & amg_d_base_solver_type, psb_ipk_
+    subroutine amg_d_base_solver_apply(alpha, sv, x, beta, y, &
+                  & desc_data, trans, work, info, init, initu)
+      import :: psb_dpk_, amg_d_base_solver_type, &
+              & psb_desc_type, psb_ipk_
       implicit none 
-      type(psb_desc_type), intent(in)           :: desc_data
-      class(amg_d_base_solver_type), intent(inout) :: sv
-      real(psb_dpk_),intent(inout)              :: x(:)
-      real(psb_dpk_),intent(inout)              :: y(:)
-      real(psb_dpk_),intent(in)                 :: alpha,beta
-      character(len=1),intent(in)                :: trans
-      real(psb_dpk_),target, intent(inout)      :: work(:)
-      integer(psb_ipk_), intent(out)             :: info
-      character, intent(in), optional       :: init
-      real(psb_dpk_),intent(inout), optional :: initu(:)
+      real(psb_dpk_), intent(in)                    :: alpha, beta
+      class(amg_d_base_solver_type), intent(inout)  :: sv
+      real(psb_dpk_), intent(inout)                 :: x(:), y(:)
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                  :: trans
+      real(psb_dpk_), target, intent(inout)         :: work(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional         :: init
+      real(psb_dpk_), intent(inout), optional :: initu(:)
     end subroutine amg_d_base_solver_apply
   end interface 
   
-      
   interface 
-    subroutine amg_d_base_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-         & trans,work,wv,info,init,initu)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
-           & amg_d_base_solver_type, psb_ipk_
+    subroutine amg_d_base_solver_apply_vect(alpha, sv, x, beta, y, &
+                  & desc_data, trans, work, wv, info, init, initu)
+      import :: psb_dpk_, amg_d_base_solver_type, &
+              & psb_d_vect_type, psb_desc_type, psb_ipk_
       implicit none 
-      type(psb_desc_type), intent(in)              :: desc_data
-      class(amg_d_base_solver_type), intent(inout) :: sv
-      type(psb_d_vect_type),intent(inout)          :: x
-      type(psb_d_vect_type),intent(inout)          :: y
-      real(psb_dpk_),intent(in)                     :: alpha,beta
-      character(len=1),intent(in)                    :: trans
-      real(psb_dpk_),target, intent(inout)          :: work(:)
-      type(psb_d_vect_type),intent(inout)            :: wv(:)
-      integer(psb_ipk_), intent(out)                 :: info
-      character, intent(in), optional                :: init
-      type(psb_d_vect_type),intent(inout), optional   :: initu
+      real(psb_dpk_), intent(in)                    :: alpha, beta
+      class(amg_d_base_solver_type), intent(inout)  :: sv
+      type(psb_d_vect_type), intent(inout)          :: x, y
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                  :: trans
+      real(psb_dpk_), target, intent(inout)         :: work(:)
+      type(psb_d_vect_type), intent(inout)          :: wv(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional                 :: init
+      type(psb_d_vect_type), intent(inout), optional  :: initu
     end subroutine amg_d_base_solver_apply_vect
+  end interface
+
+  interface 
+    subroutine amg_d_base_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y, &
+                  & desc_data, trans, work, wv, info, init, initu)
+      import :: psb_dpk_, amg_d_base_solver_type, &
+              & psb_d_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_d_vect_type
+      implicit none 
+      real(psb_dpk_), intent(in)                    :: alpha, beta
+      class(amg_d_base_solver_type), intent(inout)  :: sv
+      type(psb_d_multivect_type), intent(inout)     :: x, y
+      integer(psb_ipk_), intent(in)                 :: idx_x, idx_y
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                  :: trans
+      real(psb_dpk_), target, intent(inout)         :: work(:)
+      type(psb_d_vect_type), intent(inout)          :: wv(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional                 :: init
+      type(psb_d_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_d_base_solver_apply_mvect_col
   end interface
   
   interface 
@@ -167,11 +187,11 @@ module amg_d_base_solver_mod
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
        & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
        & amg_d_base_solver_type, psb_ipk_, psb_i_base_vect_type      
-      Implicit None
+      implicit none
       
       ! Arguments
       type(psb_dspmat_type), intent(inout), target          :: a
-      Type(psb_desc_type), Intent(inout)                    :: desc_a 
+      type(psb_desc_type), intent(inout)                    :: desc_a 
       class(amg_d_base_solver_type), intent(inout)          :: sv
       integer(psb_ipk_), intent(out)                        :: info
       type(psb_dspmat_type), intent(in), target, optional   :: b
@@ -185,7 +205,7 @@ module amg_d_base_solver_mod
     subroutine amg_d_base_solver_cnv(sv,info,amold,vmold,imold)
       import :: psb_d_base_sparse_mat, psb_d_base_vect_type, psb_dpk_, &
        & amg_d_base_solver_type, psb_ipk_, psb_i_base_vect_type      
-      Implicit None
+      implicit none
       
       ! Arguments
       class(amg_d_base_solver_type), intent(inout)          :: sv
@@ -201,7 +221,7 @@ module amg_d_base_solver_mod
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
            & amg_d_base_solver_type, psb_ipk_
-      Implicit None
+      implicit none
       
       ! Arguments
       class(amg_d_base_solver_type), intent(inout)   :: sv
@@ -214,7 +234,7 @@ module amg_d_base_solver_mod
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
            & amg_d_base_solver_type, psb_ipk_
-      Implicit None
+      implicit none
       
       ! Arguments
       class(amg_d_base_solver_type), intent(inout) :: sv 
@@ -230,7 +250,7 @@ module amg_d_base_solver_mod
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, & 
            & amg_d_base_solver_type, psb_ipk_
-      Implicit None
+      implicit none
       
       ! Arguments
       class(amg_d_base_solver_type), intent(inout) :: sv
@@ -246,7 +266,7 @@ module amg_d_base_solver_mod
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
            & amg_d_base_solver_type, psb_ipk_            
-      Implicit None      
+      implicit none      
       ! Arguments
       class(amg_d_base_solver_type), intent(inout) :: sv 
       character(len=*), intent(in)                   :: what 
@@ -261,7 +281,7 @@ module amg_d_base_solver_mod
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
            & amg_d_base_solver_type, psb_ipk_
-      Implicit None
+      implicit none
       
       ! Arguments
       class(amg_d_base_solver_type), intent(inout) :: sv
@@ -274,7 +294,7 @@ module amg_d_base_solver_mod
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
            & amg_d_base_solver_type, psb_ipk_
-      Implicit None
+      implicit none
       
       ! Arguments
       class(amg_d_base_solver_type), intent(in) :: sv
@@ -305,7 +325,7 @@ module amg_d_base_solver_mod
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
            & amg_d_base_solver_type, psb_ipk_
-      Implicit None
+      implicit none
       
       ! Arguments
       class(amg_d_base_solver_type), intent(inout)              :: sv
@@ -319,7 +339,7 @@ module amg_d_base_solver_mod
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
            & amg_d_base_solver_type, psb_ipk_
-      Implicit None
+      implicit none
       
       ! Arguments
       class(amg_d_base_solver_type), intent(inout) :: sv
@@ -333,7 +353,7 @@ module amg_d_base_solver_mod
       import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
            & amg_d_base_solver_type, psb_ipk_
-      Implicit None
+      implicit none
       
       ! Arguments
       class(amg_d_base_solver_type), intent(inout) :: sv
@@ -358,14 +378,6 @@ contains
     return
   end function d_base_solver_sizeof
 
-  function d_base_solver_get_nzeros(sv) result(val)
-    implicit none 
-    class(amg_d_base_solver_type), intent(in) :: sv
-    integer(psb_epk_) :: val
-    integer(psb_ipk_)             :: i
-    val = 0
-  end function d_base_solver_get_nzeros
-
   subroutine d_base_solver_default(sv) 
     implicit none 
     ! Arguments
@@ -375,34 +387,20 @@ contains
     return
   end subroutine d_base_solver_default
 
+  function d_base_solver_get_nzeros(sv) result(val)
+    implicit none 
+    class(amg_d_base_solver_type), intent(in) :: sv
+    integer(psb_epk_) :: val
+    integer(psb_ipk_)             :: i
+    val = 0
+  end function d_base_solver_get_nzeros
+
   function d_base_solver_get_fmt() result(val)
     implicit none 
     character(len=32)  :: val
 
     val = "Base solver"
   end function d_base_solver_get_fmt
-
-  !
-  ! If this is true, then the solver needs a starting
-  ! guess. Currently only handled in JAC smoother. 
-  ! 
-  function d_base_solver_is_iterative() result(val)
-    implicit none 
-    logical  :: val
-
-    val = .false.
-  end function d_base_solver_is_iterative
-  !
-  ! Is the solver acting globally? In most cases 
-  ! not, SuperLU_Dist does, MUMPS can do either.
-  ! 
-  function d_base_solver_is_global(sv) result(val)
-    implicit none 
-    class(amg_d_base_solver_type), intent(in) :: sv
-    logical  :: val
-
-    val = .false.
-  end function d_base_solver_is_global
 
   function d_base_solver_get_id() result(val)
     implicit none 
@@ -418,4 +416,26 @@ contains
     val = 0
   end function d_base_solver_get_wrksize
 
+  !
+  ! If this is true, then the solver needs a starting
+  ! guess. Currently only handled in JAC solver. 
+  ! 
+  function d_base_solver_is_iterative() result(val)
+    implicit none 
+    logical  :: val
+
+    val = .false.
+  end function d_base_solver_is_iterative
+
+  !
+  ! Is the solver acting globally? In most cases 
+  ! not, SuperLU_Dist does, MUMPS can do either.
+  ! 
+  function d_base_solver_is_global(sv) result(val)
+    implicit none 
+    class(amg_d_base_solver_type), intent(in) :: sv
+    logical  :: val
+
+    val = .false.
+  end function d_base_solver_is_global
 end module amg_d_base_solver_mod

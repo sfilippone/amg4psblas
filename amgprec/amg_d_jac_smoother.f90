@@ -67,8 +67,11 @@ module amg_d_jac_smoother
     integer(psb_ipk_)       :: printiter
     real(psb_dpk_)          :: tol
   contains
-    procedure, pass(sm) :: apply_v => amg_d_jac_smoother_apply_vect
-    procedure, pass(sm) :: apply_a => amg_d_jac_smoother_apply
+    procedure, pass(sv) :: apply_a    => amg_d_jac_smoother_apply
+    procedure, pass(sv) :: apply_v    => amg_d_jac_smoother_apply_vect
+    ! procedure, pass(sv) :: apply_mv   => amg_d_jac_smoother_apply_mvect
+    procedure, pass(sv) :: apply_mv_c => amg_d_jac_smoother_apply_mvect_col
+    
     procedure, pass(sm) :: dump    => amg_d_jac_smoother_dmp
     procedure, pass(sm) :: build   => amg_d_jac_smoother_bld
     procedure, pass(sm) :: cnv     => amg_d_jac_smoother_cnv
@@ -103,46 +106,61 @@ module amg_d_jac_smoother
        & d_jac_smoother_get_wrksize
   private :: d_l1_jac_smoother_get_fmt, d_l1_jac_smoother_get_id
 
-
   interface
-    subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
-         & sweeps,work,wv,info,init,initu)
-      import :: psb_desc_type, amg_d_jac_smoother_type, psb_d_vect_type, psb_dpk_, &
-           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type,&
-           & psb_ipk_
-
-      type(psb_desc_type), intent(in)                 :: desc_data
+    subroutine amg_d_jac_smoother_apply_vect(alpha, sm, x, beta, y, desc_data, trans, &
+         & sweeps, work, wv, info, init, initu)
+      import :: psb_desc_type, amg_d_jac_smoother_type, &
+              & psb_d_vect_type, &
+              & psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                    :: alpha, beta
       class(amg_d_jac_smoother_type), intent(inout) :: sm
-      type(psb_d_vect_type),intent(inout)           :: x
-      type(psb_d_vect_type),intent(inout)           :: y
-      real(psb_dpk_),intent(in)                      :: alpha,beta
-      character(len=1),intent(in)                     :: trans
-      integer(psb_ipk_), intent(in)                   :: sweeps
-      real(psb_dpk_),target, intent(inout)           :: work(:)
-      type(psb_d_vect_type),intent(inout)           :: wv(:)
-      integer(psb_ipk_), intent(out)                  :: info
-      character, intent(in), optional                :: init
-      type(psb_d_vect_type),intent(inout), optional   :: initu
+      type(psb_d_vect_type), intent(inout)          :: x, y
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1),intent(in)                   :: trans
+      integer(psb_ipk_), intent(in)                 :: sweeps
+      real(psb_dpk_), target, intent(inout)         :: work(:)
+      type(psb_d_vect_type), intent(inout)          :: wv(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional                 :: init
+      type(psb_d_vect_type), intent(inout), optional  :: initu
     end subroutine amg_d_jac_smoother_apply_vect
   end interface
 
   interface
-    subroutine amg_d_jac_smoother_apply(alpha,sm,x,beta,y,desc_data,trans,&
-         & sweeps,work,info,init,initu)
-      import :: psb_desc_type, amg_d_jac_smoother_type, psb_d_vect_type, psb_dpk_, &
-           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type, &
-           & psb_ipk_
-      type(psb_desc_type), intent(in)      :: desc_data
+    subroutine amg_d_jac_smoother_apply_mvect(alpha, sm, x, beta, y, desc_data, trans, &
+         & sweeps, work, wv, info, init, initu)
+      import :: psb_desc_type, amg_d_jac_smoother_type, &
+              & psb_d_multivect_type, psb_d_vect_type, &
+              & psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                    :: alpha, beta
       class(amg_d_jac_smoother_type), intent(inout) :: sm
-      real(psb_dpk_),intent(inout)         :: x(:)
-      real(psb_dpk_),intent(inout)         :: y(:)
-      real(psb_dpk_),intent(in)            :: alpha,beta
-      character(len=1),intent(in)           :: trans
-      integer(psb_ipk_), intent(in)         :: sweeps
-      real(psb_dpk_),target, intent(inout) :: work(:)
-      integer(psb_ipk_), intent(out)        :: info
-      character, intent(in), optional       :: init
-      real(psb_dpk_),intent(inout), optional :: initu(:)
+      type(psb_d_multivect_type), intent(inout)     :: x, y
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1),intent(in)                   :: trans
+      integer(psb_ipk_), intent(in)                 :: sweeps
+      real(psb_dpk_), target, intent(inout)         :: work(:)
+      type(psb_d_vect_type), intent(inout)          :: wv(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional                 :: init
+      type(psb_d_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_d_jac_smoother_apply_mvect
+  end interface
+
+  interface
+    subroutine amg_d_jac_smoother_apply(alpha, sm, x, beta, y, desc_data, trans, &
+         & sweeps, work, info, init, initu)
+      import :: psb_desc_type, amg_d_jac_smoother_type, &
+              & psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                    :: alpha, beta
+      class(amg_d_jac_smoother_type), intent(inout) :: sm
+      real(psb_dpk_), intent(inout)                 :: x(:),  y(:)
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                  :: trans
+      integer(psb_ipk_), intent(in)                 :: sweeps
+      real(psb_dpk_), target, intent(inout)         :: work(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional         :: init
+      real(psb_dpk_), intent(inout), optional :: initu(:)
     end subroutine amg_d_jac_smoother_apply
   end interface
 

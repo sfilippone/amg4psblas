@@ -35,46 +35,48 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine amg_d_base_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,&
-     &  trans,sweeps,work,wv,info,init,initu)
+subroutine amg_d_base_smoother_apply_vect(alpha, sm, x, beta, y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
   use psb_base_mod
-  use amg_d_base_smoother_mod, amg_protect_name =>  amg_d_base_smoother_apply_vect
+  use amg_d_base_smoother_mod, amg_protect_name => amg_d_base_smoother_apply_vect
   implicit none 
+  real(psb_dpk_), intent(in)                      :: alpha, beta
+  class(amg_d_base_smoother_type), intent(inout)  :: sm
+  type(psb_d_vect_type), intent(inout)            :: x, y
   type(psb_desc_type), intent(in)                 :: desc_data
-  class(amg_d_base_smoother_type), intent(inout) :: sm
-  type(psb_d_vect_type),intent(inout)            :: x
-  type(psb_d_vect_type),intent(inout)            :: y
-  real(psb_dpk_),intent(in)                       :: alpha,beta
-  character(len=1),intent(in)                      :: trans
-  integer(psb_ipk_), intent(in)                    :: sweeps
-  real(psb_dpk_),target, intent(inout)            :: work(:)
-  type(psb_d_vect_type),intent(inout)            :: wv(:)
-  integer(psb_ipk_), intent(out)                   :: info
-  character, intent(in), optional                  :: init
-  type(psb_d_vect_type),intent(inout), optional   :: initu
-  !    
+  character(len=1), intent(in)                    :: trans
+  integer(psb_ipk_), intent(in)                   :: sweeps
+  real(psb_dpk_), target, intent(inout)           :: work(:)
+  type(psb_d_vect_type), intent(inout)            :: wv(:)
+  integer(psb_ipk_), intent(out)                  :: info
+  character, intent(in), optional                 :: init
+  type(psb_d_vect_type), intent(inout), optional  :: initu
+  
+  ! Local variables
   integer(psb_ipk_) :: err_act
-  character(len=20) :: name='d_base_smoother_apply'
+  character(len=20) :: name = 'd_base_smoother_apply'
 
   call psb_erractionsave(err_act)
   info = psb_success_
-  if (sweeps == 0) then
-    
+
+  if (sweeps == 0) then  
     !
     ! K^0 = I
-    ! zero sweeps  of any smoother is just the identity.
+    ! zero sweeps of any smoother is just the identity.
     !
-    call psb_geaxpby(alpha,x,beta,y,desc_data,info) 
+    call psb_geaxpby(alpha, x, beta, y, desc_data, info) 
 
   else
     if (allocated(sm%sv)) then
-      call sm%sv%apply(alpha,x,beta,y,desc_data,trans,work,wv,info,init=init, initu=initu)
+      call sm%sv%apply(alpha, x, beta, y, desc_data, trans, work, wv, info, &
+                        init = init, initu = initu)
     else
-      info = 1121
+      info = 1121 !psb_err_invalid_mat_state_ ?
     endif
   end if
+
   if (info /= psb_success_) then 
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999 
   end if
 
@@ -82,7 +84,58 @@ subroutine amg_d_base_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,&
   return
 
 9999 call psb_error_handler(err_act)
+  return
+end subroutine amg_d_base_smoother_apply_vect
 
+subroutine amg_d_base_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx_y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+  use psb_base_mod
+  use amg_d_base_smoother_mod, amg_protect_name => amg_d_base_smoother_apply_mvect_col
+  implicit none 
+  real(psb_dpk_), intent(in)                      :: alpha, beta
+  class(amg_d_base_smoother_type), intent(inout)  :: sm
+  type(psb_d_multivect_type), intent(inout)       :: x, y
+  integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+  type(psb_desc_type), intent(in)                 :: desc_data
+  character(len=1), intent(in)                    :: trans
+  integer(psb_ipk_), intent(in)                   :: sweeps
+  real(psb_dpk_), target, intent(inout)           :: work(:)
+  type(psb_d_vect_type), intent(inout)            :: wv(:)
+  integer(psb_ipk_), intent(out)                  :: info
+  character, intent(in), optional                 :: init
+  type(psb_d_vect_type), intent(inout), optional  :: initu
+  
+  ! Local variables
+  integer(psb_ipk_) :: err_act
+  character(len=20) :: name = 'd_base_smoother_apply'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  if (sweeps == 0) then  
+    !
+    ! K^0 = I
+    ! zero sweeps of any smoother is just the identity.
+    !
+    call psb_geaxpby(alpha, x, idx_x, beta, y, idx_y, desc_data, info) 
+
+  else
+    if (allocated(sm%sv)) then
+      call sm%sv%apply(alpha, x, idx_x, beta, y, idx_y, desc_data, trans, work, wv, info, &
+                        init = init, initu = initu)
+    else
+      info = 1121 !psb_err_invalid_mat_state_ ?
+    endif
+  end if
+
+  if (info /= psb_success_) then 
+    call psb_errpush(info, name)
+    goto 9999 
+  end if
+
+  call psb_erractionrestore(err_act)
   return
 
-end subroutine amg_d_base_smoother_apply_vect
+9999 call psb_error_handler(err_act)
+  return
+end subroutine amg_d_base_smoother_apply_mvect_col
