@@ -2,6 +2,8 @@ include Make.inc
 
 
 all:  mods objs lib
+	@echo "====================================="
+	@echo "AMG4PSBLAS libraries Compilation Successful."
 
 objs: libdir mods amgobjs cbnd 
 mods: libdir
