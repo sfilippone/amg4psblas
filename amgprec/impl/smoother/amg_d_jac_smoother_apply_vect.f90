@@ -186,7 +186,7 @@ subroutine amg_d_jac_smoother_apply_vect(alpha, sm, x, beta, y, desc_data, trans
             end if
           end do
 
-          if (info == psb_success_) call psb_geaxpby(alpha, ty, beta, y, idx_y, desc_data, info)
+          if (info == psb_success_) call psb_geaxpby(alpha, ty, beta, y, desc_data, info)
 
           if (info /= psb_success_) then
             info=psb_err_internal_error_
@@ -304,7 +304,7 @@ subroutine amg_d_jac_smoother_apply_vect(alpha, sm, x, beta, y, desc_data, trans
   return
 end subroutine amg_d_jac_smoother_apply_vect
 
-subroutine amg_d_jac_smoother_apply_mvect_col(alpha, sm, x, beta, y, desc_data, trans, &
+subroutine amg_d_jac_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx_y, desc_data, trans, &
          & sweeps, work, wv, info, init, initu)
   use psb_base_mod
   use amg_d_diag_solver
@@ -313,6 +313,7 @@ subroutine amg_d_jac_smoother_apply_mvect_col(alpha, sm, x, beta, y, desc_data, 
   real(psb_dpk_), intent(in)                    :: alpha, beta
   class(amg_d_jac_smoother_type), intent(inout) :: sm
   type(psb_d_multivect_type), intent(inout)     :: x, y
+  integer(psb_ipk_), intent(in)                 :: idx_x, idx_y
   type(psb_desc_type), intent(in)               :: desc_data
   character(len=1),intent(in)                   :: trans
   integer(psb_ipk_), intent(in)                 :: sweeps
@@ -378,7 +379,9 @@ subroutine amg_d_jac_smoother_apply_mvect_col(alpha, sm, x, beta, y, desc_data, 
   if(sm%checkres) then
     call psb_geall(r, desc_data, info)
     call psb_geasb(r, desc_data, info)
-    resdenum = psb_genrm2(x, desc_data, info)
+    ! Need a copy because psb_genrm2 implementation for multivectors is missing.
+    call psb_geaxpby(done, x, idx_x, dzero, tx, desc_data, info)
+    resdenum = psb_genrm2(tx, desc_data, info)
   end if
 
   if ((.not. sm%sv%is_iterative()) .and. ((sweeps == 1) .or. (sm%nd_nnz_tot == 0))) then
@@ -530,7 +533,7 @@ subroutine amg_d_jac_smoother_apply_mvect_col(alpha, sm, x, beta, y, desc_data, 
             if (info /= psb_success_) exit
 
             if (sm%checkres .and. (mod(i, sm%checkiter) == 0)) then
-              call psb_geaxpby(done, x, idx_x, dzero, r, r, desc_data, info)    !TO CHECK: why use "separate" r for output?
+              call psb_geaxpby(done, x, idx_x, dzero, r, desc_data, info)    !TO CHECK: here can't use "separate" r for output
               call psb_spmm(-done, sm%pa, ty, done, r, desc_data, info)
               res = psb_genrm2(r, desc_data, info)
 

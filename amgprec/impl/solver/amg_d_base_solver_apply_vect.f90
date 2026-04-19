@@ -100,4 +100,4 @@ subroutine amg_d_base_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y
 
 9999 call psb_error_handler(err_act)
   return
-end subroutine amg_d_base_solver_apply_vect
+end subroutine amg_d_base_solver_apply_mvect_col

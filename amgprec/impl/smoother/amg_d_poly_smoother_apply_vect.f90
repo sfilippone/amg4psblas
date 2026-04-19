@@ -53,7 +53,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha, sm, x, beta, y, &
   type(psb_d_vect_type), intent(inout)            :: wv(:)
   integer(psb_ipk_), intent(out)                  :: info
   character, intent(in), optional                 :: init
-  type(psb_d_vect_type), intent(inout), optional  :: initu(:)
+  type(psb_d_vect_type), intent(inout), optional  :: initu
 
   ! Timers
   logical, parameter  :: do_timings = .false.
@@ -311,7 +311,7 @@ subroutine amg_d_poly_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx
   type(psb_d_vect_type), intent(inout)            :: wv(:)
   integer(psb_ipk_), intent(out)                  :: info
   character, intent(in), optional                 :: init
-  type(psb_d_vect_type), intent(inout), optional  :: initu(:)
+  type(psb_d_vect_type), intent(inout), optional  :: initu
 
   ! Timers
   logical, parameter  :: do_timings = .false.

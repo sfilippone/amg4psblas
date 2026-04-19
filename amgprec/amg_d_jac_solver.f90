@@ -106,8 +106,7 @@ module amg_d_jac_solver
                   & desc_data, trans, work, info, init, initu)
       import :: psb_dpk_, amg_d_jac_solver_type, &
               & psb_desc_type, psb_ipk_
-      implicit none 
-      implicit none 
+      implicit none
       real(psb_dpk_), intent(in)                  :: alpha, beta
       class(amg_d_jac_solver_type), intent(inout) :: sv
       real(psb_dpk_), intent(inout)               :: x(:), y(:)

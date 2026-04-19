@@ -130,7 +130,7 @@ module amg_d_poly_smoother
       type(psb_d_vect_type), intent(inout)            :: wv(:)
       integer(psb_ipk_), intent(out)                  :: info
       character, intent(in), optional                 :: init
-      type(psb_d_vect_type), intent(inout), optional  :: initu(:)
+      type(psb_d_vect_type), intent(inout), optional  :: initu
     end subroutine amg_d_poly_smoother_apply_vect
   end interface
 
@@ -152,7 +152,7 @@ module amg_d_poly_smoother
       type(psb_d_vect_type), intent(inout)            :: wv(:)
       integer(psb_ipk_), intent(out)                  :: info
       character, intent(in), optional                 :: init
-      type(psb_d_vect_type), intent(inout), optional  :: initu(:)
+      type(psb_d_vect_type), intent(inout), optional  :: initu
     end subroutine amg_d_poly_smoother_apply_mvect_col
   end interface
   

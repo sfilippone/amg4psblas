@@ -182,7 +182,7 @@ subroutine amg_d_jac_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y,
   use psb_base_mod
   use amg_d_diag_solver
   use psb_base_linsolve_conv_mod, only : log_conv
-  use amg_d_jac_solver, amg_protect_name => amg_d_jac_solver_apply_vect
+  use amg_d_jac_solver, amg_protect_name => amg_d_jac_solver_apply_mvect_col
   implicit none
   real(psb_dpk_), intent(in)                  :: alpha, beta
   class(amg_d_jac_solver_type), intent(inout) :: sv
@@ -320,4 +320,4 @@ subroutine amg_d_jac_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y,
 
 9999 call psb_error_handler(err_act)
   return
-end subroutine amg_d_jac_solver_apply_vect
+end subroutine amg_d_jac_solver_apply_mvect_col
