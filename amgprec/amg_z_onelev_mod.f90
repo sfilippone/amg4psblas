@@ -806,47 +806,30 @@ contains
 
     info = psb_success_
     call wk%free(info)
-    if  (present(desc2)) then
-!!$      write(0,*) 'Check on wrk_alloc 2',&
-!!$           & desc2%get_local_rows(), desc%get_local_rows(),&
-!!$           & desc2%get_local_cols(),desc%get_local_cols()
-!!$      flush(0)
+    write(0,*) 'wrk_alloc D: "',trim(desc%get_fmt()),'"', present(desc2),desc%is_valid()
+    
+    if  (present(desc2).and.(desc%is_valid())) then
+      write(0,*) 'wrk_alloc D2:',desc2%get_fmt(),desc2%is_asb()
       if (desc2%get_local_cols()>desc%get_local_cols()) then
-        call psb_geasb(wk%vx2l,desc2,info,&
-             & scratch=.true.,mold=vmold)
-        call psb_geasb(wk%vy2l,desc2,info,&
-             & scratch=.true.,mold=vmold)
-        call psb_geasb(wk%vtx,desc2,info,&
-             & scratch=.true.,mold=vmold)
-        call psb_geasb(wk%vty,desc2,info,&
-             & scratch=.true.,mold=vmold)
-        allocate(wk%wv(nwv),stat=info)
-        do i=1,nwv
-          call psb_geasb(wk%wv(i),desc2,info,&
-               & scratch=.true.,mold=vmold)
-        end do
+        call inner_do_wrk_alloc(wk,nwv,desc2,vmold=vmold)
       else
-!!$        write(0,*) 'Check on wrk_alloc 1.5 ',&
-!!$             & desc%get_local_rows(),&
-!!$             & desc%get_local_cols()
-        call psb_geasb(wk%vx2l,desc,info,&
-             & scratch=.true.,mold=vmold)
-        call psb_geasb(wk%vy2l,desc,info,&
-             & scratch=.true.,mold=vmold)
-        call psb_geasb(wk%vtx,desc,info,&
-             & scratch=.true.,mold=vmold)
-        call psb_geasb(wk%vty,desc,info,&
-             & scratch=.true.,mold=vmold)
-        allocate(wk%wv(nwv),stat=info)
-        do i=1,nwv
-          call psb_geasb(wk%wv(i),desc,info,&
-               & scratch=.true.,mold=vmold)
-        end do
+        call inner_do_wrk_alloc(wk,nwv,desc,vmold=vmold)
       end if
-    else
-!!$      write(0,*) 'Check on wrk_alloc 1 ',&
-!!$           & desc%get_local_rows(),&
-!!$           & desc%get_local_cols()
+    else if (present(desc2)) then
+      call inner_do_wrk_alloc(wk,nwv,desc2,vmold=vmold)
+    else if (desc%is_valid()) then
+      call inner_do_wrk_alloc(wk,nwv,desc,vmold=vmold)      
+    end if
+
+  contains
+    subroutine inner_do_wrk_alloc(wk,nwv,desc,vmold)
+      class(amg_zmlprec_wrk_type), target, intent(inout) :: wk
+      integer(psb_ipk_), intent(in)                     :: nwv
+      type(psb_desc_type), intent(in)                   :: desc
+      class(psb_z_base_vect_type), intent(in), optional  :: vmold
+      
+      integer(psb_ipk_) :: i
+      
       call psb_geasb(wk%vx2l,desc,info,&
            & scratch=.true.,mold=vmold)
       call psb_geasb(wk%vy2l,desc,info,&
@@ -860,7 +843,7 @@ contains
         call psb_geasb(wk%wv(i),desc,info,&
              & scratch=.true.,mold=vmold)
       end do
-    end if
+    end subroutine inner_do_wrk_alloc
   end subroutine z_wrk_alloc
 
   subroutine z_wrk_free(wk,info)
