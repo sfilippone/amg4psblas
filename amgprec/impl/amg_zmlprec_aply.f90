@@ -393,39 +393,38 @@ contains
     if(debug_level > 1) then
       write(debug_unit,*) me,' Start inner_ml_aply at level ',level, info
     end if
-    if (me >= 0) then
-      select case(p%precv(level)%parms%ml_cycle) 
-        
-      case(amg_no_ml_)
-        !
-        ! No preconditioning, should not really get here
-        ! 
-        call psb_errpush(psb_err_internal_error_,name,&
-             & a_err='amg_no_ml_ in mlprc_aply?')
-        goto 9999      
-        
-      case(amg_add_ml_)
-        
-        call amg_z_inner_add(p, level, trans, work)
-        
-      case(amg_mult_ml_,amg_vcycle_ml_, amg_wcycle_ml_)
-        
-        call amg_z_inner_mult(p, level, trans, work)
-        
-      case(amg_kcycle_ml_, amg_kcyclesym_ml_)
-        
-        call amg_z_inner_k_cycle(p, level, trans, work)
-        
-      case default
-        info = psb_err_from_subroutine_ai_
-        call psb_errpush(info,name,a_err='invalid ml_cycle',&
-             &  i_Err=(/p%precv(level)%parms%ml_cycle,izero,izero,izero,izero/))
-        goto 9999      
-        
-      end select
-      if(debug_level > 1) then
-        write(debug_unit,*) me,' End inner_ml_aply at level ',level
-      end if
+    
+    select case(p%precv(level)%parms%ml_cycle) 
+      
+    case(amg_no_ml_)
+      !
+      ! No preconditioning, should not really get here
+      ! 
+      call psb_errpush(psb_err_internal_error_,name,&
+           & a_err='amg_no_ml_ in mlprc_aply?')
+      goto 9999      
+      
+    case(amg_add_ml_)
+      
+      call amg_z_inner_add(p, level, trans, work)
+      
+    case(amg_mult_ml_,amg_vcycle_ml_, amg_wcycle_ml_)
+      
+      call amg_z_inner_mult(p, level, trans, work)
+      
+    case(amg_kcycle_ml_, amg_kcyclesym_ml_)
+      
+      call amg_z_inner_k_cycle(p, level, trans, work)
+      
+    case default
+      info = psb_err_from_subroutine_ai_
+      call psb_errpush(info,name,a_err='invalid ml_cycle',&
+           &  i_Err=(/p%precv(level)%parms%ml_cycle,izero,izero,izero,izero/))
+      goto 9999      
+      
+    end select
+    if(debug_level > 1) then
+      write(debug_unit,*) me,' End inner_ml_aply at level ',level
     end if
 
     call psb_erractionrestore(err_act)
@@ -492,7 +491,7 @@ contains
          & vtx => p%precv(level)%wrk%vtx,vty => p%precv(level)%wrk%vty,&
          & base_a => p%precv(level)%base_a, base_desc=>p%precv(level)%base_desc,&
          & wv => p%precv(level)%wrk%wv)
-
+      
       if (me >= 0) then 
         if (allocated(p%precv(level)%sm2a)) then
           call psb_geaxpby(zone,vx2l,zzero,vy2l,base_desc,info)
@@ -523,42 +522,41 @@ contains
              & a_err='Error during ADD smoother_apply')
         goto 9999
       end if
-
-      if (level < nlev) then
-        ! Apply the restriction
-        call p%precv(level+1)%map_rstr(zone,vx2l,&
-             & zzero,p%precv(level+1)%wrk%vx2l,&
-             & info,work=work,&
-             & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
-        if (info /= psb_success_) then
-          call psb_errpush(psb_err_internal_error_,name,&
-               & a_err='Error during restriction')
-          goto 9999
-        end if
-
-        call inner_ml_aply(level+1,p,trans,work,info)
-        if (info /= psb_success_) then
-          call psb_errpush(psb_err_internal_error_,name,&
-               & a_err='Error in recursive call')
-          goto 9999
-        end if
-
-        !
-        ! Apply the prolongator
-        !  
-        call p%precv(level+1)%map_prol(zone,&
-             & p%precv(level+1)%wrk%vy2l, zone,vy2l,&
-             & info,work=work,&
-             & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
-        if (info /= psb_success_) then
-          call psb_errpush(psb_err_internal_error_,name,&
-               & a_err='Error during prolongation')
-          goto 9999
-        end if
-
-
+    end if
+    
+    if (level < nlev) then
+      ! Apply the restriction
+      call p%precv(level+1)%map_rstr(zone,vx2l,&
+           & zzero,p%precv(level+1)%wrk%vx2l,&
+           & info,work=work,&
+           & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_internal_error_,name,&
+             & a_err='Error during restriction')
+        goto 9999
       end if
-    end associate
+      
+      call inner_ml_aply(level+1,p,trans,work,info)
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_internal_error_,name,&
+             & a_err='Error in recursive call')
+        goto 9999
+      end if
+      
+      !
+      ! Apply the prolongator
+      !  
+      call p%precv(level+1)%map_prol(zone,&
+           & p%precv(level+1)%wrk%vy2l, zone,vy2l,&
+           & info,work=work,&
+           & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_internal_error_,name,&
+             & a_err='Error during prolongation')
+        goto 9999
+      end if
+      
+      end associate
     
     call psb_erractionrestore(err_act)
     return

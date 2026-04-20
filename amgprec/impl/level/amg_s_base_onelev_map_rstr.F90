@@ -73,12 +73,14 @@ subroutine amg_s_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
         nsrc = size(isrc)
         nrl  = lv%remap_data%desc_ac_pre_remap%get_local_rows()
         call psb_geall(tv,lv%remap_data%desc_ac_pre_remap,info)
-        call psb_geasb(tv,lv%remap_data%desc_ac_pre_remap,info) 
+        call psb_geasb(tv,lv%remap_data%desc_ac_pre_remap,info,mold=vect_u%v) 
 !!$        write(0,*) me,' Size of TV ',tv%get_nrows()
         call lv%linmap%map_U2V(alpha,vect_u,beta,tv,info,&
              & work=work,vtx=vtx,vty=vty)
-        rsnd = tv%get_vect()
-        call psb_snd(ctxt,rsnd(1:nrl),idest)
+        call tv%sync()
+        !rsnd = tv%get_vect()
+        !call psb_snd(ctxt,rsnd(1:nrl),idest)
+        call psb_snd(ctxt,tv%v%v(1:nrl),idest)
         if (rme >=0) then
           allocate(rrcv(sum(nrsrc)))
 !!$          write(0,*) me,rme,' Size check ',size(rrcv)!,lv%desc_ac%get_local_rows()
