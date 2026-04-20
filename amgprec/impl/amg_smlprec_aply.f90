@@ -508,7 +508,6 @@ contains
                  & base_desc, trans,&
                  & ione,work,wv,info,init='Z')        
           end do
-          
         else
           sweeps = p%precv(level)%parms%sweeps_pre
           call p%precv(level)%sm%apply(sone,&
@@ -522,41 +521,41 @@ contains
              & a_err='Error during ADD smoother_apply')
         goto 9999
       end if
-    end if
-    
-    if (level < nlev) then
-      ! Apply the restriction
-      call p%precv(level+1)%map_rstr(sone,vx2l,&
-           & szero,p%precv(level+1)%wrk%vx2l,&
-           & info,work=work,&
-           & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
-      if (info /= psb_success_) then
-        call psb_errpush(psb_err_internal_error_,name,&
-             & a_err='Error during restriction')
-        goto 9999
-      end if
       
-      call inner_ml_aply(level+1,p,trans,work,info)
-      if (info /= psb_success_) then
-        call psb_errpush(psb_err_internal_error_,name,&
-             & a_err='Error in recursive call')
-        goto 9999
+      if (level < nlev) then
+        ! Apply the restriction
+        call p%precv(level+1)%map_rstr(sone,vx2l,&
+             & szero,p%precv(level+1)%wrk%vx2l,&
+             & info,work=work,&
+             & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
+        if (info /= psb_success_) then
+          call psb_errpush(psb_err_internal_error_,name,&
+               & a_err='Error during restriction')
+          goto 9999
+        end if
+        
+        call inner_ml_aply(level+1,p,trans,work,info)
+        if (info /= psb_success_) then
+          call psb_errpush(psb_err_internal_error_,name,&
+               & a_err='Error in recursive call')
+          goto 9999
+        end if
+        
+        !
+        ! Apply the prolongator
+        !  
+        call p%precv(level+1)%map_prol(sone,&
+             & p%precv(level+1)%wrk%vy2l, sone,vy2l,&
+             & info,work=work,&
+             & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
+        if (info /= psb_success_) then
+          call psb_errpush(psb_err_internal_error_,name,&
+               & a_err='Error during prolongation')
+          goto 9999
+        end if
+        
       end if
-      
-      !
-      ! Apply the prolongator
-      !  
-      call p%precv(level+1)%map_prol(sone,&
-           & p%precv(level+1)%wrk%vy2l, sone,vy2l,&
-           & info,work=work,&
-           & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
-      if (info /= psb_success_) then
-        call psb_errpush(psb_err_internal_error_,name,&
-             & a_err='Error during prolongation')
-        goto 9999
-      end if
-      
-      end associate
+    end associate
     
     call psb_erractionrestore(err_act)
     return
