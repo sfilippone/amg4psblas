@@ -62,6 +62,8 @@ subroutine amg_c_base_onelev_descr(lv,il,nl,ilmin,info,iout,verbosity,prefix)
   integer(psb_ipk_)  :: iout_, verbosity_
   logical      :: coarse
   character(1024)    :: prefix_
+  type(psb_ctxt_type) :: pctxt
+  integer(psb_ipk_)   :: pme, pnp
 
 
   call psb_erractionsave(err_act)
@@ -81,12 +83,16 @@ subroutine amg_c_base_onelev_descr(lv,il,nl,ilmin,info,iout,verbosity,prefix)
     verbosity_ = 0
   end if
   if (verbosity_ < 0) goto 9998
-    if (present(prefix)) then
-      prefix_ = prefix
-    else
-      prefix_ = ""
-    end if
-
+  if (present(prefix)) then
+    prefix_ = prefix
+  else
+    prefix_ = ""
+  end if
+  
+  pctxt = lv%desc_ac%get_ctxt()
+  call psb_info(pctxt,pme,pnp) 
+  write(iout_,*) trim(prefix_)
+  write(iout_,*) 'At level :',il,' we have ',pnp,' processes'
   write(iout_,*) trim(prefix_)
   if (il == ilmin) then 
     call lv%parms%mlcycledsc(iout_,info)

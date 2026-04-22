@@ -491,6 +491,7 @@ program amg_d_pde3d
     write(psb_out_unit,'(" ")')
   end if
 
+  call prec%descr(info,iout=psb_out_unit)
   if (p_choice%dump) then
     call prec%dump(info,istart=p_choice%dlmin,iend=p_choice%dlmax,&
          & ac=p_choice%dump_ac,rp=p_choice%dump_rp,tprol=p_choice%dump_tprol,&

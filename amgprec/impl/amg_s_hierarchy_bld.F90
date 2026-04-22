@@ -98,6 +98,8 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
   character(len=40)  :: ch_err
   integer(psb_ipk_), save  :: idx_bldtp=-1, idx_matasb=-1
   logical, parameter :: do_timings=.false.
+  type(psb_ctxt_type) :: lctxt
+  integer(psb_ipk_)   :: lme,lnp
 
   info=psb_success_
   err=0
@@ -130,7 +132,7 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
   end if
   cpymat_ = .false.
   if (present(cpymat)) cpymat_ = cpymat
-  
+
   !
   ! Check to ensure all procs have the same 
   !   
@@ -227,7 +229,7 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
     casize = mncsize
   end if
   prec%ag_data%target_coarse_size = casize
-  
+
   nplevs = max(itwo,mxplevs)
 
   !
@@ -301,7 +303,7 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
   end if
   call psb_cd_renum_block(desc_a,prec%precv(1)%desc_ac,info)
   prec%precv(1)%base_desc => prec%precv(1)%desc_ac
-  
+
   newsz = 0
   array_build_loop: do i=2, iszv
     !
@@ -309,7 +311,9 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
     ! on all processes.
     !
     call psb_bcast(ctxt,prec%precv(i)%parms)
-
+    lctxt = prec%precv(i-1)%base_desc%get_ctxt()
+    call psb_info(lctxt,lme,lnp)
+    write(0,*) 'Check at level',i,lme,lnp
     !
     ! Sanity checks on the parameters
     !
@@ -376,18 +380,29 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
         end if
       end if
 
-      if (all(nlaggr == prec%precv(i-1)%linmap%naggr)) then 
-        newsz=i-1
-        if (me == 0) then 
-          write(debug_unit,*) trim(name),&
-               &': Warning: aggregates from level ',&
-               & newsz
-          write(debug_unit,*) trim(name),&
-               &':                       to level ',&
-               & iszv,' coincide.'
-          write(debug_unit,*) trim(name),&
-               &': Number of levels actually used :',newsz
-          write(debug_unit,*)
+      !
+      ! TO BE REVIWED
+      !
+      write(0,*) me,lme,allocated(prec%precv(i-1)%linmap%naggr)
+      if (allocated(prec%precv(i-1)%linmap%naggr)) then
+        write(0,*) me,lme,size(prec%precv(i-1)%linmap%naggr), size(nlaggr)
+      end if
+      if (.false.) then 
+        if (lme >=0) then 
+          if (all(nlaggr == prec%precv(i-1)%linmap%naggr)) then 
+            newsz=i-1
+            if (me == 0) then 
+              write(debug_unit,*) trim(name),&
+                   &': Warning: aggregates from level ',&
+                   & newsz
+              write(debug_unit,*) trim(name),&
+                   &':                       to level ',&
+                   & iszv,' coincide.'
+              write(debug_unit,*) trim(name),&
+                   &': Number of levels actually used :',newsz
+              write(debug_unit,*)
+            end if
+          end if
         end if
       end if
     end if
@@ -426,6 +441,31 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
              & a_err=ch_err)
         goto 9999
       endif
+    if (amg_get_do_remap().and.(i>=2)) then
+      block
+        type(psb_ctxt_type) :: lctxt
+        integer(psb_ipk_)   :: lme,lnp
+        lctxt = prec%precv(i)%desc_ac%get_ctxt()
+        call psb_info(lctxt,lme,lnp)
+        write(0,*) ' Context on remapping ',lme,lnp
+        if ((lme >=0).and.(lnp>=2)) then 
+          associate(lv=>prec%precv(i), rmp => prec%precv(i)%remap_data)
+            call lv%desc_ac%clone(rmp%desc_ac_pre_remap,info)
+            call lv%ac%clone(rmp%ac_pre_remap,info)
+            write(0,*) ' Doing remapping ',lnp, lnp/2
+            call psb_remap(lnp/2,rmp%desc_ac_pre_remap,rmp%ac_pre_remap,&
+                 & rmp%idest,rmp%isrc,rmp%nrsrc,rmp%naggr,lv%desc_ac,lv%ac,info)
+!!$        write(0,*) me,' Out of remapping ',rmp%desc_ac_pre_remap%get_fmt(),' ',&
+!!$             & lv%desc_ac%get_fmt(),sum(lv%linmap%naggr),sum(rmp%naggr)
+            write(0,*) 'Assignment ',size(lv%linmap%naggr),size(rmp%naggr)
+            lv%linmap%naggr(:) =  rmp%naggr(:)
+            lv%linmap%p_desc_V => rmp%desc_ac_pre_remap
+            lv%base_a          => lv%ac
+            lv%base_desc       => lv%desc_ac
+          end associate
+        end if
+      end block
+    end if
       exit array_build_loop
     else
       if (do_timings) call psb_tic(idx_matasb)            
@@ -442,8 +482,35 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
     endif
     if (i<iszv) call prec%precv(i)%update_aggr(prec%precv(i+1),info)
 
+    if (amg_get_do_remap().and.(i>=2)) then
+      block
+        type(psb_ctxt_type) :: lctxt
+        integer(psb_ipk_)   :: lme,lnp
+        lctxt = prec%precv(i)%desc_ac%get_ctxt()
+        call psb_info(lctxt,lme,lnp)
+        write(0,*) ' Context on remapping ',lme,lnp
+        if ((lme >=0).and.(lnp>=2)) then 
+          associate(lv=>prec%precv(i), rmp => prec%precv(i)%remap_data)
+            call lv%desc_ac%clone(rmp%desc_ac_pre_remap,info)
+            call lv%ac%clone(rmp%ac_pre_remap,info)
+            write(0,*) ' Doing remapping ',lnp, lnp/2
+            call psb_remap(lnp/2,rmp%desc_ac_pre_remap,rmp%ac_pre_remap,&
+                 & rmp%idest,rmp%isrc,rmp%nrsrc,rmp%naggr,lv%desc_ac,lv%ac,info)
+!!$        write(0,*) me,' Out of remapping ',rmp%desc_ac_pre_remap%get_fmt(),' ',&
+!!$             & lv%desc_ac%get_fmt(),sum(lv%linmap%naggr),sum(rmp%naggr)
+            write(0,*) 'Assignment ',size(lv%linmap%naggr),size(rmp%naggr)
+            lv%linmap%naggr(:) =  rmp%naggr(:)
+            lv%linmap%p_desc_V => rmp%desc_ac_pre_remap
+            lv%base_a          => lv%ac
+            lv%base_desc       => lv%desc_ac
+          end associate
+        end if
+      end block
+    end if
+    write(0,*) ' End of array_build_loop',i,iszv,info    
   end do array_build_loop
-
+  write(0,*) ' Done  array_build_loop',iszv,newsz,info,psb_errstatus_fatal()
+  call psb_barrier(ctxt)
   if (newsz > 0) then
     !
     ! We exited early from the build loop, need to fix
@@ -487,32 +554,35 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
            & prec%precv(i)%linmap%p_desc_V => prec%precv(i)%base_desc
     end do
   end if
+  write(0,*) ' Done  reallocating precv',iszv,newsz,info,psb_errstatus_fatal()
+  call psb_barrier(ctxt)
 
 
   !write(0,*) 'Should we remap? '
-  if (amg_get_do_remap().and.(np>=4)) then
+  if (.false.) then  
+    if (amg_get_do_remap().and.(np>=4)) then
 !!$    write(0,*) 'Going for remapping '
-    if (.true.) then 
-      associate(lv=>prec%precv(iszv), rmp => prec%precv(iszv)%remap_data)
-        call lv%desc_ac%clone(rmp%desc_ac_pre_remap,info)
-        call lv%ac%clone(rmp%ac_pre_remap,info)
-        if (np >= 8) then 
-          call psb_remap(np/4,rmp%desc_ac_pre_remap,rmp%ac_pre_remap,&
-               & rmp%idest,rmp%isrc,rmp%nrsrc,rmp%naggr,lv%desc_ac,lv%ac,info)
-        else
-          call psb_remap(np/2,rmp%desc_ac_pre_remap,rmp%ac_pre_remap,&
-               & rmp%idest,rmp%isrc,rmp%nrsrc,rmp%naggr,lv%desc_ac,lv%ac,info)
-        end if
+      if (.true.) then 
+        associate(lv=>prec%precv(iszv), rmp => prec%precv(iszv)%remap_data)
+          call lv%desc_ac%clone(rmp%desc_ac_pre_remap,info)
+          call lv%ac%clone(rmp%ac_pre_remap,info)
+          if (np >= 8) then 
+            call psb_remap(np/4,rmp%desc_ac_pre_remap,rmp%ac_pre_remap,&
+                 & rmp%idest,rmp%isrc,rmp%nrsrc,rmp%naggr,lv%desc_ac,lv%ac,info)
+          else
+            call psb_remap(np/2,rmp%desc_ac_pre_remap,rmp%ac_pre_remap,&
+                 & rmp%idest,rmp%isrc,rmp%nrsrc,rmp%naggr,lv%desc_ac,lv%ac,info)
+          end if
 !!$        write(0,*) me,' Out of remapping ',rmp%desc_ac_pre_remap%get_fmt(),' ',&
 !!$             & lv%desc_ac%get_fmt(),sum(lv%linmap%naggr),sum(rmp%naggr)
-        lv%linmap%naggr(:)    =  rmp%naggr(:)
-        lv%linmap%p_desc_V => rmp%desc_ac_pre_remap
-        lv%base_a          => lv%ac
-        lv%base_desc       => lv%desc_ac
-      end associate
+          lv%linmap%naggr(:)    =  rmp%naggr(:)
+          lv%linmap%p_desc_V => rmp%desc_ac_pre_remap
+          lv%base_a          => lv%ac
+          lv%base_desc       => lv%desc_ac
+        end associate
+      end if
     end if
   end if
-
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,&
          & a_err='Internal hierarchy build' )

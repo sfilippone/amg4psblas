@@ -808,7 +808,8 @@ contains
     info = psb_success_
     call wk%free(info)
     write(0,*) 'wrk_alloc D: "',trim(desc%get_fmt()),'"', present(desc2),desc%is_valid()
-    
+
+    allocate(wk%wv(nwv),stat=info)    
     if  (present(desc2).and.(desc%is_valid())) then
       write(0,*) 'wrk_alloc D2:',desc2%get_fmt(),desc2%is_asb()
       if (desc2%get_local_cols()>desc%get_local_cols()) then
@@ -839,7 +840,6 @@ contains
            & scratch=.true.,mold=vmold)
       call psb_geasb(wk%vty,desc,info,&
            & scratch=.true.,mold=vmold)
-      allocate(wk%wv(nwv),stat=info)
       do i=1,nwv
         call psb_geasb(wk%wv(i),desc,info,&
              & scratch=.true.,mold=vmold)

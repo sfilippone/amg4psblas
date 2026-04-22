@@ -55,7 +55,7 @@ subroutine amg_z_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
     !
 !!$    write(0,*) 'Remap handling not implemented yet '
     block
-      type(psb_ctxt_type) :: ctxt, nctxt
+      type(psb_ctxt_type) :: ctxt, rctxt
       integer(psb_mpk_) :: i,j,ip, idest, nsrc, nrl, kp
       integer(psb_mpk_) :: me, np,  rme, rnp
       complex(psb_dpk_), allocatable :: rsnd(:), rrcv(:)
@@ -63,8 +63,8 @@ subroutine amg_z_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
       
       ctxt = lv%remap_data%desc_ac_pre_remap%get_ctxt()
       call psb_info(ctxt,me,np)
-      nctxt = lv%desc_ac%get_ctxt()
-      call psb_info(nctxt,rme,rnp)
+      rctxt = lv%desc_ac%get_ctxt()
+      call psb_info(rctxt,rme,rnp)
 !!$      write(0,*) 'New context ',rme,rnp
       idest = lv%remap_data%idest
       associate(isrc => lv%remap_data%isrc, nrsrc => lv%remap_data%nrsrc)
@@ -74,12 +74,15 @@ subroutine amg_z_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
         nrl  = lv%remap_data%desc_ac_pre_remap%get_local_rows()
         call psb_geall(tv,lv%remap_data%desc_ac_pre_remap,info)
         call psb_geasb(tv,lv%remap_data%desc_ac_pre_remap,info,mold=vect_u%v) 
-!!$        write(0,*) me,' Size of TV ',tv%get_nrows()
+        write(0,*) me,' map_rstr calling U2V: ',me,np,rme,rnp,tv%get_nrows()
+        flush(0)
+        call psb_barrier(ctxt)
         call lv%linmap%map_U2V(alpha,vect_u,beta,tv,info,&
              & work=work,vtx=vtx,vty=vty)
         call tv%sync()
         !rsnd = tv%get_vect()
-        !call psb_snd(ctxt,rsnd(1:nrl),idest)
+        !call psb_snd(ctxt,rsnd(1:nrl),idest) 
+        write(0,*) me,' map_rstr sending ',me,idest
         call psb_snd(ctxt,tv%v%v(1:nrl),idest)
         if (rme >=0) then
           allocate(rrcv(sum(nrsrc)))
@@ -88,7 +91,7 @@ subroutine amg_z_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
           do i = 1,size(isrc)
             ip = isrc(i)
             nrl = nrsrc(i)
-!!$            write(0,*) me,' Receiving from ',ip,nrl,kp+1,kp+nrl,size(rrcv)
+            write(0,*) me,' map_rstr receiving',rme,i,ip            
             call psb_rcv(ctxt,rrcv(kp+1:kp+nrl),ip)
             kp = kp + nrl
           end do

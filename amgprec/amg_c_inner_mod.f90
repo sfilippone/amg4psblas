@@ -67,7 +67,7 @@ module amg_c_inner_mod
   end interface amg_mlprec_bld
 
   interface amg_mlprec_aply
-    subroutine amg_cmlprec_aply(alpha,p,x,beta,y,desc_data,trans,work,info)
+    subroutine amg_cmlprec_aply_a(alpha,p,x,beta,y,desc_data,trans,work,info)
       import :: psb_cspmat_type, psb_desc_type, psb_spk_, psb_ipk_
       import :: amg_cprec_type
       implicit none 
@@ -79,7 +79,7 @@ module amg_c_inner_mod
       character,intent(in)               :: trans
       complex(psb_spk_),target             :: work(:)
       integer(psb_ipk_), intent(out)     :: info
-    end subroutine amg_cmlprec_aply
+    end subroutine amg_cmlprec_aply_a
     subroutine amg_cmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
       import :: psb_cspmat_type, psb_desc_type, &
            & psb_spk_, psb_c_vect_type, psb_ipk_
