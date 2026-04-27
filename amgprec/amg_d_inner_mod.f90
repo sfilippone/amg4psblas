@@ -44,11 +44,12 @@
 !
 module amg_d_inner_mod
 
-  use psb_base_mod, only : psb_dspmat_type, psb_desc_type, psb_i_base_vect_type, &
-       & psb_dpk_, psb_d_base_sparse_mat, psb_d_base_vect_type, psb_ipk_, &
-       & psb_d_vect_type, psb_lpk_, psb_ldspmat_type
+  use psb_base_mod, only : psb_dspmat_type, psb_ldspmat_type, psb_desc_type, &
+                          & psb_lpk_, psb_dpk_, psb_ipk_, psb_d_vect_type, psb_d_multivect_type,&
+                          & psb_d_base_sparse_mat, psb_d_base_vect_type, psb_i_base_vect_type
+
   use amg_d_prec_type, only : amg_dprec_type, amg_dml_parms, &
-       & amg_d_onelev_type, amg_dmlprec_wrk_type
+                              & amg_d_onelev_type, amg_dmlprec_wrk_type
 
   interface amg_mlprec_bld
     subroutine amg_dmlprec_bld(a,desc_a,prec,info, amold, vmold,imold)
@@ -67,33 +68,67 @@ module amg_d_inner_mod
   end interface amg_mlprec_bld
 
   interface amg_mlprec_aply
-    subroutine amg_dmlprec_aply(alpha,p,x,beta,y,desc_data,trans,work,info)
+    subroutine amg_dmlprec_aply(alpha, p, x, beta, y, desc_data, trans, work, info)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_
       import :: amg_dprec_type
       implicit none 
-      type(psb_desc_type),intent(in)        :: desc_data
+      real(psb_dpk_), intent(in)          :: alpha, beta
+      type(psb_desc_type), intent(in)     :: desc_data
       type(amg_dprec_type), intent(inout) :: p
-      real(psb_dpk_),intent(in)         :: alpha,beta
-      real(psb_dpk_),intent(inout)      :: x(:)
-      real(psb_dpk_),intent(inout)      :: y(:)
-      character,intent(in)               :: trans
-      real(psb_dpk_),target             :: work(:)
-      integer(psb_ipk_), intent(out)     :: info
+      real(psb_dpk_), intent(inout)       :: x(:)
+      real(psb_dpk_), intent(inout)       :: y(:)
+      character, intent(in)               :: trans
+      real(psb_dpk_), target              :: work(:)
+      integer(psb_ipk_), intent(out)      :: info
     end subroutine amg_dmlprec_aply
-    subroutine amg_dmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
-      import :: psb_dspmat_type, psb_desc_type, &
-           & psb_dpk_, psb_d_vect_type, psb_ipk_
+
+    subroutine amg_dmlprec_aply_vect(alpha, p, x, beta, y, desc_data, trans, work, info)
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, &
+                & psb_d_vect_type, psb_d_multivect_type
       import :: amg_dprec_type
       implicit none 
-      type(psb_desc_type),intent(in)        :: desc_data
-      type(amg_dprec_type), intent(inout) :: p
-      real(psb_dpk_),intent(in)            :: alpha,beta
-      type(psb_d_vect_type),intent(inout) :: x
-      type(psb_d_vect_type),intent(inout) :: y
-      character,intent(in)                  :: trans
-      real(psb_dpk_),target                :: work(:)
+      real(psb_dpk_), intent(in)            :: alpha, beta
+      type(amg_dprec_type), intent(inout)   :: p
+      type(psb_d_vect_type), intent(inout)  :: x
+      type(psb_d_vect_type), intent(inout)  :: y
+      type(psb_desc_type), intent(in)       :: desc_data
+      character, intent(in)                 :: trans
+      real(psb_dpk_), target                :: work(:)
       integer(psb_ipk_), intent(out)        :: info
     end subroutine amg_dmlprec_aply_vect
+
+    subroutine amg_dmlprec_aply_mvect_vect(alpha, p, x, idx_x, beta, y, desc_data, trans, work, info)
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, &
+                & psb_d_vect_type, psb_d_multivect_type
+      import :: amg_dprec_type
+      implicit none 
+      real(psb_dpk_), intent(in)                :: alpha, beta
+      type(amg_dprec_type), intent(inout)       :: p
+      type(psb_d_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)             :: idx_x
+      type(psb_d_vect_type), intent(inout)      :: y
+      type(psb_desc_type), intent(in)           :: desc_data
+      character, intent(in)                     :: trans
+      real(psb_dpk_), target                    :: work(:)
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine amg_dmlprec_aply_mvect_vect
+
+    subroutine amg_dmlprec_aply_mvect_col(alpha, p, x, idx_x, beta, y, idx_y, desc_data, trans, work, info)
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, &
+                & psb_d_vect_type, psb_d_multivect_type
+      import :: amg_dprec_type
+      implicit none 
+      real(psb_dpk_), intent(in)                :: alpha, beta
+      type(amg_dprec_type), intent(inout)       :: p
+      type(psb_d_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)             :: idx_x
+      type(psb_d_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)             :: idx_y
+      type(psb_desc_type), intent(in)           :: desc_data
+      character, intent(in)                     :: trans
+      real(psb_dpk_), target                    :: work(:)
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine amg_dmlprec_aply_mvect_col
   end interface amg_mlprec_aply
  
   interface amg_map_to_tprol
