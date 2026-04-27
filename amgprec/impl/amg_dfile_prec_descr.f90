@@ -88,6 +88,7 @@ subroutine amg_dfile_prec_descr(prec,info,iout,root, verbosity,prefix)
   logical             :: is_symgs
   character(len=20), parameter :: name='amg_file_prec_descr'
   integer(psb_ipk_)  :: iout_, root_, verbosity_
+  integer(psb_lpk_)  :: gl_nrows,gl_ncols,gl_nzeros
   character(1024)    :: prefix_
 
   info = psb_success_
@@ -122,6 +123,12 @@ subroutine amg_dfile_prec_descr(prec,info,iout,root, verbosity,prefix)
     if (root_ == -1) root_ = me
 
     if (verbosity_ >=0) then 
+      gl_nrows = prec%precv(1)%base_a%get_nrows()
+      gl_ncols = prec%precv(1)%base_a%get_ncols()
+      gl_nzeros = prec%precv(1)%base_a%get_nzeros()
+      call psb_sum(ctxt,gl_nrows)
+      call psb_sum(ctxt,gl_ncols)
+      call psb_sum(ctxt,gl_nzeros)
       !
       ! The preconditioner description is printed by processor psb_root_.
       ! This agrees with the fact that all the parameters defining the
@@ -141,7 +148,11 @@ subroutine amg_dfile_prec_descr(prec,info,iout,root, verbosity,prefix)
 
         write(iout_,*) 
         write(iout_,'(a,1x,a)') trim(prefix_),'Preconditioner description'
-
+        write(iout_,*) 
+        write(iout_,*) trim(prefix_),' Base matrix      : ',&
+             & gl_nrows, gl_ncols, gl_nzeros
+        write(iout_,*)
+        
         if (nlev == 1) then
           !
           ! Here we have a gigantic kludge just to handle Symmetrized Gauss-Seidel.
