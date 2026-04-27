@@ -70,7 +70,9 @@ module amg_d_jac_smoother
     procedure, pass(sm) :: apply_a    => amg_d_jac_smoother_apply
     procedure, pass(sm) :: apply_v    => amg_d_jac_smoother_apply_vect
     ! procedure, pass(sm) :: apply_mv   => amg_d_jac_smoother_apply_mvect
-    procedure, pass(sm) :: apply_mv_c => amg_d_jac_smoother_apply_mvect_col
+    procedure, pass(sm) :: apply_mv_v => amg_d_jac_smoother_apply_mvect_vect
+    procedure, pass(sm) :: apply_v_mv => amg_d_jac_smoother_apply_vect_mvect
+    procedure, pass(sm) :: apply_mv_col => amg_d_jac_smoother_apply_mvect_col
     
     procedure, pass(sm) :: dump    => amg_d_jac_smoother_dmp
     procedure, pass(sm) :: build   => amg_d_jac_smoother_bld
@@ -126,7 +128,7 @@ module amg_d_jac_smoother
 
   interface
     subroutine amg_d_jac_smoother_apply_vect(alpha, sm, x, beta, y, desc_data, trans, &
-         & sweeps, work, wv, info, init, initu)
+                  & sweeps, work, wv, info, init, initu)
       import :: psb_desc_type, amg_d_jac_smoother_type, &
               & psb_d_vect_type, &
               & psb_dpk_, psb_ipk_
@@ -144,9 +146,55 @@ module amg_d_jac_smoother
     end subroutine amg_d_jac_smoother_apply_vect
   end interface
 
+  interface 
+    subroutine amg_d_jac_smoother_apply_vect_mvect(alpha, sm, x, beta, y, idx_y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+      import :: psb_dpk_, amg_d_jac_smoother_type, &
+              & psb_d_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_d_vect_type
+      implicit none 
+      real(psb_dpk_), intent(in)                    :: alpha, beta
+      class(amg_d_jac_smoother_type), intent(inout) :: sm
+      type(psb_d_vect_type), intent(inout)          :: x
+      type(psb_d_multivect_type), intent(inout)     :: y
+      integer(psb_ipk_), intent(in)                 :: idx_y
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                  :: trans
+      integer(psb_ipk_), intent(in)                 :: sweeps
+      real(psb_dpk_), target, intent(inout)         :: work(:)
+      type(psb_d_vect_type), intent(inout)          :: wv(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional                 :: init
+      type(psb_d_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_d_jac_smoother_apply_vect_mvect
+  end interface
+
+  interface 
+    subroutine amg_d_jac_smoother_apply_mvect_vect(alpha, sm, x, idx_x, beta, y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+      import :: psb_dpk_, amg_d_jac_smoother_type, &
+              & psb_d_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_d_vect_type
+      implicit none 
+      real(psb_dpk_), intent(in)                    :: alpha, beta
+      class(amg_d_jac_smoother_type), intent(inout) :: sm
+      type(psb_d_multivect_type), intent(inout)     :: x
+      integer(psb_ipk_), intent(in)                 :: idx_x
+      type(psb_d_vect_type), intent(inout)          :: y
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                  :: trans
+      integer(psb_ipk_), intent(in)                 :: sweeps
+      real(psb_dpk_), target, intent(inout)         :: work(:)
+      type(psb_d_vect_type), intent(inout)          :: wv(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional                 :: init
+      type(psb_d_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_d_jac_smoother_apply_mvect_vect
+  end interface
+
   interface
-    subroutine amg_d_jac_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx_y, desc_data, trans, &
-         & sweeps, work, wv, info, init, initu)
+    subroutine amg_d_jac_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx_y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
       import :: psb_desc_type, amg_d_jac_smoother_type, &
               & psb_d_multivect_type, psb_d_vect_type, &
               & psb_dpk_, psb_ipk_

@@ -92,8 +92,12 @@ module amg_d_base_solver_mod
     procedure, pass(sv) :: apply_a      => amg_d_base_solver_apply
     procedure, pass(sv) :: apply_v      => amg_d_base_solver_apply_vect
     ! procedure, pass(sv) :: apply_mv     => amg_d_base_solver_apply_mvect
+    procedure, pass(sv) :: apply_v_mv   => amg_d_base_solver_apply_vect_mvect
+    procedure, pass(sv) :: apply_mv_v   => amg_d_base_solver_apply_mvect_vect
     procedure, pass(sv) :: apply_mv_col => amg_d_base_solver_apply_mvect_col
-    generic, public     :: apply        => apply_a, apply_v, apply_mv_col
+    generic, public     :: apply        => apply_a, apply_v, &
+                                          & apply_mv_v, apply_v_mv, &
+                                          & apply_mv_col
 
     procedure, pass(sv) :: check => amg_d_base_solver_check
     procedure, pass(sv) :: dump  => amg_d_base_solver_dmp
@@ -159,6 +163,50 @@ module amg_d_base_solver_mod
       character, intent(in), optional                 :: init
       type(psb_d_vect_type), intent(inout), optional  :: initu
     end subroutine amg_d_base_solver_apply_vect
+  end interface
+
+  interface 
+    subroutine amg_d_base_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, &
+                  & desc_data, trans, work, wv, info, init, initu)
+      import :: psb_dpk_, amg_d_base_solver_type, &
+              & psb_d_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_d_vect_type
+      implicit none 
+      real(psb_dpk_), intent(in)                    :: alpha, beta
+      class(amg_d_base_solver_type), intent(inout)  :: sv
+      type(psb_d_vect_type), intent(inout)          :: x
+      type(psb_d_multivect_type), intent(inout)     :: y
+      integer(psb_ipk_), intent(in)                 :: idx_y
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                  :: trans
+      real(psb_dpk_), target, intent(inout)         :: work(:)
+      type(psb_d_vect_type), intent(inout)          :: wv(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional                 :: init
+      type(psb_d_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_d_base_solver_apply_vect_mvect
+  end interface
+
+  interface 
+    subroutine amg_d_base_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, &
+                  & desc_data, trans, work, wv, info, init, initu)
+      import :: psb_dpk_, amg_d_base_solver_type, &
+              & psb_d_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_d_vect_type
+      implicit none 
+      real(psb_dpk_), intent(in)                    :: alpha, beta
+      class(amg_d_base_solver_type), intent(inout)  :: sv
+      type(psb_d_multivect_type), intent(inout)     :: x
+      integer(psb_ipk_), intent(in)                 :: idx_x
+      type(psb_d_vect_type), intent(inout)          :: y
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                  :: trans
+      real(psb_dpk_), target, intent(inout)         :: work(:)
+      type(psb_d_vect_type), intent(inout)          :: wv(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional                 :: init
+      type(psb_d_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_d_base_solver_apply_mvect_vect
   end interface
 
   interface 

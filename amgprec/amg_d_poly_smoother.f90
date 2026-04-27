@@ -42,12 +42,12 @@
 !
 !  This module defines:
 !    the amg_d_poly_smoother_type data structure containing the
-!    smoother for a Jacobi/block Jacobi smoother.
+!    smoother for a polyobi/block polyobi smoother.
 !  The smoother stores in ND the block off-diagonal matrix.
 !  One special case is treated separately, when the solver is DIAG or L1-DIAG
 !  then the ND is the entire off-diagonal part of the matrix (including the
 !  main diagonal block), so that it becomes possible to implement
-!  a pure Jacobi or L1-Jacobi global solver.
+!  a pure polyobi or L1-polyobi global solver.
 !
 module amg_d_poly_smoother
   use amg_d_base_smoother_mod
@@ -68,6 +68,8 @@ module amg_d_poly_smoother
     ! procedure, pass(sm) :: apply_a      => amg_d_poly_smoother_apply
     procedure, pass(sm) :: apply_v      => amg_d_poly_smoother_apply_vect
     ! procedure, pass(sm) :: apply_mv     => amg_d_poly_smoother_apply_mvect
+    procedure, pass(sm) :: apply_v_mv   => amg_d_poly_smoother_apply_vect_mvect
+    procedure, pass(sm) :: apply_mv_v   => amg_d_poly_smoother_apply_mvect_vect
     procedure, pass(sm) :: apply_mv_col => amg_d_poly_smoother_apply_mvect_col
 
     procedure, pass(sm) :: dump    => amg_d_poly_smoother_dmp
@@ -132,6 +134,52 @@ module amg_d_poly_smoother
       character, intent(in), optional                 :: init
       type(psb_d_vect_type), intent(inout), optional  :: initu
     end subroutine amg_d_poly_smoother_apply_vect
+  end interface
+
+  interface 
+    subroutine amg_d_poly_smoother_apply_vect_mvect(alpha, sm, x, beta, y, idx_y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+      import :: psb_dpk_, amg_d_poly_smoother_type, &
+              & psb_d_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_d_vect_type
+      implicit none 
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(amg_d_poly_smoother_type), intent(inout)  :: sm
+      type(psb_d_vect_type), intent(inout)            :: x
+      type(psb_d_multivect_type), intent(inout)       :: y
+      integer(psb_ipk_), intent(in)                   :: idx_y
+      type(psb_desc_type), intent(in)                 :: desc_data
+      character(len=1), intent(in)                    :: trans
+      integer(psb_ipk_), intent(in)                   :: sweeps  ! This is ignored here, the polynomial degree dictates the value
+      real(psb_dpk_), target, intent(inout)           :: work(:)
+      type(psb_d_vect_type), intent(inout)            :: wv(:)
+      integer(psb_ipk_), intent(out)                  :: info
+      character, intent(in), optional                 :: init
+      type(psb_d_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_d_poly_smoother_apply_vect_mvect
+  end interface
+
+  interface 
+    subroutine amg_d_poly_smoother_apply_mvect_vect(alpha, sm, x, idx_x, beta, y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+      import :: psb_dpk_, amg_d_poly_smoother_type, &
+              & psb_d_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_d_vect_type
+      implicit none 
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(amg_d_poly_smoother_type), intent(inout)  :: sm
+      type(psb_d_multivect_type), intent(inout)       :: x
+      integer(psb_ipk_), intent(in)                   :: idx_x
+      type(psb_d_vect_type), intent(inout)            :: y
+      type(psb_desc_type), intent(in)                 :: desc_data
+      character(len=1), intent(in)                    :: trans
+      integer(psb_ipk_), intent(in)                   :: sweeps ! This is ignored here, the polynomial degree dictates the value
+      real(psb_dpk_), target, intent(inout)           :: work(:)
+      type(psb_d_vect_type), intent(inout)            :: wv(:)
+      integer(psb_ipk_), intent(out)                  :: info
+      character, intent(in), optional                 :: init
+      type(psb_d_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_d_poly_smoother_apply_mvect_vect
   end interface
 
   interface
@@ -332,7 +380,7 @@ contains
     class(amg_d_poly_smoother_type), intent(inout) :: sm
 
     !
-    ! Default: BJAC with no residual check
+    ! Default: Bpoly with no residual check
     !
     sm%pdegree      = 1
     sm%rho_ba       = -done
