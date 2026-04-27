@@ -85,68 +85,77 @@ module amg_d_prec_type
   !
   integer, parameter, private :: wv_size_=4
 
-  type, extends(psb_dprec_type)        :: amg_dprec_type
-    type(amg_daggr_data)                 :: ag_data
+  type, extends(psb_dprec_type) :: amg_dprec_type
+    type(amg_daggr_data)  :: ag_data
     !
     ! Number of outer sweeps. Sometimes  2 V-cycles may be better than 1 W-cycle.
     !
-    integer(psb_ipk_)                  :: outer_sweeps = 1
+    integer(psb_ipk_)     :: outer_sweeps = 1
     !
     ! Coarse solver requires some tricky checks, and for this we need to
     ! record the choice in the format given by the user,
     ! to keep track against what is put later in the multilevel array
     !
-    integer(psb_ipk_)                  :: coarse_solver = -1
+    integer(psb_ipk_)     :: coarse_solver = -1
 
     !
     ! The multilevel hierarchy
     !
     type(amg_d_onelev_type), allocatable :: precv(:)
   contains
-    procedure, pass(prec)               :: psb_d_apply2_vect => amg_d_apply2_vect
-    procedure, pass(prec)               :: psb_d_apply1_vect => amg_d_apply1_vect
-    procedure, pass(prec)               :: psb_d_apply2v => amg_d_apply2v
-    procedure, pass(prec)               :: psb_d_apply1v => amg_d_apply1v
-    procedure, pass(prec)               :: dump           => amg_d_dump
-    procedure, pass(prec)               :: cnv            => amg_d_cnv
-    procedure, pass(prec)               :: clone          => amg_d_clone
-    procedure, pass(prec)               :: free           => amg_d_prec_free
-    procedure, pass(prec)               :: allocate_wrk   => amg_d_allocate_wrk
-    procedure, pass(prec)               :: free_wrk       => amg_d_free_wrk
-    procedure, pass(prec)               :: deallocate_wrk => amg_d_free_wrk
-    procedure, pass(prec)               :: is_allocated_wrk => amg_d_is_allocated_wrk
-    procedure, pass(prec)               :: get_complexity => amg_d_get_compl
-    procedure, pass(prec)               :: cmp_complexity => amg_d_cmp_compl
-    procedure, pass(prec)               :: get_avg_cr => amg_d_get_avg_cr
-    procedure, pass(prec)               :: cmp_avg_cr => amg_d_cmp_avg_cr
-    procedure, pass(prec)               :: get_nlevs  => amg_d_get_nlevs
-    procedure, pass(prec)               :: get_nzeros => amg_d_get_nzeros
-    procedure, pass(prec)               :: sizeof => amg_dprec_sizeof
-    procedure, pass(prec)               :: setsm  => amg_dprecsetsm
-    procedure, pass(prec)               :: setsv  => amg_dprecsetsv
-    procedure, pass(prec)               :: setag  => amg_dprecsetag
-    procedure, pass(prec)               :: cseti  => amg_dcprecseti
-    procedure, pass(prec)               :: csetc  => amg_dcprecsetc
-    procedure, pass(prec)               :: csetr  => amg_dcprecsetr
-    generic, public                     :: set => setsm, setsv, setag 
-    procedure, pass(prec)               :: get_smoother => amg_d_get_smootherp
-    procedure, pass(prec)               :: get_solver   => amg_d_get_solverp
-    procedure, pass(prec)               :: move_alloc   => d_prec_move_alloc
-    procedure, pass(prec)               :: init         => amg_dprecinit
-    procedure, pass(prec)               :: build        => amg_dprecbld
-    procedure, pass(prec)               :: hierarchy_build   => amg_d_hierarchy_bld
-    procedure, pass(prec)               :: hierarchy_rebuild => amg_d_hierarchy_rebld
-    procedure, pass(prec)               :: hierarchy_free    => amg_d_hierarchy_free    
-    procedure, pass(prec)               :: smoothers_build   => amg_d_smoothers_bld
-    procedure, pass(prec)               :: smoothers_free    => amg_d_smoothers_free
-    procedure, pass(prec)               :: descr        =>  amg_dfile_prec_descr
-    procedure, pass(prec)               :: memory_use   =>  amg_dfile_prec_memory_use
+    procedure, pass(prec) :: psb_d_apply2_mvect_col => amg_d_apply2_mvect_col
+    procedure, pass(prec) :: psb_d_apply1_mvect_col => amg_d_apply1_mvect_col
+    procedure, pass(prec) :: psb_d_apply2_vect      => amg_d_apply2_vect
+    procedure, pass(prec) :: psb_d_apply1_vect      => amg_d_apply1_vect
+    procedure, pass(prec) :: psb_d_apply2v          => amg_d_apply2v
+    procedure, pass(prec) :: psb_d_apply1v          => amg_d_apply1v
+
+    procedure, pass(prec) :: init   => amg_dprecinit
+    procedure, pass(prec) :: build  => amg_dprecbld
+    procedure, pass(prec) :: dump   => amg_d_dump
+    procedure, pass(prec) :: cnv    => amg_d_cnv
+    procedure, pass(prec) :: clone  => amg_d_clone
+    procedure, pass(prec) :: free   => amg_d_prec_free
+
+    procedure, pass(prec) :: allocate_wrk     => amg_d_allocate_wrk
+    procedure, pass(prec) :: free_wrk         => amg_d_free_wrk
+    procedure, pass(prec) :: deallocate_wrk   => amg_d_free_wrk
+    procedure, pass(prec) :: is_allocated_wrk => amg_d_is_allocated_wrk
+
+    procedure, pass(prec) :: get_complexity => amg_d_get_compl
+    procedure, pass(prec) :: cmp_complexity => amg_d_cmp_compl
+
+    procedure, pass(prec) :: get_avg_cr => amg_d_get_avg_cr
+    procedure, pass(prec) :: cmp_avg_cr => amg_d_cmp_avg_cr
+    procedure, pass(prec) :: get_nlevs  => amg_d_get_nlevs
+    procedure, pass(prec) :: get_nzeros => amg_d_get_nzeros
+    procedure, pass(prec) :: sizeof     => amg_dprec_sizeof
+
+    procedure, pass(prec) :: cseti  => amg_dcprecseti
+    procedure, pass(prec) :: csetc  => amg_dcprecsetc
+    procedure, pass(prec) :: csetr  => amg_dcprecsetr
+
+    procedure, pass(prec) :: setsm  => amg_dprecsetsm
+    procedure, pass(prec) :: setsv  => amg_dprecsetsv
+    procedure, pass(prec) :: setag  => amg_dprecsetag
+    generic, public       :: set    => setsm, setsv, setag 
+
+    procedure, pass(prec) :: move_alloc => d_prec_move_alloc
+
+    procedure, pass(prec) :: get_smoother => amg_d_get_smootherp
+    procedure, pass(prec) :: get_solver   => amg_d_get_solverp
+    procedure, pass(prec) :: hierarchy_build    => amg_d_hierarchy_bld
+    procedure, pass(prec) :: hierarchy_rebuild  => amg_d_hierarchy_rebld
+    procedure, pass(prec) :: hierarchy_free     => amg_d_hierarchy_free    
+    procedure, pass(prec) :: smoothers_build    => amg_d_smoothers_bld
+    procedure, pass(prec) :: smoothers_free     => amg_d_smoothers_free
+    procedure, pass(prec) :: descr      => amg_dfile_prec_descr
+    procedure, pass(prec) :: memory_use => amg_dfile_prec_memory_use
   end type amg_dprec_type
 
-  private :: amg_d_dump, amg_d_get_compl,  amg_d_cmp_compl,&
-       & amg_d_get_avg_cr,  amg_d_cmp_avg_cr,&
-       & amg_d_get_nzeros, amg_d_get_nlevs, d_prec_move_alloc
-
+  private :: amg_d_dump, amg_d_get_compl, amg_d_cmp_compl, &
+          & amg_d_get_avg_cr,  amg_d_cmp_avg_cr, &
+          & amg_d_get_nzeros, amg_d_get_nlevs, d_prec_move_alloc
 
   !
   ! Interfaces to routines for checking the definition of the preconditioner,
@@ -157,13 +166,12 @@ module amg_d_prec_type
     module procedure amg_dprecfree
   end interface
 
-
   interface amg_precdescr
-    subroutine amg_dfile_prec_descr(prec,info,iout,root,verbosity,prefix)
+    subroutine amg_dfile_prec_descr(prec, info, iout, root, verbosity, prefix)
       import :: amg_dprec_type, psb_ipk_
       implicit none
       ! Arguments
-      class(amg_dprec_type), intent(in)     :: prec
+      class(amg_dprec_type), intent(in)       :: prec
       integer(psb_ipk_), intent(out)          :: info
       integer(psb_ipk_), intent(in), optional :: iout
       integer(psb_ipk_), intent(in), optional :: root
@@ -172,13 +180,12 @@ module amg_d_prec_type
     end subroutine amg_dfile_prec_descr
   end interface
 
-  
   interface amg_memory_use
-    subroutine amg_dfile_prec_memory_use(prec,info,iout,root,verbosity,prefix,global)
+    subroutine amg_dfile_prec_memory_use(prec, info, iout, root, verbosity, prefix, global)
       import :: amg_dprec_type, psb_ipk_
       implicit none
       ! Arguments
-      class(amg_dprec_type), intent(in)     :: prec
+      class(amg_dprec_type), intent(in)       :: prec
       integer(psb_ipk_), intent(out)          :: info
       integer(psb_ipk_), intent(in), optional :: iout
       integer(psb_ipk_), intent(in), optional :: root
@@ -193,181 +200,211 @@ module amg_d_prec_type
   end interface
 
   interface amg_precapply
-    subroutine amg_dprecaply2_vect(prec,x,y,desc_data,info,trans,work)
+    subroutine amg_dprecaply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, trans, work)
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, &
+              & psb_d_vect_type, psb_d_multivect_type, amg_dprec_type
+      type(amg_dprec_type), intent(inout)       :: prec
+      type(psb_d_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)             :: idx_x, idx_y
+      type(psb_desc_type), intent(in)           :: desc_data
+      integer(psb_ipk_), intent(out)            :: info
+      character(len=1), optional                      :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
+    end subroutine amg_dprecaply2_mvect_col
+
+    subroutine amg_dprecaply1_mvect_col(prec, x, idx_x, desc_data, info, trans, work)
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, &
+              & psb_d_vect_type, psb_d_multivect_type, amg_dprec_type
+      type(amg_dprec_type), intent(inout)       :: prec
+      type(psb_d_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)             :: idx_x
+      type(psb_desc_type), intent(in)           :: desc_data
+      integer(psb_ipk_), intent(out)            :: info
+      character(len=1), optional                      :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
+    end subroutine amg_dprecaply1_mvect_col
+
+    subroutine amg_dprecaply2_vect(prec, x, y, desc_data, info, trans, work)
       import :: psb_dspmat_type, psb_desc_type, &
-           & psb_dpk_, psb_d_vect_type, amg_dprec_type, psb_ipk_
-      type(psb_desc_type),intent(in)      :: desc_data
-      type(amg_dprec_type), intent(inout) :: prec
-      type(psb_d_vect_type),intent(inout) :: x
-      type(psb_d_vect_type),intent(inout) :: y
-      integer(psb_ipk_), intent(out)                :: info
-      character(len=1), optional          :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
+              & psb_dpk_, psb_d_vect_type, amg_dprec_type, psb_ipk_
+      type(amg_dprec_type), intent(inout)   :: prec
+      type(psb_d_vect_type), intent(inout)  :: x, y
+      type(psb_desc_type), intent(in)       :: desc_data
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=1), optional                      :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
     end subroutine amg_dprecaply2_vect
-    subroutine amg_dprecaply1_vect(prec,x,desc_data,info,trans,work)
+
+    subroutine amg_dprecaply1_vect(prec, x, desc_data, info, trans, work)
       import :: psb_dspmat_type, psb_desc_type, &
-           & psb_dpk_, psb_d_vect_type, amg_dprec_type, psb_ipk_
-      type(psb_desc_type),intent(in)      :: desc_data
-      type(amg_dprec_type), intent(inout) :: prec
-      type(psb_d_vect_type),intent(inout) :: x
-      integer(psb_ipk_), intent(out)                :: info
-      character(len=1), optional          :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
+              & psb_dpk_, psb_d_vect_type, amg_dprec_type, psb_ipk_
+      type(amg_dprec_type), intent(inout)   :: prec
+      type(psb_d_vect_type), intent(inout)  :: x
+      type(psb_desc_type), intent(in)       :: desc_data
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=1), optional                      :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
     end subroutine amg_dprecaply1_vect
-    subroutine amg_dprecaply(prec,x,y,desc_data,info,trans,work)
+
+    subroutine amg_dprecaply(prec, x, y, desc_data, info, trans, work)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, amg_dprec_type, psb_ipk_
-      type(psb_desc_type),intent(in)   :: desc_data
       type(amg_dprec_type), intent(inout) :: prec
-      real(psb_dpk_),intent(inout)     :: x(:)
-      real(psb_dpk_),intent(inout)     :: y(:)
-      integer(psb_ipk_), intent(out)             :: info
-      character(len=1), optional       :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
+      real(psb_dpk_), intent(inout)       :: x(:), y(:)
+      type(psb_desc_type), intent(in)     :: desc_data
+      integer(psb_ipk_), intent(out)      :: info
+      character(len=1), optional                      :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
     end subroutine amg_dprecaply
-    subroutine amg_dprecaply1(prec,x,desc_data,info,trans)
+
+    subroutine amg_dprecaply1(prec, x, desc_data, info, trans)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, amg_dprec_type, psb_ipk_
-      type(psb_desc_type),intent(in)   :: desc_data
       type(amg_dprec_type), intent(inout) :: prec
-      real(psb_dpk_),intent(inout)     :: x(:)
-      integer(psb_ipk_), intent(out)             :: info
-      character(len=1), optional       :: trans
+      real(psb_dpk_), intent(inout)       :: x(:)
+      type(psb_desc_type), intent(in)     :: desc_data
+      integer(psb_ipk_), intent(out)      :: info
+      character(len=1), optional  :: trans
     end subroutine amg_dprecaply1
   end interface
 
   interface
-    subroutine amg_dprecsetsm(prec,val,info,ilev,ilmax,pos)
+    subroutine amg_dprecsetsm(prec, val, info, ilev, ilmax, pos)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, &
-           & amg_dprec_type, amg_d_base_smoother_type, psb_ipk_
-      class(amg_dprec_type), target, intent(inout):: prec
-      class(amg_d_base_smoother_type), intent(in) :: val
-      integer(psb_ipk_), intent(out)              :: info
-      integer(psb_ipk_), optional, intent(in)     :: ilev,ilmax
-      character(len=*), optional, intent(in)      :: pos
+              & amg_dprec_type, amg_d_base_smoother_type, psb_ipk_
+      class(amg_dprec_type), target, intent(inout)  :: prec
+      class(amg_d_base_smoother_type), intent(in)   :: val
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), optional, intent(in) :: ilev, ilmax
+      character(len=*), optional, intent(in)  :: pos
     end subroutine amg_dprecsetsm
-    subroutine amg_dprecsetsv(prec,val,info,ilev,ilmax,pos)
+
+    subroutine amg_dprecsetsv(prec, val, info, ilev, ilmax, pos)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, &
-           & amg_dprec_type, amg_d_base_solver_type, psb_ipk_
+              & amg_dprec_type, amg_d_base_solver_type, psb_ipk_
       class(amg_dprec_type), intent(inout)      :: prec
       class(amg_d_base_solver_type), intent(in) :: val
-      integer(psb_ipk_), intent(out)              :: info
-      integer(psb_ipk_), optional, intent(in)     :: ilev,ilmax
-      character(len=*), optional, intent(in)      :: pos
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), optional, intent(in) :: ilev, ilmax
+      character(len=*), optional, intent(in)  :: pos
     end subroutine amg_dprecsetsv
-    subroutine amg_dprecsetag(prec,val,info,ilev,ilmax,pos)
+
+    subroutine amg_dprecsetag(prec, val, info, ilev, ilmax, pos)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, &
-           & amg_dprec_type, amg_d_base_aggregator_type, psb_ipk_
-      class(amg_dprec_type), intent(inout)      :: prec
+              & amg_dprec_type, amg_d_base_aggregator_type, psb_ipk_
+      class(amg_dprec_type), intent(inout)          :: prec
       class(amg_d_base_aggregator_type), intent(in) :: val
-      integer(psb_ipk_), intent(out)              :: info
-      integer(psb_ipk_), optional, intent(in)     :: ilev,ilmax
-      character(len=*), optional, intent(in)      :: pos
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), optional, intent(in) :: ilev,ilmax
+      character(len=*), optional, intent(in)  :: pos
     end subroutine amg_dprecsetag
-    subroutine amg_dcprecseti(prec,what,val,info,ilev,ilmax,pos,idx)
+
+    subroutine amg_dcprecseti(prec, what, val, info, ilev, ilmax, pos, idx)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, &
-           & amg_dprec_type, psb_ipk_
-      class(amg_dprec_type), intent(inout)   :: prec
-      character(len=*), intent(in)             :: what
-      integer(psb_ipk_), intent(in)            :: val
-      integer(psb_ipk_), intent(out)           :: info
-      integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
-      character(len=*), optional, intent(in)      :: pos
+              & amg_dprec_type, psb_ipk_
+      class(amg_dprec_type), intent(inout)  :: prec
+      character(len=*), intent(in)          :: what
+      integer(psb_ipk_), intent(in)         :: val
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in) :: ilev, ilmax, idx
+      character(len=*), optional, intent(in)  :: pos
     end subroutine amg_dcprecseti
-    subroutine amg_dcprecsetr(prec,what,val,info,ilev,ilmax,pos,idx)
+
+    subroutine amg_dcprecsetr(prec, what, val, info, ilev, ilmax, pos, idx)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, &
-           & amg_dprec_type, psb_ipk_
-      class(amg_dprec_type), intent(inout)   :: prec
-      character(len=*), intent(in)             :: what
-      real(psb_dpk_), intent(in)                :: val
-      integer(psb_ipk_), intent(out)           :: info
-      integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
-      character(len=*), optional, intent(in)      :: pos
+              & amg_dprec_type, psb_ipk_
+      class(amg_dprec_type), intent(inout)  :: prec
+      character(len=*), intent(in)          :: what
+      real(psb_dpk_), intent(in)            :: val
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in) :: ilev, ilmax, idx
+      character(len=*), optional, intent(in)  :: pos
     end subroutine amg_dcprecsetr
-    subroutine amg_dcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
+
+    subroutine amg_dcprecsetc(prec, what, string, info, ilev, ilmax, pos, idx)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, &
-           & amg_dprec_type, psb_ipk_
-      class(amg_dprec_type), intent(inout)   :: prec
-      character(len=*), intent(in)             :: what
-      character(len=*), intent(in)             :: string
-      integer(psb_ipk_), intent(out)           :: info
-      integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
-      character(len=*), optional, intent(in)      :: pos
+              & amg_dprec_type, psb_ipk_
+      class(amg_dprec_type), intent(inout)  :: prec
+      character(len=*), intent(in)          :: what
+      character(len=*), intent(in)          :: string
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in) :: ilev, ilmax, idx
+      character(len=*), optional, intent(in)  :: pos
     end subroutine amg_dcprecsetc
   end interface
 
   interface amg_precinit
-    subroutine amg_dprecinit(ctxt,prec,ptype,info)
+    subroutine amg_dprecinit(ctxt, prec, ptype, info)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, &
-           & amg_dprec_type, psb_ipk_, psb_ctxt_type
-      type(psb_ctxt_type), intent(in)        :: ctxt
-      class(amg_dprec_type), intent(inout) :: prec
-      character(len=*), intent(in)           :: ptype
-      integer(psb_ipk_), intent(out)         :: info
+              & amg_dprec_type, psb_ipk_, psb_ctxt_type
+      type(psb_ctxt_type), intent(in)       :: ctxt
+      class(amg_dprec_type), intent(inout)  :: prec
+      character(len=*), intent(in)          :: ptype
+      integer(psb_ipk_), intent(out)        :: info
     end subroutine amg_dprecinit
   end interface amg_precinit
 
   interface amg_precbld
-    subroutine amg_dprecbld(a,desc_a,prec,info,amold,vmold,imold)
+    subroutine amg_dprecbld(a, desc_a, prec, info, amold, vmold, imold)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, &
-           & psb_d_base_sparse_mat, psb_d_base_vect_type, &
-           & psb_i_base_vect_type, amg_dprec_type, psb_ipk_
+              & psb_d_base_sparse_mat, psb_d_base_vect_type, &
+              & psb_i_base_vect_type, amg_dprec_type, psb_ipk_
       implicit none
-      type(psb_dspmat_type), intent(inout), target       :: a
-      type(psb_desc_type), intent(inout), target           :: desc_a
-      class(amg_dprec_type), intent(inout), target       :: prec
-      integer(psb_ipk_), intent(out)                       :: info
-      class(psb_d_base_sparse_mat), intent(in), optional :: amold
-      class(psb_d_base_vect_type), intent(in), optional  :: vmold
-      class(psb_i_base_vect_type), intent(in), optional  :: imold
-      !      character, intent(in),optional             :: upd
+      type(psb_dspmat_type), intent(inout), target  :: a
+      type(psb_desc_type), intent(inout), target    :: desc_a
+      class(amg_dprec_type), intent(inout), target  :: prec
+      integer(psb_ipk_), intent(out)                :: info
+      class(psb_d_base_sparse_mat), intent(in), optional  :: amold
+      class(psb_d_base_vect_type), intent(in), optional   :: vmold
+      class(psb_i_base_vect_type), intent(in), optional   :: imold
+      ! character, intent(in),optional                      :: upd
     end subroutine amg_dprecbld
   end interface amg_precbld
 
   interface amg_hierarchy_bld
-    subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
+    subroutine amg_d_hierarchy_bld(a, desc_a, prec, info, cpymat)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, &
-           & amg_dprec_type, psb_ipk_
+              & amg_dprec_type, psb_ipk_
       implicit none
-      type(psb_dspmat_type), intent(inout), target       :: a
-      type(psb_desc_type), intent(inout), target           :: desc_a
-      class(amg_dprec_type), intent(inout), target        :: prec
-      integer(psb_ipk_), intent(out)                       :: info
-      logical, intent(in), optional                        :: cpymat
-      !      character, intent(in),optional             :: upd
+      type(psb_dspmat_type), intent(inout), target  :: a
+      type(psb_desc_type), intent(inout), target    :: desc_a
+      class(amg_dprec_type), intent(inout), target  :: prec
+      integer(psb_ipk_), intent(out)                :: info
+      logical, intent(in), optional   :: cpymat
+      ! character, intent(in), optional :: upd
     end subroutine amg_d_hierarchy_bld
   end interface amg_hierarchy_bld
 
   interface amg_hierarchy_rebld
-    subroutine amg_d_hierarchy_rebld(a,desc_a,prec,info)
+    subroutine amg_d_hierarchy_rebld(a, desc_a, prec, info)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, &
-           & amg_dprec_type, psb_ipk_
+              & amg_dprec_type, psb_ipk_
       implicit none
-      type(psb_dspmat_type), intent(in), target          :: a
-      type(psb_desc_type), intent(inout), target           :: desc_a
-      class(amg_dprec_type), intent(inout), target        :: prec
-      integer(psb_ipk_), intent(out)                       :: info
-      !      character, intent(in),optional             :: upd
+      type(psb_dspmat_type), intent(in), target     :: a
+      type(psb_desc_type), intent(inout), target    :: desc_a
+      class(amg_dprec_type), intent(inout), target  :: prec
+      integer(psb_ipk_), intent(out)                :: info
+      ! character, intent(in), optional :: upd
     end subroutine amg_d_hierarchy_rebld
   end interface amg_hierarchy_rebld
 
   interface amg_smoothers_bld
-    subroutine amg_d_smoothers_bld(a,desc_a,prec,info,amold,vmold,imold)
+    subroutine amg_d_smoothers_bld(a, desc_a, prec, info, amold, vmold, imold)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, &
-           & psb_d_base_sparse_mat, psb_d_base_vect_type, &
-           & psb_i_base_vect_type, amg_dprec_type, psb_ipk_
+              & psb_d_base_sparse_mat, psb_d_base_vect_type, &
+              & psb_i_base_vect_type, amg_dprec_type, psb_ipk_
       implicit none
-      type(psb_dspmat_type), intent(in), target          :: a
-      type(psb_desc_type), intent(inout), target           :: desc_a
-      class(amg_dprec_type), intent(inout), target        :: prec
-      integer(psb_ipk_), intent(out)                       :: info
-      class(psb_d_base_sparse_mat), intent(in), optional :: amold
-      class(psb_d_base_vect_type), intent(in), optional  :: vmold
-      class(psb_i_base_vect_type), intent(in), optional  :: imold
-      !      character, intent(in),optional             :: upd
+      type(psb_dspmat_type), intent(in), target     :: a
+      type(psb_desc_type), intent(inout), target    :: desc_a
+      class(amg_dprec_type), intent(inout), target  :: prec
+      integer(psb_ipk_), intent(out)                :: info
+      class(psb_d_base_sparse_mat), intent(in), optional  :: amold
+      class(psb_d_base_vect_type), intent(in), optional   :: vmold
+      class(psb_i_base_vect_type), intent(in), optional   :: imold
+      ! character, intent(in), optional                     :: upd
     end subroutine amg_d_smoothers_bld
   end interface amg_smoothers_bld
 
   interface amg_smoothers_free
-    module procedure  amg_d_smoothers_free
+    module procedure amg_d_smoothers_free
   end interface amg_smoothers_free
 
   interface amg_hierarchy_free
@@ -492,7 +529,6 @@ contains
   ! various level to the nonzeroes at the fine level
   ! (original matrix)
   !
-
   function amg_d_get_compl(prec) result(val)
     implicit none
     class(amg_dprec_type), intent(in) :: prec
@@ -503,7 +539,6 @@ contains
   end function amg_d_get_compl
 
   subroutine amg_d_cmp_compl(prec)
-
     implicit none
     class(amg_dprec_type), intent(inout) :: prec
 
@@ -539,7 +574,6 @@ contains
   !
   ! Average coarsening ratio
   !
-
   function amg_d_get_avg_cr(prec) result(val)
     implicit none
     class(amg_dprec_type), intent(in) :: prec
@@ -550,7 +584,6 @@ contains
   end function amg_d_get_avg_cr
 
   subroutine amg_d_cmp_avg_cr(prec)
-
     implicit none
     class(amg_dprec_type), intent(inout) :: prec
 
@@ -586,9 +619,7 @@ contains
   !             error code.
   !
   subroutine amg_dprecfree(p,info)
-
     implicit none
-
     ! Arguments
     type(amg_dprec_type), intent(inout) :: p
     integer(psb_ipk_), intent(out)        :: info
@@ -597,7 +628,7 @@ contains
     integer(psb_ipk_)   :: me,err_act,i
     character(len=20)   :: name
 
-    info=psb_success_
+    info = psb_success_
     name = 'amg_dprecfree'
     call psb_erractionsave(err_act)
     if (psb_errstatus_fatal()) then
@@ -614,9 +645,7 @@ contains
   end subroutine amg_dprecfree
 
   subroutine amg_d_prec_free(prec,info)
-
     implicit none
-
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -625,7 +654,7 @@ contains
     integer(psb_ipk_)   :: me,err_act,i
     character(len=20)   :: name
 
-    info=psb_success_
+    info = psb_success_
     name = 'amg_dprecfree'
     call psb_erractionsave(err_act)
     if (psb_errstatus_fatal()) then
@@ -642,15 +671,12 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine amg_d_prec_free
 
   subroutine amg_d_smoothers_free(prec,info)
-
     implicit none
-
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -659,7 +685,7 @@ contains
     integer(psb_ipk_)   :: me,err_act,i
     character(len=20)   :: name
 
-    info=psb_success_
+    info = psb_success_
     name = 'amg_d_smoothers_free'
     call psb_erractionsave(err_act)
     if (psb_errstatus_fatal()) then
@@ -675,15 +701,12 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine amg_d_smoothers_free
 
   subroutine amg_d_hierarchy_free(prec,info)
-
     implicit none
-
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -692,7 +715,7 @@ contains
     integer(psb_ipk_)   :: me,err_act,i
     character(len=20)   :: name
 
-    info=psb_success_
+    info = psb_success_
     name = 'amg_d_hierarchy_free'
     call psb_erractionsave(err_act)
     if (psb_errstatus_fatal()) then
@@ -705,25 +728,85 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine amg_d_hierarchy_free
-
 
   !
   ! Top level methods.
   !
-  subroutine amg_d_apply2_vect(prec,x,y,desc_data,info,trans,work)
+  subroutine amg_d_apply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, trans, work)
     implicit none
-    type(psb_desc_type),intent(in)        :: desc_data
+    class(amg_dprec_type), intent(inout)      :: prec
+    type(psb_d_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)             :: idx_x, idx_y
+    type(psb_desc_type), intent(in)           :: desc_data
+    integer(psb_ipk_), intent(out)            :: info
+    character(len=1), optional                      :: trans
+    real(psb_dpk_), intent(inout), optional, target :: work(:)
+
+    integer(psb_ipk_) :: err_act
+    character(len=20) :: name = 'd_prec_apply'
+
+    call psb_erractionsave(err_act)
+
+    select type(prec)
+      type is (amg_dprec_type)
+        call amg_precapply(prec, x, idx_x, y, idx_y, desc_data, info, trans, work)
+      class default
+        info = psb_err_missing_override_method_
+        call psb_errpush(info, name)
+        goto 9999
+    end select
+
+    call psb_erractionrestore(err_act)
+    return
+
+    9999 call psb_error_handler(err_act)
+    return
+  end subroutine amg_d_apply2_mvect_col
+
+  subroutine amg_d_apply1_mvect_col(prec, x, idx_x, desc_data, info, trans, work)
+    implicit none
+    class(amg_dprec_type), intent(inout)      :: prec
+    type(psb_d_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)             :: idx_x
+    type(psb_desc_type), intent(in)           :: desc_data
+    integer(psb_ipk_), intent(out)            :: info
+    character(len=1), optional                      :: trans
+    real(psb_dpk_), intent(inout), optional, target :: work(:)
+
+    integer(psb_ipk_) :: err_act
+    character(len=20) :: name = 'd_prec_apply'
+
+    call psb_erractionsave(err_act)
+
+    select type(prec)
+      type is (amg_dprec_type)
+        call amg_precapply(prec, x, idx_x, desc_data, info, trans, work)
+      class default
+        info = psb_err_missing_override_method_
+        call psb_errpush(info, name)
+        goto 9999
+    end select
+
+    call psb_erractionrestore(err_act)
+    return
+
+  9999 call psb_error_handler(err_act)
+    return
+  end subroutine amg_d_apply1_mvect_col
+
+  subroutine amg_d_apply2_vect(prec, x, y, desc_data, info, trans, work)
+    implicit none
+    type(psb_desc_type), intent(in)        :: desc_data
     class(amg_dprec_type), intent(inout)  :: prec
-    type(psb_d_vect_type),intent(inout)   :: x
-    type(psb_d_vect_type),intent(inout)   :: y
+    type(psb_d_vect_type), intent(inout)   :: x
+    type(psb_d_vect_type), intent(inout)   :: y
     integer(psb_ipk_), intent(out)          :: info
     character(len=1), optional              :: trans
-    real(psb_dpk_),intent(inout), optional, target :: work(:)
-    Integer(psb_ipk_) :: err_act
+    real(psb_dpk_), intent(inout), optional, target :: work(:)
+    integer(psb_ipk_) :: err_act
     character(len=20) :: name='d_prec_apply'
 
     call psb_erractionsave(err_act)
@@ -740,20 +823,19 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+    9999 call psb_error_handler(err_act)
     return
-
   end subroutine amg_d_apply2_vect
 
-  subroutine amg_d_apply1_vect(prec,x,desc_data,info,trans,work)
+  subroutine amg_d_apply1_vect(prec, x, desc_data, info, trans, work)
     implicit none
-    type(psb_desc_type),intent(in)          :: desc_data
+    type(psb_desc_type), intent(in)          :: desc_data
     class(amg_dprec_type), intent(inout)  :: prec
-    type(psb_d_vect_type),intent(inout)   :: x
+    type(psb_d_vect_type), intent(inout)   :: x
     integer(psb_ipk_), intent(out)          :: info
     character(len=1), optional            :: trans
-    real(psb_dpk_),intent(inout), optional, target :: work(:)
-    Integer(psb_ipk_) :: err_act
+    real(psb_dpk_), intent(inout), optional, target :: work(:)
+    integer(psb_ipk_) :: err_act
     character(len=20) :: name='d_prec_apply'
 
     call psb_erractionsave(err_act)
@@ -770,22 +852,20 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine amg_d_apply1_vect
-
 
   subroutine amg_d_apply2v(prec,x,y,desc_data,info,trans,work)
     implicit none
-    type(psb_desc_type),intent(in)    :: desc_data
+    type(psb_desc_type), intent(in)    :: desc_data
     class(amg_dprec_type), intent(inout) :: prec
-    real(psb_dpk_),intent(inout)      :: x(:)
-    real(psb_dpk_),intent(inout)      :: y(:)
+    real(psb_dpk_), intent(inout)      :: x(:)
+    real(psb_dpk_), intent(inout)      :: y(:)
     integer(psb_ipk_), intent(out)     :: info
     character(len=1), optional        :: trans
-    real(psb_dpk_),intent(inout), optional, target :: work(:)
-    Integer(psb_ipk_) :: err_act
+    real(psb_dpk_), intent(inout), optional, target :: work(:)
+    integer(psb_ipk_) :: err_act
     character(len=20) :: name='d_prec_apply'
 
     call psb_erractionsave(err_act)
@@ -802,19 +882,18 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine amg_d_apply2v
 
   subroutine amg_d_apply1v(prec,x,desc_data,info,trans)
     implicit none
-    type(psb_desc_type),intent(in)    :: desc_data
+    type(psb_desc_type), intent(in)    :: desc_data
     class(amg_dprec_type), intent(inout) :: prec
-    real(psb_dpk_),intent(inout)      :: x(:)
+    real(psb_dpk_), intent(inout)      :: x(:)
     integer(psb_ipk_), intent(out)     :: info
     character(len=1), optional         :: trans
-    Integer(psb_ipk_) :: err_act
+    integer(psb_ipk_) :: err_act
     character(len=20) :: name='d_prec_apply'
 
     call psb_erractionsave(err_act)
@@ -831,16 +910,13 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
-  return
-
+  9999 call psb_error_handler(err_act)
+    return
   end subroutine amg_d_apply1v
-
 
   subroutine amg_d_dump(prec,info,istart,iend,iproc,prefix,head,&
        & ac,rp,smoother,solver,tprol,&
        & global_num)
-
     implicit none
     class(amg_dprec_type), intent(in)     :: prec
     integer(psb_ipk_), intent(out)          :: info
@@ -881,7 +957,6 @@ contains
   end subroutine amg_d_dump
 
   subroutine amg_d_cnv(prec,info,amold,vmold,imold)
-
     implicit none
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)       :: info
@@ -902,7 +977,6 @@ contains
   end subroutine amg_d_cnv
 
   subroutine amg_d_clone(prec,precout,info)
-
     implicit none
     class(amg_dprec_type), intent(inout) :: prec
     class(psb_dprec_type), intent(inout) :: precout
@@ -914,7 +988,6 @@ contains
   end subroutine amg_d_clone
 
   subroutine amg_d_inner_clone(prec,precout,info)
-
     implicit none
     class(amg_dprec_type), intent(inout)         :: prec
     class(psb_dprec_type), target, intent(inout) :: precout
@@ -955,7 +1028,7 @@ contains
       write(0,*) 'Error: wrong out type'
       info = psb_err_invalid_input_
     end select
-9999 continue
+  9999 continue
   end subroutine amg_d_inner_clone
 
   subroutine d_prec_move_alloc(prec, b,info)
@@ -972,7 +1045,7 @@ contains
         call b%free(info)
         if (info /= psb_success_) then
           !?????
-!!$        return
+    !!$      return
         endif
       end if
       b%ctxt         = prec%ctxt
@@ -1012,7 +1085,7 @@ contains
     integer(psb_ipk_)   :: me,err_act,i,j,level,nlev, nc2l
     character(len=20)   :: name
 
-    info=psb_success_
+    info = psb_success_
     name = 'amg_d_allocate_wrk'
     call psb_erractionsave(err_act)
     if (psb_errstatus_fatal()) then
@@ -1033,9 +1106,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine amg_d_allocate_wrk
 
   subroutine amg_d_free_wrk(prec,info)
@@ -1050,7 +1122,7 @@ contains
     integer(psb_ipk_)   :: me,err_act,i,j,level, nlev, nc2l
     character(len=20)   :: name
 
-    info=psb_success_
+    info = psb_success_
     name = 'amg_d_free_wrk'
     call psb_erractionsave(err_act)
     if (psb_errstatus_fatal()) then
@@ -1067,9 +1139,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine amg_d_free_wrk
 
   function amg_d_is_allocated_wrk(prec) result(res)
