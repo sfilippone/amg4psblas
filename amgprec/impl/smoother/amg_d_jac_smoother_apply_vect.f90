@@ -310,6 +310,7 @@ subroutine amg_d_jac_smoother_apply_vect_mvect(alpha, sm, x, beta, y, idx_y, &
   use amg_d_diag_solver
   use psb_base_linsolve_conv_mod, only : log_conv
   use amg_d_jac_smoother, amg_protect_name => amg_d_jac_smoother_apply_vect_mvect
+  implicit none 
   real(psb_dpk_), intent(in)                    :: alpha, beta
   class(amg_d_jac_smoother_type), intent(inout) :: sm
   type(psb_d_vect_type), intent(inout)          :: x
@@ -581,6 +582,7 @@ subroutine amg_d_jac_smoother_apply_mvect_vect(alpha, sm, x, idx_x, beta, y, &
   use amg_d_diag_solver
   use psb_base_linsolve_conv_mod, only : log_conv
   use amg_d_jac_smoother, amg_protect_name => amg_d_jac_smoother_apply_mvect_vect
+  implicit none 
   real(psb_dpk_), intent(in)                    :: alpha, beta
   class(amg_d_jac_smoother_type), intent(inout) :: sm
   type(psb_d_multivect_type), intent(inout)     :: x
@@ -858,6 +860,7 @@ subroutine amg_d_jac_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx_
   use amg_d_diag_solver
   use psb_base_linsolve_conv_mod, only : log_conv
   use amg_d_jac_smoother, amg_protect_name => amg_d_jac_smoother_apply_mvect_col
+  implicit none 
   real(psb_dpk_), intent(in)                    :: alpha, beta
   class(amg_d_jac_smoother_type), intent(inout) :: sm
   type(psb_d_multivect_type), intent(inout)     :: x, y

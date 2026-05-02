@@ -132,6 +132,7 @@ module amg_d_jac_smoother
       import :: psb_desc_type, amg_d_jac_smoother_type, &
               & psb_d_vect_type, &
               & psb_dpk_, psb_ipk_
+      implicit none 
       real(psb_dpk_), intent(in)                    :: alpha, beta
       class(amg_d_jac_smoother_type), intent(inout) :: sm
       type(psb_d_vect_type), intent(inout)          :: x, y
@@ -198,6 +199,7 @@ module amg_d_jac_smoother
       import :: psb_desc_type, amg_d_jac_smoother_type, &
               & psb_d_multivect_type, psb_d_vect_type, &
               & psb_dpk_, psb_ipk_
+      implicit none 
       real(psb_dpk_), intent(in)                    :: alpha, beta
       class(amg_d_jac_smoother_type), intent(inout) :: sm
       type(psb_d_multivect_type), intent(inout)     :: x, y
