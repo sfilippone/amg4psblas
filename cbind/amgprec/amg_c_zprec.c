@@ -11,7 +11,7 @@ amg_c_zprec* amg_c_new_zprec()
 }
 
 
-psb_i_t amg_c_delete_zprec(amg_c_zprec* p)
+psb_c_i_t amg_c_delete_zprec(amg_c_zprec* p)
 {
   int iret;
   iret=amg_c_zprecfree(p);
