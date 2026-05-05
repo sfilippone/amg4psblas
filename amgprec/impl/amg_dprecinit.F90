@@ -88,7 +88,7 @@
 !    info    -  integer, output.
 !               Error code.
 !
-subroutine amg_dprecinit(ctxt,prec,ptype,info)
+subroutine amg_dprecinit(ctxt, prec, ptype, info)
 
   use psb_base_mod
   use amg_d_prec_mod, amg_protect_name => amg_dprecinit
@@ -100,16 +100,14 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
   use amg_d_gs_solver
   use amg_d_poly_smoother
 
-#if defined(AMG_HAVE_UMF)
-  use amg_d_umf_solver
-#endif
-#if defined(AMG_HAVE_SLU)
-  use amg_d_slu_solver
-#endif
-
+  #if defined(AMG_HAVE_UMF)
+    use amg_d_umf_solver
+  #endif
+  #if defined(AMG_HAVE_SLU)
+    use amg_d_slu_solver
+  #endif
 
   implicit none
-
   ! Arguments
   type(psb_ctxt_type), intent(in)       :: ctxt
   class(amg_dprec_type), intent(inout)  :: prec
@@ -121,7 +119,8 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
   integer(psb_ipk_)            :: err_act
   integer(psb_ipk_)            :: debug_level, debug_unit
   real(psb_dpk_)               :: thr
-  character(len=*), parameter  :: name='amg_precinit'
+  character(len=*), parameter  :: name = 'amg_precinit'
+
   info = psb_success_
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
@@ -140,122 +139,129 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
   call prec%ag_data%default()
 
   select case(psb_toupper(trim(ptype)))
-  case ('NOPREC','NONE')
-    nlev_ = 1
-    ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info)
-    allocate(amg_d_base_smoother_type :: prec%precv(ilev_)%sm, stat=info)
-    if (info /= psb_success_) return
-    allocate(amg_d_id_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
-    call prec%precv(ilev_)%default()
-
-  case ('JAC','DIAG','JACOBI')
-    nlev_ = 1
-    ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info)
-    allocate(amg_d_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
-    if (info /= psb_success_) return
-    allocate(amg_d_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
-    call prec%precv(ilev_)%default()
-  case ('POLY')
-    nlev_ = 1
-    ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info)
-    allocate(amg_d_poly_smoother_type :: prec%precv(ilev_)%sm, stat=info)
-    if (info /= psb_success_) return
-    allocate(amg_d_l1_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
-    call prec%precv(ilev_)%default()
-  case ('L1-DIAG','L1-JACOBI','L1_DIAG','L1_JACOBI')
-    nlev_ = 1
-    ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info)
-    allocate(amg_d_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
-    if (info /= psb_success_) return
-    allocate(amg_d_l1_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
-    call prec%precv(ilev_)%default()
-
-  case ('GS','FWGS')
-    nlev_ = 1
-    ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info)
-    allocate(amg_d_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
-    if (info /= psb_success_) return
-    allocate(amg_d_gs_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
-    call prec%precv(ilev_)%default()
-
-  case ('BWGS')
-    nlev_ = 1
-    ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info)
-    allocate(amg_d_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
-    if (info /= psb_success_) return
-    allocate(amg_d_bwgs_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
-    call prec%precv(ilev_)%default()
-
-  case ('FBGS')
-    nlev_ = 1
-    ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info)
-    call prec%set('SMOOTHER_TYPE','FBGS',info)
-    call prec%precv(ilev_)%default()
-
-  case ('BJAC')
-    nlev_ = 1
-    ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info)
-    allocate(amg_d_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
-    if (info /= psb_success_) return
-    allocate(amg_d_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
-    call prec%precv(ilev_)%default()
-
-  case ('L1-BJAC','L1_BJAC')
-    nlev_ = 1
-    ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info)
-    allocate(amg_d_l1_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
-    if (info /= psb_success_) return
-    allocate(amg_d_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
-    call prec%precv(ilev_)%default()
-
-  case ('AS')
-    nlev_ = 1
-    ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info)
-    allocate(amg_d_as_smoother_type :: prec%precv(ilev_)%sm, stat=info)
-    if (info /= psb_success_) return
-    allocate(amg_d_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
-    call prec%precv(ilev_)%default()
-
-
-  case ('ML')
-
-    nlev_ = prec%ag_data%max_levs
-    ilev_ = 1
-    allocate(prec%precv(nlev_),stat=info)
-    if (info /= psb_success_ ) then
-      call psb_errpush(info,name,a_err='Error from hierarchy init')
-      goto 9999
-    endif
-
-    do ilev_ = 1, nlev_
+    case ('NOPREC', 'NONE')
+      nlev_ = 1
+      ilev_ = 1
+      allocate(prec%precv(nlev_), stat = info)
+      allocate(amg_d_base_smoother_type :: prec%precv(ilev_)%sm, stat = info)
+      if (info /= psb_success_) return
+      allocate(amg_d_id_solver_type :: prec%precv(ilev_)%sm%sv, stat = info)
       call prec%precv(ilev_)%default()
-    end do
-    call prec%set('ML_CYCLE','VCYCLE',info)
-    call prec%set('SMOOTHER_TYPE','FBGS',info)
-#if defined(AMG_HAVE_UMF)
-    call prec%set('COARSE_SOLVE','UMF',info)
-#elif defined(AMG_HAVE_MUMPS)
-    call prec%set('COARSE_SOLVE','MUMPS',info)
-#elif defined(AMG_HAVE_SLU)
-    call prec%set('COARSE_SOLVE','SLU',info)
-#else
-    call prec%set('COARSE_SOLVE','ILU',info)
-#endif
-  case default
-    write(psb_err_unit,*) name,&
-         &': Warning: Unknown preconditioner type request "',ptype,'"'
-    info = psb_err_pivot_too_small_
 
+    case ('JAC', 'DIAG', 'JACOBI')
+      nlev_ = 1
+      ilev_ = 1
+      allocate(prec%precv(nlev_), stat = info)
+      allocate(amg_d_jac_smoother_type :: prec%precv(ilev_)%sm, stat = info)
+      if (info /= psb_success_) return
+      allocate(amg_d_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat = info)
+      call prec%precv(ilev_)%default()
+
+    case ('POLY')
+      nlev_ = 1
+      ilev_ = 1
+      allocate(prec%precv(nlev_), stat = info)
+      allocate(amg_d_poly_smoother_type :: prec%precv(ilev_)%sm, stat = info)
+      if (info /= psb_success_) return
+      allocate(amg_d_l1_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat = info)
+      call prec%precv(ilev_)%default()
+      
+      ! TODO: fix init and remove message 
+      write(psb_err_unit,*) "Warning: POLY preconditioner is not correctly implemented."
+
+    case ('L1-DIAG', 'L1-JACOBI', 'L1_DIAG', 'L1_JACOBI')
+      nlev_ = 1
+      ilev_ = 1
+      allocate(prec%precv(nlev_), stat = info)
+      allocate(amg_d_jac_smoother_type :: prec%precv(ilev_)%sm, stat = info)
+      if (info /= psb_success_) return
+      allocate(amg_d_l1_diag_solver_type :: prec%precv(ilev_)%sm%sv, stat = info)
+      call prec%precv(ilev_)%default()
+
+    case ('GS', 'FWGS')
+      nlev_ = 1
+      ilev_ = 1
+      allocate(prec%precv(nlev_), stat = info)
+      allocate(amg_d_jac_smoother_type :: prec%precv(ilev_)%sm, stat = info)
+      if (info /= psb_success_) return
+      allocate(amg_d_gs_solver_type :: prec%precv(ilev_)%sm%sv, stat = info)
+      call prec%precv(ilev_)%default()
+
+    case ('BWGS')
+      nlev_ = 1
+      ilev_ = 1
+      allocate(prec%precv(nlev_), stat = info)
+      allocate(amg_d_jac_smoother_type :: prec%precv(ilev_)%sm, stat = info)
+      if (info /= psb_success_) return
+      allocate(amg_d_bwgs_solver_type :: prec%precv(ilev_)%sm%sv, stat = info)
+      call prec%precv(ilev_)%default()
+
+    case ('FBGS')
+      nlev_ = 1
+      ilev_ = 1
+      allocate(prec%precv(nlev_), stat = info)
+      call prec%set('SMOOTHER_TYPE','FBGS', info)
+      call prec%precv(ilev_)%default()
+
+    case ('BJAC')
+      nlev_ = 1
+      ilev_ = 1
+      allocate(prec%precv(nlev_), stat = info)
+      allocate(amg_d_jac_smoother_type :: prec%precv(ilev_)%sm, stat = info)
+      if (info /= psb_success_) return
+      allocate(amg_d_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat = info)
+      call prec%precv(ilev_)%default()
+
+    case ('L1-BJAC','L1_BJAC')
+      nlev_ = 1
+      ilev_ = 1
+      allocate(prec%precv(nlev_), stat = info)
+      allocate(amg_d_l1_jac_smoother_type :: prec%precv(ilev_)%sm, stat = info)
+      if (info /= psb_success_) return
+      allocate(amg_d_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat = info)
+      call prec%precv(ilev_)%default()
+
+    case ('AS')
+      nlev_ = 1
+      ilev_ = 1
+      allocate(prec%precv(nlev_), stat = info)
+      allocate(amg_d_as_smoother_type :: prec%precv(ilev_)%sm, stat = info)
+      if (info /= psb_success_) return
+      allocate(amg_d_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat = info)
+      call prec%precv(ilev_)%default()
+
+
+    case ('ML')
+
+      nlev_ = prec%ag_data%max_levs
+      ilev_ = 1
+      allocate(prec%precv(nlev_), stat = info)
+      if (info /= psb_success_ ) then
+        call psb_errpush(info, name, a_err = 'Error from hierarchy init')
+        goto 9999
+      endif
+
+      do ilev_ = 1, nlev_
+        call prec%precv(ilev_)%default()
+      end do
+
+      call prec%set('ML_CYCLE', 'VCYCLE', info)
+      call prec%set('SMOOTHER_TYPE', 'FBGS', info)
+
+      #if defined(AMG_HAVE_UMF)
+          call prec%set('COARSE_SOLVE', 'UMF', info)
+      #elif defined(AMG_HAVE_MUMPS)
+          call prec%set('COARSE_SOLVE', 'MUMPS', info)
+      #elif defined(AMG_HAVE_SLU)
+          call prec%set('COARSE_SOLVE', 'SLU', info)
+      #else
+          call prec%set('COARSE_SOLVE', 'ILU', info)
+      #endif
+
+    case default
+      write(psb_err_unit, *) name, &
+              & ': Warning: Unknown preconditioner type request "', ptype, '"'
+      info = psb_err_pivot_too_small_
   end select
 
   call psb_erractionrestore(err_act)
@@ -263,5 +269,4 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
 
 9999 call psb_error_handler(err_act)
   return
-
 end subroutine amg_dprecinit
