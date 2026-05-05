@@ -366,14 +366,10 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
 
     if (i>2) then
       if (sizeratio < mnaggratio) then
-        if (sizeratio > 1) then
-          newsz = i
-        else
-          !
-          ! We are not gaining 
-          !
-          newsz = i-1
-        end if
+        !
+        ! We are not gaining 
+        !
+        newsz = i-1
       end if
 
       if (all(nlaggr == prec%precv(i-1)%linmap%naggr)) then 
@@ -434,7 +430,6 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
            & ilaggr,nlaggr,op_prol,info)
       if (do_timings) call psb_toc(idx_matasb)      
     end if
-
     if (info /= psb_success_) then 
       write(ch_err,'(a,i7)') 'Mat asb fail @ level ',i
       call psb_errpush(psb_err_internal_error_,name,&

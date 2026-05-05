@@ -80,24 +80,19 @@ subroutine z_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   call psb_info(ctxt, iam, np)      
   if (sv%ipar(1) == amg_local_solver_ ) then
     call psb_init(ctxt1,np=1,basectxt=ctxt,ids=(/iam/))
-    icomm = psb_get_mpi_comm(ctxt1)
-    allocate(sv%local_ctxt,stat=info)
-    sv%local_ctxt = ctxt1
-    !write(*,*)iam,'mumps_bld: local +++++>',icomm,sv%local_ctxt
-    call psb_info(ctxt1, me, np)
-    npr  = np
   else if (sv%ipar(1) == amg_global_solver_ ) then
-    icomm = psb_get_mpi_comm(ctxt)
-    !write(*,*)iam,'mumps_bld: global +++++>',icomm,ctxt
-    call psb_info(ctxt, iam, np)
-    me = iam 
-    npr  = np
+    call psb_init(ctxt1,basectxt=ctxt)
   else
     info = psb_err_internal_error_
     call psb_errpush(info,name,& 
          & a_err='Invalid local/global solver in MUMPS')
     goto 9999
   end if
+  !allocate(sv%local_ctxt,stat=info)
+  icomm = ctxt1%get_mpic()
+  sv%local_ctxt = ctxt1
+  !write(*,*)iam,'mumps_bld: local +++++>',icomm!,sv%local_ctxt%ctxt
+  call psb_info(ctxt1, me, npr)
   npc  = 1
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
@@ -115,8 +110,8 @@ subroutine z_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
     end if
   end if
 
+  call mpi_comm_dup(icomm,sv%id%comm,info)
 
-  sv%id%comm    =  icomm
   sv%id%job     = -1
   sv%id%par     =  1
   if (sv%ipar(3) == 2) then

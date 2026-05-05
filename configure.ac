@@ -763,7 +763,11 @@ dnl fi
 if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
    if test "x$pac_cv_psblas_lpk" == "x8" ; then
       AC_MSG_NOTICE([PSBLAS defines PSB_LPK_ as $pac_cv_psblas_lpk. MUMPS interfacing will fail when called in global mode on very large matrices. ])
-   fi	
+   fi
+   MUMPS_LIBS="-lsmumps -ldmumps -lcmumps -lzmumps -lmumps_common -lpord"
+   if test "x$amg4psblas_cv_mumpslibdir" != "x" ; then
+      MUMPS_LIBS="${MUMPS_LIBS} -L$amg4psblas_cv_mumpslibdir"
+   fi 		   
    if test "x$pac_mumps_fmods_ok" == "xyes" ; then 
       FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_MUMPS $amg_cv_define_prepend-DAMG_HAVE_MUMPS_MODULES $MUMPS_MODULES $FDEFINES"
        MUMPS_FLAGS="-DAMG_HAVE_MUMPS $MUMPS_MODULES"
