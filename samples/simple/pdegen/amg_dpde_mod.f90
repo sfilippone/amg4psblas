@@ -144,7 +144,7 @@ contains
       f_ => d_null_func_3d
     end if
 
-    deltah   = 1.d0/(idim+1)
+    deltah   = 1.d0/(idim+2)
     sqdeltah = deltah*deltah
     deltah2  = 2.0_psb_dpk_* deltah
 
@@ -369,9 +369,9 @@ contains
         ! compute gridpoint coordinates
         call idx2ijk(ix,iy,iz,glob_row,idim,idim,idim)
         ! x, y, z coordinates
-        x = (ix-1)*deltah
-        y = (iy-1)*deltah
-        z = (iz-1)*deltah
+        x = (ix)*deltah
+        y = (iy)*deltah
+        z = (iz)*deltah
         zt(k) = f_(x,y,z)
         ! internal point: build discretization
         !   
