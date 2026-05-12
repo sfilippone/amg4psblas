@@ -140,11 +140,11 @@ contains
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer(psb_ipk_)     :: iret
     type(amg_zprec_type), pointer  :: precp
     type(psb_zspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
+    integer(psb_ipk_)     :: iret
 
     res = -1
 
@@ -173,15 +173,17 @@ contains
   end function amg_c_zprecbld
 
   function  amg_c_zhierarchy_build(ah,cdh,ph) bind(c) result(res)
+    use psb_base_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer(psb_ipk_)     :: iret
     type(amg_zprec_type), pointer  :: precp
     type(psb_zspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
+    integer(psb_ipk_)     :: iret, act
+
 
     res = -1
 
@@ -205,20 +207,25 @@ contains
 
     res = AMGC_ERR_FILTER(iret)
     AMGC_ERR_HANDLE(res)
-
+    if (res /=0) then
+      act = psb_act_abort_
+      call psb_error_handler(act)
+    end if
+      
     return
   end function amg_c_zhierarchy_build
 
   function  amg_c_zsmoothers_build(ah,cdh,ph) bind(c) result(res)
+    use psb_base_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer(psb_ipk_)     :: iret
     type(amg_zprec_type), pointer  :: precp
     type(psb_zspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
+    integer(psb_ipk_)     :: iret, act
 
     res = -1
 
@@ -242,6 +249,10 @@ contains
 
     res = AMGC_ERR_FILTER(iret)
     AMGC_ERR_HANDLE(res)
+    if (res /=0) then
+      act = psb_act_abort_
+      call psb_error_handler(act)
+    end if
 
     return
   end function amg_c_zsmoothers_build

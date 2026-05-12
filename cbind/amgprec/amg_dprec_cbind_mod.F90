@@ -172,15 +172,17 @@ contains
   end function amg_c_dprecbld
 
   function  amg_c_dhierarchy_build(ah,cdh,ph) bind(c) result(res)
+    use psb_base_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer(psb_ipk_)     :: iret
     type(amg_dprec_type), pointer  :: precp
     type(psb_dspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
+    integer(psb_ipk_)     :: iret, act
+
 
     res = -1
 
@@ -204,11 +206,16 @@ contains
 
     res = AMGC_ERR_FILTER(iret)
     AMGC_ERR_HANDLE(res)
-
+    if (res /=0) then
+      act = psb_act_abort_
+      call psb_error_handler(act)
+    end if
+      
     return
   end function amg_c_dhierarchy_build
 
   function  amg_c_dsmoothers_build(ah,cdh,ph) bind(c) result(res)
+    use psb_base_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
@@ -217,7 +224,7 @@ contains
     type(psb_dspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
-    integer(psb_ipk_)     :: iret
+    integer(psb_ipk_)     :: iret, act
 
     res = -1
 
@@ -241,6 +248,10 @@ contains
 
     res = AMGC_ERR_FILTER(iret)
     AMGC_ERR_HANDLE(res)
+    if (res /=0) then
+      act = psb_act_abort_
+      call psb_error_handler(act)
+    end if
 
     return
   end function amg_c_dsmoothers_build
@@ -257,7 +268,7 @@ contains
     type(psb_c_object_type) :: ah,cdh,ph,bh,xh
     character(c_char)       :: methd(*)
     type(solveroptions)     :: options
-
+    
     res= amg_c_dkrylov_opt(methd, ah, ph, bh, xh, options%eps,cdh,  &
          & itmax=options%itmax, iter=options%iter,&
          & itrace=options%itrace, istop=options%istop,&
