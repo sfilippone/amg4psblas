@@ -100,12 +100,12 @@ subroutine amg_dprecinit(ctxt, prec, ptype, info)
   use amg_d_gs_solver
   use amg_d_poly_smoother
 
-  #if defined(AMG_HAVE_UMF)
+#if defined(AMG_HAVE_UMF)
     use amg_d_umf_solver
-  #endif
-  #if defined(AMG_HAVE_SLU)
+#endif
+#if defined(AMG_HAVE_SLU)
     use amg_d_slu_solver
-  #endif
+#endif
 
   implicit none
   ! Arguments
@@ -248,15 +248,15 @@ subroutine amg_dprecinit(ctxt, prec, ptype, info)
       call prec%set('ML_CYCLE', 'VCYCLE', info)
       call prec%set('SMOOTHER_TYPE', 'FBGS', info)
 
-      #if defined(AMG_HAVE_UMF)
-          call prec%set('COARSE_SOLVE', 'UMF', info)
-      #elif defined(AMG_HAVE_MUMPS)
-          call prec%set('COARSE_SOLVE', 'MUMPS', info)
-      #elif defined(AMG_HAVE_SLU)
-          call prec%set('COARSE_SOLVE', 'SLU', info)
-      #else
-          call prec%set('COARSE_SOLVE', 'ILU', info)
-      #endif
+#if defined(AMG_HAVE_UMF)
+        call prec%set('COARSE_SOLVE', 'UMF', info)
+#elif defined(AMG_HAVE_MUMPS)
+        call prec%set('COARSE_SOLVE', 'MUMPS', info)
+#elif defined(AMG_HAVE_SLU)
+        call prec%set('COARSE_SOLVE', 'SLU', info)
+#else
+        call prec%set('COARSE_SOLVE', 'ILU', info)
+#endif
 
     case default
       write(psb_err_unit, *) name, &
