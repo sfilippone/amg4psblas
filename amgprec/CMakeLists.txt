@@ -509,6 +509,7 @@ set(AMG_amgprec_source_files
   impl/smoother/amg_s_base_smoother_free.f90
   impl/smoother/amg_d_jac_smoother_clone.f90
   impl/smoother/amg_d_jac_smoother_apply_vect.f90
+  impl/smoother/amg_d_richards_smoother_impl.f90
   impl/smoother/amg_c_as_smoother_clear_data.f90
   impl/smoother/amg_s_poly_smoother_descr.f90
   impl/smoother/amg_z_as_smoother_cseti.f90
@@ -773,6 +774,7 @@ set(AMG_amgprec_source_files
   amg_prec_mod.f90
   amg_d_gs_solver.f90
   amg_d_jac_smoother.f90
+  amg_d_richards_smoother.f90
   amg_z_symdec_aggregator_mod.f90
   amg_s_gs_solver.f90
   amg_ainv_mod.f90

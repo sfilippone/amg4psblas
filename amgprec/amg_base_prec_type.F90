@@ -216,7 +216,8 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_l1_gs_    = 7
   integer(psb_ipk_), parameter :: amg_l1_fbgs_  = 8
   integer(psb_ipk_), parameter :: amg_poly_     = 9
-  integer(psb_ipk_), parameter :: amg_max_prec_ = 9
+  integer(psb_ipk_), parameter :: amg_richardson_ = 10
+  integer(psb_ipk_), parameter :: amg_max_prec_ = 10
   !
   ! Constants for pre/post signaling. Now only used internally
   !
@@ -229,7 +230,8 @@ module amg_base_prec_type
   !
   ! Legal values for entry: amg_sub_solve_
   !
-  integer(psb_ipk_), parameter :: amg_slv_delta_     = amg_max_prec_+1
+  ! Keep this fixed so sub-solver numeric IDs remain stable.
+  integer(psb_ipk_), parameter :: amg_slv_delta_     = 10
   integer(psb_ipk_), parameter :: amg_f_none_        = amg_slv_delta_+0
   integer(psb_ipk_), parameter :: amg_diag_scale_    = amg_slv_delta_+1
   integer(psb_ipk_), parameter :: amg_l1_diag_scale_ = amg_slv_delta_+2
@@ -409,7 +411,7 @@ module amg_base_prec_type
        & 'none          ','Jacobi        ',&
        & 'L1-Jacobi     ','none          ','none          ',&
        & 'none          ','none          ','L1-GS         ',&
-       & 'L1-FBGS       ','Polynomial    ','none          ','Point Jacobi  ',&
+      & 'L1-FBGS       ','Polynomial    ', 'Richards      ','Point Jacobi  ',&
        & 'L1-Jacobi     ','Gauss-Seidel  ','ILU(n)        ',&
        & 'MILU(n)       ','ILU(t,n)      ',&
        & 'SuperLU       ','UMFPACK LU    ',&
@@ -575,6 +577,8 @@ contains
       val = amg_as_
     case('POLY')
       val = amg_poly_
+    case('RICHARDSON','RICHARDS')
+      val = amg_richardson_
     case('CHEB_4')
       val = amg_cheb_4_
     case('CHEB_4_OPT')
@@ -1202,6 +1206,8 @@ contains
       pr_to_str='BJAC'
     case(amg_as_)
       pr_to_str='AS'
+    case(amg_richardson_)
+      pr_to_str='RICHARDS'
     end select
 
   end function pr_to_str

@@ -601,7 +601,7 @@ fi
 ###############################################################################
 #	Parachute rules for ar and ranlib ... (could cause problems)
 ###############################################################################
-AC_PROG_AR
+AC_CHECK_TOOL([AR],[ar],[ar])
 AR="${AR} -cr"
 AC_PROG_RANLIB
 
@@ -752,6 +752,10 @@ PAC_CHECK_MUMPS
 #    	the problem size fits into 4 bytes, very likely since we
 #    	are mostly using MUMPS at coarse level.
 #
+amg4psblas_cv_mumps_version="unknown"
+amg4psblas_cv_mumps_version_num=0
+CHAVEMUMPSVERSION=""
+CHAVEMUMPSVERSIONSTRING=""
 dnl if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
 dnl    if test "x$pac_cv_psblas_ipk" == "x8" ; then
 dnl       AC_MSG_NOTICE([PSBLAS defines PSB_IPK_ as $pac_cv_psblas_ipk. MUMPS interfacing disabled. ])
@@ -761,6 +765,38 @@ dnl       amg4psblas_cv_have_mumps=no;
 dnl    fi
 dnl fi   
 if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
+   amg_mumps_incdir=`echo "$MUMPS_INCLUDES" | sed -e 's/^-I//'`
+   amg_mumps_header=""
+   for amg_mumps_candidate in \
+      "$amg_mumps_incdir/dmumps_c.h" \
+      "$amg4psblas_cv_mumpsincdir/dmumps_c.h" \
+      "$amg4psblas_cv_mumpsdir/dmumps_c.h" \
+      "$amg4psblas_cv_mumpsdir/include/dmumps_c.h" \
+      "$amg4psblas_cv_mumpsdir/Include/dmumps_c.h"
+   do
+      if test -f "$amg_mumps_candidate" ; then
+         amg_mumps_header="$amg_mumps_candidate"
+         break
+      fi
+   done
+   if test "x$amg_mumps_header" != "x" ; then
+      amg4psblas_cv_mumps_version=`awk '/^#[ \t]*define[ \t]+MUMPS_VERSION[ \t]+/ {v=$0; sub(/^#[ \t]*define[ \t]+MUMPS_VERSION[ \t]+/,"",v); gsub(/"/,"",v); print v; exit}' "$amg_mumps_header"`
+      if test "x$amg4psblas_cv_mumps_version" = "x" ; then
+         amg4psblas_cv_mumps_version=`awk '/part of MUMPS/ {for(i=1;i<=NF;i++) if($i=="MUMPS") {v=$(i+1); sub(/,.*/,"",v); print v; exit}}' "$amg_mumps_header"`
+      fi
+      if test "x$amg4psblas_cv_mumps_version" = "x" ; then
+         amg4psblas_cv_mumps_version="unknown"
+      fi
+      amg4psblas_cv_mumps_version_num=`echo "$amg4psblas_cv_mumps_version" | sed -e 's/[^0-9]//g' -e 's/^0*//'`
+      if test "x$amg4psblas_cv_mumps_version_num" = "x" ; then
+         amg4psblas_cv_mumps_version_num=0
+      fi
+      AC_MSG_NOTICE([Configuring with MUMPS version $amg4psblas_cv_mumps_version (numeric flag $amg4psblas_cv_mumps_version_num)])
+   else
+      AC_MSG_NOTICE([Could not locate dmumps_c.h to extract the MUMPS version.])
+   fi
+   CHAVEMUMPSVERSION="#define  AMG_MUMPS_VERSION $amg4psblas_cv_mumps_version_num"
+   CHAVEMUMPSVERSIONSTRING="#define  AMG_MUMPS_VERSION_STRING \"$amg4psblas_cv_mumps_version\""
    if test "x$pac_cv_psblas_lpk" == "x8" ; then
       AC_MSG_NOTICE([PSBLAS defines PSB_LPK_ as $pac_cv_psblas_lpk. MUMPS interfacing will fail when called in global mode on very large matrices. ])
    fi
@@ -769,14 +805,14 @@ if test "x$amg4psblas_cv_have_mumps" == "xyes" ; then
       MUMPS_LIBS="${MUMPS_LIBS} -L$amg4psblas_cv_mumpslibdir"
    fi 		   
    if test "x$pac_mumps_fmods_ok" == "xyes" ; then 
-      FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_MUMPS $amg_cv_define_prepend-DAMG_HAVE_MUMPS_MODULES $MUMPS_MODULES $FDEFINES"
-       MUMPS_FLAGS="-DAMG_HAVE_MUMPS $MUMPS_MODULES"
+        FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_MUMPS $amg_cv_define_prepend-DAMG_HAVE_MUMPS_MODULES $amg_cv_define_prepend-DAMG_MUMPS_VERSION=$amg4psblas_cv_mumps_version_num $MUMPS_MODULES $FDEFINES"
+         MUMPS_FLAGS="-DAMG_HAVE_MUMPS -DAMG_MUMPS_VERSION=$amg4psblas_cv_mumps_version_num $MUMPS_MODULES"
        CHAVEMUMPS="#define  AMG_HAVE_MUMPS"
        CHAVEMUMPSMODULES="#define  AMG_HAVE_MUMPS_MODULES"
        
    elif test "x$pac_mumps_fincs_ok" == "xyes" ; then
-      FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_MUMPS $amg_cv_define_prepend-DAMG_HAVE_MUMPS_INCLUDES $MUMPS_FINCLUDES $FDEFINES"
-       MUMPS_FLAGS="-DAMG_HAVE_MUMPS $MUMPS_FINCLUDES"
+        FDEFINES="$amg_cv_define_prepend-DAMG_HAVE_MUMPS $amg_cv_define_prepend-DAMG_HAVE_MUMPS_INCLUDES $amg_cv_define_prepend-DAMG_MUMPS_VERSION=$amg4psblas_cv_mumps_version_num $MUMPS_FINCLUDES $FDEFINES"
+         MUMPS_FLAGS="-DAMG_HAVE_MUMPS -DAMG_MUMPS_VERSION=$amg4psblas_cv_mumps_version_num $MUMPS_FINCLUDES"
        CHAVEMUMPS="#define  AMG_HAVE_MUMPS"
        CHAVEMUMPSINCLUDES="#define  AMG_HAVE_MUMPS_INCLUDES"	
    else
@@ -869,6 +905,8 @@ AC_SUBST(CSLUDISTVERSION)
 AC_SUBST(CHAVEMUMPS)
 AC_SUBST(CHAVEMUMPSMODULES)
 AC_SUBST(CHAVEMUMPSINCLUDES)
+AC_SUBST(CHAVEMUMPSVERSION)
+AC_SUBST(CHAVEMUMPSVERSIONSTRING)
 AC_SUBST(CXXMATCHBOXBIT)
 
 

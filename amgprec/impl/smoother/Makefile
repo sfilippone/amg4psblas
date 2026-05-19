@@ -94,6 +94,7 @@ amg_d_jac_smoother_cnv.o \
 amg_d_jac_smoother_csetc.o \
 amg_d_jac_smoother_cseti.o \
 amg_d_jac_smoother_csetr.o \
+amg_d_richards_smoother_impl.o \
 amg_d_l1_jac_smoother_bld.o \
 amg_d_l1_jac_smoother_descr.o \
 amg_d_l1_jac_smoother_clone.o \
