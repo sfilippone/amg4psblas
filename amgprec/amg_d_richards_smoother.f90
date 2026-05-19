@@ -342,7 +342,8 @@ contains
     class(amg_d_richards_smoother_type), intent(inout) :: sm
     integer(psb_ipk_)  :: val
 
-    val = 2
+    ! apply_vect uses tx, ty, tz mapped to wv(1:3)
+    val = 3
     if (allocated(sm%sv)) val = val + sm%sv%get_wrksz()
 
   end function d_richards_smoother_get_wrksize

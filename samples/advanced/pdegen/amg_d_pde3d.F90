@@ -160,6 +160,11 @@ program amg_d_pde3d
     integer(psb_ipk_)  :: fill         ! fill-in for incomplete LU factorization
     integer(psb_ipk_)  :: invfill      ! Inverse fill-in for INVK
     real(psb_dpk_)      :: thr          ! threshold for ILUT factorization
+    integer(psb_ipk_)  :: mumps_blr_icntl35 ! BLR activation/format (ICNTL(35))
+    integer(psb_ipk_)  :: mumps_blr_icntl36 ! BLR variant (ICNTL(36))
+    integer(psb_ipk_)  :: mumps_blr_icntl37 ! BLR block size (ICNTL(37))
+    integer(psb_ipk_)  :: mumps_blr_icntl38 ! BLR compression option (ICNTL(38))
+    real(psb_dpk_)     :: mumps_blr_cntl7   ! BLR drop parameter (CNTL(7))
 
     ! AMG post-smoother; ignored by 1-lev preconditioner
     character(len=32)  :: smther2      ! post-smoother type: BJAC, AS
@@ -319,8 +324,14 @@ program amg_d_pde3d
     call prec%set('solver_sweeps',   p_choice%ssweeps,   info)
     call prec%set('poly_degree',     p_choice%degree,    info)
     call prec%set('poly_variant',    p_choice%pvariant,  info)
-    if (psb_toupper(p_choice%solve)=='MUMPS') &
-         & call prec%set('mumps_loc_glob','local_solver',info)
+    if (psb_toupper(p_choice%solve)=='MUMPS') then
+      call prec%set('mumps_loc_glob','local_solver',info)
+      call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl35,info,idx=35_psb_ipk_)
+      call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl36,info,idx=36_psb_ipk_)
+      call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl37,info,idx=37_psb_ipk_)
+      call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl38,info,idx=38_psb_ipk_)
+      call prec%set('mumps_rpar_entry',p_choice%mumps_blr_cntl7,info,idx=7_psb_ipk_)
+    end if
     call prec%set('sub_fillin',      p_choice%fill,    info)
     call prec%set('sub_iluthrs',     p_choice%thr,     info)
 
@@ -331,8 +342,14 @@ program amg_d_pde3d
     call prec%set('sub_prol',        p_choice%prol,    info)
     call prec%set('sub_solve',       p_choice%solve,   info)
     call prec%set('solver_sweeps',   p_choice%ssweeps,   info)
-    if (psb_toupper(p_choice%solve)=='MUMPS') &
-         & call prec%set('mumps_loc_glob','local_solver',info)
+    if (psb_toupper(p_choice%solve)=='MUMPS') then
+      call prec%set('mumps_loc_glob','local_solver',info)
+      call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl35,info,idx=35_psb_ipk_)
+      call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl36,info,idx=36_psb_ipk_)
+      call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl37,info,idx=37_psb_ipk_)
+      call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl38,info,idx=38_psb_ipk_)
+      call prec%set('mumps_rpar_entry',p_choice%mumps_blr_cntl7,info,idx=7_psb_ipk_)
+    end if
     call prec%set('sub_fillin',      p_choice%fill,    info)
     call prec%set('sub_iluthrs',     p_choice%thr,     info)
 
@@ -391,8 +408,19 @@ program amg_d_pde3d
         call prec%set('ainv_alg', p_choice%variant,   info)
       case default
         call prec%set('sub_solve',       p_choice%solve,   info)
-        if (psb_toupper(p_choice%solve)=='MUMPS') &
-             & call prec%set('mumps_loc_glob','local_solver',info)
+        if (psb_toupper(p_choice%solve)=='MUMPS') then
+          if (psb_toupper(p_choice%smther) == 'RICHARDS' .or. &
+               & psb_toupper(p_choice%smther) == 'RICHARDSON') then
+            call prec%set('mumps_loc_glob','global_solver',info)
+          else
+            call prec%set('mumps_loc_glob','local_solver',info)
+          end if
+          call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl35,info,idx=35_psb_ipk_)
+          call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl36,info,idx=36_psb_ipk_)
+          call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl37,info,idx=37_psb_ipk_)
+          call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl38,info,idx=38_psb_ipk_)
+          call prec%set('mumps_rpar_entry',p_choice%mumps_blr_cntl7,info,idx=7_psb_ipk_)
+        end if
       end select
       call prec%set('solver_sweeps',   p_choice%ssweeps,   info)
       call prec%set('sub_fillin',      p_choice%fill,       info)
@@ -428,8 +456,19 @@ program amg_d_pde3d
           call prec%set('ainv_alg', p_choice%variant2,   info)
         case default
           call prec%set('sub_solve',       p_choice%solve2,   info, pos='post')
-          if (psb_toupper(p_choice%solve2)=='MUMPS') &
-               & call prec%set('mumps_loc_glob','local_solver',info)
+          if (psb_toupper(p_choice%solve2)=='MUMPS') then
+            if (psb_toupper(p_choice%smther2) == 'RICHARDS' .or. &
+                 & psb_toupper(p_choice%smther2) == 'RICHARDSON') then
+              call prec%set('mumps_loc_glob','global_solver',info)
+            else
+              call prec%set('mumps_loc_glob','local_solver',info)
+            end if
+            call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl35,info,idx=35_psb_ipk_)
+            call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl36,info,idx=36_psb_ipk_)
+            call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl37,info,idx=37_psb_ipk_)
+            call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl38,info,idx=38_psb_ipk_)
+            call prec%set('mumps_rpar_entry',p_choice%mumps_blr_cntl7,info,idx=7_psb_ipk_)
+          end if
         end select
         call prec%set('solver_sweeps',   p_choice%ssweeps2,   info,pos='post')
         call prec%set('sub_fillin',      p_choice%fill2,     info,pos='post')
@@ -674,6 +713,11 @@ contains
       call read_data(prec%fill,inp_unit)       ! fill-in for incomplete LU
       call read_data(prec%invfill,inp_unit)    !Inverse fill-in for INVK
       call read_data(prec%thr,inp_unit)        ! threshold for ILUT
+      call read_data(prec%mumps_blr_icntl35,inp_unit) ! MUMPS ICNTL(35)
+      call read_data(prec%mumps_blr_icntl36,inp_unit) ! MUMPS ICNTL(36)
+      call read_data(prec%mumps_blr_icntl37,inp_unit) ! MUMPS ICNTL(37)
+      call read_data(prec%mumps_blr_icntl38,inp_unit) ! MUMPS ICNTL(38)
+      call read_data(prec%mumps_blr_cntl7,inp_unit)   ! MUMPS CNTL(7)
       ! Second smoother/ AMG post-smoother (if NONE ignored in main)
       call read_data(prec%smther2,inp_unit)     ! smoother type
       call read_data(prec%jsweeps2,inp_unit)    ! (post-)smoother sweeps
@@ -775,6 +819,11 @@ contains
     call psb_bcast(ctxt,prec%fill)
     call psb_bcast(ctxt,prec%invfill)
     call psb_bcast(ctxt,prec%thr)
+    call psb_bcast(ctxt,prec%mumps_blr_icntl35)
+    call psb_bcast(ctxt,prec%mumps_blr_icntl36)
+    call psb_bcast(ctxt,prec%mumps_blr_icntl37)
+    call psb_bcast(ctxt,prec%mumps_blr_icntl38)
+    call psb_bcast(ctxt,prec%mumps_blr_cntl7)
     ! broadcast second (post-)smoother
     call psb_bcast(ctxt,prec%smther2)
     call psb_bcast(ctxt,prec%jsweeps2)
