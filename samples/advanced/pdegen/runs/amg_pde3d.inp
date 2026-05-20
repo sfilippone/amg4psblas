@@ -3,7 +3,7 @@ CSR                         ! Storage format CSR COO JAD
 0150                        ! IDIM; domain size. Linear system size is IDIM**3
 POISSON                     ! PDECOEFF: POISSON, EXP, BOX, GAUSS
 %                           ! Coefficients of the PDE
-CG                          ! Iterative method:     BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES RICHARDSON SSTEPCG
+SSTEPCG                          ! Iterative method:     BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES RICHARDSON SSTEPCG
 2                           ! ISTOPC
 00500                       ! ITMAX
 1                           ! ITRACE
