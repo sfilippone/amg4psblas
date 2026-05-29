@@ -34,8 +34,9 @@ extern "C" {
   psb_i_t amg_c_ddescr(amg_c_dprec *ph);
 
   psb_i_t amg_c_dkrylov(const char *method, psb_c_dspmat *ah, amg_c_dprec *ph, 
-		  psb_c_dvector *bh, psb_c_dvector *xh,
-		  psb_c_descriptor *cdh, psb_c_SolverOptions *opt);
+			psb_c_dvector *bh, psb_c_dvector *xh,
+			psb_c_descriptor *cdh, psb_c_dvector *s1,
+			psb_c_dvector *s2, psb_c_SolverOptions *opt);
 
 
 #ifdef __cplusplus

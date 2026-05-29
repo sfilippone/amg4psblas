@@ -35,8 +35,9 @@ extern "C" {
   psb_i_t amg_c_zdescr(amg_c_zprec *ph);
 
   psb_i_t amg_c_zkrylov(const char *method, psb_c_zspmat *ah, amg_c_zprec *ph, 
-		  psb_c_zvector *bh, psb_c_zvector *xh,
-		  psb_c_descriptor *cdh, psb_c_SolverOptions *opt);
+			psb_c_zvector *bh, psb_c_zvector *xh,
+			psb_c_descriptor *cdh, psb_c_zvector *s1,
+			psb_c_zvector *s2,  psb_c_SolverOptions *opt);
 
 
 #ifdef __cplusplus
