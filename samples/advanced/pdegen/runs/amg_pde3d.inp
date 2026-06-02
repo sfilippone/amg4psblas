@@ -1,11 +1,11 @@
 %%%%%%%%%%%  General  arguments % Lines starting with % are ignored.
 CSR                         ! Storage format CSR COO JAD
-0150                        ! IDIM; domain size. Linear system size is IDIM**3
+0400                        ! IDIM; domain size. Linear system size is IDIM**3
 POISSON                     ! PDECOEFF: POISSON, EXP, BOX, GAUSS
 %                           ! Coefficients of the PDE
 SSTEPCG                          ! Iterative method:     BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES RICHARDSON SSTEPCG
 2                           ! ISTOPC
-00500                       ! ITMAX
+00010                       ! ITMAX
 1                           ! ITRACE
 30                          ! IRST (restart for RGMRES and BiCGSTABL)
 5                           ! STEPS (number of steps for SSTEPCG)
@@ -13,8 +13,8 @@ C                           ! BASE_TYPE (base type for SSTEPCG):    C (Chebyshev
 1.d-6                       ! EPS
 %%%%%%%%%%%
 %%%%%%%%%%%  Main preconditioner choices %%%%%%%%%%%%%%%%
-COSEVARIE                   ! Longer descriptive name for preconditioner (up to 20 chars)
-ML                          ! Preconditioner type:  NONE JACOBI GS FBGS BJAC AS ML POLY
+paperMeyer                   ! Longer descriptive name for preconditioner (up to 20 chars)
+L1-JACOBI                      ! Preconditioner type:  NONE JACOBI GS FBGS BJAC AS ML POLY
 %%%%%%%%%%%
 %%%%%%%%%%%  First smoother (for all levels but coarsest) %%%%%%%%%%%%%%%%
 JACOBI                      ! Smoother type:    JACOBI FBGS GS BWGS BJAC AS POLY r 1-level, repeats previous.

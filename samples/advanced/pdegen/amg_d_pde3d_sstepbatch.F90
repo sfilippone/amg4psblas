@@ -90,7 +90,7 @@ program amg_d_pde3d_sstepbatch
 
   ! miscellaneous
   real(psb_dpk_)    :: t1, t2, tprec, thier, tsmth, tpgen, tstpm
-  real(psb_dpk_), allocatable     :: tslv(:, :)
+  real(psb_dpk_), allocatable     :: tslv(:, :, :)
   integer(psb_ipk_), allocatable  :: sValues(:)
   character(len=3), allocatable   :: Gsolvers(:)
   integer(psb_ipk_) :: indS, indG
@@ -526,11 +526,11 @@ program amg_d_pde3d_sstepbatch
   call psb_barrier(ctxt)
 
   allocate(sValues(7))
-  sValues = [1, 5, 6, 7, 8, 9, 10, 15]   ! 1 is a placeholder for CG method
+  sValues = [1, 5, 10, 15]   ! 1 is a placeholder for CG method
   allocate(Gsolvers(3))
-  Gsolvers = ['LLU', 'LCC', 'FGS']
+  Gsolvers = ['LLU'] !, 'LCC', 'FGS'
 
-  allocate(tslv(size(sValues), size(Gsolvers)))
+  allocate(tslv(size(sValues), size(Gsolvers), 2))
   tslv = dzero
   allocate(iter(size(sValues), size(Gsolvers)))
   iter = dzero
@@ -548,8 +548,8 @@ program amg_d_pde3d_sstepbatch
                   & itrace = s_choice%itrace, istop = s_choice%istopc, &
                   & irst = s_choice%irst)
   call psb_barrier(ctxt)
-  tslv(1, 1) = psb_wtime() - t1;
-  call psb_amx(ctxt, tslv(1, 1))
+  tslv(1, 1, 1) = psb_wtime() - t1;
+  call psb_amx(ctxt, tslv(1, 1, 1))
 
   do indS = 2, size(sValues)
     do indG = 1, size(Gsolvers)
@@ -563,8 +563,21 @@ program amg_d_pde3d_sstepbatch
                       & base_type = s_choice%base_type, eigext = eigext, &
                       & Gram_solver = Gsolvers(indG))
       call psb_barrier(ctxt)
-      tslv(indS, indG) = psb_wtime() - t1;
-      call psb_amx(ctxt, tslv(indS, indG))
+      tslv(indS, indG, 1) = psb_wtime() - t1;
+      call psb_amx(ctxt, tslv(indS, indG, 1))
+
+      call psb_geaxpby(done, b, dzero, b_copy, desc_a, info)
+      call psb_geaxpby(done, x, dzero, x_copy, desc_a, info)
+      t1 = psb_wtime()
+      call psb_krylov('SSTEPCG1', a, prec, b_copy, x_copy, s_choice%eps, desc_a, info, &
+                      & itmax = s_choice%itmax, iter = iter(indS, indG), err = err, &
+                      & itrace = s_choice%itrace, istop = s_choice%istopc, &
+                      & irst = s_choice%irst, steps = sValues(indS), &
+                      & base_type = s_choice%base_type, eigext = eigext, &
+                      & Gram_solver = Gsolvers(indG))
+      call psb_barrier(ctxt)
+      tslv(indS, indG, 2) = psb_wtime() - t1;
+      call psb_amx(ctxt, tslv(indS, indG, 2))
     end do
   end do
 
@@ -613,17 +626,24 @@ program amg_d_pde3d_sstepbatch
 
     write(psb_out_unit, '("Solving with CG")')
     write(psb_out_unit, '("    Iterations to convergence           : ", i12)')    iter(1, 1)
-    write(psb_out_unit, '("    Time to solve system                : ", es12.5)') tslv(1, 1)
-    write(psb_out_unit, '("    Time per iteration                  : ", es12.5)') tslv(1, 1) / iter(1, 1)
-    write(psb_out_unit, '("    Total time                          : ", es12.5)') tslv(1, 1) + tprec + thier
+    write(psb_out_unit, '("    Time to solve system                : ", es12.5)') tslv(1, 1, 1)
+    write(psb_out_unit, '("    Time per iteration                  : ", es12.5)') tslv(1, 1, 1) / iter(1, 1)
+    write(psb_out_unit, '("    Total time                          : ", es12.5)') tslv(1, 1, 1) + tprec + thier
 
     do indS = 2, size(sValues)
       do indG = 1, size(Gsolvers)
         write(psb_out_unit, '("Solving with sStepC(", i2, ") and Gram solver = ", a)')    sValues(indS), Gsolvers(indG)
         write(psb_out_unit, '("    Iterations to convergence           : ", i12)')    iter(indS, indG)
-        write(psb_out_unit, '("    Time to solve system                : ", es12.5)') tslv(indS, indG)
-        write(psb_out_unit, '("    Time per iteration                  : ", es12.5)') tslv(indS, indG) / iter(indS, indG)
-        write(psb_out_unit, '("    Total time                          : ", es12.5)') tslv(indS, indG) + tprec + thier
+        write(psb_out_unit, '("    Time to solve system                : ", es12.5)') tslv(indS, indG, 1)
+        write(psb_out_unit, '("    Time per iteration                  : ", es12.5)') tslv(indS, indG, 1) / iter(indS, indG)
+        write(psb_out_unit, '("    Total time                          : ", es12.5)') tslv(indS, indG, 1) + tprec + thier
+
+        
+        write(psb_out_unit, '("Solving with sStepCv2(", i2, ") and Gram solver = ", a)')    sValues(indS), Gsolvers(indG)
+        write(psb_out_unit, '("    Iterations to convergence           : ", i12)')    iter(indS, indG)
+        write(psb_out_unit, '("    Time to solve system                : ", es12.5)') tslv(indS, indG, 2)
+        write(psb_out_unit, '("    Time per iteration                  : ", es12.5)') tslv(indS, indG, 2) / iter(indS, indG)
+        write(psb_out_unit, '("    Total time                          : ", es12.5)') tslv(indS, indG, 2) + tprec + thier
       end do
     end do
 
