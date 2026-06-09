@@ -342,7 +342,7 @@ contains
     else
       nullify(s2p)
     end if
-
+    write(0,*) 'krylov: s1 s2 ',associated(s1p),associated(s2p)
     call stringc2f(methd,fmethd)
     feps    = eps
     fitmax  = itmax
