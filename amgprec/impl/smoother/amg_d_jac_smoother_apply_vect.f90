@@ -79,7 +79,7 @@ subroutine amg_d_jac_smoother_apply_vect(alpha, sm, x, beta, y, desc_data, trans
   trans_ = psb_toupper(trans)
   select case(trans_)
   case('N')
-  case('T','C')
+  case('T', 'C')
   case default
     call psb_errpush(psb_err_iarg_invalid_i_, name)
     goto 9999
@@ -174,7 +174,7 @@ subroutine amg_d_jac_smoother_apply_vect(alpha, sm, x, beta, y, desc_data, trans
             if (sm%checkres .and. (mod(i, sm%checkiter) == 0)) then
               call psb_geaxpby(done, x, dzero, r, desc_data, info)
               call psb_spmm(-done, sm%pa, ty, done, r, desc_data, info)
-              res  = psb_genrm2(r, desc_data, info)
+              res = psb_genrm2(r, desc_data, info)
 
               if(sm%printres) call log_conv("BJAC", me, i, sm%printiter, res, resdenum, sm%tol)
 
@@ -350,7 +350,7 @@ subroutine amg_d_jac_smoother_apply_vect_mvect(alpha, sm, x, beta, y, idx_y, &
   trans_ = psb_toupper(trans)
   select case(trans_)
     case('N')
-    case('T','C')
+    case('T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_, name)
       goto 9999
@@ -444,7 +444,7 @@ subroutine amg_d_jac_smoother_apply_vect_mvect(alpha, sm, x, beta, y, idx_y, &
             if (sm%checkres .and. (mod(i, sm%checkiter) == 0)) then
               call psb_geaxpby(done, x, dzero, r, desc_data, info)
               call psb_spmm(-done, sm%pa, ty, done, r, desc_data, info)
-              res  = psb_genrm2(r, desc_data, info)
+              res = psb_genrm2(r, desc_data, info)
 
               if(sm%printres) call log_conv("BJAC", me, i, sm%printiter, res, resdenum, sm%tol)
 
@@ -622,7 +622,7 @@ subroutine amg_d_jac_smoother_apply_mvect_vect(alpha, sm, x, idx_x, beta, y, &
   trans_ = psb_toupper(trans)
   select case(trans_)
     case('N')
-    case('T','C')
+    case('T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_, name)
       goto 9999
@@ -654,8 +654,8 @@ subroutine amg_d_jac_smoother_apply_mvect_vect(alpha, sm, x, idx_x, beta, y, &
     call psb_geall(r, desc_data, info)
     call psb_geasb(r, desc_data, info)
     ! Need a copy because psb_genrm2 implementation for multivectors is missing.
-    call psb_geaxpby(done, x, idx_x, dzero, tx, desc_data, info)
-    resdenum = psb_genrm2(tx, desc_data, info)
+    ! call psb_geaxpby(done, x, idx_x, dzero, tx, desc_data, info)
+    resdenum = psb_genrm2(x, idx_x, desc_data, info)
   end if
 
   if ((.not. sm%sv%is_iterative()) .and. ((sweeps == 1) .or. (sm%nd_nnz_tot == 0))) then
@@ -720,7 +720,7 @@ subroutine amg_d_jac_smoother_apply_mvect_vect(alpha, sm, x, idx_x, beta, y, &
             if (sm%checkres .and. (mod(i, sm%checkiter) == 0)) then
               call psb_geaxpby(done, x, idx_x, dzero, r, desc_data, info)
               call psb_spmm(-done, sm%pa, ty, done, r, desc_data, info)
-              res  = psb_genrm2(r, desc_data, info)
+              res = psb_genrm2(r, desc_data, info)
 
               if(sm%printres) call log_conv("BJAC", me, i, sm%printiter, res, resdenum, sm%tol)
 
@@ -899,7 +899,7 @@ subroutine amg_d_jac_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx_
   trans_ = psb_toupper(trans)
   select case(trans_)
   case('N')
-  case('T','C')
+  case('T', 'C')
   case default
     call psb_errpush(psb_err_iarg_invalid_i_, name)
     goto 9999
@@ -931,8 +931,8 @@ subroutine amg_d_jac_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx_
     call psb_geall(r, desc_data, info)
     call psb_geasb(r, desc_data, info)
     ! Need a copy because psb_genrm2 implementation for multivectors is missing.
-    call psb_geaxpby(done, x, idx_x, dzero, tx, desc_data, info)
-    resdenum = psb_genrm2(tx, desc_data, info)
+    ! call psb_geaxpby(done, x, idx_x, dzero, tx, desc_data, info)
+    resdenum = psb_genrm2(x, idx_x, desc_data, info)
   end if
 
   if ((.not. sm%sv%is_iterative()) .and. ((sweeps == 1) .or. (sm%nd_nnz_tot == 0))) then
@@ -997,7 +997,7 @@ subroutine amg_d_jac_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx_
             if (sm%checkres .and. (mod(i, sm%checkiter) == 0)) then
               call psb_geaxpby(done, x, idx_x, dzero, r, desc_data, info)
               call psb_spmm(-done, sm%pa, ty, done, r, desc_data, info)
-              res  = psb_genrm2(r, desc_data, info)
+              res = psb_genrm2(r, desc_data, info)
 
               if(sm%printres) call log_conv("BJAC", me, i, sm%printiter, res, resdenum, sm%tol)
 
