@@ -349,13 +349,7 @@ contains
     fitrace = itrace
     first   = irst
     fistop  = istop
-!!$    flush(0)
-!!$    
-!!$    if (associated(s1p)) write(0,*) 'amg_c_dkrylov_opt S1 ',s1p%get_nrows(), &
-!!$         & s1p%nrm2(s1p%get_nrows())
-!!$    if (associated(s2p)) write(0,*) 'amg_c_dkrylov_opt S2 ',s2p%get_nrows(), &
-!!$         & s2p%nrm2(s2p%get_nrows())
-!!$      flush(0)
+
     if (associated(s1p).and.associated(s2p)) then
       call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
            & descp, iret,&
@@ -378,11 +372,6 @@ contains
            & irst=first, err=ferr)
     end if
     
-!!$    call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
-!!$         & descp, iret,&
-!!$         & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
-!!$         & irst=first, err=ferr)
-
     iter = fiter
     err  = ferr
     res = min(iret,0)
