@@ -140,11 +140,11 @@ contains
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer(psb_ipk_)     :: iret
     type(amg_zprec_type), pointer  :: precp
     type(psb_zspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
+    integer(psb_ipk_)     :: iret
 
     res = -1
 

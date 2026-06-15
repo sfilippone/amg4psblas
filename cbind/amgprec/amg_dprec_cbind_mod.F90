@@ -370,7 +370,7 @@ contains
   end function amg_c_dsmoothers_build_opt
 
   function  amg_c_dkrylov(methd,&
-       & ah,ph,bh,xh,cdh,options) bind(c) result(res)
+       & ah,ph,bh,xh,cdh,s1,s2,options) bind(c) result(res)
     use psb_base_mod
     use psb_prec_mod
     use psb_linsolve_mod
@@ -378,20 +378,21 @@ contains
     use psb_dlinsolve_cbind_mod
     implicit none
     integer(psb_c_ipk_)          :: res
-    type(psb_c_object_type) :: ah,cdh,ph,bh,xh
+    type(psb_c_object_type) :: ah,cdh,ph,bh,xh,s1,s2
     character(c_char)       :: methd(*)
     type(solveroptions)     :: options
 
     res= amg_c_dkrylov_opt(methd, ah, ph, bh, xh, options%eps,cdh,  &
          & itmax=options%itmax, iter=options%iter,&
          & itrace=options%itrace, istop=options%istop,&
-         & irst=options%irst, err=options%err)
+         & irst=options%irst, err=options%err, s1=s1,s2=s2)
 
   end function amg_c_dkrylov
 
 
   function  amg_c_dkrylov_opt(methd,&
-       & ah,ph,bh,xh,eps,cdh,itmax,iter,err,itrace,irst,istop) bind(c) result(res)
+       & ah,ph,bh,xh,eps,cdh,itmax,iter,err,&
+       & itrace,irst,istop,s1,s2) bind(c) result(res)
     use psb_base_mod
     use psb_prec_mod
     use psb_linsolve_mod
@@ -399,16 +400,17 @@ contains
     use psb_prec_cbind_mod
     implicit none
     integer(psb_c_ipk_)          :: res
-    type(psb_c_object_type) :: ah,cdh,ph,bh,xh
+    type(psb_c_object_type) :: ah,cdh,ph,bh,xh,s1, s2
     integer(psb_c_ipk_), value :: itmax,itrace,irst,istop
     real(c_double), value :: eps
     integer(psb_c_ipk_)        :: iter
     real(c_double)        :: err
     character(c_char)       :: methd(*)
+
     type(psb_desc_type), pointer   :: descp
     type(psb_dspmat_type), pointer :: ap
     type(amg_dprec_type), pointer  :: precp
-    type(psb_d_vect_type), pointer :: xp, bp
+    type(psb_d_vect_type), pointer :: xp, bp, s1p, s2p
 
     integer(psb_ipk_)     :: iret,fitmax,fitrace,first,fistop,fiter
     character(len=20)     :: fmethd
@@ -441,6 +443,16 @@ contains
       return
     end if
 
+    if (c_associated(s1%item)) then
+      call c_f_pointer(s1%item,s1p)
+    else
+      nullify(s1p)
+    end if
+    if (c_associated(s2%item)) then
+      call c_f_pointer(s2%item,s2p)
+    else
+      nullify(s2p)
+    end if
 
     call psb_stringc2f(methd,fmethd)
     feps    = eps
@@ -449,10 +461,28 @@ contains
     first   = irst
     fistop  = istop
 
-    call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
-         & descp, iret,&
-         & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
-         & irst=first, err=ferr)
+    if (associated(s1p).and.associated(s2p)) then
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, iret,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr,s1=s1p,s2=s2p)
+    else if  (associated(s1p)) then
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, iret,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr,s1=s1p)
+    else  if (associated(s2p)) then
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, iret,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr,s2=s2p)
+    else
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, iret,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr)
+    end if
+    
     iter = fiter
     err  = ferr
     res = min(iret,0)
@@ -507,7 +537,7 @@ contains
     res = AMGC_ERR_FILTER(info)
     AMGC_ERR_HANDLE(res)
     return
-end function amg_c_dprecapply
+  end function amg_c_dprecapply
 
   function amg_c_dprecapply_opt(ph,bc,xc,cdh,ctrans) bind(c,name="amg_c_dprecapply_opt") result(res)
     use psb_base_mod
@@ -563,7 +593,7 @@ end function amg_c_dprecapply
     res = AMGC_ERR_FILTER(info)
     AMGC_ERR_HANDLE(res)
     return
-end function amg_c_dprecapply_opt
+  end function amg_c_dprecapply_opt
 
   function  amg_c_dprecfree(ph) bind(c) result(res)
     implicit none
