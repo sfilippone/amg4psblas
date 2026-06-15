@@ -160,7 +160,7 @@ module amg_s_base_smoother_mod
   
   interface 
     subroutine amg_s_base_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,&
-         &  trans,sweeps,work,wv,info,init,initu)
+         &  trans,sweeps,wv,info,init,initu)
       import :: psb_desc_type, psb_sspmat_type,  psb_s_base_sparse_mat, &
            & psb_s_vect_type, psb_s_base_vect_type, psb_spk_, &
            & amg_s_base_smoother_type, psb_ipk_
@@ -171,7 +171,6 @@ module amg_s_base_smoother_mod
       real(psb_spk_),intent(in)                       :: alpha,beta
       character(len=1),intent(in)                      :: trans
       integer(psb_ipk_), intent(in)                    :: sweeps
-      real(psb_spk_),target, intent(inout)            :: work(:)
       type(psb_s_vect_type),intent(inout)            :: wv(:)
       integer(psb_ipk_), intent(out)                   :: info
       character, intent(in), optional                :: init

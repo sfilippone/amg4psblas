@@ -106,7 +106,7 @@ module amg_d_gs_solver
 
   interface 
     subroutine amg_d_gs_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-         & trans,work,wv,info,init,initu)
+         & trans,wv,info,init,initu)
       import :: psb_desc_type, amg_d_gs_solver_type, psb_d_vect_type, psb_dpk_, &
            & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type, psb_ipk_
       implicit none 
@@ -116,14 +116,13 @@ module amg_d_gs_solver
       type(psb_d_vect_type),intent(inout)         :: y
       real(psb_dpk_),intent(in)                    :: alpha,beta
       character(len=1),intent(in)                   :: trans
-      real(psb_dpk_),target, intent(inout)         :: work(:)
       type(psb_d_vect_type),intent(inout)         :: wv(:)
       integer(psb_ipk_), intent(out)                :: info
       character, intent(in), optional                :: init
       type(psb_d_vect_type),intent(inout), optional   :: initu
     end subroutine amg_d_gs_solver_apply_vect
     subroutine amg_d_bwgs_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-         & trans,work,wv,info,init,initu)
+         & trans,wv,info,init,initu)
       import :: psb_desc_type, amg_d_bwgs_solver_type, psb_d_vect_type, psb_dpk_, &
            & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type, psb_ipk_
       implicit none 
@@ -133,7 +132,6 @@ module amg_d_gs_solver
       type(psb_d_vect_type),intent(inout)         :: y
       real(psb_dpk_),intent(in)                    :: alpha,beta
       character(len=1),intent(in)                   :: trans
-      real(psb_dpk_),target, intent(inout)         :: work(:)
       type(psb_d_vect_type),intent(inout)         :: wv(:)
       integer(psb_ipk_), intent(out)                :: info
       character, intent(in), optional                :: init

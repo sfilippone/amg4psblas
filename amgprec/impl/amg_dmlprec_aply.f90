@@ -203,7 +203,7 @@
 !   L and U factors are stored in data structures handled
 !   by the third party software. 
 !
-subroutine amg_dmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
+subroutine amg_dmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,info)
 
   use psb_base_mod
   use amg_base_prec_type
@@ -218,7 +218,6 @@ subroutine amg_dmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
   type(psb_d_vect_type),intent(inout) :: x
   type(psb_d_vect_type),intent(inout) :: y
   character, intent(in)                 :: trans
-  real(psb_dpk_),target                :: work(:)
   integer(psb_ipk_), intent(out)        :: info
 
   ! Local variables
@@ -278,7 +277,7 @@ subroutine amg_dmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
       ! With the current implementation, y2l is zeroed internally at first smoother. 
       ! call p%wrk(level)%vy2l%zero()
       !
-      call inner_ml_aply(level,p,trans_,work,info)    
+      call inner_ml_aply(level,p,trans_,info)    
       
       if (info /= psb_success_) then
         call psb_errpush(psb_err_internal_error_,name,&
@@ -304,7 +303,7 @@ subroutine amg_dmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
     ! With the current implementation, y2l is zeroed internally at first smoother. 
     ! call p%wrk(level)%vy2l%zero()
     !
-    call inner_ml_aply(level,p,trans_,work,info)    
+    call inner_ml_aply(level,p,trans_,info)    
     
     if (info /= psb_success_) then
       call psb_errpush(psb_err_internal_error_,name,&
@@ -351,15 +350,14 @@ contains
   ! between level and level+1 are stored at level+1. 
   !
   !
-  recursive subroutine inner_ml_aply(level,p,trans,work,info)    
+  recursive subroutine inner_ml_aply(level,p,trans,info)
 
-    implicit none 
+    implicit none
 
     ! Arguments
-    integer(psb_ipk_)                           :: level 
+    integer(psb_ipk_)                           :: level
     type(amg_dprec_type), target, intent(inout) :: p
     character, intent(in)                       :: trans
-    real(psb_dpk_),target                      :: work(:)
     integer(psb_ipk_), intent(out)              :: info
 
     type(psb_d_vect_type) :: res
@@ -406,15 +404,15 @@ contains
         
       case(amg_add_ml_)
         
-        call amg_d_inner_add(p, level, trans, work)
-        
+        call amg_d_inner_add(p, level, trans)
+
       case(amg_mult_ml_,amg_vcycle_ml_, amg_wcycle_ml_)
-        
-        call amg_d_inner_mult(p, level, trans, work)
-        
+
+        call amg_d_inner_mult(p, level, trans)
+
       case(amg_kcycle_ml_, amg_kcyclesym_ml_)
-        
-        call amg_d_inner_k_cycle(p, level, trans, work)
+
+        call amg_d_inner_k_cycle(p, level, trans)
         
       case default
         info = psb_err_from_subroutine_ai_
@@ -437,7 +435,7 @@ contains
   end subroutine inner_ml_aply
 
 
-  recursive subroutine amg_d_inner_add(p, level, trans, work)
+  recursive subroutine amg_d_inner_add(p, level, trans)
     use psb_base_mod
     use amg_prec_mod
 
@@ -448,7 +446,6 @@ contains
 
     integer(psb_ipk_), intent(in) :: level
     character, intent(in)             :: trans
-    real(psb_dpk_),target            :: work(:)
     type(psb_d_vect_type) :: res
     type(psb_d_vect_type), pointer :: current
     integer(psb_ipk_) :: sweeps_post, sweeps_pre
@@ -502,12 +499,12 @@ contains
             call p%precv(level)%sm%apply(done,&
                  & vy2l,dzero,vty,&
                  & base_desc, trans,&
-                 & ione,work,wv,info,init='Z')
+                 & ione,wv,info,init='Z')
             
             call p%precv(level)%sm2a%apply(done,&
                  & vty,dzero,vy2l,&
                  & base_desc, trans,&
-                 & ione,work,wv,info,init='Z')        
+                 & ione,wv,info,init='Z')        
           end do
           
         else
@@ -515,7 +512,7 @@ contains
           call p%precv(level)%sm%apply(done,&
                & vx2l,dzero,vy2l,&
                & base_desc, trans,&
-               & sweeps,work,wv,info,init='Z')
+               & sweeps,wv,info,init='Z')
         end if
       end if
       if (info /= psb_success_) then
@@ -528,7 +525,7 @@ contains
         ! Apply the restriction
         call p%precv(level+1)%map_rstr(done,vx2l,&
              & dzero,p%precv(level+1)%wrk%vx2l,&
-             & info,work=work,&
+             & info,&
              & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
@@ -536,7 +533,7 @@ contains
           goto 9999
         end if
 
-        call inner_ml_aply(level+1,p,trans,work,info)
+        call inner_ml_aply(level+1,p,trans,info)
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
                & a_err='Error in recursive call')
@@ -548,7 +545,7 @@ contains
         !  
         call p%precv(level+1)%map_prol(done,&
              & p%precv(level+1)%wrk%vy2l, done,vy2l,&
-             & info,work=work,&
+             & info,&
              & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
@@ -568,7 +565,7 @@ contains
 
   end subroutine amg_d_inner_add
 
-  recursive subroutine amg_d_inner_mult(p, level, trans, work)
+  recursive subroutine amg_d_inner_mult(p, level, trans)
     use psb_base_mod
     use amg_prec_mod
 
@@ -579,7 +576,6 @@ contains
 
     integer(psb_ipk_), intent(in) :: level
     character, intent(in)             :: trans
-    real(psb_dpk_),target            :: work(:)
     type(psb_d_vect_type) :: res
     type(psb_d_vect_type), pointer :: current
     integer(psb_ipk_) :: sweeps_post, sweeps_pre
@@ -631,12 +627,12 @@ contains
               sweeps = p%precv(level)%parms%sweeps_pre
               if (info == psb_success_) call p%precv(level)%sm%apply(done,&
                    & vx2l,dzero,vy2l,base_desc, trans,&
-                   & sweeps,work,wv,info,init='Z')
+                   & sweeps,wv,info,init='Z')
             else
               sweeps = p%precv(level)%parms%sweeps_post
               if (info == psb_success_) call p%precv(level)%sm2%apply(done,&
                    & vx2l,dzero,vy2l, base_desc, trans,&
-                   & sweeps,work,wv,info,init='Z')
+                   & sweeps,wv,info,init='Z')
             end if
             
             if (info /= psb_success_) then
@@ -656,7 +652,7 @@ contains
 
           if (info == psb_success_) call psb_spmm(-done,base_a,&
                & vy2l,done,vty,&
-               & base_desc,info,work=work,trans=trans)
+               & base_desc,info,trans=trans)
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
                  & a_err='Error during residue')
@@ -664,7 +660,7 @@ contains
           end if
           call p%precv(level+1)%map_rstr(done,vty,&
                & dzero,p%precv(level+1)%wrk%vx2l,&
-               & info,work=work,&
+               & info,&
                & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
@@ -675,7 +671,7 @@ contains
           ! Shortcut: just transfer x2l. 
           call p%precv(level+1)%map_rstr(done,vx2l,&
                & dzero,p%precv(level+1)%wrk%vx2l,&
-               & info,work=work,&
+               & info,&
                & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
@@ -684,14 +680,14 @@ contains
           end if
         endif
 
-        call inner_ml_aply(level+1,p,trans,work,info)
+        call inner_ml_aply(level+1,p,trans,info)
 
         !
         ! Apply the prolongator
         !  
         call p%precv(level+1)%map_prol(done,&
              & p%precv(level+1)%wrk%vy2l,done,vy2l,&
-             & info,work=work,&
+             & info,&
              & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
@@ -706,11 +702,11 @@ contains
                  & base_desc,info)        
             if (info == psb_success_) call psb_spmm(-done,base_a,&
                  & vy2l,done,vty,&
-                 & base_desc,info,work=work,trans=trans)
+                 & base_desc,info,trans=trans)
           end if
           if (info == psb_success_) &
                & call p%precv(level+1)%map_rstr(done,vty,&
-               & dzero,p%precv(level+1)%wrk%vx2l,info,work=work,&
+               & dzero,p%precv(level+1)%wrk%vx2l,info,&
                & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
@@ -718,11 +714,11 @@ contains
             goto 9999
           end if
 
-          call inner_ml_aply(level+1,p,trans,work,info)
+          call inner_ml_aply(level+1,p,trans,info)
 
           if (info == psb_success_) call p%precv(level+1)%map_prol(done, &
                & p%precv(level+1)%wrk%vy2l,done,vy2l,&
-               & info,work=work,&
+               & info,&
                & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
 
           if (info /= psb_success_) then
@@ -741,7 +737,7 @@ contains
                  & base_desc,info)
             if (info == psb_success_) call psb_spmm(-done,base_a,&
                  & vy2l, done,vty,base_desc,info,&
-                 & work=work,trans=trans)
+                 & trans=trans)
             if (info /= psb_success_) then
               call psb_errpush(psb_err_internal_error_,name,&
                    & a_err='Error during residue')
@@ -755,12 +751,12 @@ contains
               sweeps = p%precv(level)%parms%sweeps_post
               if (info == psb_success_) call p%precv(level)%sm2%apply(done,&
                    & vty,done,vy2l, base_desc, trans,&
-                   & sweeps,work,wv,info,init='Z')
+                   & sweeps,wv,info,init='Z')
             else 
               sweeps = p%precv(level)%parms%sweeps_pre
               if (info == psb_success_) call p%precv(level)%sm%apply(done,&
                    & vty,done,vy2l, base_desc, trans,&
-                   & sweeps,work,wv,info,init='Z')
+                   & sweeps,wv,info,init='Z')
             end if
           end if
 
@@ -778,7 +774,7 @@ contains
           sweeps = p%precv(level)%parms%sweeps_pre
           if (info == psb_success_) call p%precv(level)%sm%apply(done,&
                & vx2l,dzero,vy2l,base_desc, trans,&
-               & sweeps,work,wv,info)
+               & sweeps,wv,info)
         end if 
 !!$        write(0,*) me,' Done applying smoother at top level ',psb_errstatus_fatal()
 
@@ -799,7 +795,7 @@ contains
 
   end subroutine amg_d_inner_mult
     
-  recursive subroutine amg_d_inner_k_cycle(p, level, trans, work,u)
+  recursive subroutine amg_d_inner_k_cycle(p, level, trans,u)
     use psb_base_mod
     use amg_prec_mod
 
@@ -809,7 +805,6 @@ contains
     type(amg_dprec_type), intent(inout)  :: p
     integer(psb_ipk_), intent(in) :: level
     character, intent(in)             :: trans
-    real(psb_dpk_),target            :: work(:)
     type(psb_d_vect_type),intent(inout), optional :: u
 
 
@@ -868,7 +863,7 @@ contains
           sweeps = p%precv(level)%parms%sweeps_pre
           if (info == psb_success_) call p%precv(level)%sm%apply(done,&
                & vx2l,dzero,vy2l,base_desc, trans,&
-               & sweeps,work,wv,info,init='Z')
+               & sweeps,wv,info,init='Z')
         end if
       else  if (level < nlev) then 
         if (me >= 0) then 
@@ -877,12 +872,12 @@ contains
             sweeps = p%precv(level)%parms%sweeps_pre
             if (info == psb_success_) call p%precv(level)%sm%apply(done,&
                  & vx2l,dzero,vy2l,base_desc, trans,&
-                 & sweeps,work,wv,info,init='Z')
+                 & sweeps,wv,info,init='Z')
           else
             sweeps = p%precv(level)%parms%sweeps_post
             if (info == psb_success_) call p%precv(level)%sm2%apply(done,&
                  & vx2l,dzero,vy2l,base_desc, trans,&
-                 & sweeps,work,wv,info,init='Z')
+                 & sweeps,wv,info,init='Z')
           end if
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
@@ -899,7 +894,7 @@ contains
                & base_desc,info)
 
           if (info == psb_success_) call psb_spmm(-done,base_a,&
-               & vy2l,done,vty,base_desc,info,work=work,trans=trans)
+               & vy2l,done,vty,base_desc,info,trans=trans)
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
                  & a_err='Error during residue')
@@ -909,7 +904,7 @@ contains
         ! Apply the restriction
         call  p%precv(level + 1)%map_rstr(done,vty,&
              & dzero,p%precv(level + 1)%wrk%vx2l,&
-             &info,work=work,&
+             &info,&
              & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
 
         if (info /= psb_success_) then
@@ -922,16 +917,16 @@ contains
 
         if (level <= nlev - 2 ) then
           if (p%precv(level)%parms%ml_cycle == amg_kcyclesym_ml_) then
-            call amg_dinneritkcycle(p, level + 1, trans, work, 'FCG')
+            call amg_dinneritkcycle(p, level + 1, trans, 'FCG')
           elseif (p%precv(level)%parms%ml_cycle == amg_kcycle_ml_) then
-            call amg_dinneritkcycle(p, level + 1, trans, work, 'GCR') 
+            call amg_dinneritkcycle(p, level + 1, trans, 'GCR')
           else
             call psb_errpush(psb_err_internal_error_,name,&
                  & a_err='Bad value for ml_cycle')
             goto 9999
           endif
         else
-          call inner_ml_aply(level + 1 ,p,trans,work,info)
+          call inner_ml_aply(level + 1 ,p,trans,info)
         endif
 
         if (info /= psb_success_) then
@@ -945,7 +940,7 @@ contains
         !  
         call p%precv(level+1)%map_prol(done,&
              & p%precv(level+1)%wrk%vy2l,done,vy2l,&
-             & info,work=work,&
+             & info,&
              & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
 
         if (info /= psb_success_) then
@@ -961,7 +956,7 @@ contains
                & dzero,vty,base_desc,info)
           call psb_spmm(-done,base_a,vy2l,&
                & done,vty,base_desc,info,&
-               & work=work,trans=trans)
+               & trans=trans)
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
                  & a_err='Error during residue')
@@ -974,12 +969,12 @@ contains
             sweeps = p%precv(level)%parms%sweeps_post
             if (info == psb_success_) call p%precv(level)%sm2%apply(done,&
                  & vty,done,vy2l,base_desc, trans,&
-                 & sweeps,work,wv,info,init='Z')
+                 & sweeps,wv,info,init='Z')
           else
             sweeps = p%precv(level)%parms%sweeps_pre
             if (info == psb_success_) call p%precv(level)%sm%apply(done,&
                  & vty,done,vy2l,base_desc, trans,&
-                 & sweeps,work,wv,info,init='Z')
+                 & sweeps,wv,info,init='Z')
           end if
 
           if (info /= psb_success_) then
@@ -1006,7 +1001,7 @@ contains
 
   end subroutine amg_d_inner_k_cycle
   
-  recursive subroutine amg_dinneritkcycle(p, level, trans, work, innersolv)
+  recursive subroutine amg_dinneritkcycle(p, level, trans, innersolv)
     use psb_base_mod
     use amg_prec_mod
     use amg_d_inner_mod, amg_protect_name => amg_dmlprec_aply
@@ -1019,7 +1014,6 @@ contains
     integer(psb_ipk_), intent(in) :: level
     character, intent(in)            :: trans
     character(len=*), intent(in)     :: innersolv
-    real(psb_dpk_),target            :: work(:)
 
     !Other variables
     type(psb_d_vect_type)  :: v, w, rhs, v1, x
@@ -1070,7 +1064,7 @@ contains
       call vy2l%zero()
 
       idx=0
-      call inner_ml_aply(level,p,trans,work,info)
+      call inner_ml_aply(level,p,trans,info)
 
       call psb_geaxpby(done,vy2l,dzero,d0,base_desc,info)
 
@@ -1111,7 +1105,7 @@ contains
 
         !Apply preconditioner
         call psb_geaxpby(done,w,dzero,vx2l,base_desc,info)    
-        call inner_ml_aply(level,p,trans,work,info)
+        call inner_ml_aply(level,p,trans,info)
         call psb_geaxpby(done,vy2l,dzero,d1,base_desc,info)
 
         !Sparse matrix vector product

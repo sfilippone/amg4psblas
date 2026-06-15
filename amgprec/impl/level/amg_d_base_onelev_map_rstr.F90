@@ -37,7 +37,7 @@
 !  
 
 subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
-     &  work,vtx,vty)
+     &  vtx,vty)
   use psb_base_mod
   use amg_d_onelev_mod, amg_protect_name =>  amg_d_base_onelev_map_rstr_v
   implicit none
@@ -45,7 +45,6 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
   real(psb_dpk_), intent(in)           :: alpha, beta
   type(psb_d_vect_type), intent(inout) :: vect_u, vect_v
   integer(psb_ipk_), intent(out)       :: info
-  real(psb_dpk_), optional          :: work(:)
   type(psb_d_vect_type), optional, target, intent(inout)  :: vtx,vty
 
 !!$  write(0,*) 'New map_rstr',lv%remap_data%ac_pre_remap%is_asb()
@@ -76,7 +75,7 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
         call psb_geasb(tv,lv%remap_data%desc_ac_pre_remap,info) 
 !!$        write(0,*) me,' Size of TV ',tv%get_nrows()
         call lv%linmap%map_U2V(alpha,vect_u,beta,tv,info,&
-             & work=work,vtx=vtx,vty=vty)
+             & vtx=vtx,vty=vty)
         rsnd = tv%get_vect()
         call psb_snd(ctxt,rsnd(1:nrl),idest)
         if (rme >=0) then
@@ -99,7 +98,7 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
   else
     ! Default transfer
     call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&
-         & work=work,vtx=vtx,vty=vty)
+         & vtx=vtx,vty=vty)
   end if
   
 end subroutine amg_d_base_onelev_map_rstr_v

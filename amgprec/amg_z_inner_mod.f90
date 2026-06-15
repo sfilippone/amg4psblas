@@ -80,18 +80,17 @@ module amg_z_inner_mod
       complex(psb_dpk_),target             :: work(:)
       integer(psb_ipk_), intent(out)     :: info
     end subroutine amg_zmlprec_aply
-    subroutine amg_zmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
+    subroutine amg_zmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,info)
       import :: psb_zspmat_type, psb_desc_type, &
            & psb_dpk_, psb_z_vect_type, psb_ipk_
       import :: amg_zprec_type
-      implicit none 
+      implicit none
       type(psb_desc_type),intent(in)        :: desc_data
       type(amg_zprec_type), intent(inout) :: p
       complex(psb_dpk_),intent(in)            :: alpha,beta
       type(psb_z_vect_type),intent(inout) :: x
       type(psb_z_vect_type),intent(inout) :: y
       character,intent(in)                  :: trans
-      complex(psb_dpk_),target                :: work(:)
       integer(psb_ipk_), intent(out)        :: info
     end subroutine amg_zmlprec_aply_vect
   end interface amg_mlprec_aply

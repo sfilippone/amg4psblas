@@ -212,21 +212,21 @@ contains
   end subroutine d_sludist_solver_apply
 
   subroutine d_sludist_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-       & trans,work,wv,info,init,initu)
+       & trans,wv,info,init,initu)
     use psb_base_mod
-    implicit none 
+    implicit none
     type(psb_desc_type), intent(in)      :: desc_data
     class(amg_d_sludist_solver_type), intent(inout) :: sv
     type(psb_d_vect_type),intent(inout)  :: x
     type(psb_d_vect_type),intent(inout)  :: y
     real(psb_dpk_),intent(in)            :: alpha,beta
     character(len=1),intent(in)           :: trans
-    real(psb_dpk_),target, intent(inout) :: work(:)
     type(psb_d_vect_type),intent(inout) :: wv(:)
     integer, intent(out)                  :: info
     character, intent(in), optional                :: init
     type(psb_d_vect_type),intent(inout), optional   :: initu
 
+    real(psb_dpk_), target :: aux(0)
     integer    :: err_act
     character(len=20)  :: name='d_sludist_solver_apply_vect'
 
@@ -240,7 +240,7 @@ contains
 
     call x%v%sync()
     call y%v%sync()
-    call sv%apply(alpha,x%v%v,beta,y%v%v,desc_data,trans,work,info)
+    call sv%apply(alpha,x%v%v,beta,y%v%v,desc_data,trans,aux,info)
     call y%v%set_host()
     if (info /= 0) goto 9999
 

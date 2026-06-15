@@ -36,7 +36,7 @@
 !   
 !  
 subroutine amg_d_gs_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-     & trans,work,wv,info,init,initu)
+     & trans,wv,info,init,initu)
   
   use psb_base_mod
   use amg_d_gs_solver, amg_protect_name => amg_d_gs_solver_apply_vect
@@ -47,14 +47,12 @@ subroutine amg_d_gs_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   type(psb_d_vect_type),intent(inout)         :: y
   real(psb_dpk_),intent(in)                    :: alpha,beta
   character(len=1),intent(in)                   :: trans
-  real(psb_dpk_),target, intent(inout)         :: work(:)
   type(psb_d_vect_type),intent(inout)         :: wv(:)
   integer(psb_ipk_), intent(out)                :: info
   character, intent(in), optional                :: init
   type(psb_d_vect_type),intent(inout), optional   :: initu
 
   integer(psb_ipk_)   :: n_row,n_col, itx, itxst
-  real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
   real(psb_dpk_), allocatable :: temp(:)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me, i, err_act
@@ -100,26 +98,6 @@ subroutine amg_d_gs_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
     goto 9999
   end if
 
-
-
-  if (n_col <= size(work)) then 
-    ww => work(1:n_col)
-    if ((4*n_col+n_col) <= size(work)) then 
-      aux => work(n_col+1:)
-    else
-      allocate(aux(4*n_col),stat=info)
-    endif
-  else
-    allocate(ww(n_col),aux(4*n_col),stat=info)
-  endif
-
-  if (info /= psb_success_) then 
-    info=psb_err_alloc_request_
-    call psb_errpush(info,name,&
-         & i_err=(/5*n_col,izero,izero,izero,izero/),&
-         & a_err='real(psb_dpk_)')
-    goto 9999      
-  end if
 
   if (size(wv) < 2) then
     info = psb_err_internal_error_
@@ -192,15 +170,6 @@ subroutine amg_d_gs_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
       goto 9999
     endif
   end associate
-  
-  if (n_col <= size(work)) then 
-    if ((4*n_col+n_col) <= size(work)) then 
-    else
-      deallocate(aux)
-    endif
-  else
-    deallocate(ww,aux)
-  endif
 
   call psb_erractionrestore(err_act)
   return

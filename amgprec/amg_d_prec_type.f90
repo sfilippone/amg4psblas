@@ -193,7 +193,7 @@ module amg_d_prec_type
   end interface
 
   interface amg_precapply
-    subroutine amg_dprecaply2_vect(prec,x,y,desc_data,info,trans,work)
+    subroutine amg_dprecaply2_vect(prec,x,y,desc_data,info,trans)
       import :: psb_dspmat_type, psb_desc_type, &
            & psb_dpk_, psb_d_vect_type, amg_dprec_type, psb_ipk_
       type(psb_desc_type),intent(in)      :: desc_data
@@ -202,9 +202,8 @@ module amg_d_prec_type
       type(psb_d_vect_type),intent(inout) :: y
       integer(psb_ipk_), intent(out)                :: info
       character(len=1), optional          :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine amg_dprecaply2_vect
-    subroutine amg_dprecaply1_vect(prec,x,desc_data,info,trans,work)
+    subroutine amg_dprecaply1_vect(prec,x,desc_data,info,trans)
       import :: psb_dspmat_type, psb_desc_type, &
            & psb_dpk_, psb_d_vect_type, amg_dprec_type, psb_ipk_
       type(psb_desc_type),intent(in)      :: desc_data
@@ -212,7 +211,6 @@ module amg_d_prec_type
       type(psb_d_vect_type),intent(inout) :: x
       integer(psb_ipk_), intent(out)                :: info
       character(len=1), optional          :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine amg_dprecaply1_vect
     subroutine amg_dprecaply(prec,x,y,desc_data,info,trans,work)
       import :: psb_dspmat_type, psb_desc_type, psb_dpk_, amg_dprec_type, psb_ipk_
@@ -719,7 +717,7 @@ contains
   !
   ! Top level methods.
   !
-  subroutine amg_d_apply2_vect(prec,x,y,desc_data,info,trans,work)
+  subroutine amg_d_apply2_vect(prec,x,y,desc_data,info,trans)
     implicit none
     type(psb_desc_type),intent(in)        :: desc_data
     class(amg_dprec_type), intent(inout)  :: prec
@@ -727,7 +725,6 @@ contains
     type(psb_d_vect_type),intent(inout)   :: y
     integer(psb_ipk_), intent(out)          :: info
     character(len=1), optional              :: trans
-    real(psb_dpk_),intent(inout), optional, target :: work(:)
     Integer(psb_ipk_) :: err_act
     character(len=20) :: name='d_prec_apply'
 
@@ -735,7 +732,7 @@ contains
 
     select type(prec)
     type is (amg_dprec_type)
-      call amg_precapply(prec,x,y,desc_data,info,trans,work)
+      call amg_precapply(prec,x,y,desc_data,info,trans)
     class default
       info = psb_err_missing_override_method_
       call psb_errpush(info,name)
@@ -750,14 +747,13 @@ contains
 
   end subroutine amg_d_apply2_vect
 
-  subroutine amg_d_apply1_vect(prec,x,desc_data,info,trans,work)
+  subroutine amg_d_apply1_vect(prec,x,desc_data,info,trans)
     implicit none
     type(psb_desc_type),intent(in)          :: desc_data
     class(amg_dprec_type), intent(inout)  :: prec
     type(psb_d_vect_type),intent(inout)   :: x
     integer(psb_ipk_), intent(out)          :: info
     character(len=1), optional            :: trans
-    real(psb_dpk_),intent(inout), optional, target :: work(:)
     Integer(psb_ipk_) :: err_act
     character(len=20) :: name='d_prec_apply'
 
@@ -765,7 +761,7 @@ contains
 
     select type(prec)
     type is (amg_dprec_type)
-      call amg_precapply(prec,x,desc_data,info,trans,work)
+      call amg_precapply(prec,x,desc_data,info,trans)
     class default
       info = psb_err_missing_override_method_
       call psb_errpush(info,name)

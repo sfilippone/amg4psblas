@@ -35,14 +35,13 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine amg_c_as_smoother_prol_v(sm,x,trans,work,info,data)
+subroutine amg_c_as_smoother_prol_v(sm,x,trans,info,data)
   use psb_base_mod
   use amg_c_as_smoother, amg_protect_nam => amg_c_as_smoother_prol_v
   implicit none 
   class(amg_c_as_smoother_type), intent(inout) :: sm
   type(psb_c_vect_type),intent(inout)          :: x
   character(len=1),intent(in)                    :: trans
-  complex(psb_spk_),target, intent(inout)          :: work(:)
   integer(psb_ipk_), intent(out)                 :: info
   integer(psb_ipk_), optional, intent(in)        :: data
   !Local
@@ -99,7 +98,7 @@ subroutine amg_c_as_smoother_prol_v(sm,x,trans,work,info,data)
       ! Update the overlap of x
       !
       call psb_ovrl(x,sm%desc_data,info,&
-           & update=sm%prol,work=work)
+           & update=sm%prol)
       if(info /= psb_success_) then
         info=psb_err_from_subroutine_
         ch_err='psb_ovrl'
@@ -118,7 +117,7 @@ subroutine amg_c_as_smoother_prol_v(sm,x,trans,work,info,data)
     ! 
     if (sm%restr == psb_halo_) then 
       call psb_ovrl(x,sm%desc_data,info,&
-           & update=psb_sum_,work=work)
+           & update=psb_sum_)
       if(info /= psb_success_) then
         info=psb_err_from_subroutine_
         ch_err='psb_ovrl'

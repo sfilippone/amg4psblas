@@ -35,14 +35,13 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine amg_z_as_smoother_restr_v(sm,x,trans,work,info,data)
+subroutine amg_z_as_smoother_restr_v(sm,x,trans,info,data)
   use psb_base_mod
   use amg_z_as_smoother, amg_protect_nam => amg_z_as_smoother_restr_v
   implicit none 
   class(amg_z_as_smoother_type), intent(inout) :: sm
   type(psb_z_vect_type),intent(inout)          :: x
   character(len=1),intent(in)                    :: trans
-  complex(psb_dpk_),target, intent(inout)          :: work(:)
   integer(psb_ipk_), intent(out)                 :: info
       integer(psb_ipk_), optional, intent(in)        :: data
   !Local
@@ -87,7 +86,7 @@ subroutine amg_z_as_smoother_restr_v(sm,x,trans,work,info,data)
     ! Get the overlap entries x
     ! 
     if (sm%restr == psb_halo_) then 
-      call psb_halo(x,sm%desc_data,info,work=work,data=data_)
+      call psb_halo(x,sm%desc_data,info,data=data_)
       if(info /= psb_success_) then
         info=psb_err_from_subroutine_
         ch_err='psb_halo'
@@ -115,7 +114,7 @@ subroutine amg_z_as_smoother_restr_v(sm,x,trans,work,info,data)
       !
       ! The transpose of sum is halo
       !
-      call psb_halo(x,sm%desc_data,info,work=work,data=data_)
+      call psb_halo(x,sm%desc_data,info,data=data_)
       if(info /= psb_success_) then
         info=psb_err_from_subroutine_
         ch_err='psb_halo'
@@ -129,13 +128,13 @@ subroutine amg_z_as_smoother_restr_v(sm,x,trans,work,info,data)
       ! (hence only scaling), then we do the halo
       !
       call psb_ovrl(x,sm%desc_data,info,&
-           & update=psb_avg_,work=work,mode=izero)
+           & update=psb_avg_,mode=izero)
       if(info /= psb_success_) then
         info=psb_err_from_subroutine_
         ch_err='psb_ovrl'
         goto 9999
       end if
-      call psb_halo(x,sm%desc_data,info,work=work,data=data_)
+      call psb_halo(x,sm%desc_data,info,data=data_)
       if(info /= psb_success_) then
         info=psb_err_from_subroutine_
         ch_err='psb_halo'

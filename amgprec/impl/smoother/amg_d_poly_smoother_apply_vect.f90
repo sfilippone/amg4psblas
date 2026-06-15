@@ -36,7 +36,7 @@
 !
 !
 subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
-     & sweeps,work,wv,info,init,initu) 
+     & sweeps,wv,info,init,initu)
 
   use psb_base_mod
   use amg_d_diag_solver
@@ -50,7 +50,6 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   real(psb_dpk_),intent(in)                      :: alpha,beta
   character(len=1),intent(in)                     :: trans
   integer(psb_ipk_), intent(in)                   :: sweeps! this is ignored here, the polynomial degree dictates the value
-  real(psb_dpk_),target, intent(inout)           :: work(:)
   type(psb_d_vect_type),intent(inout)           :: wv(:)
   integer(psb_ipk_), intent(out)                  :: info
   character, intent(in), optional                :: init
@@ -62,7 +61,6 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   !
   integer(psb_ipk_)    :: n_row,n_col
   type(psb_d_vect_type)  :: tx, ty, tz, r
-  real(psb_dpk_), pointer :: aux(:)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me, i, err_act
   character           :: trans_, init_
@@ -112,19 +110,6 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   n_row = desc_data%get_local_rows()
   n_col = desc_data%get_local_cols()
 
-  if (4*n_col <= size(work)) then
-    aux => work(:)
-  else
-    allocate(aux(4*n_col),stat=info)
-    if (info /= psb_success_) then
-      info=psb_err_alloc_request_
-      call psb_errpush(info,name,&
-           & i_err=(/4*n_col,izero,izero,izero,izero/),&
-           & a_err='real(psb_dpk_)')
-      goto 9999
-    end if
-  endif
-
   if (size(wv) < 4) then
     info = psb_err_internal_error_
     call psb_errpush(info,name,&
@@ -150,7 +135,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
         do i=1, sm%pdegree-1
           !   B r_{k-1}
           if (do_timings) call psb_tic(poly_sv)
-          call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Z') ! ty = M^{-1} r
+          call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,wv(5:),info,init='Z') ! ty = M^{-1} r
           if (do_timings) call psb_toc(poly_sv)
           cz = (2*i*done-3)/(2*i*done+done)
           cr = (8*i*done-4)/((2*i*done+done)*sm%rho_ba)
@@ -158,11 +143,11 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           call psb_upd_xyz(cr,cz,done,done,ty,tz,tx,desc_data,info) ! zk = cz * zk-1 + cr * rk-1 
           if (do_timings) call psb_toc(poly_vect)
           if (do_timings) call psb_tic(poly_mv)
-          call psb_spmm(-done,sm%pa,tz,done,r,desc_data,info,work=aux,trans=trans_)
+          call psb_spmm(-done,sm%pa,tz,done,r,desc_data,info,trans=trans_)
           if (do_timings) call psb_toc(poly_mv)
         end do
         if (do_timings) call psb_tic(poly_sv)
-        call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Z') ! ty = M^{-1} r
+        call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,wv(5:),info,init='Z') ! ty = M^{-1} r
         if (do_timings) call psb_toc(poly_sv)
         cz = (2*sm%pdegree*done-3)/(2*sm%pdegree*done+done)
         cr = (8*sm%pdegree*done-4)/((2*sm%pdegree*done+done)*sm%rho_ba)
@@ -190,7 +175,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
         do i=1, sm%pdegree-1
           !   B r_{k-1}
           if (do_timings) call psb_tic(poly_sv)
-          call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
+          call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,wv(5:),info,init='Z')
           if (do_timings) call psb_toc(poly_sv)
           cz = (2*i*done-3)/(2*i*done+done)
           cr = (8*i*done-4)/((2*i*done+done)*sm%rho_ba)
@@ -198,10 +183,10 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           call psb_upd_xyz(cr,cz,sm%poly_beta(i),done,ty,tz,tx,desc_data,info)
           if (do_timings) call psb_toc(poly_vect)
           if (do_timings) call psb_tic(poly_mv)
-          call psb_spmm(-done,sm%pa,tz,done,r,desc_data,info,work=aux,trans=trans_)
+          call psb_spmm(-done,sm%pa,tz,done,r,desc_data,info,trans=trans_)
           if (do_timings) call psb_toc(poly_mv)
         end do
-        call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
+        call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,wv(5:),info,init='Z')
         cz = (2*sm%pdegree*done-3)/(2*sm%pdegree*done+done)
         cr = (8*sm%pdegree*done-4)/((2*sm%pdegree*done+done)*sm%rho_ba)
         if (do_timings) call psb_tic(poly_vect)
@@ -222,7 +207,7 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
         sigma = theta/delta
         rho_old = done/sigma
         if (do_timings) call psb_tic(poly_sv)
-        call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,aux,wv(5:),info,init='Z')
+        call sm%sv%apply(done,r,dzero,ty,desc_data,trans_,wv(5:),info,init='Z')
         if (do_timings) call psb_toc(poly_sv)
         call psb_geaxpby((done/sm%rho_ba),ty,dzero,r,desc_data,info)
         if (do_timings) call psb_tic(poly_vect)
@@ -235,10 +220,10 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           !
           ! r_{k-1} = r_k - (1/rho(BA)) B A d_k
           if (do_timings) call psb_tic(poly_mv)
-          call psb_spmm(done,sm%pa,tz,dzero,ty,desc_data,info,work=aux,trans=trans_)
+          call psb_spmm(done,sm%pa,tz,dzero,ty,desc_data,info,trans=trans_)
           if (do_timings) call psb_toc(poly_mv)
           if (do_timings) call psb_tic(poly_sv)
-          call sm%sv%apply(-(done/sm%rho_ba),ty,done,r,desc_data,trans_,aux,wv(5:),info,init='Z')
+          call sm%sv%apply(-(done/sm%rho_ba),ty,done,r,desc_data,trans_,wv(5:),info,init='Z')
           if (do_timings) call psb_toc(poly_sv)
           !
           ! d_{k+1} = (rho rho_old) d_k + 2(rho/delta) r_{k+1}
@@ -266,10 +251,6 @@ subroutine amg_d_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
       goto 9999
     end if
   end associate
-
-  if (.not.(4*n_col <= size(work))) then
-    deallocate(aux)
-  endif
 
   call psb_erractionrestore(err_act)
   return

@@ -137,7 +137,7 @@ module amg_c_slu_solver
 
   interface
     subroutine amg_c_slu_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-         & trans,work,wv,info,init,initu)
+         & trans,wv,info,init,initu)
       use psb_base_mod
       import amg_c_slu_solver_type
       implicit none 
@@ -147,7 +147,6 @@ module amg_c_slu_solver
       type(psb_c_vect_type),intent(inout)  :: y
       complex(psb_spk_),intent(in)            :: alpha,beta
       character(len=1),intent(in)           :: trans
-      complex(psb_spk_),target, intent(inout) :: work(:)
       type(psb_c_vect_type),intent(inout) :: wv(:)
       integer(psb_ipk_), intent(out)                 :: info
       character, intent(in), optional                :: init

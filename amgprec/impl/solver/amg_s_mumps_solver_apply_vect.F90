@@ -40,22 +40,22 @@
 !
 !  
 subroutine s_mumps_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-     & trans,work,wv,info,init,initu)
+     & trans,wv,info,init,initu)
   use psb_base_mod
   use amg_s_mumps_solver
-  implicit none 
+  implicit none
   type(psb_desc_type), intent(in)      :: desc_data
   class(amg_s_mumps_solver_type), intent(inout) :: sv
   type(psb_s_vect_type),intent(inout)  :: x
   type(psb_s_vect_type),intent(inout)  :: y
   real(psb_spk_),intent(in)            :: alpha,beta
   character(len=1),intent(in)           :: trans
-  real(psb_spk_),target, intent(inout) :: work(:)
   type(psb_s_vect_type),intent(inout) :: wv(:)
   integer(psb_ipk_), intent(out)       :: info
   character, intent(in), optional                 :: init
   type(psb_s_vect_type),intent(inout), optional :: initu
 
+  real(psb_spk_), target :: aux(0)
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='s_mumps_solver_apply_vect'
 
@@ -70,7 +70,7 @@ subroutine s_mumps_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
 
   call x%v%sync()
   call y%v%sync()
-  call sv%apply(alpha,x%v%v,beta,y%v%v,desc_data,trans,work,info)
+  call sv%apply(alpha,x%v%v,beta,y%v%v,desc_data,trans,aux,info)
   call y%v%set_host()
   if (info /= 0) goto 9999
 

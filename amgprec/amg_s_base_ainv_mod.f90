@@ -116,7 +116,7 @@ module amg_s_base_ainv_mod
 
   interface
     subroutine amg_s_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-         &  trans,work,wv,info,init,initu)
+         &  trans,wv,info,init,initu)
       import :: psb_desc_type, psb_spk_,amg_s_base_ainv_solver_type, psb_s_vect_type, psb_ipk_
       type(psb_desc_type), intent(in)      :: desc_data
       class(amg_s_base_ainv_solver_type), intent(inout) :: sv
@@ -124,7 +124,6 @@ module amg_s_base_ainv_mod
       type(psb_s_vect_type),intent(inout)  :: y
       real(psb_spk_),intent(in)            :: alpha,beta
       character(len=1),intent(in)          :: trans
-      real(psb_spk_),target, intent(inout) :: work(:)
       type(psb_s_vect_type),intent(inout)  :: wv(:)
       integer(psb_ipk_), intent(out)       :: info
       character, intent(in), optional      :: init

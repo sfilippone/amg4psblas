@@ -137,10 +137,8 @@ subroutine amg_s_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
       block
         type(psb_s_vect_type) :: tq, tt, tz,wv(2)
         real(psb_spk_)        :: znrm, lambda
-        real(psb_spk_),allocatable :: work(:)
         integer(psb_ipk_)     :: i, n_cols
         n_cols = desc_a%get_local_cols()
-        allocate(work(4*n_cols))
         call psb_geasb(tz,desc_a,info,mold=vmold,scratch=.true.)
         call psb_geasb(tt,desc_a,info,mold=vmold,scratch=.true.)
         call psb_geasb(wv(1),desc_a,info,mold=vmold,scratch=.true.)
@@ -149,12 +147,12 @@ subroutine amg_s_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
         call tq%set(sone)
         call psb_geasb(tq,desc_a,info,mold=vmold)
         call psb_spmm(sone,a,tq,szero,tt,desc_a,info) !
-        call sm%sv%apply_v(sone,tt,szero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = BA q_k
+        call sm%sv%apply_v(sone,tt,szero,tz,desc_a,'NoTrans',wv,info) ! z_{k+1} = BA q_k
         do i=1,sm%rho_estimate_iterations
           znrm = psb_genrm2(tz,desc_a,info)               ! znrm = |z_k|_2
           call psb_geaxpby((sone/znrm),tz,szero,tq,desc_a,info)  ! q_k = z_k/znrm
           call psb_spmm(sone,a,tq,szero,tt,desc_a,info) ! t_{k+1} = BA q_k
-          call sm%sv%apply_v(sone,tt,szero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = B t_{k+1}
+          call sm%sv%apply_v(sone,tt,szero,tz,desc_a,'NoTrans',wv,info) ! z_{k+1} = B t_{k+1}
           lambda = psb_gedot(tq,tz,desc_a,info)      ! lambda = q_k^T z_{k+1} = q_k^T BA q_k
           !write(0,*) 'BLD: lambda estimate ',i,lambda
         end do

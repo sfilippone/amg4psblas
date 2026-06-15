@@ -106,7 +106,7 @@ module amg_d_jac_smoother
 
   interface
     subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
-         & sweeps,work,wv,info,init,initu)
+         & sweeps,wv,info,init,initu)
       import :: psb_desc_type, amg_d_jac_smoother_type, psb_d_vect_type, psb_dpk_, &
            & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type,&
            & psb_ipk_
@@ -118,7 +118,6 @@ module amg_d_jac_smoother
       real(psb_dpk_),intent(in)                      :: alpha,beta
       character(len=1),intent(in)                     :: trans
       integer(psb_ipk_), intent(in)                   :: sweeps
-      real(psb_dpk_),target, intent(inout)           :: work(:)
       type(psb_d_vect_type),intent(inout)           :: wv(:)
       integer(psb_ipk_), intent(out)                  :: info
       character, intent(in), optional                :: init

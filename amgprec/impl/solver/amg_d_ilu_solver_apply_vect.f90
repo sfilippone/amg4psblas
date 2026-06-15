@@ -36,7 +36,7 @@
 !   
 !  
 subroutine amg_d_ilu_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-     & trans,work,wv,info,init,initu)
+     & trans,wv,info,init,initu)
   
   use psb_base_mod
   use amg_d_ilu_solver, amg_protect_name => amg_d_ilu_solver_apply_vect
@@ -47,7 +47,6 @@ subroutine amg_d_ilu_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   type(psb_d_vect_type),intent(inout)         :: y
   real(psb_dpk_),intent(in)                    :: alpha,beta
   character(len=1),intent(in)                   :: trans
-  real(psb_dpk_),target, intent(inout)         :: work(:)
   type(psb_d_vect_type),intent(inout)         :: wv(:)
   integer(psb_ipk_), intent(out)                :: info
   character, intent(in), optional                :: init
@@ -55,7 +54,6 @@ subroutine amg_d_ilu_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
 
   integer(psb_ipk_)   :: n_row,n_col
   type(psb_d_vect_type)  :: tw, tw1
-  real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
   integer(psb_ipk_)   :: i, err_act
   character           :: trans_
   character(len=20)   :: name='d_ilu_solver_apply'
@@ -105,27 +103,6 @@ subroutine amg_d_ilu_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   end if
 
 
-
-  if (n_col <= size(work)) then 
-    ww => work(1:n_col)
-    if ((4*n_col+n_col) <= size(work)) then 
-      aux => work(n_col+1:)
-    else
-      allocate(aux(4*n_col),stat=info)
-    endif
-  else
-    allocate(ww(n_col),aux(4*n_col),stat=info)
-  endif
-
-  if (info /= psb_success_) then 
-    info=psb_err_alloc_request_
-    call psb_errpush(info,name,&
-         & i_err=(/5*n_col,izero,izero,izero,izero/),&
-         & a_err='real(psb_dpk_)')
-    goto 9999      
-  end if
-
-
   if (size(wv) < 2) then
     info = psb_err_internal_error_
     call psb_errpush(info,name,&
@@ -139,26 +116,26 @@ subroutine amg_d_ilu_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
     select case(trans_)
     case('N')
       call psb_spsm(done,sv%l,x,dzero,tw,desc_data,info,&
-           & trans=trans_,scale='L',diag=sv%dv,choice=psb_none_,work=aux)
+           & trans=trans_,scale='L',diag=sv%dv,choice=psb_none_)
 
       if (info == psb_success_) call psb_spsm(alpha,sv%u,tw,beta,y,desc_data,info,&
-           & trans=trans_,scale='U',choice=psb_none_, work=aux)
+           & trans=trans_,scale='U',choice=psb_none_)
 
     case('T')
       call psb_spsm(done,sv%u,x,dzero,tw,desc_data,info,&
-           & trans=trans_,scale='L',diag=sv%dv,choice=psb_none_,work=aux)
+           & trans=trans_,scale='L',diag=sv%dv,choice=psb_none_)
       if (info == psb_success_) call psb_spsm(alpha,sv%l,tw,beta,y,desc_data,info,&
-           & trans=trans_,scale='U',choice=psb_none_,work=aux)
+           & trans=trans_,scale='U',choice=psb_none_)
 
     case('C')
 
       call psb_spsm(done,sv%u,x,dzero,tw,desc_data,info,&
-           & trans=trans_,scale='U',choice=psb_none_,work=aux)
+           & trans=trans_,scale='U',choice=psb_none_)
 
       call tw1%mlt(done,sv%dv,tw,dzero,info,conjgx=trans_)
 
       if (info == psb_success_) call psb_spsm(alpha,sv%l,tw1,beta,y,desc_data,info,&
-           & trans=trans_,scale='U',choice=psb_none_,work=aux)
+           & trans=trans_,scale='U',choice=psb_none_)
 
     case default
       call psb_errpush(psb_err_internal_error_,name,& 
@@ -174,15 +151,6 @@ subroutine amg_d_ilu_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
       goto 9999
     endif
   end associate
-  
-  if (n_col <= size(work)) then 
-    if ((4*n_col+n_col) <= size(work)) then 
-    else
-      deallocate(aux)
-    endif
-  else
-    deallocate(ww,aux)
-  endif
 
   call psb_erractionrestore(err_act)
   return

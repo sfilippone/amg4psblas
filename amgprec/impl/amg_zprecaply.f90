@@ -304,13 +304,13 @@ end subroutine amg_zprecaply1
 
 
 
-subroutine amg_zprecaply2_vect(prec,x,y,desc_data,info,trans,work)
+subroutine amg_zprecaply2_vect(prec,x,y,desc_data,info,trans)
 
   use psb_base_mod
   use amg_z_inner_mod!, amg_protect_name => amg_zprecaply2_vect
-  
+
   implicit none
-  
+
   ! Arguments
   type(psb_desc_type),intent(in)      :: desc_data
   type(amg_zprec_type), intent(inout) :: prec
@@ -318,11 +318,9 @@ subroutine amg_zprecaply2_vect(prec,x,y,desc_data,info,trans,work)
   type(psb_z_vect_type),intent(inout) :: y
   integer(psb_ipk_), intent(out)      :: info
   character(len=1), optional          :: trans
-  complex(psb_dpk_),intent(inout), optional, target  :: work(:)
 
   ! Local variables
-  character     :: trans_ 
-  complex(psb_dpk_), pointer :: work_(:)
+  character     :: trans_
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me
   integer(psb_ipk_)   :: err_act,iwsz, k, nswps
@@ -342,27 +340,13 @@ subroutine amg_zprecaply2_vect(prec,x,y,desc_data,info,trans,work)
     trans_='N'
   end if
 
-  if (present(work)) then 
-    work_ => work
-  else
-    iwsz = max(1,4*desc_data%get_local_cols())
-    allocate(work_(iwsz),stat=info)
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_alloc_request_,name, &
-           & i_err=(/iwsz,izero,izero,izero,izero/),&
-           & a_err='complex(psb_dpk_)')
-      goto 9999      
-    end if
-
-  end if
-
-  if (.not.(allocated(prec%precv))) then 
+  if (.not.(allocated(prec%precv))) then
     !! Error 1: should call amg_zprecbld
     info=3112
     call psb_errpush(info,name)
     goto 9999
   end if
-  
+
   do_alloc_wrk = .not.allocated(prec%precv(1)%wrk)
   if (do_alloc_wrk) call prec%allocate_wrk(info,vmold=x%v)
 
@@ -371,7 +355,7 @@ subroutine amg_zprecaply2_vect(prec,x,y,desc_data,info,trans,work)
     ! Number of levels > 1: apply the multilevel preconditioner
     !
     ! FIXME: generic name causes an ICE with Intel
-    call amg_zmlprec_aply_vect(zone,prec,x,zzero,y,desc_data,trans_,work_,info)
+    call amg_zmlprec_aply_vect(zone,prec,x,zzero,y,desc_data,trans_,info)
 
     if(info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_zmlprec_aply')
@@ -396,17 +380,17 @@ subroutine amg_zprecaply2_vect(prec,x,y,desc_data,info,trans,work)
         case ('N')
           do k=1, nswps
             if (info == 0) call prec%precv(1)%sm%apply(zone,w1,zzero,w2,desc_data,trans_,&
-                 & ione, work_,wv,info)
+                 & ione, wv,info)
             if (info == 0) call prec%precv(1)%sm2a%apply(zone,w2,zzero,w1,desc_data,trans_,&
-                 & ione, work_,wv,info)
+                 & ione, wv,info)
           end do
           
         case('T','C')
           do k=1, nswps
             if (info == 0) call prec%precv(1)%sm2a%apply(zone,w1,zzero,w2,desc_data,trans_,&
-                 & ione, work_,wv,info)
+                 & ione, wv,info)
             if (info == 0) call prec%precv(1)%sm%apply(zone,w2,zzero,w1,desc_data,trans_,&
-                 & ione, work_,wv,info)
+                 & ione, wv,info)
           end do
         case default
           info = psb_err_from_subroutine_
@@ -416,7 +400,7 @@ subroutine amg_zprecaply2_vect(prec,x,y,desc_data,info,trans,work)
         if (info == 0) call psb_geaxpby(zone,w1,zzero,y,desc_data,info)
       else
         if (info == 0) call prec%precv(1)%sm%apply(zone,x,zzero,y,desc_data,trans_,&
-             & nswps,work_,wv,info)
+             & nswps,wv,info)
       end if
     end associate
     if (psb_errstatus_fatal())   info = psb_err_internal_error_
@@ -440,11 +424,6 @@ subroutine amg_zprecaply2_vect(prec,x,y,desc_data,info,trans,work)
 
   if (do_alloc_wrk) call prec%free_wrk(info)
 
-  if (present(work)) then 
-  else
-    deallocate(work_)
-  end if
-
   call psb_erractionrestore(err_act)
   return
 
@@ -455,7 +434,7 @@ subroutine amg_zprecaply2_vect(prec,x,y,desc_data,info,trans,work)
 end subroutine amg_zprecaply2_vect
 
 
-subroutine amg_zprecaply1_vect(prec,x,desc_data,info,trans,work)
+subroutine amg_zprecaply1_vect(prec,x,desc_data,info,trans)
 
   use psb_base_mod
   use amg_z_inner_mod!, amg_protect_name => amg_zprecaply1_vect
@@ -468,11 +447,9 @@ subroutine amg_zprecaply1_vect(prec,x,desc_data,info,trans,work)
   type(psb_z_vect_type),intent(inout) :: x
   integer(psb_ipk_), intent(out)      :: info
   character(len=1), optional          :: trans
-  complex(psb_dpk_),intent(inout), optional, target  :: work(:)
 
   ! Local variables
-  character     :: trans_ 
-  complex(psb_dpk_), pointer :: work_(:)
+  character     :: trans_
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me
   integer(psb_ipk_)   :: err_act,iwsz, k, nswps
@@ -486,27 +463,13 @@ subroutine amg_zprecaply1_vect(prec,x,desc_data,info,trans,work)
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(trans)) then 
+  if (present(trans)) then
     trans_=psb_toupper(trans)
   else
     trans_='N'
   end if
 
-  if (present(work)) then 
-    work_ => work
-  else
-    iwsz = max(1,4*desc_data%get_local_cols())
-    allocate(work_(iwsz),stat=info)
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_alloc_request_,name, &
-           & i_err=(/iwsz,izero,izero,izero,izero/),&
-           & a_err='complex(psb_dpk_)')
-      goto 9999      
-    end if
-
-  end if
-
-  if (.not.(allocated(prec%precv))) then 
+  if (.not.(allocated(prec%precv))) then
     !! Error 1: should call amg_zprecbld
     info=3112
     call psb_errpush(info,name)
@@ -523,7 +486,7 @@ subroutine amg_zprecaply1_vect(prec,x,desc_data,info,trans,work)
       ! Number of levels > 1: apply the multilevel preconditioner
       !
       ! FIXME: generic name causes an ICE with Intel
-      call amg_zmlprec_aply_vect(zone,prec,x,zzero,ww,desc_data,trans_,work_,info)
+      call amg_zmlprec_aply_vect(zone,prec,x,zzero,ww,desc_data,trans_,info)
       if (info == 0) call psb_geaxpby(zone,ww,zzero,x,desc_data,info)
       if(info /= psb_success_) then
         call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_zmlprec_aply')
@@ -544,16 +507,16 @@ subroutine amg_zprecaply1_vect(prec,x,desc_data,info,trans,work)
         case ('N')
           do k=1, nswps
             if (info == 0) call prec%precv(1)%sm%apply(zone,x,zzero,ww,desc_data,trans_,&
-                 & ione, work_,wv,info)
+                 & ione, wv,info)
             if (info == 0) call prec%precv(1)%sm2a%apply(zone,ww,zzero,x,desc_data,trans_,&
-                 & ione, work_,wv,info)
+                 & ione, wv,info)
           end do
         case('T','C')
           do k=1, nswps
             if (info == 0) call prec%precv(1)%sm2a%apply(zone,x,zzero,ww,desc_data,trans_,&
-                 & ione, work_,wv,info)
+                 & ione, wv,info)
             if (info == 0) call prec%precv(1)%sm%apply(zone,ww,zzero,x,desc_data,trans_,&
-                 & ione, work_,wv,info)
+                 & ione, wv,info)
           end do
         case default
           info = psb_err_from_subroutine_
@@ -563,7 +526,7 @@ subroutine amg_zprecaply1_vect(prec,x,desc_data,info,trans,work)
 
       else
         if (info == 0) call prec%precv(1)%sm%apply(zone,x,zzero,ww,desc_data,trans_,&
-             & nswps, work_,wv,info)
+             & nswps, wv,info)
         if (info == 0) call psb_geaxpby(zone,ww,zzero,x,desc_data,info)
       end if
 
@@ -588,11 +551,6 @@ subroutine amg_zprecaply1_vect(prec,x,desc_data,info,trans,work)
   call psb_halo(x,desc_data,info,data=psb_comm_mov_)
 
   if (do_alloc_wrk) call prec%free_wrk(info)
-
-  if (present(work)) then 
-  else
-    deallocate(work_)
-  end if
 
   call psb_erractionrestore(err_act)
   return

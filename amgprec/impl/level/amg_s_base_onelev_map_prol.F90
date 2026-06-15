@@ -35,7 +35,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine amg_s_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vtx,vty)
+subroutine amg_s_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,vtx,vty)
   use psb_base_mod
   use amg_s_onelev_mod, amg_protect_name =>  amg_s_base_onelev_map_prol_v
   
@@ -44,7 +44,6 @@ subroutine amg_s_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vt
   real(psb_spk_), intent(in)           :: alpha, beta
   type(psb_s_vect_type), intent(inout) :: vect_u, vect_v
   integer(psb_ipk_), intent(out)       :: info
-  real(psb_spk_), optional          :: work(:)
   type(psb_s_vect_type), optional, target, intent(inout)  :: vtx,vty
   
 !!$  write(0,*) 'New map_prol',lv%remap_data%ac_pre_remap%is_asb()
@@ -96,7 +95,7 @@ subroutine amg_s_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vt
         call psb_rcv(ctxt,rsnd(1:nrl),idest)
         call tv%set_vect(rsnd)
         call lv%linmap%map_V2U(alpha,tv,beta,vect_u,info,&
-             & work=work,vtx=vtx,vty=vty)
+             & vtx=vtx,vty=vty)
       end associate
 !!$      write(0,*) me, ' Prolongator with remap done '
 !!$      flush(0)
@@ -105,7 +104,7 @@ subroutine amg_s_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vt
   else
     ! Default transfer
     call lv%linmap%map_V2U(alpha,vect_v,beta,vect_u,info,&
-         & work=work,vtx=vtx,vty=vty)
+         & vtx=vtx,vty=vty)
   end if
   
 end subroutine amg_s_base_onelev_map_prol_v

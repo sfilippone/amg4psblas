@@ -36,7 +36,7 @@
 !
 !
 subroutine amg_s_jac_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,&
-     & work,wv,info,init,initu)
+     & wv,info,init,initu)
 
   use psb_base_mod
   use amg_s_diag_solver
@@ -49,7 +49,6 @@ subroutine amg_s_jac_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,&
   type(psb_s_vect_type),intent(inout)           :: y
   real(psb_spk_),intent(in)                      :: alpha,beta
   character(len=1),intent(in)                     :: trans
-  real(psb_spk_),target, intent(inout)           :: work(:)
   type(psb_s_vect_type),intent(inout)           :: wv(:)
   integer(psb_ipk_), intent(out)                  :: info
   character, intent(in), optional                :: init
@@ -57,7 +56,6 @@ subroutine amg_s_jac_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,&
   !
   integer(psb_ipk_)    :: n_row,n_col, sweeps
   type(psb_s_vect_type)  :: tx, ty, r
-  real(psb_spk_), pointer :: aux(:)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me, i, err_act
   character           :: trans_, init_
@@ -91,18 +89,6 @@ subroutine amg_s_jac_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,&
   n_row = desc_data%get_local_rows()
   n_col = desc_data%get_local_cols()
   sweeps = sv%sweeps
-  if (4*n_col <= size(work)) then
-    aux => work(:)
-  else
-    allocate(aux(4*n_col),stat=info)
-    if (info /= psb_success_) then
-      info=psb_err_alloc_request_
-      call psb_errpush(info,name,&
-           & i_err=(/4*n_col,izero,izero,izero,izero/),&
-           & a_err='real(psb_spk_)')
-      goto 9999
-    end if
-  endif
 
   if (sweeps >= 0) then
       !
@@ -118,7 +104,7 @@ subroutine amg_s_jac_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,&
           call psb_geaxpby(sone,x,szero,tx,desc_data,info)
           call psb_geaxpby(sone,y,szero,ty,desc_data,info)
           call psb_spmm(-sone,sv%a,ty,sone,tx,desc_data,info,&
-               & work=aux,trans=trans_, doswap=.false.)
+               & trans=trans_, doswap=.false.)
           call ty%mlt(sone,sv%dv,tx,szero,info,conjgx=trans_)
 
         case('U')
@@ -130,7 +116,7 @@ subroutine amg_s_jac_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,&
           call psb_geaxpby(sone,x,szero,tx,desc_data,info)
           call psb_geaxpby(sone,initu,szero,ty,desc_data,info)
           call psb_spmm(-sone,sv%a,ty,sone,tx,desc_data,info,&
-               & work=aux,trans=trans_, doswap=.false.)
+               & trans=trans_, doswap=.false.)
           call ty%mlt(sone,sv%dv,tx,szero,info,conjgx=trans_)
 
         case default
@@ -146,7 +132,7 @@ subroutine amg_s_jac_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,&
           !
           call psb_geaxpby(sone,x,szero,tx,desc_data,info)
           call psb_spmm(-sone,sv%a,ty,sone,tx,desc_data,info,&
-               & work=aux,trans=trans_, doswap=.false.)
+               & trans=trans_, doswap=.false.)
           if (info /= psb_success_) exit
           call ty%mlt(sone,sv%dv,tx,sone,info,conjgx=trans_)
           if (info /= psb_success_) exit
@@ -174,10 +160,6 @@ subroutine amg_s_jac_solver_apply_vect(alpha,sv,x,beta,y,desc_data,trans,&
       goto 9999
       
     end if
-
-  if (.not.(4*n_col <= size(work))) then
-    deallocate(aux)
-  endif
 
 
   call psb_erractionrestore(err_act)

@@ -36,7 +36,7 @@
 !
 !
 subroutine amg_s_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-     & trans,work,wv,info,init,initu)
+     & trans,wv,info,init,initu)
 
   use psb_base_mod
   use amg_s_base_ainv_mod, amg_protect_name => amg_s_base_ainv_solver_apply_vect
@@ -47,14 +47,12 @@ subroutine amg_s_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   type(psb_s_vect_type), intent(inout)          :: y
   real(psb_spk_), intent(in)                    :: alpha,beta
   character(len=1), intent(in)                  :: trans
-  real(psb_spk_),target, intent(inout)          :: work(:)
   type(psb_s_vect_type),intent(inout)           :: wv(:)
   integer(psb_ipk_), intent(out)                :: info
   character, intent(in), optional               :: init
   type(psb_s_vect_type),intent(inout), optional :: initu
   !
   integer(psb_ipk_)     :: n_row,n_col
-  real(psb_spk_), pointer :: ww(:), aux(:)
   type(psb_s_vect_type) :: tx,ty
   integer(psb_ipk_)     :: np,me,i, err_act
   type(psb_ctxt_type)   :: ctxt
@@ -80,29 +78,6 @@ subroutine amg_s_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   n_row = psb_cd_get_local_rows(desc_data)
   n_col = psb_cd_get_local_cols(desc_data)
 
-  if (n_col <= size(work)) then
-    ww => work(1:n_col)
-    if ((4*n_col+n_col) <= size(work)) then
-      aux => work(n_col+1:)
-    else
-      allocate(aux(4*n_col),stat=info)
-      if (info /= psb_success_) then
-        info=psb_err_alloc_request_
-        call psb_errpush(info,name,i_err=(/4*n_col/),&
-             & a_err='real(psb_dpk_)')
-        goto 9999
-      end if
-    endif
-  else
-    allocate(ww(n_col),aux(4*n_col),stat=info)
-    if (info /= psb_success_) then
-      info=psb_err_alloc_request_
-      call psb_errpush(info,name,i_err=(/5*n_col/),&
-           & a_err='real(psb_dpk_)')
-      goto 9999
-    end if
-  endif
-
   if (size(wv) < 2) then
     info = psb_err_internal_error_
     call psb_errpush(info,name,&
@@ -116,19 +91,19 @@ subroutine amg_s_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
     select case(trans_)
     case('N')
       call psb_spmm(sone,sv%w,x,szero,tx,desc_data,info,&
-           & trans=trans_,work=aux,doswap=.false.)
+           & trans=trans_,doswap=.false.)
       if (info == psb_success_) call ty%mlt(sone,sv%dv,tx,szero,info)
       if (info == psb_success_) &
            & call psb_spmm(alpha,sv%z,ty,beta,y,desc_data,info,&
-           & trans=trans_,work=aux,doswap=.false.)
+           & trans=trans_,doswap=.false.)
 
     case('T','C')
       call psb_spmm(sone,sv%z,x,szero,tx,desc_data,info,&
-           & trans=trans_,work=aux,doswap=.false.)
+           & trans=trans_,doswap=.false.)
       if (info == psb_success_) call ty%mlt(sone,sv%dv,tx,szero,info)
       if (info == psb_success_) &
            & call psb_spmm(alpha,sv%w,ty,beta,y,desc_data,info,&
-           & trans=trans_,work=aux,doswap=.false.)
+           & trans=trans_,doswap=.false.)
 
     case default
       call psb_errpush(psb_err_internal_error_,name,&
@@ -145,22 +120,6 @@ subroutine amg_s_base_ainv_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
     endif
 
   end associate
-
-  if (n_col <= size(work)) then
-    if ((4*n_col+n_col) <= size(work)) then
-    else
-      deallocate(aux,stat=info)
-    endif
-  else
-    deallocate(ww,aux,stat=info)
-  endif
-
-  if (info /= psb_success_) then
-
-    call psb_errpush(psb_err_internal_error_,name,&
-         & a_err='Deallocate')
-    goto 9999
-  endif
 
   call psb_erractionrestore(err_act)
   return

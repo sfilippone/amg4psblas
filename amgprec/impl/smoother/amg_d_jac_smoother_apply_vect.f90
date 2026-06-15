@@ -36,7 +36,7 @@
 !
 !
 subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
-     & sweeps,work,wv,info,init,initu)
+     & sweeps,wv,info,init,initu)
 
   use psb_base_mod
   use amg_d_diag_solver
@@ -50,7 +50,6 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   real(psb_dpk_),intent(in)                      :: alpha,beta
   character(len=1),intent(in)                     :: trans
   integer(psb_ipk_), intent(in)                   :: sweeps
-  real(psb_dpk_),target, intent(inout)           :: work(:)
   type(psb_d_vect_type),intent(inout)           :: wv(:)
   integer(psb_ipk_), intent(out)                  :: info
   character, intent(in), optional                :: init
@@ -58,7 +57,6 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   !
   integer(psb_ipk_)    :: n_row,n_col
   type(psb_d_vect_type)  :: tx, ty, r
-  real(psb_dpk_), pointer :: aux(:)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me, i, err_act
   character           :: trans_, init_
@@ -96,19 +94,6 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
   n_row = desc_data%get_local_rows()
   n_col = desc_data%get_local_cols()
 
-  if (4*n_col <= size(work)) then
-    aux => work(:)
-  else
-    allocate(aux(4*n_col),stat=info)
-    if (info /= psb_success_) then
-      info=psb_err_alloc_request_
-      call psb_errpush(info,name,&
-           & i_err=(/4*n_col,izero,izero,izero,izero/),&
-           & a_err='real(psb_dpk_)')
-      goto 9999
-    end if
-  endif
-
   if(sm%checkres) then
     call psb_geall(r,desc_data,info)
     call psb_geasb(r,desc_data,info)
@@ -117,7 +102,7 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
 
   if ((.not.sm%sv%is_iterative()).and.((sweeps == 1).or.(sm%nd_nnz_tot==0))) then
     !  if .not.sv%is_iterative, there's no need to pass init
-    call sm%sv%apply(alpha,x,beta,y,desc_data,trans_,aux,wv,info)
+    call sm%sv%apply(alpha,x,beta,y,desc_data,trans_,wv,info)
 
     if (info /= psb_success_) then
       call psb_errpush(psb_err_internal_error_,&
@@ -135,13 +120,13 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
         select case (init_)
         case('Z')
 
-          call sm%sv%apply(done,x,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Z')
+          call sm%sv%apply(done,x,dzero,ty,desc_data,trans_,wv(3:),info,init='Z')
 
         case('Y')
           call psb_geaxpby(done,x,dzero,tx,desc_data,info)
           call psb_geaxpby(done,y,dzero,ty,desc_data,info)
-          call psb_spmm(-done,sm%pa,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
+          call psb_spmm(-done,sm%pa,ty,done,tx,desc_data,info,trans=trans_)
+          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,wv(3:),info,init='Y')
 
         case('U')
           if (.not.present(initu)) then
@@ -151,8 +136,8 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           end if
           call psb_geaxpby(done,x,dzero,tx,desc_data,info)
           call psb_geaxpby(done,initu,dzero,ty,desc_data,info)
-          call psb_spmm(-done,sm%pa,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
+          call psb_spmm(-done,sm%pa,ty,done,tx,desc_data,info,trans=trans_)
+          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,wv(3:),info,init='Y')
 
         case default
           call psb_errpush(psb_err_internal_error_,name,&
@@ -166,11 +151,11 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           !  where is the diagonal and  A the matrix.
           !
           call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-          call psb_spmm(-done,sm%pa,ty,done,tx,desc_data,info,work=aux,trans=trans_)
+          call psb_spmm(-done,sm%pa,ty,done,tx,desc_data,info,trans=trans_)
 
           if (info /= psb_success_) exit
 
-          call sm%sv%apply(done,tx,done,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
+          call sm%sv%apply(done,tx,done,ty,desc_data,trans_,wv(3:),info,init='Y')
 
           if (info /= psb_success_) exit
 
@@ -226,13 +211,13 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
         select case (init_)
         case('Z')
 
-          call sm%sv%apply(done,x,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Z')
+          call sm%sv%apply(done,x,dzero,ty,desc_data,trans_,wv(3:),info,init='Z')
 
         case('Y')
           call psb_geaxpby(done,x,dzero,tx,desc_data,info)
           call psb_geaxpby(done,y,dzero,ty,desc_data,info)
-          call psb_spmm(-done,sm%nd,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
+          call psb_spmm(-done,sm%nd,ty,done,tx,desc_data,info,trans=trans_)
+          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,wv(3:),info,init='Y')
 
         case('U')
           if (.not.present(initu)) then
@@ -242,8 +227,8 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           end if
           call psb_geaxpby(done,x,dzero,tx,desc_data,info)
           call psb_geaxpby(done,initu,dzero,ty,desc_data,info)
-          call psb_spmm(-done,sm%nd,ty,done,tx,desc_data,info,work=aux,trans=trans_)
-          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
+          call psb_spmm(-done,sm%nd,ty,done,tx,desc_data,info,trans=trans_)
+          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,wv(3:),info,init='Y')
 
         case default
           call psb_errpush(psb_err_internal_error_,name,&
@@ -258,11 +243,11 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
           ! and Y(j) is the approximate solution at sweep j.
           !
           call psb_geaxpby(done,x,dzero,tx,desc_data,info)
-          call psb_spmm(-done,sm%nd,ty,done,tx,desc_data,info,work=aux,trans=trans_)
+          call psb_spmm(-done,sm%nd,ty,done,tx,desc_data,info,trans=trans_)
 
           if (info /= psb_success_) exit
 
-          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,aux,wv(3:),info,init='Y')
+          call sm%sv%apply(done,tx,dzero,ty,desc_data,trans_,wv(3:),info,init='Y')
 
           if (info /= psb_success_) exit
 
@@ -301,10 +286,6 @@ subroutine amg_d_jac_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
          & i_err=(/itwo,sweeps,izero,izero,izero/))
     goto 9999
 
-  endif
-
-  if (.not.(4*n_col <= size(work))) then
-    deallocate(aux)
   endif
 
   if(sm%checkres) then

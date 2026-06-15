@@ -458,14 +458,13 @@ module amg_s_onelev_mod
       integer(psb_ipk_), intent(out) :: info
       real(psb_spk_), optional       :: work(:)
     end subroutine amg_s_base_onelev_map_rstr_a
-    subroutine amg_s_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,work,vtx,vty)
+    subroutine amg_s_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,vtx,vty)
       import
       implicit none
       class(amg_s_onelev_type), target, intent(inout) :: lv
       real(psb_spk_), intent(in)           :: alpha, beta
       type(psb_s_vect_type), intent(inout) :: vect_u, vect_v
       integer(psb_ipk_), intent(out)       :: info
-      real(psb_spk_), optional          :: work(:)
       type(psb_s_vect_type), optional, target, intent(inout)  :: vtx,vty
     end subroutine amg_s_base_onelev_map_rstr_v
   end interface
@@ -482,14 +481,13 @@ module amg_s_onelev_mod
       real(psb_spk_), optional          :: work(:)
 
     end subroutine amg_s_base_onelev_map_prol_a
-    subroutine amg_s_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vtx,vty)
+    subroutine amg_s_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,vtx,vty)
       import
       implicit none
       class(amg_s_onelev_type), target, intent(inout) :: lv
       real(psb_spk_), intent(in)           :: alpha, beta
       type(psb_s_vect_type), intent(inout) :: vect_u, vect_v
       integer(psb_ipk_), intent(out)       :: info
-      real(psb_spk_), optional          :: work(:)
       type(psb_s_vect_type), optional, target, intent(inout)  :: vtx,vty
     end subroutine amg_s_base_onelev_map_prol_v
   end interface
