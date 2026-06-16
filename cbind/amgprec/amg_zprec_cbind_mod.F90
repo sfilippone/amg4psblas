@@ -3,6 +3,7 @@ module amg_zprec_cbind_mod
   use iso_c_binding
   use amg_prec_mod
   use psb_base_cbind_mod
+  use psb_zlinsolve_cbind_mod
 
   type, bind(c) :: amg_c_zprec
     type(c_ptr) :: item = c_null_ptr
@@ -140,11 +141,11 @@ contains
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer(psb_ipk_)     :: iret
     type(amg_zprec_type), pointer  :: precp
     type(psb_zspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
+    integer(psb_ipk_)     :: iret
 
     res = -1
 
@@ -173,15 +174,17 @@ contains
   end function amg_c_zprecbld
 
   function  amg_c_zhierarchy_build(ah,cdh,ph) bind(c) result(res)
+    use psb_base_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer(psb_ipk_)     :: iret
     type(amg_zprec_type), pointer  :: precp
     type(psb_zspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
+    integer(psb_ipk_)     :: iret, act
+
 
     res = -1
 
@@ -205,20 +208,25 @@ contains
 
     res = AMGC_ERR_FILTER(iret)
     AMGC_ERR_HANDLE(res)
-
+    if (res /=0) then
+      act = psb_act_abort_
+      call psb_error_handler(act)
+    end if
+      
     return
   end function amg_c_zhierarchy_build
 
   function  amg_c_zsmoothers_build(ah,cdh,ph) bind(c) result(res)
+    use psb_base_mod
     implicit none
 
     integer(psb_c_ipk_) :: res
     type(psb_c_object_type)  :: ph,ah,cdh
-    integer(psb_ipk_)     :: iret
     type(amg_zprec_type), pointer  :: precp
     type(psb_zspmat_type), pointer :: ap
     type(psb_desc_type), pointer   :: descp
     character(len=80)     :: fptype
+    integer(psb_ipk_)     :: iret, act
 
     res = -1
 
@@ -242,6 +250,10 @@ contains
 
     res = AMGC_ERR_FILTER(iret)
     AMGC_ERR_HANDLE(res)
+    if (res /=0) then
+      act = psb_act_abort_
+      call psb_error_handler(act)
+    end if
 
     return
   end function amg_c_zsmoothers_build
@@ -355,31 +367,37 @@ contains
   end function amg_c_zsmoothers_build_format
 
   function  amg_c_zkrylov(methd,&
-       & ah,ph,bh,xh,cdh,options) bind(c) result(res)
+       & ah,ph,bh,xh,cdh,s1,s2,options) bind(c) result(res)
+    use psb_base_mod
+    use psb_prec_mod
     use psb_linsolve_mod
     use psb_prec_cbind_mod
     use psb_zlinsolve_cbind_mod
     implicit none
     integer(psb_c_ipk_)          :: res
-    type(psb_c_object_type) :: ah,cdh,ph,bh,xh
+    type(psb_c_object_type) :: ah,cdh,ph,bh,xh,s1,s2
     character(c_char)       :: methd(*)
     type(solveroptions)     :: options
 
     res= amg_c_zkrylov_opt(methd, ah, ph, bh, xh, options%eps,cdh,  &
          & itmax=options%itmax, iter=options%iter,&
          & itrace=options%itrace, istop=options%istop,&
-         & irst=options%irst, err=options%err)
+         & irst=options%irst, err=options%err, s1=s1,s2=s2)
 
   end function amg_c_zkrylov
 
 
   function  amg_c_zkrylov_opt(methd,&
-       & ah,ph,bh,xh,eps,cdh,itmax,iter,err,itrace,irst,istop) bind(c) result(res)
+       & ah,ph,bh,xh,eps,cdh,itmax,iter,err,&
+       & itrace,irst,istop,s1,s2) bind(c) result(res)
+    use psb_base_mod
+    use psb_prec_mod
     use psb_linsolve_mod
     use psb_objhandle_mod
+    use psb_prec_cbind_mod
     implicit none
     integer(psb_c_ipk_)          :: res
-    type(psb_c_object_type) :: ah,cdh,ph,bh,xh
+    type(psb_c_object_type) :: ah,cdh,ph,bh,xh,s1, s2
     integer(psb_c_ipk_), value :: itmax,itrace,irst,istop
     real(c_double), value :: eps
     integer(psb_c_ipk_)        :: iter
@@ -388,7 +406,7 @@ contains
     type(psb_desc_type), pointer   :: descp
     type(psb_zspmat_type), pointer :: ap
     type(amg_zprec_type), pointer  :: precp
-    type(psb_z_vect_type), pointer :: xp, bp
+    type(psb_z_vect_type), pointer :: xp, bp, s1p, s2p
 
     integer(psb_ipk_)     :: iret,fitmax,fitrace,first,fistop,fiter
     character(len=20)     :: fmethd
@@ -420,6 +438,16 @@ contains
     else
       return
     end if
+    if (c_associated(s1%item)) then
+      call c_f_pointer(s1%item,s1p)
+    else
+      nullify(s1p)
+    end if
+    if (c_associated(s2%item)) then
+      call c_f_pointer(s2%item,s2p)
+    else
+      nullify(s2p)
+    end if
 
 
     call psb_stringc2f(methd,fmethd)
@@ -429,10 +457,28 @@ contains
     first   = irst
     fistop  = istop
 
-    call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
-         & descp, iret,&
-         & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
-         & irst=first, err=ferr)
+    if (associated(s1p).and.associated(s2p)) then
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, iret,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr,s1=s1p,s2=s2p)
+    else if  (associated(s1p)) then
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, iret,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr,s1=s1p)
+    else  if (associated(s2p)) then
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, iret,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr,s2=s2p)
+    else
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, iret,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr)
+    end if
+
     iter = fiter
     err  = ferr
     res = min(iret,0)
@@ -595,55 +641,55 @@ contains
    return
  end function amg_c_zdescr
 
-   function amg_c_zallocate_wrk(ph,chfmt) bind(c, name="amg_c_zallocate_wrk") result(res)
+ function amg_c_zallocate_wrk(ph,chfmt) bind(c, name="amg_c_zallocate_wrk") result(res)
 #if defined (PSB_HAVE_CUDA)
-    use psb_cuda_mod
+   use psb_cuda_mod
 #endif
-    implicit none
+   implicit none
 
-    integer(psb_c_ipk_) :: res
-    type(psb_c_object_type) :: ph
-    character(c_char)     :: chfmt(*)
-    integer(psb_ipk_)     :: iret
-    type(amg_zprec_type), pointer :: precp
-    character(len=6)     :: fchfmt
-! Local variable
-    integer(psb_ipk_) :: info
-! Local mold variables
+   integer(psb_c_ipk_) :: res
+   type(psb_c_object_type) :: ph
+   character(c_char)     :: chfmt(*)
+   integer(psb_ipk_)     :: iret
+   type(amg_zprec_type), pointer :: precp
+   character(len=6)     :: fchfmt
+   ! Local variable
+   integer(psb_ipk_) :: info
+   ! Local mold variables
 #if defined (PSB_HAVE_CUDA)
-    type(psb_z_vect_cuda), target         :: zvgpu
+   type(psb_z_vect_cuda), target         :: zvgpu
 #endif
-    type(psb_z_base_vect_type), target         :: zvhost
-    class(psb_z_base_vect_type), pointer  :: vmold
+   type(psb_z_base_vect_type), target         :: zvhost
+   class(psb_z_base_vect_type), pointer  :: vmold
 
-    res = -1
-    if (c_associated(ph%item)) then
-      call c_f_pointer(ph%item,precp)
-    else
-      return
-    end if
+   res = -1
+   if (c_associated(ph%item)) then
+     call c_f_pointer(ph%item,precp)
+   else
+     return
+   end if
 
-    call psb_stringc2f(chfmt,fchfmt)
-    select case (psb_toupper(fchfmt))
-    case('HOST','CPU')
-      vmold => zvhost
+   call psb_stringc2f(chfmt,fchfmt)
+   select case (psb_toupper(fchfmt))
+   case('HOST','CPU')
+     vmold => zvhost
 #if defined (PSB_HAVE_CUDA)
-    case('GPU','DEVICE')
-      vmold => zvgpu
+   case('GPU','DEVICE')
+     vmold => zvgpu
 #endif
-    case default
-      write(psb_err_unit,'(A)') 'amg_c_zallocate_wrk: Unknown format ', fchfmt, ' defaulting to HOST/CPU'
-      vmold => zvhost
-    end select
+   case default
+     write(psb_err_unit,'(A)') 'amg_c_zallocate_wrk: Unknown format ', fchfmt, ' defaulting to HOST/CPU'
+     vmold => zvhost
+   end select
 
-    call precp%allocate_wrk(info,vmold=vmold)
+   call precp%allocate_wrk(info,vmold=vmold)
 
-    iret = info
+   iret = info
 
-    res = AMGC_ERR_FILTER(iret)
-    AMGC_ERR_HANDLE(res)
-    return
+   res = AMGC_ERR_FILTER(iret)
+   AMGC_ERR_HANDLE(res)
+   return
 
-  end function amg_c_zallocate_wrk
+ end function amg_c_zallocate_wrk
 
 end module amg_zprec_cbind_mod
