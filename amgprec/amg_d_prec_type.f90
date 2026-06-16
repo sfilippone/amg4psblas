@@ -665,6 +665,10 @@ contains
       info = psb_err_internal_error_; goto 9999
     end if
 
+    !
+    ! In the internals, do FREE on components,
+    ! but do not deallocate them
+    !
     if (allocated(prec%precv)) then
       do i=1,size(prec%precv)
         call prec%precv(i)%free_smoothers(info)

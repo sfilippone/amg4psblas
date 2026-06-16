@@ -144,7 +144,7 @@ contains
       f_ => s_null_func_3d
     end if
 
-    deltah   = 1.d0/(idim+2)
+    deltah   = 1.d0/(idim+1)
     sqdeltah = deltah*deltah
     deltah2  = 2.0_psb_spk_* deltah
 

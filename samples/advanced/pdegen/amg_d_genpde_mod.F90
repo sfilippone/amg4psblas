@@ -176,7 +176,7 @@ contains
     else
       partition_ = 3
     end if
-    deltah   = done/(idim+2)
+    deltah   = done/(idim+1)
     sqdeltah = deltah*deltah
     deltah2  = 2.0_psb_dpk_* deltah
 
@@ -643,7 +643,7 @@ contains
       f_ => d_null_func_2d
     end if
 
-    deltah   = done/(idim+2)
+    deltah   = done/(idim+1)
     sqdeltah = deltah*deltah
     deltah2  = 2.0_psb_dpk_* deltah
 

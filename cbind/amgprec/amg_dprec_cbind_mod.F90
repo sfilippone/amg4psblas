@@ -211,7 +211,6 @@ contains
       act = psb_act_abort_
       call psb_error_handler(act)
     end if
-
     return
   end function amg_c_dhierarchy_build
 
@@ -269,8 +268,6 @@ contains
     type(psb_c_object_type) :: ah,cdh,ph,bh,xh,s1,s2
     character(c_char)       :: methd(*)
     type(solveroptions)     :: options
-
-
     res= amg_c_dkrylov_opt(methd, ah, ph, bh, xh, options%eps,cdh,  &
          & itmax=options%itmax, iter=options%iter,&
          & itrace=options%itrace, istop=options%istop,&
