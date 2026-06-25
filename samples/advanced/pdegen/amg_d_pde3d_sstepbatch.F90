@@ -528,7 +528,7 @@ program amg_d_pde3d_sstepbatch
   allocate(sValues(7))
   sValues = [1, 5, 10, 15]   ! 1 is a placeholder for CG method
   allocate(Gsolvers(3))
-  Gsolvers = ['LLU'] !, 'LCC', 'FGS'
+  Gsolvers = ['LLU', 'LCC', 'FGS'] !
 
   allocate(tslv(size(sValues), size(Gsolvers), 2))
   tslv = dzero
