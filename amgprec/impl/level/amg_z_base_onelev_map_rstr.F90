@@ -47,8 +47,15 @@ subroutine amg_z_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
   integer(psb_ipk_), intent(out)       :: info
   complex(psb_dpk_), optional          :: work(:)
   type(psb_z_vect_type), optional, target, intent(inout)  :: vtx,vty
+  type(psb_z_vect_type), pointer   :: vty_
 
 !!$  write(0,*) 'New map_rstr',lv%remap_data%ac_pre_remap%is_asb()
+  if (present(vty)) then
+    vty_ => vty
+  else
+    vty_ => lv%wrk%wv(1)
+  end if
+  
   if (lv%remap_data%ac_pre_remap%is_asb()) then
     !
     ! Remap has happened, deal with it
@@ -74,11 +81,11 @@ subroutine amg_z_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
         nrl  = lv%remap_data%desc_ac_pre_remap%get_local_rows()
         call psb_geall(tv,lv%remap_data%desc_ac_pre_remap,info)
         call psb_geasb(tv,lv%remap_data%desc_ac_pre_remap,info,mold=vect_u%v) 
-        write(0,*) me,' map_rstr calling U2V: ',me,np,rme,rnp,tv%get_nrows()
+        write(0,*) me,' remap map_rstr calling U2V: ',me,np,rme,rnp,tv%get_nrows()
         flush(0)
         call psb_barrier(ctxt)
         call lv%linmap%map_U2V(alpha,vect_u,beta,tv,info,&
-             & work=work,vtx=vtx,vty=vty)
+             & work=work,vtx=vtx,vty=vty_)
         call tv%sync()
         !rsnd = tv%get_vect()
         !call psb_snd(ctxt,rsnd(1:nrl),idest) 
@@ -103,8 +110,15 @@ subroutine amg_z_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
  
   else
     ! Default transfer
-    call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&
-         & work=work,vtx=vtx,vty=vty)
+    block
+      type(psb_ctxt_type) :: ctxt, rctxt
+      integer(psb_mpk_) :: me, np
+      ctxt = lv%linmap%p_desc_U%get_ctxt()
+      call psb_info(ctxt,me,np)
+      write(0,*) me,' map_rstr calling U2V: ',me,np
+      call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&
+           & work=work,vtx=vtx,vty=vty_)
+    end block
   end if
   
 end subroutine amg_z_base_onelev_map_rstr_v

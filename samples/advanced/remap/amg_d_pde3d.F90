@@ -472,6 +472,12 @@ program amg_d_pde3d
     call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_hierarchy_bld')
     goto 9999
   end if
+
+  do i=2, size(prec%precv)
+    write(0,*) iam,'Between hier and smoothers_bld level',i,':',&
+         & prec%precv(i)%remap_data%desc_ac_pre_remap%is_asb()
+  end do
+  
   call psb_barrier(ctxt)
   t1 = psb_wtime()
   call prec%smoothers_build(a,desc_a,info)
@@ -490,6 +496,12 @@ program amg_d_pde3d
     write(psb_out_unit,'("Preconditioner time: ",es12.5)')thier+tprec
     write(psb_out_unit,'(" ")')
   end if
+
+  do i=2, size(prec%precv)
+    write(0,*) iam,'After smoothers_bld level',i,':',&
+         & prec%precv(i)%remap_data%desc_ac_pre_remap%is_asb()
+  end do
+  
 
   call prec%descr(info,iout=psb_out_unit)
   if (p_choice%dump) then

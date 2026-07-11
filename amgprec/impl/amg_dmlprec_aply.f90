@@ -244,10 +244,10 @@ subroutine amg_dmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
 
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),&
-       & ' Entry  ', size(p%precv)
+       & ' Entry  ', p%get_nlevs()
 
   trans_ = psb_toupper(trans)
-  nlev   = size(p%precv)
+  nlev   = p%get_nlevs()
 
   do_alloc_wrk = .not.allocated(p%precv(1)%wrk)
 
@@ -382,7 +382,7 @@ contains
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err='wrong call level to inner_ml')
@@ -468,7 +468,7 @@ contains
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err='wrong call level to inner_add')
@@ -497,7 +497,8 @@ contains
         if (allocated(p%precv(level)%sm2a)) then
           call psb_geaxpby(done,vx2l,dzero,vy2l,base_desc,info)
           
-          sweeps = max(p%precv(level)%parms%sweeps_pre,p%precv(level)%parms%sweeps_post)
+          sweeps = max(p%precv(level)%parms%sweeps_pre,&
+               & p%precv(level)%parms%sweeps_post)
           do k=1, sweeps
             call p%precv(level)%sm%apply(done,&
                  & vy2l,dzero,vty,&
@@ -527,8 +528,7 @@ contains
         ! Apply the restriction
         call p%precv(level+1)%map_rstr(done,vx2l,&
              & dzero,p%precv(level+1)%wrk%vx2l,&
-             & info,work=work,&
-             & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
+             & info,work=work,vtx=wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
                & a_err='Error during restriction')
@@ -547,8 +547,7 @@ contains
         !  
         call p%precv(level+1)%map_prol(done,&
              & p%precv(level+1)%wrk%vy2l, done,vy2l,&
-             & info,work=work,&
-             & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
+             & info,work=work, vty=wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
                & a_err='Error during prolongation')
@@ -595,7 +594,7 @@ contains
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err='wrong call level to inner_mult')
@@ -652,23 +651,23 @@ contains
         !
         if (pre) then
             
-            call psb_geaxpby(done,vx2l,&
-                 & dzero,vty,&
-                 & base_desc,info)
-            
-            if (info == psb_success_) call psb_spmm(-done,base_a,&
-                 & vy2l,done,vty,&
-                 & base_desc,info,work=work,trans=trans)
-            if (info /= psb_success_) then
-              call psb_errpush(psb_err_internal_error_,name,&
-                   & a_err='Error during residue')
-              goto 9999
-            end if
+          call psb_geaxpby(done,vx2l,&
+               & dzero,vty,&
+               & base_desc,info)
           
+          if (info == psb_success_) call psb_spmm(-done,base_a,&
+               & vy2l,done,vty,&
+               & base_desc,info,work=work,trans=trans)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_internal_error_,name,&
+                 & a_err='Error during residue')
+            goto 9999
+          end if
+
+          write(0,*) me,' Map_rstr from  ', level,' to ',level+1
           call p%precv(level+1)%map_rstr(done,vty,&
                & dzero,p%precv(level+1)%wrk%vx2l,&
-               & info,work=work,&
-               & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
+               & info,work=work,vtx=wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
                  & a_err='Error during restriction')
@@ -678,8 +677,7 @@ contains
           ! Shortcut: just transfer x2l. 
           call p%precv(level+1)%map_rstr(done,vx2l,&
                & dzero,p%precv(level+1)%wrk%vx2l,&
-               & info,work=work,&
-               & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
+               & info,work=work,vtx=wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
                  & a_err='Error during restriction')
@@ -694,8 +692,7 @@ contains
         !  
         call p%precv(level+1)%map_prol(done,&
              & p%precv(level+1)%wrk%vy2l,done,vy2l,&
-             & info,work=work,&
-             & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
+             & info,work=work,vty=wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
                & a_err='Error during prolongation')
@@ -714,7 +711,7 @@ contains
           if (info == psb_success_) &
                & call p%precv(level+1)%map_rstr(done,vty,&
                & dzero,p%precv(level+1)%wrk%vx2l,info,work=work,&
-               & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
+               & vtx=wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
                  & a_err='Error during W-cycle restriction')
@@ -725,8 +722,7 @@ contains
 
           if (info == psb_success_) call p%precv(level+1)%map_prol(done, &
                & p%precv(level+1)%wrk%vy2l,done,vy2l,&
-               & info,work=work,&
-               & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
+               & info,work=work,vty=wv(1))
 
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
@@ -837,7 +833,7 @@ contains
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err='wrong call level to inner_add')
@@ -914,7 +910,7 @@ contains
         call  p%precv(level + 1)%map_rstr(done,vty,&
              & dzero,p%precv(level + 1)%wrk%vx2l,&
              &info,work=work,&
-             & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
+             & vtx=wv(1))
 
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
@@ -949,8 +945,7 @@ contains
         !  
         call p%precv(level+1)%map_prol(done,&
              & p%precv(level+1)%wrk%vy2l,done,vy2l,&
-             & info,work=work,&
-             & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
+             & info,work=work,vty=wv(1))
 
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&

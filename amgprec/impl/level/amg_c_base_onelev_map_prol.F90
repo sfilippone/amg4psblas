@@ -46,6 +46,14 @@ subroutine amg_c_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vt
   integer(psb_ipk_), intent(out)       :: info
   complex(psb_spk_), optional          :: work(:)
   type(psb_c_vect_type), optional, target, intent(inout)  :: vtx,vty
+  type(psb_c_vect_type), pointer   :: vtx_
+
+!!$  write(0,*) 'New map_rstr',lv%remap_data%ac_pre_remap%is_asb()
+  if (present(vtx)) then
+    vtx_ => vtx
+  else
+    vtx_ => lv%wrk%wv(1)
+  end if
   
 !!$  write(0,*) 'New map_prol',lv%remap_data%ac_pre_remap%is_asb()
   if (lv%remap_data%ac_pre_remap%is_asb()) then
@@ -98,7 +106,7 @@ subroutine amg_c_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vt
         call psb_rcv(ctxt,tv%v%v(1:nrl),idest)
         call tv%set_host()
         call lv%linmap%map_V2U(alpha,tv,beta,vect_u,info,&
-             & work=work,vtx=vtx,vty=vty)
+             & work=work,vtx=vtx_,vty=vty)
       end associate
 !!$      write(0,*) me, ' Prolongator with remap done '
 !!$      flush(0)
@@ -107,7 +115,7 @@ subroutine amg_c_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vt
   else
     ! Default transfer
     call lv%linmap%map_V2U(alpha,vect_v,beta,vect_u,info,&
-         & work=work,vtx=vtx,vty=vty)
+         & work=work,vtx=vtx_,vty=vty)
   end if
   
 end subroutine amg_c_base_onelev_map_prol_v

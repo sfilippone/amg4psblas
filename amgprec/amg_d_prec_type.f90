@@ -97,11 +97,11 @@ module amg_d_prec_type
     ! to keep track against what is put later in the multilevel array
     !
     integer(psb_ipk_)                  :: coarse_solver = -1
-
     !
     ! The multilevel hierarchy
     !
     type(amg_d_onelev_type), allocatable :: precv(:)
+    integer(psb_ipk_)                    :: nlevs
   contains
     procedure, pass(prec)               :: psb_d_apply2_vect => amg_d_apply2_vect
     procedure, pass(prec)               :: psb_d_apply1_vect => amg_d_apply1_vect
@@ -119,6 +119,7 @@ module amg_d_prec_type
     procedure, pass(prec)               :: cmp_complexity => amg_d_cmp_compl
     procedure, pass(prec)               :: get_avg_cr => amg_d_get_avg_cr
     procedure, pass(prec)               :: cmp_avg_cr => amg_d_cmp_avg_cr
+    procedure, pass(prec)               :: set_nlevs  =>  amg_d_set_nlevs
     procedure, pass(prec)               :: get_nlevs  => amg_d_get_nlevs
     procedure, pass(prec)               :: get_nzeros => amg_d_get_nzeros
     procedure, pass(prec)               :: sizeof => amg_dprec_sizeof
@@ -141,6 +142,7 @@ module amg_d_prec_type
     procedure, pass(prec)               :: smoothers_free    => amg_d_smoothers_free
     procedure, pass(prec)               :: descr        =>  amg_dfile_prec_descr
     procedure, pass(prec)               :: memory_use   =>  amg_dfile_prec_memory_use
+
   end type amg_dprec_type
 
   private :: amg_d_dump, amg_d_get_compl,  amg_d_cmp_compl,&
@@ -438,7 +440,17 @@ contains
     if (allocated(prec%precv)) then
       val = size(prec%precv)
     end if
+    val = prec%nlevs
+    write(0,*) ' NLEVS: ',prec%nlevs, val,size(prec%precv)
+
   end function amg_d_get_nlevs
+
+  subroutine amg_d_set_nlevs(prec,nl) 
+    implicit none
+    class(amg_dprec_type), intent(inout) :: prec
+    integer(psb_ipk_) :: nl
+    prec%nlevs = nl
+  end subroutine amg_d_set_nlevs
   !
   ! Function returning the size of the amg_prec_type data structure
   ! in bytes or in number of nonzeros of the operator(s) involved.
@@ -509,7 +521,7 @@ contains
 
     real(psb_dpk_) :: num, den, nmin
     type(psb_ctxt_type) :: ctxt
-    integer(psb_ipk_)   :: il
+    integer(psb_ipk_)   :: il,nl
 
     num = -done
     den = done
@@ -519,7 +531,10 @@ contains
       num = prec%precv(il)%base_a%get_nzeros()
       if (num >= dzero) then
         den = num
-        do il=2,size(prec%precv)
+        nl = prec%get_nlevs()
+        write(0,*) 'Inside cmp_compl ',nl,size(prec%precv)
+        do il=2, nl
+          write(0,*) '                 ',il,associated(prec%precv(il)%base_a)
           num = num + max(0,prec%precv(il)%base_a%get_nzeros())
         end do
       end if
@@ -562,13 +577,11 @@ contains
     avgcr = dzero
     ctxt = prec%ctxt
     call psb_info(ctxt,iam,np)
-    if (allocated(prec%precv)) then
-      nl = size(prec%precv)
-      do il=2,nl
-        avgcr = avgcr + max(dzero,prec%precv(il)%szratio)
-      end do
-      avgcr = avgcr / (nl-1)
-    end if
+    nl = prec%get_nlevs()
+    do il=2,nl
+      avgcr = avgcr + max(dzero,prec%precv(il)%szratio)
+    end do
+    avgcr = avgcr / (nl-1)
     call psb_sum(ctxt,avgcr)
     prec%ag_data%avg_cr = avgcr/np
   end subroutine amg_d_cmp_avg_cr
@@ -667,7 +680,7 @@ contains
     end if
 
     if (allocated(prec%precv)) then
-      do i=1,size(prec%precv)
+      do i=1,prec%get_nlevs()
         call prec%precv(i)%free_smoothers(info)
       end do
     end if
@@ -857,7 +870,7 @@ contains
     info = 0
     ctxt = prec%ctxt
     call psb_info(ctxt,iam,np)
-    iln = size(prec%precv)
+    iln = prec%get_nlevs()
     if (present(istart)) then
       il1 = max(1,istart)
     else
@@ -893,7 +906,7 @@ contains
 
     info = psb_success_
     if (allocated(prec%precv)) then
-      do i=1,size(prec%precv)
+      do i=1,prec%get_nlevs()
         if (info == psb_success_ ) &
              & call prec%precv(i)%cnv(info,amold=amold,vmold=vmold,imold=imold)
       end do
@@ -930,8 +943,9 @@ contains
       pout%ctxt          = prec%ctxt
       pout%ag_data       = prec%ag_data
       pout%outer_sweeps  = prec%outer_sweeps
+      pout%nlevs         = prec%nlevs
       if (allocated(prec%precv)) then
-        ln = size(prec%precv)
+        ln = prec%get_nlevs()
         allocate(pout%precv(ln),stat=info)
         if (info /= psb_success_) goto 9999
         if (ln >= 1) then
@@ -939,6 +953,7 @@ contains
         end if
         do lev=2, ln
           if (info /= psb_success_) exit
+          write(0,*) 'Inner_clone must be checked and reimplemented! '
           call prec%precv(lev)%clone(pout%precv(lev),info)
           if (info == psb_success_) then
             pout%precv(lev)%base_a       => pout%precv(lev)%ac
@@ -1018,7 +1033,7 @@ contains
     if (psb_errstatus_fatal()) then
       info = psb_err_internal_error_; goto 9999
     end if
-    nlev   = size(prec%precv)
+    nlev   = prec%get_nlevs()
     level = 1
     do level = 1, nlev
       call prec%precv(level)%allocate_wrk(info,vmold=vmold)
@@ -1058,7 +1073,7 @@ contains
     end if
 
     if (allocated(prec%precv)) then
-      nlev   = size(prec%precv)
+      nlev   = prec%get_nlevs()
       do level = 1, nlev
         call prec%precv(level)%free_wrk(info)
       end do

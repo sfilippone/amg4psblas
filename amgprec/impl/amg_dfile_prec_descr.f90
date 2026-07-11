@@ -129,7 +129,9 @@ subroutine amg_dfile_prec_descr(prec,info,iout,root, verbosity,prefix)
       ! ensured by amg_precbld).
       !
       if (me == root_) then
-        nlev = size(prec%precv)
+        nlev = prec%get_nlevs()
+        write(0,*) 'From file_prec_descr: nlev ',nlev
+        flush(0)
         do ilev = 1, nlev 
           if (.not.allocated(prec%precv(ilev)%sm)) then 
             info = 3111

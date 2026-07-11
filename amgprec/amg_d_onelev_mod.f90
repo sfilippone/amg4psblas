@@ -183,6 +183,7 @@ module amg_d_onelev_mod
     integer(psb_ipk_), allocatable :: isrc(:), nrsrc(:), naggr(:)
   contains
     procedure, pass(rmp) :: clone   => d_remap_data_clone
+    procedure, pass(rmp) :: move_alloc   => d_remap_move_alloc
   end type amg_d_remap_data_type
 
   type amg_d_onelev_type
@@ -706,6 +707,7 @@ contains
     if (info == psb_success_) call psb_move_alloc(lv%tprol,b%tprol,info)
     if (info == psb_success_) call psb_move_alloc(lv%desc_ac,b%desc_ac,info)
     if (info == psb_success_) call psb_move_alloc(lv%linmap,b%linmap,info)
+    if (info == psb_success_) call lv%remap_data%move_alloc(b%remap_data,info)
     b%base_a    => lv%base_a
     b%base_desc => lv%base_desc
 
@@ -760,6 +762,7 @@ contains
     info = psb_success_
     nwv = lv%get_wrksz()
     if (.not.allocated(lv%wrk)) allocate(lv%wrk,stat=info)
+    write(0,*) 'From allocate_wrk :',lv%remap_data%desc_ac_pre_remap%is_asb()
     if (info == 0) then
       if (lv%remap_data%desc_ac_pre_remap%is_asb()) then
         !
@@ -807,7 +810,8 @@ contains
 
     info = psb_success_
     call wk%free(info)
-    write(0,*) 'wrk_alloc D: "',trim(desc%get_fmt()),'"', present(desc2),desc%is_valid()
+    write(0,*) 'wrk_alloc D: "',trim(desc%get_fmt()),'"',&
+         & present(desc2),desc%is_valid()
 
     allocate(wk%wv(nwv),stat=info)    
     if  (present(desc2).and.(desc%is_valid())) then
@@ -996,5 +1000,26 @@ contains
     call psb_safe_ab_cpy(rmp%isrc,remap_out%isrc,info)
     call psb_safe_ab_cpy(rmp%nrsrc,remap_out%nrsrc,info)
   end subroutine d_remap_data_clone
+
+  subroutine d_remap_move_alloc(rmp, remap_out, info)
+    use psb_base_mod
+    implicit none
+    ! Arguments
+    class(amg_d_remap_data_type), target, intent(inout) :: rmp
+    class(amg_d_remap_data_type), target, intent(inout) :: remap_out
+    integer(psb_ipk_), intent(out)                    :: info
+    !
+    integer(psb_ipk_) :: i
+
+    info = psb_success_
+
+    call psb_move_alloc(rmp%ac_pre_remap,remap_out%ac_pre_remap,info)
+    if (info == psb_success_) &
+         & call psb_move_alloc(rmp%desc_ac_pre_remap,remap_out%desc_ac_pre_remap,info)
+    remap_out%idest = rmp%idest
+    call move_alloc(rmp%isrc,remap_out%isrc)
+    call move_alloc(rmp%nrsrc,remap_out%nrsrc)
+    call move_alloc(rmp%naggr,remap_out%naggr)
+  end subroutine d_remap_move_alloc
 
 end module amg_d_onelev_mod

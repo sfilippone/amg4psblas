@@ -122,7 +122,7 @@ subroutine amg_d_hierarchy_rebld(a,desc_a,prec,info)
   end if
 
 
-  iszv = size(prec%precv)
+  iszv = prec%get_nlevs()
 
   do i=2, iszv
     call prec%precv(i-1)%base_a%cp_to(acsr)

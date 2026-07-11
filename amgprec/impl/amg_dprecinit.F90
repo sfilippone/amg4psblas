@@ -255,8 +255,8 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
     write(psb_err_unit,*) name,&
          &': Warning: Unknown preconditioner type request "',ptype,'"'
     info = psb_err_pivot_too_small_
-
   end select
+  call prec%set_nlevs(nlev_) 
 
   call psb_erractionrestore(err_act)
   return

@@ -527,8 +527,7 @@ contains
         ! Apply the restriction
         call p%precv(level+1)%map_rstr(cone,vx2l,&
              & czero,p%precv(level+1)%wrk%vx2l,&
-             & info,work=work,&
-             & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
+             & info,work=work,vtx=wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
                & a_err='Error during restriction')
@@ -547,8 +546,7 @@ contains
         !  
         call p%precv(level+1)%map_prol(cone,&
              & p%precv(level+1)%wrk%vy2l, cone,vy2l,&
-             & info,work=work,&
-             & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
+             & info,work=work, vty=wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
                & a_err='Error during prolongation')
@@ -667,8 +665,7 @@ contains
           
           call p%precv(level+1)%map_rstr(cone,vty,&
                & czero,p%precv(level+1)%wrk%vx2l,&
-               & info,work=work,&
-               & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
+               & info,work=work,vtx=wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
                  & a_err='Error during restriction')
@@ -678,8 +675,7 @@ contains
           ! Shortcut: just transfer x2l. 
           call p%precv(level+1)%map_rstr(cone,vx2l,&
                & czero,p%precv(level+1)%wrk%vx2l,&
-               & info,work=work,&
-               & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
+               & info,work=work,vtx=wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
                  & a_err='Error during restriction')
@@ -694,8 +690,7 @@ contains
         !  
         call p%precv(level+1)%map_prol(cone,&
              & p%precv(level+1)%wrk%vy2l,cone,vy2l,&
-             & info,work=work,&
-             & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
+             & info,work=work,vty=wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
                & a_err='Error during prolongation')
@@ -714,7 +709,7 @@ contains
           if (info == psb_success_) &
                & call p%precv(level+1)%map_rstr(cone,vty,&
                & czero,p%precv(level+1)%wrk%vx2l,info,work=work,&
-               & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
+               & vtx=wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
                  & a_err='Error during W-cycle restriction')
@@ -725,8 +720,7 @@ contains
 
           if (info == psb_success_) call p%precv(level+1)%map_prol(cone, &
                & p%precv(level+1)%wrk%vy2l,cone,vy2l,&
-               & info,work=work,&
-               & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
+               & info,work=work,vty=wv(1))
 
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_,name,&
@@ -914,7 +908,7 @@ contains
         call  p%precv(level + 1)%map_rstr(cone,vty,&
              & czero,p%precv(level + 1)%wrk%vx2l,&
              &info,work=work,&
-             & vtx=wv(1),vty=p%precv(level+1)%wrk%wv(1))
+             & vtx=wv(1))
 
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&
@@ -949,8 +943,7 @@ contains
         !  
         call p%precv(level+1)%map_prol(cone,&
              & p%precv(level+1)%wrk%vy2l,cone,vy2l,&
-             & info,work=work,&
-             & vtx=p%precv(level+1)%wrk%wv(1),vty=wv(1))
+             & info,work=work,vty=wv(1))
 
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_,name,&

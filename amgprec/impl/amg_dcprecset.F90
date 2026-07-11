@@ -129,7 +129,7 @@ subroutine amg_dcprecseti(p,what,val,info,ilev,ilmax,pos,idx)
     return
   endif
 
-  nlev_ = size(p%precv)
+  nlev_ = p%get_nlevs()
 
   if (present(ilev)) then
     ilev_ = ilev
@@ -376,7 +376,7 @@ subroutine amg_dcprecsetc(p,what,string,info,ilev,ilmax,pos,idx)
     return
   endif
 
-  nlev_ = size(p%precv)
+  nlev_ = p%get_nlevs()
 
   if (present(ilev)) then
     ilev_ = ilev
@@ -1057,7 +1057,7 @@ subroutine amg_dcprecsetr(p,what,val,info,ilev,ilmax,pos,idx)
     info = 3111
     return
   endif
-  nlev_ = size(p%precv)
+  nlev_ = p%get_nlevs()
 
   if (present(ilev)) then
     ilev_ = ilev
