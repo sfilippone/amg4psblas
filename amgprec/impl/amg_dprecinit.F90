@@ -240,6 +240,8 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
     do ilev_ = 1, nlev_
       call prec%precv(ilev_)%default()
     end do
+    call prec%set_nlevs(nlev_) 
+
     call prec%set('ML_CYCLE','VCYCLE',info)
     call prec%set('SMOOTHER_TYPE','FBGS',info)
 #if defined(AMG_HAVE_UMF)
@@ -256,7 +258,6 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
          &': Warning: Unknown preconditioner type request "',ptype,'"'
     info = psb_err_pivot_too_small_
   end select
-  call prec%set_nlevs(nlev_) 
 
   call psb_erractionrestore(err_act)
   return

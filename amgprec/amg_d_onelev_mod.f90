@@ -762,7 +762,7 @@ contains
     info = psb_success_
     nwv = lv%get_wrksz()
     if (.not.allocated(lv%wrk)) allocate(lv%wrk,stat=info)
-    write(0,*) 'From allocate_wrk :',lv%remap_data%desc_ac_pre_remap%is_asb()
+!!$    write(0,*) 'From allocate_wrk :',lv%remap_data%desc_ac_pre_remap%is_asb()
     if (info == 0) then
       if (lv%remap_data%desc_ac_pre_remap%is_asb()) then
         !
@@ -810,12 +810,12 @@ contains
 
     info = psb_success_
     call wk%free(info)
-    write(0,*) 'wrk_alloc D: "',trim(desc%get_fmt()),'"',&
-         & present(desc2),desc%is_valid()
+!!$    write(0,*) 'wrk_alloc D: "',trim(desc%get_fmt()),'"',&
+!!$         & present(desc2),desc%is_valid()
 
     allocate(wk%wv(nwv),stat=info)    
     if  (present(desc2).and.(desc%is_valid())) then
-      write(0,*) 'wrk_alloc D2:',desc2%get_fmt(),desc2%is_asb()
+!!$      write(0,*) 'wrk_alloc D2:',desc2%get_fmt(),desc2%is_asb()
       if (desc2%get_local_cols()>desc%get_local_cols()) then
         call inner_do_wrk_alloc(wk,nwv,desc2,vmold=vmold)
       else

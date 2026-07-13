@@ -605,7 +605,7 @@ contains
     if(debug_level > 1) then
       write(debug_unit,*) me,' inner_mult at level ',level
     end if
-    write(debug_unit,*) me,' inner_mult at level (1):',level,np
+!!$    write(debug_unit,*) me,' inner_mult at level (1):',level,np
     sweeps_post = p%precv(level)%parms%sweeps_post
     sweeps_pre  = p%precv(level)%parms%sweeps_pre
     pre  = ((sweeps_pre>0).and.(trans=='N')).or.((sweeps_post>0).and.(trans/='N'))
@@ -615,8 +615,8 @@ contains
          & vtx => p%precv(level)%wrk%vtx,vty => p%precv(level)%wrk%vty,&
          & base_a => p%precv(level)%base_a, base_desc=>p%precv(level)%base_desc,&
          & wv => p%precv(level)%wrk%wv)
-      write(0,*) 'Inner mult at level (2):',level,' :',me,np,':',&
-           & size(p%precv(level)%wrk%wv), allocated(p%precv(level)%wrk%wv)
+!!$      write(0,*) 'Inner mult at level (2):',level,' :',me,np,':',&
+!!$           & size(p%precv(level)%wrk%wv), allocated(p%precv(level)%wrk%wv)
       if (me >=0) then
       
       if (level < nlev) then 
@@ -664,7 +664,7 @@ contains
             goto 9999
           end if
 
-          write(0,*) me,' Map_rstr from  ', level,' to ',level+1
+!!$          write(0,*) me,' Map_rstr from  ', level,' to ',level+1
           call p%precv(level+1)%map_rstr(done,vty,&
                & dzero,p%precv(level+1)%wrk%vx2l,&
                & info,work=work,vtx=wv(1))

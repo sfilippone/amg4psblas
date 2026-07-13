@@ -437,11 +437,11 @@ contains
     class(amg_dprec_type), intent(in) :: prec
     integer(psb_ipk_) :: val
     val = 0
-    if (allocated(prec%precv)) then
-      val = size(prec%precv)
-    end if
+!!$    if (allocated(prec%precv)) then
+!!$      val = size(prec%precv)
+!!$    end if
     val = prec%nlevs
-    write(0,*) ' NLEVS: ',prec%nlevs, val,size(prec%precv)
+!!$    write(0,*) ' NLEVS: ',prec%nlevs, val,size(prec%precv)
 
   end function amg_d_get_nlevs
 
@@ -532,9 +532,9 @@ contains
       if (num >= dzero) then
         den = num
         nl = prec%get_nlevs()
-        write(0,*) 'Inside cmp_compl ',nl,size(prec%precv)
+!!$        write(0,*) 'Inside cmp_compl ',nl,size(prec%precv)
         do il=2, nl
-          write(0,*) '                 ',il,associated(prec%precv(il)%base_a)
+!!$          write(0,*) '                 ',il,associated(prec%precv(il)%base_a)
           num = num + max(0,prec%precv(il)%base_a%get_nzeros())
         end do
       end if
@@ -627,9 +627,7 @@ contains
   end subroutine amg_dprecfree
 
   subroutine amg_d_prec_free(prec,info)
-
     implicit none
-
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -661,9 +659,7 @@ contains
   end subroutine amg_d_prec_free
 
   subroutine amg_d_smoothers_free(prec,info)
-
     implicit none
-
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -927,7 +923,6 @@ contains
   end subroutine amg_d_clone
 
   subroutine amg_d_inner_clone(prec,precout,info)
-
     implicit none
     class(amg_dprec_type), intent(inout)         :: prec
     class(psb_dprec_type), target, intent(inout) :: precout
@@ -1012,7 +1007,6 @@ contains
   subroutine amg_d_allocate_wrk(prec,info,vmold,desc)
     use psb_base_mod
     implicit none
-
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -1090,7 +1084,6 @@ contains
   function amg_d_is_allocated_wrk(prec) result(res)
     use psb_base_mod
     implicit none
-
     ! Arguments
     class(amg_dprec_type), intent(in) :: prec
     logical :: res

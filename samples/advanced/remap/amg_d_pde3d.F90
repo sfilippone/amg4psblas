@@ -473,10 +473,10 @@ program amg_d_pde3d
     goto 9999
   end if
 
-  do i=2, size(prec%precv)
-    write(0,*) iam,'Between hier and smoothers_bld level',i,':',&
-         & prec%precv(i)%remap_data%desc_ac_pre_remap%is_asb()
-  end do
+!!$  do i=2, size(prec%precv)
+!!$    write(0,*) iam,'Between hier and smoothers_bld level',i,':',&
+!!$         & prec%precv(i)%remap_data%desc_ac_pre_remap%is_asb()
+!!$  end do
   
   call psb_barrier(ctxt)
   t1 = psb_wtime()
@@ -497,11 +497,11 @@ program amg_d_pde3d
     write(psb_out_unit,'(" ")')
   end if
 
-  do i=2, size(prec%precv)
-    write(0,*) iam,'After smoothers_bld level',i,':',&
-         & prec%precv(i)%remap_data%desc_ac_pre_remap%is_asb()
-  end do
-  
+!!$  do i=2, size(prec%precv)
+!!$    write(0,*) iam,'After smoothers_bld level',i,':',&
+!!$         & prec%precv(i)%remap_data%desc_ac_pre_remap%is_asb()
+!!$  end do
+!!$  
 
   call prec%descr(info,iout=psb_out_unit)
   if (p_choice%dump) then
@@ -565,7 +565,7 @@ program amg_d_pde3d
   call psb_sum(ctxt,amatsize)
   call psb_sum(ctxt,descsize)
   call psb_sum(ctxt,precsize)
-  call prec%descr(info,iout=psb_out_unit)
+!!$  call prec%descr(info,iout=psb_out_unit)
   if (iam == psb_root_) then
     write(psb_out_unit,'("Computed solution on ",i8," process(es)")')  np
     write(psb_out_unit,'("Number of threads                  : ",i12)') nth

@@ -49,7 +49,7 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
   type(psb_d_vect_type), pointer   :: vty_
       integer(psb_mpk_) :: me, np
 
-  write(0,*) 'New map_rstr ',lv%remap_data%ac_pre_remap%is_asb()
+!!$  write(0,*) 'New map_rstr ',lv%remap_data%ac_pre_remap%is_asb()
   if (present(vty)) then
     vty_ => vty
   else
@@ -60,7 +60,7 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
     !
     ! Remap has happened, deal with it
     !
-    write(0,*) 'Level map_rstr with remapping '
+!!$    write(0,*) 'Level map_rstr with remapping '
     block
       type(psb_ctxt_type) :: ctxt, rctxt
       integer(psb_mpk_) :: i,j,ip, idest, nsrc, nrl, kp
@@ -72,25 +72,25 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
       call psb_info(ctxt,me,np)
       rctxt = lv%desc_ac%get_ctxt()
       call psb_info(rctxt,rme,rnp)
-      write(0,*) 'New context map rstr',rme,rnp,me,np
+!!$      write(0,*) 'New context map rstr',rme,rnp,me,np
       idest = lv%remap_data%idest
       associate(isrc => lv%remap_data%isrc, nrsrc => lv%remap_data%nrsrc)
-        write(0,*) 'Should apply maps, then send data from ',me,' to ',idest
-        if (rme >= 0) write(0,*) rme, '  Receiving      data from ',isrc(:)
+!!$        write(0,*) 'Should apply maps, then send data from ',me,' to ',idest
+!!$        if (rme >= 0) write(0,*) rme, '  Receiving      data from ',isrc(:)
         nsrc = size(isrc)
         nrl  = lv%remap_data%desc_ac_pre_remap%get_local_rows()
         call psb_geall(tv,lv%remap_data%desc_ac_pre_remap,info)
         call psb_geasb(tv,lv%remap_data%desc_ac_pre_remap,info,mold=vect_u%v) 
-        write(0,*) me,' remap map_rstr calling U2V: ',me,np,rme,rnp,tv%get_nrows(),&
-             & psb_errstatus_fatal()
-        flush(0)
+!!$        write(0,*) me,' remap map_rstr calling U2V: ',me,np,rme,rnp,tv%get_nrows(),&
+!!$             & psb_errstatus_fatal()
+!!$        flush(0)
         call psb_barrier(ctxt)
         call lv%linmap%map_U2V(alpha,vect_u,beta,tv,info,&
              & work=work,vtx=vtx,vty=vty_)
         !call tv%sync()
         !rsnd = tv%get_vect()
         !call psb_snd(ctxt,rsnd(1:nrl),idest) 
-        write(0,*) me,' map_rstr sending ',me,idest,psb_errstatus_fatal()
+!!$        write(0,*) me,' map_rstr sending ',me,idest,psb_errstatus_fatal()
         call psb_snd(ctxt,tv%v%v(1:nrl),idest)
         if (rme >=0) then
           allocate(rrcv(sum(nrsrc)))
@@ -99,14 +99,14 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
           do i = 1,size(isrc)
             ip = isrc(i)
             nrl = nrsrc(i)
-            write(0,*) me,' map_rstr receiving',rme,ip,psb_errstatus_fatal()           
+!!$            write(0,*) me,' map_rstr receiving',rme,ip,psb_errstatus_fatal()           
             call psb_rcv(ctxt,rrcv(kp+1:kp+nrl),ip)
             kp = kp + nrl
           end do
           call vect_v%set_vect(rrcv)
         end if
       end associate
-      write(0,*) me, ' Restrictor with remap done ',psb_errstatus_fatal()     
+!!$      write(0,*) me, ' Restrictor with remap done ',psb_errstatus_fatal()     
     end block
  
   else
@@ -115,12 +115,12 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
       type(psb_ctxt_type) :: ctxt, rctxt
       ctxt = lv%linmap%p_desc_U%get_ctxt()
       call psb_info(ctxt,me,np)
-      write(0,*) me,' map_rstr calling U2V: ',me,np
+!!$      write(0,*) me,' map_rstr calling U2V: ',me,np
       call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&
            & work=work,vtx=vtx,vty=vty_)
     end block
   end if
-  write(0,*) me, 'End of restriction ',info,psb_errstatus_fatal()
+!!$  write(0,*) me, 'End of restriction ',info,psb_errstatus_fatal()
 end subroutine amg_d_base_onelev_map_rstr_v
 
 subroutine amg_d_base_onelev_map_rstr_a(lv,alpha,u,beta,v,info,work)
