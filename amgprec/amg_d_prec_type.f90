@@ -665,6 +665,11 @@ contains
     if (allocated(prec%precv)) then
       do i=1,size(prec%precv)
         call prec%precv(i)%free(info)
+        if (psb_errstatus_fatal()) then
+          info=psb_err_internal_error_
+          call psb_errpush(info,name)
+          goto 9999
+        end if
       end do
       deallocate(prec%precv,stat=info)
     end if
