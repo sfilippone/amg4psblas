@@ -572,13 +572,17 @@ contains
     integer(psb_ipk_)   :: il, nl, iam, np
 
     avgcr = szero
-    ctxt = prec%ctxt
-    call psb_info(ctxt,iam,np)
     nl = prec%get_nlevs()
     do il=2,nl
-      avgcr = avgcr + max(szero,prec%precv(il)%szratio)
+      if (prec%precv(il)%base_desc%is_ok()) then 
+        ctxt = prec%precv(il)%base_desc%get_ctxt()
+        call psb_info(ctxt,iam,np)
+        if (iam >=0)  avgcr = avgcr + max(szero,prec%precv(il)%szratio)
+      end if
     end do
     avgcr = avgcr / (nl-1)
+    ctxt = prec%ctxt
+    call psb_info(ctxt,iam,np)
     call psb_sum(ctxt,avgcr)
     prec%ag_data%avg_cr = avgcr/np
   end subroutine amg_c_cmp_avg_cr
