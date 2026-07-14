@@ -226,9 +226,7 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
     allocate(amg_d_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
 
-
   case ('ML')
-
     nlev_ = prec%ag_data%max_levs
     ilev_ = 1
     allocate(prec%precv(nlev_),stat=info)
@@ -240,6 +238,8 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
     do ilev_ = 1, nlev_
       call prec%precv(ilev_)%default()
     end do
+    call prec%set_nlevs(nlev_) 
+
     call prec%set('ML_CYCLE','VCYCLE',info)
     call prec%set('SMOOTHER_TYPE','FBGS',info)
 #if defined(AMG_HAVE_UMF)
@@ -255,7 +255,6 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
     write(psb_err_unit,*) name,&
          &': Warning: Unknown preconditioner type request "',ptype,'"'
     info = psb_err_pivot_too_small_
-
   end select
 
   call psb_erractionrestore(err_act)

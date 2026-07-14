@@ -47,25 +47,33 @@ subroutine amg_s_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
   integer(psb_ipk_), intent(out)       :: info
   real(psb_spk_), optional          :: work(:)
   type(psb_s_vect_type), optional, target, intent(inout)  :: vtx,vty
+  type(psb_s_vect_type), pointer   :: vty_
+  integer(psb_mpk_) :: me, np
 
 !!$  write(0,*) 'New map_rstr',lv%remap_data%ac_pre_remap%is_asb()
+  if (present(vty)) then
+    vty_ => vty
+  else
+    vty_ => lv%wrk%wv(1)
+  end if
+  
   if (lv%remap_data%ac_pre_remap%is_asb()) then
     !
     ! Remap has happened, deal with it
     !
 !!$    write(0,*) 'Remap handling not implemented yet '
     block
-      type(psb_ctxt_type) :: ctxt, nctxt
+      type(psb_ctxt_type) :: ctxt, rctxt
       integer(psb_mpk_) :: i,j,ip, idest, nsrc, nrl, kp
-      integer(psb_mpk_) :: me, np,  rme, rnp
+      integer(psb_mpk_) :: rme, rnp
       real(psb_spk_), allocatable :: rsnd(:), rrcv(:)
       type(psb_s_vect_type) :: tv
       
       ctxt = lv%remap_data%desc_ac_pre_remap%get_ctxt()
       call psb_info(ctxt,me,np)
-      nctxt = lv%desc_ac%get_ctxt()
-      call psb_info(nctxt,rme,rnp)
-!!$      write(0,*) 'New context ',rme,rnp
+      rctxt = lv%desc_ac%get_ctxt()
+      call psb_info(rctxt,rme,rnp)
+!!$      write(0,*) 'New context map rstr',rme,rnp,me,np
       idest = lv%remap_data%idest
       associate(isrc => lv%remap_data%isrc, nrsrc => lv%remap_data%nrsrc)
 !!$        write(0,*) 'Should apply maps, then send data from ',me,' to ',idest
@@ -73,12 +81,18 @@ subroutine amg_s_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
         nsrc = size(isrc)
         nrl  = lv%remap_data%desc_ac_pre_remap%get_local_rows()
         call psb_geall(tv,lv%remap_data%desc_ac_pre_remap,info)
-        call psb_geasb(tv,lv%remap_data%desc_ac_pre_remap,info) 
-!!$        write(0,*) me,' Size of TV ',tv%get_nrows()
+        call psb_geasb(tv,lv%remap_data%desc_ac_pre_remap,info,mold=vect_u%v) 
+!!$        write(0,*) me,' remap map_rstr calling U2V: ',me,np,rme,rnp,tv%get_nrows(),&
+!!$             & psb_errstatus_fatal()
+!!$        flush(0)
+        call psb_barrier(ctxt)
         call lv%linmap%map_U2V(alpha,vect_u,beta,tv,info,&
-             & work=work,vtx=vtx,vty=vty)
-        rsnd = tv%get_vect()
-        call psb_snd(ctxt,rsnd(1:nrl),idest)
+             & work=work,vtx=vtx,vty=vty_)
+        call tv%sync()
+        !rsnd = tv%get_vect()
+        !call psb_snd(ctxt,rsnd(1:nrl),idest) 
+!!$        write(0,*) me,' map_rstr sending ',me,idest,psb_errstatus_fatal()
+        call psb_snd(ctxt,tv%v%v(1:nrl),idest)
         if (rme >=0) then
           allocate(rrcv(sum(nrsrc)))
 !!$          write(0,*) me,rme,' Size check ',size(rrcv)!,lv%desc_ac%get_local_rows()
@@ -86,22 +100,28 @@ subroutine amg_s_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
           do i = 1,size(isrc)
             ip = isrc(i)
             nrl = nrsrc(i)
-!!$            write(0,*) me,' Receiving from ',ip,nrl,kp+1,kp+nrl,size(rrcv)
+!!$            write(0,*) me,' map_rstr receiving',rme,ip,psb_errstatus_fatal()           
             call psb_rcv(ctxt,rrcv(kp+1:kp+nrl),ip)
             kp = kp + nrl
           end do
           call vect_v%set_vect(rrcv)
         end if
       end associate
-!!$      write(0,*) me, ' Restrictor with remap done '
+!!$      write(0,*) me, ' Restrictor with remap done ',psb_errstatus_fatal()     
     end block
  
   else
     ! Default transfer
-    call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&
-         & work=work,vtx=vtx,vty=vty)
+    block
+      type(psb_ctxt_type) :: ctxt, rctxt
+      ctxt = lv%linmap%p_desc_U%get_ctxt()
+      call psb_info(ctxt,me,np)
+!!$      write(0,*) me,' map_rstr calling U2V: ',me,np
+      call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&
+           & work=work,vtx=vtx,vty=vty_)
+    end block
   end if
-  
+!!$  write(0,*) me, 'End of restriction ',info,psb_errstatus_fatal()  
 end subroutine amg_s_base_onelev_map_rstr_v
 
 subroutine amg_s_base_onelev_map_rstr_a(lv,alpha,u,beta,v,info,work)
@@ -119,7 +139,7 @@ subroutine amg_s_base_onelev_map_rstr_a(lv,alpha,u,beta,v,info,work)
     !
     ! Remap has happened, deal with it
     !
-    write(0,*) 'Remap handling not implemented yet '
+    write(0,*) 'Remap R handling not implemented yet for A'
   else
     ! Default transfer
     call lv%linmap%map_U2V(alpha,u,beta,v,info,&

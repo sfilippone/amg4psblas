@@ -67,7 +67,7 @@ module amg_s_inner_mod
   end interface amg_mlprec_bld
 
   interface amg_mlprec_aply
-    subroutine amg_smlprec_aply(alpha,p,x,beta,y,desc_data,trans,work,info)
+    subroutine amg_smlprec_aply_a(alpha,p,x,beta,y,desc_data,trans,work,info)
       import :: psb_sspmat_type, psb_desc_type, psb_spk_, psb_ipk_
       import :: amg_sprec_type
       implicit none 
@@ -79,7 +79,7 @@ module amg_s_inner_mod
       character,intent(in)               :: trans
       real(psb_spk_),target             :: work(:)
       integer(psb_ipk_), intent(out)     :: info
-    end subroutine amg_smlprec_aply
+    end subroutine amg_smlprec_aply_a
     subroutine amg_smlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
       import :: psb_sspmat_type, psb_desc_type, &
            & psb_spk_, psb_s_vect_type, psb_ipk_

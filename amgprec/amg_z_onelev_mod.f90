@@ -154,13 +154,35 @@ module amg_z_onelev_mod
   private :: z_wrk_alloc, z_wrk_free, &
        & z_wrk_clone, z_wrk_move_alloc, z_wrk_cnv, z_wrk_sizeof
 
+  !
+  ! Remap.
+  !  This keeps track of remapping.
+  !  Logic here is as follows:
+  !  1. AC_PRE_REMAP  need to figure out if we
+  !                really need it.
+  !  2. DESC_AC_PRE_REMAP  contains the descriptor before
+  !                remapping. Meaning that it is possible
+  !                to implement the RESTRICTOR operator by
+  !                 a. Doing LINMAP_U2V onto this one
+  !                 b. For each process, send the data to
+  !                    IDEST.
+  !                This assumes that remapping goes by
+  !                a factor of 2.
+  !                For the PROLONGATOR operators, we first
+  !                use DESC_AC, then split and send onto
+  !                the processes in DESC_AC_PRE_REMAP.
+  !
+  ! To be fixed: what happens if NP the starting processes
+  ! is not an even number? Coordinate with _X_remap in PSBLAS
+  ! 
   type amg_z_remap_data_type
     type(psb_zspmat_type)          :: ac_pre_remap
     type(psb_desc_type)            :: desc_ac_pre_remap
     integer(psb_ipk_)              :: idest
     integer(psb_ipk_), allocatable :: isrc(:), nrsrc(:), naggr(:)
   contains
-    procedure, pass(rmp) :: clone   => z_remap_data_clone
+    procedure, pass(rmp) :: clone      => z_remap_data_clone
+    procedure, pass(rmp) :: move_alloc => z_remap_move_alloc
   end type amg_z_remap_data_type
 
   type amg_z_onelev_type
@@ -206,7 +228,7 @@ module amg_z_onelev_mod
     procedure, pass(lv) :: get_wrksz => z_base_onelev_get_wrksize
     procedure, pass(lv) :: allocate_wrk   => z_base_onelev_allocate_wrk
     procedure, pass(lv) :: free_wrk       => z_base_onelev_free_wrk
-    procedure, nopass   :: stringval => amg_stringval
+    procedure, nopass   :: stringval  => amg_stringval
     procedure, pass(lv) :: move_alloc => z_base_onelev_move_alloc
 
 
@@ -618,7 +640,7 @@ contains
     ! Arguments
     class(amg_z_onelev_type), target, intent(inout) :: lv
     class(amg_z_onelev_type), target, intent(inout) :: lvout
-    integer(psb_ipk_), intent(out)                    :: info
+    integer(psb_ipk_), intent(out)                  :: info
 
     info = psb_success_
     if (allocated(lv%sm)) then
@@ -684,6 +706,7 @@ contains
     if (info == psb_success_) call psb_move_alloc(lv%tprol,b%tprol,info)
     if (info == psb_success_) call psb_move_alloc(lv%desc_ac,b%desc_ac,info)
     if (info == psb_success_) call psb_move_alloc(lv%linmap,b%linmap,info)
+    if (info == psb_success_) call lv%remap_data%move_alloc(b%remap_data,info)
     b%base_a    => lv%base_a
     b%base_desc => lv%base_desc
 
@@ -738,6 +761,7 @@ contains
     info = psb_success_
     nwv = lv%get_wrksz()
     if (.not.allocated(lv%wrk)) allocate(lv%wrk,stat=info)
+!!$    write(0,*) 'From allocate_wrk :',lv%remap_data%desc_ac_pre_remap%is_asb()
     if (info == 0) then
       if (lv%remap_data%desc_ac_pre_remap%is_asb()) then
         !
@@ -785,47 +809,32 @@ contains
 
     info = psb_success_
     call wk%free(info)
-    if  (present(desc2)) then
-!!$      write(0,*) 'Check on wrk_alloc 2',&
-!!$           & desc2%get_local_rows(), desc%get_local_rows(),&
-!!$           & desc2%get_local_cols(),desc%get_local_cols()
-!!$      flush(0)
+!!$    write(0,*) 'wrk_alloc D: "',trim(desc%get_fmt()),'"',&
+!!$         & present(desc2),desc%is_valid()
+
+    allocate(wk%wv(nwv),stat=info)    
+    if  (present(desc2).and.(desc%is_valid())) then
+!!$      write(0,*) 'wrk_alloc D2:',desc2%get_fmt(),desc2%is_asb()
       if (desc2%get_local_cols()>desc%get_local_cols()) then
-        call psb_geasb(wk%vx2l,desc2,info,&
-             & scratch=.true.,mold=vmold)
-        call psb_geasb(wk%vy2l,desc2,info,&
-             & scratch=.true.,mold=vmold)
-        call psb_geasb(wk%vtx,desc2,info,&
-             & scratch=.true.,mold=vmold)
-        call psb_geasb(wk%vty,desc2,info,&
-             & scratch=.true.,mold=vmold)
-        allocate(wk%wv(nwv),stat=info)
-        do i=1,nwv
-          call psb_geasb(wk%wv(i),desc2,info,&
-               & scratch=.true.,mold=vmold)
-        end do
+        call inner_do_wrk_alloc(wk,nwv,desc2,vmold=vmold)
       else
-!!$        write(0,*) 'Check on wrk_alloc 1.5 ',&
-!!$             & desc%get_local_rows(),&
-!!$             & desc%get_local_cols()
-        call psb_geasb(wk%vx2l,desc,info,&
-             & scratch=.true.,mold=vmold)
-        call psb_geasb(wk%vy2l,desc,info,&
-             & scratch=.true.,mold=vmold)
-        call psb_geasb(wk%vtx,desc,info,&
-             & scratch=.true.,mold=vmold)
-        call psb_geasb(wk%vty,desc,info,&
-             & scratch=.true.,mold=vmold)
-        allocate(wk%wv(nwv),stat=info)
-        do i=1,nwv
-          call psb_geasb(wk%wv(i),desc,info,&
-               & scratch=.true.,mold=vmold)
-        end do
+        call inner_do_wrk_alloc(wk,nwv,desc,vmold=vmold)
       end if
-    else
-!!$      write(0,*) 'Check on wrk_alloc 1 ',&
-!!$           & desc%get_local_rows(),&
-!!$           & desc%get_local_cols()
+    else if (present(desc2)) then
+      call inner_do_wrk_alloc(wk,nwv,desc2,vmold=vmold)
+    else if (desc%is_valid()) then
+      call inner_do_wrk_alloc(wk,nwv,desc,vmold=vmold)      
+    end if
+
+  contains
+    subroutine inner_do_wrk_alloc(wk,nwv,desc,vmold)
+      class(amg_zmlprec_wrk_type), target, intent(inout) :: wk
+      integer(psb_ipk_), intent(in)                     :: nwv
+      type(psb_desc_type), intent(in)                   :: desc
+      class(psb_z_base_vect_type), intent(in), optional  :: vmold
+      
+      integer(psb_ipk_) :: i
+      
       call psb_geasb(wk%vx2l,desc,info,&
            & scratch=.true.,mold=vmold)
       call psb_geasb(wk%vy2l,desc,info,&
@@ -834,12 +843,11 @@ contains
            & scratch=.true.,mold=vmold)
       call psb_geasb(wk%vty,desc,info,&
            & scratch=.true.,mold=vmold)
-      allocate(wk%wv(nwv),stat=info)
       do i=1,nwv
         call psb_geasb(wk%wv(i),desc,info,&
              & scratch=.true.,mold=vmold)
       end do
-    end if
+    end subroutine inner_do_wrk_alloc
   end subroutine z_wrk_alloc
 
   subroutine z_wrk_free(wk,info)
@@ -992,4 +1000,25 @@ contains
     call psb_safe_ab_cpy(rmp%nrsrc,remap_out%nrsrc,info)
   end subroutine z_remap_data_clone
 
+  subroutine z_remap_move_alloc(rmp, remap_out, info)
+    use psb_base_mod
+    implicit none
+    ! Arguments
+    class(amg_z_remap_data_type), target, intent(inout) :: rmp
+    class(amg_z_remap_data_type), target, intent(inout) :: remap_out
+    integer(psb_ipk_), intent(out)                    :: info
+    !
+    integer(psb_ipk_) :: i
+
+    info = psb_success_
+
+    call psb_move_alloc(rmp%ac_pre_remap,remap_out%ac_pre_remap,info)
+    if (info == psb_success_) &
+         & call psb_move_alloc(rmp%desc_ac_pre_remap,remap_out%desc_ac_pre_remap,info)
+    remap_out%idest = rmp%idest
+    call move_alloc(rmp%isrc,remap_out%isrc)
+    call move_alloc(rmp%nrsrc,remap_out%nrsrc)
+    call move_alloc(rmp%naggr,remap_out%naggr)
+  end subroutine z_remap_move_alloc
+  
 end module amg_z_onelev_mod

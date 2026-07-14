@@ -139,7 +139,7 @@ subroutine  amg_z_dec_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
   use amg_z_prec_type, amg_protect_name => amg_z_dec_aggregator_mat_bld
   use amg_z_inner_mod 
   implicit none
-  
+
   class(amg_z_dec_aggregator_type), target, intent(inout) :: ag
   type(amg_dml_parms), intent(inout)      :: parms 
   type(psb_zspmat_type), intent(in)    :: a
@@ -169,39 +169,46 @@ subroutine  amg_z_dec_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
   ctxt = desc_a%get_context()
   call psb_info(ctxt,me,np)
 
-  !
-  ! Build the coarse-level matrix from the fine-level one, starting from 
-  ! the mapping defined by amg_aggrmap_bld and applying the aggregation
-  ! algorithm specified by 
-  !
-  select case (parms%aggr_prol)
-  case (amg_no_smooth_) 
+  if (me >=0) then 
+    !
+    ! Build the coarse-level matrix from the fine-level one, starting from 
+    ! the mapping defined by amg_aggrmap_bld and applying the aggregation
+    ! algorithm specified by 
+    !
+    select case (parms%aggr_prol)
+    case (amg_no_smooth_) 
 
-    call amg_zaggrmat_nosmth_bld(parms%aggr_prol,a,desc_a,ilaggr,&
-            nlaggr,parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
+      call amg_zaggrmat_nosmth_bld(parms%aggr_prol,a,desc_a,ilaggr,&
+           nlaggr,parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
 
-  case(amg_smooth_prol_,amg_l1_smooth_prol_) 
+    case(amg_smooth_prol_,amg_l1_smooth_prol_) 
 
-    call amg_zaggrmat_smth_bld(parms%aggr_prol,a,desc_a,&
-            ilaggr,nlaggr,parms,ac,desc_ac,op_prol,&
-            op_restr,t_prol,info)
+      call amg_zaggrmat_smth_bld(parms%aggr_prol,a,desc_a,&
+           ilaggr,nlaggr,parms,ac,desc_ac,op_prol,&
+           op_restr,t_prol,info)
 
 !!$  case(amg_biz_prol_) 
 !!$
 !!$    call amg_zaggrmat_biz_bld(a,desc_a,ilaggr,nlaggr, &
 !!$         & parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
-  
-  case(amg_min_energy_) 
 
-    call amg_zaggrmat_minnrg_bld(parms%aggr_prol,a,desc_a,ilaggr,&
-            nlaggr,parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
+    case(amg_min_energy_) 
 
-  case default
-    info = psb_err_internal_error_
-    call psb_errpush(info,name,a_err='Invalid aggr kind')
-    goto 9999
+      call amg_zaggrmat_minnrg_bld(parms%aggr_prol,a,desc_a,ilaggr,&
+           nlaggr,parms,ac,desc_ac,op_prol,op_restr,t_prol,info)
 
-  end select
+    case default
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='Invalid aggr kind')
+      goto 9999
+
+    end select
+  else
+    call op_prol%allocate(izero,izero,info)
+    call op_restr%allocate(izero,izero,info)
+    call ac%allocate(izero,izero,info)
+  end if
+
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='Inner aggrmat bld')
     goto 9999
@@ -214,5 +221,5 @@ subroutine  amg_z_dec_aggregator_mat_bld(ag,parms,a,desc_a,ilaggr,nlaggr,&
 9999 call psb_error_handler(err_act)
   return
 
-  
+
 end subroutine amg_z_dec_aggregator_mat_bld

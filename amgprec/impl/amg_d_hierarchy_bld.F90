@@ -64,11 +64,9 @@
 !               Error code.              
 !  
 subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
-
   use psb_base_mod
   use amg_d_inner_mod
   use amg_d_prec_mod, amg_protect_name => amg_d_hierarchy_bld
-
   Implicit None
 
   ! Arguments
@@ -82,7 +80,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: me,np
   integer(psb_ipk_)   :: err,i,k, err_act, iszv, newsz,&
-       & nplevs, mxplevs
+       & nplevs, mxplevs, level
   integer(psb_lpk_) :: iaggsize, casize, mncsize, mncszpp
   real(psb_dpk_)     :: mnaggratio, sizeratio, athresh, aomega
   class(amg_d_base_smoother_type), allocatable :: coarse_sm, med_sm, &
@@ -98,6 +96,9 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
   character(len=40)  :: ch_err
   integer(psb_ipk_), save  :: idx_bldtp=-1, idx_matasb=-1
   logical, parameter :: do_timings=.false.
+  logical             :: stop_hierarchy_loop
+  type(psb_ctxt_type) :: lctxt
+  integer(psb_ipk_)   :: lme,lnp
 
   info=psb_success_
   err=0
@@ -130,7 +131,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
   end if
   cpymat_ = .false.
   if (present(cpymat)) cpymat_ = cpymat
-  
+
   !
   ! Check to ensure all procs have the same 
   !   
@@ -139,7 +140,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
   mnaggratio = prec%ag_data%min_cr_ratio
   mncsize    = prec%ag_data%min_coarse_size
   mncszpp    = prec%ag_data%min_coarse_size_per_process
-  iszv       = size(prec%precv)
+  iszv       = prec%get_nlevs()
   call psb_bcast(ctxt,iszv)
   call psb_bcast(ctxt,mncsize)
   call psb_bcast(ctxt,mncszpp)
@@ -165,7 +166,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
     call psb_errpush(info,name,a_err='Inconsistent min_cr_ratio')
     goto 9999
   end if
-  if (iszv /= size(prec%precv)) then 
+  if (iszv /= prec%get_nlevs()) then 
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Inconsistent size of precv')
     goto 9999
@@ -180,6 +181,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   endif
+
   if (iszv == 1) then
     !
     ! This is OK, since it may be called by the user even if there
@@ -227,7 +229,6 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
     casize = mncsize
   end if
   prec%ag_data%target_coarse_size = casize
-  
   nplevs = max(itwo,mxplevs)
 
   !
@@ -240,7 +241,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
     goto 9999
   end if
   !
-  ! First set desired number of levels
+  ! First set desired number of levels if different from default. 
   !
   if (iszv /= nplevs) then
     allocate(tprecv(nplevs),stat=info)
@@ -286,7 +287,8 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
       call prec%precv(i)%free(info)
     end do
     call move_alloc(tprecv,prec%precv)
-    iszv = size(prec%precv)
+    call prec%set_nlevs(nplevs)
+    iszv = prec%get_nlevs()
   end if
 
   !
@@ -301,15 +303,24 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
   end if
   call psb_cd_renum_block(desc_a,prec%precv(1)%desc_ac,info)
   prec%precv(1)%base_desc => prec%precv(1)%desc_ac
-  
+
+  !
+  ! Main build loop
+  !   
   newsz = 0
+  stop_hierarchy_loop = .false. 
   array_build_loop: do i=2, iszv
     !
     ! Check on the iprcparm contents: they should be the same
     ! on all processes.
     !
     call psb_bcast(ctxt,prec%precv(i)%parms)
-
+    !
+    ! Get current context: might have performed remapping
+    ! 
+    lctxt = prec%precv(i-1)%base_desc%get_ctxt()
+    call psb_info(lctxt,lme,lnp)
+!!$    write(0,*) 'Check at level',i,lme,lnp
     !
     ! Sanity checks on the parameters
     !
@@ -325,8 +336,8 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
          & write(debug_unit,*) me,' ',trim(name),&
          & 'Calling mlprcbld at level  ',i
     !
-    ! Build the mapping between levels i-1 and i and the matrix
-    ! at level i
+    ! Build the tentative mapping between levels i-1 and i
+    ! and the matrix at level i
     !
     if (do_timings) call psb_tic(idx_bldtp)
     if (info == psb_success_)&
@@ -348,47 +359,26 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
     ! Save op_prol just in case
     !
     call op_prol%clone(prec%precv(i)%tprol,info)
+
     !
     ! Check for early termination of aggregation loop. 
-    !      
-    iaggsize = sum(nlaggr)
-
-    sizeratio = iaggsize
-    if (i==2) then 
-      sizeratio = desc_a%get_global_rows()/sizeratio
+    !
+    if (i == 2) then 
+      call amg_d_hierarchy_bld_cmp_newsz(i,iszv,&
+           & desc_a%get_global_rows(),&
+           & nlaggr,casize,mnaggratio,sizeratio,newsz)
     else
-      sizeratio = sum(prec%precv(i-1)%linmap%naggr)/sizeratio
+      call amg_d_hierarchy_bld_cmp_newsz(i,iszv,&
+           & sum(prec%precv(i-1)%linmap%naggr),&
+           & nlaggr,casize,mnaggratio,sizeratio,newsz)
     end if
     prec%precv(i)%szratio = sizeratio
-
-    if (iaggsize <= casize) newsz = i      
-    if (i == iszv)          newsz = i
-
-    if (i>2) then
-      if (sizeratio < mnaggratio) then
-        !
-        ! We are not gaining 
-        !
-        newsz = i-1
-      end if
-
-      if (all(nlaggr == prec%precv(i-1)%linmap%naggr)) then 
-        newsz=i-1
-        if (me == 0) then 
-          write(debug_unit,*) trim(name),&
-               &': Warning: aggregates from level ',&
-               & newsz
-          write(debug_unit,*) trim(name),&
-               &':                       to level ',&
-               & iszv,' coincide.'
-          write(debug_unit,*) trim(name),&
-               &': Number of levels actually used :',newsz
-          write(debug_unit,*)
-        end if
-      end if
-    end if
     call psb_bcast(ctxt,newsz)
 
+    !
+    ! Handle reallocation, if needed, and then mat_asb to polish off the
+    ! construction
+    ! 
     if (newsz > 0) then
       !
       ! This is awkward, we are saving the aggregation parms, for the sake
@@ -422,92 +412,102 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
              & a_err=ch_err)
         goto 9999
       endif
-      exit array_build_loop
+!!$      write(0,*) ' Early exit  of array_build_loop',i,iszv,info,&
+      level = newsz
+      stop_hierarchy_loop = .true. 
     else
-      if (do_timings) call psb_tic(idx_matasb)            
+      if (do_timings) call psb_tic(idx_matasb)
       if (info == psb_success_) call prec%precv(i)%mat_asb(&
            & prec%precv(i-1)%base_a,prec%precv(i-1)%base_desc,&
            & ilaggr,nlaggr,op_prol,info)
       if (do_timings) call psb_toc(idx_matasb)      
+      level = i
     end if
+
+    !
+    ! Do we want to remap onto a smaller subset of processes?
+    ! Will need a more sophisticated policy
+    !
+    block
+      type(psb_ctxt_type) :: lctxt
+      integer(psb_ipk_)   :: lme,lnp
+      lctxt = prec%precv(level)%desc_ac%get_ctxt()
+      call psb_info(lctxt,lme,lnp)
+      if (amg_d_policy_do_remap(lctxt,level,sum(nlaggr))) then 
+!!$        write(0,*) ' Context on remapping ',lme,lnp
+        if ((lme >=0).and.(lnp>=2)) then 
+          associate(lv=>prec%precv(level), rmp => prec%precv(level)%remap_data)
+            call lv%desc_ac%clone(rmp%desc_ac_pre_remap,info)
+            call lv%ac%clone(rmp%ac_pre_remap,info)
+!!$            write(0,*) 'During first remapping desc_ac:',lv%desc_ac%is_asb(),&
+!!$                 & rmp%desc_ac_pre_remap%is_asb()
+!!$            write(0,*) ' First Doing remapping ',lnp, lnp/2
+            call psb_remap(lnp/2,rmp%desc_ac_pre_remap,rmp%ac_pre_remap,&
+                 & rmp%idest,rmp%isrc,rmp%nrsrc,rmp%naggr,lv%desc_ac,lv%ac,info)
+!!$        write(0,*) me,' Out of remapping ',rmp%desc_ac_pre_remap%get_fmt(),' ',&
+!!$             & lv%desc_ac%get_fmt(),sum(lv%linmap%naggr),sum(rmp%naggr)
+!!$            write(0,*) 'First Assignment ',size(lv%linmap%naggr),size(rmp%naggr)
+            lv%linmap%naggr(:) =  rmp%naggr(:)
+            lv%linmap%p_desc_V => rmp%desc_ac_pre_remap
+            lv%base_a          => lv%ac
+            lv%base_desc       => lv%desc_ac
+            block
+              integer(psb_ipk_) :: meu,npu,mev,npv
+              type(psb_ctxt_type) :: ct
+              ct = lv%linmap%p_desc_U%get_ctxt()
+              call psb_info(ct,meu,npu)
+              ct = lv%linmap%p_desc_V%get_ctxt()
+              call psb_info(ct,mev,npv)
+!!$              write(0,*) 'First Check on out remapping ',i,&
+!!$                   & rmp%desc_ac_pre_remap%is_asb(),&
+!!$                   & ':',meu,npu,mev,npv
+            end block
+          end associate
+        end if
+!!$        write(0,*) 'Second Check on out remapping ',level,&
+!!$             & prec%precv(level)%remap_data%desc_ac_pre_remap%is_asb(), newsz
+      end if
+    end block
+
     if (info /= psb_success_) then 
       write(ch_err,'(a,i7)') 'Mat asb fail @ level ',i
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err=ch_err)
       goto 9999
     endif
-    if (i<iszv) call prec%precv(i)%update_aggr(prec%precv(i+1),info)
-
+    if (stop_hierarchy_loop) then
+      exit array_build_loop
+    else
+      if (i<iszv) call prec%precv(i)%update_aggr(prec%precv(i+1),info)
+    end if
   end do array_build_loop
 
-  if (newsz > 0) then
-    !
-    ! We exited early from the build loop, need to fix
-    ! the size.
-    !
-    allocate(tprecv(newsz),stat=info)
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_from_subroutine_,name,&
-           & a_err='prec reallocation')
-      goto 9999
-    endif
-    do i=1,newsz
-      call prec%precv(i)%move_alloc(tprecv(i),info)
-    end do
-    do i=newsz+1, iszv
-      call prec%precv(i)%free(info)
-    end do
-    call move_alloc(tprecv,prec%precv) 
-    ! Ignore errors from transfer
-    info = psb_success_
-    !
-    ! Restart
-    iszv = newsz
-    ! Fix the pointers, but the level 1 should
-    ! be treated differently
-    if (.not.associated(prec%precv(1)%base_a,a)) then
-      prec%precv(1)%base_a => prec%precv(1)%ac
-    end if
-    if (.not.associated(prec%precv(1)%base_desc,desc_a)) then
-      prec%precv(1)%base_desc => prec%precv(1)%desc_ac
-    end if
-    do i=2, iszv
-      prec%precv(i)%base_a       => prec%precv(i)%ac
-      prec%precv(i)%base_desc    => prec%precv(i)%desc_ac
-      ! This is needed when the linmap object has been built
-      ! reusing the base_desc descriptor through a pointer.
-      ! With PSBLAS 4 we will have a better solution
-      if (associated(prec%precv(i)%linmap%p_desc_U)) &
-           & prec%precv(i)%linmap%p_desc_U => prec%precv(i-1)%base_desc
-      if (associated(prec%precv(i)%linmap%p_desc_V))&
-           & prec%precv(i)%linmap%p_desc_V => prec%precv(i)%base_desc
-    end do
+!!$  write(0,*) ' Done  array_build_loop',iszv,newsz,info,psb_errstatus_fatal()
+
+  if (newsz>0) then
+!!$    do i=2,newsz
+!!$      write(0,*) me,'Newsz Out of array_build_loop ',i,':',&
+!!$           & prec%precv(i)%remap_data%desc_ac_pre_remap%is_asb()
+!!$    end do
+!!$    write(0,*) 'Calling set_nlevs ',newsz
+    call prec%set_nlevs(newsz)
+  else
+!!$    do i=2, iszv
+!!$      write(0,*) me,'Out of array_build_loop ',i,':',&
+!!$           & prec%precv(i)%remap_data%desc_ac_pre_remap%is_asb()
+!!$    end do
   end if
+  iszv = prec%get_nlevs()
+  call psb_barrier(ctxt)
 
 
-  !write(0,*) 'Should we remap? '
-  if (amg_get_do_remap().and.(np>=4)) then
-    write(0,*) 'Going for remapping '
-    if (.true.) then 
-      associate(lv=>prec%precv(iszv), rmp => prec%precv(iszv)%remap_data)
-        call lv%desc_ac%clone(rmp%desc_ac_pre_remap,info)
-        call lv%ac%clone(rmp%ac_pre_remap,info)
-        if (np >= 8) then 
-          call psb_remap(np/4,rmp%desc_ac_pre_remap,rmp%ac_pre_remap,&
-               & rmp%idest,rmp%isrc,rmp%nrsrc,rmp%naggr,lv%desc_ac,lv%ac,info)
-        else
-          call psb_remap(np/2,rmp%desc_ac_pre_remap,rmp%ac_pre_remap,&
-               & rmp%idest,rmp%isrc,rmp%nrsrc,rmp%naggr,lv%desc_ac,lv%ac,info)
-        end if
-        write(0,*) me,' Out of remapping ',rmp%desc_ac_pre_remap%get_fmt(),' ',&
-             & lv%desc_ac%get_fmt(),sum(lv%linmap%naggr),sum(rmp%naggr)
-        lv%linmap%naggr(:)    =  rmp%naggr(:)
-        lv%linmap%p_desc_V => rmp%desc_ac_pre_remap
-        lv%base_a          => lv%ac
-        lv%base_desc       => lv%desc_ac
-      end associate
-    end if
-  end if
+!!$  write(0,*) ' Done  reallocating precv',iszv,newsz,info
+!!$
+!!$  do i=2, iszv
+!!$    write(0,*) me,'At end of hierarchy_bld level',i,':',&
+!!$         & prec%precv(i)%remap_data%desc_ac_pre_remap%is_asb()
+!!$  end do
+  call psb_barrier(ctxt)
 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,&
@@ -515,8 +515,9 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
     goto 9999
   endif
 
-  iszv = size(prec%precv)
-
+  iszv = prec%get_nlevs()
+!!$  write(0,*) 'Going for cmp_complexity ',&
+!!$       & allocated(prec%precv),iszv,size(prec%precv)
   call prec%cmp_complexity()
   call prec%cmp_avg_cr()
 
@@ -656,4 +657,49 @@ contains
     return
   end subroutine restore_smoothers
 #endif
+
+  function amg_d_policy_do_remap(ctxt,level,aggsize) result(res)
+    logical :: res
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: level
+    integer(psb_lpk_) :: aggsize
+    res =  amg_get_do_remap().and.(level>=2)
+!!$    res = .false.
+  end function amg_d_policy_do_remap
+
+  subroutine amg_d_hierarchy_bld_cmp_newsz(level,iszv,prevsize,&
+       & nlaggr,casize,mnratio,sizeratio,newsz)
+    implicit none 
+    integer(psb_ipk_) :: level,iszv,newsz
+    integer(psb_lpk_) :: nlaggr(:)
+    integer(psb_lpk_) :: prevsize, casize
+    real(psb_dpk_)    :: mnratio, sizeratio
+    ! ==============================
+    integer(psb_lpk_) :: iaggsize
+
+    newsz    = 0 
+    iaggsize = sum(nlaggr)
+    sizeratio = prevsize
+    sizeratio = sizeratio/iaggsize
+!!$    write(0,*) 'From cmp_newsz: ',iaggsize,casize,&
+!!$         & sizeratio,mnratio, level
+
+    if (iaggsize <= casize) newsz = level      
+    if (level == iszv)      newsz = level
+
+    if (level>2) then
+      if (sizeratio < mnratio) then
+        if (sizeratio > 1) then
+          newsz = level
+        else
+          !
+          ! We are not gaining 
+          !
+          newsz = level-1
+        end if
+      end if
+    end if
+!!$    write(0,*) 'At end of cmp_newsz ',newsz
+  end subroutine amg_d_hierarchy_bld_cmp_newsz
+
 end subroutine amg_d_hierarchy_bld

@@ -46,6 +46,15 @@ subroutine amg_s_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vt
   integer(psb_ipk_), intent(out)       :: info
   real(psb_spk_), optional          :: work(:)
   type(psb_s_vect_type), optional, target, intent(inout)  :: vtx,vty
+
+  type(psb_s_vect_type), pointer   :: vtx_
+
+!!$  write(0,*) 'New map_rstr',lv%remap_data%ac_pre_remap%is_asb()
+  if (present(vtx)) then
+    vtx_ => vtx
+  else
+    vtx_ => lv%wrk%wv(1)
+  end if
   
 !!$  write(0,*) 'New map_prol',lv%remap_data%ac_pre_remap%is_asb()
   if (lv%remap_data%ac_pre_remap%is_asb()) then
@@ -89,14 +98,16 @@ subroutine amg_s_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vt
         call psb_geall(tv,lv%remap_data%desc_ac_pre_remap,info)
 !!$        write(0,*) me, ' Allocated ',nrl,info,psb_errstatus_fatal()
         
-        call psb_geasb(tv,lv%remap_data%desc_ac_pre_remap,info) 
+        call psb_geasb(tv,lv%remap_data%desc_ac_pre_remap,info,mold=vect_u%v) 
 !!$        write(0,*) me,' Size of TV ',nrl,tv%get_nrows(),info
 !!$        write(0,*) me,' Receiving from ',idest,nrl,psb_errstatus_fatal()
-        call psb_realloc(nrc,rsnd,info)
-        call psb_rcv(ctxt,rsnd(1:nrl),idest)
-        call tv%set_vect(rsnd)
+!!$        call psb_realloc(nrc,rsnd,info)
+!!$        call psb_rcv(ctxt,rsnd(1:nrl),idest)
+!!$        call tv%set_vect(rsnd)
+        call psb_rcv(ctxt,tv%v%v(1:nrl),idest)
+        call tv%set_host()
         call lv%linmap%map_V2U(alpha,tv,beta,vect_u,info,&
-             & work=work,vtx=vtx,vty=vty)
+             & work=work,vtx=vtx_,vty=vty)
       end associate
 !!$      write(0,*) me, ' Prolongator with remap done '
 !!$      flush(0)
@@ -105,7 +116,7 @@ subroutine amg_s_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vt
   else
     ! Default transfer
     call lv%linmap%map_V2U(alpha,vect_v,beta,vect_u,info,&
-         & work=work,vtx=vtx,vty=vty)
+         & work=work,vtx=vtx_,vty=vty)
   end if
   
 end subroutine amg_s_base_onelev_map_prol_v
@@ -125,7 +136,7 @@ subroutine amg_s_base_onelev_map_prol_a(lv,alpha,v,beta,u,info,work)
     !
     ! Remap has happened, deal with it
     !
-    write(0,*) 'Remap handling not implemented yet '
+    write(0,*) 'Remap P handling not implemented yet for A'
   else
     ! Default transfer
     call lv%linmap%map_V2U(alpha,v,beta,u,info,&

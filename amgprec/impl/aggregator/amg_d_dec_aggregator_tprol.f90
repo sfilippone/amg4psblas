@@ -122,19 +122,23 @@ subroutine  amg_d_dec_aggregator_build_tprol(ag,parms,ag_data,&
   call amg_check_def(parms%aggr_ord,'Ordering',&
        &   amg_aggr_ord_nat_,is_legal_ml_aggr_ord)
   call amg_check_def(parms%aggr_thresh,'Aggr_Thresh',dzero,is_legal_d_aggr_thrs)
+  if (me >=0) then 
+    !
+    ! The decoupled aggregator based on SOC measures ignores
+    ! ag_data except for clean_zeros; soc_map_bld is a procedure pointer.
+    !
+    if (do_timings) call psb_tic(idx_map_bld)
+    clean_zeros = ag%do_clean_zeros
+    call ag%soc_map_bld(parms%aggr_ord,parms%aggr_thresh,clean_zeros,a,desc_a,nlaggr,ilaggr,info)
+    if (do_timings) call psb_toc(idx_map_bld)
+    if (do_timings) call psb_tic(idx_map_tprol)
 
-  !
-  ! The decoupled aggregator based on SOC measures ignores
-  ! ag_data except for clean_zeros; soc_map_bld is a procedure pointer.
-  !
-  if (do_timings) call psb_tic(idx_map_bld)
-  clean_zeros = ag%do_clean_zeros
-  call ag%soc_map_bld(parms%aggr_ord,parms%aggr_thresh,clean_zeros,a,desc_a,nlaggr,ilaggr,info)
-  if (do_timings) call psb_toc(idx_map_bld)
-  if (do_timings) call psb_tic(idx_map_tprol)
-
-  if (info==psb_success_) call amg_map_to_tprol(desc_a,ilaggr,nlaggr,t_prol,info)
-  if (do_timings) call psb_toc(idx_map_tprol)
+    if (info==psb_success_) call amg_map_to_tprol(desc_a,ilaggr,nlaggr,t_prol,info)
+    if (do_timings) call psb_toc(idx_map_tprol)
+  else
+    allocate(nlaggr(0),ilaggr(0))
+    call t_prol%allocate(lzero,lzero,info)
+  end if
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='soc_map_bld/map_to_tprol')
