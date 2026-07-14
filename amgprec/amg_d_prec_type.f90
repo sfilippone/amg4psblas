@@ -97,6 +97,7 @@ module amg_d_prec_type
     ! to keep track against what is put later in the multilevel array
     !
     integer(psb_ipk_)                  :: coarse_solver = -1
+
     !
     ! The multilevel hierarchy
     !
@@ -119,7 +120,7 @@ module amg_d_prec_type
     procedure, pass(prec)               :: cmp_complexity => amg_d_cmp_compl
     procedure, pass(prec)               :: get_avg_cr => amg_d_get_avg_cr
     procedure, pass(prec)               :: cmp_avg_cr => amg_d_cmp_avg_cr
-    procedure, pass(prec)               :: set_nlevs  =>  amg_d_set_nlevs
+    procedure, pass(prec)               :: set_nlevs  => amg_d_set_nlevs
     procedure, pass(prec)               :: get_nlevs  => amg_d_get_nlevs
     procedure, pass(prec)               :: get_nzeros => amg_d_get_nzeros
     procedure, pass(prec)               :: sizeof => amg_dprec_sizeof
@@ -142,7 +143,6 @@ module amg_d_prec_type
     procedure, pass(prec)               :: smoothers_free    => amg_d_smoothers_free
     procedure, pass(prec)               :: descr        =>  amg_dfile_prec_descr
     procedure, pass(prec)               :: memory_use   =>  amg_dfile_prec_memory_use
-
   end type amg_dprec_type
 
   private :: amg_d_dump, amg_d_get_compl,  amg_d_cmp_compl,&
@@ -442,7 +442,6 @@ contains
 !!$    end if
     val = prec%nlevs
 !!$    write(0,*) ' NLEVS: ',prec%nlevs, val,size(prec%precv)
-
   end function amg_d_get_nlevs
 
   subroutine amg_d_set_nlevs(prec,nl) 
@@ -565,14 +564,12 @@ contains
   end function amg_d_get_avg_cr
 
   subroutine amg_d_cmp_avg_cr(prec)
-
     implicit none
     class(amg_dprec_type), intent(inout) :: prec
 
     real(psb_dpk_)    :: avgcr
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: il, nl, iam, np
-
 
     avgcr = dzero
     ctxt = prec%ctxt
@@ -599,9 +596,7 @@ contains
   !             error code.
   !
   subroutine amg_dprecfree(p,info)
-
     implicit none
-
     ! Arguments
     type(amg_dprec_type), intent(inout) :: p
     integer(psb_ipk_), intent(out)        :: info
@@ -690,9 +685,7 @@ contains
   end subroutine amg_d_smoothers_free
 
   subroutine amg_d_hierarchy_free(prec,info)
-
     implicit none
-
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -718,7 +711,6 @@ contains
     return
 
   end subroutine amg_d_hierarchy_free
-
 
   !
   ! Top level methods.
@@ -784,7 +776,6 @@ contains
 
   end subroutine amg_d_apply1_vect
 
-
   subroutine amg_d_apply2v(prec,x,y,desc_data,info,trans,work)
     implicit none
     type(psb_desc_type),intent(in)    :: desc_data
@@ -849,7 +840,6 @@ contains
   subroutine amg_d_dump(prec,info,istart,iend,iproc,prefix,head,&
        & ac,rp,smoother,solver,tprol,&
        & global_num)
-
     implicit none
     class(amg_dprec_type), intent(in)     :: prec
     integer(psb_ipk_), intent(out)          :: info
@@ -890,7 +880,6 @@ contains
   end subroutine amg_d_dump
 
   subroutine amg_d_cnv(prec,info,amold,vmold,imold)
-
     implicit none
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)       :: info
@@ -911,7 +900,6 @@ contains
   end subroutine amg_d_cnv
 
   subroutine amg_d_clone(prec,precout,info)
-
     implicit none
     class(amg_dprec_type), intent(inout) :: prec
     class(psb_dprec_type), intent(inout) :: precout
@@ -948,7 +936,7 @@ contains
         end if
         do lev=2, ln
           if (info /= psb_success_) exit
-          write(0,*) 'Inner_clone must be checked and reimplemented! '
+!!$          write(0,*) 'Inner_clone must be checked and reimplemented! '
           call prec%precv(lev)%clone(pout%precv(lev),info)
           if (info == psb_success_) then
             pout%precv(lev)%base_a       => pout%precv(lev)%ac
@@ -1007,6 +995,7 @@ contains
   subroutine amg_d_allocate_wrk(prec,info,vmold,desc)
     use psb_base_mod
     implicit none
+
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -1050,7 +1039,6 @@ contains
   subroutine amg_d_free_wrk(prec,info)
     use psb_base_mod
     implicit none
-
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -1084,6 +1072,7 @@ contains
   function amg_d_is_allocated_wrk(prec) result(res)
     use psb_base_mod
     implicit none
+
     ! Arguments
     class(amg_dprec_type), intent(in) :: prec
     logical :: res

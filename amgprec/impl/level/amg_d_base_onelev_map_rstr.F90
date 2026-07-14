@@ -35,6 +35,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
+
 subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
      &  work,vtx,vty)
   use psb_base_mod
@@ -47,9 +48,9 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
   real(psb_dpk_), optional          :: work(:)
   type(psb_d_vect_type), optional, target, intent(inout)  :: vtx,vty
   type(psb_d_vect_type), pointer   :: vty_
-      integer(psb_mpk_) :: me, np
+  integer(psb_mpk_) :: me, np
 
-!!$  write(0,*) 'New map_rstr ',lv%remap_data%ac_pre_remap%is_asb()
+!!$  write(0,*) 'New map_rstr',lv%remap_data%ac_pre_remap%is_asb()
   if (present(vty)) then
     vty_ => vty
   else
@@ -60,7 +61,7 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
     !
     ! Remap has happened, deal with it
     !
-!!$    write(0,*) 'Level map_rstr with remapping '
+!!$    write(0,*) 'Remap handling not implemented yet '
     block
       type(psb_ctxt_type) :: ctxt, rctxt
       integer(psb_mpk_) :: i,j,ip, idest, nsrc, nrl, kp
@@ -87,7 +88,7 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
         call psb_barrier(ctxt)
         call lv%linmap%map_U2V(alpha,vect_u,beta,tv,info,&
              & work=work,vtx=vtx,vty=vty_)
-        !call tv%sync()
+        call tv%sync()
         !rsnd = tv%get_vect()
         !call psb_snd(ctxt,rsnd(1:nrl),idest) 
 !!$        write(0,*) me,' map_rstr sending ',me,idest,psb_errstatus_fatal()
@@ -120,7 +121,7 @@ subroutine amg_d_base_onelev_map_rstr_v(lv,alpha,vect_u,beta,vect_v,info,&
            & work=work,vtx=vtx,vty=vty_)
     end block
   end if
-!!$  write(0,*) me, 'End of restriction ',info,psb_errstatus_fatal()
+!!$  write(0,*) me, 'End of restriction ',info,psb_errstatus_fatal()  
 end subroutine amg_d_base_onelev_map_rstr_v
 
 subroutine amg_d_base_onelev_map_rstr_a(lv,alpha,u,beta,v,info,work)

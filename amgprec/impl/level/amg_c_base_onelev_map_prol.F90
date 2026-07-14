@@ -46,6 +46,7 @@ subroutine amg_c_base_onelev_map_prol_v(lv,alpha,vect_v,beta,vect_u,info,work,vt
   integer(psb_ipk_), intent(out)       :: info
   complex(psb_spk_), optional          :: work(:)
   type(psb_c_vect_type), optional, target, intent(inout)  :: vtx,vty
+
   type(psb_c_vect_type), pointer   :: vtx_
 
 !!$  write(0,*) 'New map_rstr',lv%remap_data%ac_pre_remap%is_asb()

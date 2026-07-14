@@ -249,11 +249,11 @@ subroutine amg_dmlprec_aply_a(alpha,p,x,beta,y,desc_data,trans,work,info)
 
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),&
-       & ' Entry  ', p%get_nlevs()
+       & ' Entry  ', size(p%precv)
 
   trans_ = psb_toupper(trans)
 
-  nlev = p%get_nlevs()
+  nlev = size(p%precv)
   allocate(mlwrk(nlev),stat=info) 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
@@ -362,7 +362,7 @@ contains
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    nlev = p%get_nlevs()
+    nlev = size(p%precv)
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err='wrong call level to inner_ml')
@@ -445,7 +445,7 @@ contains
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    nlev = p%get_nlevs()
+    nlev = size(p%precv)
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err='wrong call level to inner_add')
@@ -550,7 +550,7 @@ contains
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    nlev = p%get_nlevs()
+    nlev = size(p%precv)
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err='wrong call level to inner_mult')

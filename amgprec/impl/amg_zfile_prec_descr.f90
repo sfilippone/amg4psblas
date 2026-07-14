@@ -129,7 +129,7 @@ subroutine amg_zfile_prec_descr(prec,info,iout,root, verbosity,prefix)
       ! ensured by amg_precbld).
       !
       if (me == root_) then
-        nlev = size(prec%precv)
+        nlev = prec%get_nlevs()
         do ilev = 1, nlev 
           if (.not.allocated(prec%precv(ilev)%sm)) then 
             info = 3111
@@ -141,6 +141,7 @@ subroutine amg_zfile_prec_descr(prec,info,iout,root, verbosity,prefix)
 
         write(iout_,*) 
         write(iout_,'(a,1x,a)') trim(prefix_),'Preconditioner description'
+        write(iout_,*) 'At level :',1,' we have ',np,' processes'
 
         if (nlev == 1) then
           !

@@ -168,7 +168,7 @@ subroutine amg_z_base_onelev_mat_asb(lv,a,desc_a,ilaggr,nlaggr,t_prol,info)
   if (do_timings) call psb_tic(idx_mapbld)  
   if (info == psb_success_) call lv%ac%cscnv(info,type='csr',dupl=psb_dupl_add_)
   
-  if (info == psb_success_) call lv%aggr%bld_map(desc_a, lv%desc_ac,&
+  if (info == psb_success_) call lv%aggr%bld_linmap(desc_a, lv%desc_ac,&
        & ilaggr,nlaggr,op_restr,op_prol,lv%linmap,info)
   if (do_timings) call psb_toc(idx_mapbld)  
   if(info /= psb_success_) then

@@ -102,6 +102,7 @@ module amg_s_prec_type
     ! The multilevel hierarchy
     !
     type(amg_s_onelev_type), allocatable :: precv(:)
+    integer(psb_ipk_)                    :: nlevs
   contains
     procedure, pass(prec)               :: psb_s_apply2_vect => amg_s_apply2_vect
     procedure, pass(prec)               :: psb_s_apply1_vect => amg_s_apply1_vect
@@ -119,6 +120,7 @@ module amg_s_prec_type
     procedure, pass(prec)               :: cmp_complexity => amg_s_cmp_compl
     procedure, pass(prec)               :: get_avg_cr => amg_s_get_avg_cr
     procedure, pass(prec)               :: cmp_avg_cr => amg_s_cmp_avg_cr
+    procedure, pass(prec)               :: set_nlevs  => amg_s_set_nlevs
     procedure, pass(prec)               :: get_nlevs  => amg_s_get_nlevs
     procedure, pass(prec)               :: get_nzeros => amg_s_get_nzeros
     procedure, pass(prec)               :: sizeof => amg_sprec_sizeof
@@ -435,10 +437,19 @@ contains
     class(amg_sprec_type), intent(in) :: prec
     integer(psb_ipk_) :: val
     val = 0
-    if (allocated(prec%precv)) then
-      val = size(prec%precv)
-    end if
+!!$    if (allocated(prec%precv)) then
+!!$      val = size(prec%precv)
+!!$    end if
+    val = prec%nlevs
+!!$    write(0,*) ' NLEVS: ',prec%nlevs, val,size(prec%precv)
   end function amg_s_get_nlevs
+
+  subroutine amg_s_set_nlevs(prec,nl) 
+    implicit none
+    class(amg_sprec_type), intent(inout) :: prec
+    integer(psb_ipk_) :: nl
+    prec%nlevs = nl
+  end subroutine amg_s_set_nlevs
   !
   ! Function returning the size of the amg_prec_type data structure
   ! in bytes or in number of nonzeros of the operator(s) involved.
@@ -509,7 +520,7 @@ contains
 
     real(psb_spk_) :: num, den, nmin
     type(psb_ctxt_type) :: ctxt
-    integer(psb_ipk_)   :: il
+    integer(psb_ipk_)   :: il,nl
 
     num = -sone
     den = sone
@@ -519,7 +530,10 @@ contains
       num = prec%precv(il)%base_a%get_nzeros()
       if (num >= szero) then
         den = num
-        do il=2,size(prec%precv)
+        nl = prec%get_nlevs()
+!!$        write(0,*) 'Inside cmp_compl ',nl,size(prec%precv)
+        do il=2, nl
+!!$          write(0,*) '                 ',il,associated(prec%precv(il)%base_a)
           num = num + max(0,prec%precv(il)%base_a%get_nzeros())
         end do
       end if
@@ -550,7 +564,6 @@ contains
   end function amg_s_get_avg_cr
 
   subroutine amg_s_cmp_avg_cr(prec)
-
     implicit none
     class(amg_sprec_type), intent(inout) :: prec
 
@@ -558,17 +571,14 @@ contains
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: il, nl, iam, np
 
-
     avgcr = szero
     ctxt = prec%ctxt
     call psb_info(ctxt,iam,np)
-    if (allocated(prec%precv)) then
-      nl = size(prec%precv)
-      do il=2,nl
-        avgcr = avgcr + max(szero,prec%precv(il)%szratio)
-      end do
-      avgcr = avgcr / (nl-1)
-    end if
+    nl = prec%get_nlevs()
+    do il=2,nl
+      avgcr = avgcr + max(szero,prec%precv(il)%szratio)
+    end do
+    avgcr = avgcr / (nl-1)
     call psb_sum(ctxt,avgcr)
     prec%ag_data%avg_cr = avgcr/np
   end subroutine amg_s_cmp_avg_cr
@@ -586,9 +596,7 @@ contains
   !             error code.
   !
   subroutine amg_sprecfree(p,info)
-
     implicit none
-
     ! Arguments
     type(amg_sprec_type), intent(inout) :: p
     integer(psb_ipk_), intent(out)        :: info
@@ -614,9 +622,7 @@ contains
   end subroutine amg_sprecfree
 
   subroutine amg_s_prec_free(prec,info)
-
     implicit none
-
     ! Arguments
     class(amg_sprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -648,9 +654,7 @@ contains
   end subroutine amg_s_prec_free
 
   subroutine amg_s_smoothers_free(prec,info)
-
     implicit none
-
     ! Arguments
     class(amg_sprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -667,7 +671,7 @@ contains
     end if
 
     if (allocated(prec%precv)) then
-      do i=1,size(prec%precv)
+      do i=1,prec%get_nlevs()
         call prec%precv(i)%free_smoothers(info)
       end do
     end if
@@ -681,9 +685,7 @@ contains
   end subroutine amg_s_smoothers_free
 
   subroutine amg_s_hierarchy_free(prec,info)
-
     implicit none
-
     ! Arguments
     class(amg_sprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -709,7 +711,6 @@ contains
     return
 
   end subroutine amg_s_hierarchy_free
-
 
   !
   ! Top level methods.
@@ -775,7 +776,6 @@ contains
 
   end subroutine amg_s_apply1_vect
 
-
   subroutine amg_s_apply2v(prec,x,y,desc_data,info,trans,work)
     implicit none
     type(psb_desc_type),intent(in)    :: desc_data
@@ -840,7 +840,6 @@ contains
   subroutine amg_s_dump(prec,info,istart,iend,iproc,prefix,head,&
        & ac,rp,smoother,solver,tprol,&
        & global_num)
-
     implicit none
     class(amg_sprec_type), intent(in)     :: prec
     integer(psb_ipk_), intent(out)          :: info
@@ -857,7 +856,7 @@ contains
     info = 0
     ctxt = prec%ctxt
     call psb_info(ctxt,iam,np)
-    iln = size(prec%precv)
+    iln = prec%get_nlevs()
     if (present(istart)) then
       il1 = max(1,istart)
     else
@@ -881,7 +880,6 @@ contains
   end subroutine amg_s_dump
 
   subroutine amg_s_cnv(prec,info,amold,vmold,imold)
-
     implicit none
     class(amg_sprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)       :: info
@@ -893,7 +891,7 @@ contains
 
     info = psb_success_
     if (allocated(prec%precv)) then
-      do i=1,size(prec%precv)
+      do i=1,prec%get_nlevs()
         if (info == psb_success_ ) &
              & call prec%precv(i)%cnv(info,amold=amold,vmold=vmold,imold=imold)
       end do
@@ -902,7 +900,6 @@ contains
   end subroutine amg_s_cnv
 
   subroutine amg_s_clone(prec,precout,info)
-
     implicit none
     class(amg_sprec_type), intent(inout) :: prec
     class(psb_sprec_type), intent(inout) :: precout
@@ -914,7 +911,6 @@ contains
   end subroutine amg_s_clone
 
   subroutine amg_s_inner_clone(prec,precout,info)
-
     implicit none
     class(amg_sprec_type), intent(inout)         :: prec
     class(psb_sprec_type), target, intent(inout) :: precout
@@ -930,8 +926,9 @@ contains
       pout%ctxt          = prec%ctxt
       pout%ag_data       = prec%ag_data
       pout%outer_sweeps  = prec%outer_sweeps
+      pout%nlevs         = prec%nlevs
       if (allocated(prec%precv)) then
-        ln = size(prec%precv)
+        ln = prec%get_nlevs()
         allocate(pout%precv(ln),stat=info)
         if (info /= psb_success_) goto 9999
         if (ln >= 1) then
@@ -939,6 +936,7 @@ contains
         end if
         do lev=2, ln
           if (info /= psb_success_) exit
+!!$          write(0,*) 'Inner_clone must be checked and reimplemented! '
           call prec%precv(lev)%clone(pout%precv(lev),info)
           if (info == psb_success_) then
             pout%precv(lev)%base_a       => pout%precv(lev)%ac
@@ -1018,7 +1016,7 @@ contains
     if (psb_errstatus_fatal()) then
       info = psb_err_internal_error_; goto 9999
     end if
-    nlev   = size(prec%precv)
+    nlev   = prec%get_nlevs()
     level = 1
     do level = 1, nlev
       call prec%precv(level)%allocate_wrk(info,vmold=vmold)
@@ -1041,7 +1039,6 @@ contains
   subroutine amg_s_free_wrk(prec,info)
     use psb_base_mod
     implicit none
-
     ! Arguments
     class(amg_sprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -1058,7 +1055,7 @@ contains
     end if
 
     if (allocated(prec%precv)) then
-      nlev   = size(prec%precv)
+      nlev   = prec%get_nlevs()
       do level = 1, nlev
         call prec%precv(level)%free_wrk(info)
       end do

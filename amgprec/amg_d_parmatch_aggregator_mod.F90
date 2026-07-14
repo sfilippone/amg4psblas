@@ -136,7 +136,7 @@ module amg_d_parmatch_aggregator_mod
     procedure, pass(ag) :: mat_bld      => amg_d_parmatch_aggregator_mat_bld
     procedure, pass(ag) :: mat_asb      => amg_d_parmatch_aggregator_mat_asb
     procedure, pass(ag) :: inner_mat_asb      => amg_d_parmatch_aggregator_inner_mat_asb
-    procedure, pass(ag) :: bld_map      => amg_d_parmatch_aggregator_bld_map
+    procedure, pass(ag) :: bld_linmap   => amg_d_parmatch_aggregator_bld_linmap
     procedure, pass(ag) :: csetc        => amg_d_parmatch_aggr_csetc
     procedure, pass(ag) :: cseti        => amg_d_parmatch_aggr_cseti
     procedure, pass(ag) :: default      => amg_d_parmatch_aggr_set_default
@@ -643,7 +643,7 @@ contains
     end select
   end subroutine amg_d_parmatch_aggregator_clone
 
-  subroutine  amg_d_parmatch_aggregator_bld_map(ag,desc_a,desc_ac,ilaggr,nlaggr,&
+  subroutine  amg_d_parmatch_aggregator_bld_linmap(ag,desc_a,desc_ac,ilaggr,nlaggr,&
        & op_restr,op_prol,map,info)
     use psb_base_mod
     implicit none
@@ -654,7 +654,7 @@ contains
     type(psb_dlinmap_type), intent(out)     :: map
     integer(psb_ipk_), intent(out)          :: info
     integer(psb_ipk_) :: err_act
-    character(len=20) :: name='d_parmatch_aggregator_bld_map'
+    character(len=20) :: name='d_parmatch_aggregator_bld_linmap'
 
     info = psb_success_
     call psb_erractionsave(err_act)
@@ -680,5 +680,5 @@ contains
 9999 call psb_error_handler(err_act)
 
     return
-  end subroutine amg_d_parmatch_aggregator_bld_map
+  end subroutine amg_d_parmatch_aggregator_bld_linmap
 end module amg_d_parmatch_aggregator_mod

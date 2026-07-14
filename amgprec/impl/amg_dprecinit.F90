@@ -226,9 +226,7 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
     allocate(amg_d_ilu_solver_type :: prec%precv(ilev_)%sm%sv, stat=info)
     call prec%precv(ilev_)%default()
 
-
   case ('ML')
-
     nlev_ = prec%ag_data%max_levs
     ilev_ = 1
     allocate(prec%precv(nlev_),stat=info)

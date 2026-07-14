@@ -244,10 +244,10 @@ subroutine amg_zmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
 
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit,*) me,' ',trim(name),&
-       & ' Entry  ', size(p%precv)
+       & ' Entry  ', p%get_nlevs()
 
   trans_ = psb_toupper(trans)
-  nlev   = size(p%precv)
+  nlev   = p%get_nlevs()
 
   do_alloc_wrk = .not.allocated(p%precv(1)%wrk)
 
@@ -382,7 +382,7 @@ contains
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err='wrong call level to inner_ml')
@@ -468,7 +468,7 @@ contains
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err='wrong call level to inner_add')
@@ -497,7 +497,8 @@ contains
         if (allocated(p%precv(level)%sm2a)) then
           call psb_geaxpby(zone,vx2l,zzero,vy2l,base_desc,info)
           
-          sweeps = max(p%precv(level)%parms%sweeps_pre,p%precv(level)%parms%sweeps_post)
+          sweeps = max(p%precv(level)%parms%sweeps_pre,&
+               & p%precv(level)%parms%sweeps_post)
           do k=1, sweeps
             call p%precv(level)%sm%apply(zone,&
                  & vy2l,zzero,vty,&
@@ -593,7 +594,7 @@ contains
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err='wrong call level to inner_mult')
@@ -604,7 +605,7 @@ contains
     if(debug_level > 1) then
       write(debug_unit,*) me,' inner_mult at level ',level
     end if
-    write(debug_unit,*) me,' inner_mult at level (1):',level,np
+!!$    write(debug_unit,*) me,' inner_mult at level (1):',level,np
     sweeps_post = p%precv(level)%parms%sweeps_post
     sweeps_pre  = p%precv(level)%parms%sweeps_pre
     pre  = ((sweeps_pre>0).and.(trans=='N')).or.((sweeps_post>0).and.(trans/='N'))
@@ -614,8 +615,8 @@ contains
          & vtx => p%precv(level)%wrk%vtx,vty => p%precv(level)%wrk%vty,&
          & base_a => p%precv(level)%base_a, base_desc=>p%precv(level)%base_desc,&
          & wv => p%precv(level)%wrk%wv)
-      write(0,*) 'Inner mult at level (2):',level,' :',me,np,':',&
-           & size(p%precv(level)%wrk%wv), allocated(p%precv(level)%wrk%wv)
+!!$      write(0,*) 'Inner mult at level (2):',level,' :',me,np,':',&
+!!$           & size(p%precv(level)%wrk%wv), allocated(p%precv(level)%wrk%wv)
       if (me >=0) then
       
       if (level < nlev) then 
@@ -831,7 +832,7 @@ contains
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_,name,&
            & a_err='wrong call level to inner_add')

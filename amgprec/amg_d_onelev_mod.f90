@@ -182,8 +182,8 @@ module amg_d_onelev_mod
     integer(psb_ipk_)              :: idest
     integer(psb_ipk_), allocatable :: isrc(:), nrsrc(:), naggr(:)
   contains
-    procedure, pass(rmp) :: clone   => d_remap_data_clone
-    procedure, pass(rmp) :: move_alloc   => d_remap_move_alloc
+    procedure, pass(rmp) :: clone      => d_remap_data_clone
+    procedure, pass(rmp) :: move_alloc => d_remap_move_alloc
   end type amg_d_remap_data_type
 
   type amg_d_onelev_type
@@ -229,7 +229,7 @@ module amg_d_onelev_mod
     procedure, pass(lv) :: get_wrksz => d_base_onelev_get_wrksize
     procedure, pass(lv) :: allocate_wrk   => d_base_onelev_allocate_wrk
     procedure, pass(lv) :: free_wrk       => d_base_onelev_free_wrk
-    procedure, nopass   :: stringval => amg_stringval
+    procedure, nopass   :: stringval  => amg_stringval
     procedure, pass(lv) :: move_alloc => d_base_onelev_move_alloc
 
 
@@ -641,7 +641,7 @@ contains
     ! Arguments
     class(amg_d_onelev_type), target, intent(inout) :: lv
     class(amg_d_onelev_type), target, intent(inout) :: lvout
-    integer(psb_ipk_), intent(out)                    :: info
+    integer(psb_ipk_), intent(out)                  :: info
 
     info = psb_success_
     if (allocated(lv%sm)) then
@@ -1021,5 +1021,5 @@ contains
     call move_alloc(rmp%nrsrc,remap_out%nrsrc)
     call move_alloc(rmp%naggr,remap_out%naggr)
   end subroutine d_remap_move_alloc
-
+  
 end module amg_d_onelev_mod

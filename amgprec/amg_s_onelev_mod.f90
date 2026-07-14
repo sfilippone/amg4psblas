@@ -182,7 +182,8 @@ module amg_s_onelev_mod
     integer(psb_ipk_)              :: idest
     integer(psb_ipk_), allocatable :: isrc(:), nrsrc(:), naggr(:)
   contains
-    procedure, pass(rmp) :: clone   => s_remap_data_clone
+    procedure, pass(rmp) :: clone      => s_remap_data_clone
+    procedure, pass(rmp) :: move_alloc => s_remap_move_alloc
   end type amg_s_remap_data_type
 
   type amg_s_onelev_type
@@ -228,7 +229,7 @@ module amg_s_onelev_mod
     procedure, pass(lv) :: get_wrksz => s_base_onelev_get_wrksize
     procedure, pass(lv) :: allocate_wrk   => s_base_onelev_allocate_wrk
     procedure, pass(lv) :: free_wrk       => s_base_onelev_free_wrk
-    procedure, nopass   :: stringval => amg_stringval
+    procedure, nopass   :: stringval  => amg_stringval
     procedure, pass(lv) :: move_alloc => s_base_onelev_move_alloc
 
 
@@ -640,7 +641,7 @@ contains
     ! Arguments
     class(amg_s_onelev_type), target, intent(inout) :: lv
     class(amg_s_onelev_type), target, intent(inout) :: lvout
-    integer(psb_ipk_), intent(out)                    :: info
+    integer(psb_ipk_), intent(out)                  :: info
 
     info = psb_success_
     if (allocated(lv%sm)) then
@@ -706,6 +707,7 @@ contains
     if (info == psb_success_) call psb_move_alloc(lv%tprol,b%tprol,info)
     if (info == psb_success_) call psb_move_alloc(lv%desc_ac,b%desc_ac,info)
     if (info == psb_success_) call psb_move_alloc(lv%linmap,b%linmap,info)
+    if (info == psb_success_) call lv%remap_data%move_alloc(b%remap_data,info)
     b%base_a    => lv%base_a
     b%base_desc => lv%base_desc
 
@@ -760,6 +762,7 @@ contains
     info = psb_success_
     nwv = lv%get_wrksz()
     if (.not.allocated(lv%wrk)) allocate(lv%wrk,stat=info)
+!!$    write(0,*) 'From allocate_wrk :',lv%remap_data%desc_ac_pre_remap%is_asb()
     if (info == 0) then
       if (lv%remap_data%desc_ac_pre_remap%is_asb()) then
         !
@@ -807,11 +810,12 @@ contains
 
     info = psb_success_
     call wk%free(info)
-    write(0,*) 'wrk_alloc D: "',trim(desc%get_fmt()),'"', present(desc2),desc%is_valid()
+!!$    write(0,*) 'wrk_alloc D: "',trim(desc%get_fmt()),'"',&
+!!$         & present(desc2),desc%is_valid()
 
     allocate(wk%wv(nwv),stat=info)    
     if  (present(desc2).and.(desc%is_valid())) then
-      write(0,*) 'wrk_alloc D2:',desc2%get_fmt(),desc2%is_asb()
+!!$      write(0,*) 'wrk_alloc D2:',desc2%get_fmt(),desc2%is_asb()
       if (desc2%get_local_cols()>desc%get_local_cols()) then
         call inner_do_wrk_alloc(wk,nwv,desc2,vmold=vmold)
       else
@@ -997,4 +1001,25 @@ contains
     call psb_safe_ab_cpy(rmp%nrsrc,remap_out%nrsrc,info)
   end subroutine s_remap_data_clone
 
+  subroutine s_remap_move_alloc(rmp, remap_out, info)
+    use psb_base_mod
+    implicit none
+    ! Arguments
+    class(amg_s_remap_data_type), target, intent(inout) :: rmp
+    class(amg_s_remap_data_type), target, intent(inout) :: remap_out
+    integer(psb_ipk_), intent(out)                    :: info
+    !
+    integer(psb_ipk_) :: i
+
+    info = psb_success_
+
+    call psb_move_alloc(rmp%ac_pre_remap,remap_out%ac_pre_remap,info)
+    if (info == psb_success_) &
+         & call psb_move_alloc(rmp%desc_ac_pre_remap,remap_out%desc_ac_pre_remap,info)
+    remap_out%idest = rmp%idest
+    call move_alloc(rmp%isrc,remap_out%isrc)
+    call move_alloc(rmp%nrsrc,remap_out%nrsrc)
+    call move_alloc(rmp%naggr,remap_out%naggr)
+  end subroutine s_remap_move_alloc
+  
 end module amg_s_onelev_mod

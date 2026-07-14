@@ -651,20 +651,19 @@ contains
         !
         if (pre) then
             
-          call psb_geaxpby(done,vx2l,&
-               & dzero,vty,&
-               & base_desc,info)
+            call psb_geaxpby(done,vx2l,&
+                 & dzero,vty,&
+                 & base_desc,info)
+            
+            if (info == psb_success_) call psb_spmm(-done,base_a,&
+                 & vy2l,done,vty,&
+                 & base_desc,info,work=work,trans=trans)
+            if (info /= psb_success_) then
+              call psb_errpush(psb_err_internal_error_,name,&
+                   & a_err='Error during residue')
+              goto 9999
+            end if
           
-          if (info == psb_success_) call psb_spmm(-done,base_a,&
-               & vy2l,done,vty,&
-               & base_desc,info,work=work,trans=trans)
-          if (info /= psb_success_) then
-            call psb_errpush(psb_err_internal_error_,name,&
-                 & a_err='Error during residue')
-            goto 9999
-          end if
-
-!!$          write(0,*) me,' Map_rstr from  ', level,' to ',level+1
           call p%precv(level+1)%map_rstr(done,vty,&
                & dzero,p%precv(level+1)%wrk%vx2l,&
                & info,work=work,vtx=wv(1))

@@ -64,11 +64,9 @@
 !               Error code.              
 !  
 subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
-
   use psb_base_mod
   use amg_d_inner_mod
   use amg_d_prec_mod, amg_protect_name => amg_d_hierarchy_bld
-
   Implicit None
 
   ! Arguments
@@ -306,7 +304,6 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
   call psb_cd_renum_block(desc_a,prec%precv(1)%desc_ac,info)
   prec%precv(1)%base_desc => prec%precv(1)%desc_ac
 
-
   !
   ! Main build loop
   !   
@@ -340,7 +337,7 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
          & 'Calling mlprcbld at level  ',i
     !
     ! Build the tentative mapping between levels i-1 and i
-    ! and the matrixat level i
+    ! and the matrix at level i
     !
     if (do_timings) call psb_tic(idx_bldtp)
     if (info == psb_success_)&
@@ -511,7 +508,6 @@ subroutine amg_d_hierarchy_bld(a,desc_a,prec,info,cpymat)
 !!$         & prec%precv(i)%remap_data%desc_ac_pre_remap%is_asb()
 !!$  end do
   call psb_barrier(ctxt)
-
 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_internal_error_,name,&
