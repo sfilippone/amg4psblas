@@ -525,10 +525,10 @@ program amg_d_pde3d_sstepbatch
 
   call psb_barrier(ctxt)
 
-  allocate(sValues(7))
+  allocate(sValues(4))
   sValues = [1, 5, 10, 15]   ! 1 is a placeholder for CG method
-  allocate(Gsolvers(3))
-  Gsolvers = ['LLU', 'LCC', 'FGS'] !
+  allocate(Gsolvers(1))
+  Gsolvers = ['LCC'] !, 'LLU', 'FGS' 
 
   allocate(tslv(size(sValues), size(Gsolvers), 2))
   tslv = dzero
