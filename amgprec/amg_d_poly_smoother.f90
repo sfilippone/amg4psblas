@@ -431,5 +431,4 @@ contains
 
     val = amg_poly_
   end function d_poly_smoother_get_id
-
 end module amg_d_poly_smoother
