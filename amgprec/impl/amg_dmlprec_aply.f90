@@ -153,7 +153,7 @@
 !   p          -   type(amg_dprec_type), input.
 !                  The multilevel preconditioner data structure containing the
 !                  local part of the preconditioner to be applied.
-!      Note that nlev = size(p%precv) = number of levels.
+!      Note that nlev = p%get_nlevs() = number of levels.
 !      p%precv(lev)%sm        -  type(psb_dbaseprec_type)
 !                                 The pre-'smoother' for the current level
 !      p%precv(lev)%sm2       -  type(psb_dbaseprec_type)
@@ -206,6 +206,7 @@
 subroutine amg_dmlprec_aply_vect(alpha, p, x, beta, y, desc_data, trans, work, info)
   use psb_base_mod
   use amg_base_prec_type
+  use amg_prec_mod
   use amg_d_inner_mod, amg_protect_name => amg_dmlprec_aply_vect
 
   implicit none
@@ -240,10 +241,10 @@ subroutine amg_dmlprec_aply_vect(alpha, p, x, beta, y, desc_data, trans, work, i
 
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit, *) me, ' ', trim(name), &
-                          & ' Entry  ', size(p%precv)
+       & ' Entry  ', p%get_nlevs()
 
   trans_ = psb_toupper(trans)
-  nlev   = size(p%precv)
+  nlev   = p%get_nlevs()
 
   do_alloc_wrk = .not. allocated(p%precv(1)%wrk)
 
@@ -376,7 +377,7 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_, name, &
                     & a_err = 'wrong call level to inner_ml')
@@ -388,34 +389,32 @@ contains
 
     if(debug_level > 1) write(debug_unit, *) me, ' Start inner_ml_aply at level ', level, info
     
-    if (me >= 0) then
-      select case(p%precv(level)%parms%ml_cycle)  
-        case(amg_no_ml_)
-          !
-          ! No preconditioning, should not really get here
-          ! 
-          call psb_errpush(psb_err_internal_error_, name, &
-                        & a_err = 'amg_no_ml_ in mlprc_aply?')
-          goto 9999      
+    select case(p%precv(level)%parms%ml_cycle)
+      case(amg_no_ml_)
+        !
+        ! No preconditioning, should not really get here
+        ! 
+        call psb_errpush(psb_err_internal_error_, name, &
+                      & a_err = 'amg_no_ml_ in mlprc_aply?')
+        goto 9999      
+      
+      case(amg_add_ml_)
+        call amg_d_inner_add(p, level, trans, work)
+      
+      case(amg_mult_ml_, amg_vcycle_ml_, amg_wcycle_ml_)
+        call amg_d_inner_mult(p, level, trans, work)
+      
+      case(amg_kcycle_ml_, amg_kcyclesym_ml_)
+        call amg_d_inner_k_cycle(p, level, trans, work)
         
-        case(amg_add_ml_)
-          call amg_d_inner_add(p, level, trans, work)
-        
-        case(amg_mult_ml_, amg_vcycle_ml_, amg_wcycle_ml_)
-          call amg_d_inner_mult(p, level, trans, work)
-        
-        case(amg_kcycle_ml_, amg_kcyclesym_ml_)
-          call amg_d_inner_k_cycle(p, level, trans, work)
-          
-        case default
-          info = psb_err_from_subroutine_ai_
-          call psb_errpush(info, name, a_err = 'invalid ml_cycle', &
-              &  i_Err=(/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
-          goto 9999      
-      end select
+      case default
+        info = psb_err_from_subroutine_ai_
+        call psb_errpush(info, name, a_err = 'invalid ml_cycle', &
+            &  i_Err=(/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
+        goto 9999      
+    end select
 
-      if(debug_level > 1) write(debug_unit, *) me, ' End inner_ml_aply at level ', level
-    end if
+    if(debug_level > 1) write(debug_unit, *) me, ' End inner_ml_aply at level ', level
 
     call psb_erractionrestore(err_act)
     return
@@ -454,7 +453,7 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
     
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_, name, &
                     & a_err = 'wrong call level to inner_add')
@@ -510,7 +509,7 @@ contains
       if (level < nlev) then
         ! Apply the restriction
         call p%precv(level+1)%map_rstr(done, vx2l, dzero, p%precv(level+1)%wrk%vx2l, info, &
-                                      & work = work, vtx = wv(1), vty = p%precv(level+1)%wrk%wv(1))
+                                      & work = work, vtx = wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
                         & a_err = 'Error during restriction')
@@ -525,10 +524,9 @@ contains
           goto 9999
         end if
 
-
         ! Apply the prolongator
         call p%precv(level+1)%map_prol(done, p%precv(level + 1)%wrk%vy2l, done, vy2l, info, &
-                                      & work = work, vtx = p%precv(level + 1)%wrk%wv(1), vty = wv(1))
+                                      & work = work, vty = wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
                         & a_err = 'Error during prolongation')
@@ -574,7 +572,7 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_, name, &
                     & a_err = 'wrong call level to inner_mult')
@@ -584,7 +582,7 @@ contains
     ctxt = p%precv(level)%base_desc%get_context()
     call psb_info(ctxt, me, np)
     if(debug_level > 1) write(debug_unit, *) me, ' inner_mult at level ', level
-
+    !!$    write(debug_unit,*) me,' inner_mult at level (1):',level,np
     sweeps_post = p%precv(level)%parms%sweeps_post
     sweeps_pre  = p%precv(level)%parms%sweeps_pre
     pre  = ((sweeps_pre > 0) .and. (trans == 'N')) .or. ((sweeps_post > 0) .and. (trans /= 'N'))
@@ -594,30 +592,30 @@ contains
             & vtx => p%precv(level)%wrk%vtx, vty => p%precv(level)%wrk%vty, &
             & base_a => p%precv(level)%base_a, base_desc=>p%precv(level)%base_desc, &
             & wv => p%precv(level)%wrk%wv)
-
+    !!$      write(0,*) 'Inner mult at level (2):',level,' :',me,np,':',&
+    !!$           & size(p%precv(level)%wrk%wv), allocated(p%precv(level)%wrk%wv)
+    if (me >=0) then
       if (level < nlev) then 
         !
         ! Apply the first smoother
         ! The residual has been prepared before the recursive call. 
         !
         if (pre) then
-          if (me >= 0) then
-            !!$ write(0, *) me, 'Applying smoother pre ', level
-            if (trans == 'N') then 
-              sweeps = p%precv(level)%parms%sweeps_pre
-              if (info == psb_success_) call p%precv(level)%sm%apply(done, vx2l, dzero, vy2l, base_desc, trans, &
-                                                                    & sweeps, work, wv, info, init = 'Z')
-            else
-              sweeps = p%precv(level)%parms%sweeps_post
-              if (info == psb_success_) call p%precv(level)%sm2%apply(done, vx2l, dzero, vy2l, base_desc, trans, &
-                                                                    & sweeps, work, wv, info, init = 'Z')
-            end if
-            
-            if (info /= psb_success_) then
-              call psb_errpush(psb_err_internal_error_, name, &
-                            & a_err = 'Error during PRE smoother_apply')
-              goto 9999
-            end if
+          !!$ write(0, *) me, 'Applying smoother pre ', level
+          if (trans == 'N') then 
+            sweeps = p%precv(level)%parms%sweeps_pre
+            if (info == psb_success_) call p%precv(level)%sm%apply(done, vx2l, dzero, vy2l, base_desc, trans, &
+                                                                  & sweeps, work, wv, info, init = 'Z')
+          else
+            sweeps = p%precv(level)%parms%sweeps_post
+            if (info == psb_success_) call p%precv(level)%sm2%apply(done, vx2l, dzero, vy2l, base_desc, trans, &
+                                                                  & sweeps, work, wv, info, init = 'Z')
+          end if
+          
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_internal_error_, name, &
+                          & a_err = 'Error during PRE smoother_apply')
+            goto 9999
           end if
         endif
 
@@ -634,7 +632,7 @@ contains
           end if
 
           call p%precv(level+1)%map_rstr(done, vty, dzero, p%precv(level + 1)%wrk%vx2l, info, &
-                                        & work = work, vtx  =wv(1), vty = p%precv(level + 1)%wrk%wv(1))
+                                        & work = work, vtx = wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_, name, &
                           & a_err = 'Error during restriction')
@@ -643,7 +641,7 @@ contains
         else
           ! Shortcut: just transfer x2l. 
           call p%precv(level+1)%map_rstr(done, vx2l, dzero, p%precv(level+1)%wrk%vx2l, info, &
-                                      & work = work, vtx = wv(1), vty = p%precv(level + 1)%wrk%wv(1))
+                                      & work = work, vtx = wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_, name, &
                             & a_err = 'Error during restriction')
@@ -656,7 +654,7 @@ contains
 
         ! Apply the prolongator
         call p%precv(level+1)%map_prol(done, p%precv(level+1)%wrk%vy2l, done, vy2l, info, &
-             & work = work, vtx = p%precv(level + 1)%wrk%wv(1), vty=wv(1))
+             & work = work, vty=wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
                           & a_err = 'Error during prolongation')
@@ -664,14 +662,12 @@ contains
         end if
 
         if (p%precv(level)%parms%ml_cycle == amg_wcycle_ml_) then
-          if (me >=0) then 
-            call psb_geaxpby(done, vx2l, dzero, vty, base_desc, info)        
-            if (info == psb_success_) call psb_spmm(-done, base_a, vy2l, done, vty, &
-                                                  & base_desc, info, work = work, trans = trans)
-          end if
+          call psb_geaxpby(done, vx2l, dzero, vty, base_desc, info)        
+          if (info == psb_success_) call psb_spmm(-done, base_a, vy2l, done, vty, &
+                                                & base_desc, info, work = work, trans = trans)
 
           if (info == psb_success_) call p%precv(level+1)%map_rstr(done, vty, dzero, p%precv(level + 1)%wrk%vx2l, info, &
-                                                                  & work = work, vtx = wv(1), vty = p%precv(level + 1)%wrk%wv(1))
+                                                                  & work = work, vtx = wv(1))
 
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_, name, &
@@ -682,7 +678,7 @@ contains
           call inner_ml_aply(level+1, p, trans, work, info)
 
           if (info == psb_success_) call p%precv(level+1)%map_prol(done, p%precv(level + 1)%wrk%vy2l, done, vy2l, info, &
-                                                                  & work = work, vtx = p%precv(level + 1)%wrk%wv(1), vty = wv(1))
+                                                                  & work = work, vty = wv(1))
 
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_, name, &
@@ -692,27 +688,25 @@ contains
         endif
 
         if (post) then
-          if (me >=0) then 
-            call psb_geaxpby(done, vx2l, dzero, vty, base_desc, info)
-            if (info == psb_success_) call psb_spmm(-done, base_a, vy2l, done, vty, base_desc, info, &
-                                                  & work = work, trans = trans)
-            if (info /= psb_success_) then
-              call psb_errpush(psb_err_internal_error_, name, &
-                            & a_err = 'Error during residue')
-              goto 9999
-            end if
-            
-            ! Apply the second smoother
+          call psb_geaxpby(done, vx2l, dzero, vty, base_desc, info)
+          if (info == psb_success_) call psb_spmm(-done, base_a, vy2l, done, vty, base_desc, info, &
+                                                & work = work, trans = trans)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_internal_error_, name, &
+                          & a_err = 'Error during residue')
+            goto 9999
+          end if
+          
+          ! Apply the second smoother
 
-            if (trans == 'N') then
-              sweeps = p%precv(level)%parms%sweeps_post
-              if (info == psb_success_) call p%precv(level)%sm2%apply(done, vty, done, vy2l, base_desc, &
-                                                                    & trans, sweeps, work, wv, info, init = 'Z')
-            else 
-              sweeps = p%precv(level)%parms%sweeps_pre
-              if (info == psb_success_) call p%precv(level)%sm%apply(done, vty, done, vy2l, base_desc, &
-                                                                    & trans, sweeps, work, wv, info, init = 'Z')
-            end if
+          if (trans == 'N') then
+            sweeps = p%precv(level)%parms%sweeps_post
+            if (info == psb_success_) call p%precv(level)%sm2%apply(done, vty, done, vy2l, base_desc, &
+                                                                  & trans, sweeps, work, wv, info, init = 'Z')
+          else 
+            sweeps = p%precv(level)%parms%sweeps_pre
+            if (info == psb_success_) call p%precv(level)%sm%apply(done, vty, done, vy2l, base_desc, &
+                                                                  & trans, sweeps, work, wv, info, init = 'Z')
           end if
 
           if (info /= psb_success_) then
@@ -735,6 +729,7 @@ contains
              & a_err = 'Invalid LEVEL vs NLEV')
         goto 9999
       end if
+    end if
     end associate
 
   9998 continue
@@ -776,7 +771,7 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_, name, &
                     & a_err = 'wrong call level to inner_add')
@@ -839,7 +834,7 @@ contains
         
         ! Apply the restriction
         call p%precv(level + 1)%map_rstr(done, vty, dzero, p%precv(level + 1)%wrk%vx2l, info, &
-                                        & work = work, vtx = wv(1), vty = p%precv(level + 1)%wrk%wv(1))
+                                        & work = work, vtx = wv(1))
 
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
@@ -870,7 +865,7 @@ contains
 
         ! Apply the prolongator
         call p%precv(level+1)%map_prol(done, p%precv(level+1)%wrk%vy2l, done, vy2l, info, &
-                                    & work = work, vtx = p%precv(level+1)%wrk%wv(1), vty = wv(1))
+                                    & work = work, vty = wv(1))
 
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
@@ -922,10 +917,6 @@ contains
   end subroutine amg_d_inner_k_cycle
   
   recursive subroutine amg_dinneritkcycle(p, level, trans, work, innersolv)
-    use psb_base_mod
-    use amg_prec_mod
-    use amg_d_inner_mod, amg_protect_name => amg_dmlprec_aply
-
     implicit none
     ! Input/Output variables
     type(amg_dprec_type), intent(inout) :: p
@@ -1077,6 +1068,7 @@ end subroutine amg_dmlprec_aply_vect
 subroutine amg_dmlprec_aply_mvect_vect(alpha, p, x, idx_x, beta, y, desc_data, trans, work, info)
   use psb_base_mod
   use amg_base_prec_type
+  use amg_prec_mod
   use amg_d_inner_mod, amg_protect_name => amg_dmlprec_aply_mvect_vect
 
   implicit none
@@ -1113,10 +1105,10 @@ subroutine amg_dmlprec_aply_mvect_vect(alpha, p, x, idx_x, beta, y, desc_data, t
 
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit, *) me, ' ', trim(name), &
-                          & ' Entry  ', size(p%precv)
+       & ' Entry  ', p%get_nlevs()
 
   trans_ = psb_toupper(trans)
-  nlev   = size(p%precv)
+  nlev   = p%get_nlevs()
 
   do_alloc_wrk = .not. allocated(p%precv(1)%wrk)
 
@@ -1249,7 +1241,7 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_, name, &
                     & a_err = 'wrong call level to inner_ml')
@@ -1261,34 +1253,32 @@ contains
 
     if(debug_level > 1) write(debug_unit, *) me, ' Start inner_ml_aply at level ', level, info
     
-    if (me >= 0) then
-      select case(p%precv(level)%parms%ml_cycle)  
-        case(amg_no_ml_)
-          !
-          ! No preconditioning, should not really get here
-          ! 
-          call psb_errpush(psb_err_internal_error_, name, &
-                        & a_err = 'amg_no_ml_ in mlprc_aply?')
-          goto 9999      
+    select case(p%precv(level)%parms%ml_cycle)
+      case(amg_no_ml_)
+        !
+        ! No preconditioning, should not really get here
+        ! 
+        call psb_errpush(psb_err_internal_error_, name, &
+                      & a_err = 'amg_no_ml_ in mlprc_aply?')
+        goto 9999      
+      
+      case(amg_add_ml_)
+        call amg_d_inner_add(p, level, trans, work)
+      
+      case(amg_mult_ml_, amg_vcycle_ml_, amg_wcycle_ml_)
+        call amg_d_inner_mult(p, level, trans, work)
+      
+      case(amg_kcycle_ml_, amg_kcyclesym_ml_)
+        call amg_d_inner_k_cycle(p, level, trans, work)
         
-        case(amg_add_ml_)
-          call amg_d_inner_add(p, level, trans, work)
-        
-        case(amg_mult_ml_, amg_vcycle_ml_, amg_wcycle_ml_)
-          call amg_d_inner_mult(p, level, trans, work)
-        
-        case(amg_kcycle_ml_, amg_kcyclesym_ml_)
-          call amg_d_inner_k_cycle(p, level, trans, work)
-          
-        case default
-          info = psb_err_from_subroutine_ai_
-          call psb_errpush(info, name, a_err = 'invalid ml_cycle', &
-              &  i_Err=(/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
-          goto 9999      
-      end select
+      case default
+        info = psb_err_from_subroutine_ai_
+        call psb_errpush(info, name, a_err = 'invalid ml_cycle', &
+            &  i_Err=(/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
+        goto 9999      
+    end select
 
-      if(debug_level > 1) write(debug_unit, *) me, ' End inner_ml_aply at level ', level
-    end if
+    if(debug_level > 1) write(debug_unit, *) me, ' End inner_ml_aply at level ', level
 
     call psb_erractionrestore(err_act)
     return
@@ -1327,7 +1317,7 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
     
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_, name, &
                     & a_err = 'wrong call level to inner_add')
@@ -1383,7 +1373,7 @@ contains
       if (level < nlev) then
         ! Apply the restriction
         call p%precv(level+1)%map_rstr(done, vx2l, dzero, p%precv(level+1)%wrk%vx2l, info, &
-                                      & work = work, vtx = wv(1), vty = p%precv(level+1)%wrk%wv(1))
+                                      & work = work, vtx = wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
                         & a_err = 'Error during restriction')
@@ -1398,10 +1388,9 @@ contains
           goto 9999
         end if
 
-
         ! Apply the prolongator
         call p%precv(level+1)%map_prol(done, p%precv(level + 1)%wrk%vy2l, done, vy2l, info, &
-                                      & work = work, vtx = p%precv(level + 1)%wrk%wv(1), vty = wv(1))
+                                      & work = work, vty = wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
                         & a_err = 'Error during prolongation')
@@ -1447,7 +1436,7 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_, name, &
                     & a_err = 'wrong call level to inner_mult')
@@ -1457,7 +1446,7 @@ contains
     ctxt = p%precv(level)%base_desc%get_context()
     call psb_info(ctxt, me, np)
     if(debug_level > 1) write(debug_unit, *) me, ' inner_mult at level ', level
-
+    !!$    write(debug_unit,*) me,' inner_mult at level (1):',level,np
     sweeps_post = p%precv(level)%parms%sweeps_post
     sweeps_pre  = p%precv(level)%parms%sweeps_pre
     pre  = ((sweeps_pre > 0) .and. (trans == 'N')) .or. ((sweeps_post > 0) .and. (trans /= 'N'))
@@ -1467,30 +1456,30 @@ contains
             & vtx => p%precv(level)%wrk%vtx, vty => p%precv(level)%wrk%vty, &
             & base_a => p%precv(level)%base_a, base_desc=>p%precv(level)%base_desc, &
             & wv => p%precv(level)%wrk%wv)
-
+    !!$      write(0,*) 'Inner mult at level (2):',level,' :',me,np,':',&
+    !!$           & size(p%precv(level)%wrk%wv), allocated(p%precv(level)%wrk%wv)
+    if (me >=0) then
       if (level < nlev) then 
         !
         ! Apply the first smoother
         ! The residual has been prepared before the recursive call. 
         !
         if (pre) then
-          if (me >= 0) then
-            !!$ write(0, *) me, 'Applying smoother pre ', level
-            if (trans == 'N') then 
-              sweeps = p%precv(level)%parms%sweeps_pre
-              if (info == psb_success_) call p%precv(level)%sm%apply(done, vx2l, dzero, vy2l, base_desc, trans, &
-                                                                    & sweeps, work, wv, info, init = 'Z')
-            else
-              sweeps = p%precv(level)%parms%sweeps_post
-              if (info == psb_success_) call p%precv(level)%sm2%apply(done, vx2l, dzero, vy2l, base_desc, trans, &
-                                                                    & sweeps, work, wv, info, init = 'Z')
-            end if
-            
-            if (info /= psb_success_) then
-              call psb_errpush(psb_err_internal_error_, name, &
-                            & a_err = 'Error during PRE smoother_apply')
-              goto 9999
-            end if
+          !!$ write(0, *) me, 'Applying smoother pre ', level
+          if (trans == 'N') then 
+            sweeps = p%precv(level)%parms%sweeps_pre
+            if (info == psb_success_) call p%precv(level)%sm%apply(done, vx2l, dzero, vy2l, base_desc, trans, &
+                                                                  & sweeps, work, wv, info, init = 'Z')
+          else
+            sweeps = p%precv(level)%parms%sweeps_post
+            if (info == psb_success_) call p%precv(level)%sm2%apply(done, vx2l, dzero, vy2l, base_desc, trans, &
+                                                                  & sweeps, work, wv, info, init = 'Z')
+          end if
+          
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_internal_error_, name, &
+                          & a_err = 'Error during PRE smoother_apply')
+            goto 9999
           end if
         endif
 
@@ -1507,7 +1496,7 @@ contains
           end if
 
           call p%precv(level+1)%map_rstr(done, vty, dzero, p%precv(level + 1)%wrk%vx2l, info, &
-                                        & work = work, vtx  =wv(1), vty = p%precv(level + 1)%wrk%wv(1))
+                                        & work = work, vtx = wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_, name, &
                           & a_err = 'Error during restriction')
@@ -1516,7 +1505,7 @@ contains
         else
           ! Shortcut: just transfer x2l. 
           call p%precv(level+1)%map_rstr(done, vx2l, dzero, p%precv(level+1)%wrk%vx2l, info, &
-                                      & work = work, vtx = wv(1), vty = p%precv(level + 1)%wrk%wv(1))
+                                      & work = work, vtx = wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_, name, &
                             & a_err = 'Error during restriction')
@@ -1529,22 +1518,20 @@ contains
 
         ! Apply the prolongator
         call p%precv(level+1)%map_prol(done, p%precv(level+1)%wrk%vy2l, done, vy2l, info, &
-             & work = work, vtx = p%precv(level + 1)%wrk%wv(1), vty=wv(1))
+             & work = work, vty=wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
                           & a_err = 'Error during prolongation')
           goto 9999
         end if
 
-        if (p%precv(level)%parms%ml_cycle == amg_wcycle_ml_) then
-          if (me >=0) then 
-            call psb_geaxpby(done, vx2l, dzero, vty, base_desc, info)        
-            if (info == psb_success_) call psb_spmm(-done, base_a, vy2l, done, vty, &
-                                                  & base_desc, info, work = work, trans = trans)
-          end if
+        if (p%precv(level)%parms%ml_cycle == amg_wcycle_ml_) then 
+          call psb_geaxpby(done, vx2l, dzero, vty, base_desc, info)        
+          if (info == psb_success_) call psb_spmm(-done, base_a, vy2l, done, vty, &
+                                                & base_desc, info, work = work, trans = trans)
 
           if (info == psb_success_) call p%precv(level+1)%map_rstr(done, vty, dzero, p%precv(level + 1)%wrk%vx2l, info, &
-                                                                  & work = work, vtx = wv(1), vty = p%precv(level + 1)%wrk%wv(1))
+                                                                  & work = work, vtx = wv(1))
 
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_, name, &
@@ -1555,7 +1542,7 @@ contains
           call inner_ml_aply(level+1, p, trans, work, info)
 
           if (info == psb_success_) call p%precv(level+1)%map_prol(done, p%precv(level + 1)%wrk%vy2l, done, vy2l, info, &
-                                                                  & work = work, vtx = p%precv(level + 1)%wrk%wv(1), vty = wv(1))
+                                                                  & work = work, vty = wv(1))
 
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_, name, &
@@ -1564,28 +1551,26 @@ contains
           end if
         endif
 
-        if (post) then
-          if (me >=0) then 
-            call psb_geaxpby(done, vx2l, dzero, vty, base_desc, info)
-            if (info == psb_success_) call psb_spmm(-done, base_a, vy2l, done, vty, base_desc, info, &
-                                                  & work = work, trans = trans)
-            if (info /= psb_success_) then
-              call psb_errpush(psb_err_internal_error_, name, &
-                            & a_err = 'Error during residue')
-              goto 9999
-            end if
-            
-            ! Apply the second smoother
+        if (post) then 
+          call psb_geaxpby(done, vx2l, dzero, vty, base_desc, info)
+          if (info == psb_success_) call psb_spmm(-done, base_a, vy2l, done, vty, base_desc, info, &
+                                                & work = work, trans = trans)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_internal_error_, name, &
+                          & a_err = 'Error during residue')
+            goto 9999
+          end if
+          
+          ! Apply the second smoother
 
-            if (trans == 'N') then
-              sweeps = p%precv(level)%parms%sweeps_post
-              if (info == psb_success_) call p%precv(level)%sm2%apply(done, vty, done, vy2l, base_desc, &
-                                                                    & trans, sweeps, work, wv, info, init = 'Z')
-            else 
-              sweeps = p%precv(level)%parms%sweeps_pre
-              if (info == psb_success_) call p%precv(level)%sm%apply(done, vty, done, vy2l, base_desc, &
-                                                                    & trans, sweeps, work, wv, info, init = 'Z')
-            end if
+          if (trans == 'N') then
+            sweeps = p%precv(level)%parms%sweeps_post
+            if (info == psb_success_) call p%precv(level)%sm2%apply(done, vty, done, vy2l, base_desc, &
+                                                                  & trans, sweeps, work, wv, info, init = 'Z')
+          else 
+            sweeps = p%precv(level)%parms%sweeps_pre
+            if (info == psb_success_) call p%precv(level)%sm%apply(done, vty, done, vy2l, base_desc, &
+                                                                  & trans, sweeps, work, wv, info, init = 'Z')
           end if
 
           if (info /= psb_success_) then
@@ -1608,6 +1593,7 @@ contains
              & a_err = 'Invalid LEVEL vs NLEV')
         goto 9999
       end if
+    end if
     end associate
 
   9998 continue
@@ -1649,7 +1635,7 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_, name, &
                     & a_err = 'wrong call level to inner_add')
@@ -1712,7 +1698,7 @@ contains
         
         ! Apply the restriction
         call p%precv(level + 1)%map_rstr(done, vty, dzero, p%precv(level + 1)%wrk%vx2l, info, &
-                                        & work = work, vtx = wv(1), vty = p%precv(level + 1)%wrk%wv(1))
+                                        & work = work, vtx = wv(1))
 
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
@@ -1743,7 +1729,7 @@ contains
 
         ! Apply the prolongator
         call p%precv(level+1)%map_prol(done, p%precv(level+1)%wrk%vy2l, done, vy2l, info, &
-                                    & work = work, vtx = p%precv(level+1)%wrk%wv(1), vty = wv(1))
+                                    & work = work, vty = wv(1))
 
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
@@ -1795,10 +1781,6 @@ contains
   end subroutine amg_d_inner_k_cycle
   
   recursive subroutine amg_dinneritkcycle(p, level, trans, work, innersolv)
-    use psb_base_mod
-    use amg_prec_mod
-    use amg_d_inner_mod, amg_protect_name => amg_dmlprec_aply
-
     implicit none
     ! Input/Output variables
     type(amg_dprec_type), intent(inout) :: p
@@ -1944,6 +1926,7 @@ end subroutine amg_dmlprec_aply_mvect_vect
 subroutine amg_dmlprec_aply_mvect_col(alpha, p, x, idx_x, beta, y, idx_y, desc_data, trans, work, info)
   use psb_base_mod
   use amg_base_prec_type
+  use amg_prec_mod
   use amg_d_inner_mod, amg_protect_name => amg_dmlprec_aply_mvect_col
 
   implicit none
@@ -1979,10 +1962,10 @@ subroutine amg_dmlprec_aply_mvect_col(alpha, p, x, idx_x, beta, y, idx_y, desc_d
 
   if (debug_level >= psb_debug_inner_) &
        & write(debug_unit, *) me, ' ', trim(name), &
-                          & ' Entry  ', size(p%precv)
+       & ' Entry  ', p%get_nlevs()
 
   trans_ = psb_toupper(trans)
-  nlev   = size(p%precv)
+  nlev   = p%get_nlevs()
 
   do_alloc_wrk = .not. allocated(p%precv(1)%wrk)
 
@@ -2115,7 +2098,7 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_, name, &
                     & a_err = 'wrong call level to inner_ml')
@@ -2127,34 +2110,32 @@ contains
 
     if(debug_level > 1) write(debug_unit, *) me, ' Start inner_ml_aply at level ', level, info
     
-    if (me >= 0) then
-      select case(p%precv(level)%parms%ml_cycle)  
-        case(amg_no_ml_)
-          !
-          ! No preconditioning, should not really get here
-          ! 
-          call psb_errpush(psb_err_internal_error_, name, &
-                        & a_err = 'amg_no_ml_ in mlprc_aply?')
-          goto 9999      
+    select case(p%precv(level)%parms%ml_cycle)  
+      case(amg_no_ml_)
+        !
+        ! No preconditioning, should not really get here
+        ! 
+        call psb_errpush(psb_err_internal_error_, name, &
+                      & a_err = 'amg_no_ml_ in mlprc_aply?')
+        goto 9999      
+      
+      case(amg_add_ml_)
+        call amg_d_inner_add(p, level, trans, work)
+      
+      case(amg_mult_ml_, amg_vcycle_ml_, amg_wcycle_ml_)
+        call amg_d_inner_mult(p, level, trans, work)
+      
+      case(amg_kcycle_ml_, amg_kcyclesym_ml_)
+        call amg_d_inner_k_cycle(p, level, trans, work)
         
-        case(amg_add_ml_)
-          call amg_d_inner_add(p, level, trans, work)
-        
-        case(amg_mult_ml_, amg_vcycle_ml_, amg_wcycle_ml_)
-          call amg_d_inner_mult(p, level, trans, work)
-        
-        case(amg_kcycle_ml_, amg_kcyclesym_ml_)
-          call amg_d_inner_k_cycle(p, level, trans, work)
-          
-        case default
-          info = psb_err_from_subroutine_ai_
-          call psb_errpush(info, name, a_err = 'invalid ml_cycle', &
-              &  i_Err=(/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
-          goto 9999      
-      end select
+      case default
+        info = psb_err_from_subroutine_ai_
+        call psb_errpush(info, name, a_err = 'invalid ml_cycle', &
+            &  i_Err=(/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
+        goto 9999      
+    end select
 
-      if(debug_level > 1) write(debug_unit, *) me, ' End inner_ml_aply at level ', level
-    end if
+    if(debug_level > 1) write(debug_unit, *) me, ' End inner_ml_aply at level ', level
 
     call psb_erractionrestore(err_act)
     return
@@ -2193,7 +2174,7 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
     
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_, name, &
                     & a_err = 'wrong call level to inner_add')
@@ -2249,7 +2230,7 @@ contains
       if (level < nlev) then
         ! Apply the restriction
         call p%precv(level+1)%map_rstr(done, vx2l, dzero, p%precv(level+1)%wrk%vx2l, info, &
-                                      & work = work, vtx = wv(1), vty = p%precv(level+1)%wrk%wv(1))
+                                      & work = work, vtx = wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
                         & a_err = 'Error during restriction')
@@ -2264,10 +2245,9 @@ contains
           goto 9999
         end if
 
-
         ! Apply the prolongator
         call p%precv(level+1)%map_prol(done, p%precv(level + 1)%wrk%vy2l, done, vy2l, info, &
-                                      & work = work, vtx = p%precv(level + 1)%wrk%wv(1), vty = wv(1))
+                                      & work = work, vty = wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
                         & a_err = 'Error during prolongation')
@@ -2313,7 +2293,7 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_, name, &
                     & a_err = 'wrong call level to inner_mult')
@@ -2323,7 +2303,7 @@ contains
     ctxt = p%precv(level)%base_desc%get_context()
     call psb_info(ctxt, me, np)
     if(debug_level > 1) write(debug_unit, *) me, ' inner_mult at level ', level
-
+    !!$    write(debug_unit,*) me,' inner_mult at level (1):',level,np
     sweeps_post = p%precv(level)%parms%sweeps_post
     sweeps_pre  = p%precv(level)%parms%sweeps_pre
     pre  = ((sweeps_pre > 0) .and. (trans == 'N')) .or. ((sweeps_post > 0) .and. (trans /= 'N'))
@@ -2333,30 +2313,30 @@ contains
             & vtx => p%precv(level)%wrk%vtx, vty => p%precv(level)%wrk%vty, &
             & base_a => p%precv(level)%base_a, base_desc=>p%precv(level)%base_desc, &
             & wv => p%precv(level)%wrk%wv)
-
+    !!$      write(0,*) 'Inner mult at level (2):',level,' :',me,np,':',&
+    !!$           & size(p%precv(level)%wrk%wv), allocated(p%precv(level)%wrk%wv)
+    if (me >=0) then
       if (level < nlev) then 
         !
         ! Apply the first smoother
         ! The residual has been prepared before the recursive call. 
         !
         if (pre) then
-          if (me >= 0) then
-            !!$ write(0, *) me, 'Applying smoother pre ', level
-            if (trans == 'N') then 
-              sweeps = p%precv(level)%parms%sweeps_pre
-              if (info == psb_success_) call p%precv(level)%sm%apply(done, vx2l, dzero, vy2l, base_desc, trans, &
-                                                                    & sweeps, work, wv, info, init = 'Z')
-            else
-              sweeps = p%precv(level)%parms%sweeps_post
-              if (info == psb_success_) call p%precv(level)%sm2%apply(done, vx2l, dzero, vy2l, base_desc, trans, &
-                                                                    & sweeps, work, wv, info, init = 'Z')
-            end if
-            
-            if (info /= psb_success_) then
-              call psb_errpush(psb_err_internal_error_, name, &
-                            & a_err = 'Error during PRE smoother_apply')
-              goto 9999
-            end if
+          !!$ write(0, *) me, 'Applying smoother pre ', level
+          if (trans == 'N') then 
+            sweeps = p%precv(level)%parms%sweeps_pre
+            if (info == psb_success_) call p%precv(level)%sm%apply(done, vx2l, dzero, vy2l, base_desc, trans, &
+                                                                  & sweeps, work, wv, info, init = 'Z')
+          else
+            sweeps = p%precv(level)%parms%sweeps_post
+            if (info == psb_success_) call p%precv(level)%sm2%apply(done, vx2l, dzero, vy2l, base_desc, trans, &
+                                                                  & sweeps, work, wv, info, init = 'Z')
+          end if
+          
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_internal_error_, name, &
+                          & a_err = 'Error during PRE smoother_apply')
+            goto 9999
           end if
         endif
 
@@ -2373,7 +2353,7 @@ contains
           end if
 
           call p%precv(level+1)%map_rstr(done, vty, dzero, p%precv(level + 1)%wrk%vx2l, info, &
-                                        & work = work, vtx  =wv(1), vty = p%precv(level + 1)%wrk%wv(1))
+                                        & work = work, vtx = wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_, name, &
                           & a_err = 'Error during restriction')
@@ -2382,7 +2362,7 @@ contains
         else
           ! Shortcut: just transfer x2l. 
           call p%precv(level+1)%map_rstr(done, vx2l, dzero, p%precv(level+1)%wrk%vx2l, info, &
-                                      & work = work, vtx = wv(1), vty = p%precv(level + 1)%wrk%wv(1))
+                                      & work = work, vtx = wv(1))
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_, name, &
                             & a_err = 'Error during restriction')
@@ -2395,7 +2375,7 @@ contains
 
         ! Apply the prolongator
         call p%precv(level+1)%map_prol(done, p%precv(level+1)%wrk%vy2l, done, vy2l, info, &
-             & work = work, vtx = p%precv(level + 1)%wrk%wv(1), vty=wv(1))
+             & work = work, vty=wv(1))
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
                           & a_err = 'Error during prolongation')
@@ -2403,14 +2383,12 @@ contains
         end if
 
         if (p%precv(level)%parms%ml_cycle == amg_wcycle_ml_) then
-          if (me >=0) then 
-            call psb_geaxpby(done, vx2l, dzero, vty, base_desc, info)        
-            if (info == psb_success_) call psb_spmm(-done, base_a, vy2l, done, vty, &
-                                                  & base_desc, info, work = work, trans = trans)
-          end if
+          call psb_geaxpby(done, vx2l, dzero, vty, base_desc, info)        
+          if (info == psb_success_) call psb_spmm(-done, base_a, vy2l, done, vty, &
+                                                & base_desc, info, work = work, trans = trans)
 
           if (info == psb_success_) call p%precv(level+1)%map_rstr(done, vty, dzero, p%precv(level + 1)%wrk%vx2l, info, &
-                                                                  & work = work, vtx = wv(1), vty = p%precv(level + 1)%wrk%wv(1))
+                                                                  & work = work, vtx = wv(1))
 
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_, name, &
@@ -2421,7 +2399,7 @@ contains
           call inner_ml_aply(level+1, p, trans, work, info)
 
           if (info == psb_success_) call p%precv(level+1)%map_prol(done, p%precv(level + 1)%wrk%vy2l, done, vy2l, info, &
-                                                                  & work = work, vtx = p%precv(level + 1)%wrk%wv(1), vty = wv(1))
+                                                                  & work = work, vty = wv(1))
 
           if (info /= psb_success_) then
             call psb_errpush(psb_err_internal_error_, name, &
@@ -2431,27 +2409,25 @@ contains
         endif
 
         if (post) then
-          if (me >=0) then 
-            call psb_geaxpby(done, vx2l, dzero, vty, base_desc, info)
-            if (info == psb_success_) call psb_spmm(-done, base_a, vy2l, done, vty, base_desc, info, &
-                                                  & work = work, trans = trans)
-            if (info /= psb_success_) then
-              call psb_errpush(psb_err_internal_error_, name, &
-                            & a_err = 'Error during residue')
-              goto 9999
-            end if
-            
-            ! Apply the second smoother
+          call psb_geaxpby(done, vx2l, dzero, vty, base_desc, info)
+          if (info == psb_success_) call psb_spmm(-done, base_a, vy2l, done, vty, base_desc, info, &
+                                                & work = work, trans = trans)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_internal_error_, name, &
+                          & a_err = 'Error during residue')
+            goto 9999
+          end if
+          
+          ! Apply the second smoother
 
-            if (trans == 'N') then
-              sweeps = p%precv(level)%parms%sweeps_post
-              if (info == psb_success_) call p%precv(level)%sm2%apply(done, vty, done, vy2l, base_desc, &
-                                                                    & trans, sweeps, work, wv, info, init = 'Z')
-            else 
-              sweeps = p%precv(level)%parms%sweeps_pre
-              if (info == psb_success_) call p%precv(level)%sm%apply(done, vty, done, vy2l, base_desc, &
-                                                                    & trans, sweeps, work, wv, info, init = 'Z')
-            end if
+          if (trans == 'N') then
+            sweeps = p%precv(level)%parms%sweeps_post
+            if (info == psb_success_) call p%precv(level)%sm2%apply(done, vty, done, vy2l, base_desc, &
+                                                                  & trans, sweeps, work, wv, info, init = 'Z')
+          else 
+            sweeps = p%precv(level)%parms%sweeps_pre
+            if (info == psb_success_) call p%precv(level)%sm%apply(done, vty, done, vy2l, base_desc, &
+                                                                  & trans, sweeps, work, wv, info, init = 'Z')
           end if
 
           if (info /= psb_success_) then
@@ -2474,6 +2450,7 @@ contains
              & a_err = 'Invalid LEVEL vs NLEV')
         goto 9999
       end if
+    end if
     end associate
 
   9998 continue
@@ -2515,7 +2492,7 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    nlev = size(p%precv)
+    nlev = p%get_nlevs()
     if ((level < 1) .or. (level > nlev)) then
       call psb_errpush(psb_err_internal_error_, name, &
                     & a_err = 'wrong call level to inner_add')
@@ -2578,7 +2555,7 @@ contains
         
         ! Apply the restriction
         call p%precv(level + 1)%map_rstr(done, vty, dzero, p%precv(level + 1)%wrk%vx2l, info, &
-                                        & work = work, vtx = wv(1), vty = p%precv(level + 1)%wrk%wv(1))
+                                        & work = work, vtx = wv(1))
 
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
@@ -2609,7 +2586,7 @@ contains
 
         ! Apply the prolongator
         call p%precv(level+1)%map_prol(done, p%precv(level+1)%wrk%vy2l, done, vy2l, info, &
-                                    & work = work, vtx = p%precv(level+1)%wrk%wv(1), vty = wv(1))
+                                    & work = work, vty = wv(1))
 
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
@@ -2661,9 +2638,6 @@ contains
   end subroutine amg_d_inner_k_cycle
   
   recursive subroutine amg_dinneritkcycle(p, level, trans, work, innersolv)
-    use psb_base_mod
-    use amg_prec_mod
-    use amg_d_inner_mod, amg_protect_name => amg_dmlprec_aply
 
     implicit none
     ! Input/Output variables
@@ -2806,520 +2780,3 @@ contains
     return
   end subroutine amg_dinneritkcycle
 end subroutine amg_dmlprec_aply_mvect_col
-
-!
-! Old routine for arrays instead of psb_X_vector. To be deleted eventually.
-!
-subroutine amg_dmlprec_aply(alpha, p, x, beta, y, desc_data, trans, work, info)
-  use psb_base_mod
-  use amg_base_prec_type
-  use amg_d_inner_mod, amg_protect_name => amg_dmlprec_aply
-
-  implicit none
-
-  ! Arguments
-  type(psb_desc_type), intent(in)    :: desc_data
-  type(amg_dprec_type), intent(inout)  :: p
-  real(psb_dpk_), intent(in)         :: alpha, beta
-  real(psb_dpk_), intent(inout)      :: x(:)
-  real(psb_dpk_), intent(inout)      :: y(:)
-  character, intent(in)             :: trans
-  real(psb_dpk_), target             :: work(:)
-  integer(psb_ipk_), intent(out)              :: info
-
-  ! Local variables
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: np, me
-  integer(psb_ipk_)   :: err_act
-  integer(psb_ipk_)   :: debug_level, debug_unit, nlev, nc2l, nr2l, level
-  character(len=20)   :: name
-  character           :: trans_
-  type amg_mlwrk_type
-    real(psb_dpk_), allocatable  :: tx(:), ty(:), x2l(:), y2l(:)
-  end type amg_mlwrk_type
-  type(amg_mlwrk_type), allocatable, target  :: mlwrk(:)
-
-  name = 'amg_dmlprec_aply'
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  debug_unit  = psb_get_debug_unit()
-  debug_level = psb_get_debug_level()
-
-  ctxt = desc_data%get_context()
-  call psb_info(ctxt, me, np)
-
-  if (debug_level >= psb_debug_inner_) &
-       & write(debug_unit, *) me, ' ', trim(name), &
-       & ' Entry  ', size(p%precv)
-
-  trans_ = psb_toupper(trans)
-
-  nlev = size(p%precv)
-  allocate(mlwrk(nlev), stat=info) 
-  if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_, name, a_err = 'Allocate')
-    goto 9999      
-  end if
-  level = 1
-
-  do level = 1, nlev
-    call psb_geasb(mlwrk(level)%x2l, &
-         & p%precv(level)%base_desc, info)
-    call psb_geasb(mlwrk(level)%y2l, &
-         & p%precv(level)%base_desc, info)
-    call psb_geasb(mlwrk(level)%tx, &
-         & p%precv(level)%base_desc, info)
-    call psb_geasb(mlwrk(level)%ty, &
-         & p%precv(level)%base_desc, info)
-    if (psb_errstatus_fatal()) then 
-      nc2l = p%precv(level)%base_desc%get_local_cols()
-      info=psb_err_alloc_request_
-      call psb_errpush(info, name, i_err=(/2*nc2l, izero, izero, izero, izero/), &
-           & a_err = 'real(psb_dpk_)')
-      goto 9999      
-    end if
-  end do
-
-  mlwrk(level)%x2l(:) = x(:) 
-  mlwrk(level)%y2l(:) = dzero 
-
-  call inner_ml_aply(level, p, mlwrk, trans_, work, info)    
-
-  if (info /= psb_success_) then
-    call psb_errpush(psb_err_internal_error_, name, &
-         & a_err = 'Inner prec aply')
-    goto 9999
-  end if
-
-  call psb_geaxpby(alpha, mlwrk(level)%y2l, beta, y, &
-       &   p%precv(level)%base_desc, info)
-
-  if (info /= psb_success_) then
-    call psb_errpush(psb_err_internal_error_, name, &
-         & a_err = 'Error final update')
-    goto 9999
-  end if
-
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 call psb_error_handler(err_act)
-  return
-contains
-
-  !
-  !
-  ! inner_ml_aply: apply AMG at a given level.
-  ! This routine dispatches the computation according to the type
-  ! specified at the current level.
-  ! Each of the corrections will inturn call recursively this routine.
-  !
-  ! Assumptions:
-  ! On input:
-  !   mlprec_wkr(level)%vx2l   contains the input vector (RHS)
-  !   mlprec_wkr(level)%vy2l   contains the initial guess
-  !
-  ! On output:
-  !   mlprec_wkr(level)%vy2l   contains the solution
-  !
-  ! Constraints: each of the called routines must properly handle
-  ! the input/output conditions for level+1 (i.e. apply
-  ! prolongation/restriction).
-  ! Note: for historical/convenience reasons the prolongator/restrictor
-  ! between level and level+1 are stored at level+1. 
-  !
-  !
-  recursive subroutine inner_ml_aply(level, p, mlwrk, trans, work, info)    
-    implicit none 
-    ! Arguments
-    integer(psb_ipk_)                           :: level 
-    type(amg_dprec_type), target, intent(inout) :: p
-    type(amg_mlwrk_type), intent(inout), target    :: mlwrk(:)
-    character, intent(in)                       :: trans
-    real(psb_dpk_), target                      :: work(:)
-    integer(psb_ipk_), intent(out)              :: info
-
-    type(psb_d_vect_type) :: res
-    type(psb_d_vect_type), pointer :: current
-    integer(psb_ipk_) :: sweeps_post, sweeps_pre
-    ! Local variables
-    type(psb_ctxt_type) :: ctxt
-    integer(psb_ipk_)   :: np, me
-    integer(psb_ipk_)   :: i, err_act
-    integer(psb_ipk_)   :: debug_level, debug_unit
-    integer(psb_ipk_)   :: nlev, ilev, sweeps
-    logical             :: pre, post
-    character(len=20)   :: name
-
-    name = 'inner_ml_aply'
-    info = psb_success_
-    call psb_erractionsave(err_act)
-    debug_unit  = psb_get_debug_unit()
-    debug_level = psb_get_debug_level()
-    nlev = size(p%precv)
-    if ((level < 1) .or. (level > nlev)) then
-      call psb_errpush(psb_err_internal_error_, name, &
-           & a_err = 'wrong call level to inner_ml')
-      goto 9999      
-    end if
-    ctxt = p%precv(level)%base_desc%get_context()
-    call psb_info(ctxt, me, np)
-
-    if(debug_level > 1) then
-      write(debug_unit, *) me, ' inner_ml_aply at level ', level
-    end if
-
-    select case(p%precv(level)%parms%ml_cycle) 
-
-    case(amg_no_ml_)
-      !
-      ! No preconditioning, should not really get here
-      ! 
-      call psb_errpush(psb_err_internal_error_, name, &
-           & a_err = 'amg_no_ml_ in mlprc_aply?')
-      goto 9999      
-
-    case(amg_add_ml_)
-
-      call amg_d_inner_add(p, mlwrk, level, trans, work)
-
-    case(amg_mult_ml_, amg_vcycle_ml_, amg_wcycle_ml_)
-
-      call amg_d_inner_mult(p, mlwrk, level, trans, work)
-      
-    ! !$    case(amg_kcycle_ml_, amg_kcyclesym_ml_)
-    ! !$
-    ! !$      call amg_d_inner_k_cycle(p, mlwrk, level, trans, work)
-      
-    case default
-      info = psb_err_from_subroutine_ai_
-      call psb_errpush(info, name, a_err = 'invalid ml_cycle', &
-           &  i_Err=(/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
-      goto 9999      
-
-    end select
-
-    call psb_erractionrestore(err_act)
-    return
-
-  9999 call psb_error_handler(err_act)
-    return
-  end subroutine inner_ml_aply
-
-  recursive subroutine amg_d_inner_add(p, mlwrk, level, trans, work)
-    use psb_base_mod
-    use amg_prec_mod
-
-    implicit none
-
-    ! Input/Output variables
-    type(amg_dprec_type), intent(inout)  :: p
-
-    type(amg_mlwrk_type), target,  intent(inout) :: mlwrk(:)
-    integer(psb_ipk_), intent(in) :: level
-    character, intent(in)             :: trans
-    real(psb_dpk_), target            :: work(:)
-    type(psb_d_vect_type) :: res
-    type(psb_d_vect_type), pointer :: current
-    integer(psb_ipk_) :: sweeps_post, sweeps_pre
-    ! Local variables
-    type(psb_ctxt_type) :: ctxt
-    integer(psb_ipk_)   :: np, me
-    integer(psb_ipk_)   :: i, err_act
-    integer(psb_ipk_)   :: debug_level, debug_unit
-    integer(psb_ipk_)   :: nlev, ilev, sweeps
-    logical             :: pre, post
-    character(len=20)   :: name
-
-
-
-    name = 'inner_inner_add'
-    info = psb_success_
-    call psb_erractionsave(err_act)
-    debug_unit  = psb_get_debug_unit()
-    debug_level = psb_get_debug_level()
-    nlev = size(p%precv)
-    if ((level < 1) .or. (level > nlev)) then
-      call psb_errpush(psb_err_internal_error_, name, &
-           & a_err = 'wrong call level to inner_add')
-      goto 9999      
-    end if
-    ctxt = p%precv(level)%base_desc%get_context()
-    call psb_info(ctxt, me, np)
-
-    if(debug_level > 1) then
-      write(debug_unit, *) me, ' inner_add at level ', level
-    end if
-
-    if ((level < 1) .or. (level > nlev)) then
-      info = psb_err_internal_error_ 
-      call psb_errpush(info, name, &
-           & a_err = 'Invalid LEVEL>NLEV')
-      goto 9999
-    end if
-    
-    sweeps = p%precv(level)%parms%sweeps_pre
-    call p%precv(level)%sm%apply(done, &
-         & mlwrk(level)%x2l, dzero, mlwrk(level)%y2l, &
-         & p%precv(level)%base_desc, trans, &
-         & sweeps, work, info)
-    if (info /= psb_success_) then
-      call psb_errpush(psb_err_internal_error_, name, &
-           & a_err = 'Error during ADD smoother_apply')
-      goto 9999
-    end if
-
-    if (level < nlev) then
-      ! Apply the restriction
-      call p%precv(level+1)%map_rstr(done, mlwrk(level)%x2l, &
-           & dzero, mlwrk(level+1)%x2l, &
-           & info, work=work)
-      mlwrk(level+1)%y2l(:) = dzero
-      if (info /= psb_success_) then
-        call psb_errpush(psb_err_internal_error_, name, &
-             & a_err = 'Error during restriction')
-        goto 9999
-      end if
-      
-      call inner_ml_aply(level+1, p, mlwrk, trans, work, info)
-      if (info /= psb_success_) then
-        call psb_errpush(psb_err_internal_error_, name, &
-             & a_err = 'Error in recursive call')
-        goto 9999
-      end if
-
-      !
-      ! Apply the prolongator and add correction.
-      !  
-      call p%precv(level+1)%map_prol(done, &
-           & mlwrk(level+1)%y2l, done, mlwrk(level)%y2l, &
-           & info, work=work)
-      if (info /= psb_success_) then
-        call psb_errpush(psb_err_internal_error_, name, &
-             & a_err = 'Error during prolongation')
-        goto 9999
-      end if
-
-
-    end if
-
-    call psb_erractionrestore(err_act)
-    return
-
-  9999 call psb_error_handler(err_act)
-    return
-  end subroutine amg_d_inner_add
-
-  recursive subroutine amg_d_inner_mult(p, mlwrk, level, trans, work)
-    use psb_base_mod
-    use amg_prec_mod
-
-    implicit none
-
-    ! Input/Output variables
-    type(amg_dprec_type), intent(inout)  :: p
-
-    type(amg_mlwrk_type), target,  intent(inout) :: mlwrk(:)
-    integer(psb_ipk_), intent(in) :: level
-    character, intent(in)             :: trans
-    real(psb_dpk_), target            :: work(:)
-    type(psb_d_vect_type) :: res
-    type(psb_d_vect_type), pointer :: current
-    integer(psb_ipk_) :: sweeps_post, sweeps_pre
-    ! Local variables
-    type(psb_ctxt_type) :: ctxt
-    integer(psb_ipk_)   :: np, me
-    integer(psb_ipk_)   :: i, err_act
-    integer(psb_ipk_)   :: debug_level, debug_unit
-    integer(psb_ipk_)   :: nlev, ilev, sweeps
-    logical             :: pre, post
-    character(len=20)   :: name
-
-
-
-    name = 'inner_inner_mult'
-    info = psb_success_
-    call psb_erractionsave(err_act)
-    debug_unit  = psb_get_debug_unit()
-    debug_level = psb_get_debug_level()
-    nlev = size(p%precv)
-    if ((level < 1) .or. (level > nlev)) then
-      call psb_errpush(psb_err_internal_error_, name, &
-           & a_err = 'wrong call level to inner_mult')
-      goto 9999      
-    end if
-    ctxt = p%precv(level)%base_desc%get_context()
-    call psb_info(ctxt, me, np)
-
-    if(debug_level > 1) then
-      write(debug_unit, *) me, ' inner_mult at level ', level
-    end if
-
-    if ((level < nlev).or.(nlev == 1)) then
-      sweeps_post = p%precv(level)%parms%sweeps_post
-      sweeps_pre  = p%precv(level)%parms%sweeps_pre
-    else
-      sweeps_post = p%precv(level-1)%parms%sweeps_post
-      sweeps_pre  = p%precv(level-1)%parms%sweeps_pre
-    endif
-
-    pre  = ((sweeps_pre>0).and.(trans=='N')).or.((sweeps_post>0).and.(trans/='N'))
-    post = ((sweeps_post>0).and.(trans=='N')).or.((sweeps_pre>0).and.(trans/='N'))
-
-    
-    if (level < nlev) then 
-
-      !
-      ! Apply the first smoother
-      !
-
-      if (pre) then
-        if (trans == 'N') then 
-          sweeps = p%precv(level)%parms%sweeps_pre
-          if (info == psb_success_) call p%precv(level)%sm%apply(done, &
-               & mlwrk(level)%x2l, dzero, mlwrk(level)%y2l, &
-               & p%precv(level)%base_desc, trans, &
-               & sweeps, work, info, init='Y')
-        else
-          sweeps = p%precv(level)%parms%sweeps_post
-          if (info == psb_success_) call p%precv(level)%sm2%apply(done, &
-               & mlwrk(level)%x2l, dzero, mlwrk(level)%y2l, &
-               & p%precv(level)%base_desc, trans, &
-               & sweeps, work, info, init='Y')
-        end if
-        
-        if (info /= psb_success_) then
-          call psb_errpush(psb_err_internal_error_, name, &
-               & a_err = 'Error during PRE smoother_apply')
-          goto 9999
-        end if
-      endif
-
-      !
-      ! Compute the residual and call recursively
-      !
-      if (pre) then
-        call psb_geaxpby(done, mlwrk(level)%x2l, &
-             & dzero, mlwrk(level)%ty, &
-             & p%precv(level)%base_desc, info)
-        
-        if (info == psb_success_) call psb_spmm(-done, p%precv(level)%base_a, &
-             & mlwrk(level)%y2l, done, mlwrk(level)%ty, &
-             & p%precv(level)%base_desc, info, work=work, trans=trans)
-        if (info /= psb_success_) then
-          call psb_errpush(psb_err_internal_error_, name, &
-               & a_err = 'Error during residue')
-          goto 9999
-        end if
-        call p%precv(level+1)%map_rstr(done, mlwrk(level)%ty, &
-             & dzero, mlwrk(level+1)%x2l, info, work=work)
-        if (info /= psb_success_) then
-          call psb_errpush(psb_err_internal_error_, name, &
-               & a_err = 'Error during restriction')
-          goto 9999
-        end if
-      else
-        ! Shortcut: just transfer x2l. 
-        call p%precv(level+1)%map_rstr(done, mlwrk(level)%x2l, &
-             & dzero, mlwrk(level+1)%x2l, info, work=work)
-        if (info /= psb_success_) then
-          call psb_errpush(psb_err_internal_error_, name, &
-               & a_err = 'Error during restriction')
-          goto 9999
-        end if
-      endif
-      ! First guess is zero
-      mlwrk(level+1)%y2l(:) = dzero
-      
-      
-      call inner_ml_aply(level+1, p, mlwrk, trans, work, info)
-      
-      if (p%precv(level)%parms%ml_cycle == amg_wcycle_ml_) then
-        ! On second call will use output y2l as initial guess
-        if (info == psb_success_) call inner_ml_aply(level+1, p, mlwrk, trans, work, info)
-      endif
-      
-      if (info /= psb_success_) then
-        call psb_errpush(psb_err_internal_error_, name, &
-             & a_err = 'Error in recursive call')
-        goto 9999
-      end if
-      
-      
-      !
-      ! Apply the prolongator
-      !  
-      call p%precv(level+1)%map_prol(done, mlwrk(level+1)%y2l, &
-           & done, mlwrk(level)%y2l, info, work=work)
-      if (info /= psb_success_) then
-        call psb_errpush(psb_err_internal_error_, name, &
-             & a_err = 'Error during prolongation')
-        goto 9999
-      end if
-      
-      !
-      ! Compute the residual
-      !
-      if (post) then
-        call psb_geaxpby(done, mlwrk(level)%x2l, &
-             & dzero, mlwrk(level)%tx, &
-             & p%precv(level)%base_desc, info)
-        call psb_spmm(-done, p%precv(level)%base_a, mlwrk(level)%y2l, &
-             & done, mlwrk(level)%tx, p%precv(level)%base_desc, info, &
-             & work=work, trans=trans)
-        if (info /= psb_success_) then
-          call psb_errpush(psb_err_internal_error_, name, &
-               & a_err = 'Error during residue')
-          goto 9999
-        end if
-        !
-        ! Apply the second smoother
-        !
-        if (trans == 'N') then
-          sweeps = p%precv(level)%parms%sweeps_post
-          if (info == psb_success_) call p%precv(level)%sm2%apply(done, &
-               & mlwrk(level)%tx, done, mlwrk(level)%y2l, &
-               & p%precv(level)%base_desc, trans, &
-               & sweeps, work, info, init = 'Z')
-        else 
-          sweeps = p%precv(level)%parms%sweeps_pre
-          if (info == psb_success_) call p%precv(level)%sm%apply(done, &
-               & mlwrk(level)%tx, done, mlwrk(level)%y2l, &
-               & p%precv(level)%base_desc, trans, &
-               & sweeps, work, info, init = 'Z')
-        end if
-        
-        if (info /= psb_success_) then
-          call psb_errpush(psb_err_internal_error_, name, &
-               & a_err = 'Error during POST smoother_apply')
-          goto 9999
-        end if
-        
-      endif            
-      
-    else if (level == nlev) then
-      
-      sweeps = p%precv(level)%parms%sweeps_pre
-      if (info == psb_success_) call p%precv(level)%sm%apply(done, &
-           & mlwrk(level)%x2l, dzero, mlwrk(level)%y2l, &
-           & p%precv(level)%base_desc, trans, &
-           & sweeps, work, info)
-
-    else
-
-      info = psb_err_internal_error_ 
-      call psb_errpush(info, name, &
-           & a_err = 'Invalid LEVEL vs NLEV')
-      goto 9999
-    end if
-
-    call psb_erractionrestore(err_act)
-    return
-
-  9999 call psb_error_handler(err_act)
-    return
-  end subroutine amg_d_inner_mult
-    
-
-end subroutine amg_dmlprec_aply
