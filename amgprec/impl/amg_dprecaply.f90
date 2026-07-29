@@ -100,18 +100,15 @@ subroutine amg_dprecaply(prec, x, y, desc_data, info, trans, work)
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(trans)) then 
-    trans_ = psb_toupper(trans)
-  else
-    trans_ = 'N'
-  end if
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
-  if (present(work)) then 
+  if(present(work)) then 
     work_ => work
   else
     iwsz = max(1, 4*desc_data%get_local_cols())
     allocate(work_(iwsz), stat = info)
-    if (info /= psb_success_) then 
+    if(info /= psb_success_) then 
       call psb_errpush(psb_err_alloc_request_, name, &
             & i_err = (/iwsz, izero, izero, izero, izero/), &
             & a_err = 'real(psb_dpk_)')
@@ -119,14 +116,14 @@ subroutine amg_dprecaply(prec, x, y, desc_data, info, trans, work)
     end if
   end if
 
-  if (.not.(allocated(prec%precv))) then 
+  if(.not.(allocated(prec%precv))) then 
     !! Error 1: should call amg_dprecbld
     info = 3112
     call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (size(prec%precv) > 1) then
+  if(size(prec%precv) > 1) then
     !
     ! Number of levels > 1: apply the multilevel preconditioner
     ! 
@@ -135,11 +132,11 @@ subroutine amg_dprecaply(prec, x, y, desc_data, info, trans, work)
       call psb_errpush(psb_err_from_subroutine_, name, a_err = 'amg_dmlprec_aply')
       goto 9999
     end if
-  else if (size(prec%precv) == 1) then
+  else if(size(prec%precv) == 1) then
     !
     ! Number of levels = 1: apply the base preconditioner
     !
-    if (allocated(prec%precv(1)%sm2a)) then
+    if(allocated(prec%precv(1)%sm2a)) then
       nswps = max(prec%precv(1)%parms%sweeps_pre, prec%precv(1)%parms%sweeps_post)
       !
       ! This is a kludge for handling the symmetrized GS case.
@@ -190,10 +187,7 @@ subroutine amg_dprecaply(prec, x, y, desc_data, info, trans, work)
   ! If the original distribution has an overlap we should fix that. 
   call psb_halo(y, desc_data, info, data = psb_comm_mov_)
 
-  if (present(work)) then 
-  else
-    deallocate(work_)
-  end if
+  if(.not. present(work)) deallocate(work_)
 
   call psb_erractionrestore(err_act)
   return
@@ -261,7 +255,7 @@ subroutine amg_dprecaply1(prec, x, desc_data, info, trans)
   call psb_info(ctxt, me, np)
 
   allocate(ww(size(x)), w1(size(x)), stat = info)
-  if (info /= psb_success_) then 
+  if(info /= psb_success_) then 
     info = psb_err_alloc_request_
     call psb_errpush(info, name, &
          & i_err = (/itwo*size(x), izero, izero, izero, izero/), &
@@ -270,14 +264,14 @@ subroutine amg_dprecaply1(prec, x, desc_data, info, trans)
   end if
 
   call prec%apply(x, ww, desc_data, info, trans = trans, work = w1)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_, name, a_err = 'amg_precaply')
     goto 9999
   end if
 
   x(:) = ww(:)
   deallocate(ww, w1, stat = info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
@@ -319,26 +313,23 @@ subroutine amg_dprecaply2_vect(prec, x, y, desc_data, info, trans, work)
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(trans)) then 
-    trans_ = psb_toupper(trans)
-  else
-    trans_ = 'N'
-  end if
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
-  if (present(work)) then 
+  if(present(work)) then 
     work_ => work
   else
     iwsz = max(1, 4*desc_data%get_local_cols())
     allocate(work_(iwsz), stat = info)
-    if (info /= psb_success_) then 
+    if(info /= psb_success_) then 
       call psb_errpush(psb_err_alloc_request_, name, &
-           & i_err = (/iwsz, izero, izero, izero, izero/), &
-           & a_err = 'real(psb_dpk_)')
+            & i_err = (/iwsz, izero, izero, izero, izero/), &
+            & a_err = 'real(psb_dpk_)')
       goto 9999      
     end if
   end if
 
-  if (.not.(allocated(prec%precv))) then 
+  if(.not.(allocated(prec%precv))) then 
     !! Error 1: should call amg_dprecbld
     info = 3112
     call psb_errpush(info, name)
@@ -346,9 +337,9 @@ subroutine amg_dprecaply2_vect(prec, x, y, desc_data, info, trans, work)
   end if
   
   do_alloc_wrk = .not. allocated(prec%precv(1)%wrk)
-  if (do_alloc_wrk) call prec%allocate_wrk(info, vmold = x%v)
+  if(do_alloc_wrk) call prec%allocate_wrk(info, vmold = x%v)
 
-  if (size(prec%precv) > 1) then
+  if(size(prec%precv) > 1) then
     !
     ! Number of levels > 1: apply the multilevel preconditioner
     !
@@ -359,7 +350,7 @@ subroutine amg_dprecaply2_vect(prec, x, y, desc_data, info, trans, work)
       call psb_errpush(psb_err_from_subroutine_, name, a_err = 'amg_dmlprec_aply')
       goto 9999
     end if
-  else if (size(prec%precv) == 1) then
+  else if(size(prec%precv) == 1) then
     !
     ! Number of levels = 1: apply the base preconditioner
     !
@@ -367,7 +358,7 @@ subroutine amg_dprecaply2_vect(prec, x, y, desc_data, info, trans, work)
 
     associate(w1 => prec%precv(1)%wrk%vx2l, w2 => prec%precv(1)%wrk%vy2l, &
             & wv => prec%precv(1)%wrk%wv)
-      if (allocated(prec%precv(1)%sm2a)) then
+      if(allocated(prec%precv(1)%sm2a)) then
         !
         ! This is a kludge for handling the symmetrized GS case.
         ! Will need some rethinking. 
@@ -376,17 +367,17 @@ subroutine amg_dprecaply2_vect(prec, x, y, desc_data, info, trans, work)
         select case(trans_)
           case ('N')
             do k = 1, nswps
-              if (info == psb_success_) call prec%precv(1)%sm%apply(done, w1, dzero, w2, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm%apply(done, w1, dzero, w2, desc_data, &
                                                                     & trans_, ione, work_, wv, info)
-              if (info == psb_success_) call prec%precv(1)%sm2a%apply(done, w2, dzero, w1, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(done, w2, dzero, w1, desc_data, &
                                                                       & trans_, ione, work_, wv, info)
             end do
             
           case('T', 'C')
             do k = 1, nswps
-              if (info == psb_success_) call prec%precv(1)%sm2a%apply(done, w1, dzero, w2, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(done, w1, dzero, w2, desc_data, &
                                                                       & trans_, ione, work_, wv, info)
-              if (info == psb_success_) call prec%precv(1)%sm%apply(done, w2, dzero, w1, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm%apply(done, w2, dzero, w1, desc_data, &
                                                                     & trans_, ione, work_, wv, info)
             end do
 
@@ -396,15 +387,15 @@ subroutine amg_dprecaply2_vect(prec, x, y, desc_data, info, trans, work)
             goto 9999         
         end select
 
-        if (info == psb_success_) call psb_geaxpby(done, w1, dzero, y, desc_data, info)
+        if(info == psb_success_) call psb_geaxpby(done, w1, dzero, y, desc_data, info)
       else
-        if (info == psb_success_) call prec%precv(1)%sm%apply(done, x, dzero, y, desc_data, trans_, &
+        if(info == psb_success_) call prec%precv(1)%sm%apply(done, x, dzero, y, desc_data, trans_, &
                                                               & nswps, work_, wv, info)
       end if
     end associate
 
-    if (psb_errstatus_fatal()) info = psb_err_internal_error_
-    if (info /= 0) then
+    if(psb_errstatus_fatal()) info = psb_err_internal_error_
+    if(info /= 0) then
       info = psb_err_from_subroutine_ai_
       call psb_errpush(info, name, a_err = 'Smoother application', &
            & i_err=(/ione*size(prec%precv), izero, izero, izero, izero/))
@@ -420,12 +411,9 @@ subroutine amg_dprecaply2_vect(prec, x, y, desc_data, info, trans, work)
   ! If the original distribution has an overlap we should fix that. 
   call psb_halo(y, desc_data, info, data = psb_comm_mov_)
 
-  if (do_alloc_wrk) call prec%free_wrk(info)
+  if(do_alloc_wrk) call prec%free_wrk(info)
 
-  if (present(work)) then 
-  else
-    deallocate(work_)
-  end if
+  if(.not. present(work)) deallocate(work_)
 
   call psb_erractionrestore(err_act)
   return
@@ -463,26 +451,23 @@ subroutine amg_dprecaply1_vect(prec, x, desc_data, info, trans, work)
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(trans)) then 
-    trans_ = psb_toupper(trans)
-  else
-    trans_ = 'N'
-  end if
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
-  if (present(work)) then 
+  if(present(work)) then 
     work_ => work
   else
     iwsz = max(1, 4*desc_data%get_local_cols())
     allocate(work_(iwsz), stat = info)
-    if (info /= psb_success_) then 
+    if(info /= psb_success_) then 
       call psb_errpush(psb_err_alloc_request_, name, &
-           & i_err = (/iwsz, izero, izero, izero, izero/),&
-           & a_err = 'real(psb_dpk_)')
+            & i_err = (/iwsz, izero, izero, izero, izero/),&
+            & a_err = 'real(psb_dpk_)')
       goto 9999      
     end if
   end if
 
-  if (.not.(allocated(prec%precv))) then 
+  if(.not.(allocated(prec%precv))) then 
     !! Error 1: should call amg_dprecbld
     info = 3112
     call psb_errpush(info, name)
@@ -490,10 +475,10 @@ subroutine amg_dprecaply1_vect(prec, x, desc_data, info, trans, work)
   end if
   
   do_alloc_wrk = .not.allocated(prec%precv(1)%wrk)
-  if (do_alloc_wrk) call prec%allocate_wrk(info, vmold = x%v)
+  if(do_alloc_wrk) call prec%allocate_wrk(info, vmold = x%v)
 
   associate(ww => prec%precv(1)%wrk%vtx, wv => prec%precv(1)%wrk%wv)
-    if (size(prec%precv) > 1) then
+    if(size(prec%precv) > 1) then
       !
       ! Number of levels > 1: apply the multilevel preconditioner
       !
@@ -504,12 +489,12 @@ subroutine amg_dprecaply1_vect(prec, x, desc_data, info, trans, work)
         call psb_errpush(psb_err_from_subroutine_, name, a_err = 'amg_dmlprec_aply')
         goto 9999
       end if
-    else if (size(prec%precv) == 1) then
+    else if(size(prec%precv) == 1) then
       !
       ! Number of levels = 1: apply the base preconditioner
       !
       nswps = max(prec%precv(1)%parms%sweeps_pre, prec%precv(1)%parms%sweeps_post)
-      if (allocated(prec%precv(1)%sm2a)) then
+      if(allocated(prec%precv(1)%sm2a)) then
         !
         ! This is a kludge for handling the symmetrized GS case.
         ! Will need some rethinking. 
@@ -517,17 +502,17 @@ subroutine amg_dprecaply1_vect(prec, x, desc_data, info, trans, work)
         select case(trans_)
           case ('N')
             do k = 1, nswps
-              if (info == psb_success_) call prec%precv(1)%sm%apply(done, x, dzero, ww, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm%apply(done, x, dzero, ww, desc_data, &
                                                                     & trans_, ione, work_, wv, info)
-              if (info == psb_success_) call prec%precv(1)%sm2a%apply(done, ww, dzero, x, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(done, ww, dzero, x, desc_data, &
                                                                       & trans_, ione, work_, wv, info)
             end do
 
           case('T', 'C')
             do k = 1, nswps
-              if (info == psb_success_) call prec%precv(1)%sm2a%apply(done, x, dzero, ww, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(done, x, dzero, ww, desc_data, &
                                                                       & trans_, ione, work_, wv, info)
-              if (info == psb_success_) call prec%precv(1)%sm%apply(done, ww, dzero, x, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm%apply(done, ww, dzero, x, desc_data, &
                                                                     & trans_, ione, work_,wv,info)
             end do
 
@@ -537,13 +522,13 @@ subroutine amg_dprecaply1_vect(prec, x, desc_data, info, trans, work)
             goto 9999
         end select
       else
-        if (info == psb_success_) call prec%precv(1)%sm%apply(done, x, dzero, ww, desc_data, &
+        if(info == psb_success_) call prec%precv(1)%sm%apply(done, x, dzero, ww, desc_data, &
                                                               & trans_, nswps, work_, wv, info)
-        if (info == psb_success_) call psb_geaxpby(done, ww, dzero, x, desc_data, info)
+        if(info == psb_success_) call psb_geaxpby(done, ww, dzero, x, desc_data, info)
       end if
 
-      if (psb_errstatus_fatal()) info = psb_err_internal_error_
-      if (info /= 0) then
+      if(psb_errstatus_fatal()) info = psb_err_internal_error_
+      if(info /= 0) then
         info = psb_err_internal_error_
         call psb_errpush(info, name, a_err = 'Smoother application', &
              & i_err = (/ione*size(prec%precv), izero, izero, izero, izero/))
@@ -560,12 +545,9 @@ subroutine amg_dprecaply1_vect(prec, x, desc_data, info, trans, work)
   ! If the original distribution has an overlap we should fix that. 
   call psb_halo(x, desc_data, info, data = psb_comm_mov_)
 
-  if (do_alloc_wrk) call prec%free_wrk(info)
+  if(do_alloc_wrk) call prec%free_wrk(info)
 
-  if (present(work)) then 
-  else
-    deallocate(work_)
-  end if
+  if(.not. present(work)) deallocate(work_)
 
   call psb_erractionrestore(err_act)
   return
@@ -604,26 +586,23 @@ subroutine amg_dprecaply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, t
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(trans)) then 
-    trans_ = psb_toupper(trans)
-  else
-    trans_ = 'N'
-  end if
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
-  if (present(work)) then 
+  if(present(work)) then 
     work_ => work
   else
     iwsz = max(1, 4*desc_data%get_local_cols())
     allocate(work_(iwsz), stat = info)
-    if (info /= psb_success_) then 
+    if(info /= psb_success_) then 
       call psb_errpush(psb_err_alloc_request_, name, &
-           & i_err = (/iwsz, izero, izero, izero, izero/), &
-           & a_err = 'real(psb_dpk_)')
+            & i_err = (/iwsz, izero, izero, izero, izero/), &
+            & a_err = 'real(psb_dpk_)')
       goto 9999      
     end if
   end if
 
-  if (.not.(allocated(prec%precv))) then 
+  if(.not.(allocated(prec%precv))) then 
     !! Error 1: should call amg_dprecbld
     info = 3112
     call psb_errpush(info, name)
@@ -631,9 +610,9 @@ subroutine amg_dprecaply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, t
   end if
   
   do_alloc_wrk = .not. allocated(prec%precv(1)%wrk)
-  if (do_alloc_wrk) call prec%allocate_wrk(info) ! vmold = x%v -> TO DO: needed only for CUDA?
+  if(do_alloc_wrk) call prec%allocate_wrk(info) ! vmold = x%v -> TO DO: needed only for CUDA?
 
-  if (size(prec%precv) > 1) then
+  if(size(prec%precv) > 1) then
     !
     ! Number of levels > 1: apply the multilevel preconditioner
     !
@@ -645,7 +624,7 @@ subroutine amg_dprecaply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, t
       call psb_errpush(psb_err_from_subroutine_, name, a_err = 'amg_dmlprec_aply')
       goto 9999
     end if
-  else if (size(prec%precv) == 1) then
+  else if(size(prec%precv) == 1) then
     !
     ! Number of levels = 1: apply the base preconditioner
     !
@@ -653,7 +632,7 @@ subroutine amg_dprecaply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, t
 
     associate(w1 => prec%precv(1)%wrk%vx2l, w2 => prec%precv(1)%wrk%vy2l, &
             & wv => prec%precv(1)%wrk%wv)
-      if (allocated(prec%precv(1)%sm2a)) then
+      if(allocated(prec%precv(1)%sm2a)) then
         !
         ! This is a kludge for handling the symmetrized GS case.
         ! Will need some rethinking. 
@@ -662,17 +641,17 @@ subroutine amg_dprecaply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, t
         select case(trans_)
           case ('N')
             do k = 1, nswps
-              if (info == psb_success_) call prec%precv(1)%sm%apply(done, w1, dzero, w2, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm%apply(done, w1, dzero, w2, desc_data, &
                                                                     & trans_, ione, work_, wv, info)
-              if (info == psb_success_) call prec%precv(1)%sm2a%apply(done, w2, dzero, w1, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(done, w2, dzero, w1, desc_data, &
                                                                       & trans_, ione, work_, wv, info)
             end do
             
           case('T', 'C')
             do k = 1, nswps
-              if (info == psb_success_) call prec%precv(1)%sm2a%apply(done, w1, dzero, w2, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(done, w1, dzero, w2, desc_data, &
                                                                       & trans_, ione, work_, wv, info)
-              if (info == psb_success_) call prec%precv(1)%sm%apply(done, w2, dzero, w1, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm%apply(done, w2, dzero, w1, desc_data, &
                                                                     & trans_, ione, work_, wv, info)
             end do
 
@@ -682,15 +661,15 @@ subroutine amg_dprecaply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, t
             goto 9999         
         end select
 
-        if (info == psb_success_) call psb_geaxpby(done, w1, dzero, y, idx_y, desc_data, info)
+        if(info == psb_success_) call psb_geaxpby(done, w1, dzero, y, idx_y, desc_data, info)
       else
-        if (info == psb_success_) call prec%precv(1)%sm%apply(done, x, idx_x, dzero, y, idx_y, desc_data, trans_, &
+        if(info == psb_success_) call prec%precv(1)%sm%apply(done, x, idx_x, dzero, y, idx_y, desc_data, trans_, &
                                                               & nswps, work_, wv, info)
       end if
     end associate
 
-    if (psb_errstatus_fatal()) info = psb_err_internal_error_
-    if (info /= 0) then
+    if(psb_errstatus_fatal()) info = psb_err_internal_error_
+    if(info /= 0) then
       info = psb_err_from_subroutine_ai_
       call psb_errpush(info, name, a_err = 'Smoother application', &
            & i_err=(/ione*size(prec%precv), izero, izero, izero, izero/))
@@ -706,9 +685,9 @@ subroutine amg_dprecaply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, t
   ! If the original distribution has an overlap we should fix that. 
   call psb_halo(y, desc_data, info, data = psb_comm_mov_)
 
-  if (do_alloc_wrk) call prec%free_wrk(info)
+  if(do_alloc_wrk) call prec%free_wrk(info)
 
-  if (.not. present(work)) deallocate(work_)
+  if(.not. present(work)) deallocate(work_)
 
   call psb_erractionrestore(err_act)
   return
@@ -747,26 +726,23 @@ subroutine amg_dprecaply1_mvect_col(prec, x, idx_x, desc_data, info, trans, work
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(trans)) then 
-    trans_ = psb_toupper(trans)
-  else
-    trans_ = 'N'
-  end if
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
-  if (present(work)) then 
+  if(present(work)) then 
     work_ => work
   else
     iwsz = max(1, 4*desc_data%get_local_cols())
     allocate(work_(iwsz), stat = info)
-    if (info /= psb_success_) then 
+    if(info /= psb_success_) then 
       call psb_errpush(psb_err_alloc_request_, name, &
-           & i_err = (/iwsz, izero, izero, izero, izero/),&
-           & a_err = 'real(psb_dpk_)')
+            & i_err = (/iwsz, izero, izero, izero, izero/),&
+            & a_err = 'real(psb_dpk_)')
       goto 9999      
     end if
   end if
 
-  if (.not.(allocated(prec%precv))) then 
+  if(.not.(allocated(prec%precv))) then 
     !! Error 1: should call amg_dprecbld
     info = 3112
     call psb_errpush(info, name)
@@ -774,10 +750,10 @@ subroutine amg_dprecaply1_mvect_col(prec, x, idx_x, desc_data, info, trans, work
   end if
   
   do_alloc_wrk = .not.allocated(prec%precv(1)%wrk)
-  if (do_alloc_wrk) call prec%allocate_wrk(info) ! vmold = x%v -> TO DO: needed only for CUDA?
+  if(do_alloc_wrk) call prec%allocate_wrk(info) ! vmold = x%v -> TO DO: needed only for CUDA?
 
   associate(ww => prec%precv(1)%wrk%vtx, wv => prec%precv(1)%wrk%wv)
-    if (size(prec%precv) > 1) then
+    if(size(prec%precv) > 1) then
       !
       ! Number of levels > 1: apply the multilevel preconditioner
       !
@@ -788,12 +764,12 @@ subroutine amg_dprecaply1_mvect_col(prec, x, idx_x, desc_data, info, trans, work
         call psb_errpush(psb_err_from_subroutine_, name, a_err = 'amg_dmlprec_aply')
         goto 9999
       end if
-    else if (size(prec%precv) == 1) then
+    else if(size(prec%precv) == 1) then
       !
       ! Number of levels = 1: apply the base preconditioner
       !
       nswps = max(prec%precv(1)%parms%sweeps_pre, prec%precv(1)%parms%sweeps_post)
-      if (allocated(prec%precv(1)%sm2a)) then
+      if(allocated(prec%precv(1)%sm2a)) then
         !
         ! This is a kludge for handling the symmetrized GS case.
         ! Will need some rethinking. 
@@ -801,17 +777,17 @@ subroutine amg_dprecaply1_mvect_col(prec, x, idx_x, desc_data, info, trans, work
         select case(trans_)
           case ('N')
             do k = 1, nswps
-              if (info == psb_success_) call prec%precv(1)%sm%apply(done, x, idx_x, dzero, ww, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm%apply(done, x, idx_x, dzero, ww, desc_data, &
                                                                     & trans_, ione, work_, wv, info)
-              if (info == psb_success_) call prec%precv(1)%sm2a%apply(done, ww, dzero, x, idx_x, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(done, ww, dzero, x, idx_x, desc_data, &
                                                                       & trans_, ione, work_, wv, info)
             end do
 
           case('T', 'C')
             do k = 1, nswps
-              if (info == psb_success_) call prec%precv(1)%sm2a%apply(done, x, idx_x, dzero, ww, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(done, x, idx_x, dzero, ww, desc_data, &
                                                                       & trans_, ione, work_, wv, info)
-              if (info == psb_success_) call prec%precv(1)%sm%apply(done, ww, dzero, x, idx_x, desc_data, &
+              if(info == psb_success_) call prec%precv(1)%sm%apply(done, ww, dzero, x, idx_x, desc_data, &
                                                                     & trans_, ione, work_,wv, info)
             end do
 
@@ -821,13 +797,13 @@ subroutine amg_dprecaply1_mvect_col(prec, x, idx_x, desc_data, info, trans, work
             goto 9999
         end select
       else
-        if (info == psb_success_) call prec%precv(1)%sm%apply(done, x, idx_x, dzero, ww, desc_data, &
+        if(info == psb_success_) call prec%precv(1)%sm%apply(done, x, idx_x, dzero, ww, desc_data, &
                                                               & trans_, nswps, work_, wv, info)
-        if (info == psb_success_) call psb_geaxpby(done, ww, dzero, x, idx_x, desc_data, info)
+        if(info == psb_success_) call psb_geaxpby(done, ww, dzero, x, idx_x, desc_data, info)
       end if
 
-      if (psb_errstatus_fatal()) info = psb_err_internal_error_
-      if (info /= 0) then
+      if(psb_errstatus_fatal()) info = psb_err_internal_error_
+      if(info /= 0) then
         info = psb_err_internal_error_
         call psb_errpush(info, name, a_err = 'Smoother application', &
              & i_err = (/ione*size(prec%precv), izero, izero, izero, izero/))
@@ -844,12 +820,9 @@ subroutine amg_dprecaply1_mvect_col(prec, x, idx_x, desc_data, info, trans, work
   ! If the original distribution has an overlap we should fix that. 
   call psb_halo(x, desc_data, info, data = psb_comm_mov_)
 
-  if (do_alloc_wrk) call prec%free_wrk(info)
+  if(do_alloc_wrk) call prec%free_wrk(info)
 
-  if (present(work)) then 
-  else
-    deallocate(work_)
-  end if
+  if(.not. present(work)) deallocate(work_)
 
   call psb_erractionrestore(err_act)
   return

@@ -59,7 +59,7 @@ subroutine amg_d_base_smoother_apply_vect(alpha, sm, x, beta, y, &
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (sweeps == 0) then  
+  if(sweeps == 0) then  
     !
     ! K^0 = I
     ! zero sweeps of any smoother is just the identity.
@@ -67,7 +67,7 @@ subroutine amg_d_base_smoother_apply_vect(alpha, sm, x, beta, y, &
     call psb_geaxpby(alpha, x, beta, y, desc_data, info) 
 
   else
-    if (allocated(sm%sv)) then
+    if(allocated(sm%sv)) then
       call sm%sv%apply(alpha, x, beta, y, desc_data, trans, work, wv, info, &
                         init = init, initu = initu)
     else
@@ -75,7 +75,7 @@ subroutine amg_d_base_smoother_apply_vect(alpha, sm, x, beta, y, &
     endif
   end if
 
-  if (info /= psb_success_) then 
+  if(info /= psb_success_) then 
     call psb_errpush(info, name)
     goto 9999 
   end if
@@ -113,7 +113,7 @@ subroutine amg_d_base_smoother_apply_vect_mvect(alpha, sm, x, beta, y, idx_y, &
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (sweeps == 0) then  
+  if(sweeps == 0) then  
     !
     ! K^0 = I
     ! zero sweeps of any smoother is just the identity.
@@ -121,7 +121,7 @@ subroutine amg_d_base_smoother_apply_vect_mvect(alpha, sm, x, beta, y, idx_y, &
     call psb_geaxpby(alpha, x, beta, y, idx_y, desc_data, info) 
 
   else
-    if (allocated(sm%sv)) then
+    if(allocated(sm%sv)) then
       call sm%sv%apply(alpha, x, beta, y, idx_y, desc_data, trans, work, wv, info, &
                         init = init, initu = initu)
     else
@@ -129,7 +129,7 @@ subroutine amg_d_base_smoother_apply_vect_mvect(alpha, sm, x, beta, y, idx_y, &
     endif
   end if
 
-  if (info /= psb_success_) then 
+  if(info /= psb_success_) then 
     call psb_errpush(info, name)
     goto 9999 
   end if
@@ -167,7 +167,7 @@ subroutine amg_d_base_smoother_apply_mvect_vect(alpha, sm, x, idx_x, beta, y, &
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (sweeps == 0) then  
+  if(sweeps == 0) then  
     !
     ! K^0 = I
     ! zero sweeps of any smoother is just the identity.
@@ -175,7 +175,7 @@ subroutine amg_d_base_smoother_apply_mvect_vect(alpha, sm, x, idx_x, beta, y, &
     call psb_geaxpby(alpha, x, idx_x, beta, y, desc_data, info) 
 
   else
-    if (allocated(sm%sv)) then
+    if(allocated(sm%sv)) then
       call sm%sv%apply(alpha, x, idx_x, beta, y, desc_data, trans, work, wv, info, &
                         init = init, initu = initu)
     else
@@ -183,7 +183,7 @@ subroutine amg_d_base_smoother_apply_mvect_vect(alpha, sm, x, idx_x, beta, y, &
     endif
   end if
 
-  if (info /= psb_success_) then 
+  if(info /= psb_success_) then 
     call psb_errpush(info, name)
     goto 9999 
   end if
@@ -220,7 +220,7 @@ subroutine amg_d_base_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (sweeps == 0) then  
+  if(sweeps == 0) then  
     !
     ! K^0 = I
     ! zero sweeps of any smoother is just the identity.
@@ -228,7 +228,7 @@ subroutine amg_d_base_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx
     call psb_geaxpby(alpha, x, idx_x, beta, y, idx_y, desc_data, info) 
 
   else
-    if (allocated(sm%sv)) then
+    if(allocated(sm%sv)) then
       call sm%sv%apply(alpha, x, idx_x, beta, y, idx_y, desc_data, trans, work, wv, info, &
                         init = init, initu = initu)
     else
@@ -236,7 +236,7 @@ subroutine amg_d_base_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx
     endif
   end if
 
-  if (info /= psb_success_) then 
+  if(info /= psb_success_) then 
     call psb_errpush(info, name)
     goto 9999 
   end if

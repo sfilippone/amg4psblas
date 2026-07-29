@@ -208,7 +208,6 @@ subroutine amg_dmlprec_aply_vect(alpha, p, x, beta, y, desc_data, trans, work, i
   use amg_base_prec_type
   use amg_prec_mod
   use amg_d_inner_mod, amg_protect_name => amg_dmlprec_aply_vect
-
   implicit none
   ! Arguments
   real(psb_dpk_), intent(in)            :: alpha, beta
@@ -410,7 +409,7 @@ contains
       case default
         info = psb_err_from_subroutine_ai_
         call psb_errpush(info, name, a_err = 'invalid ml_cycle', &
-            &  i_Err=(/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
+            & i_err = (/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
         goto 9999      
     end select
 
@@ -426,9 +425,8 @@ contains
   recursive subroutine amg_d_inner_add(p, level, trans, work)
     use psb_base_mod
     use amg_prec_mod
-
     implicit none
-    ! Input/Oputput variables
+    !Input/Oputput variables
     type(amg_dprec_type), intent(inout) :: p
     integer(psb_ipk_), intent(in)       :: level
     character, intent(in)               :: trans
@@ -465,7 +463,6 @@ contains
 
     if(debug_level > 1) write(debug_unit, *) me, ' inner_add at level ', level
 
-    ! WHAT is this?
     if ((level <1 ) .or. (level > nlev)) then
       info = psb_err_internal_error_ 
       call psb_errpush(info, name, &
@@ -545,7 +542,6 @@ contains
   recursive subroutine amg_d_inner_mult(p, level, trans, work)
     use psb_base_mod
     use amg_prec_mod
-
     implicit none
     ! Input/Output variables
     type(amg_dprec_type), intent(inout) :: p
@@ -722,7 +718,7 @@ contains
           if (info == psb_success_) call p%precv(level)%sm%apply(done, vx2l, dzero, vy2l, base_desc, &
                                                                 & trans, sweeps, work, wv, info)
         end if 
-        !!$        write(0, *) me, ' Done applying smoother at top level ', psb_errstatus_fatal()
+        !!$        write(0, *) me, ' done applying smoother at top level ', psb_errstatus_fatal()
       else
         info = psb_err_internal_error_ 
         call psb_errpush(info, name, &
@@ -743,7 +739,6 @@ contains
   recursive subroutine amg_d_inner_k_cycle(p, level, trans, work, u)
     use psb_base_mod
     use amg_prec_mod
-
     implicit none
     ! Input/Output variables
     type(amg_dprec_type), intent(inout) :: p
@@ -938,8 +933,7 @@ contains
 
     if (size(p%precv(level)%wrk%wv) < 7) then
       info = psb_err_internal_error_
-      call psb_errpush(info, name, &
-                    & a_err = 'invalid wv size')
+      call psb_errpush(info, name,a_err = 'invalid wv size')
       goto 9999
     end if
 
@@ -1062,15 +1056,12 @@ contains
   end subroutine amg_dinneritkcycle
 end subroutine amg_dmlprec_aply_vect
 
-!
 ! Multivector routines
-!
 subroutine amg_dmlprec_aply_mvect_vect(alpha, p, x, idx_x, beta, y, desc_data, trans, work, info)
   use psb_base_mod
   use amg_base_prec_type
   use amg_prec_mod
   use amg_d_inner_mod, amg_protect_name => amg_dmlprec_aply_mvect_vect
-
   implicit none
   ! Arguments
   real(psb_dpk_), intent(in)                :: alpha, beta
@@ -1274,7 +1265,7 @@ contains
       case default
         info = psb_err_from_subroutine_ai_
         call psb_errpush(info, name, a_err = 'invalid ml_cycle', &
-            &  i_Err=(/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
+            & i_err = (/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
         goto 9999      
     end select
 
@@ -1290,7 +1281,6 @@ contains
   recursive subroutine amg_d_inner_add(p, level, trans, work)
     use psb_base_mod
     use amg_prec_mod
-
     implicit none
     ! Input/Oputput variables
     type(amg_dprec_type), intent(inout) :: p
@@ -1409,7 +1399,6 @@ contains
   recursive subroutine amg_d_inner_mult(p, level, trans, work)
     use psb_base_mod
     use amg_prec_mod
-
     implicit none
     ! Input/Output variables
     type(amg_dprec_type), intent(inout) :: p
@@ -1586,7 +1575,7 @@ contains
           if (info == psb_success_) call p%precv(level)%sm%apply(done, vx2l, dzero, vy2l, base_desc, &
                                                                 & trans, sweeps, work, wv, info)
         end if 
-        !!$        write(0, *) me, ' Done applying smoother at top level ', psb_errstatus_fatal()
+        !!$        write(0, *) me, ' done applying smoother at top level ', psb_errstatus_fatal()
       else
         info = psb_err_internal_error_ 
         call psb_errpush(info, name, &
@@ -1607,7 +1596,6 @@ contains
   recursive subroutine amg_d_inner_k_cycle(p, level, trans, work, u)
     use psb_base_mod
     use amg_prec_mod
-
     implicit none
     ! Input/Output variables
     type(amg_dprec_type), intent(inout) :: p
@@ -1802,8 +1790,7 @@ contains
 
     if (size(p%precv(level)%wrk%wv) < 7) then
       info = psb_err_internal_error_
-      call psb_errpush(info, name, &
-                    & a_err = 'invalid wv size')
+      call psb_errpush(info, name, a_err = 'invalid wv size')
       goto 9999
     end if
 
@@ -1928,7 +1915,6 @@ subroutine amg_dmlprec_aply_mvect_col(alpha, p, x, idx_x, beta, y, idx_y, desc_d
   use amg_base_prec_type
   use amg_prec_mod
   use amg_d_inner_mod, amg_protect_name => amg_dmlprec_aply_mvect_col
-
   implicit none
   ! Arguments
   real(psb_dpk_), intent(in)                :: alpha, beta
@@ -2131,7 +2117,7 @@ contains
       case default
         info = psb_err_from_subroutine_ai_
         call psb_errpush(info, name, a_err = 'invalid ml_cycle', &
-            &  i_Err=(/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
+            & i_err = (/p%precv(level)%parms%ml_cycle, izero, izero, izero, izero/))
         goto 9999      
     end select
 
@@ -2147,7 +2133,6 @@ contains
   recursive subroutine amg_d_inner_add(p, level, trans, work)
     use psb_base_mod
     use amg_prec_mod
-
     implicit none
     ! Input/Oputput variables
     type(amg_dprec_type), intent(inout) :: p
@@ -2266,7 +2251,6 @@ contains
   recursive subroutine amg_d_inner_mult(p, level, trans, work)
     use psb_base_mod
     use amg_prec_mod
-
     implicit none
     ! Input/Output variables
     type(amg_dprec_type), intent(inout) :: p
@@ -2443,7 +2427,7 @@ contains
           if (info == psb_success_) call p%precv(level)%sm%apply(done, vx2l, dzero, vy2l, base_desc, &
                                                                 & trans, sweeps, work, wv, info)
         end if 
-        !!$        write(0, *) me, ' Done applying smoother at top level ', psb_errstatus_fatal()
+        !!$        write(0, *) me, ' done applying smoother at top level ', psb_errstatus_fatal()
       else
         info = psb_err_internal_error_ 
         call psb_errpush(info, name, &
@@ -2464,7 +2448,6 @@ contains
   recursive subroutine amg_d_inner_k_cycle(p, level, trans, work, u)
     use psb_base_mod
     use amg_prec_mod
-
     implicit none
     ! Input/Output variables
     type(amg_dprec_type), intent(inout) :: p
@@ -2638,7 +2621,6 @@ contains
   end subroutine amg_d_inner_k_cycle
   
   recursive subroutine amg_dinneritkcycle(p, level, trans, work, innersolv)
-
     implicit none
     ! Input/Output variables
     type(amg_dprec_type), intent(inout) :: p
@@ -2660,8 +2642,7 @@ contains
 
     if (size(p%precv(level)%wrk%wv) < 7) then
       info = psb_err_internal_error_
-      call psb_errpush(info, name, &
-                    & a_err = 'invalid wv size')
+      call psb_errpush(info, name, a_err = 'invalid wv size')
       goto 9999
     end if
 

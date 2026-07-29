@@ -58,12 +58,12 @@ module amg_d_id_solver
     procedure, nopass   :: get_id   => d_id_solver_get_id
   end type amg_d_id_solver_type
 
-  private :: d_id_solver_bld, d_id_solver_free, d_id_solver_get_fmt, &
-          & d_id_solver_descr, d_id_solver_get_id
+  private ::  d_id_solver_bld, d_id_solver_free, d_id_solver_get_fmt, &
+            & d_id_solver_descr, d_id_solver_get_id
 
   interface 
     subroutine amg_d_id_solver_apply(alpha, sv, x, beta, y, &
-         & desc_data, trans, work, info, init, initu)
+                  & desc_data, trans, work, info, init, initu)
       import :: psb_dpk_, amg_d_id_solver_type, &
               & psb_desc_type, psb_ipk_
       implicit none
@@ -81,7 +81,7 @@ module amg_d_id_solver
 
   interface 
     subroutine amg_d_id_solver_apply_vect(alpha, sv, x, beta, y, &
-         & desc_data, trans, work, wv, info, init, initu)
+                  & desc_data, trans, work, wv, info, init, initu)
       import :: psb_dpk_, amg_d_id_solver_type, &
               & psb_d_vect_type, psb_desc_type, psb_ipk_
       implicit none
@@ -165,8 +165,7 @@ module amg_d_id_solver
 
   interface
     subroutine amg_d_id_solver_clone(sv, svout, info)
-      import :: amg_d_id_solver_type, amg_d_base_solver_type, &
-              & psb_ipk_
+      import :: amg_d_id_solver_type, amg_d_base_solver_type, psb_ipk_
       implicit none
       ! Arguments
       class(amg_d_id_solver_type), intent(inout)                :: sv
@@ -174,9 +173,7 @@ module amg_d_id_solver
       integer(psb_ipk_), intent(out)                            :: info
     end subroutine amg_d_id_solver_clone
   end interface
-
 contains
-
   subroutine d_id_solver_bld(a, desc_a, sv, info, b, amold, vmold, imold)
     implicit none
     ! Arguments
@@ -229,17 +226,12 @@ contains
     character(1024)   :: prefix_
 
     info = psb_success_
-    if (present(iout)) then 
-      iout_ = iout 
-    else
-      iout_ = psb_out_unit
-    endif
+    
+    iout_ = psb_out_unit
+    if(present(iout)) iout_ = iout 
 
-    if (present(prefix)) then
-      prefix_ = prefix
-    else
-      prefix_ = ""
-    end if
+    prefix_ = ""
+    if(present(prefix)) prefix_ = prefix
     
     write(iout_, *) trim(prefix_), '  Identity local solver '
     return
@@ -258,5 +250,4 @@ contains
 
     val = amg_f_none_
   end function d_id_solver_get_id
-
 end module amg_d_id_solver

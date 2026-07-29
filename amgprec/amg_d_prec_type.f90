@@ -51,22 +51,21 @@
 !
 
 module amg_d_prec_type
-
   use amg_base_prec_type
   use amg_d_base_solver_mod
   use amg_d_base_smoother_mod
   use amg_d_base_aggregator_mod
   use amg_d_onelev_mod
   use psb_base_mod, only : psb_erractionsave, psb_erractionrestore, &
-       & psb_errstatus_fatal, psb_ctxt_type
+                          & psb_errstatus_fatal, psb_ctxt_type
   use psb_prec_mod, only : psb_dprec_type
 
   !
   ! Type: amg_dprec_type.
   !
   !  This is the data type containing all the information about the multilevel
-  !  preconditioner ('d', 's', 'c' and 'z', according to the real/complex,
-  !  single/double precision version of  AMG4PSBLAS).
+  !  preconditioner ('d', 's', 'c' and 'z', according to the real/complex, 
+  !  single/double precision version of AMG4PSBLAS).
   !  It consists of an array of 'one-level' intermediate data structures
   !  of type amg_donelev_type, each containing the information needed to apply
   !  the smoothing and the coarse-space correction at a generic level. RT is the
@@ -93,7 +92,7 @@ module amg_d_prec_type
     integer(psb_ipk_)     :: outer_sweeps = 1
     !
     ! Coarse solver requires some tricky checks, and for this we need to
-    ! record the choice in the format given by the user,
+    ! record the choice in the format given by the user, 
     ! to keep track against what is put later in the multilevel array
     !
     integer(psb_ipk_)     :: coarse_solver = -1
@@ -102,6 +101,7 @@ module amg_d_prec_type
     ! The multilevel hierarchy
     !
     type(amg_d_onelev_type), allocatable :: precv(:)
+    integer(psb_ipk_)                    :: nlevs
   contains
     procedure, pass(prec) :: psb_d_apply2_mvect_col => amg_d_apply2_mvect_col
     procedure, pass(prec) :: psb_d_apply1_mvect_col => amg_d_apply1_mvect_col
@@ -127,6 +127,7 @@ module amg_d_prec_type
 
     procedure, pass(prec) :: get_avg_cr => amg_d_get_avg_cr
     procedure, pass(prec) :: cmp_avg_cr => amg_d_cmp_avg_cr
+    procedure, pass(prec) :: set_nlevs  => amg_d_set_nlevs
     procedure, pass(prec) :: get_nlevs  => amg_d_get_nlevs
     procedure, pass(prec) :: get_nzeros => amg_d_get_nzeros
     procedure, pass(prec) :: sizeof     => amg_dprec_sizeof
@@ -154,14 +155,13 @@ module amg_d_prec_type
   end type amg_dprec_type
 
   private :: amg_d_dump, amg_d_get_compl, amg_d_cmp_compl, &
-          & amg_d_get_avg_cr,  amg_d_cmp_avg_cr, &
-          & amg_d_get_nzeros, amg_d_get_nlevs, d_prec_move_alloc
+            & amg_d_get_avg_cr,  amg_d_cmp_avg_cr, &
+            & amg_d_get_nzeros, amg_d_get_nlevs, d_prec_move_alloc
 
   !
-  ! Interfaces to routines for checking the definition of the preconditioner,
+  ! Interfaces to routines for checking the definition of the preconditioner, 
   ! for printing its description and for deallocating its data structure
   !
-
   interface amg_precfree
     module procedure amg_dprecfree
   end interface
@@ -293,7 +293,7 @@ module amg_d_prec_type
       class(amg_dprec_type), intent(inout)          :: prec
       class(amg_d_base_aggregator_type), intent(in) :: val
       integer(psb_ipk_), intent(out)                :: info
-      integer(psb_ipk_), optional, intent(in) :: ilev,ilmax
+      integer(psb_ipk_), optional, intent(in) :: ilev, ilmax
       character(len=*), optional, intent(in)  :: pos
     end subroutine amg_dprecsetag
 
@@ -355,7 +355,7 @@ module amg_d_prec_type
       class(psb_d_base_sparse_mat), intent(in), optional  :: amold
       class(psb_d_base_vect_type), intent(in), optional   :: vmold
       class(psb_i_base_vect_type), intent(in), optional   :: imold
-      ! character, intent(in),optional                      :: upd
+      ! character, intent(in), optional                      :: upd
     end subroutine amg_dprecbld
   end interface amg_precbld
 
@@ -415,32 +415,33 @@ contains
   !
   ! Function returning a pointer to the smoother
   !
-  function amg_d_get_smootherp(prec,ilev) result(val)
+  function amg_d_get_smootherp(prec, ilev) result(val)
     implicit none
     class(amg_dprec_type), target, intent(in) :: prec
-    integer(psb_ipk_), optional                 :: ilev
+    integer(psb_ipk_), optional :: ilev
     class(amg_d_base_smoother_type), pointer  :: val
-    integer(psb_ipk_)        :: ilev_
+
+    integer(psb_ipk_) :: ilev_
 
     val => null()
-    if (present(ilev)) then
-      ilev_ = ilev
-    else
-      ! What is a good default?
-      ilev_ = 1
-    end if
-    if (allocated(prec%precv)) then
-      if ((1<=ilev_).and.(ilev_<=size(prec%precv))) then
-        if (allocated(prec%precv(ilev_)%sm)) then
+
+    ! What is a good default?
+    ilev_ = 1
+    if(present(ilev)) ilev_ = ilev
+
+    if(allocated(prec%precv)) then
+      if((1 <= ilev_) .and. (ilev_ <= size(prec%precv))) then
+        if(allocated(prec%precv(ilev_)%sm)) then
           val => prec%precv(ilev_)%sm
         end if
       end if
     end if
   end function amg_d_get_smootherp
+
   !
   ! Function returning a pointer to the solver
   !
-  function amg_d_get_solverp(prec,ilev) result(val)
+  function amg_d_get_solverp(prec, ilev) result(val)
     implicit none
     class(amg_dprec_type), target, intent(in) :: prec
     integer(psb_ipk_), optional                 :: ilev
@@ -448,22 +449,21 @@ contains
     integer(psb_ipk_)        :: ilev_
 
     val => null()
-    if (present(ilev)) then
-      ilev_ = ilev
-    else
-      ! What is a good default?
-      ilev_ = 1
-    end if
-    if (allocated(prec%precv)) then
-      if ((1<=ilev_).and.(ilev_<=size(prec%precv))) then
-        if (allocated(prec%precv(ilev_)%sm)) then
-          if (allocated(prec%precv(ilev_)%sm%sv)) then
+    ! What is a good default?
+    ilev_ = 1
+    if(present(ilev)) ilev_ = ilev
+
+    if(allocated(prec%precv)) then
+      if((1<=ilev_) .and. (ilev_ <= size(prec%precv))) then
+        if(allocated(prec%precv(ilev_)%sm)) then
+          if(allocated(prec%precv(ilev_)%sm%sv)) then
             val => prec%precv(ilev_)%sm%sv
           end if
         end if
       end if
     end if
   end function amg_d_get_solverp
+
   !
   ! Function returning the size of the precv(:) array
   !
@@ -471,11 +471,23 @@ contains
     implicit none
     class(amg_dprec_type), intent(in) :: prec
     integer(psb_ipk_) :: val
-    val = 0
-    if (allocated(prec%precv)) then
-      val = size(prec%precv)
-    end if
+
+    !!$   val = 0
+    !!$   if(allocated(prec%precv)) then
+    !!$     val = size(prec%precv)
+    !!$   end if
+    val = prec%nlevs
+    !!$   write(0, *) ' NLEVS: ', prec%nlevs, val, size(prec%precv)
   end function amg_d_get_nlevs
+
+  subroutine amg_d_set_nlevs(prec, nl) 
+    implicit none
+    class(amg_dprec_type), intent(inout) :: prec
+    integer(psb_ipk_) :: nl
+
+    prec%nlevs = nl
+  end subroutine amg_d_set_nlevs
+
   !
   ! Function returning the size of the amg_prec_type data structure
   ! in bytes or in number of nonzeros of the operator(s) involved.
@@ -484,10 +496,12 @@ contains
     implicit none
     class(amg_dprec_type), intent(in) :: prec
     integer(psb_epk_) :: val
-    integer(psb_ipk_)        :: i
+
+    integer(psb_ipk_) :: i
+
     val = 0
-    if (allocated(prec%precv)) then
-      do i=1, size(prec%precv)
+    if(allocated(prec%precv)) then
+      do i = 1, size(prec%precv)
         val = val + prec%precv(i)%get_nzeros()
       end do
     end if
@@ -497,30 +511,27 @@ contains
     implicit none
     class(amg_dprec_type), intent(in) :: prec
     logical, intent(in), optional :: global
-    integer(psb_epk_) :: val    
-    integer(psb_ipk_)        :: i
+    integer(psb_epk_) :: val
+
+    integer(psb_ipk_)   :: i
     type(psb_ctxt_type) :: ctxt
     
     logical :: global_
 
-    if (present(global)) then
-      global_ = global
-    else
-      global_ = .false.
-    end if
+    global_ = .false.
+    if(present(global)) global_ = global
     
     val = 0
     val = val + psb_sizeof_ip
-    if (allocated(prec%precv)) then
-      do i=1, size(prec%precv)
+    if(allocated(prec%precv)) then
+      do i = 1, size(prec%precv)
         val = val + prec%precv(i)%sizeof()
       end do
     end if
-    if (global_) then
+    if(global_) then
       ctxt = prec%ctxt
-      call psb_sum(ctxt,val)
+      call psb_sum(ctxt, val)
     end if
-
   end function amg_dprec_sizeof
 
   !
@@ -535,38 +546,40 @@ contains
     real(psb_dpk_)  :: val
 
     val = prec%ag_data%op_complexity
-
   end function amg_d_get_compl
 
   subroutine amg_d_cmp_compl(prec)
     implicit none
     class(amg_dprec_type), intent(inout) :: prec
 
-    real(psb_dpk_) :: num, den, nmin
+    real(psb_dpk_)     :: num, den, nmin
     type(psb_ctxt_type) :: ctxt
-    integer(psb_ipk_)   :: il
+    integer(psb_ipk_)   :: il, nl
 
     num = -done
     den = done
     ctxt = prec%ctxt
-    if (allocated(prec%precv)) then
-      il  = 1
+    if(allocated(prec%precv)) then
+      il = 1
       num = prec%precv(il)%base_a%get_nzeros()
-      if (num >= dzero) then
+      if(num >= dzero) then
         den = num
-        do il=2,size(prec%precv)
-          num = num + max(0,prec%precv(il)%base_a%get_nzeros())
+        nl = prec%get_nlevs()
+    !!$      write(0, *) 'Inside cmp_compl ', nl, size(prec%precv)
+        do il = 2, nl
+    !!$      write(0, *) '                 ', il, associated(prec%precv(il)%base_a)
+          num = num + max(0, prec%precv(il)%base_a%get_nzeros())
         end do
       end if
     end if
     nmin = num
-    call psb_min(ctxt,nmin)
-    if (nmin < dzero) then
+    call psb_min(ctxt, nmin)
+    if(nmin < dzero) then
       num = dzero
       den = done
     else
-      call psb_sum(ctxt,num)
-      call psb_sum(ctxt,den)
+      call psb_sum(ctxt, num)
+      call psb_sum(ctxt, den)
     end if
     prec%ag_data%op_complexity = num/den
   end subroutine amg_d_cmp_compl
@@ -580,7 +593,6 @@ contains
     real(psb_dpk_)  :: val
 
     val = prec%ag_data%avg_cr
-
   end function amg_d_get_avg_cr
 
   subroutine amg_d_cmp_avg_cr(prec)
@@ -591,18 +603,19 @@ contains
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: il, nl, iam, np
 
-
     avgcr = dzero
+    nl = prec%get_nlevs()
+    do il = 2, nl
+      if(prec%precv(il)%base_desc%is_ok()) then 
+        ctxt = prec%precv(il)%base_desc%get_ctxt()
+        call psb_info(ctxt, iam, np)
+        if(iam >= 0) avgcr = avgcr + max(dzero, prec%precv(il)%szratio)
+      end if
+    end do
+    avgcr = avgcr / (nl-1)
     ctxt = prec%ctxt
-    call psb_info(ctxt,iam,np)
-    if (allocated(prec%precv)) then
-      nl = size(prec%precv)
-      do il=2,nl
-        avgcr = avgcr + max(dzero,prec%precv(il)%szratio)
-      end do
-      avgcr = avgcr / (nl-1)
-    end if
-    call psb_sum(ctxt,avgcr)
+    call psb_info(ctxt, iam, np)
+    call psb_sum(ctxt, avgcr)
     prec%ag_data%avg_cr = avgcr/np
   end subroutine amg_d_cmp_avg_cr
 
@@ -618,60 +631,58 @@ contains
   !  info    -  integer, output.
   !             error code.
   !
-  subroutine amg_dprecfree(p,info)
+  subroutine amg_dprecfree(p, info)
     implicit none
     ! Arguments
     type(amg_dprec_type), intent(inout) :: p
     integer(psb_ipk_), intent(out)        :: info
 
     ! Local variables
-    integer(psb_ipk_)   :: me,err_act,i
+    integer(psb_ipk_)   :: me, err_act, i
     character(len=20)   :: name
 
     info = psb_success_
     name = 'amg_dprecfree'
     call psb_erractionsave(err_act)
-    if (psb_errstatus_fatal()) then
-      info = psb_err_internal_error_; return
+    if(psb_errstatus_fatal()) then
+      info = psb_err_internal_error_
+      return
     end if
 
-    me=-1
-
+    me = -1
     call p%free(info)
-
-
     return
-
   end subroutine amg_dprecfree
 
-  subroutine amg_d_prec_free(prec,info)
+  subroutine amg_d_prec_free(prec, info)
     implicit none
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
 
     ! Local variables
-    integer(psb_ipk_)   :: me,err_act,i
+    integer(psb_ipk_)   :: me, err_act, i
     character(len=20)   :: name
 
     info = psb_success_
     name = 'amg_dprecfree'
     call psb_erractionsave(err_act)
-    if (psb_errstatus_fatal()) then
-      info = psb_err_internal_error_; goto 9999
+    if(psb_errstatus_fatal()) then
+      info = psb_err_internal_error_
+      goto 9999
     end if
 
-    me=-1
-    if (allocated(prec%precv)) then
-      do i=1,size(prec%precv)
+    me = -1
+    if(allocated(prec%precv)) then
+      do i = 1, size(prec%precv)
         call prec%precv(i)%free(info)
-        if (psb_errstatus_fatal()) then
-          info=psb_err_internal_error_
-          call psb_errpush(info,name)
+        if(psb_errstatus_fatal()) then
+          info = psb_err_internal_error_
+          call psb_errpush(info, name)
           goto 9999
         end if
       end do
-      deallocate(prec%precv,stat=info)
+      deallocate(prec%precv, stat=info)
     end if
     call psb_erractionrestore(err_act)
     return
@@ -680,25 +691,26 @@ contains
     return
   end subroutine amg_d_prec_free
 
-  subroutine amg_d_smoothers_free(prec,info)
+  subroutine amg_d_smoothers_free(prec, info)
     implicit none
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
 
     ! Local variables
-    integer(psb_ipk_)   :: me,err_act,i
+    integer(psb_ipk_)   :: me, err_act, i
     character(len=20)   :: name
 
     info = psb_success_
     name = 'amg_d_smoothers_free'
     call psb_erractionsave(err_act)
-    if (psb_errstatus_fatal()) then
-      info = psb_err_internal_error_; goto 9999
+    if(psb_errstatus_fatal()) then
+      info = psb_err_internal_error_
+      goto 9999
     end if
 
-    if (allocated(prec%precv)) then
-      do i=1,size(prec%precv)
+    if(allocated(prec%precv)) then
+      do i = 1, prec%get_nlevs()
         call prec%precv(i)%free_smoothers(info)
       end do
     end if
@@ -710,25 +722,26 @@ contains
     return
   end subroutine amg_d_smoothers_free
 
-  subroutine amg_d_hierarchy_free(prec,info)
+  subroutine amg_d_hierarchy_free(prec, info)
     implicit none
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
 
     ! Local variables
-    integer(psb_ipk_)   :: me,err_act,i
+    integer(psb_ipk_)   :: me, err_act, i
     character(len=20)   :: name
 
     info = psb_success_
     name = 'amg_d_hierarchy_free'
     call psb_erractionsave(err_act)
-    if (psb_errstatus_fatal()) then
-      info = psb_err_internal_error_; goto 9999
+    if(psb_errstatus_fatal()) then
+      info = psb_err_internal_error_
+      goto 9999
     end if
 
-    me=-1
-    write(0,*) 'Missing implementation '
+    me = -1
+    write(0, *) 'Missing implementation '
 
     call psb_erractionrestore(err_act)
     return
@@ -758,6 +771,7 @@ contains
     select type(prec)
       type is (amg_dprec_type)
         call amg_precapply(prec, x, idx_x, y, idx_y, desc_data, info, trans, work)
+
       class default
         info = psb_err_missing_override_method_
         call psb_errpush(info, name)
@@ -767,7 +781,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-    9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
   end subroutine amg_d_apply2_mvect_col
 
@@ -789,6 +803,7 @@ contains
     select type(prec)
       type is (amg_dprec_type)
         call amg_precapply(prec, x, idx_x, desc_data, info, trans, work)
+
       class default
         info = psb_err_missing_override_method_
         call psb_errpush(info, name)
@@ -804,25 +819,25 @@ contains
 
   subroutine amg_d_apply2_vect(prec, x, y, desc_data, info, trans, work)
     implicit none
-    type(psb_desc_type), intent(in)        :: desc_data
     class(amg_dprec_type), intent(inout)  :: prec
-    type(psb_d_vect_type), intent(inout)   :: x
-    type(psb_d_vect_type), intent(inout)   :: y
-    integer(psb_ipk_), intent(out)          :: info
-    character(len=1), optional              :: trans
+    type(psb_d_vect_type), intent(inout)   :: x, y
+    type(psb_desc_type), intent(in)        :: desc_data
+    integer(psb_ipk_), intent(out)         :: info
+    character(len=1), optional                      :: trans
     real(psb_dpk_), intent(inout), optional, target :: work(:)
     integer(psb_ipk_) :: err_act
-    character(len=20) :: name='d_prec_apply'
+    character(len=20) :: name = 'd_prec_apply'
 
     call psb_erractionsave(err_act)
 
     select type(prec)
-    type is (amg_dprec_type)
-      call amg_precapply(prec,x,y,desc_data,info,trans,work)
-    class default
-      info = psb_err_missing_override_method_
-      call psb_errpush(info,name)
-      goto 9999
+      type is (amg_dprec_type)
+        call amg_precapply(prec, x, y, desc_data, info, trans, work)
+
+      class default
+        info = psb_err_missing_override_method_
+        call psb_errpush(info, name)
+        goto 9999
     end select
 
     call psb_erractionrestore(err_act)
@@ -834,24 +849,25 @@ contains
 
   subroutine amg_d_apply1_vect(prec, x, desc_data, info, trans, work)
     implicit none
-    type(psb_desc_type), intent(in)          :: desc_data
     class(amg_dprec_type), intent(inout)  :: prec
     type(psb_d_vect_type), intent(inout)   :: x
+    type(psb_desc_type), intent(in)         :: desc_data
     integer(psb_ipk_), intent(out)          :: info
-    character(len=1), optional            :: trans
+    character(len=1), optional                      :: trans
     real(psb_dpk_), intent(inout), optional, target :: work(:)
     integer(psb_ipk_) :: err_act
-    character(len=20) :: name='d_prec_apply'
+    character(len=20) :: name = 'd_prec_apply'
 
     call psb_erractionsave(err_act)
 
     select type(prec)
-    type is (amg_dprec_type)
-      call amg_precapply(prec,x,desc_data,info,trans,work)
-    class default
-      info = psb_err_missing_override_method_
-      call psb_errpush(info,name)
-      goto 9999
+      type is (amg_dprec_type)
+        call amg_precapply(prec, x, desc_data, info, trans, work)
+
+      class default
+        info = psb_err_missing_override_method_
+        call psb_errpush(info, name)
+        goto 9999
     end select
 
     call psb_erractionrestore(err_act)
@@ -861,27 +877,28 @@ contains
     return
   end subroutine amg_d_apply1_vect
 
-  subroutine amg_d_apply2v(prec,x,y,desc_data,info,trans,work)
+  subroutine amg_d_apply2v(prec, x, y, desc_data, info, trans, work)
     implicit none
-    type(psb_desc_type), intent(in)    :: desc_data
-    class(amg_dprec_type), intent(inout) :: prec
-    real(psb_dpk_), intent(inout)      :: x(:)
-    real(psb_dpk_), intent(inout)      :: y(:)
-    integer(psb_ipk_), intent(out)     :: info
-    character(len=1), optional        :: trans
+    class(amg_dprec_type), intent(inout)  :: prec
+    real(psb_dpk_), intent(inout)         :: x(:), y(:)
+    type(psb_desc_type), intent(in)       :: desc_data
+    integer(psb_ipk_), intent(out)        :: info
+    character(len=1), optional                      :: trans
     real(psb_dpk_), intent(inout), optional, target :: work(:)
+
     integer(psb_ipk_) :: err_act
-    character(len=20) :: name='d_prec_apply'
+    character(len=20) :: name = 'd_prec_apply'
 
     call psb_erractionsave(err_act)
 
     select type(prec)
-    type is (amg_dprec_type)
-      call amg_precapply(prec,x,y,desc_data,info,trans,work)
-    class default
-      info = psb_err_missing_override_method_
-      call psb_errpush(info,name)
-      goto 9999
+      type is (amg_dprec_type)
+        call amg_precapply(prec, x, y, desc_data, info, trans, work)
+
+      class default
+        info = psb_err_missing_override_method_
+        call psb_errpush(info, name)
+        goto 9999
     end select
 
     call psb_erractionrestore(err_act)
@@ -891,25 +908,27 @@ contains
     return
   end subroutine amg_d_apply2v
 
-  subroutine amg_d_apply1v(prec,x,desc_data,info,trans)
+  subroutine amg_d_apply1v(prec, x, desc_data, info, trans)
     implicit none
-    type(psb_desc_type), intent(in)    :: desc_data
-    class(amg_dprec_type), intent(inout) :: prec
-    real(psb_dpk_), intent(inout)      :: x(:)
-    integer(psb_ipk_), intent(out)     :: info
-    character(len=1), optional         :: trans
+    class(amg_dprec_type), intent(inout)  :: prec
+    real(psb_dpk_), intent(inout)         :: x(:)
+    type(psb_desc_type), intent(in)       :: desc_data
+    integer(psb_ipk_), intent(out)        :: info
+    character(len=1), optional  :: trans
+
     integer(psb_ipk_) :: err_act
-    character(len=20) :: name='d_prec_apply'
+    character(len=20) :: name = 'd_prec_apply'
 
     call psb_erractionsave(err_act)
 
     select type(prec)
-    type is (amg_dprec_type)
-      call amg_precapply(prec,x,desc_data,info,trans)
-    class default
-      info = psb_err_missing_override_method_
-      call psb_errpush(info,name)
-      goto 9999
+      type is (amg_dprec_type)
+        call amg_precapply(prec, x, desc_data, info, trans)
+
+      class default
+        info = psb_err_missing_override_method_
+        call psb_errpush(info, name)
+        goto 9999
     end select
 
     call psb_erractionrestore(err_act)
@@ -919,49 +938,47 @@ contains
     return
   end subroutine amg_d_apply1v
 
-  subroutine amg_d_dump(prec,info,istart,iend,iproc,prefix,head,&
-       & ac,rp,smoother,solver,tprol,&
-       & global_num)
+  subroutine amg_d_dump(prec, info, istart, iend, iproc, prefix, head, &
+                        & ac, rp, smoother, solver, tprol, global_num)
     implicit none
     class(amg_dprec_type), intent(in)     :: prec
     integer(psb_ipk_), intent(out)          :: info
     integer(psb_ipk_), intent(in), optional :: istart, iend, iproc
     character(len=*), intent(in), optional  :: prefix, head
-    logical, optional, intent(in)    :: smoother, solver,ac, rp, tprol, global_num
+    logical, optional, intent(in)           :: smoother, solver, ac, rp, tprol, global_num
+
     integer(psb_ipk_)   :: i, j, il1, iln, lev
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: iam, np, iproc_
     character(len=80)   :: prefix_
     character(len=120)  :: fname ! len should be at least 20 more than
+    
     !  len of prefix_
-
-    info = 0
+    info = psb_success_
     ctxt = prec%ctxt
-    call psb_info(ctxt,iam,np)
-    iln = size(prec%precv)
-    if (present(istart)) then
-      il1 = max(1,istart)
+    call psb_info(ctxt, iam, np)
+    iln = prec%get_nlevs()
+
+    if(present(istart)) then
+      il1 = max(1, istart)
     else
-      il1 = min(2,iln)
-    end if
-    if (present(iend)) then
-      iln = min(iln, iend)
-    end if
-    iproc_ = -1
-    if (present(iproc)) then
-      iproc_ = iproc
+      il1 = min(2, iln)
     end if
 
-    if ((iproc_ == -1).or.(iproc_==iam)) then
-      do lev=il1, iln
-        call prec%precv(lev)%dump(lev,info,prefix=prefix,head=head,&
-             & ac=ac,smoother=smoother,solver=solver,rp=rp,tprol=tprol, &
-             & global_num=global_num)
+    if(present(iend)) iln = min(iln, iend)
+
+    iproc_ = -1
+    if(present(iproc)) iproc_ = iproc
+
+    if((iproc_ == -1) .or. (iproc_ == iam)) then
+      do lev = il1, iln
+        call prec%precv(lev)%dump(lev, info, prefix = prefix, head = head, &
+            & ac = ac, smoother = smoother, solver = solver, rp = rp, tprol = tprol, global_num = global_num)
       end do
     end if
   end subroutine amg_d_dump
 
-  subroutine amg_d_cnv(prec,info,amold,vmold,imold)
+  subroutine amg_d_cnv(prec, info, amold, vmold, imold)
     implicit none
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)       :: info
@@ -972,27 +989,25 @@ contains
     integer(psb_ipk_) :: i
 
     info = psb_success_
-    if (allocated(prec%precv)) then
-      do i=1,size(prec%precv)
-        if (info == psb_success_ ) &
-             & call prec%precv(i)%cnv(info,amold=amold,vmold=vmold,imold=imold)
+    if(allocated(prec%precv)) then
+      do i = 1, prec%get_nlevs()
+        if(info == psb_success_) call prec%precv(i)%cnv(info, amold=amold, &
+                                                      & vmold=vmold, imold=imold)
       end do
     end if
-
   end subroutine amg_d_cnv
 
-  subroutine amg_d_clone(prec,precout,info)
+  subroutine amg_d_clone(prec, precout, info)
     implicit none
     class(amg_dprec_type), intent(inout) :: prec
     class(psb_dprec_type), intent(inout) :: precout
     integer(psb_ipk_), intent(out)       :: info
 
     call precout%free(info)
-    if (info == 0) call amg_d_inner_clone(prec,precout,info)
-
+    if(info == psb_success_) call amg_d_inner_clone(prec, precout, info)
   end subroutine amg_d_clone
 
-  subroutine amg_d_inner_clone(prec,precout,info)
+  subroutine amg_d_inner_clone(prec, precout, info)
     implicit none
     class(amg_dprec_type), intent(inout)         :: prec
     class(psb_dprec_type), target, intent(inout) :: precout
@@ -1004,39 +1019,38 @@ contains
 
     info = psb_success_
     select type(pout => precout)
-    class is (amg_dprec_type)
-      pout%ctxt          = prec%ctxt
-      pout%ag_data       = prec%ag_data
-      pout%outer_sweeps  = prec%outer_sweeps
-      if (allocated(prec%precv)) then
-        ln = size(prec%precv)
-        allocate(pout%precv(ln),stat=info)
-        if (info /= psb_success_) goto 9999
-        if (ln >= 1) then
-          call prec%precv(1)%clone(pout%precv(1),info)
-        end if
-        do lev=2, ln
-          if (info /= psb_success_) exit
-          call prec%precv(lev)%clone(pout%precv(lev),info)
-          if (info == psb_success_) then
-            pout%precv(lev)%base_a       => pout%precv(lev)%ac
-            pout%precv(lev)%base_desc    => pout%precv(lev)%desc_ac
-            pout%precv(lev)%linmap%p_desc_U => pout%precv(lev-1)%base_desc
-            pout%precv(lev)%linmap%p_desc_V => pout%precv(lev)%base_desc
-          end if
-        end do
-      end if
-      if (allocated(prec%precv(1)%wrk)) &
-           & call pout%allocate_wrk(info,vmold=prec%precv(1)%wrk%vx2l%v)
+      class is (amg_dprec_type)
+        pout%ctxt          = prec%ctxt
+        pout%ag_data       = prec%ag_data
+        pout%outer_sweeps  = prec%outer_sweeps
+        pout%nlevs         = prec%nlevs
+        if(allocated(prec%precv)) then
+          ln = prec%get_nlevs()
+          allocate(pout%precv(ln), stat=info)
+          if(info /= psb_success_) goto 9999
+          if(ln >= 1) call prec%precv(1)%clone(pout%precv(1), info)
 
-    class default
-      write(0,*) 'Error: wrong out type'
-      info = psb_err_invalid_input_
+          do lev = 2, ln
+            if(info /= psb_success_) write(0, *) 'Inner_clone must be checked and reimplemented! '
+            call prec%precv(lev)%clone(pout%precv(lev), info)
+            if(info == psb_success_) then
+              pout%precv(lev)%base_a          => pout%precv(lev)%ac
+              pout%precv(lev)%base_desc       => pout%precv(lev)%desc_ac
+              pout%precv(lev)%linmap%p_desc_U => pout%precv(lev-1)%base_desc
+              pout%precv(lev)%linmap%p_desc_V => pout%precv(lev)%base_desc
+            end if
+          end do
+        end if
+        if(allocated(prec%precv(1)%wrk)) call pout%allocate_wrk(info, vmold=prec%precv(1)%wrk%vx2l%v)
+
+      class default
+        write(0, *) 'Error: wrong out type'
+        info = psb_err_invalid_input_
     end select
   9999 continue
   end subroutine amg_d_inner_clone
 
-  subroutine d_prec_move_alloc(prec, b,info)
+  subroutine d_prec_move_alloc(prec, b, info)
     use psb_base_mod
     implicit none
     class(amg_dprec_type), intent(inout) :: prec
@@ -1044,11 +1058,11 @@ contains
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_) :: i
 
-    if (same_type_as(prec,b)) then
-      if (allocated(b%precv)) then
+    if(same_type_as(prec, b)) then
+      if(allocated(b%precv)) then
         ! This might not be required if FINAL procedures are available.
         call b%free(info)
-        if (info /= psb_success_) then
+        if(info /= psb_success_) then
           !?????
     !!$      return
         endif
@@ -1057,25 +1071,23 @@ contains
       b%ag_data       = prec%ag_data
       b%outer_sweeps  = prec%outer_sweeps
 
-      call move_alloc(prec%precv,b%precv)
+      call move_alloc(prec%precv, b%precv)
       ! Fix the pointers except on level 1.
-      do i=2, size(b%precv)
-        b%precv(i)%base_a    => b%precv(i)%ac
-        b%precv(i)%base_desc => b%precv(i)%desc_ac
-        b%precv(i)%linmap%p_desc_U => b%precv(i-1)%base_desc
-        b%precv(i)%linmap%p_desc_V => b%precv(i)%base_desc
+      do i = 2, size(b%precv)
+        b%precv(i)%base_a           => b%precv(i)%ac
+        b%precv(i)%base_desc        => b%precv(i)%desc_ac
+        b%precv(i)%linmap%p_desc_U  => b%precv(i-1)%base_desc
+        b%precv(i)%linmap%p_desc_V  => b%precv(i)%base_desc
       end do
-
     else
-      write(0,*) 'Warning: PREC%move_alloc onto different type?'
+      write(0, *) 'Warning: PREC%move_alloc onto different type?'
       info = psb_err_internal_error_
     end if
   end subroutine d_prec_move_alloc
 
-  subroutine amg_d_allocate_wrk(prec,info,vmold,desc)
+  subroutine amg_d_allocate_wrk(prec, info, vmold, desc)
     use psb_base_mod
     implicit none
-
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
@@ -1087,23 +1099,26 @@ contains
     type(psb_desc_type), intent(in), optional  :: desc
 
     ! Local variables
-    integer(psb_ipk_)   :: me,err_act,i,j,level,nlev, nc2l
-    character(len=20)   :: name
+    integer(psb_ipk_) :: me, err_act, i, j, level, nlev, nc2l
+    character(len=20) :: name
 
     info = psb_success_
     name = 'amg_d_allocate_wrk'
+
     call psb_erractionsave(err_act)
-    if (psb_errstatus_fatal()) then
-      info = psb_err_internal_error_; goto 9999
+    if(psb_errstatus_fatal()) then
+      info = psb_err_internal_error_
+      goto 9999
     end if
-    nlev   = size(prec%precv)
+
+    nlev = prec%get_nlevs()
     level = 1
     do level = 1, nlev
-      call prec%precv(level)%allocate_wrk(info,vmold=vmold)
-      if (psb_errstatus_fatal()) then
+      call prec%precv(level)%allocate_wrk(info, vmold=vmold)
+      if(psb_errstatus_fatal()) then
         nc2l = prec%precv(level)%base_desc%get_local_cols()
-        info=psb_err_alloc_request_
-        call psb_errpush(info,name,i_err=(/2*nc2l/), a_err='real(psb_dpk_)')
+        info = psb_err_alloc_request_
+        call psb_errpush(info, name, i_err = (/2*nc2l/), a_err = 'real(psb_dpk_)')
         goto 9999
       end if
     end do
@@ -1115,27 +1130,28 @@ contains
     return
   end subroutine amg_d_allocate_wrk
 
-  subroutine amg_d_free_wrk(prec,info)
+  subroutine amg_d_free_wrk(prec, info)
     use psb_base_mod
     implicit none
-
     ! Arguments
     class(amg_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)        :: info
 
     ! Local variables
-    integer(psb_ipk_)   :: me,err_act,i,j,level, nlev, nc2l
-    character(len=20)   :: name
+    integer(psb_ipk_) :: me, err_act, i, j, level, nlev, nc2l
+    character(len=20) :: name
 
     info = psb_success_
     name = 'amg_d_free_wrk'
+
     call psb_erractionsave(err_act)
-    if (psb_errstatus_fatal()) then
-      info = psb_err_internal_error_; goto 9999
+    if(psb_errstatus_fatal()) then
+      info = psb_err_internal_error_
+      goto 9999
     end if
 
-    if (allocated(prec%precv)) then
-      nlev   = size(prec%precv)
+    if(allocated(prec%precv)) then
+      nlev = prec%get_nlevs()
       do level = 1, nlev
         call prec%precv(level)%free_wrk(info)
       end do
@@ -1151,15 +1167,12 @@ contains
   function amg_d_is_allocated_wrk(prec) result(res)
     use psb_base_mod
     implicit none
-
     ! Arguments
     class(amg_dprec_type), intent(in) :: prec
     logical :: res
 
     res = .false.
-    if (.not.allocated(prec%precv)) return
+    if(.not.allocated(prec%precv)) return
     res = allocated(prec%precv(1)%wrk)
-
   end function amg_d_is_allocated_wrk
-
 end module amg_d_prec_type

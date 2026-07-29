@@ -63,8 +63,7 @@ subroutine amg_d_diag_solver_apply_vect(alpha, sv, x, beta, y, &
 
   trans_ = psb_toupper(trans)
   select case(trans_)
-    case('N')
-    case('T', 'C')
+    case('N', 'T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_, name)
       goto 9999
@@ -77,15 +76,13 @@ subroutine amg_d_diag_solver_apply_vect(alpha, sv, x, beta, y, &
   n_col = desc_data%get_local_cols()
   if (x%get_nrows() < n_row) then 
     info = 36
-    call psb_errpush(info, name, & 
-         & i_err = (/itwo, n_row, izero, izero, izero/))
+    call psb_errpush(info, name, i_err = (/itwo, n_row, izero, izero, izero/))
     goto 9999
   end if
 
   if (y%get_nrows() < n_row) then 
     info = 36
-    call psb_errpush(info, name, & 
-         & i_err = (/ithree, n_row, izero, izero, izero/))
+    call psb_errpush(info, name, i_err = (/ithree, n_row, izero, izero, izero/))
     goto 9999
   end if
 
@@ -145,8 +142,7 @@ subroutine amg_d_diag_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, &
 
   trans_ = psb_toupper(trans)
   select case(trans_)
-    case('N')
-    case('T', 'C')
+    case('N', 'T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_, name)
       goto 9999
@@ -159,15 +155,13 @@ subroutine amg_d_diag_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, &
   n_col = desc_data%get_local_cols()
   if (x%get_nrows() < n_row) then 
     info = 36
-    call psb_errpush(info, name, & 
-         & i_err = (/itwo, n_row, izero, izero, izero/))
+    call psb_errpush(info, name, i_err = (/itwo, n_row, izero, izero, izero/))
     goto 9999
   end if
 
   if (y%get_nrows() < n_row) then 
     info = 36
-    call psb_errpush(info, name, & 
-         & i_err = (/ithree, n_row, izero, izero, izero/))
+    call psb_errpush(info, name, i_err = (/ithree, n_row, izero, izero, izero/))
     goto 9999
   end if
 
@@ -227,8 +221,7 @@ subroutine amg_d_diag_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, &
 
   trans_ = psb_toupper(trans)
   select case(trans_)
-    case('N')
-    case('T', 'C')
+    case('N', 'T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_, name)
       goto 9999
@@ -241,15 +234,13 @@ subroutine amg_d_diag_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, &
   n_col = desc_data%get_local_cols()
   if (x%get_nrows() < n_row) then 
     info = 36
-    call psb_errpush(info, name, & 
-         & i_err = (/itwo, n_row, izero, izero, izero/))
+    call psb_errpush(info, name, i_err = (/itwo, n_row, izero, izero, izero/))
     goto 9999
   end if
 
   if (y%get_nrows() < n_row) then 
     info = 36
-    call psb_errpush(info, name, & 
-         & i_err = (/ithree, n_row, izero, izero, izero/))
+    call psb_errpush(info, name, i_err = (/ithree, n_row, izero, izero, izero/))
     goto 9999
   end if
 
@@ -309,8 +300,7 @@ subroutine amg_d_diag_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y
 
   trans_ = psb_toupper(trans)
   select case(trans_)
-    case('N')
-    case('T', 'C')
+    case('N', 'T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_, name)
       goto 9999
@@ -323,15 +313,13 @@ subroutine amg_d_diag_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y
   n_col = desc_data%get_local_cols()
   if (x%get_nrows() < n_row) then 
     info = 36
-    call psb_errpush(info, name, & 
-         & i_err = (/itwo, n_row, izero, izero, izero/))
+    call psb_errpush(info, name, i_err = (/itwo, n_row, izero, izero, izero/))
     goto 9999
   end if
 
   if (y%get_nrows() < n_row) then 
     info = 36
-    call psb_errpush(info, name, & 
-         & i_err = (/ithree, n_row, izero, izero, izero/))
+    call psb_errpush(info, name, i_err = (/ithree, n_row, izero, izero, izero/))
     goto 9999
   end if
 

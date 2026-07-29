@@ -57,37 +57,35 @@
 !    info    -  integer, output.
 !               Error code.              
 !  
-subroutine amg_dprecbld(a,desc_a,prec,info,amold,vmold,imold)
-
+subroutine amg_dprecbld(a, desc_a, prec, info, amold, vmold, imold)
   use psb_base_mod
   use amg_d_prec_mod, amg_protect_name => amg_dprecbld
-
-  Implicit None
-
+  implicit none
   ! Arguments
-  type(psb_dspmat_type),intent(inout), target        :: a
-  type(psb_desc_type), intent(inout), target           :: desc_a
-  class(amg_dprec_type),intent(inout), target         :: prec
-  integer(psb_ipk_), intent(out)                               :: info
+  type(psb_dspmat_type), intent(inout), target :: a
+  type(psb_desc_type), intent(inout), target  :: desc_a
+  class(amg_dprec_type), intent(inout), target :: prec
+  integer(psb_ipk_), intent(out)              :: info
   class(psb_d_base_sparse_mat), intent(in), optional :: amold
   class(psb_d_base_vect_type), intent(in), optional  :: vmold
   class(psb_i_base_vect_type), intent(in), optional  :: imold
 
   ! Local Variables
-  type(amg_dprec_type) :: t_prec
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: me, np
-  integer(psb_ipk_)   :: err,i,k,err_act, iszv, newsz
-  integer(psb_ipk_)   :: ipv(amg_ifpsz_), val
-  type(amg_dml_parms) :: prm
-  integer(psb_ipk_)   :: debug_level, debug_unit
-  character(len=20)   :: name, ch_err
+  type(amg_dprec_type)  :: t_prec
+  type(psb_ctxt_type)   :: ctxt
+  integer(psb_ipk_)     :: me, np
+  integer(psb_ipk_)     :: err, i, k, err_act, iszv, newsz
+  integer(psb_ipk_)     :: ipv(amg_ifpsz_), val
+  type(amg_dml_parms)   :: prm
+  integer(psb_ipk_)     :: debug_level, debug_unit
+  character(len=20)     :: name, ch_err
 
-  info=psb_success_
-  err=0
+  info = psb_success_
+  err = 0
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_; goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
   end if
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -98,15 +96,12 @@ subroutine amg_dprecbld(a,desc_a,prec,info,amold,vmold,imold)
   call psb_info(ctxt, me, np)
   prec%ctxt = ctxt
 
-  if (debug_level >= psb_debug_outer_) &
-       & write(debug_unit,*) me,' ',trim(name),&
-       & 'Entering '
-  !
+  if(debug_level >= psb_debug_outer_) write(debug_unit, *) me, ' ', trim(name), 'Entering '
 
-  if (.not.allocated(prec%precv)) then 
+  if(.not. allocated(prec%precv)) then 
     !! Error: should have called amg_dprecinit
-    info=3111
-    call psb_errpush(info,name)
+    info = 3111
+    call psb_errpush(info, name)
     goto 9999
   end if
 
@@ -115,46 +110,41 @@ subroutine amg_dprecbld(a,desc_a,prec,info,amold,vmold,imold)
   !   
   newsz = -1
   iszv  = size(prec%precv)
-  call psb_bcast(ctxt,iszv)
-  if (iszv /= size(prec%precv)) then 
-    info=psb_err_internal_error_
-    call psb_errpush(info,name,a_err='Inconsistent size of precv')
+  call psb_bcast(ctxt, iszv)
+  if(iszv /= size(prec%precv)) then 
+    info = psb_err_internal_error_
+    call psb_errpush(info, name, a_err = 'Inconsistent size of precv')
     goto 9999
   end if
 
-  if (iszv <= 0) then 
+  if(iszv <= 0) then 
     ! Is this really possible? probably not.
-    info=psb_err_from_subroutine_
-    ch_err='size bpv'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'size bpv'
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
   !
   ! Build the  preconditioner
   ! 
-  call prec%hierarchy_build(a,desc_a,info)
-  
-  if (info /= psb_success_) then 
-    info=psb_err_internal_error_
-    call psb_errpush(info,name,a_err='Error from hierarchy build')
+  call prec%hierarchy_build(a, desc_a, info)
+  if(info /= psb_success_) then 
+    info = psb_err_internal_error_
+    call psb_errpush(info, name, a_err = 'Error from hierarchy build')
     goto 9999
   end if
   
-  call prec%smoothers_build(a,desc_a,info,amold,vmold,imold)
-  
-  if (info /= psb_success_) then 
-    info=psb_err_internal_error_
-    call psb_errpush(info,name,a_err='Error from smoothers build')
+  call prec%smoothers_build(a, desc_a, info, amold, vmold, imold)
+  if(info /= psb_success_) then 
+    info = psb_err_internal_error_
+    call psb_errpush(info, name, a_err = 'Error from smoothers build')
     goto 9999
   end if
   
-
   call psb_erractionrestore(err_act)
   return
 
 9999 call psb_error_handler(err_act)
-
   return
-
 end subroutine amg_dprecbld

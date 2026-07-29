@@ -63,13 +63,13 @@
 module amg_z_base_smoother_mod
 
   use amg_z_base_solver_mod
-  use psb_base_mod, only : psb_desc_type, psb_zspmat_type, psb_epk_,&
-       & psb_z_vect_type, psb_z_base_vect_type, psb_z_base_sparse_mat, &
-       & psb_dpk_, psb_i_base_vect_type, psb_erractionsave, psb_error_handler
+  use psb_base_mod, only : psb_desc_type, psb_zspmat_type, psb_z_base_sparse_mat, &
+                    & psb_z_vect_type, psb_z_base_vect_type, psb_i_base_vect_type, &
+                    & psb_z_multivect_type, psb_z_base_multivect_type, &
+                    & psb_dpk_, psb_epk_, psb_ipk_, &
+                    & psb_erractionsave, psb_error_handler
   
   !
-  !
-  ! 
   ! Type: amg_T_base_smoother_type.
   ! 
   !  It holds the smoother a single level. Its only mandatory component is a solver
@@ -106,9 +106,16 @@ module amg_z_base_smoother_mod
   type  amg_z_base_smoother_type
     class(amg_z_base_solver_type), allocatable :: sv
   contains
-    procedure, pass(sm) :: apply_v => amg_z_base_smoother_apply_vect
-    procedure, pass(sm) :: apply_a => amg_z_base_smoother_apply
-    generic, public     :: apply => apply_a, apply_v
+    procedure, pass(sm) :: apply_a      => amg_z_base_smoother_apply
+    procedure, pass(sm) :: apply_v      => amg_z_base_smoother_apply_vect
+    ! procedure, pass(sm) :: apply_mv     => amg_z_base_smoother_apply_mvect
+    procedure, pass(sm) :: apply_v_mv   => amg_z_base_smoother_apply_vect_mvect
+    procedure, pass(sm) :: apply_mv_v   => amg_z_base_smoother_apply_mvect_vect
+    procedure, pass(sm) :: apply_mv_col => amg_z_base_smoother_apply_mvect_col
+    generic, public     :: apply        => apply_a, apply_v, &
+                                          & apply_mv_v, apply_v_mv, &
+                                          & apply_mv_col
+
     procedure, pass(sm) :: check => amg_z_base_smoother_check
     procedure, pass(sm) :: dump  => amg_z_base_smoother_dmp
     procedure, pass(sm) :: clone => amg_z_base_smoother_clone
@@ -131,57 +138,120 @@ module amg_z_base_smoother_mod
     procedure, nopass   :: get_id    => z_base_smoother_get_id
   end type amg_z_base_smoother_type
 
-
-  private :: z_base_smoother_sizeof, z_base_smoother_get_fmt, &
-       &  z_base_smoother_default, z_base_smoother_get_nzeros, &
-       & z_base_smoother_get_id, z_base_smoother_get_wrksize
-
-
+  private ::  z_base_smoother_sizeof, z_base_smoother_get_fmt, &
+            & z_base_smoother_default, z_base_smoother_get_nzeros, &
+            & z_base_smoother_get_id, z_base_smoother_get_wrksize
 
   interface 
-    subroutine amg_z_base_smoother_apply(alpha,sm,x,beta,y,desc_data,& 
-         & trans,sweeps,work,info,init,initu)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
-           & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
-           & amg_z_base_smoother_type, psb_ipk_
-      type(psb_desc_type), intent(in)             :: desc_data
-      class(amg_z_base_smoother_type), intent(inout) :: sm
-      complex(psb_dpk_),intent(inout)                :: x(:)
-      complex(psb_dpk_),intent(inout)                :: y(:)
-      complex(psb_dpk_),intent(in)                   :: alpha,beta
-      character(len=1),intent(in)                  :: trans
-      integer(psb_ipk_), intent(in)                :: sweeps
-      complex(psb_dpk_),target, intent(inout)        :: work(:)
-      integer(psb_ipk_), intent(out)               :: info
-      character, intent(in), optional       :: init
-      complex(psb_dpk_),intent(inout), optional :: initu(:)
+    subroutine amg_z_base_smoother_apply(alpha, sm, x, beta, y, & 
+                  & desc_data, trans, sweeps, work, info, init, initu)
+      import :: psb_dpk_, amg_z_base_smoother_type, &
+              & psb_desc_type, psb_ipk_
+      implicit none 
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(amg_z_base_smoother_type), intent(inout)  :: sm
+      complex(psb_dpk_), intent(inout)                   :: x(:), y(:)
+      type(psb_desc_type), intent(in)                 :: desc_data
+      character(len=1), intent(in)                    :: trans
+      integer(psb_ipk_), intent(in)                   :: sweeps
+      complex(psb_dpk_), target, intent(inout)           :: work(:)
+      integer(psb_ipk_), intent(out)                  :: info
+      character, intent(in), optional         :: init
+      complex(psb_dpk_), intent(inout), optional :: initu(:)
     end subroutine amg_z_base_smoother_apply
   end interface
   
   interface 
-    subroutine amg_z_base_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,&
-         &  trans,sweeps,work,wv,info,init,initu)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
-           & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
-           & amg_z_base_smoother_type, psb_ipk_
-      type(psb_desc_type), intent(in)                :: desc_data
-      class(amg_z_base_smoother_type), intent(inout) :: sm
-      type(psb_z_vect_type),intent(inout)            :: x
-      type(psb_z_vect_type),intent(inout)            :: y
-      complex(psb_dpk_),intent(in)                       :: alpha,beta
-      character(len=1),intent(in)                      :: trans
-      integer(psb_ipk_), intent(in)                    :: sweeps
-      complex(psb_dpk_),target, intent(inout)            :: work(:)
-      type(psb_z_vect_type),intent(inout)            :: wv(:)
-      integer(psb_ipk_), intent(out)                   :: info
-      character, intent(in), optional                :: init
-      type(psb_z_vect_type),intent(inout), optional   :: initu
+    subroutine amg_z_base_smoother_apply_vect(alpha, sm, x, beta, y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+      import :: psb_dpk_, amg_z_base_smoother_type, &
+              & psb_z_vect_type, psb_desc_type, psb_ipk_
+      implicit none 
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(amg_z_base_smoother_type), intent(inout)  :: sm
+      type(psb_z_vect_type), intent(inout)            :: x, y
+      type(psb_desc_type), intent(in)                 :: desc_data
+      character(len=1), intent(in)                    :: trans
+      integer(psb_ipk_), intent(in)                   :: sweeps
+      complex(psb_dpk_), target, intent(inout)           :: work(:)
+      type(psb_z_vect_type), intent(inout)            :: wv(:)
+      integer(psb_ipk_), intent(out)                  :: info
+      character, intent(in), optional                 :: init
+      type(psb_z_vect_type), intent(inout), optional  :: initu
     end subroutine amg_z_base_smoother_apply_vect
+  end interface
+
+  interface 
+    subroutine amg_z_base_smoother_apply_vect_mvect(alpha, sm, x, beta, y, idx_y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+      import :: psb_dpk_, amg_z_base_smoother_type, &
+              & psb_z_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_z_vect_type
+      implicit none 
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(amg_z_base_smoother_type), intent(inout)  :: sm
+      type(psb_z_vect_type), intent(inout)            :: x
+      type(psb_z_multivect_type), intent(inout)       :: y
+      integer(psb_ipk_), intent(in)                   :: idx_y
+      type(psb_desc_type), intent(in)                 :: desc_data
+      character(len=1), intent(in)                    :: trans
+      integer(psb_ipk_), intent(in)                   :: sweeps
+      complex(psb_dpk_), target, intent(inout)           :: work(:)
+      type(psb_z_vect_type), intent(inout)            :: wv(:)
+      integer(psb_ipk_), intent(out)                  :: info
+      character, intent(in), optional                 :: init
+      type(psb_z_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_z_base_smoother_apply_vect_mvect
+  end interface
+
+  interface 
+    subroutine amg_z_base_smoother_apply_mvect_vect(alpha, sm, x, idx_x, beta, y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+      import :: psb_dpk_, amg_z_base_smoother_type, &
+              & psb_z_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_z_vect_type
+      implicit none 
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(amg_z_base_smoother_type), intent(inout)  :: sm
+      type(psb_z_multivect_type), intent(inout)       :: x
+      integer(psb_ipk_), intent(in)                   :: idx_x
+      type(psb_z_vect_type), intent(inout)            :: y
+      type(psb_desc_type), intent(in)                 :: desc_data
+      character(len=1), intent(in)                    :: trans
+      integer(psb_ipk_), intent(in)                   :: sweeps
+      complex(psb_dpk_), target, intent(inout)           :: work(:)
+      type(psb_z_vect_type), intent(inout)            :: wv(:)
+      integer(psb_ipk_), intent(out)                  :: info
+      character, intent(in), optional                 :: init
+      type(psb_z_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_z_base_smoother_apply_mvect_vect
+  end interface
+
+  interface 
+    subroutine amg_z_base_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx_y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+      import :: psb_dpk_, amg_z_base_smoother_type, &
+              & psb_z_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_z_vect_type
+      implicit none 
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(amg_z_base_smoother_type), intent(inout)  :: sm
+      type(psb_z_multivect_type), intent(inout)       :: x, y
+      integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+      type(psb_desc_type), intent(in)                 :: desc_data
+      character(len=1), intent(in)                    :: trans
+      integer(psb_ipk_), intent(in)                   :: sweeps
+      complex(psb_dpk_), target, intent(inout)           :: work(:)
+      type(psb_z_vect_type), intent(inout)            :: wv(:)
+      integer(psb_ipk_), intent(out)                  :: info
+      character, intent(in), optional                 :: init
+      type(psb_z_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_z_base_smoother_apply_mvect_col
   end interface
   
   interface 
-    subroutine amg_z_base_smoother_check(sm,info)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
+    subroutine amg_z_base_smoother_check(sm, info)
+      import :: psb_desc_type, psb_zspmat_type, psb_z_base_sparse_mat, &
            & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_base_smoother_type, psb_ipk_
       ! Arguments
@@ -191,8 +261,8 @@ module amg_z_base_smoother_mod
   end interface
   
   interface 
-    subroutine amg_z_base_smoother_cseti(sm,what,val,info,idx)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
+    subroutine amg_z_base_smoother_cseti(sm, what, val, info, idx)
+      import :: psb_desc_type, psb_zspmat_type, psb_z_base_sparse_mat, &
            & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_base_smoother_type, psb_ipk_
       ! Arguments
@@ -205,8 +275,8 @@ module amg_z_base_smoother_mod
   end interface
   
   interface 
-    subroutine amg_z_base_smoother_csetc(sm,what,val,info,idx)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
+    subroutine amg_z_base_smoother_csetc(sm, what, val, info, idx)
+      import :: psb_desc_type, psb_zspmat_type, psb_z_base_sparse_mat, &
            & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_base_smoother_type, psb_ipk_
       class(amg_z_base_smoother_type), intent(inout) :: sm 
@@ -218,8 +288,8 @@ module amg_z_base_smoother_mod
   end interface
   
   interface 
-    subroutine amg_z_base_smoother_csetr(sm,what,val,info,idx)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
+    subroutine amg_z_base_smoother_csetr(sm, what, val, info, idx)
+      import :: psb_desc_type, psb_zspmat_type, psb_z_base_sparse_mat, &
            & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_base_smoother_type, psb_ipk_
       ! Arguments
@@ -232,8 +302,8 @@ module amg_z_base_smoother_mod
   end interface
   
   interface 
-    subroutine amg_z_base_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
+    subroutine amg_z_base_smoother_bld(a, desc_a, sm, info, amold, vmold, imold)
+      import :: psb_desc_type, psb_zspmat_type, psb_z_base_sparse_mat, &
            & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_base_smoother_type, psb_ipk_, psb_i_base_vect_type
       ! Arguments
@@ -248,7 +318,7 @@ module amg_z_base_smoother_mod
   end interface
   
   interface 
-    subroutine amg_z_base_smoother_cnv(sm,info,amold,vmold,imold)
+    subroutine amg_z_base_smoother_cnv(sm, info, amold, vmold, imold)
       import :: psb_z_base_sparse_mat, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_base_smoother_type, psb_ipk_, psb_i_base_vect_type
       ! Arguments
@@ -261,113 +331,103 @@ module amg_z_base_smoother_mod
   end interface
   
   interface 
-    subroutine amg_z_base_smoother_free(sm,info)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
+    subroutine amg_z_base_smoother_free(sm, info)
+      import :: psb_desc_type, psb_zspmat_type, psb_z_base_sparse_mat, &
            & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_base_smoother_type, psb_ipk_
       ! Arguments
       class(amg_z_base_smoother_type), intent(inout) :: sm
-      integer(psb_ipk_), intent(out)                   :: info
+      integer(psb_ipk_), intent(out)                 :: info
     end subroutine amg_z_base_smoother_free
   end interface
   
   interface 
-    subroutine amg_z_base_smoother_descr(sm,info,iout,coarse,prefix)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
+    subroutine amg_z_base_smoother_descr(sm, info, iout, coarse, prefix)
+      import :: psb_desc_type, psb_zspmat_type, psb_z_base_sparse_mat, &
            & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_base_smoother_type, psb_ipk_
       ! Arguments
       class(amg_z_base_smoother_type), intent(in) :: sm
       integer(psb_ipk_), intent(out)                :: info
-      integer(psb_ipk_), intent(in), optional       :: iout
-      logical, intent(in), optional                 :: coarse
-      character(len=*), intent(in), optional        :: prefix
+      integer(psb_ipk_), intent(in), optional :: iout
+      logical, intent(in), optional           :: coarse
+      character(len=*), intent(in), optional  :: prefix
     end subroutine amg_z_base_smoother_descr
   end interface
   
   interface 
-    subroutine amg_z_base_smoother_dmp(sm,desc,level,info,prefix,head,smoother,solver,global_num)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
-           & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
-           & amg_z_base_smoother_type, psb_ipk_
+    subroutine amg_z_base_smoother_dmp(sm, desc, level, info, prefix, head, smoother, solver, global_num)
+      import :: psb_desc_type, psb_zspmat_type, psb_z_base_sparse_mat, &
+              & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
+              & amg_z_base_smoother_type, psb_ipk_
       class(amg_z_base_smoother_type), intent(in) :: sm
       type(psb_desc_type), intent(in)               :: desc
-      integer(psb_ipk_), intent(in)              :: level
-      integer(psb_ipk_), intent(out)             :: info
-      character(len=*), intent(in), optional :: prefix, head
-      logical, optional, intent(in)    :: smoother, solver, global_num
+      integer(psb_ipk_), intent(in)               :: level
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=*), intent(in), optional  :: prefix, head
+      logical, optional, intent(in)           :: smoother, solver, global_num
     end subroutine amg_z_base_smoother_dmp
   end interface
    
   interface
-    subroutine amg_z_base_smoother_clone(sm,smout,info)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
+    subroutine amg_z_base_smoother_clone(sm, smout, info)
+      import :: psb_desc_type, psb_zspmat_type, psb_z_base_sparse_mat, &
            & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_base_smoother_type, psb_ipk_
-      Implicit None
-      
+      implicit none
       ! Arguments
       class(amg_z_base_smoother_type), intent(inout)              :: sm
       class(amg_z_base_smoother_type), allocatable, intent(inout) :: smout
-      integer(psb_ipk_), intent(out)                 :: info
+      integer(psb_ipk_), intent(out)                              :: info
     end subroutine amg_z_base_smoother_clone
   end interface
    
   interface
-    subroutine amg_z_base_smoother_clone_settings(sm,smout,info)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
+    subroutine amg_z_base_smoother_clone_settings(sm, smout, info)
+      import :: psb_desc_type, psb_zspmat_type, psb_z_base_sparse_mat, &
            & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_base_smoother_type, psb_ipk_
-      Implicit None
-      
+      implicit none
       ! Arguments
       class(amg_z_base_smoother_type), intent(inout) :: sm
       class(amg_z_base_smoother_type), intent(inout) :: smout
-      integer(psb_ipk_), intent(out)                   :: info
+      integer(psb_ipk_), intent(out)                 :: info
     end subroutine amg_z_base_smoother_clone_settings
   end interface
    
   interface
-    subroutine amg_z_base_smoother_clear_data(sm,info)
-      import :: psb_desc_type, psb_zspmat_type,  psb_z_base_sparse_mat, &
+    subroutine amg_z_base_smoother_clear_data(sm, info)
+      import :: psb_desc_type, psb_zspmat_type, psb_z_base_sparse_mat, &
            & psb_z_vect_type, psb_z_base_vect_type, psb_dpk_, &
            & amg_z_base_smoother_type, psb_ipk_
-      Implicit None
-      
+      implicit none
       ! Arguments
       class(amg_z_base_smoother_type), intent(inout) :: sm
-      integer(psb_ipk_), intent(out)                   :: info
+      integer(psb_ipk_), intent(out)                 :: info
     end subroutine amg_z_base_smoother_clear_data
   end interface
-  
 contains
   !
   ! Function returning the size of the amg_prec_type data structure
   ! in bytes or in number of nonzeros of the operator(s) involved. 
   !
-
   function z_base_smoother_get_nzeros(sm) result(val)
     implicit none 
     class(amg_z_base_smoother_type), intent(in) :: sm
     integer(psb_epk_) :: val
-    integer(psb_ipk_)             :: i
+    
     val = 0
-    if (allocated(sm%sv)) &
-         &  val =  sm%sv%get_nzeros()
+    if(allocated(sm%sv)) val = sm%sv%get_nzeros()
   end function z_base_smoother_get_nzeros
 
   function z_base_smoother_sizeof(sm) result(val)
     implicit none 
     ! Arguments
     class(amg_z_base_smoother_type), intent(in) :: sm
-    integer(psb_epk_)                    :: val
-    integer(psb_ipk_)             :: i
+    integer(psb_epk_) :: val
     
     val = 0
-    if (allocated(sm%sv)) then 
-      val = sm%sv%sizeof()
-    end if
-
+    if(allocated(sm%sv)) val = sm%sv%sizeof()
     return
   end function z_base_smoother_sizeof
 
@@ -378,36 +438,33 @@ contains
   subroutine z_base_smoother_default(sm) 
     implicit none 
     ! Arguments
-    class(amg_z_base_smoother_type), intent(inout) :: sm
+    class(amg_z_base_smoother_type), intent(inout)  :: sm
     ! Do nothing for base version
 
-    if (allocated(sm%sv)) call sm%sv%default()
-
+    if(allocated(sm%sv)) call sm%sv%default()
     return
   end subroutine z_base_smoother_default
 
   function z_base_smoother_get_wrksize(sm) result(val)
     implicit none 
-    class(amg_z_base_smoother_type), intent(inout) :: sm
-    integer(psb_ipk_)  :: val
+    class(amg_z_base_smoother_type), intent(inout)  :: sm
+    integer(psb_ipk_) :: val
 
     val = 0
-    if (allocated(sm%sv)) val = val + sm%sv%get_wrksz()
-    
+    if(allocated(sm%sv)) val = val + sm%sv%get_wrksz()
   end function z_base_smoother_get_wrksize
   
   function z_base_smoother_get_fmt() result(val)
     implicit none 
-    character(len=32)  :: val
+    character(len=32) :: val
 
     val = "Base smoother"
   end function z_base_smoother_get_fmt
 
   function z_base_smoother_get_id() result(val)
     implicit none 
-    integer(psb_ipk_)  :: val
+    integer(psb_ipk_) :: val
 
     val = amg_base_smooth_
   end function z_base_smoother_get_id
-
 end module amg_z_base_smoother_mod

@@ -62,9 +62,7 @@ subroutine amg_d_id_solver_apply_vect(alpha, sv, x, beta, y, desc_data, &
   info = psb_success_
   trans_ = psb_toupper(trans)
   select case(trans_)
-    case('N')
-    case('T')
-    case('C')
+    case('N', 'T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_,name)
       goto 9999
@@ -111,9 +109,7 @@ subroutine amg_d_id_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, desc_d
   info = psb_success_
   trans_ = psb_toupper(trans)
   select case(trans_)
-    case('N')
-    case('T')
-    case('C')
+    case('N', 'T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_,name)
       goto 9999
@@ -160,9 +156,7 @@ subroutine amg_d_id_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, desc_d
   info = psb_success_
   trans_ = psb_toupper(trans)
   select case(trans_)
-    case('N')
-    case('T')
-    case('C')
+    case('N', 'T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_,name)
       goto 9999
@@ -208,9 +202,7 @@ subroutine amg_d_id_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y, 
   info = psb_success_
   trans_ = psb_toupper(trans)
   select case(trans_)
-    case('N')
-    case('T')
-    case('C')
+    case('N', 'T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_,name)
       goto 9999

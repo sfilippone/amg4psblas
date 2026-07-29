@@ -53,7 +53,7 @@ subroutine amg_d_base_solver_apply_vect(alpha, sv, x, beta, y, &
 
   ! Local variables
   integer(psb_ipk_) :: err_act
-  character(len=20) :: name = 'd_base_solver_apply'
+  character(len=20) :: name = 'd_base_solver_apply_vect'
 
   call psb_erractionsave(err_act)
 
@@ -88,7 +88,7 @@ subroutine amg_d_base_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, &
 
   ! Local variables
   integer(psb_ipk_) :: err_act
-  character(len=20) :: name = 'd_base_solver_apply'
+  character(len=20) :: name = 'd_base_solver_apply_vect_mvect'
 
   call psb_erractionsave(err_act)
 
@@ -123,7 +123,7 @@ subroutine amg_d_base_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, &
 
   ! Local variables
   integer(psb_ipk_) :: err_act
-  character(len=20) :: name = 'd_base_solver_apply'
+  character(len=20) :: name = 'd_base_solver_apply_mvect_vect'
 
   call psb_erractionsave(err_act)
 
@@ -157,7 +157,7 @@ subroutine amg_d_base_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y
 
   ! Local variables
   integer(psb_ipk_) :: err_act
-  character(len=20) :: name = 'd_base_solver_apply'
+  character(len=20) :: name = 'd_base_solver_apply_mvect_col'
 
   call psb_erractionsave(err_act)
 

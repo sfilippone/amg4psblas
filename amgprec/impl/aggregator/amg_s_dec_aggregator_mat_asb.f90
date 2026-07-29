@@ -114,63 +114,67 @@ subroutine  amg_s_dec_aggregator_mat_asb(ag,parms,a,desc_a,&
   info  = psb_success_
   ctxt = desc_a%get_context()
   call psb_info(ctxt,me,np)
+  
+  if (me >=0) then 
+    select case(parms%coarse_mat)
 
-  select case(parms%coarse_mat)
+    case(amg_distr_mat_) 
 
-  case(amg_distr_mat_) 
+      call ac%cscnv(info,type='csr')
+      call op_prol%cscnv(info,type='csr')
+      call op_restr%cscnv(info,type='csr')
 
-    call ac%cscnv(info,type='csr')
-    call op_prol%cscnv(info,type='csr')
-    call op_restr%cscnv(info,type='csr')
+      if (debug_level >= psb_debug_outer_) &
+           & write(debug_unit,*) me,' ',trim(name),&
+           & 'Done ac '
 
-    if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),&
-         & 'Done ac '
+    case(amg_repl_mat_) 
+      !
+      ! We are assuming here that an s matrix
+      ! can hold all entries
+      !
+      if (desc_ac%get_global_rows() < huge(1_psb_ipk_) ) then 
+        ntaggr = desc_ac%get_global_rows()
+        i_nr   = ntaggr
+      else
+        info = psb_err_internal_error_
+        call psb_errpush(info,name,a_err='invalid amg_coarse_mat_')
+        goto 9999
+      end if
 
-  case(amg_repl_mat_) 
-    !
-    ! We are assuming here that an s matrix
-    ! can hold all entries
-    !
-    if (desc_ac%get_global_rows() < huge(1_psb_ipk_) ) then 
-      ntaggr = desc_ac%get_global_rows()
-      i_nr   = ntaggr
-    else
+      call op_prol%mv_to(tmpcoo)
+      nzl = tmpcoo%get_nzeros()
+      call psb_loc_to_glob(tmpcoo%ja(1:nzl),desc_ac,info,'I')
+      call tmpcoo%set_ncols(i_nr)
+      call op_prol%mv_from(tmpcoo)
+
+      call op_restr%mv_to(tmpcoo)
+      nzl = tmpcoo%get_nzeros()
+      call psb_loc_to_glob(tmpcoo%ia(1:nzl),desc_ac,info,'I')
+      call tmpcoo%set_nrows(i_nr)
+      call op_restr%mv_from(tmpcoo)
+
+
+      call psb_gather(tmp_ac,ac,desc_ac,info,root=-ione,&
+           & dupl=psb_dupl_add_,keeploc=.false.)
+      call tmp_ac%mv_to(tmpcoo)
+      call ac%mv_from(tmpcoo)
+
+      call psb_cdall(ctxt,desc_ac,info,mg=ntaggr,repl=.true.)
+      if (info == psb_success_) call psb_cdasb(desc_ac,info)
+
+      if (info /= psb_success_) goto 9999
+
+    case default 
       info = psb_err_internal_error_
       call psb_errpush(info,name,a_err='invalid amg_coarse_mat_')
       goto 9999
-    end if
-    
-    call op_prol%mv_to(tmpcoo)
-    nzl = tmpcoo%get_nzeros()
-    call psb_loc_to_glob(tmpcoo%ja(1:nzl),desc_ac,info,'I')
-    call tmpcoo%set_ncols(i_nr)
-    call op_prol%mv_from(tmpcoo)
-
-    call op_restr%mv_to(tmpcoo)
-    nzl = tmpcoo%get_nzeros()
-    call psb_loc_to_glob(tmpcoo%ia(1:nzl),desc_ac,info,'I')
-    call tmpcoo%set_nrows(i_nr)
-    call op_restr%mv_from(tmpcoo)
-
-
-    call psb_gather(tmp_ac,ac,desc_ac,info,root=-ione,&
-         & dupl=psb_dupl_add_,keeploc=.false.)
-    call tmp_ac%mv_to(tmpcoo)
-    call ac%mv_from(tmpcoo)
-    
-    call psb_cdall(ctxt,desc_ac,info,mg=ntaggr,repl=.true.)
-    if (info == psb_success_) call psb_cdasb(desc_ac,info)
-
-    if (info /= psb_success_) goto 9999
-
-  case default 
-    info = psb_err_internal_error_
-    call psb_errpush(info,name,a_err='invalid amg_coarse_mat_')
-    goto 9999
-  end select
-
-
+    end select
+  else
+    call op_prol%allocate(izero,izero,info)
+    call op_restr%allocate(izero,izero,info)
+    call ac%allocate(izero,izero,info)
+  end if
   call psb_erractionrestore(err_act)
   return
 

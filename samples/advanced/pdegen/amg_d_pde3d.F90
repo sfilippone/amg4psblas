@@ -79,7 +79,6 @@ program amg_d_pde3d
 #if defined(PSB_OPENMP)
   use omp_lib
 #endif
-
   implicit none
   ! input parameters
   character(len=20) :: kmethd, ptype
@@ -139,11 +138,11 @@ program amg_d_pde3d
     integer(psb_ipk_) :: aggr_size    ! Requested size of the aggregates for MATCHBOXP
     character(len=32) :: aggr_ord     ! ordering for aggregation: NATURAL, DEGREE
     character(len=32) :: aggr_filter  ! filtering: FILTER, NO_FILTER
-    integer(psb_ipk_) :: csizepp      ! minimum size of coarsest matrix per process
     real(psb_dpk_)    :: mncrratio    ! minimum aggregation ratio
+    real(psb_dpk_), allocatable :: athresv(:)   ! smoothed aggregation threshold vector
     integer(psb_ipk_)           :: thrvsz       ! size of threshold vector
     real(psb_dpk_)              :: athres       ! smoothed aggregation threshold
-    real(psb_dpk_), allocatable :: athresv(:)   ! smoothed aggregation threshold vector
+    integer(psb_ipk_) :: csizepp      ! minimum size of coarsest matrix per process
 
     ! AMG smoother or pre-smoother; also 1-lev preconditioner
     character(len=32) :: smther       ! (pre-)smoother type: BJAC, AS
@@ -528,7 +527,7 @@ program amg_d_pde3d
                         & itmax = s_choice%itmax, iter = iter, err = err, &
                         & itrace = s_choice%itrace, istop = s_choice%istopc)
 
-    case('BICGSTAB', 'BICGSTABL', 'BICG', 'CG', 'CGS', 'FCG', 'GCR', 'RGMRES', 'SSTEPCG')
+    case('BICGSTAB', 'BICGSTABL', 'BICG', 'CG', 'CGS', 'FCG', 'GCR', 'RGMRES', 'SSTEPCG', 'SSTEPCG1')
       call psb_krylov(s_choice%kmethd, a, prec, b, x, s_choice%eps, desc_a, info, &
                         & itmax = s_choice%itmax, iter = iter, err = err, &
                         & itrace = s_choice%itrace, istop = s_choice%istopc, &
@@ -587,7 +586,8 @@ program amg_d_pde3d
     write(psb_out_unit, '("Problem setup time                  : ", es12.5)') tpgen
     
     write(psb_out_unit, '("Krylov method                       : ", a)')      trim(s_choice%kmethd)
-    if((psb_toupper(trim(s_choice%kmethd)) == 'SSTEPCG')) then
+    if((psb_toupper(trim(s_choice%kmethd)) == 'SSTEPCG') .or. &
+      & (psb_toupper(trim(s_choice%kmethd)) == 'SSTEPCG1')) then
       write(psb_out_unit, '("step size s                         : ", i2)')   s_choice%steps
     end if
 
@@ -669,7 +669,7 @@ contains
       inp_unit = 30
       open(inp_unit, file = filename, action = 'read', iostat = info)
 
-      if (info /= 0) then
+      if (info /= psb_success_) then
         write(psb_err_unit, *) 'Could not open file ', filename, ' for input'
         call psb_abort(ctxt)
         stop
@@ -784,9 +784,7 @@ contains
       call read_data(prec%dump_solver, inp_unit)    ! Dump SOLVER
       call read_data(prec%dump_global_num, inp_unit)! Global numering ? 
 
-      if (inp_unit /= psb_inp_unit) then
-        close(inp_unit)
-      end if
+      if (inp_unit /= psb_inp_unit) close(inp_unit)
     end if
 
     call psb_bcast(ctxt, afmt)

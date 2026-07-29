@@ -69,16 +69,12 @@ subroutine amg_d_jac_solver_apply_vect(alpha, sv, x, beta, y, &
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(init)) then
-    init_ = psb_toupper(init)
-  else
-    init_ = 'Z'
-  end if
+  init_ = 'Z'
+  if(present(init)) init_ = psb_toupper(init)
 
   trans_ = psb_toupper(trans)
   select case(trans_)
-    case('N')
-    case('T', 'C')
+    case('N', 'T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_, name)
       goto 9999
@@ -87,11 +83,11 @@ subroutine amg_d_jac_solver_apply_vect(alpha, sv, x, beta, y, &
   n_row = desc_data%get_local_rows()
   n_col = desc_data%get_local_cols()
   sweeps = sv%sweeps
-  if (4*n_col <= size(work)) then
+  if(4*n_col <= size(work)) then
     aux => work(:)
   else
     allocate(aux(4*n_col), stat = info)
-    if (info /= psb_success_) then
+    if(info /= psb_success_) then
       info = psb_err_alloc_request_
       call psb_errpush(info, name, &
            & i_err = (/4*n_col, izero, izero, izero, izero/), &
@@ -100,73 +96,70 @@ subroutine amg_d_jac_solver_apply_vect(alpha, sv, x, beta, y, &
     end if
   endif
 
-  if (sweeps >= 0) then
-      !
-      ! This means we are dealing with a pure Jacobi smoother/solver.
-      !
-      associate(tx => wv(1), ty => wv(2))
-        select case (init_)
-          case('Z')
-            call ty%mlt(done, sv%dv, x, dzero, info, conjgx = trans_)
-
-          case('Y')
-            call psb_geaxpby(done, x, dzero, tx, desc_data, info)
-            call psb_geaxpby(done, y, dzero, ty, desc_data, info)
-            call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
-                            & work = aux, trans = trans_, doswap = .false.)
-            call ty%mlt(done, sv%dv, tx, dzero, info, conjgx = trans_)
-
-          case('U')
-            if (.not.present(initu)) then
-              call psb_errpush(psb_err_internal_error_, name, &
-                  & a_err = 'missing initu to smoother_apply')
-              goto 9999
-            end if
-            call psb_geaxpby(done, x, dzero, tx, desc_data, info)
-            call psb_geaxpby(done, initu, dzero, ty, desc_data, info)
-            call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
-                & work = aux, trans = trans_, doswap = .false.)
-            call ty%mlt(done, sv%dv, tx, dzero, info, conjgx = trans_)
-
-          case default
-            call psb_errpush(psb_err_internal_error_, name, &
-                & a_err = 'wrong init to smoother_apply')
-            goto 9999
-        end select
-
-        do i = 1, sweeps-1
-          !
-          ! Compute Y(j+1) = Y(j) + D^(-1)*(X - A*Y(j)),
-          !   where D is the diagonal and A the matrix.
-          !
-          call psb_geaxpby(done, x, dzero, tx, desc_data, info)
-          call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
-               & work = aux, trans = trans_, doswap = .false.)
-          if (info /= psb_success_) exit
-
-          call ty%mlt(done, sv%dv, tx, done, info, conjgx = trans_)
-          if (info /= psb_success_) exit
-        end do
-
-        if (info == psb_success_) call psb_geaxpby(alpha, ty, beta, y, desc_data, info)
-
-        if (info /= psb_success_) then
-          info = psb_err_internal_error_
-          call psb_errpush(info, name, &
-               & a_err = 'subsolve with Jacobi sweeps > 1')
-          goto 9999
-        end if
-      end associate
-  else
+  if(sweeps < 0) then
     info = psb_err_iarg_neg_
     call psb_errpush(info, name, &
           & i_err = (/itwo, sweeps, izero, izero, izero/))
     goto 9999
   end if
+  !
+  ! This means we are dealing with a pure Jacobi smoother/solver.
+  !
+  associate(tx => wv(1), ty => wv(2))
+    select case (init_)
+      case('Z')
+        call ty%mlt(done, sv%dv, x, dzero, info, conjgx = trans_)
 
-  if (.not.(4*n_col <= size(work))) then
-    deallocate(aux)
-  endif
+      case('Y')
+        call psb_geaxpby(done, x, dzero, tx, desc_data, info)
+        call psb_geaxpby(done, y, dzero, ty, desc_data, info)
+        call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
+                    & work = aux, trans = trans_, doswap = .false.)
+        call ty%mlt(done, sv%dv, tx, dzero, info, conjgx = trans_)
+
+      case('U')
+        if(.not. present(initu)) then
+          call psb_errpush(psb_err_internal_error_, name, &
+              & a_err = 'missing initu to smoother_apply')
+          goto 9999
+        end if
+        call psb_geaxpby(done, x, dzero, tx, desc_data, info)
+        call psb_geaxpby(done, initu, dzero, ty, desc_data, info)
+        call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
+                    & work = aux, trans = trans_, doswap = .false.)
+        call ty%mlt(done, sv%dv, tx, dzero, info, conjgx = trans_)
+
+      case default
+        call psb_errpush(psb_err_internal_error_, name, &
+            & a_err = 'wrong init to smoother_apply')
+        goto 9999
+    end select
+
+    do i = 1, sweeps-1
+      !
+      ! Compute Y(j+1) = Y(j) + D^(-1)*(X - A*Y(j)),
+      !   where D is the diagonal and A the matrix.
+      !
+      call psb_geaxpby(done, x, dzero, tx, desc_data, info)
+      call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
+                  & work = aux, trans = trans_, doswap = .false.)
+      if(info /= psb_success_) exit
+
+      call ty%mlt(done, sv%dv, tx, done, info, conjgx = trans_)
+      if(info /= psb_success_) exit
+    end do
+
+    if(info == psb_success_) call psb_geaxpby(alpha, ty, beta, y, desc_data, info)
+
+    if(info /= psb_success_) then
+      info = psb_err_internal_error_
+      call psb_errpush(info, name, &
+            & a_err = 'subsolve with Jacobi sweeps > 1')
+      goto 9999
+    end if
+  end associate
+
+  if(4*n_col > size(work)) deallocate(aux)
 
   call psb_erractionrestore(err_act)
   return
@@ -211,16 +204,12 @@ subroutine amg_d_jac_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, &
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(init)) then
-    init_ = psb_toupper(init)
-  else
-    init_ = 'Z'
-  end if
+  init_ = 'Z'
+  if(present(init)) init_ = psb_toupper(init)
 
   trans_ = psb_toupper(trans)
   select case(trans_)
-    case('N')
-    case('T', 'C')
+    case('N', 'T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_, name)
       goto 9999
@@ -229,11 +218,11 @@ subroutine amg_d_jac_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, &
   n_row = desc_data%get_local_rows()
   n_col = desc_data%get_local_cols()
   sweeps = sv%sweeps
-  if (4*n_col <= size(work)) then
+  if(4*n_col <= size(work)) then
     aux => work(:)
   else
     allocate(aux(4*n_col), stat = info)
-    if (info /= psb_success_) then
+    if(info /= psb_success_) then
       info = psb_err_alloc_request_
       call psb_errpush(info, name, &
            & i_err = (/4*n_col, izero, izero, izero, izero/), &
@@ -245,13 +234,12 @@ subroutine amg_d_jac_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, &
   !
   ! Check we are dealing with a pure Jacobi smoother/solver.
   !
-  if (sweeps < 0) then
+  if(sweeps < 0) then
     info = psb_err_iarg_neg_
     call psb_errpush(info, name, &
           & i_err = (/itwo, sweeps, izero, izero, izero/))
     goto 9999
   end if
-
   
   associate(tx => wv(1), ty => wv(2))
     select case (init_)
@@ -262,11 +250,11 @@ subroutine amg_d_jac_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, &
         call psb_geaxpby(done, x, dzero, tx, desc_data, info)
         call psb_geaxpby(done, y, idx_y, dzero, ty, desc_data, info)
         call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
-                        & work = aux, trans = trans_, doswap = .false.)
+                    & work = aux, trans = trans_, doswap = .false.)
         call ty%mlt(done, sv%dv, tx, dzero, info, conjgx = trans_)
 
       case('U')
-        if (.not.present(initu)) then
+        if(.not. present(initu)) then
           call psb_errpush(psb_err_internal_error_, name, &
                 & a_err = 'missing initu to smoother_apply')
           goto 9999
@@ -274,7 +262,7 @@ subroutine amg_d_jac_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, &
         call psb_geaxpby(done, x, dzero, tx, desc_data, info)
         call psb_geaxpby(done, initu, dzero, ty, desc_data, info)
         call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
-                        & work = aux, trans = trans_, doswap = .false.)
+                    & work = aux, trans = trans_, doswap = .false.)
         call ty%mlt(done, sv%dv, tx, dzero, info, conjgx = trans_)
 
       case default
@@ -290,16 +278,16 @@ subroutine amg_d_jac_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, &
       !
       call psb_geaxpby(done, x, dzero, tx, desc_data, info)
       call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
-                      & work = aux, trans = trans_, doswap = .false.)
-      if (info /= psb_success_) exit
+                  & work = aux, trans = trans_, doswap = .false.)
+      if(info /= psb_success_) exit
 
       call ty%mlt(done, sv%dv, tx, done, info, conjgx = trans_)
-      if (info /= psb_success_) exit
+      if(info /= psb_success_) exit
     end do
 
-    if (info == psb_success_) call psb_geaxpby(alpha, ty, beta, y, idx_y, desc_data, info)
+    if(info == psb_success_) call psb_geaxpby(alpha, ty, beta, y, idx_y, desc_data, info)
 
-    if (info /= psb_success_) then
+    if(info /= psb_success_) then
       info = psb_err_internal_error_
       call psb_errpush(info, name, &
             & a_err = 'subsolve with Jacobi sweeps > 1')
@@ -307,9 +295,7 @@ subroutine amg_d_jac_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, &
     end if
   end associate
 
-  if (.not.(4*n_col <= size(work))) then
-    deallocate(aux)
-  endif
+  if(4*n_col > size(work)) deallocate(aux)
 
   call psb_erractionrestore(err_act)
   return
@@ -354,16 +340,12 @@ subroutine amg_d_jac_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, &
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(init)) then
-    init_ = psb_toupper(init)
-  else
-    init_ = 'Z'
-  end if
+  init_ = 'Z'
+  if(present(init)) init_ = psb_toupper(init)
 
   trans_ = psb_toupper(trans)
   select case(trans_)
-    case('N')
-    case('T', 'C')
+    case('N', 'T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_, name)
       goto 9999
@@ -372,11 +354,11 @@ subroutine amg_d_jac_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, &
   n_row = desc_data%get_local_rows()
   n_col = desc_data%get_local_cols()
   sweeps = sv%sweeps
-  if (4*n_col <= size(work)) then
+  if(4*n_col <= size(work)) then
     aux => work(:)
   else
     allocate(aux(4*n_col), stat = info)
-    if (info /= psb_success_) then
+    if(info /= psb_success_) then
       info = psb_err_alloc_request_
       call psb_errpush(info, name, &
            & i_err = (/4*n_col, izero, izero, izero, izero/), &
@@ -388,14 +370,13 @@ subroutine amg_d_jac_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, &
   !
   ! Check we are dealing with a pure Jacobi smoother/solver.
   !
-  if (sweeps < 0) then
+  if(sweeps < 0) then
     info = psb_err_iarg_neg_
     call psb_errpush(info, name, &
           & i_err = (/itwo, sweeps, izero, izero, izero/))
     goto 9999
   end if
 
-  
   associate(tx => wv(1), ty => wv(2))
     select case (init_)
       case('Z')
@@ -407,11 +388,11 @@ subroutine amg_d_jac_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, &
         call psb_geaxpby(done, x, idx_x, dzero, tx, desc_data, info)
         call psb_geaxpby(done, y, dzero, ty, desc_data, info)
         call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
-                        & work = aux, trans = trans_, doswap = .false.)
+                    & work = aux, trans = trans_, doswap = .false.)
         call ty%mlt(done, sv%dv, tx, dzero, info, conjgx = trans_)
 
       case('U')
-        if (.not.present(initu)) then
+        if(.not. present(initu)) then
           call psb_errpush(psb_err_internal_error_, name, &
                 & a_err = 'missing initu to smoother_apply')
           goto 9999
@@ -419,7 +400,7 @@ subroutine amg_d_jac_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, &
         call psb_geaxpby(done, x, idx_x, dzero, tx, desc_data, info)
         call psb_geaxpby(done, initu, dzero, ty, desc_data, info)
         call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
-                        & work = aux, trans = trans_, doswap = .false.)
+                    & work = aux, trans = trans_, doswap = .false.)
         call ty%mlt(done, sv%dv, tx, dzero, info, conjgx = trans_)
 
       case default
@@ -435,16 +416,16 @@ subroutine amg_d_jac_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, &
       !
       call psb_geaxpby(done, x, idx_x, dzero, tx, desc_data, info)
       call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
-                      & work = aux, trans = trans_, doswap = .false.)
-      if (info /= psb_success_) exit
+                  & work = aux, trans = trans_, doswap = .false.)
+      if(info /= psb_success_) exit
 
       call ty%mlt(done, sv%dv, tx, done, info, conjgx = trans_)
-      if (info /= psb_success_) exit
+      if(info /= psb_success_) exit
     end do
 
-    if (info == psb_success_) call psb_geaxpby(alpha, ty, beta, y, desc_data, info)
+    if(info == psb_success_) call psb_geaxpby(alpha, ty, beta, y, desc_data, info)
 
-    if (info /= psb_success_) then
+    if(info /= psb_success_) then
       info = psb_err_internal_error_
       call psb_errpush(info, name, &
             & a_err = 'subsolve with Jacobi sweeps > 1')
@@ -452,9 +433,7 @@ subroutine amg_d_jac_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, &
     end if
   end associate
 
-  if (.not.(4*n_col <= size(work))) then
-    deallocate(aux)
-  endif
+  if(4*n_col > size(work)) deallocate(aux)
 
   call psb_erractionrestore(err_act)
   return
@@ -498,16 +477,12 @@ subroutine amg_d_jac_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y,
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(init)) then
-    init_ = psb_toupper(init)
-  else
-    init_ = 'Z'
-  end if
+  init_ = 'Z'
+  if(present(init)) init_ = psb_toupper(init)
 
   trans_ = psb_toupper(trans)
   select case(trans_)
-    case('N')
-    case('T', 'C')
+    case('N', 'T', 'C')
     case default
       call psb_errpush(psb_err_iarg_invalid_i_, name)
       goto 9999
@@ -516,11 +491,11 @@ subroutine amg_d_jac_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y,
   n_row = desc_data%get_local_rows()
   n_col = desc_data%get_local_cols()
   sweeps = sv%sweeps
-  if (4*n_col <= size(work)) then
+  if(4*n_col <= size(work)) then
     aux => work(:)
   else
     allocate(aux(4*n_col), stat = info)
-    if (info /= psb_success_) then
+    if(info /= psb_success_) then
       info = psb_err_alloc_request_
       call psb_errpush(info, name, &
            & i_err = (/4*n_col, izero, izero, izero, izero/), &
@@ -532,14 +507,13 @@ subroutine amg_d_jac_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y,
   !
   ! Check we are dealing with a pure Jacobi smoother/solver.
   !
-  if (sweeps < 0) then
+  if(sweeps < 0) then
     info = psb_err_iarg_neg_
     call psb_errpush(info, name, &
           & i_err = (/itwo, sweeps, izero, izero, izero/))
     goto 9999
   end if
 
-  
   associate(tx => wv(1), ty => wv(2))
     select case (init_)
       case('Z')
@@ -551,11 +525,11 @@ subroutine amg_d_jac_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y,
         call psb_geaxpby(done, x, idx_x, dzero, tx, desc_data, info)
         call psb_geaxpby(done, y, idx_y, dzero, ty, desc_data, info)
         call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
-                        & work = aux, trans = trans_, doswap = .false.)
+                    & work = aux, trans = trans_, doswap = .false.)
         call ty%mlt(done, sv%dv, tx, dzero, info, conjgx = trans_)
 
       case('U')
-        if (.not.present(initu)) then
+        if(.not. present(initu)) then
           call psb_errpush(psb_err_internal_error_, name, &
                 & a_err = 'missing initu to smoother_apply')
           goto 9999
@@ -563,7 +537,7 @@ subroutine amg_d_jac_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y,
         call psb_geaxpby(done, x, idx_x, dzero, tx, desc_data, info)
         call psb_geaxpby(done, initu, dzero, ty, desc_data, info)
         call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
-                        & work = aux, trans = trans_, doswap = .false.)
+                    & work = aux, trans = trans_, doswap = .false.)
         call ty%mlt(done, sv%dv, tx, dzero, info, conjgx = trans_)
 
       case default
@@ -579,16 +553,16 @@ subroutine amg_d_jac_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y,
       !
       call psb_geaxpby(done, x, idx_x, dzero, tx, desc_data, info)
       call psb_spmm(-done, sv%a, ty, done, tx, desc_data, info, &
-                      & work = aux, trans = trans_, doswap = .false.)
-      if (info /= psb_success_) exit
+                  & work = aux, trans = trans_, doswap = .false.)
+      if(info /= psb_success_) exit
 
       call ty%mlt(done, sv%dv, tx, done, info, conjgx = trans_)
-      if (info /= psb_success_) exit
+      if(info /= psb_success_) exit
     end do
 
-    if (info == psb_success_) call psb_geaxpby(alpha, ty, beta, y, idx_y, desc_data, info)
+    if(info == psb_success_) call psb_geaxpby(alpha, ty, beta, y, idx_y, desc_data, info)
 
-    if (info /= psb_success_) then
+    if(info /= psb_success_) then
       info = psb_err_internal_error_
       call psb_errpush(info, name, &
             & a_err = 'subsolve with Jacobi sweeps > 1')
@@ -596,9 +570,7 @@ subroutine amg_d_jac_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y,
     end if
   end associate
 
-  if (.not.(4*n_col <= size(work))) then
-    deallocate(aux)
-  endif
+  if(4*n_col > size(work)) deallocate(aux)
 
   call psb_erractionrestore(err_act)
   return

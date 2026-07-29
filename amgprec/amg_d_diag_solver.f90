@@ -61,10 +61,10 @@ module amg_d_diag_solver
     procedure, pass(sv) :: apply_mv_col => amg_d_diag_solver_apply_mvect_col
 
     procedure, pass(sv) :: dump   => amg_d_diag_solver_dmp
-    procedure, pass(sv) :: clone  => amg_d_diag_solver_clone
-    procedure, pass(sv) :: clear_data  => amg_d_diag_solver_clear_data
     procedure, pass(sv) :: build  => amg_d_diag_solver_bld
     procedure, pass(sv) :: cnv    => amg_d_diag_solver_cnv
+    procedure, pass(sv) :: clone  => amg_d_diag_solver_clone
+    procedure, pass(sv) :: clear_data  => amg_d_diag_solver_clear_data
     procedure, pass(sv) :: free   => d_diag_solver_free
     procedure, pass(sv) :: descr  => d_diag_solver_descr
     procedure, pass(sv) :: sizeof => d_diag_solver_sizeof
@@ -73,17 +73,17 @@ module amg_d_diag_solver
     procedure, nopass   :: get_id     => d_diag_solver_get_id
   end type amg_d_diag_solver_type
 
-  private :: d_diag_solver_free,  d_diag_solver_descr, &
-       & d_diag_solver_sizeof, d_diag_solver_get_nzeros, &
-       & d_diag_solver_get_fmt, d_diag_solver_get_id
+  private :: d_diag_solver_free, d_diag_solver_descr, &
+            & d_diag_solver_sizeof, d_diag_solver_get_nzeros, &
+            & d_diag_solver_get_fmt, d_diag_solver_get_id
 
   interface 
     subroutine amg_d_diag_solver_apply(alpha, sv, x, beta, y, &
-         & desc_data, trans, work, info, init, initu)
+                  & desc_data, trans, work, info, init, initu)
       import :: psb_dpk_, amg_d_diag_solver_type, &
               & psb_desc_type, psb_ipk_
       implicit none
-      real(psb_dpk_),intent(in)                     :: alpha, beta
+      real(psb_dpk_), intent(in)                     :: alpha, beta
       class(amg_d_diag_solver_type), intent(inout)  :: sv
       real(psb_dpk_), intent(inout)                 :: x(:), y(:)
       type(psb_desc_type), intent(in)               :: desc_data
@@ -97,15 +97,15 @@ module amg_d_diag_solver
   
   interface 
     subroutine amg_d_diag_solver_apply_vect(alpha, sv, x, beta, y, & 
-         & desc_data, trans, work, wv, info, init, initu)
+                  & desc_data, trans, work, wv, info, init, initu)
       import :: psb_dpk_, amg_d_diag_solver_type, &
               & psb_d_vect_type, psb_desc_type, psb_ipk_
       implicit none
-      real(psb_dpk_),intent(in)                     :: alpha, beta
+      real(psb_dpk_), intent(in)                     :: alpha, beta
       class(amg_d_diag_solver_type), intent(inout)  :: sv
       type(psb_d_vect_type), intent(inout)          :: x, y
       type(psb_desc_type), intent(in)               :: desc_data
-      character(len=1),intent(in)                   :: trans
+      character(len=1), intent(in)                   :: trans
       real(psb_dpk_), target, intent(inout)         :: work(:)
       type(psb_d_vect_type), intent(inout)          :: wv(:)
       integer(psb_ipk_), intent(out)                :: info
@@ -116,18 +116,18 @@ module amg_d_diag_solver
   
   interface 
     subroutine amg_d_diag_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, & 
-         & desc_data, trans, work, wv, info, init, initu)
+                  & desc_data, trans, work, wv, info, init, initu)
       import :: psb_dpk_, amg_d_diag_solver_type, &
               & psb_d_multivect_type, psb_ipk_, &
               & psb_desc_type, psb_d_vect_type
       implicit none
-      real(psb_dpk_),intent(in)                     :: alpha, beta
+      real(psb_dpk_), intent(in)                     :: alpha, beta
       class(amg_d_diag_solver_type), intent(inout)  :: sv
       type(psb_d_vect_type), intent(inout)          :: x
       type(psb_d_multivect_type), intent(inout)     :: y
       integer(psb_ipk_), intent(in)                 :: idx_y
       type(psb_desc_type), intent(in)               :: desc_data
-      character(len=1),intent(in)                   :: trans
+      character(len=1), intent(in)                   :: trans
       real(psb_dpk_), target, intent(inout)         :: work(:)
       type(psb_d_vect_type), intent(inout)          :: wv(:)
       integer(psb_ipk_), intent(out)                :: info
@@ -138,18 +138,18 @@ module amg_d_diag_solver
 
   interface 
     subroutine amg_d_diag_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, & 
-         & desc_data, trans, work, wv, info, init, initu)
+                  & desc_data, trans, work, wv, info, init, initu)
       import :: psb_dpk_, amg_d_diag_solver_type, &
               & psb_d_multivect_type, psb_ipk_, &
               & psb_desc_type, psb_d_vect_type
       implicit none
-      real(psb_dpk_),intent(in)                     :: alpha, beta
+      real(psb_dpk_), intent(in)                     :: alpha, beta
       class(amg_d_diag_solver_type), intent(inout)  :: sv
       type(psb_d_multivect_type), intent(inout)     :: x
       integer(psb_ipk_), intent(in)                 :: idx_x
       type(psb_d_vect_type), intent(inout)          :: y
       type(psb_desc_type), intent(in)               :: desc_data
-      character(len=1),intent(in)                   :: trans
+      character(len=1), intent(in)                   :: trans
       real(psb_dpk_), target, intent(inout)         :: work(:)
       type(psb_d_vect_type), intent(inout)          :: wv(:)
       integer(psb_ipk_), intent(out)                :: info
@@ -180,10 +180,10 @@ module amg_d_diag_solver
   end interface
 
   interface 
-    subroutine amg_d_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
-           & amg_d_diag_solver_type, psb_ipk_, psb_i_base_vect_type      
+    subroutine amg_d_diag_solver_bld(a, desc_a, sv, info, b, amold, vmold, imold)
+      import :: psb_desc_type, psb_dspmat_type, psb_d_base_sparse_mat, &
+              & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
+              & amg_d_diag_solver_type, psb_ipk_, psb_i_base_vect_type      
       type(psb_dspmat_type), intent(inout), target        :: a
       Type(psb_desc_type), Intent(inout)                    :: desc_a 
       class(amg_d_diag_solver_type), intent(inout)        :: sv
@@ -196,9 +196,9 @@ module amg_d_diag_solver
   end interface
   
   interface 
-    subroutine amg_d_diag_solver_cnv(sv,info,amold,vmold,imold)
+    subroutine amg_d_diag_solver_cnv(sv, info, amold, vmold, imold)
       import :: psb_d_base_sparse_mat, psb_d_base_vect_type, psb_dpk_, &
-           & amg_d_diag_solver_type, psb_ipk_, psb_i_base_vect_type      
+              & amg_d_diag_solver_type, psb_ipk_, psb_i_base_vect_type      
       class(amg_d_diag_solver_type), intent(inout)        :: sv
       integer(psb_ipk_), intent(out)                        :: info
       class(psb_d_base_sparse_mat), intent(in), optional  :: amold
@@ -208,10 +208,8 @@ module amg_d_diag_solver
   end interface
 
   interface 
-    subroutine amg_d_diag_solver_dmp(sv,desc,level,info,prefix,head,solver,global_num)
-      import :: psb_desc_type, amg_d_diag_solver_type, psb_d_vect_type, psb_dpk_, &
-           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type, &
-           & psb_ipk_
+    subroutine amg_d_diag_solver_dmp(sv, desc, level, info, prefix, head, solver, global_num)
+      import :: psb_desc_type, amg_d_diag_solver_type, psb_dpk_, psb_ipk_
       implicit none 
       class(amg_d_diag_solver_type), intent(in) :: sv
       type(psb_desc_type), intent(in)             :: desc
@@ -223,12 +221,9 @@ module amg_d_diag_solver
   end interface
   
   interface
-    subroutine amg_d_diag_solver_clone(sv,svout,info)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
-           & amg_d_base_solver_type, amg_d_diag_solver_type, psb_ipk_
-      Implicit None
-      
+    subroutine amg_d_diag_solver_clone(sv, svout, info)
+      import :: amg_d_base_solver_type, amg_d_diag_solver_type, psb_ipk_
+      implicit none
       ! Arguments
       class(amg_d_diag_solver_type), intent(inout)              :: sv
       class(amg_d_base_solver_type), allocatable, intent(inout) :: svout
@@ -237,25 +232,17 @@ module amg_d_diag_solver
   end interface
 
   interface
-    subroutine amg_d_diag_solver_clear_data(sv,info)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
-           & amg_d_diag_solver_type, psb_ipk_
-      Implicit None
-      
+    subroutine amg_d_diag_solver_clear_data(sv, info)
+      import :: amg_d_diag_solver_type, psb_ipk_
+      implicit none
       ! Arguments
       class(amg_d_diag_solver_type), intent(inout) :: sv
       integer(psb_ipk_), intent(out)                 :: info
     end subroutine amg_d_diag_solver_clear_data
   end interface
-  
-  
 contains
-
-  subroutine d_diag_solver_free(sv,info)
-
-    Implicit None
-
+  subroutine d_diag_solver_free(sv, info)
+    implicit none
     ! Arguments
     class(amg_d_diag_solver_type), intent(inout) :: sv
     integer(psb_ipk_), intent(out)                 :: info
@@ -265,13 +252,13 @@ contains
     call psb_erractionsave(err_act)
     info = psb_success_
 
-    if (allocated(sv%dv)) call sv%dv%free(info)
+    if(allocated(sv%dv)) call sv%dv%free(info)
     
-    if (allocated(sv%d)) then 
-      deallocate(sv%d,stat=info)
-      if (info /= psb_success_) then 
+    if(allocated(sv%d)) then 
+      deallocate(sv%d, stat=info)
+      if(info /= psb_success_) then 
         info = psb_err_alloc_dealloc_
-        call psb_errpush(info,name)
+        call psb_errpush(info, name)
         goto 9999 
       end if
     end if
@@ -279,15 +266,12 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine d_diag_solver_free
 
-  subroutine d_diag_solver_descr(sv,info,iout,coarse,prefix)
-
-    Implicit None
-
+  subroutine d_diag_solver_descr(sv, info, iout, coarse, prefix)
+    implicit none
     ! Arguments
     class(amg_d_diag_solver_type), intent(in) :: sv
     integer(psb_ipk_), intent(out)              :: info
@@ -302,21 +286,16 @@ contains
     character(1024)    :: prefix_
 
     info = psb_success_
-    if (present(iout)) then 
-      iout_ = iout 
-    else
-      iout_ = psb_out_unit
-    endif
-    if (present(prefix)) then
-      prefix_ = prefix
-    else
-      prefix_ = ""
-    end if
 
-    write(iout_,*) trim(prefix_), '  Diagonal local solver '
+    iout_ = psb_out_unit
+    if(present(iout)) iout_ = iout 
 
+    
+    prefix_ = ""
+    if(present(prefix)) prefix_ = prefix
+
+    write(iout_, *) trim(prefix_), '  Diagonal local solver '
     return
-
   end subroutine d_diag_solver_descr
 
   function d_diag_solver_sizeof(sv) result(val)
@@ -324,11 +303,9 @@ contains
     ! Arguments
     class(amg_d_diag_solver_type), intent(in) :: sv
     integer(psb_epk_) :: val
-    integer(psb_ipk_)             :: i
 
     val = 0
-    if (allocated(sv%dv)) val = val + sv%dv%sizeof()
-
+    if(allocated(sv%dv)) val = val + sv%dv%sizeof()
     return
   end function d_diag_solver_sizeof
 
@@ -337,11 +314,9 @@ contains
     ! Arguments
     class(amg_d_diag_solver_type), intent(in) :: sv
     integer(psb_epk_) :: val
-    integer(psb_ipk_)             :: i
 
     val = 0
-    if (allocated(sv%dv)) val = val +  sv%dv%get_nrows()
-
+    if(allocated(sv%dv)) val = val +  sv%dv%get_nrows()
     return
   end function d_diag_solver_get_nzeros
 
@@ -358,7 +333,6 @@ contains
 
     val = amg_diag_scale_
   end function d_diag_solver_get_id
-
 end module amg_d_diag_solver
 
 !
@@ -375,25 +349,22 @@ end module amg_d_diag_solver
 !
 
 module amg_d_l1_diag_solver
-
   use amg_d_diag_solver
 
   type, extends(amg_d_diag_solver_type) :: amg_d_l1_diag_solver_type
   contains
-    procedure, pass(sv) :: dump    => amg_d_l1_diag_solver_dmp
-    procedure, pass(sv) :: build   => amg_d_l1_diag_solver_bld
-    procedure, pass(sv) :: descr   => d_l1_diag_solver_descr
-    procedure, nopass   :: get_fmt   => d_l1_diag_solver_get_fmt
-    procedure, nopass   :: get_id    => d_l1_diag_solver_get_id
+    procedure, pass(sv) :: dump     => amg_d_l1_diag_solver_dmp
+    procedure, pass(sv) :: build    => amg_d_l1_diag_solver_bld
+    procedure, pass(sv) :: descr    => d_l1_diag_solver_descr
+    procedure, nopass   :: get_fmt  => d_l1_diag_solver_get_fmt
+    procedure, nopass   :: get_id   => d_l1_diag_solver_get_id
   end type amg_d_l1_diag_solver_type
 
-
-  private :: d_l1_diag_solver_descr, &
-       & d_l1_diag_solver_get_fmt, d_l1_diag_solver_get_id
+  private :: d_l1_diag_solver_descr, d_l1_diag_solver_get_fmt, d_l1_diag_solver_get_id
 
   interface 
-    subroutine amg_d_l1_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+    subroutine amg_d_l1_diag_solver_bld(a, desc_a, sv, info, b, amold, vmold, imold)
+      import :: psb_desc_type, psb_dspmat_type, psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
            & amg_d_l1_diag_solver_type, psb_ipk_, psb_i_base_vect_type      
       type(psb_dspmat_type), intent(inout), target        :: a
@@ -408,10 +379,8 @@ module amg_d_l1_diag_solver
   end interface
   
   interface 
-    subroutine amg_d_l1_diag_solver_dmp(sv,desc,level,info,prefix,head,solver,global_num)
-      import :: psb_desc_type, amg_d_l1_diag_solver_type, psb_d_vect_type, psb_dpk_, &
-           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type, &
-           & psb_ipk_
+    subroutine amg_d_l1_diag_solver_dmp(sv, desc, level, info, prefix, head, solver, global_num)
+      import :: psb_desc_type, amg_d_l1_diag_solver_type, psb_ipk_
       implicit none 
       class(amg_d_l1_diag_solver_type), intent(in) :: sv
       type(psb_desc_type), intent(in)             :: desc
@@ -421,13 +390,9 @@ module amg_d_l1_diag_solver
       logical, optional, intent(in)              :: solver, global_num
     end subroutine amg_d_l1_diag_solver_dmp
   end interface
-  
 contains
-
-  subroutine d_l1_diag_solver_descr(sv,info,iout,coarse,prefix)
-
-    Implicit None
-
+  subroutine d_l1_diag_solver_descr(sv, info, iout, coarse, prefix)
+    implicit none
     ! Arguments
     class(amg_d_l1_diag_solver_type), intent(in) :: sv
     integer(psb_ipk_), intent(out)              :: info
@@ -442,21 +407,15 @@ contains
     character(1024)    :: prefix_
 
     info = psb_success_
-    if (present(iout)) then 
-      iout_ = iout 
-    else
-      iout_ = psb_out_unit
-    endif
-    if (present(prefix)) then
-      prefix_ = prefix
-    else
-      prefix_ = ""
-    end if
+    
+    iout_ = psb_out_unit
+    if(present(iout)) iout_ = iout 
 
-    write(iout_,*) trim(prefix_), '  L1 Diagonal solver '
+    prefix_ = ""
+    if(present(prefix)) prefix_ = prefix
 
+    write(iout_, *) trim(prefix_), ' L1 Diagonal solver '
     return
-
   end subroutine d_l1_diag_solver_descr
 
   function d_l1_diag_solver_get_fmt() result(val)
@@ -472,6 +431,4 @@ contains
 
     val = amg_l1_diag_scale_
   end function d_l1_diag_solver_get_id
-
 end module amg_d_l1_diag_solver
-

@@ -42,12 +42,12 @@
 !
 !  This module defines:
 !    the amg_d_poly_smoother_type data structure containing the
-!    smoother for a polyobi/block polyobi smoother.
+!    smoother for a poly/block poly smoother.
 !  The smoother stores in ND the block off-diagonal matrix.
 !  One special case is treated separately, when the solver is DIAG or L1-DIAG
 !  then the ND is the entire off-diagonal part of the matrix (including the
 !  main diagonal block), so that it becomes possible to implement
-!  a pure polyobi or L1-polyobi global solver.
+!  a pure poly or L1-poly global solver.
 !
 module amg_d_poly_smoother
   use amg_d_base_smoother_mod
@@ -92,9 +92,9 @@ module amg_d_poly_smoother
   end type amg_d_poly_smoother_type
 
   private :: d_poly_smoother_free, &
-       & d_poly_smoother_sizeof,  d_poly_smoother_get_nzeros, &
-       & d_poly_smoother_get_fmt, d_poly_smoother_get_id, &
-       & d_poly_smoother_get_wrksize
+            & d_poly_smoother_sizeof,  d_poly_smoother_get_nzeros, &
+            & d_poly_smoother_get_fmt, d_poly_smoother_get_id, &
+            & d_poly_smoother_get_wrksize
 
   ! interface
   !   subroutine amg_d_poly_smoother_apply(alpha, sm, x, beta, y, &
@@ -325,9 +325,7 @@ module amg_d_poly_smoother
       integer(psb_ipk_), intent(in), optional        :: idx
     end subroutine amg_d_poly_smoother_csetr
   end interface
-
 contains
-
   subroutine d_poly_smoother_free(sm,info)
     implicit none
     ! Arguments
@@ -339,16 +337,16 @@ contains
     call psb_erractionsave(err_act)
     info = psb_success_
 
-    if (allocated(sm%sv)) then
+    if(allocated(sm%sv)) then
       call sm%sv%free(info)
-      if (info == psb_success_) deallocate(sm%sv,stat=info)
-      if (info /= psb_success_) then
+      if(info == psb_success_) deallocate(sm%sv,stat=info)
+      if(info /= psb_success_) then
         info = psb_err_alloc_dealloc_
         call psb_errpush(info,name)
         goto 9999
       end if
     end if
-    if (allocated(sm%poly_beta))  deallocate(sm%poly_beta)
+    if(allocated(sm%poly_beta))  deallocate(sm%poly_beta)
     sm%pa => null()
 
     call psb_erractionrestore(err_act)
@@ -359,23 +357,19 @@ contains
   end subroutine d_poly_smoother_free
 
   function d_poly_smoother_sizeof(sm) result(val)
-
     implicit none
     ! Arguments
     class(amg_d_poly_smoother_type), intent(in) :: sm
     integer(psb_epk_) :: val
 
     val = psb_sizeof_dp
-    if (allocated(sm%sv)) val = val + sm%sv%sizeof()
-    if (allocated(sm%poly_beta)) val = val + psb_sizeof_dp * size(sm%poly_beta)
-
+    if(allocated(sm%sv)) val = val + sm%sv%sizeof()
+    if(allocated(sm%poly_beta)) val = val + psb_sizeof_dp * size(sm%poly_beta)
     return
   end function d_poly_smoother_sizeof
 
   subroutine d_poly_smoother_default(sm)
-
     implicit none
-
     ! Arguments
     class(amg_d_poly_smoother_type), intent(inout) :: sm
 
@@ -387,24 +381,19 @@ contains
     sm%variant      = amg_cheb_4_
     sm%rho_estimate = amg_poly_rho_est_power_
     sm%rho_estimate_iterations = 20
-    if (allocated(sm%sv)) then
-      call sm%sv%default()
-    end if
 
+    if(allocated(sm%sv)) call sm%sv%default()
     return
   end subroutine d_poly_smoother_default
 
   function d_poly_smoother_get_nzeros(sm) result(val)
-
     implicit none
     ! Arguments
     class(amg_d_poly_smoother_type), intent(in) :: sm
     integer(psb_epk_) :: val
-    integer(psb_ipk_)        :: i
 
     val = 0
-    if (allocated(sm%sv)) val = val + sm%sv%get_nzeros()
-
+    if(allocated(sm%sv)) val = val + sm%sv%get_nzeros()
     return
   end function d_poly_smoother_get_nzeros
 
@@ -414,8 +403,7 @@ contains
     integer(psb_ipk_)  :: val
 
     val = 4
-    if (allocated(sm%sv)) val = val + sm%sv%get_wrksz()
-
+    if(allocated(sm%sv)) val = val + sm%sv%get_wrksz()
   end function d_poly_smoother_get_wrksize
 
   function d_poly_smoother_get_fmt() result(val)

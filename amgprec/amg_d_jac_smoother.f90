@@ -50,7 +50,6 @@
 !  a pure Jacobi or L1-Jacobi global solver.
 !
 module amg_d_jac_smoother
-
   use amg_d_base_smoother_mod
 
   type, extends(amg_d_base_smoother_type) :: amg_d_jac_smoother_type
@@ -103,19 +102,19 @@ module amg_d_jac_smoother
   end type amg_d_l1_jac_smoother_type
 
   private :: d_jac_smoother_free, &
-       & d_jac_smoother_sizeof,  d_jac_smoother_get_nzeros, &
-       & d_jac_smoother_get_fmt, d_jac_smoother_get_id, &
-       & d_jac_smoother_get_wrksize
+            & d_jac_smoother_sizeof, d_jac_smoother_get_nzeros, &
+            & d_jac_smoother_get_fmt, d_jac_smoother_get_id, &
+            & d_jac_smoother_get_wrksize
+
   private :: d_l1_jac_smoother_get_fmt, d_l1_jac_smoother_get_id
 
   interface
     subroutine amg_d_jac_smoother_apply(alpha, sm, x, beta, y, desc_data, trans, &
          & sweeps, work, info, init, initu)
-      import :: psb_desc_type, amg_d_jac_smoother_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_desc_type, amg_d_jac_smoother_type, psb_dpk_, psb_ipk_
       real(psb_dpk_), intent(in)                    :: alpha, beta
       class(amg_d_jac_smoother_type), intent(inout) :: sm
-      real(psb_dpk_), intent(inout)                 :: x(:),  y(:)
+      real(psb_dpk_), intent(inout)                 :: x(:), y(:)
       type(psb_desc_type), intent(in)               :: desc_data
       character(len=1), intent(in)                  :: trans
       integer(psb_ipk_), intent(in)                 :: sweeps
@@ -129,15 +128,14 @@ module amg_d_jac_smoother
   interface
     subroutine amg_d_jac_smoother_apply_vect(alpha, sm, x, beta, y, desc_data, trans, &
                   & sweeps, work, wv, info, init, initu)
-      import :: psb_desc_type, amg_d_jac_smoother_type, &
-              & psb_d_vect_type, &
+      import :: psb_desc_type, amg_d_jac_smoother_type, psb_d_vect_type, &
               & psb_dpk_, psb_ipk_
       implicit none 
       real(psb_dpk_), intent(in)                    :: alpha, beta
       class(amg_d_jac_smoother_type), intent(inout) :: sm
       type(psb_d_vect_type), intent(inout)          :: x, y
       type(psb_desc_type), intent(in)               :: desc_data
-      character(len=1),intent(in)                   :: trans
+      character(len=1), intent(in)                   :: trans
       integer(psb_ipk_), intent(in)                 :: sweeps
       real(psb_dpk_), target, intent(inout)         :: work(:)
       type(psb_d_vect_type), intent(inout)          :: wv(:)
@@ -205,7 +203,7 @@ module amg_d_jac_smoother
       type(psb_d_multivect_type), intent(inout)     :: x, y
       integer(psb_ipk_), intent(in)                 :: idx_x, idx_y
       type(psb_desc_type), intent(in)               :: desc_data
-      character(len=1),intent(in)                   :: trans
+      character(len=1), intent(in)                   :: trans
       integer(psb_ipk_), intent(in)                 :: sweeps
       real(psb_dpk_), target, intent(inout)         :: work(:)
       type(psb_d_vect_type), intent(inout)          :: wv(:)
@@ -216,9 +214,9 @@ module amg_d_jac_smoother
   end interface
 
   interface
-    subroutine amg_d_jac_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
+    subroutine amg_d_jac_smoother_bld(a, desc_a, sm, info, amold, vmold, imold)
       import :: psb_desc_type, amg_d_jac_smoother_type, psb_d_vect_type, psb_dpk_, &
-           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type,&
+           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type, &
            & psb_ipk_, psb_i_base_vect_type
       type(psb_dspmat_type), intent(inout), target        :: a
       Type(psb_desc_type), Intent(inout)                  :: desc_a
@@ -231,12 +229,12 @@ module amg_d_jac_smoother
   end interface
 
   interface
-    subroutine amg_d_jac_smoother_cnv(sm,info,amold,vmold,imold)
+    subroutine amg_d_jac_smoother_cnv(sm, info, amold, vmold, imold)
       import :: amg_d_jac_smoother_type, psb_dpk_, &
-           & psb_d_base_sparse_mat, psb_d_base_vect_type,&
+           & psb_d_base_sparse_mat, psb_d_base_vect_type, &
            & psb_ipk_, psb_i_base_vect_type
-      class(amg_d_jac_smoother_type), intent(inout)       :: sm
-      integer(psb_ipk_), intent(out)                      :: info
+      class(amg_d_jac_smoother_type), intent(inout) :: sm
+      integer(psb_ipk_), intent(out)                :: info
       class(psb_d_base_sparse_mat), intent(in), optional :: amold
       class(psb_d_base_vect_type), intent(in), optional  :: vmold
       class(psb_i_base_vect_type), intent(in), optional  :: imold
@@ -244,104 +242,99 @@ module amg_d_jac_smoother
   end interface
 
   interface
-    subroutine amg_d_jac_smoother_dmp(sm,desc,level,info,prefix,head,smoother,solver,global_num)
+    subroutine amg_d_jac_smoother_dmp(sm, desc, level, info, prefix, head, smoother, solver, global_num)
       import :: psb_dspmat_type, psb_d_vect_type, psb_d_base_vect_type, &
            & psb_dpk_, amg_d_jac_smoother_type, psb_epk_, psb_desc_type, &
            & psb_ipk_
       implicit none
-      class(amg_d_jac_smoother_type), intent(in) :: sm
-      type(psb_desc_type), intent(in)               :: desc
+      class(amg_d_jac_smoother_type), intent(in)  :: sm
+      type(psb_desc_type), intent(in)             :: desc
       integer(psb_ipk_), intent(in)               :: level
       integer(psb_ipk_), intent(out)              :: info
-      character(len=*), intent(in), optional :: prefix, head
-      logical, optional, intent(in)    :: smoother, solver, global_num
+      character(len=*), intent(in), optional  :: prefix, head
+      logical, optional, intent(in)           :: smoother, solver, global_num
     end subroutine amg_d_jac_smoother_dmp
   end interface
 
   interface
-    subroutine amg_d_jac_smoother_clone(sm,smout,info)
+    subroutine amg_d_jac_smoother_clone(sm, smout, info)
       import :: amg_d_jac_smoother_type, psb_dpk_, &
            & amg_d_base_smoother_type, psb_ipk_
       class(amg_d_jac_smoother_type), intent(inout)               :: sm
       class(amg_d_base_smoother_type), allocatable, intent(inout) :: smout
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)                              :: info
     end subroutine amg_d_jac_smoother_clone
   end interface
 
   interface
-    subroutine amg_d_jac_smoother_clone_settings(sm,smout,info)
+    subroutine amg_d_jac_smoother_clone_settings(sm, smout, info)
       import :: amg_d_jac_smoother_type, psb_dpk_, &
            & amg_d_base_smoother_type, psb_ipk_
-      class(amg_d_jac_smoother_type), intent(inout)  :: sm
-      class(amg_d_base_smoother_type), intent(inout) :: smout
-      integer(psb_ipk_), intent(out)                :: info
+      class(amg_d_jac_smoother_type), intent(inout)   :: sm
+      class(amg_d_base_smoother_type), intent(inout)  :: smout
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine amg_d_jac_smoother_clone_settings
   end interface
 
   interface
-    subroutine amg_d_jac_smoother_clear_data(sm,info)
-      import :: amg_d_jac_smoother_type, psb_dpk_, &
-           & amg_d_base_smoother_type, psb_ipk_
-      class(amg_d_jac_smoother_type), intent(inout)               :: sm
+    subroutine amg_d_jac_smoother_clear_data(sm, info)
+      import :: amg_d_jac_smoother_type, psb_dpk_, psb_ipk_
+      class(amg_d_jac_smoother_type), intent(inout) :: sm
       integer(psb_ipk_), intent(out)                :: info
     end subroutine amg_d_jac_smoother_clear_data
   end interface
 
   interface
-    subroutine amg_d_jac_smoother_descr(sm,info,iout,coarse,prefix)
+    subroutine amg_d_jac_smoother_descr(sm, info, iout, coarse, prefix)
       import :: amg_d_jac_smoother_type, psb_ipk_
       class(amg_d_jac_smoother_type), intent(in) :: sm
       integer(psb_ipk_), intent(out)               :: info
-      integer(psb_ipk_), intent(in), optional      :: iout
-      logical, intent(in), optional                :: coarse
-      character(len=*), intent(in), optional       :: prefix
+      integer(psb_ipk_), intent(in), optional :: iout
+      logical, intent(in), optional           :: coarse
+      character(len=*), intent(in), optional  :: prefix
     end subroutine amg_d_jac_smoother_descr
   end interface
 
   interface
-    subroutine amg_d_jac_smoother_cseti(sm,what,val,info,idx)
-      import :: psb_dspmat_type, psb_d_vect_type, psb_d_base_vect_type, &
-           & psb_dpk_, amg_d_jac_smoother_type, psb_epk_, psb_desc_type, psb_ipk_
+    subroutine amg_d_jac_smoother_cseti(sm, what, val, info, idx)
+      import :: psb_dpk_, amg_d_jac_smoother_type, psb_ipk_
       implicit none
       class(amg_d_jac_smoother_type), intent(inout) :: sm
-      character(len=*), intent(in)                   :: what
-      integer(psb_ipk_), intent(in)                  :: val
-      integer(psb_ipk_), intent(out)                 :: info
-      integer(psb_ipk_), intent(in), optional        :: idx
+      character(len=*), intent(in)                  :: what
+      integer(psb_ipk_), intent(in)                 :: val
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(in), optional :: idx
     end subroutine amg_d_jac_smoother_cseti
   end interface
 
   interface
-    subroutine amg_d_jac_smoother_csetc(sm,what,val,info,idx)
-      import :: psb_dspmat_type, psb_d_vect_type, psb_d_base_vect_type, &
-           & psb_dpk_, amg_d_jac_smoother_type, psb_epk_, psb_desc_type, psb_ipk_
+    subroutine amg_d_jac_smoother_csetc(sm, what, val, info, idx)
+      import :: psb_dpk_, amg_d_jac_smoother_type, psb_ipk_
       implicit none
       class(amg_d_jac_smoother_type), intent(inout) :: sm
-      character(len=*), intent(in)                   :: what
-      character(len=*), intent(in)                   :: val
-      integer(psb_ipk_), intent(out)                 :: info
-      integer(psb_ipk_), intent(in), optional        :: idx
+      character(len=*), intent(in)                  :: what
+      character(len=*), intent(in)                  :: val
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(in), optional :: idx
     end subroutine amg_d_jac_smoother_csetc
   end interface
 
   interface
-    subroutine amg_d_jac_smoother_csetr(sm,what,val,info,idx)
-      import :: psb_dspmat_type, psb_d_vect_type, psb_d_base_vect_type, &
-           & psb_dpk_, amg_d_jac_smoother_type, psb_epk_, psb_desc_type, psb_ipk_
+    subroutine amg_d_jac_smoother_csetr(sm, what, val, info, idx)
+      import :: psb_dpk_, amg_d_jac_smoother_type, psb_epk_, psb_ipk_
       implicit none
       class(amg_d_jac_smoother_type), intent(inout) :: sm
-      character(len=*), intent(in)                   :: what
-      real(psb_dpk_), intent(in)                   :: val
-      integer(psb_ipk_), intent(out)                 :: info
-      integer(psb_ipk_), intent(in), optional        :: idx
+      character(len=*), intent(in)                  :: what
+      real(psb_dpk_), intent(in)                  :: val
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(in), optional :: idx
     end subroutine amg_d_jac_smoother_csetr
   end interface
 
-
   interface
-    subroutine amg_d_l1_jac_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
+    subroutine amg_d_l1_jac_smoother_bld(a, desc_a, sm, info, amold, vmold, imold)
       import :: psb_desc_type, amg_d_l1_jac_smoother_type, psb_d_vect_type, &
-           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type,&
+           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type, &
            & psb_ipk_, psb_i_base_vect_type
       type(psb_dspmat_type), intent(inout), target        :: a
       Type(psb_desc_type), Intent(inout)                  :: desc_a
@@ -354,70 +347,62 @@ module amg_d_jac_smoother
   end interface
 
   interface
-    subroutine amg_d_l1_jac_smoother_clone(sm,smout,info)
+    subroutine amg_d_l1_jac_smoother_clone(sm, smout, info)
       import :: amg_d_l1_jac_smoother_type, &
            & amg_d_base_smoother_type, psb_ipk_
-      class(amg_d_l1_jac_smoother_type), intent(inout)               :: sm
+      class(amg_d_l1_jac_smoother_type), intent(inout)            :: sm
       class(amg_d_base_smoother_type), allocatable, intent(inout) :: smout
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)                              :: info
     end subroutine amg_d_l1_jac_smoother_clone
   end interface
 
   interface
-    subroutine amg_d_l1_jac_smoother_clone_settings(sm,smout,info)
+    subroutine amg_d_l1_jac_smoother_clone_settings(sm, smout, info)
       import :: amg_d_l1_jac_smoother_type, &
            & amg_d_base_smoother_type, psb_ipk_
-      class(amg_d_l1_jac_smoother_type), intent(inout)               :: sm
+      class(amg_d_l1_jac_smoother_type), intent(inout)            :: sm
       class(amg_d_base_smoother_type), allocatable, intent(inout) :: smout
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)                              :: info
     end subroutine amg_d_l1_jac_smoother_clone_settings
   end interface
 
   interface
-    subroutine amg_d_l1_jac_smoother_clear_data(sm,info)
+    subroutine amg_d_l1_jac_smoother_clear_data(sm, info)
       import :: amg_d_l1_jac_smoother_type, &
            & amg_d_base_smoother_type, psb_ipk_
-      class(amg_d_l1_jac_smoother_type), intent(inout) :: sm
-      integer(psb_ipk_), intent(out)                     :: info
+      class(amg_d_l1_jac_smoother_type), intent(inout)  :: sm
+      integer(psb_ipk_), intent(out)                    :: info
     end subroutine amg_d_l1_jac_smoother_clear_data
   end interface
 
   interface
-    subroutine amg_d_l1_jac_smoother_descr(sm,info,iout,coarse,prefix)
+    subroutine amg_d_l1_jac_smoother_descr(sm, info, iout, coarse, prefix)
       import :: amg_d_l1_jac_smoother_type, psb_ipk_
       class(amg_d_l1_jac_smoother_type), intent(in) :: sm
       integer(psb_ipk_), intent(out)                  :: info
-      integer(psb_ipk_), intent(in), optional         :: iout
-      logical, intent(in), optional                   :: coarse
-      character(len=*), intent(in), optional          :: prefix
+      integer(psb_ipk_), intent(in), optional :: iout
+      logical, intent(in), optional           :: coarse
+      character(len=*), intent(in), optional  :: prefix
     end subroutine amg_d_l1_jac_smoother_descr
   end interface
-
 contains
-
-
-  subroutine d_jac_smoother_free(sm,info)
-
-
-    Implicit None
-
+  subroutine d_jac_smoother_free(sm, info)
+    implicit none
     ! Arguments
     class(amg_d_jac_smoother_type), intent(inout) :: sm
     integer(psb_ipk_), intent(out)                  :: info
     integer(psb_ipk_) :: err_act
-    character(len=20)  :: name='d_jac_smoother_free'
+    character(len=20) :: name = 'd_jac_smoother_free'
 
     call psb_erractionsave(err_act)
     info = psb_success_
 
-
-
-    if (allocated(sm%sv)) then
+    if(allocated(sm%sv)) then
       call sm%sv%free(info)
-      if (info == psb_success_) deallocate(sm%sv,stat=info)
-      if (info /= psb_success_) then
+      if(info == psb_success_) deallocate(sm%sv, stat = info)
+      if(info /= psb_success_) then
         info = psb_err_alloc_dealloc_
-        call psb_errpush(info,name)
+        call psb_errpush(info, name)
         goto 9999
       end if
     end if
@@ -427,29 +412,24 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
   end subroutine d_jac_smoother_free
 
   function d_jac_smoother_sizeof(sm) result(val)
-
     implicit none
     ! Arguments
     class(amg_d_jac_smoother_type), intent(in) :: sm
     integer(psb_epk_) :: val
-    integer(psb_ipk_)        :: i
 
     val = psb_sizeof_lp
-    if (allocated(sm%sv)) val = val + sm%sv%sizeof()
+    if(allocated(sm%sv)) val = val + sm%sv%sizeof()
     val = val + sm%nd%sizeof()
-
     return
   end function d_jac_smoother_sizeof
 
   subroutine d_jac_smoother_default(sm)
-
-    Implicit None
-
+    implicit none
     ! Arguments
     class(amg_d_jac_smoother_type), intent(inout) :: sm
 
@@ -462,15 +442,11 @@ contains
     sm%printiter = -1
     sm%tol = 0
 
-    if (allocated(sm%sv)) then
-      call sm%sv%default()
-    end if
-
+    if(allocated(sm%sv))  call sm%sv%default()
     return
   end subroutine d_jac_smoother_default
 
   function d_jac_smoother_get_nzeros(sm) result(val)
-
     implicit none
     ! Arguments
     class(amg_d_jac_smoother_type), intent(in) :: sm
@@ -478,9 +454,8 @@ contains
     integer(psb_ipk_)        :: i
 
     val = 0
-    if (allocated(sm%sv)) val = val + sm%sv%get_nzeros()
+    if(allocated(sm%sv)) val = val + sm%sv%get_nzeros()
     val = val + sm%nd%get_nzeros()
-
     return
   end function d_jac_smoother_get_nzeros
 
@@ -490,8 +465,7 @@ contains
     integer(psb_ipk_)  :: val
 
     val = 2
-    if (allocated(sm%sv)) val = val + sm%sv%get_wrksz()
-
+    if(allocated(sm%sv)) val = val + sm%sv%get_wrksz()
   end function d_jac_smoother_get_wrksize
 
   function d_jac_smoother_get_fmt() result(val)
@@ -521,5 +495,4 @@ contains
 
     val = amg_l1_jac_
   end function d_l1_jac_smoother_get_id
-
 end module amg_d_jac_smoother

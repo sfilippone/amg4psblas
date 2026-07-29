@@ -89,7 +89,7 @@ module amg_s_base_aggregator_mod
     procedure, pass(ag) :: bld_tprol   => amg_s_base_aggregator_build_tprol
     procedure, pass(ag) :: mat_bld     => amg_s_base_aggregator_mat_bld
     procedure, pass(ag) :: mat_asb     => amg_s_base_aggregator_mat_asb
-    procedure, pass(ag) :: bld_map     => amg_s_base_aggregator_bld_map
+    procedure, pass(ag) :: bld_linmap  => amg_s_base_aggregator_bld_linmap
     procedure, pass(ag) :: update_next => amg_s_base_aggregator_update_next
     procedure, pass(ag) :: clone       => amg_s_base_aggregator_clone
     procedure, pass(ag) :: free        => amg_s_base_aggregator_free
@@ -458,7 +458,7 @@ contains
   end subroutine amg_s_base_aggregator_mat_asb
 
   !
-  !> Function   bld_map
+  !> Function   bld_linmap
   !! \memberof  amg_s_base_aggregator_type
   !! \brief     Build linear map between hierarchy levels 
   !!
@@ -473,7 +473,7 @@ contains
   !!  \param map       The output map
   !!  \param info    Return code
   !!  
-  subroutine  amg_s_base_aggregator_bld_map(ag,desc_a,desc_ac,ilaggr,nlaggr,&
+  subroutine  amg_s_base_aggregator_bld_linmap(ag,desc_a,desc_ac,ilaggr,nlaggr,&
        & op_restr,op_prol,map,info)
     use psb_base_mod
     implicit none
@@ -484,7 +484,7 @@ contains
     type(psb_slinmap_type), intent(out)    :: map
     integer(psb_ipk_), intent(out)       :: info
     integer(psb_ipk_) :: err_act
-    character(len=20) :: name='s_base_aggregator_bld_map'
+    character(len=20) :: name='s_base_aggregator_bld_linmap'
 
     info = psb_success_
     call psb_erractionsave(err_act)
@@ -508,7 +508,6 @@ contains
 9999 call psb_error_handler(err_act)
 
     return
-  end subroutine amg_s_base_aggregator_bld_map
-
+  end subroutine amg_s_base_aggregator_bld_linmap
 
 end module amg_s_base_aggregator_mod

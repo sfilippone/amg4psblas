@@ -44,22 +44,23 @@
 !
 module amg_z_inner_mod
 
-  use psb_base_mod, only : psb_zspmat_type, psb_desc_type, psb_i_base_vect_type, &
-       & psb_dpk_, psb_z_base_sparse_mat, psb_z_base_vect_type, psb_ipk_, &
-       & psb_z_vect_type, psb_lpk_, psb_lzspmat_type
+  use psb_base_mod, only : psb_zspmat_type, psb_lzspmat_type, psb_desc_type, &
+                          & psb_lpk_, psb_dpk_, psb_ipk_, psb_z_vect_type, psb_z_multivect_type, &
+                          & psb_z_base_sparse_mat, psb_z_base_vect_type, psb_i_base_vect_type
+
   use amg_z_prec_type, only : amg_zprec_type, amg_dml_parms, &
-       & amg_z_onelev_type, amg_zmlprec_wrk_type
+                              & amg_z_onelev_type, amg_zmlprec_wrk_type
 
   interface amg_mlprec_bld
-    subroutine amg_zmlprec_bld(a,desc_a,prec,info, amold, vmold,imold)
+    subroutine amg_zmlprec_bld(a, desc_a, prec, info, amold, vmold, imold)
       import :: psb_zspmat_type, psb_desc_type, psb_i_base_vect_type, &
            & psb_dpk_, psb_z_base_sparse_mat, psb_z_base_vect_type, psb_ipk_
       import :: amg_zprec_type
       implicit none
-      type(psb_zspmat_type), intent(inout), target       :: a
-      type(psb_desc_type), intent(inout), target           :: desc_a
-      type(amg_zprec_type), intent(inout), target        :: prec
-      integer(psb_ipk_), intent(out)                       :: info
+      type(psb_zspmat_type), intent(inout), target  :: a
+      type(psb_desc_type), intent(inout), target    :: desc_a
+      type(amg_zprec_type), intent(inout), target   :: prec
+      integer(psb_ipk_), intent(out)                :: info
       class(psb_z_base_sparse_mat), intent(in), optional :: amold
       class(psb_z_base_vect_type), intent(in), optional  :: vmold
       class(psb_i_base_vect_type), intent(in), optional  :: imold
@@ -67,66 +68,100 @@ module amg_z_inner_mod
   end interface amg_mlprec_bld
 
   interface amg_mlprec_aply
-    subroutine amg_zmlprec_aply(alpha,p,x,beta,y,desc_data,trans,work,info)
+    subroutine amg_zmlprec_aply_a(alpha, p, x, beta, y, desc_data, trans, work, info)
       import :: psb_zspmat_type, psb_desc_type, psb_dpk_, psb_ipk_
       import :: amg_zprec_type
       implicit none 
-      type(psb_desc_type),intent(in)        :: desc_data
+      complex(psb_dpk_), intent(in)          :: alpha, beta
       type(amg_zprec_type), intent(inout) :: p
-      complex(psb_dpk_),intent(in)         :: alpha,beta
-      complex(psb_dpk_),intent(inout)      :: x(:)
-      complex(psb_dpk_),intent(inout)      :: y(:)
-      character,intent(in)               :: trans
-      complex(psb_dpk_),target             :: work(:)
-      integer(psb_ipk_), intent(out)     :: info
-    end subroutine amg_zmlprec_aply
-    subroutine amg_zmlprec_aply_vect(alpha,p,x,beta,y,desc_data,trans,work,info)
-      import :: psb_zspmat_type, psb_desc_type, &
-           & psb_dpk_, psb_z_vect_type, psb_ipk_
+      complex(psb_dpk_), intent(inout)       :: x(:)
+      complex(psb_dpk_), intent(inout)       :: y(:)
+      type(psb_desc_type), intent(in)     :: desc_data
+      character, intent(in)               :: trans
+      complex(psb_dpk_), target              :: work(:)
+      integer(psb_ipk_), intent(out)      :: info
+    end subroutine amg_zmlprec_aply_a
+
+    subroutine amg_zmlprec_aply_vect(alpha, p, x, beta, y, desc_data, trans, work, info)
+      import :: psb_zspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, &
+                & psb_z_vect_type, psb_z_multivect_type
       import :: amg_zprec_type
       implicit none 
-      type(psb_desc_type),intent(in)        :: desc_data
-      type(amg_zprec_type), intent(inout) :: p
-      complex(psb_dpk_),intent(in)            :: alpha,beta
-      type(psb_z_vect_type),intent(inout) :: x
-      type(psb_z_vect_type),intent(inout) :: y
-      character,intent(in)                  :: trans
-      complex(psb_dpk_),target                :: work(:)
+      complex(psb_dpk_), intent(in)            :: alpha, beta
+      type(amg_zprec_type), intent(inout)   :: p
+      type(psb_z_vect_type), intent(inout)  :: x
+      type(psb_z_vect_type), intent(inout)  :: y
+      type(psb_desc_type), intent(in)       :: desc_data
+      character, intent(in)                 :: trans
+      complex(psb_dpk_), target                :: work(:)
       integer(psb_ipk_), intent(out)        :: info
     end subroutine amg_zmlprec_aply_vect
+
+    subroutine amg_zmlprec_aply_mvect_vect(alpha, p, x, idx_x, beta, y, desc_data, trans, work, info)
+      import :: psb_zspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, &
+                & psb_z_vect_type, psb_z_multivect_type
+      import :: amg_zprec_type
+      implicit none 
+      complex(psb_dpk_), intent(in)                :: alpha, beta
+      type(amg_zprec_type), intent(inout)       :: p
+      type(psb_z_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)             :: idx_x
+      type(psb_z_vect_type), intent(inout)      :: y
+      type(psb_desc_type), intent(in)           :: desc_data
+      character, intent(in)                     :: trans
+      complex(psb_dpk_), target                    :: work(:)
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine amg_zmlprec_aply_mvect_vect
+
+    subroutine amg_zmlprec_aply_mvect_col(alpha, p, x, idx_x, beta, y, idx_y, desc_data, trans, work, info)
+      import :: psb_zspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, &
+                & psb_z_vect_type, psb_z_multivect_type
+      import :: amg_zprec_type
+      implicit none 
+      complex(psb_dpk_), intent(in)                :: alpha, beta
+      type(amg_zprec_type), intent(inout)       :: p
+      type(psb_z_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)             :: idx_x
+      type(psb_z_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)             :: idx_y
+      type(psb_desc_type), intent(in)           :: desc_data
+      character, intent(in)                     :: trans
+      complex(psb_dpk_), target                    :: work(:)
+      integer(psb_ipk_), intent(out)            :: info
+    end subroutine amg_zmlprec_aply_mvect_col
   end interface amg_mlprec_aply
  
   interface amg_map_to_tprol
-    subroutine amg_z_map_to_tprol(desc_a,ilaggr,nlaggr,op_prol,info)
+    subroutine amg_z_map_to_tprol(desc_a, ilaggr, nlaggr, op_prol, info)
       import :: psb_zspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, psb_lpk_, psb_lzspmat_type
       import :: amg_z_onelev_type
       implicit none 
       type(psb_desc_type), intent(in)     :: desc_a
-      integer(psb_lpk_), allocatable, intent(inout) :: ilaggr(:),nlaggr(:)
+      integer(psb_lpk_), allocatable, intent(inout) :: ilaggr(:), nlaggr(:)
       type(psb_lzspmat_type), intent(out)  :: op_prol
       integer(psb_ipk_), intent(out)      :: info
     end subroutine amg_z_map_to_tprol
   end interface amg_map_to_tprol
 
   abstract interface
-    subroutine amg_zaggrmat_var_bld(dol1smoothing,a,desc_a,ilaggr,nlaggr,parms,&
-         & ac,desc_ac,op_prol,op_restr,t_prol,info)
+    subroutine amg_zaggrmat_var_bld(dol1smoothing, a, desc_a, ilaggr, nlaggr, parms, &
+                                    & ac, desc_ac, op_prol, op_restr, t_prol, info)
       import :: psb_zspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, psb_lpk_, psb_lzspmat_type
-      import ::  amg_z_onelev_type, amg_dml_parms
+      import :: amg_z_onelev_type, amg_dml_parms
       implicit none 
-      integer(psb_ipk_), intent(in)               :: dol1smoothing
-      type(psb_zspmat_type), intent(in)         :: a
-      type(psb_desc_type), intent(inout)          :: desc_a
-      integer(psb_lpk_), intent(inout)            :: ilaggr(:), nlaggr(:)
-      type(amg_dml_parms), intent(inout)        :: parms 
-      type(psb_zspmat_type), intent(inout)     :: op_prol,ac,op_restr
-      type(psb_lzspmat_type), intent(inout)     :: t_prol
-      type(psb_desc_type), intent(inout)         :: desc_ac
-      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(in)         :: dol1smoothing
+      type(psb_zspmat_type), intent(in)     :: a
+      type(psb_desc_type), intent(inout)    :: desc_a
+      integer(psb_lpk_), intent(inout)      :: ilaggr(:), nlaggr(:)
+      type(amg_dml_parms), intent(inout)    :: parms 
+      type(psb_zspmat_type), intent(inout)  :: op_prol, ac, op_restr
+      type(psb_lzspmat_type), intent(inout) :: t_prol
+      type(psb_desc_type), intent(inout)    :: desc_ac
+      integer(psb_ipk_), intent(out)        :: info
     end subroutine amg_zaggrmat_var_bld
   end interface
 
   procedure(amg_zaggrmat_var_bld) ::  amg_zaggrmat_nosmth_bld, &
-       & amg_zaggrmat_smth_bld, amg_zaggrmat_minnrg_bld
-
+                                      & amg_zaggrmat_smth_bld, &
+                                      & amg_zaggrmat_minnrg_bld
 end module amg_z_inner_mod

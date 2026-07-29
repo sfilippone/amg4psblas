@@ -42,22 +42,21 @@
 !
 !  This module defines:
 !    the amg_s_poly_smoother_type data structure containing the
-!    smoother for a Jacobi/block Jacobi smoother.
+!    smoother for a poly/block poly smoother.
 !  The smoother stores in ND the block off-diagonal matrix.
 !  One special case is treated separately, when the solver is DIAG or L1-DIAG
 !  then the ND is the entire off-diagonal part of the matrix (including the
 !  main diagonal block), so that it becomes possible to implement
-!  a pure Jacobi or L1-Jacobi global solver.
+!  a pure poly or L1-poly global solver.
 !
 module amg_s_poly_smoother
   use amg_s_base_smoother_mod
   use amg_d_poly_coeff_mod
   
   type, extends(amg_s_base_smoother_type) :: amg_s_poly_smoother_type
-    ! The local solver component is inherited from the
-    ! parent type.
+    ! The local solver component is inherited from the parent type.
     !    class(amg_s_base_solver_type), allocatable :: sv
-    !
+
     integer(psb_ipk_)              :: pdegree, variant
     integer(psb_ipk_)              :: rho_estimate=amg_poly_rho_est_power_
     integer(psb_ipk_)              :: rho_estimate_iterations=10
@@ -66,8 +65,13 @@ module amg_s_poly_smoother
     real(psb_spk_)                 :: cf_a = szero
     real(psb_spk_)                 :: rho_ba = -sone
   contains
-    procedure, pass(sm) :: apply_v => amg_s_poly_smoother_apply_vect
-!!$    procedure, pass(sm) :: apply_a => amg_s_poly_smoother_apply
+    ! procedure, pass(sm) :: apply_a      => amg_s_poly_smoother_apply
+    procedure, pass(sm) :: apply_v      => amg_s_poly_smoother_apply_vect
+    ! procedure, pass(sm) :: apply_mv     => amg_s_poly_smoother_apply_mvect
+    procedure, pass(sm) :: apply_v_mv   => amg_s_poly_smoother_apply_vect_mvect
+    procedure, pass(sm) :: apply_mv_v   => amg_s_poly_smoother_apply_mvect_vect
+    procedure, pass(sm) :: apply_mv_col => amg_s_poly_smoother_apply_mvect_col
+
     procedure, pass(sm) :: dump    => amg_s_poly_smoother_dmp
     procedure, pass(sm) :: build   => amg_s_poly_smoother_bld
     procedure, pass(sm) :: cnv     => amg_s_poly_smoother_cnv
@@ -86,54 +90,119 @@ module amg_s_poly_smoother
     procedure, nopass   :: get_fmt    => s_poly_smoother_get_fmt
     procedure, nopass   :: get_id     => s_poly_smoother_get_id
   end type amg_s_poly_smoother_type
-  private :: s_poly_smoother_free, &
-       & s_poly_smoother_sizeof,  s_poly_smoother_get_nzeros, &
-       & s_poly_smoother_get_fmt, s_poly_smoother_get_id, &
-       & s_poly_smoother_get_wrksize
 
+  private :: s_poly_smoother_free, &
+            & s_poly_smoother_sizeof,  s_poly_smoother_get_nzeros, &
+            & s_poly_smoother_get_fmt, s_poly_smoother_get_id, &
+            & s_poly_smoother_get_wrksize
+
+  ! interface
+  !   subroutine amg_s_poly_smoother_apply(alpha, sm, x, beta, y, &
+  !                 & desc_data, trans,  sweeps, work, info, init, initu)
+  !     import :: psb_desc_type, amg_s_poly_smoother_type, &
+  !             & psb_spk_, psb_ipk_
+  !     implicit none 
+  !     real(psb_spk_), intent(in)                      :: alpha, beta
+  !     class(amg_s_poly_smoother_type), intent(inout)  :: sm
+  !     real(psb_spk_), intent(inout)                   :: x(:), y(:)
+  !     type(psb_desc_type), intent(in)                 :: desc_data
+  !     character(len=1), intent(in)                    :: trans
+  !     integer(psb_ipk_), intent(in)                   :: sweeps ! This is ignored here, the polynomial degree dictates the value
+  !     real(psb_spk_), target, intent(inout)           :: work(:)
+  !     integer(psb_ipk_), intent(out)                  :: info
+  !     character, intent(in), optional         :: init
+  !     real(psb_spk_), intent(inout), optional :: initu(:)
+  !   end subroutine amg_s_poly_smoother_apply
+  ! end interface
 
   interface
-    subroutine amg_s_poly_smoother_apply_vect(alpha,sm,x,beta,y,desc_data,trans,&
-         & sweeps,work,wv,info,init,initu)
-      import :: psb_desc_type, amg_s_poly_smoother_type, psb_s_vect_type, psb_spk_, &
-           & psb_sspmat_type, psb_s_base_sparse_mat, psb_s_base_vect_type,&
-           & psb_ipk_
-
+    subroutine amg_s_poly_smoother_apply_vect(alpha, sm, x, beta, y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+      import :: psb_desc_type, amg_s_poly_smoother_type, &
+              & psb_s_vect_type, &
+              & psb_spk_, psb_ipk_   
+      implicit none 
+      real(psb_spk_), intent(in)                      :: alpha, beta
+      class(amg_s_poly_smoother_type), intent(inout)  :: sm
+      type(psb_s_vect_type), intent(inout)            :: x, y
       type(psb_desc_type), intent(in)                 :: desc_data
-      class(amg_s_poly_smoother_type), intent(inout) :: sm
-      type(psb_s_vect_type),intent(inout)           :: x
-      type(psb_s_vect_type),intent(inout)           :: y
-      real(psb_spk_),intent(in)                      :: alpha,beta
-      character(len=1),intent(in)                     :: trans
-      integer(psb_ipk_), intent(in)                   :: sweeps
-      real(psb_spk_),target, intent(inout)           :: work(:)
-      type(psb_s_vect_type),intent(inout)           :: wv(:)
+      character(len=1), intent(in)                    :: trans
+      integer(psb_ipk_), intent(in)                   :: sweeps ! This is ignored here, the polynomial degree dictates the value
+      real(psb_spk_), target, intent(inout)           :: work(:)
+      type(psb_s_vect_type), intent(inout)            :: wv(:)
       integer(psb_ipk_), intent(out)                  :: info
-      character, intent(in), optional                :: init
-      type(psb_s_vect_type),intent(inout), optional   :: initu
+      character, intent(in), optional                 :: init
+      type(psb_s_vect_type), intent(inout), optional  :: initu
     end subroutine amg_s_poly_smoother_apply_vect
   end interface
 
-!!$  interface
-!!$    subroutine amg_s_poly_smoother_apply(alpha,sm,x,beta,y,desc_data,trans,&
-!!$         & sweeps,work,info,init,initu)
-!!$      import :: psb_desc_type, amg_s_poly_smoother_type, psb_s_vect_type, psb_spk_, &
-!!$           & psb_sspmat_type, psb_s_base_sparse_mat, psb_s_base_vect_type, &
-!!$           & psb_ipk_
-!!$      type(psb_desc_type), intent(in)      :: desc_data
-!!$      class(amg_s_poly_smoother_type), intent(inout) :: sm
-!!$      real(psb_spk_),intent(inout)         :: x(:)
-!!$      real(psb_spk_),intent(inout)         :: y(:)
-!!$      real(psb_spk_),intent(in)            :: alpha,beta
-!!$      character(len=1),intent(in)           :: trans
-!!$      integer(psb_ipk_), intent(in)         :: sweeps
-!!$      real(psb_spk_),target, intent(inout) :: work(:)
-!!$      integer(psb_ipk_), intent(out)        :: info
-!!$      character, intent(in), optional       :: init
-!!$      real(psb_spk_),intent(inout), optional :: initu(:)
-!!$    end subroutine amg_s_poly_smoother_apply
-!!$  end interface
-!!$
+  interface 
+    subroutine amg_s_poly_smoother_apply_vect_mvect(alpha, sm, x, beta, y, idx_y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+      import :: psb_spk_, amg_s_poly_smoother_type, &
+              & psb_s_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_s_vect_type
+      implicit none 
+      real(psb_spk_), intent(in)                      :: alpha, beta
+      class(amg_s_poly_smoother_type), intent(inout)  :: sm
+      type(psb_s_vect_type), intent(inout)            :: x
+      type(psb_s_multivect_type), intent(inout)       :: y
+      integer(psb_ipk_), intent(in)                   :: idx_y
+      type(psb_desc_type), intent(in)                 :: desc_data
+      character(len=1), intent(in)                    :: trans
+      integer(psb_ipk_), intent(in)                   :: sweeps  ! This is ignored here, the polynomial degree dictates the value
+      real(psb_spk_), target, intent(inout)           :: work(:)
+      type(psb_s_vect_type), intent(inout)            :: wv(:)
+      integer(psb_ipk_), intent(out)                  :: info
+      character, intent(in), optional                 :: init
+      type(psb_s_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_s_poly_smoother_apply_vect_mvect
+  end interface
+
+  interface 
+    subroutine amg_s_poly_smoother_apply_mvect_vect(alpha, sm, x, idx_x, beta, y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+      import :: psb_spk_, amg_s_poly_smoother_type, &
+              & psb_s_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_s_vect_type
+      implicit none 
+      real(psb_spk_), intent(in)                      :: alpha, beta
+      class(amg_s_poly_smoother_type), intent(inout)  :: sm
+      type(psb_s_multivect_type), intent(inout)       :: x
+      integer(psb_ipk_), intent(in)                   :: idx_x
+      type(psb_s_vect_type), intent(inout)            :: y
+      type(psb_desc_type), intent(in)                 :: desc_data
+      character(len=1), intent(in)                    :: trans
+      integer(psb_ipk_), intent(in)                   :: sweeps ! This is ignored here, the polynomial degree dictates the value
+      real(psb_spk_), target, intent(inout)           :: work(:)
+      type(psb_s_vect_type), intent(inout)            :: wv(:)
+      integer(psb_ipk_), intent(out)                  :: info
+      character, intent(in), optional                 :: init
+      type(psb_s_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_s_poly_smoother_apply_mvect_vect
+  end interface
+
+  interface
+    subroutine amg_s_poly_smoother_apply_mvect_col(alpha, sm, x, idx_x, beta, y, idx_y, &
+                  & desc_data, trans, sweeps, work, wv, info, init, initu)
+      import :: psb_desc_type, amg_s_poly_smoother_type, &
+              & psb_s_multivect_type, psb_s_vect_type, &
+              & psb_spk_, psb_ipk_    
+      implicit none 
+      real(psb_spk_), intent(in)                      :: alpha, beta
+      class(amg_s_poly_smoother_type), intent(inout)  :: sm
+      type(psb_s_multivect_type), intent(inout)       :: x, y
+      integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+      type(psb_desc_type), intent(in)                 :: desc_data
+      character(len=1), intent(in)                    :: trans
+      integer(psb_ipk_), intent(in)                   :: sweeps ! This is ignored here, the polynomial degree dictates the value
+      real(psb_spk_), target, intent(inout)           :: work(:)
+      type(psb_s_vect_type), intent(inout)            :: wv(:)
+      integer(psb_ipk_), intent(out)                  :: info
+      character, intent(in), optional                 :: init
+      type(psb_s_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_s_poly_smoother_apply_mvect_col
+  end interface
   
   interface
     subroutine amg_s_poly_smoother_bld(a,desc_a,sm,info,amold,vmold,imold)
@@ -141,7 +210,7 @@ module amg_s_poly_smoother
            & psb_sspmat_type, psb_s_base_sparse_mat, psb_s_base_vect_type,&
            & psb_ipk_, psb_i_base_vect_type
       type(psb_sspmat_type), intent(inout), target        :: a
-      Type(psb_desc_type), Intent(inout)                  :: desc_a
+      type(psb_desc_type), intent(inout)                  :: desc_a
       class(amg_s_poly_smoother_type), intent(inout)       :: sm
       integer(psb_ipk_), intent(out)                      :: info
       class(psb_s_base_sparse_mat), intent(in), optional :: amold
@@ -256,16 +325,9 @@ module amg_s_poly_smoother
       integer(psb_ipk_), intent(in), optional        :: idx
     end subroutine amg_s_poly_smoother_csetr
   end interface
-
-
 contains
-
-
   subroutine s_poly_smoother_free(sm,info)
-
-
-    Implicit None
-
+    implicit none
     ! Arguments
     class(amg_s_poly_smoother_type), intent(inout) :: sm
     integer(psb_ipk_), intent(out)                  :: info
@@ -275,74 +337,63 @@ contains
     call psb_erractionsave(err_act)
     info = psb_success_
 
-
-
-    if (allocated(sm%sv)) then
+    if(allocated(sm%sv)) then
       call sm%sv%free(info)
-      if (info == psb_success_) deallocate(sm%sv,stat=info)
-      if (info /= psb_success_) then
+      if(info == psb_success_) deallocate(sm%sv,stat=info)
+      if(info /= psb_success_) then
         info = psb_err_alloc_dealloc_
         call psb_errpush(info,name)
         goto 9999
       end if
     end if
-    if (allocated(sm%poly_beta))  deallocate(sm%poly_beta)
+    if(allocated(sm%poly_beta))  deallocate(sm%poly_beta)
     sm%pa => null()
 
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
   end subroutine s_poly_smoother_free
 
   function s_poly_smoother_sizeof(sm) result(val)
-
     implicit none
     ! Arguments
     class(amg_s_poly_smoother_type), intent(in) :: sm
     integer(psb_epk_) :: val
 
     val = psb_sizeof_dp
-    if (allocated(sm%sv)) val = val + sm%sv%sizeof()
-    if (allocated(sm%poly_beta)) val = val + psb_sizeof_dp * size(sm%poly_beta)
-
+    if(allocated(sm%sv)) val = val + sm%sv%sizeof()
+    if(allocated(sm%poly_beta)) val = val + psb_sizeof_dp * size(sm%poly_beta)
     return
   end function s_poly_smoother_sizeof
 
   subroutine s_poly_smoother_default(sm)
-
-    Implicit None
-
+    implicit none
     ! Arguments
     class(amg_s_poly_smoother_type), intent(inout) :: sm
 
     !
-    ! Default: BJAC with no residual check
+    ! Default: Bpoly with no residual check
     !
     sm%pdegree      = 1
     sm%rho_ba       = -sone
     sm%variant      = amg_cheb_4_
     sm%rho_estimate = amg_poly_rho_est_power_
     sm%rho_estimate_iterations = 20
-    if (allocated(sm%sv)) then
-      call sm%sv%default()
-    end if
 
+    if(allocated(sm%sv)) call sm%sv%default()
     return
   end subroutine s_poly_smoother_default
 
   function s_poly_smoother_get_nzeros(sm) result(val)
-
     implicit none
     ! Arguments
     class(amg_s_poly_smoother_type), intent(in) :: sm
     integer(psb_epk_) :: val
-    integer(psb_ipk_)        :: i
 
     val = 0
-    if (allocated(sm%sv)) val = val + sm%sv%get_nzeros()
-
+    if(allocated(sm%sv)) val = val + sm%sv%get_nzeros()
     return
   end function s_poly_smoother_get_nzeros
 
@@ -352,8 +403,7 @@ contains
     integer(psb_ipk_)  :: val
 
     val = 4
-    if (allocated(sm%sv)) val = val + sm%sv%get_wrksz()
-
+    if(allocated(sm%sv)) val = val + sm%sv%get_wrksz()
   end function s_poly_smoother_get_wrksize
 
   function s_poly_smoother_get_fmt() result(val)
@@ -369,6 +419,4 @@ contains
 
     val = amg_poly_
   end function s_poly_smoother_get_id
-
-
 end module amg_s_poly_smoother

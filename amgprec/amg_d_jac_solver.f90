@@ -35,8 +35,6 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-!
-!
 ! File: amg_d_jac_solver_mod.f90
 !
 ! Module: amg_d_jac_solver_mod
@@ -95,13 +93,13 @@ module amg_d_jac_solver
   end type amg_d_l1_jac_solver_type
 
   private :: d_jac_solver_default, d_jac_solver_check, &
-       & d_jac_solver_free, d_jac_solver_descr, &
-       & d_jac_solver_get_nzeros, d_jac_solver_sizeof, &
-       & d_jac_solver_get_fmt, d_jac_solver_get_id, &
-       & d_jac_solver_is_iterative, d_jac_solver_get_wrksize, &
-       & d_jac_solver_bld, d_jac_solver_dmp, &
-       & d_jac_solver_apply, d_jac_solver_apply_vect, &
-       & d_jac_solver_apply_mvect_col
+            & d_jac_solver_free, d_jac_solver_descr, &
+            & d_jac_solver_get_nzeros, d_jac_solver_sizeof, &
+            & d_jac_solver_get_fmt, d_jac_solver_get_id, &
+            & d_jac_solver_is_iterative, d_jac_solver_get_wrksize, &
+            & d_jac_solver_bld, d_jac_solver_dmp, &
+            & d_jac_solver_apply, d_jac_solver_apply_vect, &
+            & d_jac_solver_apply_mvect_col
 
   interface 
     subroutine amg_d_jac_solver_apply(alpha, sv, x, beta, y, &
@@ -206,11 +204,11 @@ module amg_d_jac_solver
   end interface
 
   interface 
-    subroutine amg_d_jac_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
+    subroutine amg_d_jac_solver_bld(a, desc_a, sv, info, b, amold, vmold, imold)
       import :: psb_desc_type, amg_d_jac_solver_type, psb_d_vect_type, psb_dpk_, &
-           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type,&
+           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type, &
            & psb_ipk_, psb_i_base_vect_type
-      implicit none 
+      implicit none
       type(psb_dspmat_type), intent(inout), target        :: a
       type(psb_desc_type), intent(inout)                  :: desc_a 
       class(amg_d_jac_solver_type), intent(inout)         :: sv
@@ -223,9 +221,9 @@ module amg_d_jac_solver
   end interface
 
   interface 
-    subroutine amg_d_l1_jac_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
+    subroutine amg_d_l1_jac_solver_bld(a, desc_a, sv, info, b, amold, vmold, imold)
       import :: psb_desc_type, amg_d_l1_jac_solver_type, psb_d_vect_type, psb_dpk_, &
-           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type,&
+           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type, &
            & psb_ipk_, psb_i_base_vect_type
       implicit none 
       type(psb_dspmat_type), intent(inout), target        :: a
@@ -240,10 +238,9 @@ module amg_d_jac_solver
   end interface
 
   interface 
-    subroutine amg_d_jac_solver_cnv(sv,info,amold,vmold,imold)
-      import :: amg_d_jac_solver_type, psb_dpk_, &
-           & psb_d_base_sparse_mat, psb_d_base_vect_type,&
-           & psb_ipk_, psb_i_base_vect_type
+    subroutine amg_d_jac_solver_cnv(sv, info, amold, vmold, imold)
+      import :: amg_d_jac_solver_type, psb_ipk_, psb_i_base_vect_type, &
+           & psb_d_base_sparse_mat, psb_d_base_vect_type
       implicit none 
       class(amg_d_jac_solver_type), intent(inout)         :: sv
       integer(psb_ipk_), intent(out)                      :: info
@@ -254,10 +251,8 @@ module amg_d_jac_solver
   end interface
   
   interface 
-    subroutine amg_d_jac_solver_dmp(sv,desc,level,info,prefix,head,solver,global_num)
-      import :: psb_desc_type, amg_d_jac_solver_type, psb_d_vect_type, psb_dpk_, &
-           & psb_dspmat_type, psb_d_base_sparse_mat, psb_d_base_vect_type, &
-           & psb_ipk_
+    subroutine amg_d_jac_solver_dmp(sv, desc, level, info, prefix, head, solver, global_num)
+      import :: psb_desc_type, amg_d_jac_solver_type, psb_ipk_
       implicit none 
       class(amg_d_jac_solver_type), intent(in) :: sv
       type(psb_desc_type), intent(in)             :: desc
@@ -269,12 +264,9 @@ module amg_d_jac_solver
   end interface
   
   interface
-    subroutine amg_d_jac_solver_clone(sv,svout,info)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
-           & amg_d_base_solver_type, amg_d_jac_solver_type, psb_ipk_
+    subroutine amg_d_jac_solver_clone(sv, svout, info)
+      import :: amg_d_base_solver_type, amg_d_jac_solver_type, psb_ipk_
       implicit none
-      
       ! Arguments
       class(amg_d_jac_solver_type), intent(inout)               :: sv
       class(amg_d_base_solver_type), allocatable, intent(inout) :: svout
@@ -283,10 +275,8 @@ module amg_d_jac_solver
   end interface
   
   !!$ interface
-  !!$   subroutine amg_d_l1_jac_solver_clone(sv,svout,info)
-  !!$     import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-  !!$          & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
-  !!$          & amg_d_base_solver_type, amg_d_l1_jac_solver_type, psb_ipk_
+  !!$   subroutine amg_d_l1_jac_solver_clone(sv, svout, info)
+  !!$     import :: amg_d_base_solver_type, amg_d_l1_jac_solver_type, psb_ipk_
   !!$     implicit none
   !!$     
   !!$     ! Arguments
@@ -297,12 +287,9 @@ module amg_d_jac_solver
   !!$ end interface
 
   interface
-    subroutine amg_d_jac_solver_clone_settings(sv,svout,info)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
-           & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
-           & amg_d_base_solver_type, amg_d_jac_solver_type, psb_ipk_
+    subroutine amg_d_jac_solver_clone_settings(sv, svout, info)
+      import :: amg_d_base_solver_type, amg_d_jac_solver_type, psb_ipk_
       implicit none
-      
       ! Arguments
       class(amg_d_jac_solver_type), intent(inout) :: sv
       class(amg_d_base_solver_type), intent(inout) :: svout
@@ -311,20 +298,17 @@ module amg_d_jac_solver
   end interface
 
   interface
-    subroutine amg_d_jac_solver_clear_data(sv,info)
-      import :: psb_desc_type, psb_dspmat_type,  psb_d_base_sparse_mat, &
+    subroutine amg_d_jac_solver_clear_data(sv, info)
+      import :: psb_desc_type, psb_dspmat_type, psb_d_base_sparse_mat, &
            & psb_d_vect_type, psb_d_base_vect_type, psb_dpk_, &
            & amg_d_jac_solver_type, psb_ipk_
       implicit none
-      
       ! Arguments
       class(amg_d_jac_solver_type), intent(inout) :: sv
       integer(psb_ipk_), intent(out)                 :: info
     end subroutine amg_d_jac_solver_clear_data
   end interface
-
 contains
-
   subroutine d_jac_solver_default(sv)
     implicit none
     ! Arguments
@@ -347,10 +331,9 @@ contains
     call psb_erractionsave(err_act)
     info = psb_success_
 
-    call amg_check_def(sv%sweeps, &
-         & 'Jacobi sweeps', ione, is_int_positive)
+    call amg_check_def(sv%sweeps, 'Jacobi sweeps', ione, is_int_positive)
 
-    if (info /= psb_success_) goto 9999
+    if(info /= psb_success_) goto 9999
     
     call psb_erractionrestore(err_act)
     return
@@ -376,7 +359,8 @@ contains
 
     select case(psb_toupper(what))
       case('SOLVER_SWEEPS')
-        sv%sweeps = val      
+        sv%sweeps = val
+
       case default
         call sv%amg_d_base_solver_type%set(what, val, info, idx = idx)
     end select
@@ -405,7 +389,7 @@ contains
 
     call sv%amg_d_base_solver_type%set(what, val, info, idx = idx)
   
-    if (info /= psb_success_) then
+    if(info /= psb_success_) then
       info = psb_err_from_subroutine_
       call psb_errpush(info, name)
       goto 9999
@@ -436,6 +420,7 @@ contains
     select case(psb_toupper(what))
       case('SOLVER_EPS') 
         sv%eps = val
+
       case default
         call sv%amg_d_base_solver_type%set(what, val, info, idx = idx)
     end select
@@ -447,7 +432,7 @@ contains
     return
   end subroutine d_jac_solver_csetr
 
-  subroutine d_jac_solver_free(sv,info)
+  subroutine d_jac_solver_free(sv, info)
     implicit none
     ! Arguments
     class(amg_d_jac_solver_type), intent(inout) :: sv
@@ -460,12 +445,12 @@ contains
     info = psb_success_
 
     call sv%a%free()
-    if (allocated(sv%dv)) then
+    if(allocated(sv%dv)) then
       call sv%dv%free(info)
       deallocate(sv%dv)
     end if
 
-    if (allocated(sv%d)) deallocate(sv%d)
+    if(allocated(sv%d)) deallocate(sv%d)
 
     call psb_erractionrestore(err_act)
     return
@@ -474,7 +459,7 @@ contains
     return
   end subroutine d_jac_solver_free
 
-  subroutine d_jac_solver_descr(sv,info,iout,coarse,prefix)
+  subroutine d_jac_solver_descr(sv, info, iout, coarse, prefix)
     implicit none
     ! Arguments
     class(amg_d_jac_solver_type), intent(in) :: sv
@@ -491,23 +476,20 @@ contains
 
     call psb_erractionsave(err_act)
     info = psb_success_
-    if (present(iout)) then 
-      iout_ = iout 
-    else
-      iout_ = psb_out_unit
-    endif
-    if (present(prefix)) then
-      prefix_ = prefix
-    else
-      prefix_ = ""
-    end if
+    
+    iout_ = psb_out_unit
+    if(present(iout)) iout_ = iout 
+    
+    prefix_ = ""
+    if(present(prefix)) prefix_ = prefix
+    
 
-    if (sv%eps<=dzero) then 
+    if(sv%eps<=dzero) then 
       write(iout_, *) trim(prefix_), '  Jacobi iterative solver with  ', &
-                      & sv%sweeps,' sweeps'
+                      & sv%sweeps, ' sweeps'
     else
       write(iout_, *) trim(prefix_), '  Jacobi iterative solver with tolerance', &
-                      & sv%eps,' and maxit', sv%sweeps
+                      & sv%eps, ' and maxit', sv%sweeps
     end if
     
     call psb_erractionrestore(err_act)
@@ -594,18 +576,15 @@ contains
 
     call psb_erractionsave(err_act)
     info = psb_success_
-    if (present(iout)) then 
-      iout_ = iout 
-    else
-      iout_ = psb_out_unit
-    endif
-    if (present(prefix)) then
-      prefix_ = prefix
-    else
-      prefix_ = ""
-    end if
+    
+    iout_ = psb_out_unit
+    if(present(iout)) iout_ = iout 
+    
+    prefix_ = ""
+    if(present(prefix)) prefix_ = prefix
+    
 
-    if (sv%eps <= dzero) then 
+    if(sv%eps <= dzero) then 
       write(iout_, *) trim(prefix_), ' L1-Jacobi iterative solver with ', &
                     & sv%sweeps, ' sweeps'
     else
@@ -633,5 +612,4 @@ contains
 
     val = amg_l1_jac_
   end function d_l1_jac_solver_get_id
-  
 end module amg_d_jac_solver
