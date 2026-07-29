@@ -35,76 +35,73 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !  
-subroutine amg_d_diag_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
-     & trans,work,wv,info,init,initu)
-  
+subroutine amg_d_diag_solver_apply_vect(alpha, sv, x, beta, y, &
+     & desc_data, trans, work, wv, info, init, initu)
   use psb_base_mod
   use amg_d_diag_solver, amg_protect_name => amg_d_diag_solver_apply_vect
-  implicit none 
-  type(psb_desc_type), intent(in)                :: desc_data
-  class(amg_d_diag_solver_type), intent(inout) :: sv
-  type(psb_d_vect_type), intent(inout)         :: x
-  type(psb_d_vect_type), intent(inout)         :: y
-  real(psb_dpk_),intent(in)                     :: alpha,beta
-  character(len=1),intent(in)                    :: trans
-  real(psb_dpk_),target, intent(inout)          :: work(:)
-  type(psb_d_vect_type),intent(inout)          :: wv(:)
-  integer(psb_ipk_), intent(out)                 :: info
-  character, intent(in), optional                :: init
-  type(psb_d_vect_type),intent(inout), optional   :: initu
+  implicit none
+  real(psb_dpk_), intent(in)                    :: alpha, beta
+  class(amg_d_diag_solver_type), intent(inout)  :: sv
+  type(psb_d_vect_type), intent(inout)          :: x, y
+  type(psb_desc_type), intent(in)               :: desc_data
+  character(len=1), intent(in)                  :: trans
+  real(psb_dpk_), target, intent(inout)         :: work(:)
+  type(psb_d_vect_type), intent(inout)          :: wv(:)
+  integer(psb_ipk_), intent(out)                :: info
+  character, intent(in), optional                 :: init
+  type(psb_d_vect_type), intent(inout), optional  :: initu
 
-  integer(psb_ipk_)   :: n_row,n_col
-  real(psb_dpk_), pointer :: ww(:), aux(:), tx(:),ty(:)
+  integer(psb_ipk_)   :: n_row, n_col
+  real(psb_dpk_), pointer :: ww(:), aux(:), tx(:), ty(:)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me, i, err_act
   character           :: trans_
-  character(len=20)   :: name='d_diag_solver_apply'
+  character(len=20)   :: name = 'd_diag_solver_apply'
 
   call psb_erractionsave(err_act)
-
   info = psb_success_
 
   trans_ = psb_toupper(trans)
   select case(trans_)
-  case('N')
-  case('T','C')
-  case default
-    call psb_errpush(psb_err_iarg_invalid_i_,name)
-    goto 9999
+    case('N', 'T', 'C')
+    case default
+      call psb_errpush(psb_err_iarg_invalid_i_, name)
+      goto 9999
   end select
+
   !
   ! For non-iterative solvers, init and initu are ignored.
   !
-
   n_row = desc_data%get_local_rows()
   n_col = desc_data%get_local_cols()
   if (x%get_nrows() < n_row) then 
     info = 36
-    call psb_errpush(info,name,& 
-         & i_err=(/itwo,n_row,izero,izero,izero/))
+    call psb_errpush(info, name, i_err = (/itwo, n_row, izero, izero, izero/))
     goto 9999
   end if
+
   if (y%get_nrows() < n_row) then 
     info = 36
-    call psb_errpush(info,name,& 
-         & i_err=(/ithree,n_row,izero,izero,izero/))
+    call psb_errpush(info, name, i_err = (/ithree, n_row, izero, izero, izero/))
     goto 9999
   end if
-  if (.not.allocated(sv%dv)) then
+
+  if (.not. allocated(sv%dv)) then
     info = 1124
-    call psb_errpush(info,name,a_err="preconditioner: D")
+    call psb_errpush(info, name, a_err = "preconditioner: D")
     goto 9999
   end if
+
   if (sv%dv%get_nrows() < n_row) then
     info = 1124
-    call psb_errpush(info,name,a_err="preconditioner: D")
+    call psb_errpush(info, name, a_err = "preconditioner: D")
     goto 9999
   end if
 
-  call y%mlt(alpha,sv%dv,x,beta,info,conjgx=trans_)
+  call y%mlt(alpha, sv%dv, x, beta, info, conjgx = trans_)
 
   if (info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='vect%mlt')
+    call psb_errpush(psb_err_from_subroutine_, name, a_err = 'vect%mlt')
     goto 9999      
   end if
 
@@ -112,7 +109,242 @@ subroutine amg_d_diag_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   return
 
 9999 call psb_error_handler(err_act)
+  return
+end subroutine amg_d_diag_solver_apply_vect
 
+subroutine amg_d_diag_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, &
+     & desc_data, trans, work, wv, info, init, initu)
+  use psb_base_mod
+  use amg_d_diag_solver, amg_protect_name => amg_d_diag_solver_apply_vect_mvect
+  implicit none
+  real(psb_dpk_), intent(in)                    :: alpha, beta
+  class(amg_d_diag_solver_type), intent(inout)  :: sv
+  type(psb_d_vect_type), intent(inout)          :: x
+  type(psb_d_multivect_type), intent(inout)     :: y
+  integer(psb_ipk_), intent(in)                 :: idx_y
+  type(psb_desc_type), intent(in)               :: desc_data
+  character(len=1), intent(in)                  :: trans
+  real(psb_dpk_), target, intent(inout)         :: work(:)
+  type(psb_d_vect_type), intent(inout)          :: wv(:)
+  integer(psb_ipk_), intent(out)                :: info
+  character, intent(in), optional                 :: init
+  type(psb_d_vect_type), intent(inout), optional  :: initu
+
+  integer(psb_ipk_)   :: n_row, n_col
+  real(psb_dpk_), pointer :: ww(:), aux(:), tx(:), ty(:)
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act
+  character           :: trans_
+  character(len=20)   :: name = 'd_diag_solver_apply'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  trans_ = psb_toupper(trans)
+  select case(trans_)
+    case('N', 'T', 'C')
+    case default
+      call psb_errpush(psb_err_iarg_invalid_i_, name)
+      goto 9999
+  end select
+
+  !
+  ! For non-iterative solvers, init and initu are ignored.
+  !
+  n_row = desc_data%get_local_rows()
+  n_col = desc_data%get_local_cols()
+  if (x%get_nrows() < n_row) then 
+    info = 36
+    call psb_errpush(info, name, i_err = (/itwo, n_row, izero, izero, izero/))
+    goto 9999
+  end if
+
+  if (y%get_nrows() < n_row) then 
+    info = 36
+    call psb_errpush(info, name, i_err = (/ithree, n_row, izero, izero, izero/))
+    goto 9999
+  end if
+
+  if (.not. allocated(sv%dv)) then
+    info = 1124
+    call psb_errpush(info, name, a_err = "preconditioner: D")
+    goto 9999
+  end if
+
+  if (sv%dv%get_nrows() < n_row) then
+    info = 1124
+    call psb_errpush(info, name, a_err = "preconditioner: D")
+    goto 9999
+  end if
+
+  call y%mlt(n_row, alpha, sv%dv, x, beta, idx_y, info, conjgx = trans_)
+
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_, name, a_err = 'mvect%mlt')
+    goto 9999      
+  end if
+
+  call psb_erractionrestore(err_act)
   return
 
-end subroutine amg_d_diag_solver_apply_vect
+9999 call psb_error_handler(err_act)
+  return
+end subroutine amg_d_diag_solver_apply_vect_mvect
+
+subroutine amg_d_diag_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, &
+     & desc_data, trans, work, wv, info, init, initu)
+  use psb_base_mod
+  use amg_d_diag_solver, amg_protect_name => amg_d_diag_solver_apply_mvect_vect
+  implicit none
+  real(psb_dpk_), intent(in)                    :: alpha, beta
+  class(amg_d_diag_solver_type), intent(inout)  :: sv
+  type(psb_d_multivect_type), intent(inout)     :: x
+  integer(psb_ipk_), intent(in)                 :: idx_x
+  type(psb_d_vect_type), intent(inout)          :: y
+  type(psb_desc_type), intent(in)               :: desc_data
+  character(len=1), intent(in)                  :: trans
+  real(psb_dpk_), target, intent(inout)         :: work(:)
+  type(psb_d_vect_type), intent(inout)          :: wv(:)
+  integer(psb_ipk_), intent(out)                :: info
+  character, intent(in), optional                 :: init
+  type(psb_d_vect_type), intent(inout), optional  :: initu
+
+  integer(psb_ipk_)   :: n_row, n_col
+  real(psb_dpk_), pointer :: ww(:), aux(:), tx(:), ty(:)
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act
+  character           :: trans_
+  character(len=20)   :: name = 'd_diag_solver_apply'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  trans_ = psb_toupper(trans)
+  select case(trans_)
+    case('N', 'T', 'C')
+    case default
+      call psb_errpush(psb_err_iarg_invalid_i_, name)
+      goto 9999
+  end select
+
+  !
+  ! For non-iterative solvers, init and initu are ignored.
+  !
+  n_row = desc_data%get_local_rows()
+  n_col = desc_data%get_local_cols()
+  if (x%get_nrows() < n_row) then 
+    info = 36
+    call psb_errpush(info, name, i_err = (/itwo, n_row, izero, izero, izero/))
+    goto 9999
+  end if
+
+  if (y%get_nrows() < n_row) then 
+    info = 36
+    call psb_errpush(info, name, i_err = (/ithree, n_row, izero, izero, izero/))
+    goto 9999
+  end if
+
+  if (.not. allocated(sv%dv)) then
+    info = 1124
+    call psb_errpush(info, name, a_err = "preconditioner: D")
+    goto 9999
+  end if
+
+  if (sv%dv%get_nrows() < n_row) then
+    info = 1124
+    call psb_errpush(info, name, a_err = "preconditioner: D")
+    goto 9999
+  end if
+
+  ! Use mlt of x with y as externel vector output
+  call x%mlt(n_row, alpha, sv%dv, idx_x, beta, y, info, conjgx = trans_)
+
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_, name, a_err = 'mvect%mlt')
+    goto 9999      
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine amg_d_diag_solver_apply_mvect_vect
+
+subroutine amg_d_diag_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y, &
+     & desc_data, trans, work, wv, info, init, initu)
+  use psb_base_mod
+  use amg_d_diag_solver, amg_protect_name => amg_d_diag_solver_apply_mvect_col
+  implicit none
+  real(psb_dpk_), intent(in)                    :: alpha, beta
+  class(amg_d_diag_solver_type), intent(inout)  :: sv
+  type(psb_d_multivect_type), intent(inout)     :: x, y
+  integer(psb_ipk_), intent(in)                 :: idx_x, idx_y
+  type(psb_desc_type), intent(in)               :: desc_data
+  character(len=1), intent(in)                  :: trans
+  real(psb_dpk_), target, intent(inout)         :: work(:)
+  type(psb_d_vect_type), intent(inout)          :: wv(:)
+  integer(psb_ipk_), intent(out)                :: info
+  character, intent(in), optional                 :: init
+  type(psb_d_vect_type), intent(inout), optional  :: initu
+
+  integer(psb_ipk_)   :: n_row, n_col
+  real(psb_dpk_), pointer :: ww(:), aux(:), tx(:), ty(:)
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, i, err_act
+  character           :: trans_
+  character(len=20)   :: name = 'd_diag_solver_apply'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  trans_ = psb_toupper(trans)
+  select case(trans_)
+    case('N', 'T', 'C')
+    case default
+      call psb_errpush(psb_err_iarg_invalid_i_, name)
+      goto 9999
+  end select
+
+  !
+  ! For non-iterative solvers, init and initu are ignored.
+  !
+  n_row = desc_data%get_local_rows()
+  n_col = desc_data%get_local_cols()
+  if (x%get_nrows() < n_row) then 
+    info = 36
+    call psb_errpush(info, name, i_err = (/itwo, n_row, izero, izero, izero/))
+    goto 9999
+  end if
+
+  if (y%get_nrows() < n_row) then 
+    info = 36
+    call psb_errpush(info, name, i_err = (/ithree, n_row, izero, izero, izero/))
+    goto 9999
+  end if
+
+  if (.not. allocated(sv%dv)) then
+    info = 1124
+    call psb_errpush(info, name, a_err = "preconditioner: D")
+    goto 9999
+  end if
+
+  if (sv%dv%get_nrows() < n_row) then
+    info = 1124
+    call psb_errpush(info, name, a_err = "preconditioner: D")
+    goto 9999
+  end if
+
+  call y%mlt(n_row, alpha, sv%dv, x, idx_x, beta, idx_y, info, conjgx = trans_)
+
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_, name, a_err = 'mvect%mlt')
+    goto 9999      
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine amg_d_diag_solver_apply_mvect_col

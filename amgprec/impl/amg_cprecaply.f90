@@ -70,21 +70,18 @@
 !                  Workspace. Its size must be at
 !                  least 4*desc_data%get_local_cols().
 !    
-subroutine amg_cprecaply(prec,x,y,desc_data,info,trans,work)
-
+subroutine amg_cprecaply(prec, x, y, desc_data, info, trans, work)
   use psb_base_mod
   use amg_c_inner_mod!, amg_protect_name => amg_cprecaply
   
   implicit none
-  
   ! Arguments
-  type(psb_desc_type),intent(in)    :: desc_data
-  type(amg_cprec_type), intent(inout)  :: prec
-  complex(psb_spk_),intent(inout)   :: x(:)
-  complex(psb_spk_),intent(inout)   :: y(:)
-  integer(psb_ipk_), intent(out)    :: info
-  character(len=1), optional        :: trans
-  complex(psb_spk_),intent(inout), optional, target  :: work(:)
+  type(amg_cprec_type), intent(inout) :: prec
+  complex(psb_spk_), intent(inout)       :: x(:), y(:)
+  type(psb_desc_type), intent(in)     :: desc_data
+  integer(psb_ipk_), intent(out)      :: info
+  character(len=1), optional                      :: trans
+  complex(psb_spk_), intent(inout), optional, target :: work(:)
 
   ! Local variables
   character     :: trans_ 
@@ -93,122 +90,111 @@ subroutine amg_cprecaply(prec,x,y,desc_data,info,trans,work)
   
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me
-  integer(psb_ipk_)   :: err_act,iwsz, k, nswps
+  integer(psb_ipk_)   :: err_act, iwsz, k, nswps
   character(len=20)   :: name
 
-  name='amg_cprecaply'
+  name = 'amg_cprecaply'
   info = psb_success_
   call psb_erractionsave(err_act)
 
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(trans)) then 
-    trans_=psb_toupper(trans)
-  else
-    trans_='N'
-  end if
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
-  if (present(work)) then 
+  if(present(work)) then 
     work_ => work
   else
-    iwsz = max(1,4*desc_data%get_local_cols())
-    allocate(work_(iwsz),stat=info)
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_alloc_request_,name, &
-           & i_err=(/iwsz,izero,izero,izero,izero/),&
-           & a_err='complex(psb_spk_)')
+    iwsz = max(1, 4*desc_data%get_local_cols())
+    allocate(work_(iwsz), stat = info)
+    if(info /= psb_success_) then 
+      call psb_errpush(psb_err_alloc_request_, name, &
+            & i_err = (/iwsz, izero, izero, izero, izero/), &
+            & a_err = 'complex(psb_spk_)')
       goto 9999      
     end if
-
   end if
 
-  if (.not.(allocated(prec%precv))) then 
+  if(.not.(allocated(prec%precv))) then 
     !! Error 1: should call amg_cprecbld
-    info=3112
-    call psb_errpush(info,name)
+    info = 3112
+    call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (size(prec%precv) >1) then
+  if(size(prec%precv) > 1) then
     !
     ! Number of levels > 1: apply the multilevel preconditioner
     ! 
-    call amg_mlprec_aply(cone,prec,x,czero,y,desc_data,trans_,work_,info)
+    call amg_mlprec_aply(cone, prec, x, czero, y, desc_data, trans_, work_, info)
     if(info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_cmlprec_aply')
+      call psb_errpush(psb_err_from_subroutine_, name, a_err = 'amg_cmlprec_aply')
       goto 9999
     end if
-
-  else  if (size(prec%precv) == 1) then
+  else if(size(prec%precv) == 1) then
     !
     ! Number of levels = 1: apply the base preconditioner
     !
-    if (allocated(prec%precv(1)%sm2a)) then
-      nswps = max(prec%precv(1)%parms%sweeps_pre,prec%precv(1)%parms%sweeps_post)
+    if(allocated(prec%precv(1)%sm2a)) then
+      nswps = max(prec%precv(1)%parms%sweeps_pre, prec%precv(1)%parms%sweeps_post)
       !
       ! This is a kludge for handling the symmetrized GS case.
       ! Will need some rethinking. 
       ! 
-      call psb_geasb(w1,desc_data,info,scratch=.true.)
-      call psb_geasb(w2,desc_data,info,scratch=.true.)
+      call psb_geasb(w1, desc_data, info, scratch = .true.)
+      call psb_geasb(w2, desc_data, info,scratch = .true.)
 
       call psb_geaxpby(cone,x,czero,w1,desc_data,info)
       select case(trans_)
-      case ('N')
-        do k=1, nswps
-          call prec%precv(1)%sm%apply(cone,w1,czero,w2,desc_data,trans_,&
-               & ione, work_,info)
-          call prec%precv(1)%sm2a%apply(cone,w2,czero,w1,desc_data,trans_,&
-               & ione, work_,info)
-        end do
+        case ('N')
+          do k = 1, nswps
+            call prec%precv(1)%sm%apply(cone, w1, czero, w2, desc_data, trans_, &
+                                          & ione, work_, info)
+            call prec%precv(1)%sm2a%apply(cone, w2, czero, w1, desc_data, trans_, &
+                                            & ione, work_, info)
+          end do
 
-      case('T','C')
-        do k=1, nswps
-          call prec%precv(1)%sm2a%apply(cone,w1,czero,w2,desc_data,trans_,&
-               & ione, work_,info)
-          call prec%precv(1)%sm%apply(cone,w2,czero,w1,desc_data,trans_,&
-               & ione, work_,info)
-        end do
-      case default
-        info = psb_err_from_subroutine_
-        call psb_errpush(info,name,a_err='Invalid trans')
-        goto 9999         
+        case('T', 'C')
+          do k = 1, nswps
+            call prec%precv(1)%sm2a%apply(cone, w1, czero, w2, desc_data, trans_, &
+                                            & ione, work_,info)
+            call prec%precv(1)%sm%apply(cone, w2, czero, w1, desc_data, trans_, &
+                                          & ione, work_,info)
+          end do
+
+        case default
+          info = psb_err_from_subroutine_
+          call psb_errpush(info, name, a_err = 'Invalid trans')
+          goto 9999         
       end select
-      call psb_geaxpby(cone,w1,czero,y,desc_data,info)
-      call psb_gefree(w1,desc_data,info)        
-      call psb_gefree(w2,desc_data,info)
 
+      call psb_geaxpby(cone, w1, czero, y, desc_data, info)
+      call psb_gefree(w1, desc_data, info)        
+      call psb_gefree(w2, desc_data, info)
     else
       nswps = prec%precv(1)%parms%sweeps_pre
-      call prec%precv(1)%sm%apply(cone,x,czero,y,desc_data,trans_,&
-           & nswps, work_,info)
+      call prec%precv(1)%sm%apply(cone, x, czero, y, desc_data, trans_, &
+                                    & nswps, work_, info)
     end if
   else 
     info = psb_err_from_subroutine_ai_
-    call psb_errpush(info,name,a_err='Invalid size of precv',&
-         & i_Err=(/ione*size(prec%precv),izero,izero,izero,izero/))
+    call psb_errpush(info, name, a_err = 'Invalid size of precv', &
+                  & i_err = (/ione*size(prec%precv), izero, izero, izero, izero/))
     goto 9999
   endif
 
   ! If the original distribution has an overlap we should fix that. 
-  call psb_halo(y,desc_data,info,data=psb_comm_mov_)
+  call psb_halo(y, desc_data, info, data = psb_comm_mov_)
 
-
-  if (present(work)) then 
-  else
-    deallocate(work_)
-  end if
+  if(.not. present(work)) deallocate(work_)
 
   call psb_erractionrestore(err_act)
   return
 
 9999 call psb_error_handler(err_act)
-
   return
-
 end subroutine amg_cprecaply
-
 
 !
 ! Subroutine: amg_cprecaply1
@@ -242,53 +228,50 @@ end subroutine amg_cprecaply
 !                  If trans='N','n' then op(M^(-1)) = M^(-1);
 !                  if trans='T','t' then op(M^(-1)) = M^(-T) (transpose of M^(-1)).
 !  
-subroutine amg_cprecaply1(prec,x,desc_data,info,trans)
-
+subroutine amg_cprecaply1(prec, x, desc_data, info, trans)
   use psb_base_mod
   use amg_c_inner_mod!, amg_protect_name => amg_cprecaply1
 
   implicit none
-
   ! Arguments
-  type(psb_desc_type),intent(in)    :: desc_data
-  type(amg_cprec_type), intent(inout)  :: prec
-  complex(psb_spk_),intent(inout)   :: x(:)
-  integer(psb_ipk_), intent(out)    :: info
-  character(len=1), optional        :: trans
+  type(amg_cprec_type), intent(inout) :: prec
+  complex(psb_spk_), intent(inout)       :: x(:)
+  type(psb_desc_type), intent(in)     :: desc_data
+  integer(psb_ipk_), intent(out)      :: info
+  character(len=1), optional  :: trans
 
   ! Local variables
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me
   integer(psb_ipk_)   :: err_act
-  complex(psb_spk_), pointer :: ww(:), w1(:)
   character(len=20)   :: name
+  complex(psb_spk_), pointer :: ww(:), w1(:)
 
-  name='amg_cprecaply1'
+  name = 'amg_cprecaply1'
   info = psb_success_
   call psb_erractionsave(err_act)
   
-
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  allocate(ww(size(x)),w1(size(x)),stat=info)
-  if (info /= psb_success_) then 
-    info=psb_err_alloc_request_
-    call psb_errpush(info,name, &
-         & i_err=(/itwo*size(x),izero,izero,izero,izero/),&
-         & a_err='complex(psb_spk_)')
+  allocate(ww(size(x)), w1(size(x)), stat = info)
+  if(info /= psb_success_) then 
+    info = psb_err_alloc_request_
+    call psb_errpush(info, name, &
+         & i_err = (/itwo*size(x), izero, izero, izero, izero/), &
+         & a_err = 'complex(psb_spk_)')
     goto 9999      
   end if
 
-  call prec%apply(x,ww,desc_data,info,trans=trans,work=w1)
-  if (info /= psb_success_) then
-    call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_precaply')
+  call prec%apply(x, ww, desc_data, info, trans = trans, work = w1)
+  if(info /= psb_success_) then
+    call psb_errpush(psb_err_from_subroutine_, name, a_err = 'amg_precaply')
     goto 9999
   end if
 
   x(:) = ww(:)
-  deallocate(ww,w1,stat=info)
-  if (info /= psb_success_) then
+  deallocate(ww, w1, stat = info)
+  if(info /= psb_success_) then
     info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
@@ -299,306 +282,551 @@ subroutine amg_cprecaply1(prec,x,desc_data,info,trans)
 
 9999 call psb_error_handler(err_act)
   return
-
 end subroutine amg_cprecaply1
 
-
-
-subroutine amg_cprecaply2_vect(prec,x,y,desc_data,info,trans,work)
-
+subroutine amg_cprecaply2_vect(prec, x, y, desc_data, info, trans, work)
   use psb_base_mod
   use amg_c_inner_mod!, amg_protect_name => amg_cprecaply2_vect
   
   implicit none
-  
   ! Arguments
-  type(psb_desc_type),intent(in)      :: desc_data
-  type(amg_cprec_type), intent(inout) :: prec
-  type(psb_c_vect_type),intent(inout) :: x
-  type(psb_c_vect_type),intent(inout) :: y
-  integer(psb_ipk_), intent(out)      :: info
-  character(len=1), optional          :: trans
-  complex(psb_spk_),intent(inout), optional, target  :: work(:)
+  type(amg_cprec_type), intent(inout)   :: prec
+  type(psb_c_vect_type), intent(inout)  :: x, y
+  type(psb_desc_type), intent(in)       :: desc_data
+  integer(psb_ipk_), intent(out)        :: info
+  character(len=1), optional                      :: trans
+  complex(psb_spk_), intent(inout), optional, target :: work(:)
 
   ! Local variables
-  character     :: trans_ 
-  complex(psb_spk_), pointer :: work_(:)
+  character           :: trans_ 
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me
-  integer(psb_ipk_)   :: err_act,iwsz, k, nswps
+  integer(psb_ipk_)   :: err_act, iwsz, k, nswps
   logical             :: do_alloc_wrk
   character(len=20)   :: name
+  complex(psb_spk_), pointer :: work_(:)
 
-  name='amg_cprecaply'
+  name = 'amg_cprecaply'
   info = psb_success_
   call psb_erractionsave(err_act)
 
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(trans)) then 
-    trans_=psb_toupper(trans)
-  else
-    trans_='N'
-  end if
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
-  if (present(work)) then 
+  if(present(work)) then 
     work_ => work
   else
-    iwsz = max(1,4*desc_data%get_local_cols())
-    allocate(work_(iwsz),stat=info)
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_alloc_request_,name, &
-           & i_err=(/iwsz,izero,izero,izero,izero/),&
-           & a_err='complex(psb_spk_)')
+    iwsz = max(1, 4*desc_data%get_local_cols())
+    allocate(work_(iwsz), stat = info)
+    if(info /= psb_success_) then 
+      call psb_errpush(psb_err_alloc_request_, name, &
+            & i_err = (/iwsz, izero, izero, izero, izero/), &
+            & a_err = 'complex(psb_spk_)')
       goto 9999      
     end if
-
   end if
 
-  if (.not.(allocated(prec%precv))) then 
+  if(.not.(allocated(prec%precv))) then 
     !! Error 1: should call amg_cprecbld
-    info=3112
-    call psb_errpush(info,name)
+    info = 3112
+    call psb_errpush(info, name)
     goto 9999
   end if
   
-  do_alloc_wrk = .not.allocated(prec%precv(1)%wrk)
-  if (do_alloc_wrk) call prec%allocate_wrk(info,vmold=x%v)
+  do_alloc_wrk = .not. allocated(prec%precv(1)%wrk)
+  if(do_alloc_wrk) call prec%allocate_wrk(info, vmold = x%v)
 
-  if (size(prec%precv) >1) then
+  if(size(prec%precv) > 1) then
     !
     ! Number of levels > 1: apply the multilevel preconditioner
     !
     ! FIXME: generic name causes an ICE with Intel
-    call amg_cmlprec_aply_vect(cone,prec,x,czero,y,desc_data,trans_,work_,info)
+    call amg_cmlprec_aply_vect(cone, prec, x, czero, y, desc_data, trans_, work_, info)
 
     if(info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_cmlprec_aply')
+      call psb_errpush(psb_err_from_subroutine_, name, a_err = 'amg_cmlprec_aply')
       goto 9999
     end if
-
-  else  if (size(prec%precv) == 1) then
+  else if(size(prec%precv) == 1) then
     !
     ! Number of levels = 1: apply the base preconditioner
     !
-    nswps = max(prec%precv(1)%parms%sweeps_pre,prec%precv(1)%parms%sweeps_post)
+    nswps = max(prec%precv(1)%parms%sweeps_pre, prec%precv(1)%parms%sweeps_post)
 
-    associate(w1 => prec%precv(1)%wrk%vx2l, w2 => prec%precv(1)%wrk%vy2l,&
-         & wv =>  prec%precv(1)%wrk%wv)
-      if (allocated(prec%precv(1)%sm2a)) then
+    associate(w1 => prec%precv(1)%wrk%vx2l, w2 => prec%precv(1)%wrk%vy2l, &
+            & wv => prec%precv(1)%wrk%wv)
+      if(allocated(prec%precv(1)%sm2a)) then
         !
         ! This is a kludge for handling the symmetrized GS case.
         ! Will need some rethinking. 
         !
-        call psb_geaxpby(cone,x,czero,w1,desc_data,info)
+        call psb_geaxpby(cone, x, czero, w1, desc_data, info)
         select case(trans_)
-        case ('N')
-          do k=1, nswps
-            if (info == 0) call prec%precv(1)%sm%apply(cone,w1,czero,w2,desc_data,trans_,&
-                 & ione, work_,wv,info)
-            if (info == 0) call prec%precv(1)%sm2a%apply(cone,w2,czero,w1,desc_data,trans_,&
-                 & ione, work_,wv,info)
-          end do
-          
-        case('T','C')
-          do k=1, nswps
-            if (info == 0) call prec%precv(1)%sm2a%apply(cone,w1,czero,w2,desc_data,trans_,&
-                 & ione, work_,wv,info)
-            if (info == 0) call prec%precv(1)%sm%apply(cone,w2,czero,w1,desc_data,trans_,&
-                 & ione, work_,wv,info)
-          end do
-        case default
-          info = psb_err_from_subroutine_
-          call psb_errpush(info,name,a_err='Invalid trans')
-          goto 9999         
+          case ('N')
+            do k = 1, nswps
+              if(info == psb_success_) call prec%precv(1)%sm%apply(cone, w1, czero, w2, desc_data, &
+                                                                    & trans_, ione, work_, wv, info)
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(cone, w2, czero, w1, desc_data, &
+                                                                      & trans_, ione, work_, wv, info)
+            end do
+            
+          case('T', 'C')
+            do k = 1, nswps
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(cone, w1, czero, w2, desc_data, &
+                                                                      & trans_, ione, work_, wv, info)
+              if(info == psb_success_) call prec%precv(1)%sm%apply(cone, w2, czero, w1, desc_data, &
+                                                                    & trans_, ione, work_, wv, info)
+            end do
+
+          case default
+            info = psb_err_from_subroutine_
+            call psb_errpush(info, name, a_err = 'Invalid trans')
+            goto 9999         
         end select
-        if (info == 0) call psb_geaxpby(cone,w1,czero,y,desc_data,info)
+
+        if(info == psb_success_) call psb_geaxpby(cone, w1, czero, y, desc_data, info)
       else
-        if (info == 0) call prec%precv(1)%sm%apply(cone,x,czero,y,desc_data,trans_,&
-             & nswps,work_,wv,info)
+        if(info == psb_success_) call prec%precv(1)%sm%apply(cone, x, czero, y, desc_data, trans_, &
+                                                              & nswps, work_, wv, info)
       end if
     end associate
-    if (psb_errstatus_fatal())   info = psb_err_internal_error_
-    if (info /= 0) then
+
+    if(psb_errstatus_fatal()) info = psb_err_internal_error_
+    if(info /= 0) then
       info = psb_err_from_subroutine_ai_
-      call psb_errpush(info,name,a_err='Smoother application',&
-           & i_Err=(/ione*size(prec%precv),izero,izero,izero,izero/))
+      call psb_errpush(info, name, a_err = 'Smoother application', &
+           & i_err=(/ione*size(prec%precv), izero, izero, izero, izero/))
       goto 9999
     end if
-    
   else 
-    
     info = psb_err_from_subroutine_ai_
-    call psb_errpush(info,name,a_err='Invalid size of precv',&
-         & i_Err=(/ione*size(prec%precv),izero,izero,izero,izero/))
+    call psb_errpush(info, name, a_err = 'Invalid size of precv', &
+         & i_err=(/ione*size(prec%precv), izero, izero, izero, izero/))
     goto 9999
   endif
 
   ! If the original distribution has an overlap we should fix that. 
-  call psb_halo(y,desc_data,info,data=psb_comm_mov_)
+  call psb_halo(y, desc_data, info, data = psb_comm_mov_)
 
-  if (do_alloc_wrk) call prec%free_wrk(info)
+  if(do_alloc_wrk) call prec%free_wrk(info)
 
-  if (present(work)) then 
-  else
-    deallocate(work_)
-  end if
+  if(.not. present(work)) deallocate(work_)
 
   call psb_erractionrestore(err_act)
   return
 
 9999 call psb_error_handler(err_act)
-
   return
-
 end subroutine amg_cprecaply2_vect
 
-
-subroutine amg_cprecaply1_vect(prec,x,desc_data,info,trans,work)
-
+subroutine amg_cprecaply1_vect(prec, x, desc_data, info, trans, work)
   use psb_base_mod
   use amg_c_inner_mod!, amg_protect_name => amg_cprecaply1_vect
 
   implicit none
-
   ! Arguments
-  type(psb_desc_type),intent(in)      :: desc_data
-  type(amg_cprec_type), intent(inout) :: prec
-  type(psb_c_vect_type),intent(inout) :: x
-  integer(psb_ipk_), intent(out)      :: info
-  character(len=1), optional          :: trans
-  complex(psb_spk_),intent(inout), optional, target  :: work(:)
+  type(amg_cprec_type), intent(inout)   :: prec
+  type(psb_c_vect_type), intent(inout)  :: x
+  type(psb_desc_type), intent(in)       :: desc_data
+  integer(psb_ipk_), intent(out)        :: info
+  character(len=1), optional                      :: trans
+  complex(psb_spk_), intent(inout), optional, target :: work(:)
 
   ! Local variables
-  character     :: trans_ 
-  complex(psb_spk_), pointer :: work_(:)
+  character           :: trans_ 
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_)   :: np, me
-  integer(psb_ipk_)   :: err_act,iwsz, k, nswps
+  integer(psb_ipk_)   :: err_act, iwsz, k, nswps
   logical             :: do_alloc_wrk
   character(len=20)   :: name
+  complex(psb_spk_), pointer :: work_(:)
 
-  name='amg_cprecaply'
+  name = 'amg_cprecaply'
   info = psb_success_
   call psb_erractionsave(err_act)
 
   ctxt = desc_data%get_context()
   call psb_info(ctxt, me, np)
 
-  if (present(trans)) then 
-    trans_=psb_toupper(trans)
-  else
-    trans_='N'
-  end if
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
-  if (present(work)) then 
+  if(present(work)) then 
     work_ => work
   else
-    iwsz = max(1,4*desc_data%get_local_cols())
-    allocate(work_(iwsz),stat=info)
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_alloc_request_,name, &
-           & i_err=(/iwsz,izero,izero,izero,izero/),&
-           & a_err='complex(psb_spk_)')
+    iwsz = max(1, 4*desc_data%get_local_cols())
+    allocate(work_(iwsz), stat = info)
+    if(info /= psb_success_) then 
+      call psb_errpush(psb_err_alloc_request_, name, &
+            & i_err = (/iwsz, izero, izero, izero, izero/),&
+            & a_err = 'complex(psb_spk_)')
       goto 9999      
     end if
-
   end if
 
-  if (.not.(allocated(prec%precv))) then 
+  if(.not.(allocated(prec%precv))) then 
     !! Error 1: should call amg_cprecbld
-    info=3112
-    call psb_errpush(info,name)
+    info = 3112
+    call psb_errpush(info, name)
     goto 9999
   end if
   
   do_alloc_wrk = .not.allocated(prec%precv(1)%wrk)
-  if (do_alloc_wrk) call prec%allocate_wrk(info,vmold=x%v)
+  if(do_alloc_wrk) call prec%allocate_wrk(info, vmold = x%v)
 
-  associate(ww => prec%precv(1)%wrk%vtx, wv =>  prec%precv(1)%wrk%wv)
-
-    if (size(prec%precv) >1) then
+  associate(ww => prec%precv(1)%wrk%vtx, wv => prec%precv(1)%wrk%wv)
+    if(size(prec%precv) > 1) then
       !
       ! Number of levels > 1: apply the multilevel preconditioner
       !
       ! FIXME: generic name causes an ICE with Intel
-      call amg_cmlprec_aply_vect(cone,prec,x,czero,ww,desc_data,trans_,work_,info)
-      if (info == 0) call psb_geaxpby(cone,ww,czero,x,desc_data,info)
+      call amg_cmlprec_aply_vect(cone, prec, x, czero, ww, desc_data, trans_, work_, info)
+      if(info == psb_success_) call psb_geaxpby(cone, ww, czero, x, desc_data, info)
       if(info /= psb_success_) then
-        call psb_errpush(psb_err_from_subroutine_,name,a_err='amg_cmlprec_aply')
+        call psb_errpush(psb_err_from_subroutine_, name, a_err = 'amg_cmlprec_aply')
         goto 9999
       end if
-
-    else  if (size(prec%precv) == 1) then
+    else if(size(prec%precv) == 1) then
       !
       ! Number of levels = 1: apply the base preconditioner
       !
-      nswps = max(prec%precv(1)%parms%sweeps_pre,prec%precv(1)%parms%sweeps_post)
-      if (allocated(prec%precv(1)%sm2a)) then
+      nswps = max(prec%precv(1)%parms%sweeps_pre, prec%precv(1)%parms%sweeps_post)
+      if(allocated(prec%precv(1)%sm2a)) then
         !
         ! This is a kludge for handling the symmetrized GS case.
         ! Will need some rethinking. 
         ! 
         select case(trans_)
-        case ('N')
-          do k=1, nswps
-            if (info == 0) call prec%precv(1)%sm%apply(cone,x,czero,ww,desc_data,trans_,&
-                 & ione, work_,wv,info)
-            if (info == 0) call prec%precv(1)%sm2a%apply(cone,ww,czero,x,desc_data,trans_,&
-                 & ione, work_,wv,info)
-          end do
-        case('T','C')
-          do k=1, nswps
-            if (info == 0) call prec%precv(1)%sm2a%apply(cone,x,czero,ww,desc_data,trans_,&
-                 & ione, work_,wv,info)
-            if (info == 0) call prec%precv(1)%sm%apply(cone,ww,czero,x,desc_data,trans_,&
-                 & ione, work_,wv,info)
-          end do
-        case default
-          info = psb_err_from_subroutine_
-          call psb_errpush(info,name,a_err='Invalid trans')
-          goto 9999         
-        end select
+          case ('N')
+            do k = 1, nswps
+              if(info == psb_success_) call prec%precv(1)%sm%apply(cone, x, czero, ww, desc_data, &
+                                                                    & trans_, ione, work_, wv, info)
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(cone, ww, czero, x, desc_data, &
+                                                                      & trans_, ione, work_, wv, info)
+            end do
 
+          case('T', 'C')
+            do k = 1, nswps
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(cone, x, czero, ww, desc_data, &
+                                                                      & trans_, ione, work_, wv, info)
+              if(info == psb_success_) call prec%precv(1)%sm%apply(cone, ww, czero, x, desc_data, &
+                                                                    & trans_, ione, work_,wv,info)
+            end do
+
+          case default
+            info = psb_err_from_subroutine_
+            call psb_errpush(info, name, a_err = 'Invalid trans')
+            goto 9999
+        end select
       else
-        if (info == 0) call prec%precv(1)%sm%apply(cone,x,czero,ww,desc_data,trans_,&
-             & nswps, work_,wv,info)
-        if (info == 0) call psb_geaxpby(cone,ww,czero,x,desc_data,info)
+        if(info == psb_success_) call prec%precv(1)%sm%apply(cone, x, czero, ww, desc_data, &
+                                                              & trans_, nswps, work_, wv, info)
+        if(info == psb_success_) call psb_geaxpby(cone, ww, czero, x, desc_data, info)
       end if
 
-      if (psb_errstatus_fatal())   info = psb_err_internal_error_
-      if (info /=0) then
+      if(psb_errstatus_fatal()) info = psb_err_internal_error_
+      if(info /= 0) then
         info = psb_err_internal_error_
-        call psb_errpush(info,name,a_err='Smoother application',&
-             & i_Err=(/ione*size(prec%precv),izero,izero,izero,izero/))
+        call psb_errpush(info, name, a_err = 'Smoother application', &
+             & i_err = (/ione*size(prec%precv), izero, izero, izero, izero/))
         goto 9999
       end if
-
     else 
-
       info = psb_err_from_subroutine_ai_
-      call psb_errpush(info,name,a_err='Invalid size of precv',&
-           & i_Err=(/ione*size(prec%precv),izero,izero,izero,izero/))
+      call psb_errpush(info, name, a_err = 'Invalid size of precv', &
+           & i_err = (/ione*size(prec%precv), izero, izero, izero, izero/))
       goto 9999
     endif
   end associate
 
   ! If the original distribution has an overlap we should fix that. 
-  call psb_halo(x,desc_data,info,data=psb_comm_mov_)
+  call psb_halo(x, desc_data, info, data = psb_comm_mov_)
 
-  if (do_alloc_wrk) call prec%free_wrk(info)
+  if(do_alloc_wrk) call prec%free_wrk(info)
 
-  if (present(work)) then 
-  else
-    deallocate(work_)
-  end if
+  if(.not. present(work)) deallocate(work_)
 
   call psb_erractionrestore(err_act)
   return
 
 9999 call psb_error_handler(err_act)
+  return
+end subroutine amg_cprecaply1_vect
 
+subroutine amg_cprecaply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, trans, work)
+  use psb_base_mod
+  use amg_c_inner_mod!, amg_protect_name => amg_cprecaply2_mvect_col
+  
+  implicit none
+  ! Arguments
+  type(amg_cprec_type), intent(inout)       :: prec
+  type(psb_c_multivect_type), intent(inout) :: x, y
+  integer(psb_ipk_), intent(in)             :: idx_x, idx_y
+  type(psb_desc_type), intent(in)           :: desc_data
+  integer(psb_ipk_), intent(out)            :: info
+  character(len=1), optional                      :: trans
+  complex(psb_spk_), intent(inout), optional, target :: work(:)
+
+  ! Local variables
+  character           :: trans_ 
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: err_act, iwsz, k, nswps
+  logical             :: do_alloc_wrk
+  character(len=20)   :: name
+  complex(psb_spk_), pointer :: work_(:)
+
+  name = 'amg_cprecaply'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt, me, np)
+
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
+
+  if(present(work)) then 
+    work_ => work
+  else
+    iwsz = max(1, 4*desc_data%get_local_cols())
+    allocate(work_(iwsz), stat = info)
+    if(info /= psb_success_) then 
+      call psb_errpush(psb_err_alloc_request_, name, &
+            & i_err = (/iwsz, izero, izero, izero, izero/), &
+            & a_err = 'complex(psb_spk_)')
+      goto 9999      
+    end if
+  end if
+
+  if(.not.(allocated(prec%precv))) then 
+    !! Error 1: should call amg_cprecbld
+    info = 3112
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+  
+  do_alloc_wrk = .not. allocated(prec%precv(1)%wrk)
+  if(do_alloc_wrk) call prec%allocate_wrk(info) ! vmold = x%v -> TO DO: needed only for CUDA?
+
+  if(size(prec%precv) > 1) then
+    !
+    ! Number of levels > 1: apply the multilevel preconditioner
+    !
+    
+    ! FIXME: generic name causes an ICE with Intel
+    call amg_cmlprec_aply_mvect_col(cone, prec, x, idx_x, czero, y, idx_y, desc_data, trans_, work_, info)
+
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_, name, a_err = 'amg_cmlprec_aply')
+      goto 9999
+    end if
+  else if(size(prec%precv) == 1) then
+    !
+    ! Number of levels = 1: apply the base preconditioner
+    !
+    nswps = max(prec%precv(1)%parms%sweeps_pre, prec%precv(1)%parms%sweeps_post)
+
+    associate(w1 => prec%precv(1)%wrk%vx2l, w2 => prec%precv(1)%wrk%vy2l, &
+            & wv => prec%precv(1)%wrk%wv)
+      if(allocated(prec%precv(1)%sm2a)) then
+        !
+        ! This is a kludge for handling the symmetrized GS case.
+        ! Will need some rethinking. 
+        !
+        call psb_geaxpby(cone, x, idx_x, czero, w1, desc_data, info)
+        select case(trans_)
+          case ('N')
+            do k = 1, nswps
+              if(info == psb_success_) call prec%precv(1)%sm%apply(cone, w1, czero, w2, desc_data, &
+                                                                    & trans_, ione, work_, wv, info)
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(cone, w2, czero, w1, desc_data, &
+                                                                      & trans_, ione, work_, wv, info)
+            end do
+            
+          case('T', 'C')
+            do k = 1, nswps
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(cone, w1, czero, w2, desc_data, &
+                                                                      & trans_, ione, work_, wv, info)
+              if(info == psb_success_) call prec%precv(1)%sm%apply(cone, w2, czero, w1, desc_data, &
+                                                                    & trans_, ione, work_, wv, info)
+            end do
+
+          case default
+            info = psb_err_from_subroutine_
+            call psb_errpush(info, name, a_err = 'Invalid trans')
+            goto 9999         
+        end select
+
+        if(info == psb_success_) call psb_geaxpby(cone, w1, czero, y, idx_y, desc_data, info)
+      else
+        if(info == psb_success_) call prec%precv(1)%sm%apply(cone, x, idx_x, czero, y, idx_y, desc_data, trans_, &
+                                                              & nswps, work_, wv, info)
+      end if
+    end associate
+
+    if(psb_errstatus_fatal()) info = psb_err_internal_error_
+    if(info /= 0) then
+      info = psb_err_from_subroutine_ai_
+      call psb_errpush(info, name, a_err = 'Smoother application', &
+           & i_err=(/ione*size(prec%precv), izero, izero, izero, izero/))
+      goto 9999
+    end if
+  else 
+    info = psb_err_from_subroutine_ai_
+    call psb_errpush(info, name, a_err = 'Invalid size of precv', &
+         & i_err=(/ione*size(prec%precv), izero, izero, izero, izero/))
+    goto 9999
+  endif
+
+  ! If the original distribution has an overlap we should fix that. 
+  call psb_halo(y, desc_data, info, data = psb_comm_mov_)
+
+  if(do_alloc_wrk) call prec%free_wrk(info)
+
+  if(.not. present(work)) deallocate(work_)
+
+  call psb_erractionrestore(err_act)
   return
 
-end subroutine amg_cprecaply1_vect
+9999 call psb_error_handler(err_act)
+  return
+end subroutine amg_cprecaply2_mvect_col
+
+subroutine amg_cprecaply1_mvect_col(prec, x, idx_x, desc_data, info, trans, work)
+  use psb_base_mod
+  use amg_c_inner_mod!, amg_protect_name => amg_cprecaply1_mvect_col
+
+  implicit none
+  ! Arguments
+  type(amg_cprec_type), intent(inout)       :: prec
+  type(psb_c_multivect_type), intent(inout) :: x
+  integer(psb_ipk_), intent(in)             :: idx_x
+  type(psb_desc_type), intent(in)           :: desc_data
+  integer(psb_ipk_), intent(out)            :: info
+  character(len=1), optional                      :: trans
+  complex(psb_spk_), intent(inout), optional, target :: work(:)
+
+  ! Local variables
+  character           :: trans_ 
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: err_act, iwsz, k, nswps
+  logical             :: do_alloc_wrk
+  character(len=20)   :: name
+  complex(psb_spk_), pointer :: work_(:)
+
+  name = 'amg_cprecaply'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  ctxt = desc_data%get_context()
+  call psb_info(ctxt, me, np)
+
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
+
+  if(present(work)) then 
+    work_ => work
+  else
+    iwsz = max(1, 4*desc_data%get_local_cols())
+    allocate(work_(iwsz), stat = info)
+    if(info /= psb_success_) then 
+      call psb_errpush(psb_err_alloc_request_, name, &
+            & i_err = (/iwsz, izero, izero, izero, izero/),&
+            & a_err = 'complex(psb_spk_)')
+      goto 9999      
+    end if
+  end if
+
+  if(.not.(allocated(prec%precv))) then 
+    !! Error 1: should call amg_cprecbld
+    info = 3112
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+  
+  do_alloc_wrk = .not.allocated(prec%precv(1)%wrk)
+  if(do_alloc_wrk) call prec%allocate_wrk(info) ! vmold = x%v -> TO DO: needed only for CUDA?
+
+  associate(ww => prec%precv(1)%wrk%vtx, wv => prec%precv(1)%wrk%wv)
+    if(size(prec%precv) > 1) then
+      !
+      ! Number of levels > 1: apply the multilevel preconditioner
+      !
+      ! FIXME: generic name causes an ICE with Intel
+      call amg_cmlprec_aply_mvect_vect(cone, prec, x, idx_x, czero, ww, desc_data, trans_, work_, info)
+      if(info == psb_success_) call psb_geaxpby(cone, ww, czero, x, idx_x, desc_data, info)
+      if(info /= psb_success_) then
+        call psb_errpush(psb_err_from_subroutine_, name, a_err = 'amg_cmlprec_aply')
+        goto 9999
+      end if
+    else if(size(prec%precv) == 1) then
+      !
+      ! Number of levels = 1: apply the base preconditioner
+      !
+      nswps = max(prec%precv(1)%parms%sweeps_pre, prec%precv(1)%parms%sweeps_post)
+      if(allocated(prec%precv(1)%sm2a)) then
+        !
+        ! This is a kludge for handling the symmetrized GS case.
+        ! Will need some rethinking. 
+        ! 
+        select case(trans_)
+          case ('N')
+            do k = 1, nswps
+              if(info == psb_success_) call prec%precv(1)%sm%apply(cone, x, idx_x, czero, ww, desc_data, &
+                                                                    & trans_, ione, work_, wv, info)
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(cone, ww, czero, x, idx_x, desc_data, &
+                                                                      & trans_, ione, work_, wv, info)
+            end do
+
+          case('T', 'C')
+            do k = 1, nswps
+              if(info == psb_success_) call prec%precv(1)%sm2a%apply(cone, x, idx_x, czero, ww, desc_data, &
+                                                                      & trans_, ione, work_, wv, info)
+              if(info == psb_success_) call prec%precv(1)%sm%apply(cone, ww, czero, x, idx_x, desc_data, &
+                                                                    & trans_, ione, work_,wv, info)
+            end do
+
+          case default
+            info = psb_err_from_subroutine_
+            call psb_errpush(info, name, a_err = 'Invalid trans')
+            goto 9999
+        end select
+      else
+        if(info == psb_success_) call prec%precv(1)%sm%apply(cone, x, idx_x, czero, ww, desc_data, &
+                                                              & trans_, nswps, work_, wv, info)
+        if(info == psb_success_) call psb_geaxpby(cone, ww, czero, x, idx_x, desc_data, info)
+      end if
+
+      if(psb_errstatus_fatal()) info = psb_err_internal_error_
+      if(info /= 0) then
+        info = psb_err_internal_error_
+        call psb_errpush(info, name, a_err = 'Smoother application', &
+             & i_err = (/ione*size(prec%precv), izero, izero, izero, izero/))
+        goto 9999
+      end if
+    else 
+      info = psb_err_from_subroutine_ai_
+      call psb_errpush(info, name, a_err = 'Invalid size of precv', &
+           & i_err = (/ione*size(prec%precv), izero, izero, izero, izero/))
+      goto 9999
+    endif
+  end associate
+
+  ! If the original distribution has an overlap we should fix that. 
+  call psb_halo(x, desc_data, info, data = psb_comm_mov_)
+
+  if(do_alloc_wrk) call prec%free_wrk(info)
+
+  if(.not. present(work)) deallocate(work_)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine amg_cprecaply1_mvect_col

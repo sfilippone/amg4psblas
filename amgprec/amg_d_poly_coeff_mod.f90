@@ -539,9 +539,9 @@ module amg_d_poly_coeff_mod
 
 
 
-!!$  [1.1250000000000000_psb_dpk_, 0.0_psb_dpk_, 0.0_psb_dpk__psb_dpk_,,&
-!!$       & 1.0238728757031315_psb_dpk_, 1.2640890537108553_psb_dpk_,  0.0_psb_dpk_,&
-!!$       & 1.0084254478202830_psb_dpk_, 1.0886783920873087_psb_dpk_, 1.3375312590961856_psb_dpk_]
+  !!$  [1.1250000000000000_psb_dpk_, 0.0_psb_dpk_, 0.0_psb_dpk__psb_dpk_,,&
+  !!$       & 1.0238728757031315_psb_dpk_, 1.2640890537108553_psb_dpk_,  0.0_psb_dpk_,&
+  !!$       & 1.0084254478202830_psb_dpk_, 1.0886783920873087_psb_dpk_, 1.3375312590961856_psb_dpk_]
 
   real(psb_dpk_), parameter  :: amg_d_poly_beta_mat(30,30)=reshape(amg_d_poly_beta_vect,[30,30])
 

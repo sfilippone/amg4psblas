@@ -47,78 +47,143 @@
 !    what are commonly known as the classic Jacobi iterations
 !
 module amg_c_diag_solver
-
   use amg_c_base_solver_mod
 
   type, extends(amg_c_base_solver_type) :: amg_c_diag_solver_type
     type(psb_c_vect_type), allocatable :: dv
     complex(psb_spk_), allocatable        :: d(:)
   contains
-    procedure, pass(sv) :: dump    => amg_c_diag_solver_dmp
-    procedure, pass(sv) :: build   => amg_c_diag_solver_bld
-    procedure, pass(sv) :: cnv     => amg_c_diag_solver_cnv
-    procedure, pass(sv) :: clone   => amg_c_diag_solver_clone
+    procedure, pass(sv) :: apply_a      => amg_c_diag_solver_apply
+    procedure, pass(sv) :: apply_v      => amg_c_diag_solver_apply_vect
+    ! procedure, pass(sv) :: apply_mv     => amg_c_base_solver_apply_mvect
+    procedure, pass(sv) :: apply_v_mv   => amg_c_diag_solver_apply_vect_mvect
+    procedure, pass(sv) :: apply_mv_v   => amg_c_diag_solver_apply_mvect_vect
+    procedure, pass(sv) :: apply_mv_col => amg_c_diag_solver_apply_mvect_col
+
+    procedure, pass(sv) :: dump   => amg_c_diag_solver_dmp
+    procedure, pass(sv) :: build  => amg_c_diag_solver_bld
+    procedure, pass(sv) :: cnv    => amg_c_diag_solver_cnv
+    procedure, pass(sv) :: clone  => amg_c_diag_solver_clone
     procedure, pass(sv) :: clear_data  => amg_c_diag_solver_clear_data
-    procedure, pass(sv) :: apply_v => amg_c_diag_solver_apply_vect
-    procedure, pass(sv) :: apply_a => amg_c_diag_solver_apply
-    procedure, pass(sv) :: free    => c_diag_solver_free
-    procedure, pass(sv) :: descr   => c_diag_solver_descr
-    procedure, pass(sv) :: sizeof  => c_diag_solver_sizeof
-    procedure, pass(sv) :: get_nzeros  => c_diag_solver_get_nzeros
-    procedure, nopass   :: get_fmt   => c_diag_solver_get_fmt
-    procedure, nopass   :: get_id    => c_diag_solver_get_id
+    procedure, pass(sv) :: free   => c_diag_solver_free
+    procedure, pass(sv) :: descr  => c_diag_solver_descr
+    procedure, pass(sv) :: sizeof => c_diag_solver_sizeof
+    procedure, pass(sv) :: get_nzeros => c_diag_solver_get_nzeros
+    procedure, nopass   :: get_fmt    => c_diag_solver_get_fmt
+    procedure, nopass   :: get_id     => c_diag_solver_get_id
   end type amg_c_diag_solver_type
 
-
-  private :: c_diag_solver_free,  c_diag_solver_descr, &
-       & c_diag_solver_sizeof, c_diag_solver_get_nzeros, &
-       & c_diag_solver_get_fmt, c_diag_solver_get_id
-
+  private :: c_diag_solver_free, c_diag_solver_descr, &
+            & c_diag_solver_sizeof, c_diag_solver_get_nzeros, &
+            & c_diag_solver_get_fmt, c_diag_solver_get_id
 
   interface 
-    subroutine amg_c_diag_solver_apply_vect(alpha,sv,x,beta,y,desc_data,& 
-         & trans,work,wv,info,init,initu)
-      import :: psb_desc_type, psb_cspmat_type,  psb_c_base_sparse_mat, &
-       & psb_c_vect_type, psb_c_base_vect_type, psb_spk_, &
-       & amg_c_diag_solver_type, psb_ipk_
-      type(psb_desc_type), intent(in)                :: desc_data
-      class(amg_c_diag_solver_type), intent(inout) :: sv
-      type(psb_c_vect_type), intent(inout)         :: x
-      type(psb_c_vect_type), intent(inout)         :: y
-      complex(psb_spk_),intent(in)                     :: alpha,beta
-      character(len=1),intent(in)                    :: trans
-      complex(psb_spk_),target, intent(inout)          :: work(:)
-      type(psb_c_vect_type),intent(inout)          :: wv(:)
-      integer(psb_ipk_), intent(out)                 :: info
-      character, intent(in), optional                :: init
-      type(psb_c_vect_type),intent(inout), optional   :: initu
-    end subroutine amg_c_diag_solver_apply_vect
-  end interface
-  
-  interface 
-    subroutine amg_c_diag_solver_apply(alpha,sv,x,beta,y,desc_data,&
-         & trans,work,info,init,initu)
-      import :: psb_desc_type, psb_cspmat_type,  psb_c_base_sparse_mat, &
-       & psb_c_vect_type, psb_c_base_vect_type, psb_spk_, &
-       & amg_c_diag_solver_type, psb_ipk_
-      type(psb_desc_type), intent(in)            :: desc_data
-      class(amg_c_diag_solver_type), intent(inout) :: sv
-      complex(psb_spk_), intent(inout)             :: x(:)
-      complex(psb_spk_), intent(inout)             :: y(:)
-      complex(psb_spk_),intent(in)                 :: alpha,beta
-      character(len=1),intent(in)                :: trans
-      complex(psb_spk_),target, intent(inout)      :: work(:)
-      integer(psb_ipk_), intent(out)             :: info
-      character, intent(in), optional       :: init
-      complex(psb_spk_),intent(inout), optional :: initu(:)
+    subroutine amg_c_diag_solver_apply(alpha, sv, x, beta, y, &
+                  & desc_data, trans, work, info, init, initu)
+      import :: psb_spk_, amg_c_diag_solver_type, &
+              & psb_desc_type, psb_ipk_
+      implicit none
+      complex(psb_spk_), intent(in)                     :: alpha, beta
+      class(amg_c_diag_solver_type), intent(inout)  :: sv
+      complex(psb_spk_), intent(inout)                 :: x(:), y(:)
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                  :: trans
+      complex(psb_spk_), target, intent(inout)         :: work(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional         :: init
+      complex(psb_spk_), intent(inout), optional :: initu(:)
     end subroutine amg_c_diag_solver_apply
   end interface
   
   interface 
-    subroutine amg_c_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
-      import :: psb_desc_type, psb_cspmat_type,  psb_c_base_sparse_mat, &
-           & psb_c_vect_type, psb_c_base_vect_type, psb_spk_, &
-           & amg_c_diag_solver_type, psb_ipk_, psb_i_base_vect_type      
+    subroutine amg_c_diag_solver_apply_vect(alpha, sv, x, beta, y, & 
+                  & desc_data, trans, work, wv, info, init, initu)
+      import :: psb_spk_, amg_c_diag_solver_type, &
+              & psb_c_vect_type, psb_desc_type, psb_ipk_
+      implicit none
+      complex(psb_spk_), intent(in)                     :: alpha, beta
+      class(amg_c_diag_solver_type), intent(inout)  :: sv
+      type(psb_c_vect_type), intent(inout)          :: x, y
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                   :: trans
+      complex(psb_spk_), target, intent(inout)         :: work(:)
+      type(psb_c_vect_type), intent(inout)          :: wv(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional                 :: init
+      type(psb_c_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_c_diag_solver_apply_vect
+  end interface
+  
+  interface 
+    subroutine amg_c_diag_solver_apply_vect_mvect(alpha, sv, x, beta, y, idx_y, & 
+                  & desc_data, trans, work, wv, info, init, initu)
+      import :: psb_spk_, amg_c_diag_solver_type, &
+              & psb_c_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_c_vect_type
+      implicit none
+      complex(psb_spk_), intent(in)                     :: alpha, beta
+      class(amg_c_diag_solver_type), intent(inout)  :: sv
+      type(psb_c_vect_type), intent(inout)          :: x
+      type(psb_c_multivect_type), intent(inout)     :: y
+      integer(psb_ipk_), intent(in)                 :: idx_y
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                   :: trans
+      complex(psb_spk_), target, intent(inout)         :: work(:)
+      type(psb_c_vect_type), intent(inout)          :: wv(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional                 :: init
+      type(psb_c_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_c_diag_solver_apply_vect_mvect
+  end interface
+
+  interface 
+    subroutine amg_c_diag_solver_apply_mvect_vect(alpha, sv, x, idx_x, beta, y, & 
+                  & desc_data, trans, work, wv, info, init, initu)
+      import :: psb_spk_, amg_c_diag_solver_type, &
+              & psb_c_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_c_vect_type
+      implicit none
+      complex(psb_spk_), intent(in)                     :: alpha, beta
+      class(amg_c_diag_solver_type), intent(inout)  :: sv
+      type(psb_c_multivect_type), intent(inout)     :: x
+      integer(psb_ipk_), intent(in)                 :: idx_x
+      type(psb_c_vect_type), intent(inout)          :: y
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                   :: trans
+      complex(psb_spk_), target, intent(inout)         :: work(:)
+      type(psb_c_vect_type), intent(inout)          :: wv(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional                 :: init
+      type(psb_c_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_c_diag_solver_apply_mvect_vect
+  end interface
+  
+  interface 
+    subroutine amg_c_diag_solver_apply_mvect_col(alpha, sv, x, idx_x, beta, y, idx_y, &
+                  & desc_data, trans, work, wv, info, init, initu)
+      import :: psb_spk_, amg_c_diag_solver_type, &
+              & psb_c_multivect_type, psb_ipk_, &
+              & psb_desc_type, psb_c_vect_type
+      implicit none 
+      complex(psb_spk_), intent(in)                    :: alpha, beta
+      class(amg_c_diag_solver_type), intent(inout)  :: sv
+      type(psb_c_multivect_type), intent(inout)     :: x, y
+      integer(psb_ipk_), intent(in)                 :: idx_x, idx_y
+      type(psb_desc_type), intent(in)               :: desc_data
+      character(len=1), intent(in)                  :: trans
+      complex(psb_spk_), target, intent(inout)         :: work(:)
+      type(psb_c_vect_type), intent(inout)          :: wv(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, intent(in), optional                 :: init
+      type(psb_c_vect_type), intent(inout), optional  :: initu
+    end subroutine amg_c_diag_solver_apply_mvect_col
+  end interface
+
+  interface 
+    subroutine amg_c_diag_solver_bld(a, desc_a, sv, info, b, amold, vmold, imold)
+      import :: psb_desc_type, psb_cspmat_type, psb_c_base_sparse_mat, &
+              & psb_c_vect_type, psb_c_base_vect_type, psb_spk_, &
+              & amg_c_diag_solver_type, psb_ipk_, psb_i_base_vect_type      
       type(psb_cspmat_type), intent(inout), target        :: a
       Type(psb_desc_type), Intent(inout)                    :: desc_a 
       class(amg_c_diag_solver_type), intent(inout)        :: sv
@@ -131,9 +196,9 @@ module amg_c_diag_solver
   end interface
   
   interface 
-    subroutine amg_c_diag_solver_cnv(sv,info,amold,vmold,imold)
+    subroutine amg_c_diag_solver_cnv(sv, info, amold, vmold, imold)
       import :: psb_c_base_sparse_mat, psb_c_base_vect_type, psb_spk_, &
-           & amg_c_diag_solver_type, psb_ipk_, psb_i_base_vect_type      
+              & amg_c_diag_solver_type, psb_ipk_, psb_i_base_vect_type      
       class(amg_c_diag_solver_type), intent(inout)        :: sv
       integer(psb_ipk_), intent(out)                        :: info
       class(psb_c_base_sparse_mat), intent(in), optional  :: amold
@@ -143,10 +208,8 @@ module amg_c_diag_solver
   end interface
 
   interface 
-    subroutine amg_c_diag_solver_dmp(sv,desc,level,info,prefix,head,solver,global_num)
-      import :: psb_desc_type, amg_c_diag_solver_type, psb_c_vect_type, psb_spk_, &
-           & psb_cspmat_type, psb_c_base_sparse_mat, psb_c_base_vect_type, &
-           & psb_ipk_
+    subroutine amg_c_diag_solver_dmp(sv, desc, level, info, prefix, head, solver, global_num)
+      import :: psb_desc_type, amg_c_diag_solver_type, psb_spk_, psb_ipk_
       implicit none 
       class(amg_c_diag_solver_type), intent(in) :: sv
       type(psb_desc_type), intent(in)             :: desc
@@ -158,12 +221,9 @@ module amg_c_diag_solver
   end interface
   
   interface
-    subroutine amg_c_diag_solver_clone(sv,svout,info)
-      import :: psb_desc_type, psb_cspmat_type,  psb_c_base_sparse_mat, &
-           & psb_c_vect_type, psb_c_base_vect_type, psb_spk_, &
-           & amg_c_base_solver_type, amg_c_diag_solver_type, psb_ipk_
-      Implicit None
-      
+    subroutine amg_c_diag_solver_clone(sv, svout, info)
+      import :: amg_c_base_solver_type, amg_c_diag_solver_type, psb_ipk_
+      implicit none
       ! Arguments
       class(amg_c_diag_solver_type), intent(inout)              :: sv
       class(amg_c_base_solver_type), allocatable, intent(inout) :: svout
@@ -172,25 +232,17 @@ module amg_c_diag_solver
   end interface
 
   interface
-    subroutine amg_c_diag_solver_clear_data(sv,info)
-      import :: psb_desc_type, psb_cspmat_type,  psb_c_base_sparse_mat, &
-           & psb_c_vect_type, psb_c_base_vect_type, psb_spk_, &
-           & amg_c_diag_solver_type, psb_ipk_
-      Implicit None
-      
+    subroutine amg_c_diag_solver_clear_data(sv, info)
+      import :: amg_c_diag_solver_type, psb_ipk_
+      implicit none
       ! Arguments
       class(amg_c_diag_solver_type), intent(inout) :: sv
       integer(psb_ipk_), intent(out)                 :: info
     end subroutine amg_c_diag_solver_clear_data
   end interface
-  
-  
 contains
-
-  subroutine c_diag_solver_free(sv,info)
-
-    Implicit None
-
+  subroutine c_diag_solver_free(sv, info)
+    implicit none
     ! Arguments
     class(amg_c_diag_solver_type), intent(inout) :: sv
     integer(psb_ipk_), intent(out)                 :: info
@@ -200,13 +252,13 @@ contains
     call psb_erractionsave(err_act)
     info = psb_success_
 
-    if (allocated(sv%dv)) call sv%dv%free(info)
+    if(allocated(sv%dv)) call sv%dv%free(info)
     
-    if (allocated(sv%d)) then 
-      deallocate(sv%d,stat=info)
-      if (info /= psb_success_) then 
+    if(allocated(sv%d)) then 
+      deallocate(sv%d, stat=info)
+      if(info /= psb_success_) then 
         info = psb_err_alloc_dealloc_
-        call psb_errpush(info,name)
+        call psb_errpush(info, name)
         goto 9999 
       end if
     end if
@@ -214,15 +266,12 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine c_diag_solver_free
 
-  subroutine c_diag_solver_descr(sv,info,iout,coarse,prefix)
-
-    Implicit None
-
+  subroutine c_diag_solver_descr(sv, info, iout, coarse, prefix)
+    implicit none
     ! Arguments
     class(amg_c_diag_solver_type), intent(in) :: sv
     integer(psb_ipk_), intent(out)              :: info
@@ -237,21 +286,16 @@ contains
     character(1024)    :: prefix_
 
     info = psb_success_
-    if (present(iout)) then 
-      iout_ = iout 
-    else
-      iout_ = psb_out_unit
-    endif
-    if (present(prefix)) then
-      prefix_ = prefix
-    else
-      prefix_ = ""
-    end if
 
-    write(iout_,*) trim(prefix_), '  Diagonal local solver '
+    iout_ = psb_out_unit
+    if(present(iout)) iout_ = iout 
 
+    
+    prefix_ = ""
+    if(present(prefix)) prefix_ = prefix
+
+    write(iout_, *) trim(prefix_), '  Diagonal local solver '
     return
-
   end subroutine c_diag_solver_descr
 
   function c_diag_solver_sizeof(sv) result(val)
@@ -259,11 +303,9 @@ contains
     ! Arguments
     class(amg_c_diag_solver_type), intent(in) :: sv
     integer(psb_epk_) :: val
-    integer(psb_ipk_)             :: i
 
     val = 0
-    if (allocated(sv%dv)) val = val + sv%dv%sizeof()
-
+    if(allocated(sv%dv)) val = val + sv%dv%sizeof()
     return
   end function c_diag_solver_sizeof
 
@@ -272,11 +314,9 @@ contains
     ! Arguments
     class(amg_c_diag_solver_type), intent(in) :: sv
     integer(psb_epk_) :: val
-    integer(psb_ipk_)             :: i
 
     val = 0
-    if (allocated(sv%dv)) val = val +  sv%dv%get_nrows()
-
+    if(allocated(sv%dv)) val = val +  sv%dv%get_nrows()
     return
   end function c_diag_solver_get_nzeros
 
@@ -293,7 +333,6 @@ contains
 
     val = amg_diag_scale_
   end function c_diag_solver_get_id
-
 end module amg_c_diag_solver
 
 !
@@ -310,25 +349,22 @@ end module amg_c_diag_solver
 !
 
 module amg_c_l1_diag_solver
-
   use amg_c_diag_solver
 
   type, extends(amg_c_diag_solver_type) :: amg_c_l1_diag_solver_type
   contains
-    procedure, pass(sv) :: dump    => amg_c_l1_diag_solver_dmp
-    procedure, pass(sv) :: build   => amg_c_l1_diag_solver_bld
-    procedure, pass(sv) :: descr   => c_l1_diag_solver_descr
-    procedure, nopass   :: get_fmt   => c_l1_diag_solver_get_fmt
-    procedure, nopass   :: get_id    => c_l1_diag_solver_get_id
+    procedure, pass(sv) :: dump     => amg_c_l1_diag_solver_dmp
+    procedure, pass(sv) :: build    => amg_c_l1_diag_solver_bld
+    procedure, pass(sv) :: descr    => c_l1_diag_solver_descr
+    procedure, nopass   :: get_fmt  => c_l1_diag_solver_get_fmt
+    procedure, nopass   :: get_id   => c_l1_diag_solver_get_id
   end type amg_c_l1_diag_solver_type
 
-
-  private :: c_l1_diag_solver_descr, &
-       & c_l1_diag_solver_get_fmt, c_l1_diag_solver_get_id
+  private :: c_l1_diag_solver_descr, c_l1_diag_solver_get_fmt, c_l1_diag_solver_get_id
 
   interface 
-    subroutine amg_c_l1_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
-      import :: psb_desc_type, psb_cspmat_type,  psb_c_base_sparse_mat, &
+    subroutine amg_c_l1_diag_solver_bld(a, desc_a, sv, info, b, amold, vmold, imold)
+      import :: psb_desc_type, psb_cspmat_type, psb_c_base_sparse_mat, &
            & psb_c_vect_type, psb_c_base_vect_type, psb_spk_, &
            & amg_c_l1_diag_solver_type, psb_ipk_, psb_i_base_vect_type      
       type(psb_cspmat_type), intent(inout), target        :: a
@@ -343,10 +379,8 @@ module amg_c_l1_diag_solver
   end interface
   
   interface 
-    subroutine amg_c_l1_diag_solver_dmp(sv,desc,level,info,prefix,head,solver,global_num)
-      import :: psb_desc_type, amg_c_l1_diag_solver_type, psb_c_vect_type, psb_spk_, &
-           & psb_cspmat_type, psb_c_base_sparse_mat, psb_c_base_vect_type, &
-           & psb_ipk_
+    subroutine amg_c_l1_diag_solver_dmp(sv, desc, level, info, prefix, head, solver, global_num)
+      import :: psb_desc_type, amg_c_l1_diag_solver_type, psb_ipk_
       implicit none 
       class(amg_c_l1_diag_solver_type), intent(in) :: sv
       type(psb_desc_type), intent(in)             :: desc
@@ -356,13 +390,9 @@ module amg_c_l1_diag_solver
       logical, optional, intent(in)              :: solver, global_num
     end subroutine amg_c_l1_diag_solver_dmp
   end interface
-  
 contains
-
-  subroutine c_l1_diag_solver_descr(sv,info,iout,coarse,prefix)
-
-    Implicit None
-
+  subroutine c_l1_diag_solver_descr(sv, info, iout, coarse, prefix)
+    implicit none
     ! Arguments
     class(amg_c_l1_diag_solver_type), intent(in) :: sv
     integer(psb_ipk_), intent(out)              :: info
@@ -377,21 +407,15 @@ contains
     character(1024)    :: prefix_
 
     info = psb_success_
-    if (present(iout)) then 
-      iout_ = iout 
-    else
-      iout_ = psb_out_unit
-    endif
-    if (present(prefix)) then
-      prefix_ = prefix
-    else
-      prefix_ = ""
-    end if
+    
+    iout_ = psb_out_unit
+    if(present(iout)) iout_ = iout 
 
-    write(iout_,*) trim(prefix_), '  L1 Diagonal solver '
+    prefix_ = ""
+    if(present(prefix)) prefix_ = prefix
 
+    write(iout_, *) trim(prefix_), ' L1 Diagonal solver '
     return
-
   end subroutine c_l1_diag_solver_descr
 
   function c_l1_diag_solver_get_fmt() result(val)
@@ -407,6 +431,4 @@ contains
 
     val = amg_l1_diag_scale_
   end function c_l1_diag_solver_get_id
-
 end module amg_c_l1_diag_solver
-
