@@ -25,22 +25,22 @@ MPCOBJS=amg_dslud_interface.o amg_zslud_interface.o
 
 DINNEROBJS= amg_dmlprec_bld.o amg_dfile_prec_descr.o amg_dfile_prec_memory_use.o \
 	amg_d_smoothers_bld.o amg_d_hierarchy_bld.o amg_d_hierarchy_rebld.o \
-	amg_dmlprec_aply.o   \
+	amg_dmlprec_aply.o amg_dmlprec_aply_a.o \
 	$(DMPFOBJS) amg_d_extprol_bld.o
 
 SINNEROBJS=   amg_smlprec_bld.o amg_sfile_prec_descr.o amg_sfile_prec_memory_use.o \
 	amg_s_smoothers_bld.o amg_s_hierarchy_bld.o amg_s_hierarchy_rebld.o \
-	amg_smlprec_aply.o   \
+	amg_smlprec_aply.o amg_smlprec_aply_a.o \
 	$(SMPFOBJS) amg_s_extprol_bld.o 
 
 ZINNEROBJS=   amg_zmlprec_bld.o amg_zfile_prec_descr.o amg_zfile_prec_memory_use.o \
 	amg_z_smoothers_bld.o amg_z_hierarchy_bld.o amg_z_hierarchy_rebld.o \
-	amg_zmlprec_aply.o   \
+	amg_zmlprec_aply.o amg_zmlprec_aply_a.o \
 	$(ZMPFOBJS)  amg_z_extprol_bld.o
 
 CINNEROBJS=   amg_cmlprec_bld.o amg_cfile_prec_descr.o amg_cfile_prec_memory_use.o \
 	amg_c_smoothers_bld.o amg_c_hierarchy_bld.o amg_c_hierarchy_rebld.o \
-	amg_cmlprec_aply.o   \
+	amg_cmlprec_aply.o amg_cmlprec_aply_a.o \
 	$(CMPFOBJS)  amg_c_extprol_bld.o
 
 INNEROBJS= $(SINNEROBJS) $(DINNEROBJS) $(CINNEROBJS) $(ZINNEROBJS)
