@@ -17,7 +17,14 @@ SGEN2D=amg_s_pde2d_poisson_mod.o amg_s_pde2d_exp_mod.o \
 SGEN3D=amg_s_pde3d_poisson_mod.o amg_s_pde3d_exp_mod.o \
   amg_s_pde3d_gauss_mod.o amg_s_pde3d_box_mod.o 	
 
-all: amg_s_pde3d amg_d_pde3d amg_s_pde2d amg_d_pde2d
+all: amg_s_pde3d amg_d_pde3d amg_s_pde2d amg_d_pde2d amg_d_comm_test
+
+# Comparison of the PSBLAS communication schemes over an AMG hierarchy.
+# Reuses the 3D PDE generators of this directory rather than duplicating them.
+amg_d_comm_test: amg_d_comm_test.o amg_d_genpde_mod.o $(DGEN3D)
+	$(FLINK) $(LINKOPT) amg_d_comm_test.o amg_d_genpde_mod.o $(DGEN3D) \
+         -o amg_d_comm_test $(AMG_LIBS) $(PSBLAS_LIBS) $(AMG_LDLIBS) $(LDLIBS)
+	/bin/mv amg_d_comm_test $(EXEDIR)
 
 amg_d_pde3d: amg_d_pde3d.o amg_d_genpde_mod.o $(DGEN3D) data_input.o
 	$(FLINK) $(LINKOPT) amg_d_pde3d.o  amg_d_genpde_mod.o $(DGEN3D) data_input.o \
@@ -42,6 +49,7 @@ amg_s_pde2d: amg_s_pde2d.o amg_s_genpde_mod.o $(SGEN2D) data_input.o
 
 amg_d_pde3d.o amg_s_pde3d.o amg_d_pde2d.o amg_s_pde2d.o: data_input.o
 
+amg_d_comm_test.o: amg_d_genpde_mod.o $(DGEN3D)
 amg_d_pde3d.o: amg_d_genpde_mod.o $(DGEN3D)
 amg_s_pde3d.o: amg_s_genpde_mod.o $(SGEN3D) 
 amg_d_pde2d.o: amg_d_genpde_mod.o $(DGEN2D)
