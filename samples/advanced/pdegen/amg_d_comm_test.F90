@@ -26,7 +26,7 @@
 !     left over from a previous repetition must be freed explicitly.
 !
 ! Run with:
-!   mpirun -np <P> ./amg_d_comm_test [idim] [nrep] [nlev] [itmax]
+!   mpirun -np <P> ./amg_d_comm_test [idim] [nrep] [nlev] [itmax] [nwarm]
 !                                    [--remap] [--csv=<path>] [--mode=all|uniform|sensitivity]
 !
 program amg_d_comm_test
@@ -52,7 +52,7 @@ program amg_d_comm_test
 
   integer(psb_ipk_) :: info, my_rank, np
   integer(psb_ipk_) :: idim, itmax, itrace, istop
-  integer(psb_ipk_) :: s_idx, rep, nrep, nlev, lev, nlev_built, csv_unit
+  integer(psb_ipk_) :: s_idx, rep, nrep, nwarm, nlev, lev, nlev_built, csv_unit
   integer(psb_ipk_) :: scheme_type(n_schemes)
   integer(psb_ipk_) :: scheme_of_level(max_lev)
   character(len=25) :: scheme_name(n_schemes)
@@ -69,7 +69,7 @@ program amg_d_comm_test
   afmt   = 'CSR'
   idim   = 40
   nrep   = 5
-  nlev   = 3
+  nlev   = 3 
   itmax  = 1000
   itrace = -1
   istop  = 2
@@ -95,6 +95,15 @@ program amg_d_comm_test
   call read_int_arg(2, nrep,   5)
   call read_int_arg(3, nlev,   3)
   call read_int_arg(4, itmax,1000)
+  ! Warm-up repetitions, discarded from the statistics.
+  !
+  ! The first run of a scheme is not the same measurement as the ones after it.
+  ! Beyond the usual first-touch effects, whichever scheme creates the first RMA
+  ! window of the program pays the one-off initialisation of the one-sided
+  ! transport -- at 448 ranks that was 1600 s aggregated against 62 s for the
+  ! very same code path in the scheme that ran second. Folded into an average it
+  ! is charged entirely to rma_pull, which is simply not where it belongs.
+  call read_int_arg(5, nwarm,   1)
   call parse_flags(do_remap, csv_file, run_mode)
   want_csv = (len_trim(csv_file) > 0)
 
@@ -109,7 +118,7 @@ program amg_d_comm_test
     write(psb_out_unit,'("Number of processors : ",i0)') np
     write(psb_out_unit,'("Preconditioner       : ML, V-cycle, JACOBI, max levels ",i0)') nlev
     write(psb_out_unit,'("Iterative method     : CG, itmax ",i0,", eps ",es9.2)') itmax, eps
-    write(psb_out_unit,'("Repetitions          : ",i0)') nrep
+    write(psb_out_unit,'("Repetitions          : ",i0," (+ ",i0," warm-up, not averaged)")') nrep, nwarm
     write(psb_out_unit,'("Remap active         : ",l1)') amg_get_do_remap()
     write(psb_out_unit,'("Mode                 : ",a)') trim(run_mode)
     if (want_csv) write(psb_out_unit,'("CSV output           : ",a)') trim(csv_file)
@@ -155,9 +164,9 @@ program amg_d_comm_test
     end if
     do s_idx = 1, n_schemes
       scheme_of_level(:) = scheme_type(s_idx)
-      do rep = 1, nrep
+      do rep = 1-nwarm, nrep
         call run_one('uniform', trim(scheme_name(s_idx)), izero, &
-             & scheme_of_level, (rep == 1), info)
+             & scheme_of_level, (rep == 1), (rep <= 0), info)
         if (info /= psb_success_) goto 9999
       end do
     end do
@@ -173,7 +182,7 @@ program amg_d_comm_test
     if (nlev_built <= 0) then
       ! Need one build to learn how many levels the hierarchy actually has.
       scheme_of_level(:) = scheme_type(1)
-      call run_one('probe', trim(scheme_name(1)), izero, scheme_of_level, .false., info)
+      call run_one('probe', trim(scheme_name(1)), izero, scheme_of_level, .false., .false., info)
       if (info /= psb_success_) goto 9999
     end if
     if (my_rank == psb_root_) then
@@ -186,9 +195,9 @@ program amg_d_comm_test
       do s_idx = 2, n_schemes
         scheme_of_level(:)   = scheme_type(1)
         scheme_of_level(lev) = scheme_type(s_idx)
-        do rep = 1, nrep
+        do rep = 1-nwarm, nrep
           call run_one('sensitivity', trim(scheme_name(s_idx)), lev, &
-               & scheme_of_level, .false., info)
+               & scheme_of_level, .false., (rep <= 0), info)
           if (info /= psb_success_) goto 9999
         end do
       end do
@@ -226,17 +235,27 @@ contains
   ! One full init/build/solve with the given per-level scheme assignment.
   ! Timings are max-reduced across ranks before being recorded.
   !
-  subroutine run_one(mode, sname, target_lev, sch_of_lev, verbose, info)
+  subroutine run_one(mode, sname, target_lev, sch_of_lev, verbose, warmup, info)
     character(len=*), intent(in)   :: mode, sname
     integer(psb_ipk_), intent(in)  :: target_lev
     integer(psb_ipk_), intent(in)  :: sch_of_lev(:)
     logical, intent(in)            :: verbose
+    logical, intent(in)            :: warmup
     integer(psb_ipk_), intent(out) :: info
 
     real(psb_dpk_) :: t_start, t_init, t_bld, t_comm, t_kry, err
     integer(psb_ipk_) :: iter, lv
+    character(len=32) :: mode_out
 
     info = psb_success_
+    ! Warm-up rows are kept, not discarded: they carry the setup cost, which is
+    ! a result in its own right. The tag keeps them out of the averages, since
+    ! the analysis only picks up 'uniform' and 'sensitivity'.
+    if (warmup) then
+      mode_out = 'warmup_'//trim(mode)
+    else
+      mode_out = mode
+    end if
 
     ! Fine level: must be set before the build, so that desc_a and every vector
     ! lazily initialised during the solve pick this scheme up.
@@ -317,13 +336,13 @@ contains
         end do
       end if
       if (trim(mode) /= 'probe') then
-        write(psb_out_unit,'(a14,1x,a26,1x,"lev ",i2,1x,"it ",i5,1x,"err ",es12.5,&
+        write(psb_out_unit,'(a18,1x,a26,1x,"lev ",i2,1x,"it ",i5,1x,"err ",es12.5,&
              &1x,"bld ",es11.4,1x,"solve ",es11.4)') &
-             & trim(mode), trim(sname), target_lev, iter, err, t_bld, t_kry
+             & trim(mode_out), trim(sname), target_lev, iter, err, t_bld, t_kry
       end if
       if (want_csv .and. header_done .and. (trim(mode) /= 'probe')) then
         write(csv_unit,'(a,",",a,",",i0,",",i0,",",i0,",",i0,",",i0,5(",",es16.9),",",i0,",",es16.9,",",l1)') &
-             & trim(mode), trim(sname), target_lev, np, idim, nlev_built, rep, &
+             & trim(mode_out), trim(sname), target_lev, np, idim, nlev_built, rep, &
              & t_init, t_bld, t_comm, t_kry, t_init+t_bld+t_comm+t_kry, &
              & iter, err, do_remap
       end if
