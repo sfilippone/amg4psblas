@@ -87,7 +87,7 @@ program amg_d_pde2d
   integer(psb_epk_) :: system_size
 
   ! miscellaneous
-  real(psb_dpk_) :: t1, t2, tprec, thier, tslv, tsmth, tpgen
+  real(psb_dpk_) :: t1, t2, thier, tslv, tsmth, tpgen
 
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a
@@ -476,12 +476,12 @@ program amg_d_pde2d
   end if
 
   call psb_amx(ctxt, thier)
-  call psb_amx(ctxt, tprec)
+  call psb_amx(ctxt, tsmth)
 
   if(iam == psb_root_) then
     write(psb_out_unit,'(" ")')
     write(psb_out_unit,'("Preconditioner: ",a)') trim(p_choice%descr)
-    write(psb_out_unit,'("Preconditioner time: ",es12.5)')thier+tprec
+    write(psb_out_unit,'("Preconditioner time: ",es12.5)')thier+tsmth
     write(psb_out_unit,'(" ")')
   end if
 
@@ -565,7 +565,7 @@ program amg_d_pde2d
     write(psb_out_unit,'("Total preconditioner setup time    : ",es12.5)') tsmth+thier
     write(psb_out_unit,'("Time to solve system               : ",es12.5)') tslv
     write(psb_out_unit,'("Time per iteration                 : ",es12.5)') tslv/iter
-    write(psb_out_unit,'("Total time                         : ",es12.5)') tslv+tprec+thier
+    write(psb_out_unit,'("Total time                         : ",es12.5)') tslv+tsmth+thier
     write(psb_out_unit,'("Residual 2-norm                    : ",es12.5)') resmx
     write(psb_out_unit,'("Residual inf-norm                  : ",es12.5)') resmxp
     write(psb_out_unit,'("Total memory occupation for X      : ",i16)') vecsize
