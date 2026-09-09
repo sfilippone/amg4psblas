@@ -8,6 +8,9 @@ FINCLUDES=$(FMFLAG). $(FMFLAG)$(AMGMODDIR) $(FMFLAG)$(AMGINCDIR) $(PSBLAS_INCLUD
 
 LINKOPT=
 EXEDIR=./runs
+
+PSBMIXED=psb_mixed_support_mod.o
+
 DGEN2D=amg_d_pde2d_poisson_mod.o amg_d_pde2d_exp_mod.o \
   amg_d_pde2d_gauss_mod.o amg_d_pde2d_box_mod.o
 DGEN3D=amg_d_pde3d_poisson_mod.o amg_d_pde3d_exp_mod.o \
@@ -22,7 +25,7 @@ all: dir amg_d_pde3d
 dir:
 	(if test ! -d $(EXEDIR); then mkdir $(EXEDIR); fi)
 
-amg_d_pde3d: amg_d_pde3d.o amg_d_genpde_mod.o $(DGEN3D) data_input.o
+amg_d_pde3d: amg_d_pde3d.o amg_d_genpde_mod.o $(DGEN3D) $(PSBMIXED) data_input.o
 	$(FLINK) $(LINKOPT) amg_d_pde3d.o  amg_d_genpde_mod.o $(DGEN3D) data_input.o \
          -o amg_d_pde3d $(AMG_LIBS) $(PSBLAS_LIBS) $(AMG_LDLIBS) $(LDLIBS)
 	/bin/mv amg_d_pde3d $(EXEDIR)
