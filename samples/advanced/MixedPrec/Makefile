@@ -26,7 +26,7 @@ dir:
 	(if test ! -d $(EXEDIR); then mkdir $(EXEDIR); fi)
 
 amg_d_pde3d: amg_d_pde3d.o amg_d_genpde_mod.o $(DGEN3D) $(PSBMIXED) data_input.o
-	$(FLINK) $(LINKOPT) amg_d_pde3d.o  amg_d_genpde_mod.o $(DGEN3D) data_input.o \
+	$(FLINK) $(LINKOPT) amg_d_pde3d.o  amg_d_genpde_mod.o $(DGEN3D) $(PSBMIXED) data_input.o \
          -o amg_d_pde3d $(AMG_LIBS) $(PSBLAS_LIBS) $(AMG_LDLIBS) $(LDLIBS)
 	/bin/mv amg_d_pde3d $(EXEDIR)
 

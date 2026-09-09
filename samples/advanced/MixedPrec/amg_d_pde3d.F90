@@ -93,6 +93,7 @@ program amg_d_pde3d
 
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a
+  type(psb_sspmat_type) :: asingle
   type(amg_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
@@ -286,6 +287,7 @@ program amg_d_pde3d
     goto 9999
   end select
 
+  call psb_d2s_cscnv(a,asingle,info,type=afmt)
 
   call psb_barrier(ctxt)
   tpgen = psb_wtime() - t1
