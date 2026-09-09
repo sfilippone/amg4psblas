@@ -48,7 +48,7 @@ amg_s_pde2d: amg_s_pde2d.o amg_s_genpde_mod.o $(SGEN2D) data_input.o
 
 amg_d_pde3d.o amg_s_pde3d.o amg_d_pde2d.o amg_s_pde2d.o: data_input.o
 
-amg_d_pde3d.o: amg_d_genpde_mod.o $(DGEN3D)
+amg_d_pde3d.o: amg_d_genpde_mod.o $(DGEN3D) $(PSBMIXED)
 amg_s_pde3d.o: amg_s_genpde_mod.o $(SGEN3D) 
 amg_d_pde2d.o: amg_d_genpde_mod.o $(DGEN2D)
 amg_s_pde2d.o: amg_s_genpde_mod.o $(SGEN2D)

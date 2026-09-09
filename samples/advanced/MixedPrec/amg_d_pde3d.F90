@@ -75,6 +75,7 @@ program amg_d_pde3d
   use amg_d_pde3d_box_mod
   use amg_d_pde3d_gauss_mod
   use amg_d_genpde_mod
+  use psb_mixed_support_mod
 #if defined(PSB_OPENMP)
   use omp_lib
 #endif

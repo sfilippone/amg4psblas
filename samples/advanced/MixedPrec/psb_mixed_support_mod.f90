@@ -8,7 +8,6 @@ contains
     class(psb_dspmat_type), intent(in)    :: a
     class(psb_sspmat_type), intent(out)   :: b
     integer(psb_ipk_), intent(out)                   :: info
-    integer(psb_ipk_),optional, intent(in)           :: dupl, upd
     character(len=*), optional, intent(in) :: type
     class(psb_s_base_sparse_mat), intent(in), optional :: mold
 
@@ -78,9 +77,8 @@ contains
     class(psb_sspmat_type), intent(in)    :: a
     class(psb_dspmat_type), intent(out)   :: b
     integer(psb_ipk_), intent(out)                   :: info
-    integer(psb_ipk_),optional, intent(in)           :: dupl, upd
     character(len=*), optional, intent(in) :: type
-    class(psb_s_base_sparse_mat), intent(in), optional :: mold
+    class(psb_d_base_sparse_mat), intent(in), optional :: mold
 
     type(psb_d_coo_sparse_mat) :: dcoo
     type(psb_s_coo_sparse_mat) :: scoo
@@ -113,7 +111,7 @@ contains
         goto 9999
       end select
     end if
-    call b%a%mv_from_coo(scoo,info)
+    call b%a%mv_from_coo(dcoo,info)
     call psb_erractionrestore(err_act)
     return
 
@@ -141,7 +139,7 @@ contains
       return
     end subroutine coo_s2d
 
-  end subroutine psb_d2s_cscnv
+  end subroutine psb_s2d_cscnv
 
   subroutine psb_d2s_vect(dv,sv,info,mold)
     class(psb_d_vect_type), intent(inout) :: dv
