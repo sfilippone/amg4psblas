@@ -64,6 +64,369 @@
 ! 3. A 3D distribution in which the unit cube is partitioned
 !    into subcubes, each one assigned to a process.
 !
+!
+! File: amg_d_pde3d.F90
+!
+! Module: psb_cg_mixed_mod
+!
+!   This module contains a copy of the PSBLAS psb_dcg implementation,
+!   renamed psb_cg_mixed and specialized for mixed precision: the Krylov
+!   recurrence, the matrix-vector products and the convergence tests are
+!   carried out in double precision, whereas the preconditioner is built
+!   and applied in single precision.
+!
+!   At each iteration the application of the preconditioner
+!
+!               z = M^(-1) r
+!
+!   is replaced by
+!
+!               r_single = single(r)
+!               z_single = M^(-1) r_single      (single precision preconditioner)
+!               z  = double(z_single)
+!
+!   the conversions being performed by the psb_d2s_vect/psb_s2d_vect
+!   routines of psb_mixed_support_mod. Everything else is identical to
+!   psb_dcg.
+!
+module psb_cg_mixed_mod
+  use psb_base_mod
+  use psb_prec_mod
+  use psb_d_linsolve_conv_mod
+  use psb_linsolve_mod
+  use psb_mixed_support_mod
+
+  implicit none
+
+contains
+
+  !
+  ! Subroutine: psb_cg_mixed
+  !    Conjugate Gradient in double precision with a single precision
+  !    preconditioner.
+  !
+  ! Arguments:
+  !
+  !    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A,
+  !                                         in double precision.
+  !    prec   -  class(psb_sprec_type)      Input: preconditioner, in SINGLE
+  !                                         precision; it must have been built
+  !                                         on the single precision copy of A.
+  !    b      -  type(psb_d_vect_type)      Input: right hand side B.
+  !    x      -  type(psb_d_vect_type)      Input/Output: initial guess and
+  !                                         final solution X.
+  !    eps    -  real                       Input: stopping tolerance; the
+  !                                         iteration is stopped when the error
+  !                                         estimate |err| <= eps
+  !    desc_a -  type(psb_desc_type)        Input: the communication descriptor;
+  !                                         it is precision independent, hence
+  !                                         it is shared by the double and the
+  !                                         single precision vectors.
+  !    info   -  integer                    Output: return code
+  !
+  !    itmax  -  integer(optional)          Input: maximum number of iterations
+  !                                         to be performed.
+  !    iter   -  integer(optional)          Output: how many iterations have
+  !                                         been performed.
+  !    err    -  real   (optional)          Output: error estimate on exit.
+  !    itrace -  integer(optional)          Input: print an informational message
+  !                                         with the error estimate every itrace
+  !                                         iterations
+  !    istop  -  integer(optional)          Input: stopping criterion.
+  !    cond   -  real   (optional)          Output: condition number estimate.
+  !
+  subroutine psb_cg_mixed(a,prec,b,x,eps,desc_a,info,&
+       & itmax,iter,err,itrace,istop,cond)
+    implicit none
+    type(psb_dspmat_type), intent(in)    :: a
+    Type(psb_desc_type), Intent(in)      :: desc_a
+    class(psb_sprec_type), intent(inout) :: prec
+    type(psb_d_vect_type), Intent(inout) :: b
+    type(psb_d_vect_type), Intent(inout) :: x
+    Real(psb_dpk_), Intent(in)           :: eps
+    integer(psb_ipk_), intent(out)                 :: info
+    integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, istop
+    integer(psb_ipk_), Optional, Intent(out)       :: iter
+    Real(psb_dpk_), Optional, Intent(out) :: err,cond
+! =   Local data
+    real(psb_dpk_), allocatable, target   :: aux(:),td(:),tu(:),eig(:),ewrk(:)
+    integer(psb_mpk_), allocatable :: ibl(:), ispl(:), iwrk(:)
+    type(psb_d_vect_type), allocatable, target :: wwrk(:)
+    type(psb_d_vect_type), pointer  :: q, p, r, z, w
+! =   Single precision workspace for the preconditioner application
+    real(psb_spk_), allocatable, target   :: saux(:)
+    type(psb_s_vect_type)                 :: r_single, z_single
+    real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
+    integer(psb_ipk_) :: itmax_, istop_, naux, it, itx, itrace_,&
+         &  n_col, n_row,err_act, ieg,nspl, istebz
+    integer(psb_lpk_) :: mglob
+    integer(psb_ipk_) :: debug_level, debug_unit
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: np, me
+    real(psb_dpk_)     :: derr
+    type(psb_itconv_type)       :: stopdat
+    logical                     :: do_cond
+    character(len=20)           :: name
+    character(len=*), parameter :: methdname='CG-MIXED'
+
+    info = psb_success_
+    name = 'psb_cg_mixed'
+    call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    ctxt = desc_a%get_context()
+
+    call psb_info(ctxt, me, np)
+    if (.not.allocated(b%v)) then
+      info = psb_err_invalid_vect_state_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    if (.not.allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+
+    mglob = desc_a%get_global_rows()
+    n_row = desc_a%get_local_rows()
+    n_col = desc_a%get_local_cols()
+
+
+    if (present(istop)) then
+      istop_ = istop
+    else
+      istop_ = psb_get_istop_default()
+    endif
+    if (.not.psb_is_valid_istop(istop_)) then
+      info=psb_err_invalid_istop_
+      err=info
+      call psb_errpush(info,name,i_err=(/istop_/))
+      goto 9999
+    end if
+    !
+    !  istop_ = 1:  normwise backward error, infinity norm
+    !  istop_ = 2:  ||r||/||b||   norm 2
+    !
+    select case(istop_)
+    case(psb_istop_ani_,psb_istop_bn2_,&
+         & psb_istop_rn2_abs_, psb_istop_rrn2_)
+      ! nothing needed
+    case default
+      ! should never get here
+      info=psb_err_internal_error_
+      err=info
+      call psb_errpush(info,name,a_err="invalid istop_")
+      goto 9999
+    end select
+
+    call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
+    if (info == psb_success_)&
+         & call psb_chkvect(mglob,lone,b%get_nrows(),lone,lone,desc_a,info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      call psb_errpush(info,name,a_err='psb_chkvect on X/B')
+      goto 9999
+    end if
+
+    naux=4*n_col
+    allocate(aux(naux),saux(naux), stat=info)
+    if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=5_psb_ipk_)
+    if (info == psb_success_) call psb_geasb(wwrk,desc_a,info,mold=x%v,scratch=.true.)
+    !
+    !  The descriptor is precision independent: the single precision
+    !  vectors handed to the preconditioner are allocated on the very
+    !  same descriptor as the double precision ones.
+    !
+    if (info == psb_success_) call psb_geall(r_single,desc_a,info)
+    if (info == psb_success_) call psb_geasb(r_single,desc_a,info,scratch=.true.)
+    if (info == psb_success_) call psb_geall(z_single,desc_a,info)
+    if (info == psb_success_) call psb_geasb(z_single,desc_a,info,scratch=.true.)
+    if (info /= psb_success_) then
+      info=psb_err_from_subroutine_non_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    p  => wwrk(1)
+    q  => wwrk(2)
+    r  => wwrk(3)
+    z  => wwrk(4)
+    w  => wwrk(5)
+    !
+    !  The vectors crossing the precision boundary are converted in
+    !  full, halo included; the halo of R is only written by the
+    !  preconditioner, hence the scratch storage is cleaned here to
+    !  avoid converting uninitialized values.
+    !
+    call r%zero()
+    call z_single%zero()
+
+
+    if (present(itmax)) then
+      itmax_ = itmax
+    else
+      itmax_ = 1000
+    endif
+
+    if (present(itrace)) then
+      itrace_ = itrace
+    else
+      itrace_ = 0
+    end if
+
+    do_cond=present(cond)
+    if (do_cond) then
+      istebz = 0
+      allocate(td(itmax_),tu(itmax_), eig(itmax_),&
+           & ibl(itmax_),ispl(itmax_),iwrk(3*itmax_),ewrk(4*itmax_),&
+           & stat=info)
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_non_
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+    end if
+    itx=0
+    alpha = dzero
+
+    restart: do
+! =
+! =    r0 = b-Ax0
+! =
+      if (itx>= itmax_) exit restart
+
+      it = 0
+      call psb_geaxpby(done,b,dzero,r,desc_a,info)
+      if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_non_
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+
+      rho = dzero
+
+      call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
+      if (info /= psb_success_) Then
+        call psb_errpush(psb_err_from_subroutine_non_,name)
+        goto 9999
+      End If
+
+      iteration:  do
+
+        it   = it + 1
+        itx = itx + 1
+
+        !
+        !  This is the only step performed in single precision:
+        !  convert the residual, apply the single precision
+        !  preconditioner, then convert the result back to double
+        !  and carry on with the double precision recurrence.
+        !
+        call psb_d2s_vect(r,r_single,info)
+        if (info == psb_success_) call prec%apply(r_single,z_single,desc_a,info,work=saux)
+        if (info == psb_success_) call psb_s2d_vect(z_single,z,info,mold=x%v)
+        if (info /= psb_success_) then
+          info=psb_err_from_subroutine_non_
+          call psb_errpush(info,name,a_err='single precision preconditioner')
+          goto 9999
+        end if
+
+        rho_old = rho
+        rho     = psb_gedot(r,z,desc_a,info)
+
+        if (it == 1) then
+          call psb_geaxpby(done,z,dzero,p,desc_a,info)
+        else
+          if (rho_old == dzero) then
+            if (debug_level >= psb_debug_ext_)&
+                 & write(debug_unit,*) me,' ',trim(name),&
+                 & ': CG Iteration breakdown rho'
+            exit iteration
+          endif
+          beta = rho/rho_old
+          call psb_geaxpby(done,z,beta,p,desc_a,info)
+        end if
+
+        call psb_spmm(done,a,p,dzero,q,desc_a,info,work=aux)
+        sigma = psb_gedot(p,q,desc_a,info)
+        if (sigma == dzero) then
+          if (debug_level >= psb_debug_ext_)&
+               & write(debug_unit,*) me,' ',trim(name),&
+               & ': CG Iteration breakdown sigma'
+          exit iteration
+        endif
+        alpha_old = alpha
+        alpha = rho/sigma
+
+        if (do_cond) then
+          istebz = istebz + 1
+          if (istebz == 1) then
+            td(istebz) = done/alpha
+          else
+            td(istebz) = done/alpha + beta/alpha_old
+            tu(istebz-1) = sqrt(beta)/alpha_old
+          end if
+        end if
+
+
+        call psb_geaxpby(alpha,p,done,x,desc_a,info)
+        call psb_geaxpby(-alpha,q,done,r,desc_a,info)
+
+        if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+        if (info /= psb_success_) Then
+          call psb_errpush(psb_err_from_subroutine_non_,name)
+          goto 9999
+        End If
+
+      end do iteration
+    end do restart
+    if (do_cond) then
+      if (me == psb_root_) then
+#if defined(PSB_HAVE_LAPACK)
+        call dstebz('A','E',istebz,dzero,dzero,0,0,-done,td,tu,&
+             & ieg,nspl,eig,ibl,ispl,ewrk,iwrk,info)
+        if (info < 0) then
+          call psb_errpush(psb_err_from_subroutine_ai_,name,&
+               & a_err='dstebz',i_err=(/info/))
+          info=psb_err_from_subroutine_ai_
+          goto 9999
+        end if
+        cond = eig(ieg)/eig(1)
+#else
+        cond = dzero
+#endif
+        info=psb_success_
+      end if
+      call psb_bcast(ctxt,cond)
+    end if
+
+
+    call psb_end_conv(methdname,itx,desc_a,stopdat,info,derr,iter)
+    if (present(err)) err = derr
+
+    if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
+    if (info == psb_success_) call psb_gefree(r_single,desc_a,info)
+    if (info == psb_success_) call psb_gefree(z_single,desc_a,info)
+    if (info == psb_success_) deallocate(aux,saux,stat=info)
+    if (info /= psb_success_) then
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(err_act)
+    return
+
+  end subroutine psb_cg_mixed
+
+end module psb_cg_mixed_mod
+
 program amg_d_pde3d
   use psb_base_mod
   use amg_prec_mod
@@ -76,6 +439,7 @@ program amg_d_pde3d
   use amg_d_pde3d_gauss_mod
   use amg_d_genpde_mod
   use psb_mixed_support_mod
+  use psb_cg_mixed_mod
 #if defined(PSB_OPENMP)
   use omp_lib
 #endif
@@ -221,6 +585,8 @@ program amg_d_pde3d
   ! other variables
   integer(psb_ipk_)  :: info, i, k
   character(len=20)  :: name,ch_err
+  ! .true. when the Krylov method uses the single precision preconditioner
+  logical            :: mixed
 
   info=psb_success_
 
@@ -257,6 +623,18 @@ program amg_d_pde3d
   !  get parameters
   !
   call get_parms(ctxt,afmt,idim,s_choice,p_choice,pdecoeff)
+
+  !
+  !  Only the preconditioner actually used by the chosen Krylov method is
+  !  built: the mixed method applies the single precision one, all the
+  !  other methods the double precision one.
+  !
+  select case(psb_toupper(trim(s_choice%kmethd)))
+  case('CG-MIXED','CGMIXED')
+    mixed = .true.
+  case default
+    mixed = .false.
+  end select
 
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess
@@ -305,6 +683,11 @@ program amg_d_pde3d
   if (iam == psb_root_) &
        & write(psb_out_unit,'(" ")')
   
+  if (mixed) then
+  !
+  !  Convert the matrix to single precision and build the single
+  !  precision preconditioner on it.
+  !
   call psb_barrier(ctxt)
   t1 = psb_wtime() 
   call psb_d2s_cscnv(a,asingle,info,type=afmt)
@@ -503,6 +886,7 @@ program amg_d_pde3d
     write(psb_out_unit,'(" ")')
   end if
 
+  else
 
   !
   ! initialize the preconditioner
@@ -692,12 +1076,21 @@ program amg_d_pde3d
     write(psb_out_unit,'(" ")')
   end if
 
+  end if
+
 
   if (p_choice%dump) then
-    call prec%dump(info,istart=p_choice%dlmin,iend=p_choice%dlmax,&
-         & ac=p_choice%dump_ac,rp=p_choice%dump_rp,tprol=p_choice%dump_tprol,&
-         & smoother=p_choice%dump_smoother, solver=p_choice%dump_solver, &
-         & global_num=p_choice%dump_global_num)    
+    if (mixed) then
+      call sprec%dump(info,istart=p_choice%dlmin,iend=p_choice%dlmax,&
+           & ac=p_choice%dump_ac,rp=p_choice%dump_rp,tprol=p_choice%dump_tprol,&
+           & smoother=p_choice%dump_smoother, solver=p_choice%dump_solver, &
+           & global_num=p_choice%dump_global_num)
+    else
+      call prec%dump(info,istart=p_choice%dlmin,iend=p_choice%dlmax,&
+           & ac=p_choice%dump_ac,rp=p_choice%dump_rp,tprol=p_choice%dump_tprol,&
+           & smoother=p_choice%dump_smoother, solver=p_choice%dump_solver, &
+           & global_num=p_choice%dump_global_num)
+    end if
   end if
   !
   ! iterative method parameters
@@ -714,6 +1107,14 @@ program amg_d_pde3d
     call psb_krylov(s_choice%kmethd,a,prec,b,x,s_choice%eps,&
          & desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,itrace=s_choice%itrace,&
          & istop=s_choice%istopc,irst=s_choice%irst)
+  case('CG-MIXED','CGMIXED')
+    !
+    ! Double precision CG with the single precision preconditioner
+    ! built above on ASINGLE; see psb_cg_mixed_mod at the top of this file.
+    !
+    call psb_cg_mixed(a,sprec,b,x,s_choice%eps,&
+         & desc_a,info,itmax=s_choice%itmax,iter=iter,err=err,&
+         & itrace=s_choice%itrace,istop=s_choice%istopc)
   case default
     write(psb_err_unit,*) 'Unknown method :"',trim(s_choice%kmethd),'"'
     info=psb_err_invalid_input_
@@ -748,13 +1149,23 @@ program amg_d_pde3d
   vecsize = x%sizeof()
   amatsize = a%sizeof()
   descsize = desc_a%sizeof()
-  precsize = prec%sizeof()
+  if (mixed) then
+    precsize = sprec%sizeof()
+    nlv      = sprec%get_nlevs()
+  else
+    precsize = prec%sizeof()
+    nlv      = prec%get_nlevs()
+  end if
   system_size = desc_a%get_global_rows()
   call psb_sum(ctxt,vecsize)
   call psb_sum(ctxt,amatsize)
   call psb_sum(ctxt,descsize)
   call psb_sum(ctxt,precsize)
-  call prec%descr(info,iout=psb_out_unit)
+  if (mixed) then
+    call sprec%descr(info,iout=psb_out_unit)
+  else
+    call prec%descr(info,iout=psb_out_unit)
+  end if
   if (iam == psb_root_) then
     write(psb_out_unit,'("Computed solution on ",i8," process(es)")')  np
     write(psb_out_unit,'("Number of threads                  : ",i12)') nth
@@ -767,7 +1178,7 @@ program amg_d_pde3d
     write(psb_out_unit,'("Preconditioner                     : ",a)') trim(p_choice%descr)
     write(psb_out_unit,'("Iterations to convergence          : ",i12)')    iter
     write(psb_out_unit,'("Relative error estimate on exit    : ",es12.5)') err
-    write(psb_out_unit,'("Number of levels in hierarchy      : ",i12)')    prec%get_nlevs()
+    write(psb_out_unit,'("Number of levels in hierarchy      : ",i12)')    nlv
     write(psb_out_unit,'("Time to build hierarchy            : ",es12.5)') thier
     write(psb_out_unit,'("Time to build smoothers            : ",es12.5)') tsmth
     write(psb_out_unit,'("Total preconditioner setup time    : ",es12.5)') tsmth+thier
@@ -793,7 +1204,12 @@ program amg_d_pde3d
   call psb_gefree(b,desc_a,info)
   call psb_gefree(x,desc_a,info)
   call psb_spfree(a,desc_a,info)
-  call prec%free(info)
+  if (mixed) then
+    call sprec%free(info)
+    call psb_spfree(asingle,desc_a,info)
+  else
+    call prec%free(info)
+  end if
   call psb_cdfree(desc_a,info)
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
