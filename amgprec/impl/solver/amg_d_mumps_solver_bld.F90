@@ -69,7 +69,8 @@ subroutine d_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   integer(psb_ipk_)  :: np, iam, me, i, err_act, debug_unit, debug_level
   character(len=20)  :: name='d_mumps_solver_bld', ch_err
 
-#if defined(AMG_HAVE_MUMPS) 
+#if defined(AMG_HAVE_MUMPS)
+#if defined(AMG_MUMPS_VERSION) && (AMG_MUMPS_VERSION <= 590)
 
   info=psb_success_
 
@@ -244,6 +245,171 @@ subroutine d_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
 
   call psb_erractionrestore(err_act)
   return
+
+#else
+
+  ! Snapshot MUMPS branch (e.g. snapshot06052026 and newer snapshots).
+
+  info=psb_success_
+
+  call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+  ctxt       = desc_a%get_context()
+  call psb_info(ctxt, iam, np)
+  if (sv%ipar(1) == amg_local_solver_ ) then
+    call psb_init(ctxt1,np=1,basectxt=ctxt,ids=(/iam/))
+  else if (sv%ipar(1) == amg_global_solver_ ) then
+    call psb_init(ctxt1,basectxt=ctxt)
+  else
+    info = psb_err_internal_error_
+    call psb_errpush(info,name,&
+         & a_err='Invalid local/global solver in MUMPS')
+    goto 9999
+  end if
+  icomm = ctxt1%get_mpic()
+  sv%local_ctxt = ctxt1
+  call psb_info(ctxt1, me, npr)
+  npc  = 1
+  if (debug_level >= psb_debug_outer_) &
+       & write(debug_unit,*) me,' ',trim(name),' start'
+
+  if(.not.allocated(sv%id)) then
+    allocate(sv%id,stat=info)
+    if (info /= psb_success_) then
+      info=psb_err_alloc_dealloc_
+      call psb_errpush(info,name,a_err='amg_dmumps_default')
+      goto 9999
+    end if
+  end if
+
+  ! Snapshot path: bind directly to the local communicator.
+  sv%id%comm = icomm
+
+  sv%id%job     = -1
+  sv%id%par     =  1
+  if (sv%ipar(3) == 2) then
+    sv%id%sym = 2
+  else
+    sv%id%sym = 0
+  end if
+
+  call dmumps(sv%id)
+
+  if (allocated(sv%icntl)) then
+    do i=1,amg_mumps_icntl_size
+      if (allocated(sv%icntl(i)%item)) then
+        sv%id%icntl(i) = sv%icntl(i)%item
+      end if
+    end do
+  end if
+  if (allocated(sv%rcntl)) then
+    do i=1,amg_mumps_rcntl_size
+      if (allocated(sv%rcntl(i)%item)) sv%id%cntl(i) = sv%rcntl(i)%item
+    end do
+  end if
+  sv%id%icntl(5)=0
+  sv%id%icntl(3)=sv%ipar(2)
+
+  nglob  = desc_a%get_global_rows()
+  nrow_a = a%get_nrows()
+  if (sv%ipar(1) == amg_local_solver_ ) then
+    nglobrec=desc_a%get_local_rows()
+    if (sv%ipar(3) == 2) then
+      call a%triu(c,info,jmax=nrow_a)
+      call c%set_symmetric()
+    else
+      call a%csclip(c,info,jmax=nrow_a)
+    end if
+    call c%cp_to(acoo)
+    nglob = c%get_nrows()
+    if (nglobrec /= nglob) then
+      write(*,*)'WARNING: MUMPS solver does not allow overlap in AS yet. '
+      write(*,*)'A zero-overlap is used instead'
+    end if
+  else
+    call a%cp_to(acoo)
+  end if
+  nza = acoo%get_nzeros()
+
+  if ((sv%ipar(1) == amg_global_solver_) .and. (nza > 0)) then
+#if defined(PSB_IPK4) && defined(PSB_LPK8)
+    if (nglob > huge(1_psb_ipk_)) then
+      write(0,*) iam,' ',trim(name),': Error: overflow of local indices '
+      info=psb_err_internal_error_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    gia = acoo%ia(1:nza)
+    gja = acoo%ja(1:nza)
+    call psb_loc_to_glob(gia(1:nza), desc_a, info, iact='I')
+    call psb_loc_to_glob(gja(1:nza), desc_a, info, iact='I')
+    acoo%ia(1:nza) = gia(1:nza)
+    acoo%ja(1:nza) = gja(1:nza)
+#else
+    call psb_loc_to_glob(acoo%ja(1:nza), desc_a, info, iact='I')
+    call psb_loc_to_glob(acoo%ia(1:nza), desc_a, info, iact='I')
+#endif
+
+    if (sv%ipar(3) == 2 ) then
+      block
+        integer(psb_ipk_) :: j,nz
+        nz = 0
+        do j=1,nza
+          if (acoo%ja(j) >= acoo%ia(j)) then
+            nz = nz + 1
+            acoo%ia(nz)  = acoo%ia(j)
+            acoo%ja(nz)  = acoo%ja(j)
+            acoo%val(nz) = acoo%val(j)
+          end if
+        end do
+        call acoo%set_nzeros(nz)
+        call acoo%set_triangle()
+        call acoo%set_upper()
+        call acoo%set_symmetric()
+        nza = nz
+      end block
+    end if
+  end if
+
+  ! Snapshot input mode: distributed assembled matrix.
+  ! Each process contributes its own non-overlapping local triplets.
+  sv%id%irn_loc   => acoo%ia
+  sv%id%jcn_loc   => acoo%ja
+  sv%id%a_loc     => acoo%val
+  sv%id%icntl(18) = 3
+  sv%id%n      = nglob
+  sv%id%nnz_loc = acoo%get_nzeros()
+  sv%id%nnz     = acoo%get_nzeros()
+  sv%id%job    = 4
+  if (sv%ipar(1) == amg_global_solver_ ) then
+    call psb_sum(ctxt,sv%id%nnz)
+  end if
+
+  call dmumps(sv%id)
+  info = sv%id%infog(1)
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='amg_dmumps_fact '
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  nullify(sv%id%irn)
+  nullify(sv%id%jcn)
+  nullify(sv%id%a)
+
+  call acoo%free()
+  sv%built=.true.
+
+  if (debug_level >= psb_debug_outer_) &
+       & write(debug_unit,*) iam,' ',trim(name),' end'
+
+  call psb_erractionrestore(err_act)
+  return
+
+#endif
 
 9999 continue
   call psb_erractionrestore(err_act)

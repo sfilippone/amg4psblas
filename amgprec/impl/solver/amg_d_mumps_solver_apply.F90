@@ -59,14 +59,18 @@ subroutine d_mumps_solver_apply(alpha,sv,x,beta,y,desc_data,&
   integer(psb_lpk_)  :: nglob
   integer(psb_epk_)  :: eng
   real(psb_dpk_), allocatable     :: ww(:)
+  real(psb_dpk_), allocatable, target :: rhs_loc(:), sol_loc(:)
   real(psb_dpk_), allocatable, target :: gx(:)
+  integer(psb_lpk_), allocatable  :: gidx(:)
+  integer, allocatable, target    :: irhs_loc(:), isol_loc(:)
   integer(psb_ipk_)   :: i, err_act
   character           :: trans_
   character(len=20)   :: name='d_mumps_solver_apply'
 
   call psb_erractionsave(err_act)
 
-#if defined(AMG_HAVE_MUMPS) 
+#if defined(AMG_HAVE_MUMPS)
+#if defined(AMG_MUMPS_VERSION) && (AMG_MUMPS_VERSION <= 590)
   info = psb_success_
   trans_ = psb_toupper(trans)
   select case(trans_)
@@ -153,6 +157,147 @@ subroutine d_mumps_solver_apply(alpha,sv,x,beta,y,desc_data,&
 
   call psb_erractionrestore(err_act)
   return
+
+#else
+
+  ! Snapshot MUMPS branch (e.g. snapshot06052026 and newer snapshots).
+  info = psb_success_
+  trans_ = psb_toupper(trans)
+  select case(trans_)
+  case('N')
+  case('T')
+  case default
+    call psb_errpush(psb_err_iarg_invalid_i_,name)
+    goto 9999
+  end select
+
+  nglob = desc_data%get_global_rows()
+  n_row = desc_data%get_local_rows()
+  n_col = desc_data%get_local_cols()
+
+  if (sv%ipar(1) == amg_local_solver_ ) then
+    gx = x
+    sv%id%icntl(20) = 0
+    sv%id%icntl(21) = 0
+  else if (sv%ipar(1) == amg_global_solver_ ) then
+
+    if (n_col <= size(work)) then
+      ww = work(1:n_col)
+    else
+      allocate(ww(n_col),stat=info)
+      if (info /= psb_success_) then
+        info=psb_err_alloc_request_
+        call psb_errpush(info,name,i_err=(/n_col/),&
+             & a_err='real(psb_dpk_)')
+        goto 9999
+      end if
+    end if
+    allocate(rhs_loc(max(n_row,1)),sol_loc(max(n_row,1)),&
+         & irhs_loc(max(n_row,1)),isol_loc(max(n_row,1)),stat=info)
+    if (info /= psb_success_) then
+      info=psb_err_alloc_request_; eng = max(n_row,1)
+      call psb_errpush(info,name,e_err=(/eng/),&
+           & a_err='real(psb_dpk_)')
+      goto 9999
+    end if
+    ww = 0.0_psb_dpk_
+    sol_loc = 0.0_psb_dpk_
+    rhs_loc = 0.0_psb_dpk_
+    gidx = desc_data%get_global_indices(owned=.true.)
+    if (size(gidx) /= n_row) then
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,&
+           & a_err='Invalid local row distribution in MUMPS')
+      goto 9999
+    end if
+    if ((n_row > 0) .and. ((minval(gidx) < 1_psb_lpk_) .or. &
+         & (maxval(gidx) > int(huge(0),psb_lpk_)))) then
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,&
+           & a_err='Overflow in distributed MUMPS RHS indices')
+      goto 9999
+    end if
+    if (n_row > 0) then
+      rhs_loc(1:n_row) = x(1:n_row)
+      irhs_loc(1:n_row) = int(gidx(1:n_row))
+      isol_loc(1:n_row) = int(gidx(1:n_row))
+    end if
+  else
+      info=psb_err_internal_error_
+      call psb_errpush(info,name,&
+           & a_err='Invalid local/global solver in MUMPS')
+      goto 9999
+  end if
+
+  select case(trans_)
+  case('N')
+    sv%id%icntl(9) = 1
+  case('T')
+    sv%id%icntl(9) = 2
+  case default
+    call psb_errpush(psb_err_internal_error_,&
+         & name,a_err='Invalid TRANS in subsolve')
+    goto 9999
+  end select
+
+  sv%id%nrhs =  1
+  if (sv%ipar(1) == amg_local_solver_ ) then
+    sv%id%nloc_rhs  = 0
+    sv%id%lrhs_loc  = 0
+    sv%id%nsol_loc  = 0
+    sv%id%lsol_loc  = 0
+    nullify(sv%id%rhs_loc)
+    nullify(sv%id%irhs_loc)
+    nullify(sv%id%sol_loc)
+    nullify(sv%id%isol_loc)
+    sv%id%rhs  => gx
+  else
+    nullify(sv%id%rhs)
+    sv%id%icntl(20) = 10
+    sv%id%nloc_rhs  = n_row
+    sv%id%lrhs_loc  = n_row
+    sv%id%rhs_loc   => rhs_loc
+    sv%id%irhs_loc  => irhs_loc
+    sv%id%icntl(21) = 2
+    sv%id%nsol_loc  = n_row
+    sv%id%lsol_loc  = n_row
+    sv%id%sol_loc   => sol_loc
+    sv%id%isol_loc  => isol_loc
+  end if
+  ! Snapshot path: preserve stream settings coming from build,
+  ! only enforce silent mode if the user did not set them explicitly.
+  if (sv%id%icntl(1) == 0) sv%id%icntl(1) = -1
+  if (sv%id%icntl(2) == 0) sv%id%icntl(2) = -1
+  if (sv%id%icntl(3) == 0) sv%id%icntl(3) = -1
+  if (sv%id%icntl(4) == 0) sv%id%icntl(4) = -1
+  sv%id%job = 3
+  call dmumps(sv%id)
+
+  if (sv%ipar(1) == amg_local_solver_ ) then
+    call psb_geaxpby(alpha,gx,beta,y,desc_data,info)
+  else
+    if (n_row > 0) ww(1:n_row) = sol_loc(1:n_row)
+    call psb_geaxpby(alpha,ww,beta,y,desc_data,info)
+  end if
+
+  nullify(sv%id%rhs)
+  nullify(sv%id%rhs_loc)
+  nullify(sv%id%irhs_loc)
+  nullify(sv%id%sol_loc)
+  nullify(sv%id%isol_loc)
+
+  if (info /= psb_success_) then
+    call psb_errpush(psb_err_internal_error_,&
+         & name,a_err='Error in subsolve')
+    goto 9999
+  endif
+
+  if (allocated(ww)) deallocate(ww)
+
+  call psb_erractionrestore(err_act)
+  return
+
+#endif
 
 9999 continue
   call psb_erractionrestore(err_act)

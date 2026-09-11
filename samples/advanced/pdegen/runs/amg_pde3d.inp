@@ -1,12 +1,12 @@
 %%%%%%%%%%%  General  arguments % Lines starting with % are ignored.
 CSR                         ! Storage format CSR COO JAD
-0150                        ! IDIM; domain size. Linear system size is IDIM**3
+00070                        ! IDIM; domain size. Linear system size is IDIM**3
 POISSON                     ! PDECOEFF: POISSON, EXP, BOX, GAUSS
 %                           ! Coefficients of the PDE
 CG                          ! Iterative method:
 %                           !    BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES RICHARDSON
 2                           ! ISTOPC
-00500                       ! ITMAX
+00100                       ! ITMAX
 1                           ! ITRACE
 30                          ! IRST (restart for RGMRES and BiCGSTABL)
 1.d-6                       ! EPS
@@ -15,8 +15,8 @@ ML-VBM-VCYC-POLY-L1-D-BJAC       ! Longer descriptive name for preconditioner (u
 ML                        ! Preconditioner type: NONE JACOBI GS FBGS BJAC AS ML POLY
 %
 %%%%%%%%%%%  First smoother (for all levels but coarsest) %%%%%%%%%%%%%%%%
-POLY                        ! Smoother type JACOBI FBGS GS BWGS BJAC AS POLY  r 1-level, repeats previous.
-6                           ! Number of sweeps for smoother
+RICHARDS                    ! Smoother type JACOBI FBGS GS BWGS BJAC AS POLY RICHARDS  r 1-level, repeats previous.
+1                           ! Number of sweeps for smoother
 6                           ! degree for polynomial smoother
 CHEB_4_OPT            ! Polynomial variant
 %  Fields to be added for POLY
@@ -28,12 +28,17 @@ POLY_RHO_EST_POWER     !    POLY_RHO_ESTIMATE             Currently only POLY_RH
 0                           ! Number of overlap layers for AS preconditioner
 HALO                        ! AS restriction operator: NONE HALO
 NONE                        ! AS prolongation operator: NONE SUM AVG
-L1-JACOBI                     ! Subdomain solver for BJAC/AS: JACOBI GS BGS ILU ILUT MILU MUMPS SLU UMF
+MUMPS                       ! Subdomain solver for BJAC/AS: JACOBI GS BGS ILU ILUT MILU MUMPS SLU UMF
 1                           ! Inner solver sweeps (GS and JACOBI)
 LLK                         ! AINV variant
 0                           ! Fill level P for ILU(P) and ILU(T,P)
 1                           ! Inverse Fill level P for INVK
 1.d-4                       ! Threshold T for ILU(T,P)
+1                           ! MUMPS ICNTL(35) BLR activation/format
+0                           ! MUMPS ICNTL(36) BLR variant
+256                         ! MUMPS ICNTL(37) BLR block size
+333                         ! MUMPS ICNTL(38) BLR compression option
+1.d-2                       ! MUMPS CNTL(7) BLR dropping parameter
 %%%%%%%%%%%  Second smoother, always ignored for non-ML  %%%%%%%%%%%%%%%%
 NONE                        ! Second (post) smoother, ignored if NONE
 6                           ! Number of sweeps for (post) smoother
@@ -68,7 +73,7 @@ FILTER                      ! Filtering of matrix:  FILTER NOFILTER
 -2                           ! Number of thresholds in vector, next line ignored if <= 0
 0.05 0.025                  ! Thresholds
 %%%%%%%%%%%  Coarse level solver  %%%%%%%%%%%%%%%%
-BJAC                        ! Coarsest-level solver: MUMPS UMF SLU SLUDIST JACOBI GS BJAC KRM
+MUMPS                       ! Coarsest-level solver: MUMPS UMF SLU SLUDIST JACOBI GS BJAC KRM
 ILU                         ! Coarsest-level subsolver for BJAC: ILU ILUT MILU UMF MUMPS SLU
 DIST                        ! Coarsest-level matrix distribution: DIST  REPL
 1                           ! Coarsest-level fillin P for ILU(P) and ILU(T,P)
