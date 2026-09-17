@@ -74,6 +74,7 @@ program amg_d_pde3d
   use amg_d_pde3d_exp_mod
   use amg_d_pde3d_box_mod
   use amg_d_pde3d_gauss_mod
+  use amg_d_pde3d_aniso_mod
   use amg_d_genpde_mod
 #if defined(PSB_OPENMP)
   use omp_lib
@@ -89,6 +90,9 @@ program amg_d_pde3d
 
   ! miscellaneous
   real(psb_dpk_) :: t1, t2, tprec, thier, tslv, tsmth, tpgen
+
+  ! anisotropy parameters
+  real(psb_dpk_) :: epsilonaniso, thetaaniso, anisovec(2)
 
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a
@@ -165,6 +169,7 @@ program amg_d_pde3d
     integer(psb_ipk_)  :: mumps_blr_icntl37 ! BLR block size (ICNTL(37))
     integer(psb_ipk_)  :: mumps_blr_icntl38 ! BLR compression option (ICNTL(38))
     real(psb_dpk_)     :: mumps_blr_cntl7   ! BLR drop parameter (CNTL(7))
+    integer(psb_ipk_)  :: mumps_sym_value ! Symmetry value for MUMPS 
 
     ! AMG post-smoother; ignored by 1-lev preconditioner
     character(len=32)  :: smther2      ! post-smoother type: BJAC, AS
@@ -258,7 +263,9 @@ program amg_d_pde3d
   !
   !  get parameters
   !
-  call get_parms(ctxt,afmt,idim,s_choice,p_choice,pdecoeff)
+  call get_parms(ctxt,afmt,idim,s_choice,p_choice,pdecoeff,epsilonaniso,thetaaniso)
+  anisovec(1) = epsilonaniso
+  anisovec(2) = thetaaniso
 
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess
@@ -283,6 +290,13 @@ program amg_d_pde3d
     call amg_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,&
          & a1_gauss,a2_gauss,a3_gauss,&
          & b1_gauss,b2_gauss,b3_gauss,c_gauss,g_gauss,info)
+  case("ANISO")
+    call amg_d_gen_aniso_poisson3d(ctxt,idim,a,b,x,desc_a,afmt, &
+         & k11,k22,k33,k12,k13,k23,g_aniso,info)
+    call pde_set_parm3d_aniso(anisovec)
+    if (iam == psb_root_) then
+      write(psb_out_unit,'("Anisotropy \epsilon = ",es12.5," \theta = ",es12.5)') anisovec(1), anisovec(2)
+    end if
   case default
     info=psb_err_from_subroutine_
     ch_err='amg_gen_pdecoeff'
@@ -349,6 +363,7 @@ program amg_d_pde3d
       call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl37,info,idx=37_psb_ipk_)
       call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl38,info,idx=38_psb_ipk_)
       call prec%set('mumps_rpar_entry',p_choice%mumps_blr_cntl7,info,idx=7_psb_ipk_)
+      call prec%set('MUMPS_SYM',p_choice%mumps_sym_value,info)
     end if
     call prec%set('sub_fillin',      p_choice%fill,    info)
     call prec%set('sub_iluthrs',     p_choice%thr,     info)
@@ -420,6 +435,7 @@ program amg_d_pde3d
           call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl37,info,idx=37_psb_ipk_)
           call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl38,info,idx=38_psb_ipk_)
           call prec%set('mumps_rpar_entry',p_choice%mumps_blr_cntl7,info,idx=7_psb_ipk_)
+          call prec%set('MUMPS_SYM',p_choice%mumps_sym_value,info)
         end if
       end select
       call prec%set('solver_sweeps',   p_choice%ssweeps,   info)
@@ -468,6 +484,7 @@ program amg_d_pde3d
             call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl37,info,idx=37_psb_ipk_)
             call prec%set('mumps_ipar_entry',p_choice%mumps_blr_icntl38,info,idx=38_psb_ipk_)
             call prec%set('mumps_rpar_entry',p_choice%mumps_blr_cntl7,info,idx=7_psb_ipk_)
+            call prec%set('MUMPS_SYM',p_choice%mumps_sym_value,info)
           end if
         end select
         call prec%set('solver_sweeps',   p_choice%ssweeps2,   info,pos='post')
@@ -649,7 +666,7 @@ contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine get_parms(ctxt,afmt,idim,solve,prec,pdecoeff)
+  subroutine get_parms(ctxt,afmt,idim,solve,prec,pdecoeff,epsilonaniso,thetaaniso)
 
     implicit none
 
@@ -659,6 +676,7 @@ contains
     type(solverdata)    :: solve
     type(precdata)      :: prec
     character(len=*)    :: pdecoeff
+    real(psb_dpk_)      :: epsilonaniso, thetaaniso
     integer(psb_ipk_)   :: iam, nm, np, inp_unit
     character(len=1024)   :: filename
 
@@ -686,6 +704,8 @@ contains
       call read_data(afmt,inp_unit)            ! matrix storage format
       call read_data(idim,inp_unit)            ! Discretization grid size
       call read_data(pdecoeff,inp_unit)        ! PDE Coefficients
+      call read_data(epsilonaniso,inp_unit)    ! Anysotropy epsilon parameter
+      call read_data(thetaaniso,inp_unit)      ! Anysotropy angle
       ! Krylov solver data
       call read_data(solve%kmethd,inp_unit)    ! Krylov solver
       call read_data(solve%istopc,inp_unit)    ! stopping criterion
@@ -718,6 +738,7 @@ contains
       call read_data(prec%mumps_blr_icntl37,inp_unit) ! MUMPS ICNTL(37)
       call read_data(prec%mumps_blr_icntl38,inp_unit) ! MUMPS ICNTL(38)
       call read_data(prec%mumps_blr_cntl7,inp_unit)   ! MUMPS CNTL(7)
+      call read_data(prec%mumps_sym_value,inp_unit)   ! MUMPS SYMMETRY
       ! Second smoother/ AMG post-smoother (if NONE ignored in main)
       call read_data(prec%smther2,inp_unit)     ! smoother type
       call read_data(prec%jsweeps2,inp_unit)    ! (post-)smoother sweeps
@@ -792,6 +813,8 @@ contains
     call psb_bcast(ctxt,afmt)
     call psb_bcast(ctxt,idim)
     call psb_bcast(ctxt,pdecoeff)
+    call psb_bcast(ctxt,epsilonaniso)
+    call psb_bcast(ctxt,thetaaniso)
 
     call psb_bcast(ctxt,solve%kmethd)
     call psb_bcast(ctxt,solve%istopc)
@@ -824,6 +847,7 @@ contains
     call psb_bcast(ctxt,prec%mumps_blr_icntl37)
     call psb_bcast(ctxt,prec%mumps_blr_icntl38)
     call psb_bcast(ctxt,prec%mumps_blr_cntl7)
+    call psb_bcast(ctxt,prec%mumps_sym_value)
     ! broadcast second (post-)smoother
     call psb_bcast(ctxt,prec%smther2)
     call psb_bcast(ctxt,prec%jsweeps2)

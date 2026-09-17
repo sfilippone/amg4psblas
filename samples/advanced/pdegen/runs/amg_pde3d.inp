@@ -1,7 +1,9 @@
 %%%%%%%%%%%  General  arguments % Lines starting with % are ignored.
 CSR                         ! Storage format CSR COO JAD
-00070                        ! IDIM; domain size. Linear system size is IDIM**3
-POISSON                     ! PDECOEFF: POISSON, EXP, BOX, GAUSS
+00070                       ! IDIM; domain size. Linear system size is IDIM**3
+ANISO                       ! PDECOEFF: POISSON, EXP, BOX, GAUSS, ANISO
+100                         ! Epsilon for anistropic PDE (ANISO only)
+0.785398163397448           ! Theta for anistropic PDE (ANISO only) needs to be in radians
 %                           ! Coefficients of the PDE
 CG                          ! Iterative method:
 %                           !    BiCGSTAB BiCGSTABL BiCG CG CGS FCG GCR RGMRES RICHARDSON
@@ -39,6 +41,7 @@ LLK                         ! AINV variant
 256                         ! MUMPS ICNTL(37) BLR block size
 333                         ! MUMPS ICNTL(38) BLR compression option
 1.d-2                       ! MUMPS CNTL(7) BLR dropping parameter
+2                           ! Force symmetry into MUMPS 
 %%%%%%%%%%%  Second smoother, always ignored for non-ML  %%%%%%%%%%%%%%%%
 NONE                        ! Second (post) smoother, ignored if NONE
 6                           ! Number of sweeps for (post) smoother

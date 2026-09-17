@@ -3,7 +3,8 @@ AMGINCDIR=$(AMGDIR)/include
 include $(AMGINCDIR)/Make.inc.amg4psblas
 AMGMODDIR=$(AMGDIR)/modules
 AMGLIBDIR=$(AMGDIR)/lib
-AMG_LIBS=-L$(AMGLIBDIR) -lpsb_linsolve -lamg_prec -lpsb_prec 
+#AMG_LIBS = -L$(AMGLIBDIR) -lpsb_linsolve -lamg_prec -lpsb_prec $(MUMPSLIBS) $(EXTRALIBS)
+AMG_LIBS=-L$(AMGLIBDIR) -lamg_prec
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(AMGMODDIR) $(FMFLAG)$(AMGINCDIR) $(PSBLAS_INCLUDES) $(FIFLAG).
 
 LINKOPT=
@@ -11,7 +12,8 @@ EXEDIR=./runs
 DGEN2D=amg_d_pde2d_poisson_mod.o amg_d_pde2d_exp_mod.o \
   amg_d_pde2d_gauss_mod.o amg_d_pde2d_box_mod.o
 DGEN3D=amg_d_pde3d_poisson_mod.o amg_d_pde3d_exp_mod.o \
-  amg_d_pde3d_gauss_mod.o amg_d_pde3d_box_mod.o 	
+  amg_d_pde3d_gauss_mod.o amg_d_pde3d_box_mod.o \
+  amg_d_pde3d_aniso_mod.o	
 SGEN2D=amg_s_pde2d_poisson_mod.o amg_s_pde2d_exp_mod.o \
   amg_s_pde2d_gauss_mod.o amg_s_pde2d_box_mod.o
 SGEN3D=amg_s_pde3d_poisson_mod.o amg_s_pde3d_exp_mod.o \

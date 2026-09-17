@@ -53,6 +53,10 @@ module amg_d_genpde_mod
     module procedure  amg_d_gen_pde3d
   end interface amg_gen_pde3d
 
+  interface amg_gen_pde3d_aniso
+    module procedure  amg_d_gen_aniso_poisson3d
+  end interface
+
   interface
     function d_func_2d(x,y) result(val)
       import :: psb_dpk_
@@ -1006,4 +1010,645 @@ contains
     end if
     return
   end subroutine amg_d_gen_pde2d
+
+    subroutine amg_d_gen_aniso_poisson3d(ctxt,idim,a,bv,xv,desc_a,afmt,&
+       & k11,k22,k33,k12,k13,k23,g,info,f,amold,vmold,partition,nrl,iv)
+    use psb_base_mod
+    use psb_util_mod
+#if defined(PSB_OPENMP)
+    use omp_lib
+#endif
+    !
+    !   Discretizes the anisotropic Poisson equation
+    !
+    !       - div(K grad(u)) = f
+    !
+    !   with Dirichlet boundary conditions u = g on the unit cube.
+    !
+    !   The symmetric diffusion tensor is
+    !
+    !       K = [ k11 k12 k13 ]
+    !           [ k12 k22 k23 ]
+    !           [ k13 k23 k33 ].
+    !
+    !   The coefficient functions are evaluated at the grid point.  The
+    !   19-point stencil below is the centered discretization of the
+    !   constant-tensor operator
+    !
+    !       -k11 u_xx - k22 u_yy - k33 u_zz
+    !       -2 k12 u_xy - 2 k13 u_xz - 2 k23 u_yz.
+    !
+    !   For variable coefficient functions this is therefore a
+    !   non-divergence-form discretization; for the intended anisotropic
+    !   Poisson benchmarks the tensor is normally constant.
+    !
+    implicit none
+    procedure(d_func_3d)  :: k11,k22,k33,k12,k13,k23,g
+    integer(psb_ipk_)     :: idim
+    type(psb_dspmat_type) :: a
+    type(psb_d_vect_type) :: xv,bv
+    type(psb_desc_type)   :: desc_a
+    integer(psb_ipk_)     :: info
+    type(psb_ctxt_type)   :: ctxt
+    character             :: afmt*5
+    procedure(d_func_3d), optional :: f
+    class(psb_d_base_sparse_mat), optional :: amold
+    class(psb_d_base_vect_type), optional :: vmold
+    integer(psb_ipk_), optional :: partition, nrl,iv(:)
+
+    ! Local variables.
+
+    integer(psb_ipk_), parameter :: nb=20
+    type(psb_d_csc_sparse_mat)  :: acsc
+    type(psb_d_coo_sparse_mat)  :: acoo
+    type(psb_d_csr_sparse_mat)  :: acsr
+    integer(psb_ipk_) :: nnz,nr,nlr,i,j,ii,ib,k, partition_
+    integer(psb_lpk_) :: m,n,glob_row,nt
+    integer(psb_ipk_) :: ix,iy,iz,ia,indx_owner
+    ! For 3D partition
+    ! Note: integer control variables going directly into an MPI call
+    ! must be 4 bytes, i.e. psb_mpk_
+    integer(psb_mpk_) :: npdims(3), npp, minfo
+    integer(psb_ipk_) :: npx,npy,npz, iamx,iamy,iamz,mynx,myny,mynz
+    integer(psb_ipk_), allocatable :: bndx(:),bndy(:),bndz(:)
+    ! Process grid
+    integer(psb_ipk_) :: np, iam
+    integer(psb_ipk_) :: icoeff
+    integer(psb_lpk_), allocatable     :: myidx(:)
+    ! deltah dimension of each grid cell
+    ! deltat discretization time
+    real(psb_dpk_)            :: deltah, sqdeltah, deltah2
+    real(psb_dpk_), parameter :: rhs=dzero,one=done,zero=dzero
+    real(psb_dpk_)    :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcdasb
+    integer(psb_ipk_) :: err_act
+    procedure(d_func_3d), pointer :: f_
+    character(len=20)  :: name, ch_err,tmpfmt
+
+    info = psb_success_
+    name = 'd_create_aniso_poisson3d'
+    call psb_erractionsave(err_act)
+
+    call psb_info(ctxt, iam, np)
+
+
+    if (present(f)) then
+      f_ => f
+    else
+      f_ => d_null_func_3d
+    end if
+
+    if (present(partition)) then
+      if ((1<= partition).and.(partition <= 3)) then
+        partition_ = partition
+      else
+        write(*,*) 'Invalid partition choice ',partition,' defaulting to 3'
+        partition_ = 3
+      end if
+    else
+      partition_ = 3
+    end if
+    deltah   = done/(idim+2)
+    sqdeltah = deltah*deltah
+    deltah2  = 2.0_psb_dpk_* deltah
+
+    if (present(partition)) then
+      if ((1<= partition).and.(partition <= 3)) then
+        partition_ = partition
+      else
+        write(*,*) 'Invalid partition choice ',partition,' defaulting to 3'
+        partition_ = 3
+      end if
+    else
+      partition_ = 3
+    end if
+
+    ! initialize array descriptor and sparse matrix storage. provide an
+    ! estimate of the number of non zeroes
+
+    m   = (1_psb_lpk_*idim)*idim*idim
+    n   = m
+    ! A full symmetric tensor diffusion operator uses a 19-point stencil.
+    nnz = 19*((n+np-1)/np)
+    if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
+    t0 = psb_wtime()
+    select case(partition_)
+    case(1)
+      ! A BLOCK partition
+      if (present(nrl)) then
+        nr = nrl
+      else
+        !
+        ! Using a simple BLOCK distribution.
+        !
+        nt = (m+np-1)/np
+        nr = max(0,min(nt,m-(iam*nt)))
+      end if
+
+      nt = nr
+      call psb_sum(ctxt,nt)
+      if (nt /= m) then
+        write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
+        info = -1
+        call psb_barrier(ctxt)
+        call psb_abort(ctxt)
+        return
+      end if
+
+      !
+      ! First example  of use of CDALL: specify for each process a number of
+      ! contiguous rows
+      !
+      call psb_cdall(ctxt,desc_a,info,nl=nr)
+      if (info /=0) goto 9999
+      myidx = desc_a%get_global_indices()
+      nlr = size(myidx)
+
+    case(2)
+      ! A  partition  defined by the user through IV
+
+      if (present(iv)) then
+        if (size(iv) /= m) then
+          write(psb_err_unit,*) iam, 'Initialization error: wrong IV size',size(iv),m
+          info = -1
+          call psb_barrier(ctxt)
+          call psb_abort(ctxt)
+          return
+        end if
+      else
+        write(psb_err_unit,*) iam, 'Initialization error: IV not present'
+        info = -1
+        call psb_barrier(ctxt)
+        call psb_abort(ctxt)
+        return
+      end if
+
+      !
+      ! Second example  of use of CDALL: specify for each row the
+      ! process that owns it
+      !
+      call psb_cdall(ctxt,desc_a,info,vg=iv)
+      if (info /=0) goto 9999
+      myidx = desc_a%get_global_indices()
+      nlr = size(myidx)
+
+    case(3)
+      ! A 3-dimensional partition
+
+      ! A nifty MPI function will split the process list
+      npdims = 0
+#if defined(PSB_SERIAL_MPI)
+      npdims = 1
+#else
+      npp = np
+      call mpi_dims_create(npp,3,npdims,minfo)
+#endif
+      npx = npdims(1)
+      npy = npdims(2)
+      npz = npdims(3)
+
+      allocate(bndx(0:npx),bndy(0:npy),bndz(0:npz))
+      ! We can reuse idx2ijk for process indices as well.
+      call idx2ijk(iamx,iamy,iamz,iam,npx,npy,npz,base=mzero)
+      ! Now let's split the 3D cube in hexahedra
+      call dist1Didx(bndx,idim,npx)
+      mynx = bndx(iamx+1)-bndx(iamx)
+      call dist1Didx(bndy,idim,npy)
+      myny = bndy(iamy+1)-bndy(iamy)
+      call dist1Didx(bndz,idim,npz)
+      mynz = bndz(iamz+1)-bndz(iamz)
+
+      ! How many indices do I own?
+      nlr = mynx*myny*mynz
+      allocate(myidx(nlr))
+      ! Now, let's generate the list of indices I own
+      nr = 0
+      do i=bndx(iamx),bndx(iamx+1)-1
+        do j=bndy(iamy),bndy(iamy+1)-1
+          do k=bndz(iamz),bndz(iamz+1)-1
+            nr = nr + 1
+            call ijk2idx(myidx(nr),i,j,k,idim,idim,idim)
+          end do
+        end do
+      end do
+      if (nr /= nlr) then
+        write(psb_err_unit,*) iam,iamx,iamy,iamz, 'Initialization error: NR vs NLR ',&
+             & nr,nlr,mynx,myny,mynz
+        info = -1
+        call psb_barrier(ctxt)
+        call psb_abort(ctxt)
+      end if
+
+      !
+      ! Third example  of use of CDALL: specify for each process
+      ! the set of global indices it owns.
+      !
+      call psb_cdall(ctxt,desc_a,info,vl=myidx)
+      if (info /=0) goto 9999
+
+      !
+      ! Specify process topology
+      !
+      block
+        !
+        ! Use adjcncy methods 
+        ! 
+        integer(psb_ipk_), allocatable :: neighbours(:)
+        integer(psb_mpk_) :: cnt
+        logical, parameter :: debug_adj=.true.
+        if (debug_adj.and.(np > 1)) then 
+          cnt = 0
+          allocate(neighbours(np))
+          if (iamx < npx-1) then
+            cnt = cnt + 1 
+            call ijk2idx(neighbours(cnt),iamx+1,iamy,iamz,npx,npy,npz,base=mzero)
+          end if
+          if (iamy < npy-1) then
+            cnt = cnt + 1 
+            call ijk2idx(neighbours(cnt),iamx,iamy+1,iamz,npx,npy,npz,base=mzero)
+          end if
+          if (iamz < npz-1) then
+            cnt = cnt + 1 
+            call ijk2idx(neighbours(cnt),iamx,iamy,iamz+1,npx,npy,npz,base=mzero)
+          end if
+          if (iamx >0) then
+            cnt = cnt + 1 
+            call ijk2idx(neighbours(cnt),iamx-1,iamy,iamz,npx,npy,npz,base=mzero)
+          end if
+          if (iamy >0) then
+            cnt = cnt + 1 
+            call ijk2idx(neighbours(cnt),iamx,iamy-1,iamz,npx,npy,npz,base=mzero)
+          end if
+          if (iamz >0) then
+            cnt = cnt + 1 
+            call ijk2idx(neighbours(cnt),iamx,iamy,iamz-1,npx,npy,npz,base=mzero)
+          end if
+          call psb_realloc(cnt, neighbours,info)
+          call desc_a%set_p_adjcncy(neighbours)
+          !write(0,*) iam,' Check on neighbours: ',desc_a%get_p_adjcncy()
+        end if
+      end block
+      
+    case default
+      write(psb_err_unit,*) iam, 'Initialization error: should not get here'
+      info = -1
+      call psb_barrier(ctxt)
+      call psb_abort(ctxt)
+      return
+    end select
+
+
+    if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz)
+    ! define  rhs from boundary conditions; also build initial guess
+    if (info == psb_success_) call psb_geall(xv,desc_a,info)
+    if (info == psb_success_) call psb_geall(bv,desc_a,info)
+
+    call psb_barrier(ctxt)
+    talc = psb_wtime()-t0
+
+    call psb_barrier(ctxt)
+    t1 = psb_wtime()
+    ! Disable OMP here for the time being
+    !
+    ! For a symmetric diffusion tensor the centered discretization has a
+    ! 19-point stencil: 1 center, 6 face neighbours and 12 edge neighbours.
+    block
+      integer(psb_ipk_) :: i,j,k,ii,ib,icoeff, ix,iy,iz, ith,nth
+      integer(psb_lpk_) :: glob_row
+      integer(psb_lpk_), allocatable :: irow(:),icol(:)
+      real(psb_dpk_), allocatable :: val(:)
+      real(psb_dpk_) :: x,y,z,zt(nb)
+      real(psb_dpk_) :: v
+      real(psb_dpk_) :: c11,c22,c33,c12,c13,c23
+#if defined(PSB_OPENMP)
+      nth = omp_get_num_threads()
+      ith = omp_get_thread_num()
+#else
+      nth = 1
+      ith = 0
+#endif
+      allocate(val(20*nb),irow(20*nb),icol(20*nb),stat=info)
+      if (info /= psb_success_) then
+        info=psb_err_alloc_dealloc_
+        call psb_errpush(info,name)
+      endif
+
+      do ii=1,nlr,nb
+        if (info /= psb_success_) cycle
+        ib = min(nb,nlr-ii+1)
+        icoeff = 1
+
+        do k=1,ib
+          i=ii+k-1
+          glob_row=myidx(i)
+
+          call idx2ijk(ix,iy,iz,glob_row,idim,idim,idim)
+          x = (ix-1)*deltah
+          y = (iy-1)*deltah
+          z = (iz-1)*deltah
+
+          zt(k) = f_(x,y,z)
+
+          c11 = k11(x,y,z)
+          c22 = k22(x,y,z)
+          c33 = k33(x,y,z)
+          c12 = k12(x,y,z)
+          c13 = k13(x,y,z)
+          c23 = k23(x,y,z)
+
+          !
+          ! x-direction neighbours
+          !
+          v = -c11/sqdeltah
+          if (ix == 1) then
+            zt(k) = g(dzero,y,z)*(-v) + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix-1,iy,iz,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=v
+            icoeff=icoeff+1
+          endif
+
+          v = -c11/sqdeltah
+          if (ix == idim) then
+            zt(k) = g(done,y,z)*(-v) + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix+1,iy,iz,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=v
+            icoeff=icoeff+1
+          endif
+
+          !
+          ! y-direction neighbours
+          !
+          v = -c22/sqdeltah
+          if (iy == 1) then
+            zt(k) = g(x,dzero,z)*(-v) + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix,iy-1,iz,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=v
+            icoeff=icoeff+1
+          endif
+
+          v = -c22/sqdeltah
+          if (iy == idim) then
+            zt(k) = g(x,done,z)*(-v) + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix,iy+1,iz,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=v
+            icoeff=icoeff+1
+          endif
+
+          !
+          ! z-direction neighbours
+          !
+          v = -c33/sqdeltah
+          if (iz == 1) then
+            zt(k) = g(x,y,dzero)*(-v) + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix,iy,iz-1,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=v
+            icoeff=icoeff+1
+          endif
+
+          v = -c33/sqdeltah
+          if (iz == idim) then
+            zt(k) = g(x,y,done)*(-v) + zt(k)
+          else
+            call ijk2idx(icol(icoeff),ix,iy,iz+1,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=v
+            icoeff=icoeff+1
+          endif
+
+          !
+          ! xy mixed derivative:
+          !
+          !   -2 c12 u_xy
+          !
+          ! gives
+          !
+          !   -c12/(2h^2) [u(i+1,j+1)-u(i+1,j-1)
+          !                 -u(i-1,j+1)+u(i-1,j-1)].
+          !
+          v = -c12/(2.0_psb_dpk_*sqdeltah)
+
+          ! (ix+1,iy+1,iz)
+          if ((ix < idim).and.(iy < idim)) then
+            call ijk2idx(icol(icoeff),ix+1,iy+1,iz,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=v
+            icoeff=icoeff+1
+          else
+            zt(k)=g(merge(done,x,ix==idim),merge(done,y,iy==idim),z)*(-v)+zt(k)
+          endif
+
+          ! (ix+1,iy-1,iz)
+          if ((ix < idim).and.(iy > 1)) then
+            call ijk2idx(icol(icoeff),ix+1,iy-1,iz,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=-v
+            icoeff=icoeff+1
+          else
+            zt(k)=g(merge(done,x,ix==idim),merge(dzero,y,iy==1),z)*v+zt(k)
+          endif
+
+          ! (ix-1,iy+1,iz)
+          if ((ix > 1).and.(iy < idim)) then
+            call ijk2idx(icol(icoeff),ix-1,iy+1,iz,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=-v
+            icoeff=icoeff+1
+          else
+            zt(k)=g(merge(dzero,x,ix==1),merge(done,y,iy==idim),z)*v+zt(k)
+          endif
+
+          ! (ix-1,iy-1,iz)
+          if ((ix > 1).and.(iy > 1)) then
+            call ijk2idx(icol(icoeff),ix-1,iy-1,iz,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=v
+            icoeff=icoeff+1
+          else
+            zt(k)=g(merge(dzero,x,ix==1),merge(dzero,y,iy==1),z)*(-v)+zt(k)
+          endif
+
+          !
+          ! xz mixed derivative
+          !
+          v = -c13/(2.0_psb_dpk_*sqdeltah)
+
+          ! (ix+1,iy,iz+1)
+          if ((ix < idim).and.(iz < idim)) then
+            call ijk2idx(icol(icoeff),ix+1,iy,iz+1,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=v
+            icoeff=icoeff+1
+          else
+            zt(k)=g(merge(done,x,ix==idim),y,merge(done,z,iz==idim))*(-v)+zt(k)
+          endif
+
+          ! (ix+1,iy,iz-1)
+          if ((ix < idim).and.(iz > 1)) then
+            call ijk2idx(icol(icoeff),ix+1,iy,iz-1,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=-v
+            icoeff=icoeff+1
+          else
+            zt(k)=g(merge(done,x,ix==idim),y,merge(dzero,z,iz==1))*v+zt(k)
+          endif
+
+          ! (ix-1,iy,iz+1)
+          if ((ix > 1).and.(iz < idim)) then
+            call ijk2idx(icol(icoeff),ix-1,iy,iz+1,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=-v
+            icoeff=icoeff+1
+          else
+            zt(k)=g(merge(dzero,x,ix==1),y,merge(done,z,iz==idim))*v+zt(k)
+          endif
+
+          ! (ix-1,iy,iz-1)
+          if ((ix > 1).and.(iz > 1)) then
+            call ijk2idx(icol(icoeff),ix-1,iy,iz-1,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=v
+            icoeff=icoeff+1
+          else
+            zt(k)=g(merge(dzero,x,ix==1),y,merge(dzero,z,iz==1))*(-v)+zt(k)
+          endif
+
+          !
+          ! yz mixed derivative
+          !
+          v = -c23/(2.0_psb_dpk_*sqdeltah)
+
+          ! (ix,iy+1,iz+1)
+          if ((iy < idim).and.(iz < idim)) then
+            call ijk2idx(icol(icoeff),ix,iy+1,iz+1,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=v
+            icoeff=icoeff+1
+          else
+            zt(k)=g(x,merge(done,y,iy==idim),merge(done,z,iz==idim))*(-v)+zt(k)
+          endif
+
+          ! (ix,iy+1,iz-1)
+          if ((iy < idim).and.(iz > 1)) then
+            call ijk2idx(icol(icoeff),ix,iy+1,iz-1,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=-v
+            icoeff=icoeff+1
+          else
+            zt(k)=g(x,merge(done,y,iy==idim),merge(dzero,z,iz==1))*v+zt(k)
+          endif
+
+          ! (ix,iy-1,iz+1)
+          if ((iy > 1).and.(iz < idim)) then
+            call ijk2idx(icol(icoeff),ix,iy-1,iz+1,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=-v
+            icoeff=icoeff+1
+          else
+            zt(k)=g(x,merge(dzero,y,iy==1),merge(done,z,iz==idim))*v+zt(k)
+          endif
+
+          ! (ix,iy-1,iz-1)
+          if ((iy > 1).and.(iz > 1)) then
+            call ijk2idx(icol(icoeff),ix,iy-1,iz-1,idim,idim,idim)
+            irow(icoeff)=glob_row
+            val(icoeff)=v
+            icoeff=icoeff+1
+          else
+            zt(k)=g(x,merge(dzero,y,iy==1),merge(dzero,z,iz==1))*(-v)+zt(k)
+          endif
+
+          !
+          ! Center coefficient.
+          !
+          val(icoeff)=2.0_psb_dpk_*(c11+c22+c33)/sqdeltah
+          call ijk2idx(icol(icoeff),ix,iy,iz,idim,idim,idim)
+          irow(icoeff)=glob_row
+          icoeff=icoeff+1
+
+        end do
+
+        call psb_spins(icoeff-1,irow,icol,val,a,desc_a,info)
+        if(info /= psb_success_) cycle
+        call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
+        if(info /= psb_success_) cycle
+        zt(:)=dzero
+        call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
+        if(info /= psb_success_) cycle
+      end do
+
+      deallocate(val,irow,icol)
+    end block
+    tgen = psb_wtime()-t1
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='insert rout.'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+
+    call psb_barrier(ctxt)
+    t1 = psb_wtime()
+    call psb_cdasb(desc_a,info)
+    tcdasb = psb_wtime()-t1
+    call psb_barrier(ctxt)
+    t1 = psb_wtime()
+    if (info == psb_success_) then
+      if (present(amold)) then
+        call psb_spasb(a,desc_a,info,mold=amold)
+      else
+        call psb_spasb(a,desc_a,info,afmt=afmt)
+      end if
+    end if
+    call psb_barrier(ctxt)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='asb rout.'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+    if (info == psb_success_) call psb_geasb(xv,desc_a,info,mold=vmold)
+    if (info == psb_success_) call psb_geasb(bv,desc_a,info,mold=vmold)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='asb rout.'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+    tasb = psb_wtime()-t1
+    call psb_barrier(ctxt)
+    ttot = psb_wtime() - t0
+
+    call psb_amx(ctxt,talc)
+    call psb_amx(ctxt,tgen)
+    call psb_amx(ctxt,tasb)
+    call psb_amx(ctxt,ttot)
+    if(iam == psb_root_) then
+      tmpfmt = a%get_fmt()
+      write(psb_out_unit,'("The matrix has been generated and assembled in ",a3," format.")')&
+           &   tmpfmt
+      write(psb_out_unit,'("-allocation  time : ",es12.5)') talc
+      write(psb_out_unit,'("-coeff. gen. time : ",es12.5)') tgen
+      write(psb_out_unit,'("-desc asbly  time : ",es12.5)') tcdasb
+      write(psb_out_unit,'("- mat asbly  time : ",es12.5)') tasb
+      write(psb_out_unit,'("-total       time : ",es12.5)') ttot
+
+    end if
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+    return
+  end subroutine amg_d_gen_aniso_poisson3d
+
 end module amg_d_genpde_mod
