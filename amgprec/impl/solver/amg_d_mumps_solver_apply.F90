@@ -65,7 +65,8 @@ subroutine d_mumps_solver_apply(alpha,sv,x,beta,y,desc_data,&
   character(len=20)   :: name='d_mumps_solver_apply'
 
   call psb_erractionsave(err_act)
-
+  info = psb_success_
+  
 #if defined(AMG_HAVE_MUMPS) 
   info = psb_success_
   trans_ = psb_toupper(trans)

@@ -68,7 +68,7 @@ contains
     character(1024)    :: prefix_
     integer(psb_epk_), allocatable  :: sz(:)
 
-
+    info = psb_success_
     call psb_erractionsave(err_act)
 
     ctxt = lv%base_desc%get_ctxt()

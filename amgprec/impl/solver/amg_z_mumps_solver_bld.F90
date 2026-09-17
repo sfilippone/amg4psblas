@@ -69,10 +69,8 @@ subroutine z_mumps_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   integer(psb_ipk_)  :: np, iam, me, i, err_act, debug_unit, debug_level
   character(len=20)  :: name='z_mumps_solver_bld', ch_err
 
-#if defined(AMG_HAVE_MUMPS) 
-
   info=psb_success_
-
+#if defined(AMG_HAVE_MUMPS) 
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()

@@ -59,11 +59,11 @@ subroutine s_mumps_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   integer(psb_ipk_)  :: err_act
   character(len=20)  :: name='s_mumps_solver_apply_vect'
 
+  info = psb_success_
 #if defined(AMG_HAVE_MUMPS) 
 
   call psb_erractionsave(err_act)
 
-  info = psb_success_
   !
   ! For non-iterative solvers, init and initu are ignored.
   !
