@@ -291,12 +291,12 @@ program amg_d_pde3d
          & a1_gauss,a2_gauss,a3_gauss,&
          & b1_gauss,b2_gauss,b3_gauss,c_gauss,g_gauss,info)
   case("ANISO")
-    call amg_d_gen_aniso_poisson3d(ctxt,idim,a,b,x,desc_a,afmt, &
-         & k11,k22,k33,k12,k13,k23,g_aniso,info)
     call pde_set_parm3d_aniso(anisovec)
     if (iam == psb_root_) then
       write(psb_out_unit,'("Anisotropy \epsilon = ",es12.5," \theta = ",es12.5)') anisovec(1), anisovec(2)
     end if
+    call amg_d_gen_aniso_poisson3d(ctxt,idim,a,b,x,desc_a,afmt, &
+         & k11,k22,k33,k12,k13,k23,g_aniso,info)
   case default
     info=psb_err_from_subroutine_
     ch_err='amg_gen_pdecoeff'
