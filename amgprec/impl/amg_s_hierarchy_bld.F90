@@ -366,14 +366,10 @@ subroutine amg_s_hierarchy_bld(a,desc_a,prec,info,cpymat)
 
     if (i>2) then
       if (sizeratio < mnaggratio) then
-        if (sizeratio > 1) then
-          newsz = i
-        else
-          !
-          ! We are not gaining 
-          !
-          newsz = i-1
-        end if
+        !
+        ! We are not gaining 
+        !
+        newsz = i-1
       end if
 
       if (all(nlaggr == prec%precv(i-1)%linmap%naggr)) then 

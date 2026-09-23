@@ -176,7 +176,7 @@ contains
     else
       partition_ = 3
     end if
-    deltah   = sone/(idim+2)
+    deltah   = sone/(idim+1)
     sqdeltah = deltah*deltah
     deltah2  = 2.0_psb_spk_* deltah
 
@@ -412,9 +412,9 @@ contains
           ! compute gridpoint coordinates
           call idx2ijk(ix,iy,iz,glob_row,idim,idim,idim)
           ! x, y, z coordinates
-          x = (ix-1)*deltah
-          y = (iy-1)*deltah
-          z = (iz-1)*deltah
+          x = (ix)*deltah
+          y = (iy)*deltah
+          z = (iz)*deltah
           zt(k) = f_(x,y,z)
           ! internal point: build discretization
           !
@@ -643,7 +643,7 @@ contains
       f_ => s_null_func_2d
     end if
 
-    deltah   = sone/(idim+2)
+    deltah   = sone/(idim+1)
     sqdeltah = deltah*deltah
     deltah2  = 2.0_psb_spk_* deltah
 
@@ -875,8 +875,8 @@ contains
           ! compute gridpoint coordinates
           call idx2ijk(ix,iy,glob_row,idim,idim)
           ! x, y coordinates
-          x = (ix-1)*deltah
-          y = (iy-1)*deltah
+          x = (ix)*deltah
+          y = (iy)*deltah
 
           zt(k) = f_(x,y)
           ! internal point: build discretization
