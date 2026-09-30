@@ -420,7 +420,7 @@ subroutine d_mumps_solver_cseti(sv,what,val,info,idx)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  select case(psb_toupper(what))
+  select case(psb_toupper(trim(what)))
 #if defined(AMG_HAVE_MUMPS)
   case('MUMPS_LOC_GLOB')
     sv%ipar(1) = val
@@ -466,7 +466,7 @@ subroutine d_mumps_solver_csetr(sv,what,val,info,idx)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  select case(psb_toupper(what))
+  select case(psb_toupper(trim(what)))
 #if defined(AMG_HAVE_MUMPS)
   case('MUMPS_RPAR_ENTRY')
     if(present(idx)) then 
