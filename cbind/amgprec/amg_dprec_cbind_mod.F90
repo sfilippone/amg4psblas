@@ -220,6 +220,265 @@ function amg_c_dpreccseti_idx(ph,what,val,idx) bind(c) result(res)
     return
   end function amg_c_dpreccsetc_idx
 
+  function amg_c_dpreccseti_pos(ph,what,val,pos) bind(c) result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: what(*), pos(*)
+    integer(psb_c_ipk_), value :: val
+    integer(psb_ipk_)     :: iret
+    character(len=80)     :: fwhat, fpos
+    type(amg_dprec_type), pointer  :: precp
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(what,fwhat)
+    call psb_stringc2f(pos,fpos)
+
+    call precp%cseti(fwhat,val,iret,pos=trim(fpos))
+
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
+    return
+  end function amg_c_dpreccseti_pos
+
+
+  function amg_c_dpreccsetr_pos(ph,what,val,pos) bind(c) result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: what(*), pos(*)
+    real(c_double), value :: val
+    integer(psb_ipk_)     :: iret
+    character(len=80)     :: fwhat, fpos
+    type(amg_dprec_type), pointer  :: precp
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(what,fwhat)
+    call psb_stringc2f(pos,fpos)
+
+    call precp%csetr(fwhat,val,iret,pos=trim(fpos))
+
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
+    return
+  end function amg_c_dpreccsetr_pos
+
+
+  function amg_c_dpreccsetc_pos(ph,what,val,pos) bind(c) result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: what(*), val(*), pos(*)
+    integer(psb_ipk_)     :: iret
+    character(len=80)     :: fwhat, fval, fpos
+    type(amg_dprec_type), pointer  :: precp
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(what,fwhat)
+    call psb_stringc2f(val,fval)
+    call psb_stringc2f(pos,fpos)
+
+    call precp%csetc(fwhat,fval,iret,pos=trim(fpos))
+
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
+    return
+  end function amg_c_dpreccsetc_pos
+
+  function amg_c_dpreccseti_lev(ph,what,val,ilev,ilmax) bind(c) result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: what(*)
+    integer(psb_c_ipk_), value :: val, ilev, ilmax
+    integer(psb_ipk_)     :: iret
+    character(len=80)     :: fwhat
+    type(amg_dprec_type), pointer  :: precp
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(what,fwhat)
+
+    call precp%cseti(fwhat,val,iret,ilev=ilev,ilmax=ilmax)
+
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
+    return
+  end function amg_c_dpreccseti_lev
+
+
+  function amg_c_dpreccsetr_lev(ph,what,val,ilev,ilmax) bind(c) result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: what(*)
+    real(c_double), value :: val
+    integer(psb_c_ipk_), value :: ilev, ilmax
+    integer(psb_ipk_)     :: iret
+    character(len=80)     :: fwhat
+    type(amg_dprec_type), pointer  :: precp
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(what,fwhat)
+
+    call precp%csetr(fwhat,val,iret,ilev=ilev,ilmax=ilmax)
+
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
+    return
+  end function amg_c_dpreccsetr_lev
+
+
+  function amg_c_dpreccsetc_lev(ph,what,val,ilev,ilmax) bind(c) result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: what(*), val(*)
+    integer(psb_c_ipk_), value :: ilev, ilmax
+    integer(psb_ipk_)     :: iret
+    character(len=80)     :: fwhat, fval
+    type(amg_dprec_type), pointer  :: precp
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(what,fwhat)
+    call psb_stringc2f(val,fval)
+
+    call precp%csetc(fwhat,fval,iret,ilev=ilev,ilmax=ilmax)
+
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
+    return
+  end function amg_c_dpreccsetc_lev
+
+  function amg_c_dpreccseti_opt(ph,what,val,ilev,ilmax,pos,idx) bind(c) result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: what(*), pos(*)
+    integer(psb_c_ipk_), value :: val, ilev, ilmax, idx
+    integer(psb_ipk_)     :: iret
+    character(len=80)     :: fwhat, fpos
+    type(amg_dprec_type), pointer  :: precp
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(what,fwhat)
+    call psb_stringc2f(pos,fpos)
+
+    call precp%cseti(fwhat,val,iret,ilev=ilev,ilmax=ilmax,pos=trim(fpos),idx=idx)
+
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
+    return
+  end function amg_c_dpreccseti_opt
+
+
+  function amg_c_dpreccsetr_opt(ph,what,val,ilev,ilmax,pos,idx) bind(c) result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: what(*), pos(*)
+    real(c_double), value :: val
+    integer(psb_c_ipk_), value :: ilev, ilmax, idx
+    integer(psb_ipk_)     :: iret
+    character(len=80)     :: fwhat, fpos
+    type(amg_dprec_type), pointer  :: precp
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(what,fwhat)
+    call psb_stringc2f(pos,fpos)
+
+    call precp%csetr(fwhat,val,iret,ilev=ilev,ilmax=ilmax,pos=trim(fpos),idx=idx)
+
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
+    return
+  end function amg_c_dpreccsetr_opt
+
+
+  function amg_c_dpreccsetc_opt(ph,what,val,ilev,ilmax,pos,idx) bind(c) result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: what(*), val(*), pos(*)
+    integer(psb_c_ipk_), value :: ilev, ilmax, idx
+    integer(psb_ipk_)     :: iret
+    character(len=80)     :: fwhat, fval, fpos
+    type(amg_dprec_type), pointer  :: precp
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(what,fwhat)
+    call psb_stringc2f(val,fval)
+    call psb_stringc2f(pos,fpos)
+
+    call precp%csetc(fwhat,fval,iret,ilev=ilev,ilmax=ilmax,pos=trim(fpos),idx=idx)
+
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
+    return
+  end function amg_c_dpreccsetc_opt
+
   function  amg_c_dprecbld(ah,cdh,ph) bind(c) result(res)
     implicit none
 

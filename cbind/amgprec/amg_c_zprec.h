@@ -27,7 +27,16 @@ extern "C"
   psb_i_t amg_c_zprecsetr(amg_c_zprec *ph, const char *what, double val);
   psb_i_t amg_c_zpreccseti_idx(amg_c_zprec *ph, const char *what, psb_i_t val, psb_i_t idx);
   psb_i_t amg_c_zpreccsetr_idx(amg_c_zprec *ph, const char *what, double val, psb_i_t idx);
-  psb_i_t amg_c_zpreccsetc_idx(amg_c_zprec *ph, const char *what, const char *val, psb_i_t idx);  
+  psb_i_t amg_c_zpreccsetc_idx(amg_c_zprec *ph, const char *what, const char *val, psb_i_t idx);
+  psb_i_t amg_c_zpreccseti_pos(amg_c_zprec *ph, const char *what, psb_i_t val, const char *pos);
+  psb_i_t amg_c_zpreccsetr_pos(amg_c_zprec *ph, const char *what, double val, const char *pos);
+  psb_i_t amg_c_zpreccsetc_pos(amg_c_zprec *ph, const char *what, const char *val, const char *pos);  
+  psb_i_t amg_c_zpreccseti_lev(amg_c_zprec *ph, const char *what, psb_i_t val, psb_i_t ilev, psb_i_t ilmax);
+  psb_i_t amg_c_zpreccsetr_lev(amg_c_zprec *ph, const char *what, double val, psb_i_t ilev, psb_i_t ilmax);
+  psb_i_t amg_c_zpreccsetc_lev(amg_c_zprec *ph, const char *what, const char *val, psb_i_t ilev, psb_i_t ilmax);
+  psb_i_t amg_c_zpreccseti_opt(amg_c_zprec *ph, const char *what, psb_i_t val, psb_i_t ilev, psb_i_t ilmax, const char *pos, psb_i_t idx);
+  psb_i_t amg_c_zpreccsetr_opt(amg_c_zprec *ph, const char *what, double val, psb_i_t ilev, psb_i_t ilmax, const char *pos, psb_i_t idx);
+  psb_i_t amg_c_zpreccsetc_opt(amg_c_zprec *ph, const char *what, const char *val, psb_i_t ilev, psb_i_t ilmax, const char *pos, psb_i_t idx);
   psb_i_t amg_c_zprecbld(psb_c_zspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph);
   psb_i_t amg_c_zhierarchy_build(psb_c_zspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph);
   psb_i_t amg_c_zsmoothers_build(psb_c_zspmat *ah, psb_c_descriptor *cdh, amg_c_zprec *ph);
