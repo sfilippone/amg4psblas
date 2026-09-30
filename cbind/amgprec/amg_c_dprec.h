@@ -23,6 +23,9 @@ extern "C" {
   psb_i_t amg_c_dprecseti(amg_c_dprec *ph, const char *what, psb_i_t val);
   psb_i_t amg_c_dprecsetc(amg_c_dprec *ph, const char *what, const char *val);
   psb_i_t amg_c_dprecsetr(amg_c_dprec *ph, const char *what, double val);
+  psb_i_t amg_c_dpreccseti_idx(amg_c_dprec *ph, const char *what, psb_i_t val, psb_i_t idx);
+  psb_i_t amg_c_dpreccsetr_idx(amg_c_dprec *ph, const char *what, double val, psb_i_t idx);
+  psb_i_t amg_c_dpreccsetc_idx(amg_c_dprec *ph, const char *what, const char *val, psb_i_t idx);
   psb_i_t amg_c_dprecbld(psb_c_dspmat *ah, psb_c_descriptor *cdh, amg_c_dprec *ph);
   psb_i_t amg_c_dhierarchy_build(psb_c_dspmat *ah, psb_c_descriptor *cdh, amg_c_dprec *ph);
   psb_i_t amg_c_dsmoothers_build(psb_c_dspmat *ah, psb_c_descriptor *cdh, amg_c_dprec *ph);

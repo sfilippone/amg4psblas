@@ -134,6 +134,92 @@ contains
     return
   end function amg_c_dprecsetc
 
+function amg_c_dpreccseti_idx(ph,what,val,idx) bind(c) result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: what(*)
+    integer(psb_c_ipk_), value :: val
+    integer(psb_c_ipk_), value :: idx
+    integer(psb_ipk_)     :: iret
+    character(len=80)     :: fwhat
+    type(amg_dprec_type), pointer  :: precp
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(what,fwhat)
+
+    call precp%cseti(fwhat,val,iret,idx=idx)
+
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
+    return
+  end function amg_c_dpreccseti_idx
+
+
+  function amg_c_dpreccsetr_idx(ph,what,val,idx) bind(c) result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: what(*)
+    real(c_double), value :: val
+    integer(psb_c_ipk_), value :: idx
+    integer(psb_ipk_)     :: iret
+    character(len=80)     :: fwhat
+    type(amg_dprec_type), pointer  :: precp
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(what,fwhat)
+
+    call precp%csetr(fwhat,val,iret,idx=idx)
+
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
+    return
+  end function amg_c_dpreccsetr_idx
+
+
+  function amg_c_dpreccsetc_idx(ph,what,val,idx) bind(c) result(res)
+    implicit none
+
+    integer(psb_c_ipk_) :: res
+    type(psb_c_object_type) :: ph
+    character(c_char)     :: what(*), val(*)
+    integer(psb_c_ipk_), value :: idx
+    integer(psb_ipk_)     :: iret
+    character(len=80)     :: fwhat,fval
+    type(amg_dprec_type), pointer  :: precp
+
+    res = -1
+    if (c_associated(ph%item)) then
+      call c_f_pointer(ph%item,precp)
+    else
+      return
+    end if
+
+    call psb_stringc2f(what,fwhat)
+    call psb_stringc2f(val,fval)
+
+    call precp%csetc(fwhat,fval,iret,idx=idx)
+
+    res = AMGC_ERR_FILTER(iret)
+    AMGC_ERR_HANDLE(res)
+    return
+  end function amg_c_dpreccsetc_idx
+
   function  amg_c_dprecbld(ah,cdh,ph) bind(c) result(res)
     implicit none
 
