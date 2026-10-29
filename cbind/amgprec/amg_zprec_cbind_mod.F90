@@ -3,6 +3,7 @@ module amg_zprec_cbind_mod
   use iso_c_binding
   use amg_prec_mod
   use psb_base_cbind_mod
+  use psb_zlinsolve_cbind_mod
 
   type, bind(c) :: amg_c_zprec
     type(c_ptr) :: item = c_null_ptr
@@ -367,31 +368,36 @@ contains
   end function amg_c_zsmoothers_build_format
 
   function  amg_c_zkrylov(methd,&
-       & ah,ph,bh,xh,cdh,options) bind(c) result(res)
+       & ah,ph,bh,xh,cdh,s1,s2,options) bind(c) result(res)
+    use psb_base_mod
+    use psb_prec_mod
     use psb_linsolve_mod
     use psb_prec_cbind_mod
     use psb_zlinsolve_cbind_mod
     implicit none
     integer(psb_c_ipk_)          :: res
-    type(psb_c_object_type) :: ah,cdh,ph,bh,xh
+    type(psb_c_object_type) :: ah,cdh,ph,bh,xh,s1,s2
     character(c_char)       :: methd(*)
     type(solveroptions)     :: options
 
     res= amg_c_zkrylov_opt(methd, ah, ph, bh, xh, options%eps,cdh,  &
          & itmax=options%itmax, iter=options%iter,&
          & itrace=options%itrace, istop=options%istop,&
-         & irst=options%irst, err=options%err)
+         & irst=options%irst, err=options%err, s1=s1,s2=s2)
 
   end function amg_c_zkrylov
 
 
   function  amg_c_zkrylov_opt(methd,&
-       & ah,ph,bh,xh,eps,cdh,itmax,iter,err,itrace,irst,istop) bind(c) result(res)
+       & ah,ph,bh,xh,eps,cdh,itmax,iter,err,&
+       & itrace,irst,istop,s1,s2) bind(c) result(res)
+    use psb_base_mod
+    use psb_prec_mod
     use psb_linsolve_mod
     use psb_objhandle_mod
     implicit none
     integer(psb_c_ipk_)          :: res
-    type(psb_c_object_type) :: ah,cdh,ph,bh,xh
+    type(psb_c_object_type) :: ah,cdh,ph,bh,xh,s1, s2
     integer(psb_c_ipk_), value :: itmax,itrace,irst,istop
     real(c_double), value :: eps
     integer(psb_c_ipk_)        :: iter
@@ -400,7 +406,7 @@ contains
     type(psb_desc_type), pointer   :: descp
     type(psb_zspmat_type), pointer :: ap
     type(amg_zprec_type), pointer  :: precp
-    type(psb_z_vect_type), pointer :: xp, bp
+    type(psb_z_vect_type), pointer :: xp, bp, s1p, s2p
 
     integer(psb_ipk_)     :: iret,fitmax,fitrace,first,fistop,fiter
     character(len=20)     :: fmethd
@@ -432,7 +438,16 @@ contains
     else
       return
     end if
-
+    if (c_associated(s1%item)) then
+      call c_f_pointer(s1%item,s1p)
+    else
+      nullify(s1p)
+    end if
+    if (c_associated(s2%item)) then
+      call c_f_pointer(s2%item,s2p)
+    else
+      nullify(s2p)
+    end if
 
     call psb_stringc2f(methd,fmethd)
     feps    = eps
@@ -441,10 +456,28 @@ contains
     first   = irst
     fistop  = istop
 
-    call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
-         & descp, iret,&
-         & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
-         & irst=first, err=ferr)
+    if (associated(s1p).and.associated(s2p)) then
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, iret,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr,s1=s1p,s2=s2p)
+    else if  (associated(s1p)) then
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, iret,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr,s1=s1p)
+    else  if (associated(s2p)) then
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, iret,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr,s2=s2p)
+    else
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, iret,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr)
+    end if
+
     iter = fiter
     err  = ferr
     res = min(iret,0)
