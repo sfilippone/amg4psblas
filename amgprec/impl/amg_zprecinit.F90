@@ -248,6 +248,7 @@ subroutine amg_zprecinit(ctxt,prec,ptype,info)
     info = psb_err_pivot_too_small_
   end select
 
+  if (info == psb_success_) call prec%set_nlevs(nlev_)
   call psb_erractionrestore(err_act)
   return
 
