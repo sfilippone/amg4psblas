@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "amg_c_zprec.h"
 
-amg_c_zprec* amg_c_new_zprec()
+amg_c_zprec* amg_c_zprec_new()
 {
   amg_c_zprec* temp;
   
@@ -11,7 +11,7 @@ amg_c_zprec* amg_c_new_zprec()
 }
 
 
-psb_i_t amg_c_delete_zprec(amg_c_zprec* p)
+psb_i_t amg_c_zprec_delete(amg_c_zprec* p)
 {
   int iret;
   iret=amg_c_zprecfree(p);

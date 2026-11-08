@@ -26,7 +26,7 @@ static void fail(const char *what, int line)
 static void exercise_d(psb_c_dspmat *matrix, psb_c_descriptor *desc,
                        psb_i_t nlocal, psb_l_t first)
 {
-  amg_c_dprec prec = {0};
+  amg_c_dprec *prec = amg_c_dprec_new();
   amg_c_prec_info info;
   amg_c_prec_level_info level;
   psb_c_dvector x = {0}, y = {0}, sum = {0};
@@ -38,6 +38,7 @@ static void exercise_d(psb_c_dspmat *matrix, psb_c_descriptor *desc,
   double xpy, ypx, xpx;
   double scale;
 
+  REQUIRE(prec != NULL);
   REQUIRE(rows != NULL && vx != NULL && vy != NULL);
   for (i = 0; i < nlocal; ++i) {
     double g = (double)(first + i + 1);
@@ -63,84 +64,84 @@ static void exercise_d(psb_c_dspmat *matrix, psb_c_descriptor *desc,
   free(vx);
   free(vy);
 
-  REQUIRE(amg_c_dprec_get_info(&prec, &info) != 0);
+  REQUIRE(amg_c_dprec_get_info(prec, &info) != 0);
   REQUIRE(info.nlevels == 0);
   REQUIRE(amg_c_dprec_get_info(NULL, &info) != 0);
-  REQUIRE(amg_c_dprec_get_info(&prec, NULL) != 0);
+  REQUIRE(amg_c_dprec_get_info(prec, NULL) != 0);
 
   {
-    CHECK(amg_c_dprecinit(context, &prec, "ML"));
-    CHECK(amg_c_dprec_get_info(&prec, &info));
+    CHECK(amg_c_dprecinit(context, prec, "ML"));
+    CHECK(amg_c_dprec_get_info(prec, &info));
     REQUIRE(info.nlevels > 0 && info.hierarchy_built == 0);
     REQUIRE(info.operator_complexity == 0);
     bad_level = 0;
-    REQUIRE(amg_c_dprecseti_opt(&prec, "SMOOTHER_SWEEPS", 1,
+    REQUIRE(amg_c_dprecseti_opt(prec, "SMOOTHER_SWEEPS", 1,
                                    &bad_level, NULL, NULL, NULL) != 0);
     REQUIRE(amg_c_dprecseti_opt(NULL, "SMOOTHER_SWEEPS", 1,
                                    NULL, NULL, NULL, NULL) != 0);
-    REQUIRE(amg_c_dprecsetc_opt(&prec, NULL, "VCYCLE",
+    REQUIRE(amg_c_dprecsetc_opt(prec, NULL, "VCYCLE",
                                    NULL, NULL, NULL, NULL) != 0);
 
     /* NULL options preserve the ordinary whole-hierarchy setter behavior. */
-    CHECK(amg_c_dprecsetc_opt(&prec, "ML_CYCLE", "VCYCLE", NULL, NULL, NULL, NULL));
-    CHECK(amg_c_dprecsetc(&prec, "PAR_AGGR_ALG", "DECOUPLED"));
-    CHECK(amg_c_dprecsetc(&prec, "AGGR_TYPE", "SOC1"));
-    CHECK(amg_c_dprecsetc(&prec, "AGGR_PROL", "SMOOTHED"));
-    CHECK(amg_c_dprecsetc(&prec, "SMOOTHER_TYPE", "L1-JACOBI"));
-    CHECK(amg_c_dprecsetc(&prec, "COARSE_SOLVE", "L1-JACOBI"));
-    CHECK(amg_c_dprecseti_opt(&prec, "MIN_COARSE_SIZE", 8, NULL, NULL, NULL, NULL));
-    CHECK(amg_c_dprecseti(&prec, "MIN_COARSE_SIZE_PER_PROCESS", 1));
-    CHECK(amg_c_dprecseti(&prec, "OUTER_SWEEPS", 1));
-    CHECK(amg_c_dprecsetr_opt(&prec, "AGGR_THRESH", 0.0, NULL, NULL, NULL, NULL));
-    CHECK(amg_c_dhierarchy_build(matrix, desc, &prec));
-    CHECK(amg_c_dprec_get_info(&prec, &info));
+    CHECK(amg_c_dprecsetc_opt(prec, "ML_CYCLE", "VCYCLE", NULL, NULL, NULL, NULL));
+    CHECK(amg_c_dprecsetc(prec, "PAR_AGGR_ALG", "DECOUPLED"));
+    CHECK(amg_c_dprecsetc(prec, "AGGR_TYPE", "SOC1"));
+    CHECK(amg_c_dprecsetc(prec, "AGGR_PROL", "SMOOTHED"));
+    CHECK(amg_c_dprecsetc(prec, "SMOOTHER_TYPE", "L1-JACOBI"));
+    CHECK(amg_c_dprecsetc(prec, "COARSE_SOLVE", "L1-JACOBI"));
+    CHECK(amg_c_dprecseti_opt(prec, "MIN_COARSE_SIZE", 8, NULL, NULL, NULL, NULL));
+    CHECK(amg_c_dprecseti(prec, "MIN_COARSE_SIZE_PER_PROCESS", 1));
+    CHECK(amg_c_dprecseti(prec, "OUTER_SWEEPS", 1));
+    CHECK(amg_c_dprecsetr_opt(prec, "AGGR_THRESH", 0.0, NULL, NULL, NULL, NULL));
+    CHECK(amg_c_dhierarchy_build(matrix, desc, prec));
+    CHECK(amg_c_dprec_get_info(prec, &info));
     REQUIRE(info.hierarchy_built == 1 && info.nlevels > 1);
     REQUIRE(isfinite(info.operator_complexity) && info.operator_complexity >= 1.0);
     REQUIRE(info.local_bytes > 0 && info.outer_sweeps == 1);
     first_level = 1;
     last_level = info.nlevels;
     bad_level = last_level + 1;
-    REQUIRE(amg_c_dprec_get_level_info(&prec, bad_level, &level) != 0);
-    REQUIRE(amg_c_dprecseti_opt(&prec, "SMOOTHER_SWEEPS", 2,
+    REQUIRE(amg_c_dprec_get_level_info(prec, bad_level, &level) != 0);
+    REQUIRE(amg_c_dprecseti_opt(prec, "SMOOTHER_SWEEPS", 2,
                                    &last_level, &first_level, NULL, NULL) != 0);
 
     /* Configure the actual built levels, including the coarsest one.
      * Explicit POST is separately allocated; its report must not alias PRE.
      */
-    CHECK(amg_c_dprecsetc_opt(&prec, "SMOOTHER_TYPE", "L1-JACOBI",
+    CHECK(amg_c_dprecsetc_opt(prec, "SMOOTHER_TYPE", "L1-JACOBI",
                                  &first_level, &last_level, "PRE", NULL));
-    CHECK(amg_c_dprecsetc_opt(&prec, "SMOOTHER_TYPE", "L1-JACOBI",
+    CHECK(amg_c_dprecsetc_opt(prec, "SMOOTHER_TYPE", "L1-JACOBI",
                                  &first_level, &last_level, "POST", NULL));
-    CHECK(amg_c_dprecseti_opt(&prec, "SMOOTHER_SWEEPS", 2,
+    CHECK(amg_c_dprecseti_opt(prec, "SMOOTHER_SWEEPS", 2,
                                  &first_level, &last_level, "PRE", NULL));
-    CHECK(amg_c_dprecseti_opt(&prec, "SMOOTHER_SWEEPS", 3,
+    CHECK(amg_c_dprecseti_opt(prec, "SMOOTHER_SWEEPS", 3,
                                  &first_level, &last_level, "POST", NULL));
-    CHECK(amg_c_dprec_get_level_info(&prec, 1, &level));
+    CHECK(amg_c_dprec_get_level_info(prec, 1, &level));
     REQUIRE(level.sweeps_pre == 2 && level.sweeps_post == 3);
-    CHECK(amg_c_dprecseti_opt(&prec, "SMOOTHER_SWEEPS", 2,
+    CHECK(amg_c_dprecseti_opt(prec, "SMOOTHER_SWEEPS", 2,
                                  &first_level, &last_level, "POST", NULL));
-    CHECK(amg_c_dprecsetc_opt(&prec, "SMOOTHER_STOP", "FALSE",
+    CHECK(amg_c_dprecsetc_opt(prec, "SMOOTHER_STOP", "FALSE",
                                  &first_level, &last_level, "PRE", NULL));
-    CHECK(amg_c_dprecsetc_opt(&prec, "SMOOTHER_STOP", "FALSE",
+    CHECK(amg_c_dprecsetc_opt(prec, "SMOOTHER_STOP", "FALSE",
                                  &first_level, &last_level, "POST", NULL));
     /* Exercise non-NULL idx forwarding on a named scalar parameter; a
      * parameter which does not consume an index retains native behavior.
      */
     idx = 1;
-    CHECK(amg_c_dprecsetr_opt(&prec, "SMOOTHER_STOPTOL", 1.e-12,
+    CHECK(amg_c_dprecsetr_opt(prec, "SMOOTHER_STOPTOL", 1.e-12,
                                  &first_level, &last_level, "PRE", &idx));
-    CHECK(amg_c_dsmoothers_build(matrix, desc, &prec));
+    CHECK(amg_c_dsmoothers_build(matrix, desc, prec));
 
     for (i = 1; i <= last_level; ++i) {
-      CHECK(amg_c_dprec_get_level_info(&prec, i, &level));
+      CHECK(amg_c_dprec_get_level_info(prec, i, &level));
       REQUIRE(level.sweeps_pre == 2 && level.sweeps_post == 2);
       REQUIRE(level.residual_stop_pre == 0 && level.residual_stop_post == 0);
       REQUIRE(strstr(level.solver_pre, "L1") != NULL);
       REQUIRE(strstr(level.solver_post, "L1") != NULL);
     }
 
-    CHECK(amg_c_dprecapply(&prec, &x, &px, desc));
-    CHECK(amg_c_dprecapply(&prec, &y, &py, desc));
+    CHECK(amg_c_dprecapply(prec, &x, &px, desc));
+    CHECK(amg_c_dprecapply(prec, &y, &py, desc));
     xpx = psb_c_dgedot(&x, &px, desc);
     xpy = psb_c_dgedot(&x, &py, desc);
     ypx = psb_c_dgedot(&y, &px, desc);
@@ -150,27 +151,28 @@ static void exercise_d(psb_c_dspmat *matrix, psb_c_descriptor *desc,
     REQUIRE(fabs(xpy - ypx) < 5.e-11 * scale);
 
     CHECK(psb_c_dgeaxpbyz(1.0, &x, 1.0, &y, &sum, desc));
-    CHECK(amg_c_dprecapply(&prec, &sum, &work, desc));
+    CHECK(amg_c_dprecapply(prec, &sum, &work, desc));
     CHECK(psb_c_dgeaxpby(-1.0, &px, 1.0, &work, desc));
     CHECK(psb_c_dgeaxpby(-1.0, &py, 1.0, &work, desc));
     scale = fmax(1.0, psb_c_dgenrm2(&px, desc) + psb_c_dgenrm2(&py, desc));
     REQUIRE(psb_c_dgenrm2(&work, desc) < 5.e-11 * scale);
 
     CHECK(psb_c_dvect_set_scal(&work, 19.0));
-    CHECK(amg_c_dprecapply_opt(&prec, &x, &work, desc, "N"));
+    CHECK(amg_c_dprecapply_opt(prec, &x, &work, desc, "N"));
     CHECK(psb_c_dgeaxpby(-1.0, &px, 1.0, &work, desc));
     REQUIRE(psb_c_dgenrm2(&work, desc) < 5.e-11 * scale);
     CHECK(psb_c_dvect_set_scal(&sum, 0.0));
     CHECK(psb_c_dvect_set_scal(&work, 19.0));
-    CHECK(amg_c_dprecapply(&prec, &sum, &work, desc));
+    CHECK(amg_c_dprecapply(prec, &sum, &work, desc));
     REQUIRE(psb_c_dgenrm2(&work, desc) < 5.e-13);
 
-    CHECK(amg_c_dprecfree(&prec));
-    CHECK(amg_c_dprec_get_info(&prec, &info));
+    CHECK(amg_c_dprecfree(prec));
+    CHECK(amg_c_dprec_get_info(prec, &info));
     REQUIRE(info.nlevels == 0 && info.hierarchy_built == 0);
-    REQUIRE(amg_c_dprec_get_level_info(&prec, 1, &level) != 0);
+    REQUIRE(amg_c_dprec_get_level_info(prec, 1, &level) != 0);
   }
 
+  CHECK(amg_c_dprec_delete(prec));
   CHECK(psb_c_dgefree(&x, desc));
   CHECK(psb_c_dgefree(&y, desc));
   CHECK(psb_c_dgefree(&sum, desc));
@@ -183,7 +185,7 @@ static void exercise_d(psb_c_dspmat *matrix, psb_c_descriptor *desc,
 static void exercise_z(psb_c_zspmat *matrix, psb_c_descriptor *desc,
                        psb_i_t nlocal, psb_l_t first)
 {
-  amg_c_zprec prec = {0};
+  amg_c_zprec *prec = amg_c_zprec_new();
   amg_c_prec_info info;
   amg_c_prec_level_info level;
   psb_c_zvector x = {0}, y = {0}, sum = {0};
@@ -195,6 +197,7 @@ static void exercise_z(psb_c_zspmat *matrix, psb_c_descriptor *desc,
   psb_z_t xpy, ypx, xpx;
   double scale;
 
+  REQUIRE(prec != NULL);
   REQUIRE(rows != NULL && vx != NULL && vy != NULL);
   for (i = 0; i < nlocal; ++i) {
     double g = (double)(first + i + 1);
@@ -220,84 +223,84 @@ static void exercise_z(psb_c_zspmat *matrix, psb_c_descriptor *desc,
   free(vx);
   free(vy);
 
-  REQUIRE(amg_c_zprec_get_info(&prec, &info) != 0);
+  REQUIRE(amg_c_zprec_get_info(prec, &info) != 0);
   REQUIRE(info.nlevels == 0);
   REQUIRE(amg_c_zprec_get_info(NULL, &info) != 0);
-  REQUIRE(amg_c_zprec_get_info(&prec, NULL) != 0);
+  REQUIRE(amg_c_zprec_get_info(prec, NULL) != 0);
 
   {
-    CHECK(amg_c_zprecinit(context, &prec, "ML"));
-    CHECK(amg_c_zprec_get_info(&prec, &info));
+    CHECK(amg_c_zprecinit(context, prec, "ML"));
+    CHECK(amg_c_zprec_get_info(prec, &info));
     REQUIRE(info.nlevels > 0 && info.hierarchy_built == 0);
     REQUIRE(info.operator_complexity == 0);
     bad_level = 0;
-    REQUIRE(amg_c_zprecseti_opt(&prec, "SMOOTHER_SWEEPS", 1,
+    REQUIRE(amg_c_zprecseti_opt(prec, "SMOOTHER_SWEEPS", 1,
                                    &bad_level, NULL, NULL, NULL) != 0);
     REQUIRE(amg_c_zprecseti_opt(NULL, "SMOOTHER_SWEEPS", 1,
                                    NULL, NULL, NULL, NULL) != 0);
-    REQUIRE(amg_c_zprecsetc_opt(&prec, NULL, "VCYCLE",
+    REQUIRE(amg_c_zprecsetc_opt(prec, NULL, "VCYCLE",
                                    NULL, NULL, NULL, NULL) != 0);
 
     /* NULL options preserve the ordinary whole-hierarchy setter behavior. */
-    CHECK(amg_c_zprecsetc_opt(&prec, "ML_CYCLE", "VCYCLE", NULL, NULL, NULL, NULL));
-    CHECK(amg_c_zprecsetc(&prec, "PAR_AGGR_ALG", "DECOUPLED"));
-    CHECK(amg_c_zprecsetc(&prec, "AGGR_TYPE", "SOC1"));
-    CHECK(amg_c_zprecsetc(&prec, "AGGR_PROL", "SMOOTHED"));
-    CHECK(amg_c_zprecsetc(&prec, "SMOOTHER_TYPE", "L1-JACOBI"));
-    CHECK(amg_c_zprecsetc(&prec, "COARSE_SOLVE", "L1-JACOBI"));
-    CHECK(amg_c_zprecseti_opt(&prec, "MIN_COARSE_SIZE", 8, NULL, NULL, NULL, NULL));
-    CHECK(amg_c_zprecseti(&prec, "MIN_COARSE_SIZE_PER_PROCESS", 1));
-    CHECK(amg_c_zprecseti(&prec, "OUTER_SWEEPS", 1));
-    CHECK(amg_c_zprecsetr_opt(&prec, "AGGR_THRESH", 0.0, NULL, NULL, NULL, NULL));
-    CHECK(amg_c_zhierarchy_build(matrix, desc, &prec));
-    CHECK(amg_c_zprec_get_info(&prec, &info));
+    CHECK(amg_c_zprecsetc_opt(prec, "ML_CYCLE", "VCYCLE", NULL, NULL, NULL, NULL));
+    CHECK(amg_c_zprecsetc(prec, "PAR_AGGR_ALG", "DECOUPLED"));
+    CHECK(amg_c_zprecsetc(prec, "AGGR_TYPE", "SOC1"));
+    CHECK(amg_c_zprecsetc(prec, "AGGR_PROL", "SMOOTHED"));
+    CHECK(amg_c_zprecsetc(prec, "SMOOTHER_TYPE", "L1-JACOBI"));
+    CHECK(amg_c_zprecsetc(prec, "COARSE_SOLVE", "L1-JACOBI"));
+    CHECK(amg_c_zprecseti_opt(prec, "MIN_COARSE_SIZE", 8, NULL, NULL, NULL, NULL));
+    CHECK(amg_c_zprecseti(prec, "MIN_COARSE_SIZE_PER_PROCESS", 1));
+    CHECK(amg_c_zprecseti(prec, "OUTER_SWEEPS", 1));
+    CHECK(amg_c_zprecsetr_opt(prec, "AGGR_THRESH", 0.0, NULL, NULL, NULL, NULL));
+    CHECK(amg_c_zhierarchy_build(matrix, desc, prec));
+    CHECK(amg_c_zprec_get_info(prec, &info));
     REQUIRE(info.hierarchy_built == 1 && info.nlevels > 1);
     REQUIRE(isfinite(info.operator_complexity) && info.operator_complexity >= 1.0);
     REQUIRE(info.local_bytes > 0 && info.outer_sweeps == 1);
     first_level = 1;
     last_level = info.nlevels;
     bad_level = last_level + 1;
-    REQUIRE(amg_c_zprec_get_level_info(&prec, bad_level, &level) != 0);
-    REQUIRE(amg_c_zprecseti_opt(&prec, "SMOOTHER_SWEEPS", 2,
+    REQUIRE(amg_c_zprec_get_level_info(prec, bad_level, &level) != 0);
+    REQUIRE(amg_c_zprecseti_opt(prec, "SMOOTHER_SWEEPS", 2,
                                    &last_level, &first_level, NULL, NULL) != 0);
 
     /* Configure the actual built levels, including the coarsest one.
      * Explicit POST is separately allocated; its report must not alias PRE.
      */
-    CHECK(amg_c_zprecsetc_opt(&prec, "SMOOTHER_TYPE", "L1-JACOBI",
+    CHECK(amg_c_zprecsetc_opt(prec, "SMOOTHER_TYPE", "L1-JACOBI",
                                  &first_level, &last_level, "PRE", NULL));
-    CHECK(amg_c_zprecsetc_opt(&prec, "SMOOTHER_TYPE", "L1-JACOBI",
+    CHECK(amg_c_zprecsetc_opt(prec, "SMOOTHER_TYPE", "L1-JACOBI",
                                  &first_level, &last_level, "POST", NULL));
-    CHECK(amg_c_zprecseti_opt(&prec, "SMOOTHER_SWEEPS", 2,
+    CHECK(amg_c_zprecseti_opt(prec, "SMOOTHER_SWEEPS", 2,
                                  &first_level, &last_level, "PRE", NULL));
-    CHECK(amg_c_zprecseti_opt(&prec, "SMOOTHER_SWEEPS", 3,
+    CHECK(amg_c_zprecseti_opt(prec, "SMOOTHER_SWEEPS", 3,
                                  &first_level, &last_level, "POST", NULL));
-    CHECK(amg_c_zprec_get_level_info(&prec, 1, &level));
+    CHECK(amg_c_zprec_get_level_info(prec, 1, &level));
     REQUIRE(level.sweeps_pre == 2 && level.sweeps_post == 3);
-    CHECK(amg_c_zprecseti_opt(&prec, "SMOOTHER_SWEEPS", 2,
+    CHECK(amg_c_zprecseti_opt(prec, "SMOOTHER_SWEEPS", 2,
                                  &first_level, &last_level, "POST", NULL));
-    CHECK(amg_c_zprecsetc_opt(&prec, "SMOOTHER_STOP", "FALSE",
+    CHECK(amg_c_zprecsetc_opt(prec, "SMOOTHER_STOP", "FALSE",
                                  &first_level, &last_level, "PRE", NULL));
-    CHECK(amg_c_zprecsetc_opt(&prec, "SMOOTHER_STOP", "FALSE",
+    CHECK(amg_c_zprecsetc_opt(prec, "SMOOTHER_STOP", "FALSE",
                                  &first_level, &last_level, "POST", NULL));
     /* Exercise non-NULL idx forwarding on a named scalar parameter; a
      * parameter which does not consume an index retains native behavior.
      */
     idx = 1;
-    CHECK(amg_c_zprecsetr_opt(&prec, "SMOOTHER_STOPTOL", 1.e-12,
+    CHECK(amg_c_zprecsetr_opt(prec, "SMOOTHER_STOPTOL", 1.e-12,
                                  &first_level, &last_level, "PRE", &idx));
-    CHECK(amg_c_zsmoothers_build(matrix, desc, &prec));
+    CHECK(amg_c_zsmoothers_build(matrix, desc, prec));
 
     for (i = 1; i <= last_level; ++i) {
-      CHECK(amg_c_zprec_get_level_info(&prec, i, &level));
+      CHECK(amg_c_zprec_get_level_info(prec, i, &level));
       REQUIRE(level.sweeps_pre == 2 && level.sweeps_post == 2);
       REQUIRE(level.residual_stop_pre == 0 && level.residual_stop_post == 0);
       REQUIRE(strstr(level.solver_pre, "L1") != NULL);
       REQUIRE(strstr(level.solver_post, "L1") != NULL);
     }
 
-    CHECK(amg_c_zprecapply(&prec, &x, &px, desc));
-    CHECK(amg_c_zprecapply(&prec, &y, &py, desc));
+    CHECK(amg_c_zprecapply(prec, &x, &px, desc));
+    CHECK(amg_c_zprecapply(prec, &y, &py, desc));
     xpx = psb_c_zgedot(&x, &px, desc);
     xpy = psb_c_zgedot(&x, &py, desc);
     ypx = psb_c_zgedot(&y, &px, desc);
@@ -307,27 +310,28 @@ static void exercise_z(psb_c_zspmat *matrix, psb_c_descriptor *desc,
     REQUIRE(cabs(xpy - conj(ypx)) < 5.e-11 * scale);
 
     CHECK(psb_c_zgeaxpbyz(1.0, &x, 1.0, &y, &sum, desc));
-    CHECK(amg_c_zprecapply(&prec, &sum, &work, desc));
+    CHECK(amg_c_zprecapply(prec, &sum, &work, desc));
     CHECK(psb_c_zgeaxpby(-1.0, &px, 1.0, &work, desc));
     CHECK(psb_c_zgeaxpby(-1.0, &py, 1.0, &work, desc));
     scale = fmax(1.0, psb_c_zgenrm2(&px, desc) + psb_c_zgenrm2(&py, desc));
     REQUIRE(psb_c_zgenrm2(&work, desc) < 5.e-11 * scale);
 
     CHECK(psb_c_zvect_set_scal(&work, 19.0));
-    CHECK(amg_c_zprecapply_opt(&prec, &x, &work, desc, "N"));
+    CHECK(amg_c_zprecapply_opt(prec, &x, &work, desc, "N"));
     CHECK(psb_c_zgeaxpby(-1.0, &px, 1.0, &work, desc));
     REQUIRE(psb_c_zgenrm2(&work, desc) < 5.e-11 * scale);
     CHECK(psb_c_zvect_set_scal(&sum, 0.0));
     CHECK(psb_c_zvect_set_scal(&work, 19.0));
-    CHECK(amg_c_zprecapply(&prec, &sum, &work, desc));
+    CHECK(amg_c_zprecapply(prec, &sum, &work, desc));
     REQUIRE(psb_c_zgenrm2(&work, desc) < 5.e-13);
 
-    CHECK(amg_c_zprecfree(&prec));
-    CHECK(amg_c_zprec_get_info(&prec, &info));
+    CHECK(amg_c_zprecfree(prec));
+    CHECK(amg_c_zprec_get_info(prec, &info));
     REQUIRE(info.nlevels == 0 && info.hierarchy_built == 0);
-    REQUIRE(amg_c_zprec_get_level_info(&prec, 1, &level) != 0);
+    REQUIRE(amg_c_zprec_get_level_info(prec, 1, &level) != 0);
   }
 
+  CHECK(amg_c_zprec_delete(prec));
   CHECK(psb_c_zgefree(&x, desc));
   CHECK(psb_c_zgefree(&y, desc));
   CHECK(psb_c_zgefree(&sum, desc));
@@ -380,7 +384,7 @@ int main(void)
   exercise_d(&da, &desc, nlocal, first);
   exercise_z(&za, &desc, nlocal, first);
 
-  /* Advertised heap APIs, plus the two previously exported complex aliases. */
+  /* Heap constructors and deletion functions. */
   dp = amg_c_dprec_new();
   REQUIRE(dp != NULL);
   CHECK(amg_c_dprecinit(context, dp, "ML"));
@@ -389,10 +393,6 @@ int main(void)
   REQUIRE(zp != NULL);
   CHECK(amg_c_zprecinit(context, zp, "ML"));
   CHECK(amg_c_zprec_delete(zp));
-  zp = amg_c_new_zprec();
-  REQUIRE(zp != NULL);
-  CHECK(amg_c_zprecinit(context, zp, "ML"));
-  CHECK(amg_c_delete_zprec(zp));
 
   CHECK(psb_c_dspfree(&da, &desc));
   CHECK(psb_c_zspfree(&za, &desc));
