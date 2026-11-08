@@ -6,6 +6,7 @@ set(amg4psblas_VERSION "@amg4psblas_VERSION@")
 set(amg4psblas_INCLUDE_DIRS "@CMAKE_INSTALL_INCLUDEDIR@")
 
 include(CMakeFindDependencyMacro)
+find_dependency(psblas CONFIG HINTS "${PSBLAS_INSTALL_DIR}")
 
 # Provide the targets
 include("${CMAKE_CURRENT_LIST_DIR}/@CMAKE_PROJECT_NAME@Targets.cmake")

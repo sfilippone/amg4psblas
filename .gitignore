@@ -2,6 +2,7 @@
 *.o
 *.mod
 *~
+*.smod
 
 # header files generated
 cbind/*.h

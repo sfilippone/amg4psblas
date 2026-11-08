@@ -5,5 +5,6 @@ module amg_prec_cbind_mod
   use psb_prec_cbind_mod
   use amg_dprec_cbind_mod
   use amg_zprec_cbind_mod
+  use amg_cbind_ext_mod
 
 end module amg_prec_cbind_mod
