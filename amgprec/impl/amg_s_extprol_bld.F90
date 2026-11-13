@@ -189,8 +189,8 @@ subroutine amg_s_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
     call psb_errpush(info,name,a_err='Inconsistent min_cr_ratio')
     goto 9999
   end if
-!!$  if (iszv /= size(p%precv)) then
-  if (iszv /= p%get_nlevs())) then 
+
+  if (iszv /= p%get_nlevs()) then 
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Inconsistent number of levels')
     goto 9999
