@@ -164,7 +164,8 @@ subroutine amg_z_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
   mxplevs    = p%ag_data%max_levs
   mnaggratio = p%ag_data%min_cr_ratio
   casize     = p%ag_data%min_coarse_size
-  iszv       = size(p%precv)
+  iszv       = p%get_nlevs()
+!!$    iszv       = size(p%precv)
   nprolv     = size(prolv)
   nrestrv    = size(restrv)
   call psb_bcast(ctxt,iszv)
@@ -188,9 +189,10 @@ subroutine amg_z_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
     call psb_errpush(info,name,a_err='Inconsistent min_cr_ratio')
     goto 9999
   end if
-  if (iszv /= size(p%precv)) then 
+!!$  if (iszv /= size(p%precv)) then
+  if (iszv /= p%get_nlevs())) then 
     info=psb_err_internal_error_
-    call psb_errpush(info,name,a_err='Inconsistent size of precv')
+    call psb_errpush(info,name,a_err='Inconsistent number of levels')
     goto 9999
   end if
   if (nprolv /= size(prolv)) then 
@@ -283,7 +285,9 @@ subroutine amg_z_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
       call p%precv(i)%free(info)
     end do
     call move_alloc(tprecv,p%precv)
-    iszv = size(p%precv)
+    call prec%set_nlevs(nplevs)
+    iszv = prec%get_nlevs()
+!    iszv = size(p%precv)
   end if
   !
   ! Finest level first; remember to fix base_a and base_desc
@@ -325,7 +329,10 @@ subroutine amg_z_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
     goto 9999
   endif
 
-  iszv = size(p%precv)
+!!$  iszv = size(p%precv)
+  iszv = prec%get_nlevs()
+  call prec%cmp_complexity()
+  call prec%cmp_avg_cr()
   
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),&

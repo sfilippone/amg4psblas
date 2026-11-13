@@ -68,7 +68,7 @@ contains
         type(psb_ctxt_type) :: ctxt, rctxt
         integer(psb_mpk_) :: i,j,ip, idest, nsrc, nrl, kp
         integer(psb_mpk_) :: rme, rnp
-complex(psb_spk_), allocatable :: rsnd(:), rrcv(:)
+        complex(psb_spk_), allocatable :: rsnd(:), rrcv(:)
         type(psb_c_vect_type) :: tv
 
         ctxt = lv%remap_data%desc_ac_pre_remap%get_ctxt()
@@ -116,8 +116,8 @@ complex(psb_spk_), allocatable :: rsnd(:), rrcv(:)
       ! Default transfer
       block
         type(psb_ctxt_type) :: ctxt, rctxt
-        ctxt = lv%linmap%p_desc_U%get_ctxt()
-        call psb_info(ctxt,me,np)
+!!$        ctxt = lv%linmap%get_U_ctxt()
+!!$        call psb_info(ctxt,me,np)
 !!$      write(0,*) me,' map_rstr calling U2V: ',me,np
         call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&
              & work=work,vtx=vtx,vty=vty_)

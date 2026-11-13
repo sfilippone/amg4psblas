@@ -114,11 +114,11 @@ subroutine amg_sprecbld(a,desc_a,prec,info,amold,vmold,imold)
   ! Check to ensure all procs have the same 
   !   
   newsz = -1
-  iszv  = size(prec%precv)
+  iszv  = prec%get_nlevs()
   call psb_bcast(ctxt,iszv)
-  if (iszv /= size(prec%precv)) then 
+  if (iszv /= prec%get_nlevs()) then 
     info=psb_err_internal_error_
-    call psb_errpush(info,name,a_err='Inconsistent size of precv')
+    call psb_errpush(info,name,a_err='Inconsistent number of levels')
     goto 9999
   end if
 

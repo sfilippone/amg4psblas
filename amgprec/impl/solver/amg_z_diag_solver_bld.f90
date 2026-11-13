@@ -91,11 +91,7 @@ subroutine amg_z_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
       sv%d(i) = zone/sv%d(i)
     end if
   end do
-  if (allocated(sv%dv)) then
-    call sv%dv%free(info)
-    deallocate(sv%dv)
-  end if
-  allocate(sv%dv,stat=info) 
+  if (.not.allocated(sv%dv)) allocate(sv%dv,stat=info) 
   if (info == psb_success_) then 
     call sv%dv%bld(sv%d)
     if (present(vmold)) call sv%dv%cnv(vmold)
@@ -176,11 +172,7 @@ subroutine amg_z_l1_diag_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
       sv%d(i) = zone/sv%d(i)
     end if
   end do
-  if (allocated(sv%dv)) then
-    call sv%dv%free(info)
-    deallocate(sv%dv)
-  end if
-  allocate(sv%dv,stat=info) 
+  if (.not.allocated(sv%dv)) allocate(sv%dv,stat=info) 
   if (info == psb_success_) then 
     call sv%dv%bld(sv%d)
     if (present(vmold)) call sv%dv%cnv(vmold)

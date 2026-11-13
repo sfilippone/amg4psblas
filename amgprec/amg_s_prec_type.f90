@@ -395,7 +395,7 @@ contains
       ilev_ = 1
     end if
     if (allocated(prec%precv)) then
-      if ((1<=ilev_).and.(ilev_<=size(prec%precv))) then
+      if ((1<=ilev_).and.(ilev_<=prec%get_nlevs())) then
         if (allocated(prec%precv(ilev_)%sm)) then
           val => prec%precv(ilev_)%sm
         end if
@@ -420,7 +420,7 @@ contains
       ilev_ = 1
     end if
     if (allocated(prec%precv)) then
-      if ((1<=ilev_).and.(ilev_<=size(prec%precv))) then
+      if ((1<=ilev_).and.(ilev_<=prec%get_nlevs())) then
         if (allocated(prec%precv(ilev_)%sm)) then
           if (allocated(prec%precv(ilev_)%sm%sv)) then
             val => prec%precv(ilev_)%sm%sv
@@ -461,7 +461,7 @@ contains
     integer(psb_ipk_)        :: i
     val = 0
     if (allocated(prec%precv)) then
-      do i=1, size(prec%precv)
+      do i=1, prec%get_nlevs()
         val = val + prec%precv(i)%get_nzeros()
       end do
     end if
@@ -486,7 +486,7 @@ contains
     val = 0
     val = val + psb_sizeof_ip
     if (allocated(prec%precv)) then
-      do i=1, size(prec%precv)
+      do i=1, prec%get_nlevs()
         val = val + prec%precv(i)%sizeof()
       end do
     end if
@@ -644,7 +644,7 @@ contains
 
     me=-1
     if (allocated(prec%precv)) then
-      do i=1,size(prec%precv)
+      do i=1,prec%get_nlevs()
         call prec%precv(i)%free(info)
         if (psb_errstatus_fatal()) then
           info=psb_err_internal_error_
@@ -679,6 +679,10 @@ contains
       info = psb_err_internal_error_; goto 9999
     end if
 
+    !
+    ! In the internals, do FREE on components,
+    ! but do not deallocate them
+    !
     if (allocated(prec%precv)) then
       do i=1,prec%get_nlevs()
         call prec%precv(i)%free_smoothers(info)

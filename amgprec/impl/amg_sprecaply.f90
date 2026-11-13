@@ -130,7 +130,7 @@ subroutine amg_sprecaply(prec,x,y,desc_data,info,trans,work)
     goto 9999
   end if
 
-  if (size(prec%precv) >1) then
+  if (prec%get_nlevs() >1) then
     !
     ! Number of levels > 1: apply the multilevel preconditioner
     ! 
@@ -140,7 +140,7 @@ subroutine amg_sprecaply(prec,x,y,desc_data,info,trans,work)
       goto 9999
     end if
 
-  else  if (size(prec%precv) == 1) then
+  else  if (prec%get_nlevs() == 1) then
     !
     ! Number of levels = 1: apply the base preconditioner
     !
@@ -186,8 +186,8 @@ subroutine amg_sprecaply(prec,x,y,desc_data,info,trans,work)
     end if
   else 
     info = psb_err_from_subroutine_ai_
-    call psb_errpush(info,name,a_err='Invalid size of precv',&
-         & i_Err=(/ione*size(prec%precv),izero,izero,izero,izero/))
+    call psb_errpush(info,name,a_err='Invalid number of levels',&
+         & i_Err=(/ione*prec%get_nlevs(),izero,izero,izero,izero/))
     goto 9999
   endif
 
@@ -366,7 +366,7 @@ subroutine amg_sprecaply2_vect(prec,x,y,desc_data,info,trans,work)
   do_alloc_wrk = .not.allocated(prec%precv(1)%wrk)
   if (do_alloc_wrk) call prec%allocate_wrk(info,vmold=x%v)
 
-  if (size(prec%precv) >1) then
+  if (prec%get_nlevs() >1) then
     !
     ! Number of levels > 1: apply the multilevel preconditioner
     !
@@ -378,7 +378,7 @@ subroutine amg_sprecaply2_vect(prec,x,y,desc_data,info,trans,work)
       goto 9999
     end if
 
-  else  if (size(prec%precv) == 1) then
+  else  if (prec%get_nlevs() == 1) then
     !
     ! Number of levels = 1: apply the base preconditioner
     !
@@ -423,15 +423,15 @@ subroutine amg_sprecaply2_vect(prec,x,y,desc_data,info,trans,work)
     if (info /= 0) then
       info = psb_err_from_subroutine_ai_
       call psb_errpush(info,name,a_err='Smoother application',&
-           & i_Err=(/ione*size(prec%precv),izero,izero,izero,izero/))
+           & i_Err=(/ione*prec%get_nlevs(),izero,izero,izero,izero/))
       goto 9999
     end if
     
   else 
     
     info = psb_err_from_subroutine_ai_
-    call psb_errpush(info,name,a_err='Invalid size of precv',&
-         & i_Err=(/ione*size(prec%precv),izero,izero,izero,izero/))
+    call psb_errpush(info,name,a_err='Invalid number of levels',&
+         & i_Err=(/ione*prec%get_nlevs(),izero,izero,izero,izero/))
     goto 9999
   endif
 
@@ -518,7 +518,7 @@ subroutine amg_sprecaply1_vect(prec,x,desc_data,info,trans,work)
 
   associate(ww => prec%precv(1)%wrk%vtx, wv =>  prec%precv(1)%wrk%wv)
 
-    if (size(prec%precv) >1) then
+    if (prec%get_nlevs() >1) then
       !
       ! Number of levels > 1: apply the multilevel preconditioner
       !
@@ -530,7 +530,7 @@ subroutine amg_sprecaply1_vect(prec,x,desc_data,info,trans,work)
         goto 9999
       end if
 
-    else  if (size(prec%precv) == 1) then
+    else  if (prec%get_nlevs() == 1) then
       !
       ! Number of levels = 1: apply the base preconditioner
       !
@@ -571,15 +571,15 @@ subroutine amg_sprecaply1_vect(prec,x,desc_data,info,trans,work)
       if (info /=0) then
         info = psb_err_internal_error_
         call psb_errpush(info,name,a_err='Smoother application',&
-             & i_Err=(/ione*size(prec%precv),izero,izero,izero,izero/))
+             & i_Err=(/ione*prec%get_nlevs(),izero,izero,izero,izero/))
         goto 9999
       end if
 
     else 
 
       info = psb_err_from_subroutine_ai_
-      call psb_errpush(info,name,a_err='Invalid size of precv',&
-           & i_Err=(/ione*size(prec%precv),izero,izero,izero,izero/))
+      call psb_errpush(info,name,a_err='Invalid number of levels',&
+           & i_Err=(/ione*prec%get_nlevs(),izero,izero,izero,izero/))
       goto 9999
     endif
   end associate

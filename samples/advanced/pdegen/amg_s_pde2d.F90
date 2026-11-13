@@ -346,7 +346,7 @@ program amg_s_pde2d
     if (p_choice%athres >= dzero) &
          & call prec%set('aggr_thresh',     p_choice%athres,  info)
     if (p_choice%thrvsz>0) then
-      do k=1,min(p_choice%thrvsz,size(prec%precv)-1)
+      do k=1,min(p_choice%thrvsz,prec%get_nlevs()-1)
         call prec%set('aggr_thresh',     p_choice%athresv(k),  info,ilev=(k+1))
       end do
     end if

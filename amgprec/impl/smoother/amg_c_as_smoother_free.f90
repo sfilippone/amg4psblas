@@ -53,7 +53,6 @@ subroutine amg_c_as_smoother_free(sm,info)
 
   if (allocated(sm%sv)) then 
     call sm%sv%free(info)
-    if (info == psb_success_) deallocate(sm%sv,stat=info)
     if (info /= psb_success_) then 
       info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)

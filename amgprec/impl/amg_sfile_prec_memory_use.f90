@@ -135,7 +135,8 @@ subroutine amg_sfile_prec_memory_use(prec,info,iout,root, verbosity,prefix,globa
         write(iout_,*) 
         write(iout_,'(a,1x,a)') trim(prefix_),'Preconditioner memory usage'
       end if
-      nlev = size(prec%precv)
+      !nlev = size(prec%precv)
+      nlev = prec%get_nlevs()
       do ilev=1,nlev
         call prec%precv(ilev)%memory_use(ilev,nlev,ilmin,info, &
              & iout=iout_,verbosity=verbosity_,prefix=trim(prefix_),global=global)

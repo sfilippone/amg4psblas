@@ -1,6 +1,6 @@
 %%%%%%%%%%%  General  arguments % Lines starting with % are ignored.
 CSR                         ! Storage format CSR COO JAD
-0150                        ! IDIM; domain size. Linear system size is IDIM**3
+0050                        ! IDIM; domain size. Linear system size is IDIM**3
 POISSON                     ! PDECOEFF: POISSON, EXP, BOX, GAUSS
 %                           ! Coefficients of the PDE
 CG                          ! Iterative method:
@@ -58,8 +58,8 @@ VCYCLE                      ! Type of multilevel CYCLE: VCYCLE WCYCLE KCYCLE MUL
 -3                          ! Max Number of levels in a multilevel preconditioner; if <0, lib default
 -3                          ! Target coarse matrix size per process; if <0, lib default
 SMOOTHED                    ! Type of aggregation: SMOOTHED UNSMOOTHED
-DEC    !COUPLED                     ! Parallel aggregation: DEC, SYMDEC, COUPLED
-SOC1   !MATCHBOXP                   ! aggregation measure SOC1, MATCHBOXP
+DECOUPLED                     ! Parallel aggregation: DEC, SYMDEC, COUPLED
+SOC1  !MATCHBOXP                   ! aggregation measure SOC1, MATCHBOXP
 8                           ! Requested size of the aggregates for MATCHBOXP
 NATURAL                     ! Ordering of aggregation NATURAL DEGREE
 -1.5                        ! Coarsening ratio, if < 0 use library default
@@ -68,7 +68,7 @@ FILTER                      ! Filtering of matrix:  FILTER NOFILTER
 -2                           ! Number of thresholds in vector, next line ignored if <= 0
 0.05 0.025                  ! Thresholds
 %%%%%%%%%%%  Coarse level solver  %%%%%%%%%%%%%%%%
-BJAC                        ! Coarsest-level solver: MUMPS UMF SLU SLUDIST JACOBI GS BJAC KRM
+KRM                        ! Coarsest-level solver: MUMPS UMF SLU SLUDIST JACOBI GS BJAC KRM
 ILU                         ! Coarsest-level subsolver for BJAC: ILU ILUT MILU UMF MUMPS SLU
 DIST                        ! Coarsest-level matrix distribution: DIST  REPL
 1                           ! Coarsest-level fillin P for ILU(P) and ILU(T,P)

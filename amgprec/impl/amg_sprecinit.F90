@@ -136,10 +136,12 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   prec%ctxt = ctxt
   call prec%ag_data%default()
 
+  call prec%set_nlevs(nlev_) 
   select case(psb_toupper(trim(ptype)))
   case ('NOPREC','NONE')
     nlev_ = 1
     ilev_ = 1
+    call prec%set_nlevs(nlev_) 
     allocate(prec%precv(nlev_),stat=info)
     allocate(amg_s_base_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
@@ -149,6 +151,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   case ('JAC','DIAG','JACOBI')
     nlev_ = 1
     ilev_ = 1
+    call prec%set_nlevs(nlev_) 
     allocate(prec%precv(nlev_),stat=info)
     allocate(amg_s_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
@@ -157,6 +160,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   case ('POLY')
     nlev_ = 1
     ilev_ = 1
+    call prec%set_nlevs(nlev_)
     allocate(prec%precv(nlev_),stat=info)
     allocate(amg_s_poly_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
@@ -165,6 +169,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   case ('L1-DIAG','L1-JACOBI','L1_DIAG','L1_JACOBI')
     nlev_ = 1
     ilev_ = 1
+    call prec%set_nlevs(nlev_)
     allocate(prec%precv(nlev_),stat=info)
     allocate(amg_s_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
@@ -174,6 +179,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   case ('GS','FWGS')
     nlev_ = 1
     ilev_ = 1
+    call prec%set_nlevs(nlev_)
     allocate(prec%precv(nlev_),stat=info)
     allocate(amg_s_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
@@ -183,6 +189,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   case ('BWGS')
     nlev_ = 1
     ilev_ = 1
+    call prec%set_nlevs(nlev_)
     allocate(prec%precv(nlev_),stat=info)
     allocate(amg_s_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
@@ -192,6 +199,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   case ('FBGS')
     nlev_ = 1
     ilev_ = 1
+    call prec%set_nlevs(nlev_)
     allocate(prec%precv(nlev_),stat=info)
     call prec%set('SMOOTHER_TYPE','FBGS',info)
     call prec%precv(ilev_)%default()
@@ -199,6 +207,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   case ('BJAC')
     nlev_ = 1
     ilev_ = 1
+    call prec%set_nlevs(nlev_)
     allocate(prec%precv(nlev_),stat=info)
     allocate(amg_s_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
@@ -208,6 +217,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   case ('L1-BJAC','L1_BJAC')
     nlev_ = 1
     ilev_ = 1
+    call prec%set_nlevs(nlev_)
     allocate(prec%precv(nlev_),stat=info)
     allocate(amg_s_l1_jac_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
@@ -217,6 +227,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   case ('AS')
     nlev_ = 1
     ilev_ = 1
+    call prec%set_nlevs(nlev_)
     allocate(prec%precv(nlev_),stat=info)
     allocate(amg_s_as_smoother_type :: prec%precv(ilev_)%sm, stat=info)
     if (info /= psb_success_) return
@@ -226,6 +237,7 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
   case ('ML')
     nlev_ = prec%ag_data%max_levs
     ilev_ = 1
+    call prec%set_nlevs(nlev_)
     allocate(prec%precv(nlev_),stat=info)
     if (info /= psb_success_ ) then
       call psb_errpush(info,name,a_err='Error from hierarchy init')
@@ -235,7 +247,6 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
     do ilev_ = 1, nlev_
       call prec%precv(ilev_)%default()
     end do
-    call prec%set_nlevs(nlev_) 
 
     call prec%set('ML_CYCLE','VCYCLE',info)
     call prec%set('SMOOTHER_TYPE','FBGS',info)
@@ -250,6 +261,10 @@ subroutine amg_sprecinit(ctxt,prec,ptype,info)
     write(psb_err_unit,*) name,&
          &': Warning: Unknown preconditioner type request "',ptype,'"'
     info = psb_err_pivot_too_small_
+    if (info /= psb_success_ ) then
+      call psb_errpush(info,name,a_err='Error from hierarchy init')
+      goto 9999
+    endif
   end select
 
   call psb_erractionrestore(err_act)
