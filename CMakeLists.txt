@@ -429,6 +429,12 @@ target_link_libraries(amgcbind
   psblas::ext psblas::cbind psblas::base)
   #TODO  check actual libraries needed
 
+option(AMG_BUILD_C_BINDING_TESTS "Build MPI tests of the C preconditioner extensions" OFF)
+if(AMG_BUILD_C_BINDING_TESTS)
+  enable_testing()
+  add_subdirectory(cbind/test/prec_extensions)
+endif()
+
 
 
 

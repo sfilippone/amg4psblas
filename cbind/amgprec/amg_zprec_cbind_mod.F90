@@ -544,7 +544,7 @@ contains
     type(psb_c_object_type) :: bc ! C handle to rhs
     type(psb_c_object_type) :: xc ! C handle to solution
     type(psb_c_object_type) :: cdh ! C handle to descriptor
-    character(c_char)       :: ctrans(:) ! Tranpose flag as character
+    character(c_char)       :: ctrans(*) ! NUL-terminated C transpose flag
 
     ! Fortran containers for preconditioner, lhs, rhs and descriptor
     type(amg_zprec_type), pointer  :: precp

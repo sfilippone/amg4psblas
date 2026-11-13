@@ -40,6 +40,9 @@ install: all
 	 	 mkdir -p  $(INSTALL_SAMPLESDIR)/advanced && \
 		(cd samples/simple; /bin/cp -fr pdegen fileread $(INSTALL_SAMPLESDIR)/simple ) && \
 		(cd samples/advanced; /bin/cp -fr pdegen fileread $(INSTALL_SAMPLESDIR)/advanced )
+	mkdir -p $(INSTALL_SAMPLESDIR)/cbind/prec_extensions && \
+	   $(INSTALL_DATA) cbind/test/prec_extensions/Makefile \
+	   cbind/test/prec_extensions/prec_extensions.c $(INSTALL_SAMPLESDIR)/cbind/prec_extensions
 cleanlib:
 	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
 	(cd include; /bin/rm -f *.a *$(.mod) *$(.fh))

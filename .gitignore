@@ -3,6 +3,7 @@
 *.mod
 *.smod
 *~
+*.smod
 
 # header files generated
 cbind/*.h
@@ -24,3 +25,6 @@ runs
 
 # Documentation temporary files
 docs/src/userguide.pdf
+
+# Backup files
+*.bak

@@ -272,6 +272,7 @@ subroutine amg_dprecinit(ctxt,prec,ptype,info)
     endif
   end select
 
+  if (info == psb_success_) call prec%set_nlevs(nlev_)
   call psb_erractionrestore(err_act)
   return
 

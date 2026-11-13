@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "amg_c_zprec.h"
 
-amg_c_zprec* amg_c_new_zprec()
+amg_c_zprec* amg_c_zprec_new()
 {
   amg_c_zprec* temp;
   
