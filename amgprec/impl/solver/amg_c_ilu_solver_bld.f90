@@ -75,15 +75,6 @@ subroutine amg_c_ilu_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
     nztota = nztota + b%get_nzeros()
   end if
 
-  call sv%l%csall(n_row,n_row,info,nztota)
-  if (info == psb_success_) call sv%u%csall(n_row,n_row,info,nztota)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_sp_all'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
   if (allocated(sv%d)) then 
     if (size(sv%d) < n_row) then 
       deallocate(sv%d)
