@@ -329,7 +329,10 @@ subroutine amg_z_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
     goto 9999
   endif
 
+<<<<<<< HEAD
 !!$  iszv = size(p%precv)
+=======
+>>>>>>> refs/remotes/origin/devmerge
   iszv = p%get_nlevs()
   call p%cmp_complexity()
   call p%cmp_avg_cr()

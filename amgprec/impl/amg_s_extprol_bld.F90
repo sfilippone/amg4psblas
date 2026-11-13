@@ -189,7 +189,11 @@ subroutine amg_s_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
     call psb_errpush(info,name,a_err='Inconsistent min_cr_ratio')
     goto 9999
   end if
+<<<<<<< HEAD
 !!$  if (iszv /= size(p%precv)) then
+=======
+
+>>>>>>> refs/remotes/origin/devmerge
   if (iszv /= p%get_nlevs()) then 
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Inconsistent number of levels')
@@ -329,7 +333,10 @@ subroutine amg_s_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
     goto 9999
   endif
 
+<<<<<<< HEAD
 !!$  iszv = size(p%precv)
+=======
+>>>>>>> refs/remotes/origin/devmerge
   iszv = p%get_nlevs()
   call p%cmp_complexity()
   call p%cmp_avg_cr()
