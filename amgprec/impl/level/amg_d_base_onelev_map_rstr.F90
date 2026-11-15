@@ -114,14 +114,9 @@ real(psb_dpk_), allocatable :: rsnd(:), rrcv(:)
 
     else
       ! Default transfer
-      block
-        type(psb_ctxt_type) :: ctxt, rctxt
-        ctxt = lv%linmap%p_desc_U%get_ctxt()
-        call psb_info(ctxt,me,np)
-!!$      write(0,*) me,' map_rstr calling U2V: ',me,np
-        call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&
-             & work=work,vtx=vtx,vty=vty_)
-      end block
+      ! The map selects owned or borrowed descriptors according to its kind.
+      call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&
+           & work=work,vtx=vtx,vty=vty_)
     end if
 !!$  write(0,*) me, 'End of restriction ',info,psb_errstatus_fatal()  
   end subroutine amg_d_base_onelev_map_rstr_v
