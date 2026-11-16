@@ -114,9 +114,14 @@ contains
 
     else
       ! Default transfer
-      ! The map selects owned or borrowed descriptors according to its kind.
-      call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&
-           & work=work,vtx=vtx,vty=vty_)
+      block
+        type(psb_ctxt_type) :: ctxt, rctxt
+!!$        ctxt = lv%linmap%get_U_ctxt()
+!!$        call psb_info(ctxt,me,np)
+!!$      write(0,*) me,' map_rstr calling U2V: ',me,np
+        call lv%linmap%map_U2V(alpha,vect_u,beta,vect_v,info,&
+             & work=work,vtx=vtx,vty=vty_)
+      end block
     end if
 !!$  write(0,*) me, 'End of restriction ',info,psb_errstatus_fatal()  
   end subroutine amg_z_base_onelev_map_rstr_v

@@ -165,7 +165,6 @@ subroutine amg_d_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
   mnaggratio = p%ag_data%min_cr_ratio
   casize     = p%ag_data%min_coarse_size
   iszv       = p%get_nlevs()
-!!$    iszv       = size(p%precv)
   nprolv     = size(prolv)
   nrestrv    = size(restrv)
   call psb_bcast(ctxt,iszv)
@@ -189,6 +188,7 @@ subroutine amg_d_extprol_bld(a,desc_a,p,prolv,restrv,info,amold,vmold,imold)
     call psb_errpush(info,name,a_err='Inconsistent min_cr_ratio')
     goto 9999
   end if
+
   if (iszv /= p%get_nlevs()) then 
     info=psb_err_internal_error_
     call psb_errpush(info,name,a_err='Inconsistent number of levels')
