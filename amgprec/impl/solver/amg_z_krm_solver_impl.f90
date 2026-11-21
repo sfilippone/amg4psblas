@@ -110,6 +110,7 @@ subroutine amg_z_krm_solver_bld(a,desc_a,sv,info,b,amold,vmold,imold)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
 
+  call sv%free_ws(info)
   call sv%prec%free(info)
 
   if (sv%global) then
@@ -186,7 +187,7 @@ subroutine amg_z_krm_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   character, intent(in), optional                :: init
   type(psb_z_vect_type),intent(inout), optional   :: initu
 
-  type(psb_z_vect_type)   :: z
+  integer(psb_ipk_), parameter :: nkwrk = 5 ! work vectors needed by FCG
   integer(psb_ipk_) :: i, err_act, debug_unit, debug_level
   integer(psb_mpk_) :: np,me
   type(psb_ctxt_type) :: ctxt
@@ -201,26 +202,46 @@ subroutine amg_z_krm_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
   call psb_info(ctxt, me, np)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),' start'
+  !
+  ! Persistent workspace: allocated (with the mold of X) at the first call
+  ! and reused afterwards, so that no device allocation/registration of
+  ! host buffers happens at each application of the coarse solver.
+  !
   if (sv%global) then
-    call psb_geall(z,desc_data,info)
-    call z%zero()
-    call psb_geasb(z,desc_data,info,mold=x%v)
+    if (.not.allocated(sv%z_global%v)) then
+      call psb_geall(sv%z_global,desc_data,info)
+      if (info == psb_success_) call psb_geasb(sv%z_global,desc_data,info,mold=x%v)
+    end if
+    if (info == psb_success_) call alloc_kwrk(desc_data,info)
+  else
+    if (info == psb_success_) call alloc_kwrk(sv%desc_local,info)
+  end if
+  if ((info == psb_success_).and.(.not.sv%prec%is_allocated_wrk())) &
+       & call sv%prec%allocate_wrk(info,vmold=x%v)
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info,name,a_err='workspace allocation')
+    goto 9999
+  end if
+
+  if (sv%global) then
+    call sv%z_global%zero()
 
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),' norms ',&
          & psb_genrm2(x,desc_data,info),psb_genrm2(y,desc_data,info),&
-         & psb_genrm2(z,desc_data,info)
+         & psb_genrm2(sv%z_global,desc_data,info)
 
-    call psb_krylov(sv%method,sv%a,sv%prec,x,z,sv%eps,&
+    call psb_krylov(sv%method,sv%a,sv%prec,x,sv%z_global,sv%eps,&
          & desc_data,info,itmax=sv%itmax,itrace=sv%itrace,&
-         & istop=sv%istopc,irst=sv%irst)
+         & istop=sv%istopc,irst=sv%irst,wrk=sv%kwrk)
 !!$  call sv%prec%apply(x,z,desc_data,info,trans=trans,work=work)
-    call psb_geaxpby(alpha,z,beta,y,desc_data,info)
+    call psb_geaxpby(alpha,sv%z_global,beta,y,desc_data,info)
   else
     call psb_geaxpby(zone,x,zzero,sv%x_local,sv%desc_local,info)
     call psb_krylov(sv%method,sv%a_local,sv%prec,sv%x_local,sv%z_local,sv%eps,&
          & sv%desc_local,info,itmax=sv%itmax,itrace=sv%itrace,&
-         & istop=sv%istopc,irst=sv%irst)
+         & istop=sv%istopc,irst=sv%irst,wrk=sv%kwrk)
     call psb_geaxpby(alpha,sv%z_local,beta,y,sv%desc_local,info)
   end if
 
@@ -230,6 +251,23 @@ subroutine amg_z_krm_solver_apply_vect(alpha,sv,x,beta,y,desc_data,&
 9999 call psb_error_handler(err_act)
 
   return
+
+contains
+
+  subroutine alloc_kwrk(desc,info)
+    type(psb_desc_type), intent(in) :: desc
+    integer(psb_ipk_), intent(out)  :: info
+    integer(psb_ipk_) :: k
+
+    info = psb_success_
+    if (allocated(sv%kwrk)) return
+    allocate(sv%kwrk(nkwrk),stat=info)
+    do k=1, nkwrk
+      if (info == psb_success_) &
+           & call psb_geasb(sv%kwrk(k),desc,info,scratch=.true.,mold=x%v)
+    end do
+  end subroutine alloc_kwrk
+
 end subroutine amg_z_krm_solver_apply_vect
 
 
