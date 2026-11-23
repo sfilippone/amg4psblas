@@ -122,6 +122,8 @@ module amg_d_prec_type
     procedure, pass(prec)               :: get_nlevs  => amg_d_get_nlevs
     procedure, pass(prec)               :: get_nzeros => amg_d_get_nzeros
     procedure, pass(prec)               :: sizeof => amg_dprec_sizeof
+    procedure, pass(prec)               :: detailed_sizeof => amg_dprec_detailed_sizeof
+    procedure, pass(prec)               :: print_detailed_sizeof => amg_dprec_print_detailed_sizeof
     procedure, pass(prec)               :: setsm  => amg_dprecsetsm
     procedure, pass(prec)               :: setsv  => amg_dprecsetsv
     procedure, pass(prec)               :: setag  => amg_dprecsetag
@@ -190,6 +192,10 @@ module amg_d_prec_type
 
   interface amg_sizeof
     module procedure amg_dprec_sizeof
+  end interface
+
+  interface amg_detailed_sizeof
+    module procedure amg_dprec_detailed_sizeof
   end interface
 
   interface amg_precapply
@@ -461,37 +467,86 @@ contains
     logical, intent(in), optional :: global
     integer(psb_epk_) :: val    
     integer(psb_ipk_)        :: i
-    type(psb_ctxt_type) :: ctxt
-    
+    type(psb_ctxt_type) :: ctxt 
     logical :: global_
 
-    if (present(global)) then
-      global_ = global
-    else
-      global_ = .false.
-    end if
+    global_ = .false.
+    if (present(global)) global_ = global
+    ctxt = prec%ctxt
     
     val = 0
-    val = val + psb_sizeof_ip
-    if (allocated(prec%precv)) then
-      do i=1, size(prec%precv)
-        val = val + prec%precv(i)%sizeof()
-      end do
-    end if
-    if (global_) then
-      ctxt = prec%ctxt
-      call psb_sum(ctxt,val)
-    end if
+    val = val + psb_sizeof_ip + sum(prec%detailed_sizeof(global))
+
+    if (global_) call psb_sum(ctxt,val)
 
   end function amg_dprec_sizeof
 
+  function amg_dprec_detailed_sizeof(prec,global)  result(val)
+    implicit none
+    !....Parameters...
+    class(amg_dprec_type), intent(in) :: prec
+    logical, intent(in), optional :: global
+    integer(psb_epk_) :: val(amg_prec_sz_array_size_)
+    integer(psb_ipk_) :: i
+    type(psb_ctxt_type) :: ctxt
+    logical :: global_
+
+    global_ = .false.
+    if (present(global)) global_ = global
+    ctxt = prec%ctxt
+
+    val = 0
+    if (allocated(prec%precv)) then
+      do i=1, size(prec%precv)
+        val = val + prec%precv(i)%detailed_sizeof()
+      end do
+    end if
+    if (global_) call psb_sum(ctxt,val)
+
+    return
+  end function amg_dprec_detailed_sizeof
+
+  subroutine amg_dprec_print_detailed_sizeof(prec,global,unit)
+    implicit none
+    !....Parameters...
+    class(amg_dprec_type), intent(in) :: prec
+    logical, intent(in), optional :: global
+    integer, optional  :: unit
+    integer(psb_epk_) :: val(amg_prec_sz_array_size_)
+    type(psb_ctxt_type) :: ctxt    
+    integer(psb_ipk_)   :: iam, np
+    integer(psb_ipk_)  :: unit_
+    logical :: global_
+
+    global_ = .false.
+    if (present(global)) global_ = global
+    ctxt = prec%ctxt
+    unit_ = psb_out_unit
+    if (present(unit)) unit_ = unit
+    call psb_info(ctxt,iam,np)
+
+    val = prec%detailed_sizeof(global_)
+    if ((.not.global_).or.(iam==psb_root_)) then
+      write(unit_,*) iam,'   PREC            AC: ',val(amg_prec_sz_ac_)
+      write(unit_,*) iam,'   PREC       DESC_AC: ',val(amg_prec_sz_desc_ac_)
+      write(unit_,*) iam,'   PREC        LINMAP: ',val(amg_prec_sz_linmap_)
+      write(unit_,*) iam,'   PREC            SM: ',val(amg_prec_sz_sm_)
+      write(unit_,*) iam,'   PREC           SM2: ',val(amg_prec_sz_sm2_)
+      write(unit_,*) iam,'   PREC         TPROL: ',val(amg_prec_sz_tprol_)
+      write(unit_,*) iam,'   PREC          AGGR: ',val(amg_prec_sz_aggr_)
+      write(unit_,*) iam,'   PREC           WRK: ',val(amg_prec_sz_wrk_)
+      write(unit_,*) iam,'   PREC         Total: ',sum(val)
+    end if
+    return
+  end subroutine amg_dprec_print_detailed_sizeof
+
+ 
   !
   ! Operator complexity: ratio of total number
   ! of nonzeros in the aggregated matrices at the
   ! various level to the nonzeroes at the fine level
   ! (original matrix)
   !
-
   function amg_d_get_compl(prec) result(val)
     implicit none
     class(amg_dprec_type), intent(in) :: prec

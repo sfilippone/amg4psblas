@@ -338,6 +338,21 @@ module amg_base_prec_type
   integer(psb_ipk_), parameter :: amg_prec_built_ = 98765
 
   !
+  ! Entries positions for detailed_sizeof()
+  ! 
+  integer(psb_ipk_), parameter, public :: amg_prec_sz_ac_         = 1
+  integer(psb_ipk_), parameter, public :: amg_prec_sz_desc_ac_    = 2
+  integer(psb_ipk_), parameter, public :: amg_prec_sz_linmap_     = 3
+  integer(psb_ipk_), parameter, public :: amg_prec_sz_sm_         = 4
+  integer(psb_ipk_), parameter, public :: amg_prec_sz_sm2_        = 5
+  integer(psb_ipk_), parameter, public :: amg_prec_sz_tprol_      = 6
+  integer(psb_ipk_), parameter, public :: amg_prec_sz_aggr_       = 7
+  integer(psb_ipk_), parameter, public :: amg_prec_sz_wrk_        = 8
+  integer(psb_ipk_), parameter, public :: amg_prec_sz_array_size_ = 10
+
+
+  
+  !
   ! Entries in rprcparm: ILU(k,t) threshold, smoothed aggregation omega
   !
   integer(psb_ipk_), parameter :: amg_sub_iluthrs_    = 1

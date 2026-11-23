@@ -203,6 +203,7 @@ module amg_d_onelev_mod
     procedure, pass(lv) :: setag => amg_d_base_onelev_setag
     generic, public     :: set   => cseti, csetr, csetc, setsm, setsv, setag
     procedure, pass(lv) :: sizeof => d_base_onelev_sizeof
+    procedure, pass(lv) :: detailed_sizeof => d_base_onelev_detailed_sizeof
     procedure, pass(lv) :: get_nzeros => d_base_onelev_get_nzeros
     procedure, pass(lv) :: get_wrksz => d_base_onelev_get_wrksize
     procedure, pass(lv) :: allocate_wrk   => d_base_onelev_allocate_wrk
@@ -224,7 +225,7 @@ module amg_d_onelev_mod
     type(amg_d_onelev_node), pointer :: prev=>null(), next=>null()
   end type amg_d_onelev_node
 
-  private :: d_base_onelev_default, d_base_onelev_sizeof, &
+  private :: d_base_onelev_default, d_base_onelev_sizeof, d_base_onelev_detailed_sizeof, &
        & d_base_onelev_nullify, d_base_onelev_get_nzeros, &
        & d_base_onelev_clone, d_base_onelev_move_alloc, &
        & d_base_onelev_get_wrksize, d_base_onelev_allocate_wrk, &
@@ -519,15 +520,26 @@ contains
     integer(psb_ipk_)        :: i
 
     val = psb_sizeof_ip+psb_sizeof_lp
-    val = val + lv%desc_ac%sizeof()
-    val = val + lv%ac%sizeof()
-    val = val + lv%tprol%sizeof()
-    val = val + lv%linmap%sizeof()
-    if (allocated(lv%sm))   val = val + lv%sm%sizeof()
-    if (allocated(lv%sm2a)) val = val + lv%sm2a%sizeof()
-    if (allocated(lv%aggr)) val = val + lv%aggr%sizeof()
-    if (allocated(lv%wrk))  val = val + lv%wrk%sizeof()
+    val = val + sum(lv%detailed_sizeof())
   end function d_base_onelev_sizeof
+
+  function d_base_onelev_detailed_sizeof(lv) result(val)
+    implicit none
+    class(amg_d_onelev_type), intent(in) :: lv
+    integer(psb_epk_) :: val(amg_prec_sz_array_size_)
+    integer(psb_ipk_)        :: i
+
+    val = 0 
+    val(amg_prec_sz_ac_)      = lv%ac%sizeof()
+    val(amg_prec_sz_desc_ac_) = lv%desc_ac%sizeof()
+    val(amg_prec_sz_linmap_)  = lv%linmap%sizeof()
+    val(amg_prec_sz_tprol_)   = lv%tprol%sizeof()
+    if (allocated(lv%sm))   val(amg_prec_sz_sm_)   = lv%sm%sizeof()
+    if (allocated(lv%sm2a)) val(amg_prec_sz_sm2_)  = lv%sm2a%sizeof()
+    if (allocated(lv%aggr)) val(amg_prec_sz_aggr_) = lv%aggr%sizeof()
+    if (allocated(lv%wrk))  val(amg_prec_sz_wrk_)  = lv%wrk%sizeof()    
+    
+  end function d_base_onelev_detailed_sizeof
 
 
   subroutine d_base_onelev_nullify(lv)
