@@ -551,8 +551,6 @@ program amg_d_pde3d
   call psb_sum(ctxt,descsize)
   call psb_sum(ctxt,precsize)
   call prec%descr(info,iout=psb_out_unit)
-  call desc_a%print_detailed_sizeof(global=.true.)
-  call prec%print_detailed_sizeof(global=.true.)
   if (iam == psb_root_) then
     write(psb_out_unit,'("Computed solution on ",i8," process(es)")')  np
     write(psb_out_unit,'("Number of threads                  : ",i12)') nth
@@ -584,7 +582,6 @@ program amg_d_pde3d
     write(psb_out_unit,'("Storage format for DESC_A          : ",a  )') desc_a%get_fmt()
 
   end if
-  
 ! call psb_print_timers(ctxt)
   !
   !  cleanup storage and exit
