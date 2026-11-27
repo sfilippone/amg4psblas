@@ -93,15 +93,6 @@ module amg_d_krm_solver
     type(psb_desc_type)   :: desc_local
     type(psb_dspmat_type) :: a_local
     type(psb_d_vect_type) :: x_local, z_local
-    !
-    ! Persistent workspace for the apply phase, allocated on first use and
-    ! reused across calls (one call per cycle when used as coarse solver):
-    !   z_global : solution vector for the global (distributed) case
-    !   kwrk(:)  : work vectors handed to psb_krylov (FCG)
-    ! The inner preconditioner workspace (prec%allocate_wrk) is also kept.
-    !
-    type(psb_d_vect_type) :: z_global
-    type(psb_d_vect_type), allocatable :: kwrk(:)
     type(psb_dspmat_type), pointer  :: a=>null()
   contains
     !
@@ -115,7 +106,6 @@ module amg_d_krm_solver
     procedure, pass(sv) :: apply_a => amg_d_krm_solver_apply
     procedure, pass(sv) :: clear_data  => d_krm_solver_clear_data
     procedure, pass(sv) :: free    => d_krm_solver_free
-    procedure, pass(sv) :: free_ws => d_krm_solver_free_ws
     procedure, pass(sv) :: cseti   => d_krm_solver_cseti
     procedure, pass(sv) :: csetc   => d_krm_solver_csetc
     procedure, pass(sv) :: csetr   => d_krm_solver_csetr
@@ -404,7 +394,6 @@ contains
     call psb_erractionsave(err_act)
     info = psb_success_
 
-    call sv%free_ws(info)
     call sv%prec%free(info)
     call sv%a_local%free()
     call sv%x_local%free(info)
@@ -503,32 +492,9 @@ contains
     class(psb_d_base_vect_type), intent(in), optional   :: vmold
     class(psb_i_base_vect_type), intent(in), optional   :: imold
 
-    ! The workspace is rebuilt with the new format at the next apply
-    call sv%free_ws(info)
     call sv%prec%cnv(info,amold=amold,vmold=vmold,imold=imold)
 
   end subroutine d_krm_solver_cnv
-
-  !
-  ! Free the persistent apply workspace (see type definition)
-  !
-  subroutine d_krm_solver_free_ws(sv,info)
-    Implicit None
-    class(amg_d_krm_solver_type), intent(inout) :: sv
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i
-
-    info = psb_success_
-    call sv%z_global%free(info)
-    if (allocated(sv%kwrk)) then
-      do i=1, size(sv%kwrk)
-        call sv%kwrk(i)%free(info)
-      end do
-      deallocate(sv%kwrk,stat=info)
-    end if
-    if (sv%prec%is_allocated_wrk()) call sv%prec%free_wrk(info)
-
-  end subroutine d_krm_solver_free_ws
 
   subroutine d_krm_solver_clone(sv,svout,info)
     Implicit None
